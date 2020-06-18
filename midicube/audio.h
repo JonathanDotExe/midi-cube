@@ -9,6 +9,7 @@
 #define MIDICUBE_AUDIO_H_
 
 #include <exception>
+#include <jack/jack.h>
 
 class AudioException : public std::exception {
 
@@ -28,18 +29,19 @@ public:
 
 class AudioHandler {
 
+private:
+	jack_client_t* client = NULL;
+
 public:
-	virtual void init() = 0;
-	virtual void close() = 0;
 
-	virtual ~AudioHandler() {
+	~AudioHandler() {
+		close();
+	};
 
-	}
+	void init();
+
+	void close();
 
 };
-
-extern AudioHandler* create_audio_handler();
-
-extern void dispose_audio_handler();
 
 #endif /* MIDICUBE_AUDIO_H_ */
