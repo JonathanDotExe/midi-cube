@@ -1,19 +1,19 @@
 #include <iostream>
-#include <jack/jack.h>
+#include "midicube/audio.h"
 using namespace std;
 
 int main(int argc, char **argv) {
-	cout << "A simple jack test!";
-	jack_options_t options = JackNullOption;
-	jack_status_t status;
-	jack_client_t* client = NULL;
+	cout << "A simple jack test!" << endl;
 
-	client = jack_client_open("MIDICube", options, &status, NULL);
-	if (client == NULL) {
-		cout << "Failed to connect to jack server!" << endl;
+	AudioHandler* handler = create_audio_handler();
+	try {
+		cout << "Pointer-Adresse " << handler << endl;
+	}
+	catch (AudioException& e) {
+		cerr << e.what() << endl;
 	}
 
-	jack_client_close(client);
+	dispose_audio_handler();
 
 	return 0;
 }
