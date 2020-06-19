@@ -10,6 +10,7 @@
 
 #include <exception>
 #include <jack/jack.h>
+#include <atomic>
 
 class AudioException : public std::exception {
 
@@ -26,17 +27,25 @@ public:
 	}
 };
 
-
 class AudioHandler {
 
 private:
 	jack_client_t* client = NULL;
+	jack_port_t* output_port = NULL;
+	double (* get_sample) (unsigned int, double) = NULL;
+	/**
+	 * Only for use in the jack audio thread
+	 */
+	double time = 0.0;
+	std::atomic<double> time_step = 0.0;
 
 public:
 
 	~AudioHandler() {
 		close();
 	};
+
+	void set_sample_callback(double (* get_sample) (unsigned int, double));
 
 	void init();
 
