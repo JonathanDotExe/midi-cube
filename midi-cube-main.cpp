@@ -14,12 +14,12 @@ int main(int argc, char **argv) {
 	try {
 		handler.set_sample_callback(process);
 		handler.init();
+		cout << "Press any key to exit!" << endl;
+		getchar();
 	}
 	catch (AudioException& e) {
 		cerr << e.what() << endl;
 	}
-	cout << "Press any key to exit!" << endl;
-	getchar();
 
 	return 0;
 }

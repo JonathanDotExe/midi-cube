@@ -7,11 +7,16 @@
 #include "audio.h"
 #include <jack/jack.h>
 #include <math.h>
-#include <iostream>
+#include <stdio.h>
+
+#ifndef _countof
+#define _countof(arr) (sizeof(arr)/sizeof(arr[0]))
+#endif
 
 int g_sample_rate_callback(jack_nframes_t nframes, void* arg) {
 	AudioHandler* handler = (AudioHandler*) arg;
 	handler->sample_rate_callback(nframes);
+	return 0;
 }
 
 int g_process(jack_nframes_t nframes, void* arg) {
@@ -31,10 +36,14 @@ void AudioHandler::init() {
 	//Set callback
 	jack_set_sample_rate_callback(client, g_sample_rate_callback, this);
 	jack_set_process_callback(client, g_process, this);
-	//Create output port
-	output_port = jack_port_register(client, "MIDICube Sound Output", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-	if (output_port == NULL) {
-		throw AudioException("Couldn't create output port");
+	//Create output ports
+	output_port_1 = jack_port_register(client, "stereo_output_1", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+	if (output_port_1 == NULL) {
+		throw AudioException("Couldn't create output port!");
+	}
+	output_port_2 = jack_port_register(client, "stereo_output_2", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+	if (output_port_2 == NULL) {
+		throw AudioException("Couldn't create output port!");
 	}
 	//Start callback
 	if (jack_activate(client)) {
@@ -43,9 +52,13 @@ void AudioHandler::init() {
 	//Connect output port
 	const char** ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
 	if (ports == NULL) {
-		throw AudioException("No more open port available!");
+		throw AudioException("No more open ports available!");
 	}
-	if (jack_connect(client, jack_port_name(output_port), ports[0])) {
+	if (jack_connect(client, jack_port_name(output_port_1), ports[0])) {
+		delete ports;
+		throw AudioException("Couldn't connect to output port!");
+	}
+	if (jack_connect(client, jack_port_name(output_port_2), ports[1])) {	//TODO Check if port 1 exists
 		delete ports;
 		throw AudioException("Couldn't connect to output port!");
 	}
@@ -59,11 +72,16 @@ void AudioHandler::sample_rate_callback(jack_nframes_t nframes) {
 };
 
 int AudioHandler::process(jack_nframes_t nframes) {
-	jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*) jack_port_get_buffer(output_port, nframes);
+	jack_default_audio_sample_t* buffer1 = (jack_default_audio_sample_t*) jack_port_get_buffer(output_port_1, nframes);
+	jack_default_audio_sample_t* buffer2 = (jack_default_audio_sample_t*) jack_port_get_buffer(output_port_2, nframes);
+
 	//Compute each sample
 	for (jack_nframes_t i = 0; i < nframes; ++i) {
 		double sample = fmax(-1, fmin(1, get_sample(0, time)));
-		buffer[i] = JACK_MAX_FRAMES/2 + (jack_nframes_t) (sample * JACK_MAX_FRAMES/2);
+		jack_default_audio_sample_t frame = JACK_MAX_FRAMES/2 + (jack_nframes_t) (sample * JACK_MAX_FRAMES/2);
+		buffer1[i] = frame;
+		buffer2[i] = frame;
+
 		time += time_step;
 	}
 	return 0;

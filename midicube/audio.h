@@ -31,7 +31,8 @@ class AudioHandler {
 
 private:
 	jack_client_t* client = NULL;
-	jack_port_t* output_port = NULL;
+	jack_port_t* output_port_1 = NULL;
+	jack_port_t* output_port_2 = NULL;
 	double (* get_sample) (unsigned int, double) = NULL;
 	/**
 	 * Only for use in the jack audio thread
