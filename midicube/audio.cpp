@@ -33,14 +33,32 @@ void AudioHandler::init() {
 	jack_options_t options = JackNullOption;
 	jack_status_t status;
 
+	//Open client
 	client = jack_client_open("MIDICube", options, &status, NULL);
 	if (client == NULL) {
 		throw AudioException("Couldn't connect to JACK Server!");
 	}
-	output_port = jack_port_register(client, "Output Port Name", JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
+	//Create output port
+	output_port = jack_port_register(client, "MIDICube Sound Output", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 	if (output_port == NULL) {
-		throw AudioException("Couldn't connect to JACK Server!");
+		throw AudioException("Couldn't create output port");
 	}
+	//Start callback
+	if (jack_activate(client)) {
+		throw AudioException("Couldn't activate JACK client!");
+	}
+	//Connect output port
+	const char** ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+	if (ports == NULL) {
+		throw AudioException("No more open port available!");
+	}
+	if (jack_connect(client, jack_port_name(output_port), ports[0])) {
+		delete ports;
+		throw AudioException("Couldn't connect to output port!");
+	}
+
+	delete ports;
+	ports = NULL;
 };
 
 void AudioHandler::close() {
