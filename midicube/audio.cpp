@@ -7,7 +7,7 @@
 #include "audio.h"
 #include <jack/jack.h>
 #include <math.h>
-#include <stdio.h>
+#include <iostream>
 
 #ifndef _countof
 #define _countof(arr) (sizeof(arr)/sizeof(arr[0]))
@@ -78,7 +78,8 @@ int AudioHandler::process(jack_nframes_t nframes) {
 	//Compute each sample
 	for (jack_nframes_t i = 0; i < nframes; ++i) {
 		double sample = fmax(-1, fmin(1, get_sample(0, time)));
-		jack_default_audio_sample_t frame = JACK_MAX_FRAMES/2 + (jack_nframes_t) (sample * JACK_MAX_FRAMES/2);
+		jack_default_audio_sample_t frame = sample;
+
 		buffer1[i] = frame;
 		buffer2[i] = frame;
 
