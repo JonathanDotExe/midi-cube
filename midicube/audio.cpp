@@ -7,26 +7,16 @@
 #include "audio.h"
 #include <jack/jack.h>
 #include <math.h>
+#include <iostream>
 
-void sample_rate_callback(jack_nframes_t nframes, void* arg) {
+int g_sample_rate_callback(jack_nframes_t nframes, void* arg) {
 	AudioHandler* handler = (AudioHandler*) arg;
-	handler->time_step = 1.0/nframes;
+	handler->sample_rate_callback(nframes);
 }
 
-int process(jack_nframes_t nframes, void* arg) {
+int g_process(jack_nframes_t nframes, void* arg) {
 	AudioHandler* handler = (AudioHandler*) arg;
-
-	jack_default_audio_sample_t* buffer = jack_port_get_buffer(handler->output_port, nframes);
-	//Compute each sample
-	for (jack_nframes_t i = 0; i < nframes; ++i) {
-		double sample = fmax(-1, fmin(1, handler->get_sample(0, handler->time)));
-		buffer[i] = JACK_MAX_FRAMES/2 + (jack_nframes_t) (sample * JACK_MAX_FRAMES/2);
-	}
-	return 0;
-}
-
-void AudioHandler::AudioHandler() {
-
+	return handler->process(nframes);
 }
 
 void AudioHandler::init() {
@@ -38,6 +28,9 @@ void AudioHandler::init() {
 	if (client == NULL) {
 		throw AudioException("Couldn't connect to JACK Server!");
 	}
+	//Set callback
+	jack_set_sample_rate_callback(client, g_sample_rate_callback, this);
+	jack_set_process_callback(client, g_process, this);
 	//Create output port
 	output_port = jack_port_register(client, "MIDICube Sound Output", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 	if (output_port == NULL) {
@@ -59,6 +52,21 @@ void AudioHandler::init() {
 
 	delete ports;
 	ports = NULL;
+};
+
+void AudioHandler::sample_rate_callback(jack_nframes_t nframes) {
+	time_step = 1.0/nframes;
+};
+
+int AudioHandler::process(jack_nframes_t nframes) {
+	jack_default_audio_sample_t* buffer = (jack_default_audio_sample_t*) jack_port_get_buffer(output_port, nframes);
+	//Compute each sample
+	for (jack_nframes_t i = 0; i < nframes; ++i) {
+		double sample = fmax(-1, fmin(1, get_sample(0, time)));
+		buffer[i] = JACK_MAX_FRAMES/2 + (jack_nframes_t) (sample * JACK_MAX_FRAMES/2);
+		time += time_step;
+	}
+	return 0;
 };
 
 void AudioHandler::close() {

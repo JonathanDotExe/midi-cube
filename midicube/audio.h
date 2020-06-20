@@ -18,7 +18,7 @@ private:
 	const char* cause;
 
 public:
-	AudioException(char* cause) {
+	AudioException(const char* cause) {
 		this->cause = cause;
 	}
 
@@ -37,7 +37,7 @@ private:
 	 * Only for use in the jack audio thread
 	 */
 	double time = 0.0;
-	std::atomic<double> time_step = 0.0;
+	std::atomic<double> time_step{0.0};
 
 public:
 
@@ -50,6 +50,10 @@ public:
 	void init();
 
 	void close();
+
+	int process(jack_nframes_t nframes);
+
+	void sample_rate_callback(jack_nframes_t nframes);
 
 };
 
