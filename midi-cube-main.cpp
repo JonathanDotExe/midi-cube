@@ -4,7 +4,7 @@
 using namespace std;
 
 double process(unsigned int channel, double time) {
-	double sample = square_wave(time, 440.0) * 0.3;
+	double sample = saw_wave(time, 440.0) * 0.3;
 	return sample;
 }
 

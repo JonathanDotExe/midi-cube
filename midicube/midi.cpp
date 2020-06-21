@@ -1,0 +1,110 @@
+/*
+ * midi.cpp
+ *
+ *  Created on: 21 Jun 2020
+ *      Author: jojo
+ */
+
+
+#include <midi.h>
+#include <exception>
+
+#define NOTE_OFF_BIT 0x8
+#define NOTE_ON_BIT 0x9
+#define POLYPHONIC_AFTERTOUCH_BIT 0xA
+#define CONTROL_CHANGE_BIT 0xB
+#define PROGRAM_CHANGE_BIT 0xC
+#define MONOPHONIC_AFTERTOUCH_BIT 0xD
+#define PITCH_BEND_BIT 0xE
+#define SYSEX_BIT 0xF
+
+
+MidiMessage::MidiMessage(std::vector<unsigned char> message) {
+	if (message.size() < 3) {
+		throw std::runtime_error("Message array has to be at least 3 bytes long.");
+	}
+	this->message.swap(message);
+}
+
+unsigned char MidiMessage::get_status_channel_byte () {
+	return message[0];
+}
+
+unsigned char MidiMessage::get_message_type_bits () {
+	return get_status_channel_byte() >> 4 & 0x0F;
+}
+
+unsigned char MidiMessage::get_channel_bits () {
+	return get_status_channel_byte() & 0x0F;
+}
+
+unsigned char MidiMessage::get_first_data_byte () {
+	return message[1] & 0xEF;
+}
+
+unsigned char MidiMessage::get_second_data_byte () {
+	return message[2] & 0xEF;
+}
+
+MessageType MidiMessage::get_message_type() {
+	switch (get_message_type_bits()) {
+	case NOTE_OFF_BIT:
+		return MessageType::NOTE_OFF;
+	case NOTE_ON_BIT:
+		return MessageType::NOTE_ON;
+	case POLYPHONIC_AFTERTOUCH_BIT:
+		return MessageType::POLYPHONIC_AFTERTOUCH;
+	case CONTROL_CHANGE_BIT:
+		return MessageType::CONTROL_CHANGE;
+	case PROGRAM_CHANGE_BIT:
+		return MessageType::PROGRAM_CHANGE;
+	case MONOPHONIC_AFTERTOUCH_BIT:
+		return MessageType::MONOPHONIC_AFTERTOUCH;
+	case PITCH_BEND_BIT:
+		return MessageType::PITCH_BEND;
+	case SYSEX_BIT:
+		return MessageType::SYSEX;
+	}
+
+	return MessageType::INVALID;
+}
+
+unsigned int MidiMessage::get_channel () {
+	return get_channel_bits();
+}
+
+unsigned int MidiMessage::get_note () {
+	return get_first_data_byte();
+}
+
+unsigned int MidiMessage::get_velocity () {
+	return get_second_data_byte();
+}
+
+unsigned int MidiMessage::get_polyphonic_aftertouch () {
+	return get_second_data_byte();
+}
+
+unsigned int MidiMessage::get_monophonic_aftertouch () {
+	return get_first_data_byte();
+}
+
+unsigned int MidiMessage::get_programm () {
+	return get_first_data_byte();
+}
+
+unsigned int MidiMessage::get_control () {
+	return get_first_data_byte();
+}
+
+unsigned int MidiMessage::get_value () {
+	return get_second_data_byte();
+}
+
+unsigned int MidiMessage::get_pitch_bend () {
+	return get_second_data_byte() << 7 + get_first_data_byte();
+}
+
+size_t MidiMessage::get_message_length () {
+	return message.size();
+}
