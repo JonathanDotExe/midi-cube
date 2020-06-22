@@ -134,11 +134,44 @@ std::vector<std::string> MidiHandler::available_port_names() {
 	return names;
 }
 
-void open(unsigned int port) {
-
+void MidiHandler::open(unsigned int port) {
+	try {
+		rtmidi().openPort(port);
+	}
+	catch (RtMidiError& error) {
+		throw MidiException(error.what());
+	}
 }
 
-void close() {
-
+virtual MidiHandler::~MidiHandler() {
+	close();
 }
+
+MidiInput::MidiInput() {
+	midiin = new RtMidiIn();
+}
+
+RtMidi& MidiInput::rtmidi() {
+	return midiin;
+}
+
+void MidiInput::close() {
+	delete midiin;
+	midiin = nullptr;
+}
+
+MidiOutput::MidiOutput() {
+	midiout = new RtMidiOut();
+}
+
+RtMidi& MidiOutput::rtmidi() {
+	return *midiout;
+}
+
+void MidiOutput::close() {
+	delete midiout;
+	midiout = nullptr;
+}
+
+
 

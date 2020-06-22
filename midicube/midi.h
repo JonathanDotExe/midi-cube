@@ -134,10 +134,10 @@ public:
 	 */
 	virtual void open(unsigned int port);
 
-	virtual void close();
+	virtual void close() = 0;
 
 protected:
-	virtual RtMidi& rtmidi();
+	virtual RtMidi& rtmidi() = 0;
 
 };
 
@@ -150,6 +150,11 @@ private:
 public:
 
 	void set_callback(void (*callback)(double deltatime, MidiMessage&));
+
+	void close();
+
+protected:
+	RtMidi& rtmidi();
 
 };
 
@@ -164,6 +169,11 @@ public:
 	 * Can throw MidiException
 	 */
 	void send(MidiMessage &message);
+
+	void close();
+
+protected:
+	RtMidi& rtmidi();
 
 };
 
