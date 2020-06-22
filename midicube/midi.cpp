@@ -6,7 +6,7 @@
  */
 
 
-#include <midi.h>
+#include "midi.h"
 #include <exception>
 
 #define NOTE_OFF_BIT 0x8

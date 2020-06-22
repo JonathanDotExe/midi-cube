@@ -10,6 +10,22 @@
 
 #include <rtmidi/RtMidi.h>
 #include <vector>
+#include <exception>
+
+class MidiException : public std::exception {
+
+private:
+	const char* cause;
+
+public:
+	MidiException(const char* cause) {
+		this->cause = cause;
+	}
+
+	const char* what() const throw() {
+		return cause;
+	}
+};
 
 enum class MessageType {
 	NOTE_OFF,
@@ -93,6 +109,61 @@ public:
 	 * SYSEX
 	 */
 	size_t get_message_length ();
+
+};
+
+
+class MidiInput {
+
+private:
+	void (*callback) (double deltatime, MidiMessage&) = nullptr;
+	RtMidiIn *midiin = nullptr;
+
+public:
+
+	unsigned int available_ports();
+
+	void port_name(unsigned int port);
+
+	std::vector<std::string> available_port_names();
+
+	void open(unsigned int port);
+
+	void close();
+
+};
+
+class MidiOutput {
+
+private:
+	void (*callback) (double deltatime, MidiMessage&) = nullptr;
+	RtMidiOut *midiout = nullptr;
+
+public:
+
+	unsigned int available_ports();
+
+	/**
+	 * Can throw MidiException
+	 */
+	void port_name(unsigned int port);
+
+	/**
+	 * Can throw MidiException
+	 */
+	std::vector<std::string> available_port_names();
+
+	/**
+	 * Can throw MidiException
+	 */
+	void open(unsigned int port);
+
+	/**
+	 * Can throw MidiException
+	 */
+	void send(MidiMessage& message);
+
+	void close();
 
 };
 
