@@ -12,17 +12,17 @@
 #include <vector>
 #include <exception>
 
-class MidiException : public std::exception {
+class MidiException: public std::exception {
 
 private:
-	const char* cause;
+	const char *cause;
 
 public:
-	MidiException(const char* cause) {
+	MidiException(const char *cause) {
 		this->cause = cause;
 	}
 
-	const char* what() const throw() {
+	const char* what() const throw () {
 		return cause;
 	}
 };
@@ -44,15 +44,15 @@ class MidiMessage {
 private:
 	std::vector<unsigned char> message;
 
-	unsigned char get_status_channel_byte ();
+	unsigned char get_status_channel_byte();
 
-	unsigned char get_message_type_bits ();
+	unsigned char get_message_type_bits();
 
-	unsigned char get_channel_bits ();
+	unsigned char get_channel_bits();
 
-	unsigned char get_first_data_byte ();
+	unsigned char get_first_data_byte();
 
-	unsigned char get_second_data_byte ();
+	unsigned char get_second_data_byte();
 
 public:
 	MidiMessage(std::vector<unsigned char> message);
@@ -62,111 +62,109 @@ public:
 	/**
 	 * Every type except SYSEX and INVALID
 	 */
-	unsigned int get_channel ();
+	unsigned int get_channel();
 
 	/**
 	 * NOTE_ON, NOTE_OFF, POLYPHONIC_AFTERTOUCH
 	 */
-	unsigned int get_note ();
+	unsigned int get_note();
 
 	/**
 	 * NOTE_ON, NOTE_OFF
 	 */
-	unsigned int get_velocity ();
+	unsigned int get_velocity();
 
 	/**
 	 * POLYPHONIC_AFTERTOUCH
 	 */
-	unsigned int get_polyphonic_aftertouch ();
+	unsigned int get_polyphonic_aftertouch();
 
 	/**
 	 * MONOPHONIC_AFTERTOUCH
 	 */
-	unsigned int get_monophonic_aftertouch ();
-
+	unsigned int get_monophonic_aftertouch();
 
 	/**
 	 * PROGRAM_CHANGE
 	 */
-	unsigned int get_programm ();
+	unsigned int get_programm();
 
 	/**
 	 * CONTROL_CHANGE
 	 */
-	unsigned int get_control ();
+	unsigned int get_control();
 
 	/**
 	 * CONTROL_CHANGE
 	 */
-	unsigned int get_value ();
+	unsigned int get_value();
 
 	/**
 	 * PITCH_BEND
 	 */
-	unsigned int get_pitch_bend ();
+	unsigned int get_pitch_bend();
 
 	/**
 	 * SYSEX
 	 */
-	size_t get_message_length ();
+	size_t get_message_length();
 
 };
 
+class MidiHandler {
 
-class MidiInput {
+public:
+
+	virtual ~MidiHandler();
+
+	unsigned int available_ports();
+
+	/**
+	 * Can throw MidiException
+	 */
+	std::string port_name(unsigned int port);
+
+	/**
+	 * Can throw MidiException
+	 */
+	std::vector<std::string> available_port_names();
+
+	/**
+	 * Can throw MidiException
+	 */
+	virtual void open(unsigned int port);
+
+	virtual void close();
+
+protected:
+	virtual RtMidi& rtmidi();
+
+};
+
+class MidiInput : MidiHandler {
 
 private:
-	void (*callback) (double deltatime, MidiMessage&) = nullptr;
+	void (*callback)(double deltatime, MidiMessage&) = nullptr;
 	RtMidiIn *midiin = nullptr;
 
 public:
 
-	unsigned int available_ports();
-
-	void port_name(unsigned int port);
-
-	std::vector<std::string> available_port_names();
-
-	void open(unsigned int port);
-
-	void close();
+	void set_callback(void (*callback)(double deltatime, MidiMessage&));
 
 };
 
-class MidiOutput {
+class MidiOutput : MidiHandler {
 
 private:
-	void (*callback) (double deltatime, MidiMessage&) = nullptr;
 	RtMidiOut *midiout = nullptr;
 
 public:
 
-	unsigned int available_ports();
-
 	/**
 	 * Can throw MidiException
 	 */
-	void port_name(unsigned int port);
-
-	/**
-	 * Can throw MidiException
-	 */
-	std::vector<std::string> available_port_names();
-
-	/**
-	 * Can throw MidiException
-	 */
-	void open(unsigned int port);
-
-	/**
-	 * Can throw MidiException
-	 */
-	void send(MidiMessage& message);
-
-	void close();
+	void send(MidiMessage &message);
 
 };
-
-
 
 #endif /* MIDICUBE_MIDI_H_ */

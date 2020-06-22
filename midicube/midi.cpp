@@ -102,9 +102,43 @@ unsigned int MidiMessage::get_value () {
 }
 
 unsigned int MidiMessage::get_pitch_bend () {
-	return get_second_data_byte() << 7 + get_first_data_byte();
+	return (get_second_data_byte() << 7) + get_first_data_byte();
 }
 
 size_t MidiMessage::get_message_length () {
 	return message.size();
 }
+
+
+unsigned int MidiHandler::available_ports() {
+	return rtmidi().getPortCount();
+}
+
+std::string MidiHandler::port_name(unsigned int port) {
+	std::string name;
+	try {
+		name = rtmidi().getPortName(port);
+	}
+	catch (RtMidiError& e) {
+		throw MidiException(e.what());
+	}
+	return name;
+}
+
+std::vector<std::string> MidiHandler::available_port_names() {
+	unsigned int ports = available_ports();
+	std::vector<std::string> names;
+	for (unsigned int i = 0; i < ports; ++i) {
+		names.push_back(port_name(i));
+	}
+	return names;
+}
+
+void open(unsigned int port) {
+
+}
+
+void close() {
+
+}
+
