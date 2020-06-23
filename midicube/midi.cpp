@@ -143,16 +143,25 @@ void MidiHandler::open(unsigned int port) {
 	}
 }
 
-virtual MidiHandler::~MidiHandler() {
-	close();
+MidiHandler::MidiHandler() {
+
 }
 
-MidiInput::MidiInput() {
-	midiin = new RtMidiIn();
+MidiHandler::~MidiHandler() {
+
+}
+
+MidiInput::MidiInput() : MidiHandler::MidiHandler() {
+	try {
+		midiin = new RtMidiIn();
+	}
+	catch (RtMidiError& error) {
+		throw MidiException(error.what());
+	}
 }
 
 RtMidi& MidiInput::rtmidi() {
-	return midiin;
+	return *midiin;
 }
 
 void MidiInput::close() {
@@ -160,7 +169,12 @@ void MidiInput::close() {
 	midiin = nullptr;
 }
 
-MidiOutput::MidiOutput() {
+MidiInput::~MidiInput() {
+	close();
+}
+
+
+MidiOutput::MidiOutput() : MidiHandler::MidiHandler() {
 	midiout = new RtMidiOut();
 }
 
@@ -171,6 +185,10 @@ RtMidi& MidiOutput::rtmidi() {
 void MidiOutput::close() {
 	delete midiout;
 	midiout = nullptr;
+}
+
+MidiOutput::~MidiOutput() {
+	close();
 }
 
 

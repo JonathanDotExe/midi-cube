@@ -115,6 +115,8 @@ class MidiHandler {
 
 public:
 
+	MidiHandler();
+
 	virtual ~MidiHandler();
 
 	unsigned int available_ports();
@@ -149,6 +151,10 @@ private:
 
 public:
 
+	MidiInput();
+
+	~MidiInput();
+
 	void set_callback(void (*callback)(double deltatime, MidiMessage&));
 
 	void close();
@@ -164,6 +170,10 @@ private:
 	RtMidiOut *midiout = nullptr;
 
 public:
+
+	MidiOutput();
+
+	~MidiOutput();
 
 	/**
 	 * Can throw MidiException
