@@ -19,6 +19,7 @@
 #define SYSEX_BIT 0xF
 
 
+//MidiMessage
 MidiMessage::MidiMessage(std::vector<unsigned char> message) {
 	if (message.size() < 3) {
 		throw std::runtime_error("Message array has to be at least 3 bytes long.");
@@ -109,7 +110,12 @@ size_t MidiMessage::get_message_length () {
 	return message.size();
 }
 
+std::vector<unsigned char> MidiMessage::get_message() {
+	return message;
+}
 
+
+//MidiHandler
 unsigned int MidiHandler::available_ports() {
 	return rtmidi().getPortCount();
 }
@@ -151,13 +157,29 @@ MidiHandler::~MidiHandler() {
 
 }
 
+
+void input_callback (double delta, std::vector<unsigned char>* msg, void* arg) {
+	((MidiInput*) arg)->call_callback(delta, msg);
+}
+
+//MidiInput
 MidiInput::MidiInput() : MidiHandler::MidiHandler() {
 	try {
 		midiin = new RtMidiIn();
+		midiin->setCallback(&input_callback, this);
 	}
 	catch (RtMidiError& error) {
 		throw MidiException(error.what());
 	}
+}
+
+void MidiInput::call_callback(double delta, std::vector<unsigned char>* msg) {
+	MidiMessage message(*msg);
+	callback(delta, message);
+}
+
+void MidiInput::set_callback(void (*callback)(double deltatime, MidiMessage&)) {
+	this->callback = callback;
 }
 
 RtMidi& MidiInput::rtmidi() {
@@ -174,8 +196,19 @@ MidiInput::~MidiInput() {
 }
 
 
+//MidiOutput
 MidiOutput::MidiOutput() : MidiHandler::MidiHandler() {
 	midiout = new RtMidiOut();
+}
+
+void MidiOutput::send(MidiMessage& message) {
+	try {
+		std::vector<unsigned char> m = message.get_message();
+		midiout->sendMessage(&m);
+	}
+	catch (RtMidiError& error) {
+		throw MidiException(error.what());
+	}
 }
 
 RtMidi& MidiOutput::rtmidi() {

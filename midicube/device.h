@@ -9,76 +9,101 @@
 #define MIDICUBE_DEVICE_H_
 
 #include <string>
+#include <vector>
 #include "midicube.h"
 #include "midi.h"
 
-class MidiInputDevice {
+class AudioDevice {
 
 private:
-	MidiCube* cube;
+	MidiCube* cube = nullptr;
 
 public:
 
-	MidiCube* cube();
+	AudioDevice();
+
+	MidiCube* get_cube();
 
 	void set_cube(MidiCube* cube);
 
-	virtual void add_listener(void (*recieve(MidiMessage& msg))) = 0;
+	/**
+	 * For MIDI inputs
+	 */
+	virtual void add_midi_listener(void (*recieve) (MidiMessage&)) {
+
+	}
+
+	/**
+	 * For MIDI outputs
+	 */
+	virtual void send(MidiMessage& message) {
+
+	}
+
+	/**
+	 * For Audio Inputs
+	 */
+	virtual double process_sample(double time) {
+		return 0.0;
+	}
+
+	virtual bool is_midi_input() {
+		return false;
+	}
+
+	virtual bool is_midi_output() {
+		return false;
+	}
+
+	virtual bool is_audio_input() {
+		return false;
+	}
 
 	virtual std::string get_identifier() = 0;
 
-	virtual ~MidiInputDevice();
+	virtual ~AudioDevice();
 
 };
 
-class MidiOutputDevice {
-
-private:
-	MidiCube* cube;
-
-public:
-
-	MidiCube* cube();
-
-	void set_cube(MidiCube* cube);
-
-	virtual void send(MidiMessage& message);
-
-	virtual std::string get_identifier() = 0;
-
-	virtual ~MidiOutputDevice();
-
-};
-
-class PortInputDevice : MidiInputDevice{
+class PortInputDevice : AudioDevice {
 
 private:
 	MidiInput* input;
+	std::string identifier;
+	std::vector<void (*) (MidiMessage&)> listeners;
 
 public:
 
-	PortInputDevice();
+	PortInputDevice(MidiInput* input, std::string identifier);
 
-	void add_listener(void (*recieve(MidiMessage& msg)));
+	void add_listener(void (*recieve) (MidiMessage&));
 
 	std::string get_identifier();
+
+	bool is_midi_input() {
+		return true;
+	}
 
 	~PortInputDevice();
 
 };
 
-class PortOutputDevice {
+class PortOutputDevice : AudioDevice {
 
 private:
 	MidiOutput* output;
-
+	std::string identifier;
 public:
 
-	PortOutputDevice(MidiOutput* output);
+	PortOutputDevice(MidiOutput* output, std::string identifier);
 
 	void send(MidiMessage& message);
 
 	std::string get_identifier();
+
+	bool is_midi_output() {
+		return true;
+	}
 
 	~PortOutputDevice();
 

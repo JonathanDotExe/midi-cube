@@ -109,6 +109,8 @@ public:
 	 */
 	size_t get_message_length();
 
+	std::vector<unsigned char> get_message();
+
 };
 
 class MidiHandler {
@@ -154,6 +156,8 @@ public:
 	MidiInput();
 
 	~MidiInput();
+
+	void call_callback(double deltatime, std::vector<unsigned char>* msg);
 
 	void set_callback(void (*callback)(double deltatime, MidiMessage&));
 
