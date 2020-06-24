@@ -148,7 +148,8 @@ protected:
 class MidiInput : MidiHandler {
 
 private:
-	void (*callback)(double deltatime, MidiMessage&) = nullptr;
+	void (*callback)(double deltatime, MidiMessage&, void*) = nullptr;
+	void* user_data = nullptr;
 	RtMidiIn *midiin = nullptr;
 
 public:
@@ -159,7 +160,7 @@ public:
 
 	void call_callback(double deltatime, std::vector<unsigned char>* msg);
 
-	void set_callback(void (*callback)(double deltatime, MidiMessage&));
+	void set_callback(void (*callback)(double deltatime, MidiMessage&, void*), void*);
 
 	void close();
 

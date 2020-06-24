@@ -30,14 +30,15 @@ AudioDevice::~AudioDevice() {
 }
 
 
+
 //PortInputDevice
 PortInputDevice::PortInputDevice(MidiInput* input, std::string identifier) : AudioDevice() {
 	this->input = input;
 	this->identifier = identifier;
 }
 
-void PortInputDevice::add_listener(void (*recieve) (MidiMessage& msg)) {
-	listeners.push_back(recieve);
+void PortInputDevice::set_midi_callback(void (*recieve) (double, MidiMessage&, void*), void* user_data) {
+	this->input->set_callback(recieve, user_data);
 }
 
 std::string PortInputDevice::get_identifier() {

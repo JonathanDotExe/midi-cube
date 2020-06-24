@@ -175,10 +175,10 @@ MidiInput::MidiInput() : MidiHandler::MidiHandler() {
 
 void MidiInput::call_callback(double delta, std::vector<unsigned char>* msg) {
 	MidiMessage message(*msg);
-	callback(delta, message);
+	callback(delta, message, user_data);
 }
 
-void MidiInput::set_callback(void (*callback)(double deltatime, MidiMessage&)) {
+void MidiInput::set_callback(void (*callback)(double deltatime, MidiMessage&, void*), void* user_data) {
 	this->callback = callback;
 }
 

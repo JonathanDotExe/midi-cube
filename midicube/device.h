@@ -29,7 +29,7 @@ public:
 	/**
 	 * For MIDI inputs
 	 */
-	virtual void add_midi_listener(void (*recieve) (MidiMessage&)) {
+	virtual void set_midi_callback(void (*recieve) (double, MidiMessage&, void*), void*) {
 
 	}
 
@@ -70,13 +70,14 @@ class PortInputDevice : AudioDevice {
 private:
 	MidiInput* input;
 	std::string identifier;
-	std::vector<void (*) (MidiMessage&)> listeners;
 
 public:
 
 	PortInputDevice(MidiInput* input, std::string identifier);
 
-	void add_listener(void (*recieve) (MidiMessage&));
+	void set_midi_callback(void (*recieve) (double, MidiMessage&, void*), void*);
+
+	void call_listeners (MidiMessage& msg);
 
 	std::string get_identifier();
 
