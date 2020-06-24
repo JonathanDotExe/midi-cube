@@ -65,7 +65,7 @@ public:
 
 };
 
-class PortInputDevice : AudioDevice {
+class PortInputDevice : public AudioDevice {
 
 private:
 	MidiInput* input;
@@ -89,7 +89,7 @@ public:
 
 };
 
-class PortOutputDevice : AudioDevice {
+class PortOutputDevice : public AudioDevice {
 
 private:
 	MidiOutput* output;

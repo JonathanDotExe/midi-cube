@@ -87,7 +87,7 @@ public:
 	/**
 	 * PROGRAM_CHANGE
 	 */
-	unsigned int get_programm();
+	unsigned int get_program();
 
 	/**
 	 * CONTROL_CHANGE
@@ -110,6 +110,8 @@ public:
 	size_t get_message_length();
 
 	std::vector<unsigned char> get_message();
+
+	std::string to_string();
 
 };
 
@@ -145,7 +147,7 @@ protected:
 
 };
 
-class MidiInput : MidiHandler {
+class MidiInput : public MidiHandler {
 
 private:
 	void (*callback)(double deltatime, MidiMessage&, void*) = nullptr;
@@ -162,6 +164,8 @@ public:
 
 	void set_callback(void (*callback)(double deltatime, MidiMessage&, void*), void*);
 
+	void open(unsigned int port);
+
 	void close();
 
 protected:
@@ -169,7 +173,7 @@ protected:
 
 };
 
-class MidiOutput : MidiHandler {
+class MidiOutput : public MidiHandler {
 
 private:
 	RtMidiOut *midiout = nullptr;

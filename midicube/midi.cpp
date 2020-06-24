@@ -90,7 +90,7 @@ unsigned int MidiMessage::get_monophonic_aftertouch () {
 	return get_first_data_byte();
 }
 
-unsigned int MidiMessage::get_programm () {
+unsigned int MidiMessage::get_program () {
 	return get_first_data_byte();
 }
 
@@ -112,6 +112,33 @@ size_t MidiMessage::get_message_length () {
 
 std::vector<unsigned char> MidiMessage::get_message() {
 	return message;
+}
+
+std::string MidiMessage::to_string() {
+	using namespace std::string_literals;
+
+	switch (get_message_type()) {
+	case MessageType::NOTE_OFF:
+		return "[NOTE_OFF Message note="s + std::to_string(get_note()) + "]"s;
+	case MessageType::NOTE_ON:
+			return "[NOTE_ON Message note="s + std::to_string(get_note()) + " velocity="s + std::to_string(get_velocity()) + "]"s;
+	case MessageType::POLYPHONIC_AFTERTOUCH:
+			return "[POLYPHONIC_AFTERTOUCH Message note="s + std::to_string(get_note()) + " touch="s + std::to_string(get_polyphonic_aftertouch()) + "]"s;
+	case MessageType::CONTROL_CHANGE:
+			return "[CONTROL_CHANGE Message control="s + std::to_string(get_control()) + " value="s + std::to_string(get_value()) + "]"s;
+	case MessageType::PROGRAM_CHANGE:
+			return "[PROGRAM_CHANGE Message program="s + std::to_string(get_program()) + "]"s;
+	case MessageType::MONOPHONIC_AFTERTOUCH:
+			return "[MONOPHONIC_AFTERTOUCH Message touch="s + std::to_string(get_monophonic_aftertouch()) + "]"s;
+	case MessageType::PITCH_BEND:
+			return "[PITCH_BEND Message pitch_bend="s + std::to_string(get_pitch_bend()) + "]"s;
+	case MessageType::SYSEX:
+			return "[SYSEX Message]";
+	default:
+		break;
+
+	}
+	return "[Invalid Message]";
 }
 
 
@@ -141,6 +168,7 @@ std::vector<std::string> MidiHandler::available_port_names() {
 }
 
 void MidiHandler::open(unsigned int port) {
+	std::cout << "Opening port!" << std::endl;
 	try {
 		rtmidi().openPort(port);
 	}
@@ -159,6 +187,7 @@ MidiHandler::~MidiHandler() {
 
 
 void input_callback (double delta, std::vector<unsigned char>* msg, void* arg) {
+	std::cout << "Input has arrived!" << std::endl;
 	((MidiInput*) arg)->call_callback(delta, msg);
 }
 
@@ -166,7 +195,6 @@ void input_callback (double delta, std::vector<unsigned char>* msg, void* arg) {
 MidiInput::MidiInput() : MidiHandler::MidiHandler() {
 	try {
 		midiin = new RtMidiIn();
-		midiin->setCallback(&input_callback, this);
 	}
 	catch (RtMidiError& error) {
 		throw MidiException(error.what());
@@ -184,6 +212,18 @@ void MidiInput::set_callback(void (*callback)(double deltatime, MidiMessage&, vo
 
 RtMidi& MidiInput::rtmidi() {
 	return *midiin;
+}
+
+void MidiInput::open(unsigned int port) {
+	MidiHandler::open(port);
+	std::cout << "Registering callback" << std::endl;
+	try {
+		midiin->setCallback(&input_callback, this);
+		midiin->ignoreTypes(false, false, false);
+	}
+	catch (RtMidiError& error) {
+		throw MidiException(error.what());
+	}
 }
 
 void MidiInput::close() {
