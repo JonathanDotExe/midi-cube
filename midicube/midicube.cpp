@@ -61,6 +61,9 @@ void MidiCube::add_device(AudioDevice* device) {
 };
 
 MidiCube::~MidiCube() {
-	//TODO Clean up ressources
+	for (AudioDevice* device : devices) {
+		delete device;
+	}
+	devices.clear();
 };
 

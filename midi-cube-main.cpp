@@ -1,5 +1,5 @@
 #include <iostream>
-//#include "midicube/audio.h"
+#include "midicube/audio.h"
 #include "midicube/synthesis.h"
 #include "midicube/midi.h"
 #include "midicube/device.h"
@@ -16,7 +16,7 @@ void midi_callback(double deltatime, MidiMessage& msg, void* arg) {
 }
 
 int main(int argc, char **argv) {
-	cout << "Printing MIDI messages from device 0!" << endl;
+	/*cout << "Printing MIDI messages from device 0!" << endl;
 	MidiInput* input;
 	PortInputDevice* device = nullptr;
 	try {
@@ -36,11 +36,11 @@ int main(int argc, char **argv) {
 
 	getchar();
 
-	delete device;
+	delete device;*/
 
-	//cout << "Playing a cool square wave sound!" << endl;
+	cout << "Playing a cool square wave sound!" << endl;
 
-	/*AudioHandler handler;
+	AudioHandler handler;
 	try {
 		handler.set_sample_callback(process);
 		handler.init();
@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 	}
 	catch (AudioException& e) {
 		cerr << e.what() << endl;
-	}*/
+	}
 
 	return 0;
 }
