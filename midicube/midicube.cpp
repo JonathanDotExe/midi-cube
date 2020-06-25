@@ -8,17 +8,30 @@
 #include "midicube.h"
 #include <iostream>
 
+
+static double process_func(unsigned int channel, double time, void* user_data) {
+	return ((MidiCube*) user_data)->process(channel, time);
+}
+
 static void midi_callback(double deltatime, MidiMessage& msg, void* arg) {
 	std::cout << "Callback" << std::endl;
 	std::cout << msg.to_string() << std::endl;
 }
 
 MidiCube::MidiCube() {
-
+	audio_handler.set_sample_callback(&process_func, this);
 };
 
 void MidiCube::init() {
+	audio_handler.init();
+};
 
+double MidiCube::process(unsigned int channel, double time) {
+	double sig = 0;
+	for (std::pair<std::string, AudioDevice*> device : devices) {
+		sig += device.second->process_sample(time);
+	}
+	return sig;
 };
 
 void MidiCube::create_default_devices() {
@@ -61,8 +74,8 @@ void MidiCube::add_device(AudioDevice* device) {
 };
 
 MidiCube::~MidiCube() {
-	for (AudioDevice* device : devices) {
-		delete device;
+	for (std::pair<std::string, AudioDevice*> device : devices) {
+		delete device.second;
 	}
 	devices.clear();
 };

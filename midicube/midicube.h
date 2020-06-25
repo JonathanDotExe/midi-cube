@@ -23,6 +23,7 @@ public:
 	void init();
 	void create_default_devices();
 	void add_device(AudioDevice* device);
+	double process(unsigned int channel, double time);
 };
 
 #endif /* MIDICUBE_MIDICUBE_H_ */

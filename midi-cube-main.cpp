@@ -5,7 +5,7 @@
 #include "midicube/device.h"
 using namespace std;
 
-double process(unsigned int channel, double time) {
+double process(unsigned int channel, double time, void* user_data) {
 	double sample = square_wave(time, 440.0) * 0.3;
 	return sample;
 }
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 
 	AudioHandler handler;
 	try {
-		handler.set_sample_callback(process);
+		handler.set_sample_callback(process, nullptr);
 		handler.init();
 		cout << "Press any key to exit!" << endl;
 		getchar();
