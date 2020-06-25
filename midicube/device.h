@@ -10,21 +10,20 @@
 
 #include <string>
 #include <vector>
-#include "midicube.h"
 #include "midi.h"
 
 class AudioDevice {
 
 private:
-	MidiCube* cube = nullptr;
+	//MidiCube* cube = nullptr;
 
 public:
 
 	AudioDevice();
 
-	MidiCube* get_cube();
+	//MidiCube* get_cube();
 
-	void set_cube(MidiCube* cube);
+	//void set_cube(MidiCube* cube);
 
 	/**
 	 * For MIDI inputs

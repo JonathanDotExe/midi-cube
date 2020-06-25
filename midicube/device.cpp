@@ -12,7 +12,7 @@ AudioDevice::AudioDevice() {
 
 }
 
-MidiCube* AudioDevice::get_cube() {
+/*MidiCube* AudioDevice::get_cube() {
 	return cube;
 }
 
@@ -23,7 +23,7 @@ void AudioDevice::set_cube(MidiCube* cube) {
 	else {
 		throw std::runtime_error("Cube already set!");
 	}
-}
+}*/
 
 AudioDevice::~AudioDevice() {
 

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "midicube/audio.h"
+//#include "midicube/audio.h"
 #include "midicube/synthesis.h"
 #include "midicube/midi.h"
 #include "midicube/device.h"
