@@ -21,14 +21,11 @@
 
 //MidiMessage
 MidiMessage::MidiMessage(std::vector<unsigned char> message) {
-	if (message.size() < 3) {
-		throw std::runtime_error("Message array has to be at least 3 bytes long.");
-	}
 	this->message.swap(message);
 }
 
 unsigned char MidiMessage::get_status_channel_byte () {
-	return message[0];
+	return message.at(0);
 }
 
 unsigned char MidiMessage::get_message_type_bits () {
@@ -40,11 +37,11 @@ unsigned char MidiMessage::get_channel_bits () {
 }
 
 unsigned char MidiMessage::get_first_data_byte () {
-	return message[1] & 0xEF;
+	return message.at(1) & 0x7F;
 }
 
 unsigned char MidiMessage::get_second_data_byte () {
-	return message[2] & 0xEF;
+	return message.at(2) & 0x7F;
 }
 
 MessageType MidiMessage::get_message_type() {
@@ -187,7 +184,6 @@ MidiHandler::~MidiHandler() {
 
 
 void input_callback (double delta, std::vector<unsigned char>* msg, void* arg) {
-	std::cout << "Input has arrived!" << std::endl;
 	((MidiInput*) arg)->call_callback(delta, msg);
 }
 
@@ -208,6 +204,7 @@ void MidiInput::call_callback(double delta, std::vector<unsigned char>* msg) {
 
 void MidiInput::set_callback(void (*callback)(double deltatime, MidiMessage&, void*), void* user_data) {
 	this->callback = callback;
+	this->user_data = user_data;
 }
 
 RtMidi& MidiInput::rtmidi() {

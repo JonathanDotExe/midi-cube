@@ -123,6 +123,8 @@ public:
 		return true;
 	}
 
+	void send(MidiMessage& message);
+
 	double process_sample(unsigned int channel, double time);
 
 	~SoundEngineDevice();

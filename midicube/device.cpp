@@ -84,6 +84,10 @@ double SoundEngineDevice::process_sample(unsigned int channel, double time) {
 	return sample;
 }
 
+void SoundEngineDevice::send(MidiMessage& message) {
+	std::cout << message.to_string() << std::endl;
+}
+
 SoundEngineDevice::~SoundEngineDevice() {
 
 }
