@@ -8,6 +8,10 @@
 #include "synthesis.h"
 #include <cmath>
 
+extern double note_to_freq (double note) {
+	return 440.0 * pow(2, (note - 69)/12.0);
+}
+
 extern double freq_to_radians(double freq) {
 	return 2 * M_PI * freq;
 }

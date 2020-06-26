@@ -113,6 +113,8 @@ class SoundEngineDevice : public AudioDevice {
 
 private:
 	std::string identifier;
+	double freq = 440;
+	double envelope = 0;
 public:
 
 	SoundEngineDevice(std::string identifier);
