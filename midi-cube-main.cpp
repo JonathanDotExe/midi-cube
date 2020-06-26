@@ -2,6 +2,7 @@
 #include "midicube/audio.h"
 #include "midicube/synthesis.h"
 #include "midicube/midi.h"
+#include "midicube/midicube.h"
 #include "midicube/device.h"
 using namespace std;
 
@@ -38,13 +39,22 @@ int main(int argc, char **argv) {
 
 	delete device;*/
 
-	cout << "Playing a cool square wave sound!" << endl;
+	/*cout << "Playing a cool square wave sound!" << endl;
 
 	AudioHandler handler;
 	try {
 		handler.set_sample_callback(process, nullptr);
 		handler.init();
 		cout << "Press any key to exit!" << endl;
+		getchar();
+	}
+	catch (AudioException& e) {
+		cerr << e.what() << endl;
+	}*/
+
+	MidiCube cube;
+	try {
+		cube.init();
 		getchar();
 	}
 	catch (AudioException& e) {

@@ -23,13 +23,14 @@ MidiCube::MidiCube() {
 };
 
 void MidiCube::init() {
+	create_default_devices();
 	audio_handler.init();
 };
 
 double MidiCube::process(unsigned int channel, double time) {
 	double sig = 0;
 	for (std::pair<std::string, AudioDevice*> device : devices) {
-		sig += device.second->process_sample(time);
+		sig += device.second->process_sample(channel, time);
 	}
 	return sig;
 };
@@ -37,31 +38,30 @@ double MidiCube::process(unsigned int channel, double time) {
 void MidiCube::create_default_devices() {
 	using namespace std::string_literals;
 	//Input-Devices
-	MidiInput* input = new MidiInput();
-	while (input != nullptr) {
-		if (input->available_ports() > 0) {
-			std::string name;
-			try {
-				name = input->port_name(1);
-				input->open(0);
-			}
-			catch (MidiException& exc) {
-				delete input;
-				input = nullptr;
-				std::cerr << "Error opening MIDI Input: " << exc.what() << std::endl;
-			}
-			if (input != nullptr) {
-				PortInputDevice* device = new PortInputDevice(input, "[MIDIIN] "s + name);
-				device->set_midi_callback(&midi_callback, nullptr);
-				add_device(device);
-			}
-			input = new MidiInput();
+	MidiInput input_dummy;
+	size_t n_ports = input_dummy.available_ports();
+	for (size_t i = 0; i < n_ports; ++i) {
+		MidiInput* input = new MidiInput();
+		std::string name;
+		try {
+			name = input->port_name(1);
+			input->open(0);
 		}
-		else {
+		catch (MidiException& exc) {
 			delete input;
 			input = nullptr;
+			std::cerr << "Error opening MIDI Input: " << exc.what() << std::endl;
+		}
+		if (input != nullptr) {
+			PortInputDevice* device = new PortInputDevice(input, "[MIDIIN] "s + name);
+			device->set_midi_callback(&midi_callback, nullptr);
+			add_device(device);
 		}
 	}
+	//Sound Engine
+	SoundEngineDevice* device = new SoundEngineDevice("Sound Engine");
+	add_device(device);
+	std::cout << devices.size() << std::endl;
 };
 
 /**

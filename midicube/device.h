@@ -42,7 +42,7 @@ public:
 	/**
 	 * For Audio Inputs
 	 */
-	virtual double process_sample(double time) {
+	virtual double process_sample(unsigned int channel, double time) {
 		return 0.0;
 	}
 
@@ -106,6 +106,26 @@ public:
 	}
 
 	~PortOutputDevice();
+
+};
+
+class SoundEngineDevice : public AudioDevice {
+
+private:
+	std::string identifier;
+public:
+
+	SoundEngineDevice(std::string identifier);
+
+	std::string get_identifier();
+
+	bool is_audio_input() {
+		return true;
+	}
+
+	double process_sample(unsigned int channel, double time);
+
+	~SoundEngineDevice();
 
 };
 

@@ -6,6 +6,7 @@
  */
 
 #include "device.h"
+#include "synthesis.h"
 
 //AudioDevice
 AudioDevice::AudioDevice() {
@@ -67,5 +68,23 @@ std::string PortOutputDevice::get_identifier() {
 PortOutputDevice::~PortOutputDevice() {
 	delete output;
 	output = nullptr;
+}
+
+//SoundEngineDevice
+SoundEngineDevice::SoundEngineDevice(std::string identifier) {
+	this->identifier = identifier;
+}
+
+std::string SoundEngineDevice::get_identifier() {
+	return identifier;
+}
+
+double SoundEngineDevice::process_sample(unsigned int channel, double time) {
+	double sample = square_wave(time, 440.0);
+	return sample;
+}
+
+SoundEngineDevice::~SoundEngineDevice() {
+
 }
 
