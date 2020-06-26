@@ -17,7 +17,7 @@ void midi_callback(double deltatime, MidiMessage& msg, void* arg) {
 }
 
 int main(int argc, char **argv) {
-	/*cout << "Printing MIDI messages from device 0!" << endl;
+	/*cout << "Printing MIDI messages from device 1!" << endl;
 	MidiInput* input;
 	PortInputDevice* device = nullptr;
 	try {
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 		if (input->available_ports() > 1) {
 			name = input->port_name(1);
 			cout << "Using port " << name << endl;
-			input->open(0);
+			input->open(1);
 			device = new PortInputDevice(input, name);
 			device->set_midi_callback(&midi_callback, nullptr);
 		}

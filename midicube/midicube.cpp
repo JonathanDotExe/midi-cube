@@ -44,8 +44,8 @@ void MidiCube::create_default_devices() {
 		MidiInput* input = new MidiInput();
 		std::string name;
 		try {
-			name = input->port_name(1);
-			input->open(0);
+			name = input->port_name(i);
+			input->open(i);
 		}
 		catch (MidiException& exc) {
 			delete input;
