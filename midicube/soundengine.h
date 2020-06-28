@@ -11,6 +11,7 @@
 #include "device.h"
 #include "midi.h"
 #include <string>
+#include <array>
 
 #define SOUND_ENGINE_POLYPHONY 30
 
@@ -37,6 +38,27 @@ private:
 public:
 
 	PresetSynth();
+
+	double process_sample(unsigned int channel, double time, double freq);
+
+	std::string get_name();
+
+};
+
+#define ORGAN_DRAWBAR_COUNT 9
+
+struct B3OrganData {
+	std::array<int, ORGAN_DRAWBAR_COUNT> drawbars = {8, 8, 8, 8, 8, 8, 8, 8, 8};
+};
+
+class B3Organ : public SoundEngine {
+
+private:
+	B3OrganData data;
+	std::array<double, ORGAN_DRAWBAR_COUNT> drawbar_harmonics;
+
+public:
+	B3Organ();
 
 	double process_sample(unsigned int channel, double time, double freq);
 

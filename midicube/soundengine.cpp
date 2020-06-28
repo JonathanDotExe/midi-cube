@@ -7,6 +7,7 @@
 
 #include "soundengine.h"
 #include "synthesis.h"
+#include <iostream>
 
 //PresetSynth
 PresetSynth::PresetSynth() {
@@ -27,10 +28,37 @@ std::string PresetSynth::get_name() {
 	return "Preset Synth";
 }
 
+//B3Organ
+B3Organ::B3Organ() {
+	drawbar_harmonics = {0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8};
+}
+
+double B3Organ::process_sample(unsigned int channel, double time, double freq) {
+	double sample = 0;
+
+	//Organ sound
+	for (size_t i = 0;  i < data.drawbars.size(); ++i) {
+		double f = freq * drawbar_harmonics[i];
+		while (f > 5593) {
+			f /= 2.0;
+		}
+		sample += data.drawbars[i]/8.0 * sine_wave(time, f);
+	}
+	sample /= 9.0;
+
+	std::cout << sample << std::endl;
+
+	return sample;
+}
+
+std::string B3Organ::get_name() {
+	return "B3 Organ";
+}
+
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice(std::string identifier) {
 	this->identifier = identifier;
-	engine = new PresetSynth();
+	engine = new B3Organ();
 }
 
 std::string SoundEngineDevice::get_identifier() {
