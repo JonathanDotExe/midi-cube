@@ -8,6 +8,10 @@
 #include "synthesis.h"
 #include <cmath>
 
+extern double note_to_freq_transpose (double tnote) {
+	return pow(2, (tnote)/12.0);
+}
+
 extern double note_to_freq (double note) {
 	return 440.0 * pow(2, (note - 69)/12.0);
 }

@@ -83,7 +83,9 @@ double SoundEngineDevice::process_sample(unsigned int channel, double time) {
 	double sample = 0.0;
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (amplitude[i]) {
-			sample += square_wave(time, freq[i]) * amplitude[i] * 0.3;
+			sample += saw_wave(time, freq[i]) * amplitude[i] * 0.1;
+			sample += saw_wave(time, freq[i] * note_to_freq_transpose(0.1)) * amplitude[i] * 0.1;
+			sample += saw_wave(time, freq[i] * note_to_freq_transpose(-0.1)) * amplitude[i] * 0.1;
 		}
 	}
 	return sample;

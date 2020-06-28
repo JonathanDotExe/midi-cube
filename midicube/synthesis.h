@@ -8,6 +8,9 @@
 #ifndef MIDICUBE_SYNTHESIS_H_
 #define MIDICUBE_SYNTHESIS_H_
 
+
+extern double note_to_freq_transpose (double tnote);
+
 extern double note_to_freq (double note);
 
 extern double freq_to_radians(double freq);
