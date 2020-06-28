@@ -34,7 +34,8 @@ B3Organ::B3Organ() {
 }
 
 double B3Organ::process_sample(unsigned int channel, double time, double freq) {
-	double sample = 0;
+	double horn_sample = 0;
+	double bass_sample = 0;
 
 	//Organ sound
 	for (size_t i = 0;  i < data.drawbars.size(); ++i) {
@@ -42,9 +43,27 @@ double B3Organ::process_sample(unsigned int channel, double time, double freq) {
 		while (f > 5593) {
 			f /= 2.0;
 		}
-		sample += data.drawbars[i]/8.0 * sine_wave(time, f);
+		if (f > ROTARY_CUTOFF) {
+			horn_sample += data.drawbars[i]/8.0 * sine_wave(time, f);
+		}
+		else {
+			bass_sample += data.drawbars[i]/8.0 * sine_wave(time, f);
+		}
 	}
-	sample /= data.drawbars.size();
+	horn_sample /= data.drawbars.size();
+	bass_sample /= data.drawbars.size();
+	double sample = 0;
+
+	//Rotary speaker
+	if (data.rotary) {
+		//Horn
+		double horn_speed = data.rotary_fast ? ROTARY_HORN_FAST_FREQUENCY : ROTARY_HORN_SLOW_FREQUENCY;
+		//Bass
+		double bass_speed = data.rotary_fast ? ROTARY_BASS_FAST_FREQUENCY : ROTARY_BASS_SLOW_FREQUENCY;
+	}
+	else {
+		sample = horn_sample + bass_sample;
+	}
 
 	return sample * 0.1;
 }

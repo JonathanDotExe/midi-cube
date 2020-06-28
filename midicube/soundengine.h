@@ -46,9 +46,16 @@ public:
 };
 
 #define ORGAN_DRAWBAR_COUNT 9
+#define ROTARY_CUTOFF 800
+#define ROTARY_HORN_SLOW_FREQUENCY 0.8
+#define ROTARY_HORN_FAST_FREQUENCY 6.8
+#define ROTARY_BASS_SLOW_FREQUENCY 0.76
+#define ROTARY_BASS_FAST_FREQUENCY 6.5
 
 struct B3OrganData {
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbars = {8, 8, 8, 8, 8, 8, 8, 8, 8};
+	bool rotary = false;
+	bool rotary_fast = true;
 };
 
 class B3Organ : public SoundEngine {
