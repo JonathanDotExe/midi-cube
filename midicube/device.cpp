@@ -80,18 +80,41 @@ std::string SoundEngineDevice::get_identifier() {
 }
 
 double SoundEngineDevice::process_sample(unsigned int channel, double time) {
-	double sample = square_wave(time, freq) * envelope * 0.3;
+	double sample = 0.0;
+	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+		if (amplitude[i]) {
+			sample += square_wave(time, freq[i]) * amplitude[i] * 0.3;
+		}
+	}
 	return sample;
+}
+
+size_t SoundEngineDevice::next_freq_slot() {
+	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+		if (!amplitude[i]) {
+			return i;
+		}
+	}
+	//TODO return longest used slot
+	return 0;
 }
 
 void SoundEngineDevice::send(MidiMessage& message) {
 	std::cout << message.to_string() << std::endl;
 	if (message.get_message_type() == MessageType::NOTE_ON) {
-		freq = note_to_freq(message.get_note());
-		envelope = 1;
+		size_t slot = next_freq_slot();
+		std::cout << slot << std::endl;
+		freq[slot] = note_to_freq(message.get_note());
+		amplitude[slot] = 1;
 	}
 	else if (message.get_message_type() == MessageType::NOTE_OFF) {
-		envelope = 0;
+		double f  = note_to_freq(message.get_note());
+		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+			if (freq[i] == f) {
+				freq[i] = 0;
+				amplitude[i] = 0;
+			}
+		}
 	}
 }
 

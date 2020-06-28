@@ -109,12 +109,17 @@ public:
 
 };
 
+#define SOUND_ENGINE_POLYPHONY 30
+
 class SoundEngineDevice : public AudioDevice {
 
 private:
 	std::string identifier;
-	double freq = 440;
-	double envelope = 0;
+	double freq[SOUND_ENGINE_POLYPHONY];
+	double amplitude[SOUND_ENGINE_POLYPHONY];
+
+	size_t next_freq_slot();
+
 public:
 
 	SoundEngineDevice(std::string identifier);
