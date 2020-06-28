@@ -44,11 +44,9 @@ double B3Organ::process_sample(unsigned int channel, double time, double freq) {
 		}
 		sample += data.drawbars[i]/8.0 * sine_wave(time, f);
 	}
-	sample /= 9.0;
+	sample /= data.drawbars.size();
 
-	std::cout << sample << std::endl;
-
-	return sample;
+	return sample * 0.1;
 }
 
 std::string B3Organ::get_name() {
