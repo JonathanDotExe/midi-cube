@@ -6,6 +6,7 @@
  */
 
 #include "midicube.h"
+#include "soundengine.h"
 #include <iostream>
 
 static double process_func(unsigned int channel, double time, void* user_data) {
