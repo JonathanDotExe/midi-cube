@@ -15,8 +15,10 @@ private:
 	std::array<T, N> buffer;
 	std::size_t start;
 	std::size_t end;
+
 public:
 	T at(size_t pos);
+	void push_back(T t);
 	std::size_t size();
 	std::size_t buffer_size();
 };

@@ -4,15 +4,27 @@
  *  Created on: 28 Jun 2020
  *      Author: jojo
  */
-
-#ifndef MIDICUBE_UTIL_CPP_
-#define MIDICUBE_UTIL_CPP_
-
 #include "util.h"
 
-/*T CircularBuffer::at(size_t pos);
-std::size_t  CircularBuffer::size();
-std::size_t  CircularBuffer::buffer_size();*/
 
+template<class T, std::size_t N> T CircularBuffer<T, N>::at(size_t pos) {
+	return buffer[(start + pos) %buffer.size()];
+};
 
-#endif /* MIDICUBE_UTIL_CPP_ */
+template<class T, std::size_t N> void CircularBuffer<T, N>::push_back(T t) {
+	buffer[end] = t;
+	++end;
+	end %= buffer.size();
+	if (end == start) {
+		start++;
+	}
+};
+
+template<class T, std::size_t N> std::size_t  CircularBuffer<T, N>::size() {
+	return end < start ? (buffer.size() - start + end) : (end - start);
+};
+
+template<class T, std::size_t N> std::size_t  CircularBuffer<T, N>::buffer_size() {
+	return buffer.size();
+};
+
