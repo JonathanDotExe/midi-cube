@@ -52,6 +52,10 @@ public:
 #define ROTARY_HORN_FAST_FREQUENCY 6.8
 #define ROTARY_BASS_SLOW_FREQUENCY 0.76
 #define ROTARY_BASS_FAST_FREQUENCY 6.5
+#define SPEAKER_RADIUS 0.25
+#define HORN_RADIUS 0.15
+#define BASS_RADIUS 0.15
+#define SOUND_SPEED 343.2
 
 struct B3OrganData {
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbars = {8, 8, 8, 8, 8, 8, 8, 8, 8};

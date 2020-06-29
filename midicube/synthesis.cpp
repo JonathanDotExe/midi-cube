@@ -43,52 +43,17 @@ extern double noise_wave(double time, double freq) {
 
 
 //DelayBuffer
-void DelayBuffer::add_sample(DelaySample sample) {
-	buffer.push_back(sample);
-}
-
-double DelayBuffer::process(double time) {
-	double sample = 0;
-	while (buffer.size() > 0) {
-		DelaySample samp = buffer.peek_first();
-		if (samp.time <= time) {
-			buffer.pop_first();
-			sample += samp.sample;
-		}
-		else {
-			break;
-		}
-	}
-	return sample;
-}
-
-//SortedDelay
-SortedDelayBuffer::SortedDelayBuffer() {
-	buffer.resize(DELAY_BUFFER_SIZE);
-}
-
-void SortedDelayBuffer::add_sample(DelaySample sample) {
-	std::size_t nbuf = buffer.size();
-	for (std::size_t i = 0; i < nbuf; ++i) {
-		if (buffer[i].time > sample.time) {
-			buffer.insert(buffer.begin() + i, sample);
-			break;
-		}
+void DelayBuffer::add_sample(double sample, unsigned int delay) {
+	if (delay < buffer.size()) {
+		buffer[(index + delay) % buffer.size()] += sample;
 	}
 }
 
-double SortedDelayBuffer::process(double time) {
-	double sample = 0;
-	while (buffer.size() > 0) {
-		DelaySample samp = buffer[0];
-		if (samp.time <= time) {
-			buffer.erase(buffer.begin());
-			sample += samp.sample;
-		}
-		else {
-			break;
-		}
-	}
+double DelayBuffer::process() {
+	double sample = buffer[index];
+	buffer[index] = 0;
+	index++;
+	index %= buffer.size();
 	return sample;
 }
 

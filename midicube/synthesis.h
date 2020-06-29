@@ -8,8 +8,7 @@
 #ifndef MIDICUBE_SYNTHESIS_H_
 #define MIDICUBE_SYNTHESIS_H_
 
-#include "util.h"
-#include <vector>
+#include <array>
 
 #define DELAY_BUFFER_SIZE 1048576
 
@@ -30,34 +29,16 @@ extern double saw_wave(double time, double freq);
  */
 extern double noise_wave(double time, double freq);
 
-struct DelaySample {
-	double time;
-	double sample;
-};
-
 class DelayBuffer {
 private:
-	CircularBuffer<DelaySample, DELAY_BUFFER_SIZE> buffer;
+	std::array<double, DELAY_BUFFER_SIZE> buffer = {};
+	std::size_t index;
 
 public:
 
-	void add_sample(DelaySample sample);
+	void add_sample(double sample, unsigned int delay);
 
-	double process(double time);
-
-};
-
-class SortedDelayBuffer {
-private:
-	std::vector<DelaySample> buffer;
-
-public:
-
-	SortedDelayBuffer();
-
-	void add_sample(DelaySample sample);
-
-	double process(double time);
+	double process();
 
 };
 
