@@ -9,8 +9,9 @@
 #define MIDICUBE_SYNTHESIS_H_
 
 #include "util.h"
+#include <vector>
 
-#define DELAY_BUFFER_SIZE 8192
+#define DELAY_BUFFER_SIZE 1048576
 
 extern double note_to_freq_transpose (double tnote);
 
@@ -39,6 +40,20 @@ private:
 	CircularBuffer<DelaySample, DELAY_BUFFER_SIZE> buffer;
 
 public:
+
+	void add_sample(DelaySample sample);
+
+	double process(double time);
+
+};
+
+class SortedDelayBuffer {
+private:
+	std::vector<DelaySample> buffer;
+
+public:
+
+	SortedDelayBuffer();
 
 	void add_sample(DelaySample sample);
 

@@ -9,6 +9,7 @@
 #define MIDICUBE_UTIL_H_
 
 #include <array>
+#include <iostream>
 
 
 template<class T, std::size_t N> class CircularBuffer {
@@ -35,6 +36,7 @@ public:
 		end %= buffer.size();
 		if (end == start) {
 			start++;
+			std::cerr << "Buffer overflow" << std::endl;
 		}
 	};
 

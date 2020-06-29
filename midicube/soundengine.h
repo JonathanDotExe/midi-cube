@@ -10,6 +10,7 @@
 
 #include "device.h"
 #include "midi.h"
+#include "synthesis.h"
 #include <string>
 #include <array>
 
@@ -54,7 +55,7 @@ public:
 
 struct B3OrganData {
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbars = {8, 8, 8, 8, 8, 8, 8, 8, 8};
-	bool rotary = false;
+	bool rotary = true;
 	bool rotary_fast = true;
 };
 
@@ -63,7 +64,10 @@ class B3Organ : public SoundEngine {
 private:
 	B3OrganData data;
 	std::array<double, ORGAN_DRAWBAR_COUNT> drawbar_harmonics;
-
+	DelayBuffer left_horn_del;
+	DelayBuffer left_bass_del;
+	DelayBuffer right_horn_del;
+	DelayBuffer right_bass_del;
 public:
 	B3Organ();
 

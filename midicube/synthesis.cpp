@@ -51,8 +51,38 @@ double DelayBuffer::process(double time) {
 	double sample = 0;
 	while (buffer.size() > 0) {
 		DelaySample samp = buffer.peek_first();
-		if (samp.time >= time) {
+		if (samp.time <= time) {
 			buffer.pop_first();
+			sample += samp.sample;
+		}
+		else {
+			break;
+		}
+	}
+	return sample;
+}
+
+//SortedDelay
+SortedDelayBuffer::SortedDelayBuffer() {
+	buffer.resize(DELAY_BUFFER_SIZE);
+}
+
+void SortedDelayBuffer::add_sample(DelaySample sample) {
+	std::size_t nbuf = buffer.size();
+	for (std::size_t i = 0; i < nbuf; ++i) {
+		if (buffer[i].time > sample.time) {
+			buffer.insert(buffer.begin() + i, sample);
+			break;
+		}
+	}
+}
+
+double SortedDelayBuffer::process(double time) {
+	double sample = 0;
+	while (buffer.size() > 0) {
+		DelaySample samp = buffer[0];
+		if (samp.time <= time) {
+			buffer.erase(buffer.begin());
 			sample += samp.sample;
 		}
 		else {

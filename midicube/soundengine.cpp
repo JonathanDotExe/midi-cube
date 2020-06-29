@@ -29,8 +29,18 @@ std::string PresetSynth::get_name() {
 }
 
 //B3Organ
+#define SPEAKER_RADIUS 0.25
+#define HORN_RADIUS 0.15
+#define BASS_RADIUS 0.15
+#define SOUND_SPEED 343.2
+
 B3Organ::B3Organ() {
 	drawbar_harmonics = {0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8};
+}
+
+static inline double sound_delay(double rotation, double radius) {
+	double dst = rotation >= 0 ? (SPEAKER_RADIUS - radius * rotation) : (SPEAKER_RADIUS + radius * rotation + radius * 2);
+	return dst/SOUND_SPEED;
 }
 
 double B3Organ::process_sample(unsigned int channel, double time, double freq) {
@@ -56,13 +66,45 @@ double B3Organ::process_sample(unsigned int channel, double time, double freq) {
 
 	//Rotary speaker
 	if (data.rotary) {
-		//Horn
+		double mul = channel % 2 == 0 ? 1 : 1;
+
 		double horn_speed = data.rotary_fast ? ROTARY_HORN_FAST_FREQUENCY : ROTARY_HORN_SLOW_FREQUENCY;
-		//Bass
 		double bass_speed = data.rotary_fast ? ROTARY_BASS_FAST_FREQUENCY : ROTARY_BASS_SLOW_FREQUENCY;
+
+		//Horn
+		DelaySample samp_horn{time + sound_delay(sine_wave(time, horn_speed) * mul, HORN_RADIUS), horn_sample};
+		//Bass
+		DelaySample samp_bass{time + sound_delay(sine_wave(time, bass_speed) * mul, BASS_RADIUS), bass_sample};
+
+		//Horn
+		//DelaySample samp_horn{time + (1 + sine_wave(time, horn_speed)) * HORN_RADIUS/SOUND_SPEED, horn_sample};
+		//Bass
+		//DelaySample samp_bass{time + (1 + sine_wave(time, bass_speed)) * BASS_RADIUS/SOUND_SPEED, bass_sample};
+
+		//Process
+		if (channel % 2 == 0) {
+			if (horn_sample) {
+				left_horn_del.add_sample(samp_horn);
+			}
+			if (bass_sample) {
+				left_bass_del.add_sample(samp_bass);
+			}
+			sample += left_horn_del.process(time);
+			sample += left_bass_del.process(time);
+		}
+		else {
+			if (horn_sample) {
+				right_horn_del.add_sample(samp_horn);
+			}
+			if (bass_sample) {
+				right_bass_del.add_sample(samp_bass);
+			}
+			sample += right_horn_del.process(time);
+			sample += right_bass_del.process(time);
+		}
 	}
 	else {
-		sample = horn_sample + bass_sample;
+		sample += horn_sample + bass_sample;
 	}
 
 	return sample * 0.1;
@@ -75,7 +117,7 @@ std::string B3Organ::get_name() {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice(std::string identifier) {
 	this->identifier = identifier;
-	engine = new B3Organ();
+	engine = new PresetSynth();
 }
 
 std::string SoundEngineDevice::get_identifier() {
