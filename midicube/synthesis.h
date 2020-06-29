@@ -8,6 +8,9 @@
 #ifndef MIDICUBE_SYNTHESIS_H_
 #define MIDICUBE_SYNTHESIS_H_
 
+#include "util.h"
+
+#define DELAY_BUFFER_SIZE 8192
 
 extern double note_to_freq_transpose (double tnote);
 
@@ -25,5 +28,22 @@ extern double saw_wave(double time, double freq);
  * The arguments are irrelevant here, they are just there if a function pointer to a generic wave function is needed
  */
 extern double noise_wave(double time, double freq);
+
+struct DelaySample {
+	double time;
+	double sample;
+};
+
+class DelayBuffer {
+private:
+	CircularBuffer<DelaySample, DELAY_BUFFER_SIZE> buffer;
+
+public:
+
+	void add_sample(DelaySample sample);
+
+	double process(double time);
+
+};
 
 #endif /* MIDICUBE_SYNTHESIS_H_ */

@@ -8,6 +8,7 @@
 #include "synthesis.h"
 #include <cmath>
 
+
 extern double note_to_freq_transpose (double tnote) {
 	return pow(2, (tnote)/12.0);
 }
@@ -39,4 +40,26 @@ extern double saw_wave(double time, double freq) {
 extern double noise_wave(double time, double freq) {
 	return ((double) rand())/RAND_MAX* 2 - 1;
 }
+
+
+//DelayBuffer
+void DelayBuffer::add_sample(DelaySample sample) {
+	buffer.push_back(sample);
+}
+
+double DelayBuffer::process(double time) {
+	double sample = 0;
+	while (buffer.size() > 0) {
+		DelaySample samp = buffer.peek_first();
+		if (samp.time >= time) {
+			buffer.pop_first();
+			sample += samp.sample;
+		}
+		else {
+			break;
+		}
+	}
+	return sample;
+}
+
 
