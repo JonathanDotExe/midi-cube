@@ -40,7 +40,7 @@ public:
 	void init();
 	void create_default_devices();
 	void add_device(AudioDevice* device);
-	double process(unsigned int channel, double time);
+	double process(unsigned int channel, SampleInfo& info);
 	void midi_callback(MidiMessage& message, std::string device);
 	void add_binding(DeviceBinding binding);
 };

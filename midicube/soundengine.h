@@ -20,7 +20,7 @@
 class SoundEngine {
 
 public:
-	virtual double process_sample(unsigned int channel, double time, double freq) = 0;
+	virtual double process_sample(unsigned int channel, SampleInfo& info, double freq) = 0;
 
 	virtual std::string get_name() = 0;
 
@@ -40,7 +40,7 @@ public:
 
 	PresetSynth();
 
-	double process_sample(unsigned int channel, double time, double freq);
+	double process_sample(unsigned int channel, SampleInfo& info, double freq);
 
 	std::string get_name();
 
@@ -71,7 +71,7 @@ private:
 public:
 	B3Organ();
 
-	double process_sample(unsigned int channel, double time, double freq);
+	double process_sample(unsigned int channel, SampleInfo& info, double freq);
 
 	std::string get_name();
 
@@ -99,7 +99,7 @@ public:
 
 	void send(MidiMessage& message);
 
-	double process_sample(unsigned int channel, double time);
+	double process_sample(unsigned int channel, SampleInfo& info);
 
 	~SoundEngineDevice();
 

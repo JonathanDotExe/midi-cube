@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include "midi.h"
+#include "audio.h"
 
 class AudioDevice {
 
@@ -42,7 +43,7 @@ public:
 	/**
 	 * For Audio Inputs
 	 */
-	virtual double process_sample(unsigned int channel, double time) {
+	virtual double process_sample(unsigned int channel, SampleInfo& info) {
 		return 0.0;
 	}
 

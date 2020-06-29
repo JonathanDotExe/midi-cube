@@ -9,8 +9,8 @@
 #include "soundengine.h"
 #include <iostream>
 
-static double process_func(unsigned int channel, double time, void* user_data) {
-	return ((MidiCube*) user_data)->process(channel, time);
+static double process_func(unsigned int channel, SampleInfo& info, void* user_data) {
+	return ((MidiCube*) user_data)->process(channel, info);
 }
 
 static void midi_callback_func(double deltatime, MidiMessage& msg, void* arg) {
@@ -27,10 +27,10 @@ void MidiCube::init() {
 	audio_handler.init();
 };
 
-double MidiCube::process(unsigned int channel, double time) {
+double MidiCube::process(unsigned int channel, SampleInfo& info) {
 	double sig = 0;
 	for (std::pair<std::string, AudioDevice*> device : devices) {
-		sig += device.second->process_sample(channel, time);
+		sig += device.second->process_sample(channel, info);
 	}
 	return sig;
 };

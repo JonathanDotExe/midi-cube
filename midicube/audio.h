@@ -27,6 +27,13 @@ public:
 	}
 };
 
+struct SampleInfo {
+	double time;
+	double time_step;
+	unsigned int sample_rate;
+	unsigned int sample_time;
+};
+
 class AudioHandler {
 
 private:
@@ -34,20 +41,21 @@ private:
 	jack_port_t* output_port_1 = NULL;
 	jack_port_t* output_port_2 = NULL;
 	void* user_data = nullptr;
-	double (* get_sample) (unsigned int, double, void*) = NULL;
+	double (* get_sample) (unsigned int, SampleInfo&, void*) = NULL;
 	/**
 	 * Only for use in the jack audio thread
 	 */
 	double time = 0.0;
 	std::atomic<double> time_step{0.0};
-
+	std::atomic<unsigned int> sample_rate{0};
+	unsigned int sample_time = 0;
 public:
 
 	~AudioHandler() {
 		close();
 	};
 
-	void set_sample_callback(double (* get_sample) (unsigned int, double, void*), void* user_data);
+	void set_sample_callback(double (* get_sample) (unsigned int, SampleInfo&, void*), void* user_data);
 
 	void init();
 

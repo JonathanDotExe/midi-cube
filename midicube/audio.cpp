@@ -68,6 +68,7 @@ void AudioHandler::init() {
 };
 
 void AudioHandler::sample_rate_callback(jack_nframes_t nframes) {
+	sample_rate = nframes;
 	time_step = 1.0/nframes;
 };
 
@@ -75,14 +76,16 @@ int AudioHandler::process(jack_nframes_t nframes) {
 	jack_default_audio_sample_t* buffer1 = (jack_default_audio_sample_t*) jack_port_get_buffer(output_port_1, nframes);
 	jack_default_audio_sample_t* buffer2 = (jack_default_audio_sample_t*) jack_port_get_buffer(output_port_2, nframes);
 
+	SampleInfo info;
 	//Compute each sample
 	for (jack_nframes_t i = 0; i < nframes; ++i) {
 		//double sample = fmax(-1, fmin(1, get_sample(0, time, user_data)));
-
-		buffer1[i] = get_sample(0, time, user_data);;
-		buffer2[i] = get_sample(1, time, user_data);;
+		info = {time, time_step, sample_rate, sample_time};
+		buffer1[i] = get_sample(0, info, user_data);
+		buffer2[i] = get_sample(1, info, user_data);
 
 		time += time_step;
+		++sample_time;
 	}
 	return 0;
 };
@@ -94,7 +97,7 @@ void AudioHandler::close() {
 	}
 };
 
-void AudioHandler::set_sample_callback(double (* get_sample) (unsigned int, double, void*), void* user_data) {
+void AudioHandler::set_sample_callback(double (* get_sample) (unsigned int, SampleInfo&, void*), void* user_data) {
 	this->get_sample = get_sample;
 	this->user_data = user_data;
 }
