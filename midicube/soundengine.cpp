@@ -94,21 +94,17 @@ double B3Organ::process_note_sample(unsigned int channel, SampleInfo &info,
 		//Process
 		if (channel % 2 == 0) {
 			if (horn_sample) {
-				left_horn_del.add_sample(horn_sample, horn_delay, 8,
-						ORGAN_REP_DELAY * info.sample_rate, 0.5);
+				left_horn_del.add_sample(horn_sample, horn_delay);
 			}
 			if (bass_sample) {
-				left_bass_del.add_sample(bass_sample, bass_delay, 8,
-						ORGAN_REP_DELAY * info.sample_rate, 0.5);
+				left_bass_del.add_sample(bass_sample, bass_delay);
 			}
 		} else {
 			if (horn_sample) {
-				right_horn_del.add_sample(horn_sample, horn_delay, 8,
-						ORGAN_REP_DELAY * info.sample_rate, 0.5);
+				right_horn_del.add_sample(horn_sample, horn_delay);
 			}
 			if (bass_sample) {
-				right_bass_del.add_sample(bass_sample, bass_delay, 8,
-						ORGAN_REP_DELAY * info.sample_rate, 0.5);
+				right_bass_del.add_sample(bass_sample, bass_delay);
 			}
 		}
 	} else {
