@@ -26,6 +26,10 @@ public:
 		return 0;
 	};
 
+	virtual void control_change(unsigned int control, unsigned int value) {
+
+	};
+
 	virtual std::string get_name() = 0;
 
 	virtual ~SoundEngine() {
@@ -64,8 +68,11 @@ public:
 
 struct B3OrganData {
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbars = {8, 8, 8, 8, 8, 8, 8, 8, 8};
+	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs = {1, 2, 3, 4, 5, 6, 7, 8, 8};
 	bool rotary = true;
 	bool rotary_fast = true;
+	unsigned int rotary_cc = 9;
+	unsigned int rotary_speed_cc = 10;
 };
 
 class B3Organ : public SoundEngine {
@@ -83,6 +90,8 @@ public:
 	double process_note_sample(unsigned int channel, SampleInfo& info, double freq);
 
 	double process_sample(unsigned int channel, SampleInfo& info);
+
+	void control_change(unsigned int control, unsigned int value);
 
 	std::string get_name();
 

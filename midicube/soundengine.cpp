@@ -57,13 +57,11 @@ double B3Organ::process_note_sample(unsigned int channel, SampleInfo &info,
 			f /= 2.0;
 		}
 		if (f > ROTARY_CUTOFF) {
-			horn_sample += data.drawbars[i] / 8.0 * sine_wave(info.time, f);
+			horn_sample += data.drawbars[i] / 8.0 * sine_wave(info.time, f) / data.drawbars.size();
 		} else {
-			bass_sample += data.drawbars[i] / 8.0 * sine_wave(info.time, f);
+			bass_sample += data.drawbars[i] / 8.0 * sine_wave(info.time, f) / data.drawbars.size();
 		}
 	}
-	horn_sample /= data.drawbars.size();
-	bass_sample /= data.drawbars.size();
 	double sample = 0;
 
 	//Rotary speaker
@@ -111,7 +109,7 @@ double B3Organ::process_note_sample(unsigned int channel, SampleInfo &info,
 		sample += horn_sample + bass_sample;
 	}
 
-	return sample * 0.05;
+	return sample * 0.2;
 }
 
 double B3Organ::process_sample(unsigned int channel, SampleInfo &info) {
@@ -123,7 +121,23 @@ double B3Organ::process_sample(unsigned int channel, SampleInfo &info) {
 		sample += right_horn_del.process();
 		sample += right_bass_del.process();
 	}
-	return sample * 0.05;
+	return sample * 0.2;
+}
+
+void B3Organ::control_change(unsigned int control, unsigned int value) {
+	//Drawbars
+	for (size_t i = 0; i < data.drawbar_ccs.size(); ++i) {
+		if (data.drawbar_ccs[i] == control) {
+			data.drawbars[i] = round((double) value/127 * 8);
+		}
+	}
+	//Rotary
+	if (control == data.rotary_cc) {
+		data.rotary = value > 0;
+	}
+	if (control == data.rotary_speed_cc) {
+		data.rotary_fast = value > 0;
+	}
 }
 
 std::string B3Organ::get_name() {
@@ -178,6 +192,9 @@ void SoundEngineDevice::send(MidiMessage &message) {
 				amplitude[i] = 0;
 			}
 		}
+	}
+	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
+		engine->control_change(message.get_control(), message.get_value());
 	}
 }
 
