@@ -16,7 +16,7 @@ PresetSynth::PresetSynth() {
 	ndetune = note_to_freq_transpose(-0.1);
 }
 
-double PresetSynth::process_sample(unsigned int channel, SampleInfo &info,
+double PresetSynth::process_note_sample(unsigned int channel, SampleInfo &info,
 		double freq) {
 	double sample = 0.0;
 	sample += saw_wave(info.time, freq);
@@ -37,14 +37,15 @@ B3Organ::B3Organ() {
 
 static inline unsigned int sound_delay(double rotation, double radius,
 		unsigned int sample_rate) {
-	double dst =
+	/*double dst =
 			rotation >= 0 ?
 					(SPEAKER_RADIUS - radius * rotation) :
 					(SPEAKER_RADIUS + radius * rotation + radius * 2);
-	return round(dst / SOUND_SPEED * sample_rate);
+	return round(dst / SOUND_SPEED * sample_rate);*/
+	return (1 + rotation) * radius / SOUND_SPEED * sample_rate;
 }
 
-double B3Organ::process_sample(unsigned int channel, SampleInfo &info,
+double B3Organ::process_note_sample(unsigned int channel, SampleInfo &info,
 		double freq) {
 	double horn_sample = 0;
 	double bass_sample = 0;
@@ -69,12 +70,12 @@ double B3Organ::process_sample(unsigned int channel, SampleInfo &info,
 	if (data.rotary) {
 		double mul = channel % 2 == 0 ? 1 : -1;
 
-		double horn_speed =
-				data.rotary_fast ?
-						ROTARY_HORN_FAST_FREQUENCY : ROTARY_HORN_SLOW_FREQUENCY;
-		double bass_speed =
-				data.rotary_fast ?
-						ROTARY_BASS_FAST_FREQUENCY : ROTARY_BASS_SLOW_FREQUENCY;
+		double horn_speed = data.rotary_fast ?
+		ROTARY_HORN_FAST_FREQUENCY :
+												ROTARY_HORN_SLOW_FREQUENCY;
+		double bass_speed = data.rotary_fast ?
+		ROTARY_BASS_FAST_FREQUENCY :
+												ROTARY_BASS_SLOW_FREQUENCY;
 
 		//Horn
 		unsigned int horn_delay = sound_delay(
@@ -93,28 +94,40 @@ double B3Organ::process_sample(unsigned int channel, SampleInfo &info,
 		//Process
 		if (channel % 2 == 0) {
 			if (horn_sample) {
-				left_horn_del.add_sample(horn_sample, horn_delay);
+				left_horn_del.add_sample(horn_sample, horn_delay, 8,
+						ORGAN_REP_DELAY * info.sample_rate, 0.5);
 			}
 			if (bass_sample) {
-				left_bass_del.add_sample(bass_sample, bass_delay);
+				left_bass_del.add_sample(bass_sample, bass_delay, 8,
+						ORGAN_REP_DELAY * info.sample_rate, 0.5);
 			}
-			sample += left_horn_del.process();
-			sample += left_bass_del.process();
 		} else {
 			if (horn_sample) {
-				right_horn_del.add_sample(horn_sample, horn_delay);
+				right_horn_del.add_sample(horn_sample, horn_delay, 8,
+						ORGAN_REP_DELAY * info.sample_rate, 0.5);
 			}
 			if (bass_sample) {
-				right_bass_del.add_sample(bass_sample, bass_delay);
+				right_bass_del.add_sample(bass_sample, bass_delay, 8,
+						ORGAN_REP_DELAY * info.sample_rate, 0.5);
 			}
-			sample += right_horn_del.process();
-			sample += right_bass_del.process();
 		}
 	} else {
 		sample += horn_sample + bass_sample;
 	}
 
-	return sample * 0.1;
+	return sample * 0.05;
+}
+
+double B3Organ::process_sample(unsigned int channel, SampleInfo &info) {
+	double sample = 0;
+	if (channel % 2 == 0) {
+		sample += left_horn_del.process();
+		sample += left_bass_del.process();
+	} else {
+		sample += right_horn_del.process();
+		sample += right_bass_del.process();
+	}
+	return sample * 0.05;
 }
 
 std::string B3Organ::get_name() {
@@ -136,10 +149,11 @@ double SoundEngineDevice::process_sample(unsigned int channel,
 	double sample = 0.0;
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (amplitude[i]) {
-			sample += engine->process_sample(channel, info, freq[i])
+			sample += engine->process_note_sample(channel, info, freq[i])
 					* amplitude[i];
 		}
 	}
+	sample += engine->process_sample(channel, info);
 	return sample;
 }
 

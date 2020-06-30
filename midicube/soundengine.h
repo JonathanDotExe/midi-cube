@@ -20,7 +20,11 @@
 class SoundEngine {
 
 public:
-	virtual double process_sample(unsigned int channel, SampleInfo& info, double freq) = 0;
+	virtual double process_note_sample(unsigned int channel, SampleInfo& info, double freq) = 0;
+
+	virtual double process_sample(unsigned int channel, SampleInfo& info) {
+		return 0;
+	};
 
 	virtual std::string get_name() = 0;
 
@@ -40,7 +44,7 @@ public:
 
 	PresetSynth();
 
-	double process_sample(unsigned int channel, SampleInfo& info, double freq);
+	double process_note_sample(unsigned int channel, SampleInfo& info, double freq);
 
 	std::string get_name();
 
@@ -56,6 +60,7 @@ public:
 #define HORN_RADIUS 0.15
 #define BASS_RADIUS 0.15
 #define SOUND_SPEED 343.2
+#define ORGAN_REP_DELAY 0.000728226
 
 struct B3OrganData {
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbars = {8, 8, 8, 8, 8, 8, 8, 8, 8};
@@ -75,7 +80,9 @@ private:
 public:
 	B3Organ();
 
-	double process_sample(unsigned int channel, SampleInfo& info, double freq);
+	double process_note_sample(unsigned int channel, SampleInfo& info, double freq);
+
+	double process_sample(unsigned int channel, SampleInfo& info);
 
 	std::string get_name();
 

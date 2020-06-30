@@ -36,6 +36,8 @@ private:
 
 public:
 
+	void add_sample(double sample, unsigned int delay, unsigned int repetition, unsigned int rep_delay, double factor);
+
 	void add_sample(double sample, unsigned int delay);
 
 	double process();
