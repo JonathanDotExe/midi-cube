@@ -147,7 +147,7 @@ std::string B3Organ::get_name() {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice(std::string identifier) {
 	this->identifier = identifier;
-	engine = new B3Organ();
+	engine = new PresetSynth();
 }
 
 std::string SoundEngineDevice::get_identifier() {
@@ -159,7 +159,7 @@ double SoundEngineDevice::process_sample(unsigned int channel,
 	double sample = 0.0;
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (amplitude[i]) {
-			sample += engine->process_note_sample(channel, info, freq[i])
+			sample += engine->process_note_sample(channel, info, freq[i] * pitch_bend)
 					* amplitude[i];
 		}
 	}
@@ -195,6 +195,11 @@ void SoundEngineDevice::send(MidiMessage &message) {
 	}
 	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
 		engine->control_change(message.get_control(), message.get_value());
+	}
+	else if (message.get_message_type() == MessageType::PITCH_BEND) {
+		double pitch = (message.get_pitch_bend()/4096.0 - 1.0) * 2;
+		pitch_bend = note_to_freq_transpose(pitch);
+
 	}
 }
 

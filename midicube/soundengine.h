@@ -103,6 +103,7 @@ private:
 	std::string identifier;
 	double freq[SOUND_ENGINE_POLYPHONY] = {};
 	double amplitude[SOUND_ENGINE_POLYPHONY] = {};
+	double pitch_bend = 1;
 	SoundEngine* engine;
 
 	size_t next_freq_slot();
