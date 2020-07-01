@@ -39,6 +39,10 @@ public:
 
 	};
 
+	virtual double release_time() {
+		return 0;
+	}
+
 	virtual std::string get_name() = 0;
 
 	virtual ~SoundEngine() {
@@ -76,7 +80,7 @@ public:
 #define ROTARY_HORN_FAST_FREQUENCY 6.8
 #define ROTARY_BASS_SLOW_FREQUENCY 0.76
 #define ROTARY_BASS_FAST_FREQUENCY 6.5
-#define SPEAKER_RADIUS 0.25
+#define SPEAKER_RADIUS 0.1
 #define HORN_RADIUS 0.15
 #define BASS_RADIUS 0.15
 #define SOUND_SPEED 343.2
@@ -125,6 +129,8 @@ private:
 	size_t next_freq_slot();
 
 public:
+
+	AudioHandler* handler = nullptr; //TODO remove this reference and pass time through send() to be thread-safe
 
 	SoundEngineDevice(std::string identifier);
 

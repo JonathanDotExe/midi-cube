@@ -14,13 +14,13 @@
 PresetSynth::PresetSynth() {
 	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
-	vib_detune = note_to_freq_transpose(SYNTH_VIBRATO_DETUNE);
+	vib_detune = note_to_freq_transpose(0.25);
 	vibrato = 0;
 }
 
 double PresetSynth::process_note_sample(unsigned int channel, SampleInfo &info, TriggeredNote& note, double phase_mul) {
 	double sample = 0.0;
-	double freq = note_to_freq(note.note + sine_wave(info.time, SYNTH_VIBRATO_RATE) * SYNTH_VIBRATO_DETUNE * vibrato);
+	double freq = note_to_freq(note.note - sine_wave(info.time, SYNTH_VIBRATO_RATE) * SYNTH_VIBRATO_DETUNE * vibrato);
 	sample += saw_wave(phase_mul, freq);
 	sample += saw_wave(phase_mul, freq * detune);
 	sample += saw_wave(phase_mul, freq * ndetune);
@@ -202,6 +202,7 @@ void SoundEngineDevice::send(MidiMessage &message) {
 				note[i].freq = 0;
 				note[i].note = 0;
 				note[i].velocity = 0;
+				note[i].start_time = handler->sample_info().time;
 			}
 		}
 	}

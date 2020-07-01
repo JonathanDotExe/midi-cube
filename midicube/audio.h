@@ -65,6 +65,8 @@ public:
 
 	void sample_rate_callback(jack_nframes_t nframes);
 
+	SampleInfo sample_info();
+
 };
 
 #endif /* MIDICUBE_AUDIO_H_ */

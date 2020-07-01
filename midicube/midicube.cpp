@@ -58,6 +58,7 @@ void MidiCube::create_default_devices() {
 	}
 	//Sound Engine
 	SoundEngineDevice* device = new SoundEngineDevice("Sound Engine");
+	device->handler = &audio_handler; //TODO remove, bad practise
 	add_device(device);
 	//Bind devices to sound engine, will be removed later
 	for (std::pair<std::string, AudioDevice*> dev : devices) {

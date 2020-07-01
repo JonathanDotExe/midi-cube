@@ -102,3 +102,7 @@ void AudioHandler::set_sample_callback(double (* get_sample) (unsigned int, Samp
 	this->user_data = user_data;
 }
 
+SampleInfo AudioHandler::sample_info() {
+	return {time, time_step, sample_rate, sample_time};
+}
+
