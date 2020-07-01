@@ -17,11 +17,11 @@ PresetSynth::PresetSynth() {
 }
 
 double PresetSynth::process_note_sample(unsigned int channel, SampleInfo &info,
-		double freq) {
+		double freq, double phase_mul) {
 	double sample = 0.0;
-	sample += saw_wave(info.time, freq);
-	sample += saw_wave(info.time, freq * detune);
-	sample += saw_wave(info.time, freq * ndetune);
+	sample += saw_wave(phase_mul, freq);
+	sample += saw_wave(phase_mul, freq * detune);
+	sample += saw_wave(phase_mul, freq * ndetune);
 
 	return sample * 0.1;
 }
@@ -46,7 +46,7 @@ static inline unsigned int sound_delay(double rotation, double radius,
 }
 
 double B3Organ::process_note_sample(unsigned int channel, SampleInfo &info,
-		double freq) {
+		double freq, double phase_mul) {
 	double horn_sample = 0;
 	double bass_sample = 0;
 
@@ -57,9 +57,9 @@ double B3Organ::process_note_sample(unsigned int channel, SampleInfo &info,
 			f /= 2.0;
 		}
 		if (f > ROTARY_CUTOFF) {
-			horn_sample += data.drawbars[i] / 8.0 * sine_wave(info.time, f) / data.drawbars.size();
+			horn_sample += data.drawbars[i] / 8.0 * sine_wave(phase_mul, f) / data.drawbars.size();
 		} else {
-			bass_sample += data.drawbars[i] / 8.0 * sine_wave(info.time, f) / data.drawbars.size();
+			bass_sample += data.drawbars[i] / 8.0 * sine_wave(phase_mul, f) / data.drawbars.size();
 		}
 	}
 	double sample = 0;
@@ -159,11 +159,15 @@ double SoundEngineDevice::process_sample(unsigned int channel,
 	double sample = 0.0;
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (amplitude[i]) {
-			sample += engine->process_note_sample(channel, info, freq[i] * pitch_bend)
+			sample += engine->process_note_sample(channel, info, freq[i], phase_multiplier)
 					* amplitude[i];
 		}
 	}
 	sample += engine->process_sample(channel, info);
+	//TODO output for all channels
+	if (channel == 1) {
+		phase_multiplier += pitch_bend * info.time_step;
+	}
 	return sample;
 }
 
@@ -197,9 +201,8 @@ void SoundEngineDevice::send(MidiMessage &message) {
 		engine->control_change(message.get_control(), message.get_value());
 	}
 	else if (message.get_message_type() == MessageType::PITCH_BEND) {
-		double pitch = (message.get_pitch_bend()/4096.0 - 1.0) * 2;
+		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
 		pitch_bend = note_to_freq_transpose(pitch);
-
 	}
 }
 

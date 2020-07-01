@@ -20,7 +20,7 @@
 class SoundEngine {
 
 public:
-	virtual double process_note_sample(unsigned int channel, SampleInfo& info, double freq) = 0;
+	virtual double process_note_sample(unsigned int channel, SampleInfo& info, double freq, double phase_mul) = 0;
 
 	virtual double process_sample(unsigned int channel, SampleInfo& info) {
 		return 0;
@@ -48,7 +48,7 @@ public:
 
 	PresetSynth();
 
-	double process_note_sample(unsigned int channel, SampleInfo& info, double freq);
+	double process_note_sample(unsigned int channel, SampleInfo& info, double freq, double phase_mul);
 
 	std::string get_name();
 
@@ -87,7 +87,7 @@ private:
 public:
 	B3Organ();
 
-	double process_note_sample(unsigned int channel, SampleInfo& info, double freq);
+	double process_note_sample(unsigned int channel, SampleInfo& info, double freq, double phase_mul);
 
 	double process_sample(unsigned int channel, SampleInfo& info);
 
@@ -104,6 +104,7 @@ private:
 	double freq[SOUND_ENGINE_POLYPHONY] = {};
 	double amplitude[SOUND_ENGINE_POLYPHONY] = {};
 	double pitch_bend = 1;
+	double phase_multiplier = 0;
 	SoundEngine* engine;
 
 	size_t next_freq_slot();
