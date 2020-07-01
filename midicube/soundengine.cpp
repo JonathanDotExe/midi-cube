@@ -14,16 +14,26 @@
 PresetSynth::PresetSynth() {
 	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
+	vib_detune = note_to_freq_transpose(SYNTH_VIBRATO_DETUNE);
+	vibrato = 0;
 }
 
 double PresetSynth::process_note_sample(unsigned int channel, SampleInfo &info,
 		double freq, double phase_mul) {
 	double sample = 0.0;
+	std::cout << sine_wave(info.time, SYNTH_VIBRATO_RATE) * vib_detune * vibrato << std::endl;
+	freq *= sine_wave(info.time, SYNTH_VIBRATO_RATE) * vib_detune * vibrato + 1;
 	sample += saw_wave(phase_mul, freq);
 	sample += saw_wave(phase_mul, freq * detune);
 	sample += saw_wave(phase_mul, freq * ndetune);
 
 	return sample * 0.1;
+}
+
+void PresetSynth::control_change(unsigned int control, unsigned int value) {
+	if (control == 1) {
+		vibrato = value/127.0;
+	}
 }
 
 std::string PresetSynth::get_name() {

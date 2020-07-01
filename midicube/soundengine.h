@@ -38,17 +38,24 @@ public:
 
 };
 
+#define SYNTH_VIBRATO_RATE 6
+#define SYNTH_VIBRATO_DETUNE 0.25
+
 class PresetSynth : public SoundEngine {
 
 private:
 	double detune;
 	double ndetune;
+	double vib_detune;
+	double vibrato;
 
 public:
 
 	PresetSynth();
 
 	double process_note_sample(unsigned int channel, SampleInfo& info, double freq, double phase_mul);
+
+	void control_change(unsigned int control, unsigned int value);
 
 	std::string get_name();
 
