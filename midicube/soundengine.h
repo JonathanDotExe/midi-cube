@@ -17,10 +17,19 @@
 #define SOUND_ENGINE_POLYPHONY 30
 
 
+struct TriggeredNote {
+	double start_time = 0;
+	unsigned int note = 0;
+	double freq = 0;
+	double velocity = 0;
+	double aftertouch = 0;
+};
+
+
 class SoundEngine {
 
 public:
-	virtual double process_note_sample(unsigned int channel, SampleInfo& info, double freq, double phase_mul) = 0;
+	virtual double process_note_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, double phase_mul) = 0;
 
 	virtual double process_sample(unsigned int channel, SampleInfo& info) {
 		return 0;
@@ -53,7 +62,7 @@ public:
 
 	PresetSynth();
 
-	double process_note_sample(unsigned int channel, SampleInfo& info, double freq, double phase_mul);
+	double process_note_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, double phase_mul);
 
 	void control_change(unsigned int control, unsigned int value);
 
@@ -94,7 +103,7 @@ private:
 public:
 	B3Organ();
 
-	double process_note_sample(unsigned int channel, SampleInfo& info, double freq, double phase_mul);
+	double process_note_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, double phase_mul);
 
 	double process_sample(unsigned int channel, SampleInfo& info);
 
@@ -108,8 +117,7 @@ class SoundEngineDevice : public AudioDevice {
 
 private:
 	std::string identifier;
-	double freq[SOUND_ENGINE_POLYPHONY] = {};
-	double amplitude[SOUND_ENGINE_POLYPHONY] = {};
+	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
 	double pitch_bend = 1;
 	double phase_multiplier = 0;
 	SoundEngine* engine;
