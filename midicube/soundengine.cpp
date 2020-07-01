@@ -36,7 +36,7 @@ bool PresetSynth::note_finished(TriggeredNote& note, double time) {
 
 void PresetSynth::control_change(unsigned int control, unsigned int value) {
 	if (control == 1) {
-		vibrato = value/127.0;
+		vibrato = value/127.0 * value/127.0;
 	}
 }
 

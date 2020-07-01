@@ -53,7 +53,7 @@ private:
 	double ndetune;
 	double vib_detune;
 	double vibrato;
-	ADSREnvelope env{0.7, 0.5, 0.5, 1};
+	ADSREnvelope env{0.0005, 0.0, 1, 0.0005};
 public:
 
 	PresetSynth();
