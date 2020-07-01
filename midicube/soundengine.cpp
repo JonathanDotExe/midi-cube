@@ -25,7 +25,13 @@ double PresetSynth::process_note_sample(unsigned int channel, SampleInfo &info, 
 	sample += saw_wave(phase_mul, freq * detune);
 	sample += saw_wave(phase_mul, freq * ndetune);
 
-	return sample * 0.1;
+	double amp = env.amplitude(info.time, note);
+
+	return sample * 0.1 * amp;
+}
+
+bool PresetSynth::note_finished(TriggeredNote& note, double time) {
+	return !note.pressed && note.release_time + env.release < time;
 }
 
 void PresetSynth::control_change(unsigned int control, unsigned int value) {
@@ -33,6 +39,8 @@ void PresetSynth::control_change(unsigned int control, unsigned int value) {
 		vibrato = value/127.0;
 	}
 }
+
+
 
 std::string PresetSynth::get_name() {
 	return "Preset Synth";
@@ -155,6 +163,11 @@ std::string B3Organ::get_name() {
 SoundEngineDevice::SoundEngineDevice(std::string identifier) {
 	this->identifier = identifier;
 	engine = new PresetSynth();
+	//Init notes
+	for (size_t i = 0; i < note.size(); ++i) {
+		note[i].start_time = -1024;
+		note[i].release_time = -1024;
+	}
 }
 
 std::string SoundEngineDevice::get_identifier() {
@@ -165,7 +178,7 @@ double SoundEngineDevice::process_sample(unsigned int channel,
 		SampleInfo &info) {
 	double sample = 0.0;
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-		if (note[i].velocity) {
+		if (!engine->note_finished(note[i], info.time)) {
 			sample += engine->process_note_sample(channel, info, note[i], phase_multiplier);
 		}
 	}
@@ -179,7 +192,7 @@ double SoundEngineDevice::process_sample(unsigned int channel,
 
 size_t SoundEngineDevice::next_freq_slot() {
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-		if (!note[i].velocity) {
+		if (!note[i].pressed) {
 			return i;
 		}
 	}
@@ -188,27 +201,31 @@ size_t SoundEngineDevice::next_freq_slot() {
 }
 
 void SoundEngineDevice::send(MidiMessage &message) {
-	std::cout << message.to_string() << std::endl;
+	//Note on
 	if (message.get_message_type() == MessageType::NOTE_ON) {
 		size_t slot = next_freq_slot();
-		std::cout << slot << std::endl;
 		note[slot].freq = note_to_freq(message.get_note());
 		note[slot].velocity = message.get_velocity()/127.0;
 		note[slot].note = message.get_note();
-	} else if (message.get_message_type() == MessageType::NOTE_OFF) {
+		note[slot].pressed = true;
+		note[slot].start_time = handler->sample_info().time;
+		note[slot].release_time = 0;
+	}
+	//Note off
+	else if (message.get_message_type() == MessageType::NOTE_OFF) {
 		double f = note_to_freq(message.get_note());
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 			if (note[i].freq == f) {
-				note[i].freq = 0;
-				note[i].note = 0;
-				note[i].velocity = 0;
-				note[i].start_time = handler->sample_info().time;
+				note[i].pressed = false;
+				note[i].release_time = handler->sample_info().time;
 			}
 		}
 	}
+	//Control change
 	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
 		engine->control_change(message.get_control(), message.get_value());
 	}
+	//Pitch bend
 	else if (message.get_message_type() == MessageType::PITCH_BEND) {
 		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
 		pitch_bend = note_to_freq_transpose(pitch);

@@ -11,19 +11,11 @@
 #include "device.h"
 #include "midi.h"
 #include "synthesis.h"
+#include "envelope.h"
 #include <string>
 #include <array>
 
 #define SOUND_ENGINE_POLYPHONY 30
-
-
-struct TriggeredNote {
-	double start_time = 0;
-	unsigned int note = 0;
-	double freq = 0;
-	double velocity = 0;
-	double aftertouch = 0;
-};
 
 
 class SoundEngine {
@@ -39,8 +31,8 @@ public:
 
 	};
 
-	virtual double release_time() {
-		return 0;
+	virtual bool note_finished(TriggeredNote& note, double time) {
+		return !note.pressed;
 	}
 
 	virtual std::string get_name() = 0;
@@ -61,7 +53,7 @@ private:
 	double ndetune;
 	double vib_detune;
 	double vibrato;
-
+	ADSREnvelope env{0.7, 0.5, 0.5, 1};
 public:
 
 	PresetSynth();
@@ -69,6 +61,8 @@ public:
 	double process_note_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, double phase_mul);
 
 	void control_change(unsigned int control, unsigned int value);
+
+	bool note_finished(TriggeredNote& note, double time);
 
 	std::string get_name();
 

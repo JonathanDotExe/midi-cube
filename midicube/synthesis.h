@@ -44,11 +44,4 @@ public:
 
 };
 
-struct ADSREnvelope {
-	double attack;
-	double decay;
-	double sustain;
-	double release;
-};
-
 #endif /* MIDICUBE_SYNTHESIS_H_ */
