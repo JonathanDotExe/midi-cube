@@ -25,8 +25,6 @@ void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	sample += saw_wave(t, freq * detune);
 	sample += saw_wave(t, freq * ndetune);
 
-	std::cout << note.phase_shift << std::endl;
-
 	if (vibrato) {
 		note.phase_shift += info.time_step * (note_to_freq_transpose(SYNTH_VIBRATO_DETUNE * sine_wave(info.time, SYNTH_VIBRATO_RATE) * vibrato) - 1);
 	}
@@ -71,6 +69,8 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	double horn_sample = 0;
 	double bass_sample = 0;
 
+	double time = info.time + note.phase_shift;
+
 	/*double horn_time = phase_mul;
 	double bass_time = phase_mul;
 
@@ -89,9 +89,9 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 			f /= 2.0;
 		}
 		if (f > ROTARY_CUTOFF) {
-			horn_sample += data.drawbars[i] / 8.0 * sine_wave(info.time, f) / data.drawbars.size();
+			horn_sample += data.drawbars[i] / 8.0 * sine_wave(time, f) / data.drawbars.size();
 		} else {
-			bass_sample += data.drawbars[i] / 8.0 * sine_wave(info.time, f) / data.drawbars.size();
+			bass_sample += data.drawbars[i] / 8.0 * sine_wave(time, f) / data.drawbars.size();
 		}
 	}
 	double sample = 0;
@@ -166,7 +166,7 @@ std::string B3Organ::get_name() {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice(std::string identifier) {
 	this->identifier = identifier;
-	engine = new PresetSynth();
+	engine = new B3Organ();
 	//Init notes
 	for (size_t i = 0; i < note.size(); ++i) {
 		note[i].start_time = -1024;
