@@ -11,6 +11,9 @@
 #include <exception>
 #include <jack/jack.h>
 #include <atomic>
+#include <array>
+
+#define OUTPUT_CHANNELS 2
 
 class AudioException : public std::exception {
 
@@ -38,10 +41,10 @@ class AudioHandler {
 
 private:
 	jack_client_t* client = NULL;
-	jack_port_t* output_port_1 = NULL;
-	jack_port_t* output_port_2 = NULL;
+	jack_port_t* output_port_1 = nullptr;
+	jack_port_t* output_port_2 = nullptr;
 	void* user_data = nullptr;
-	double (* get_sample) (unsigned int, SampleInfo&, void*) = NULL;
+	void (* get_sample) (std::array<double, OUTPUT_CHANNELS>&, SampleInfo&, void*) = nullptr;
 	/**
 	 * Only for use in the jack audio thread
 	 */
@@ -49,13 +52,14 @@ private:
 	std::atomic<double> time_step{0.0};
 	std::atomic<unsigned int> sample_rate{0};
 	unsigned int sample_time = 0;
+	std::array<double, OUTPUT_CHANNELS> sample_buf = {};
 public:
 
 	~AudioHandler() {
 		close();
 	};
 
-	void set_sample_callback(double (* get_sample) (unsigned int, SampleInfo&, void*), void* user_data);
+	void set_sample_callback(void (* get_sample) (std::array<double, OUTPUT_CHANNELS>&, SampleInfo&, void*), void* user_data);
 
 	void init();
 

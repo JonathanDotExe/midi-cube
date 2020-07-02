@@ -81,8 +81,12 @@ int AudioHandler::process(jack_nframes_t nframes) {
 	for (jack_nframes_t i = 0; i < nframes; ++i) {
 		//double sample = fmax(-1, fmin(1, get_sample(0, time, user_data)));
 		info = {time, time_step, sample_rate, sample_time};
-		buffer1[i] = get_sample(0, info, user_data);
-		buffer2[i] = get_sample(1, info, user_data);
+
+		sample_buf = {0, 0};
+		get_sample(sample_buf, info, user_data);
+
+		buffer1[i] = sample_buf[0];
+		buffer2[i] = sample_buf[1];
 
 		time += time_step;
 		++sample_time;
@@ -97,7 +101,7 @@ void AudioHandler::close() {
 	}
 };
 
-void AudioHandler::set_sample_callback(double (* get_sample) (unsigned int, SampleInfo&, void*), void* user_data) {
+void AudioHandler::set_sample_callback(void (* get_sample) (std::array<double, OUTPUT_CHANNELS>&, SampleInfo&, void*), void* user_data) {
 	this->get_sample = get_sample;
 	this->user_data = user_data;
 }

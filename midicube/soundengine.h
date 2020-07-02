@@ -21,10 +21,10 @@
 class SoundEngine {
 
 public:
-	virtual double process_note_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, double phase_mul) = 0;
+	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, double pitch_time) = 0;
 
-	virtual double process_sample(unsigned int channel, SampleInfo& info) {
-		return 0;
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+
 	};
 
 	virtual void control_change(unsigned int control, unsigned int value) {
@@ -58,7 +58,7 @@ public:
 
 	PresetSynth();
 
-	double process_note_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, double phase_mul);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, double phase_mul);
 
 	void control_change(unsigned int control, unsigned int value);
 
@@ -83,8 +83,8 @@ public:
 struct B3OrganData {
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbars = {8, 8, 8, 8, 8, 8, 8, 8, 8};
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs = {1, 2, 3, 4, 5, 6, 7, 8, 8};
-	bool rotary = true;
-	bool rotary_fast = true;
+	bool rotary = false;
+	bool rotary_fast = false;
 	unsigned int rotary_cc = 9;
 	unsigned int rotary_speed_cc = 10;
 };
@@ -101,9 +101,9 @@ private:
 public:
 	B3Organ();
 
-	double process_note_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, double phase_mul);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, double phase_mul);
 
-	double process_sample(unsigned int channel, SampleInfo& info);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 
 	void control_change(unsigned int control, unsigned int value);
 
@@ -136,7 +136,7 @@ public:
 
 	void send(MidiMessage& message);
 
-	double process_sample(unsigned int channel, SampleInfo& info);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 
 	~SoundEngineDevice();
 

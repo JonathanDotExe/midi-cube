@@ -8,3 +8,7 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 * Looper, Arpeggiator, Sequencer/Drum Machine
 * A touch responsive GUI
 * A web interface or a desktop client that allows uploading new sounds
+
+## Used ressources
+* https://de.wikipedia.org/wiki/RIFF_WAVE
+

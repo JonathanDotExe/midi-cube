@@ -43,8 +43,8 @@ public:
 	/**
 	 * For Audio Inputs
 	 */
-	virtual double process_sample(unsigned int channel, SampleInfo& info) {
-		return 0.0;
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+
 	}
 
 	virtual bool is_midi_input() {
