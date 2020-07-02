@@ -14,16 +14,22 @@
 PresetSynth::PresetSynth() {
 	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
-	vib_detune = note_to_freq_transpose(0.25);
 	vibrato = 0;
 }
 
-void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, double phase_mul) {
+void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note) {
 	double sample = 0.0;
-	double freq = note_to_freq(note.note - sine_wave(info.time, SYNTH_VIBRATO_RATE) * SYNTH_VIBRATO_DETUNE * vibrato);
-	sample += saw_wave(phase_mul, freq);
-	sample += saw_wave(phase_mul, freq * detune);
-	sample += saw_wave(phase_mul, freq * ndetune);
+	double freq = note.freq;
+	double t = info.time + note.phase_shift;
+	sample += saw_wave(t, freq);
+	sample += saw_wave(t, freq * detune);
+	sample += saw_wave(t, freq * ndetune);
+
+	std::cout << note.phase_shift << std::endl;
+
+	if (vibrato) {
+		note.phase_shift += info.time_step * (note_to_freq_transpose(SYNTH_VIBRATO_DETUNE * sine_wave(info.time, SYNTH_VIBRATO_RATE) * vibrato) - 1);
+	}
 
 	double amp = env.amplitude(info.time, note);
 	sample *= 0.1 * amp;
@@ -39,7 +45,7 @@ bool PresetSynth::note_finished(TriggeredNote& note, double time) {
 
 void PresetSynth::control_change(unsigned int control, unsigned int value) {
 	if (control == 1) {
-		vibrato = value/127.0 * value/127.0;
+		vibrato = value/127.0;
 	}
 }
 
@@ -61,7 +67,7 @@ static inline unsigned int sound_delay(double rotation, double radius, unsigned 
 	return (1 + rotation) * radius / SOUND_SPEED * sample_rate;
 }
 
-void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, double phase_mul) {
+void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note) {
 	double horn_sample = 0;
 	double bass_sample = 0;
 
@@ -83,9 +89,9 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 			f /= 2.0;
 		}
 		if (f > ROTARY_CUTOFF) {
-			horn_sample += data.drawbars[i] / 8.0 * sine_wave(phase_mul, f) / data.drawbars.size();
+			horn_sample += data.drawbars[i] / 8.0 * sine_wave(info.time, f) / data.drawbars.size();
 		} else {
-			bass_sample += data.drawbars[i] / 8.0 * sine_wave(phase_mul, f) / data.drawbars.size();
+			bass_sample += data.drawbars[i] / 8.0 * sine_wave(info.time, f) / data.drawbars.size();
 		}
 	}
 	double sample = 0;
@@ -160,7 +166,7 @@ std::string B3Organ::get_name() {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice(std::string identifier) {
 	this->identifier = identifier;
-	engine = new B3Organ();
+	engine = new PresetSynth();
 	//Init notes
 	for (size_t i = 0; i < note.size(); ++i) {
 		note[i].start_time = -1024;
@@ -175,12 +181,11 @@ std::string SoundEngineDevice::get_identifier() {
 void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (!engine->note_finished(note[i], info.time)) {
-			engine->process_note_sample(channels, info, note[i], phase_multiplier);
+			engine->process_note_sample(channels, info, note[i]);
+			note[i].phase_shift += pitch_bend * info.time_step;
 		}
 	}
 	engine->process_sample(channels, info);
-	//TODO output for all channels
-	phase_multiplier += pitch_bend * info.time_step;
 }
 
 size_t SoundEngineDevice::next_freq_slot() {
@@ -203,6 +208,7 @@ void SoundEngineDevice::send(MidiMessage &message) {
 		note[slot].pressed = true;
 		note[slot].start_time = handler->sample_info().time;
 		note[slot].release_time = 0;
+		note[slot].phase_shift = 0;
 	}
 	//Note off
 	else if (message.get_message_type() == MessageType::NOTE_OFF) {
@@ -221,7 +227,7 @@ void SoundEngineDevice::send(MidiMessage &message) {
 	//Pitch bend
 	else if (message.get_message_type() == MessageType::PITCH_BEND) {
 		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
-		pitch_bend = note_to_freq_transpose(pitch);
+		pitch_bend = note_to_freq_transpose(pitch) - 1;
 	}
 }
 

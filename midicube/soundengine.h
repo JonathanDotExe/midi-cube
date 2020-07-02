@@ -21,7 +21,7 @@
 class SoundEngine {
 
 public:
-	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, double pitch_time) = 0;
+	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note) = 0;
 
 	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
 
@@ -44,21 +44,20 @@ public:
 };
 
 #define SYNTH_VIBRATO_RATE 6
-#define SYNTH_VIBRATO_DETUNE 0.25
+#define SYNTH_VIBRATO_DETUNE 1
 
 class PresetSynth : public SoundEngine {
 
 private:
 	double detune;
 	double ndetune;
-	double vib_detune;
 	double vibrato;
 	ADSREnvelope env{0.0005, 0.0, 1, 0.0005};
 public:
 
 	PresetSynth();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, double phase_mul);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note);
 
 	void control_change(unsigned int control, unsigned int value);
 
@@ -101,7 +100,7 @@ private:
 public:
 	B3Organ();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, double phase_mul);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note);
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 
@@ -116,8 +115,7 @@ class SoundEngineDevice : public AudioDevice {
 private:
 	std::string identifier;
 	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
-	double pitch_bend = 1;
-	double phase_multiplier = 0;
+	double pitch_bend = 0;
 	SoundEngine* engine;
 
 	size_t next_freq_slot();
