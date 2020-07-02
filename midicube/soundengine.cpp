@@ -54,8 +54,7 @@ B3Organ::B3Organ() {
 	drawbar_harmonics = { 0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8 };
 }
 
-static inline unsigned int sound_delay(double rotation, double radius,
-		unsigned int sample_rate) {
+static inline unsigned int sound_delay(double rotation, double radius, unsigned int sample_rate) {
 	/*double dst =
 			rotation >= 0 ?
 					(SPEAKER_RADIUS - radius * rotation) :
@@ -68,6 +67,17 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	double horn_sample = 0;
 	double bass_sample = 0;
 
+	/*double horn_time = phase_mul;
+	double bass_time = phase_mul;
+
+	//Rotary speaker
+	if (data.rotary) {
+		double horn_speed = data.rotary_fast ? ROTARY_HORN_FAST_FREQUENCY : ROTARY_HORN_SLOW_FREQUENCY;
+		double bass_speed = data.rotary_fast ? ROTARY_BASS_FAST_FREQUENCY : ROTARY_BASS_SLOW_FREQUENCY;
+
+		horn_time -= (double) sound_delay(sine_wave(info.time, horn_speed), HORN_RADIUS, info.sample_rate)/info.sample_rate;
+		bass_time -= (double) sound_delay(sine_wave(info.time, bass_speed), BASS_RADIUS, info.sample_rate)/info.sample_rate;
+	}*/
 	//Organ sound
 	for (size_t i = 0; i < data.drawbars.size(); ++i) {
 		double f = note.freq * drawbar_harmonics[i];
@@ -111,6 +121,11 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 			channels[i] += sample;
 		}
 	}
+	/*sample += horn_sample + bass_sample;
+	sample *= 0.3;
+	for (size_t i = 0; i < channels.size() ; ++i) {
+		channels[i] += sample;
+	}*/
 }
 
 void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {

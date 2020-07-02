@@ -10,5 +10,8 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 * A web interface or a desktop client that allows uploading new sounds
 
 ## Used ressources
-* https://de.wikipedia.org/wiki/RIFF_WAVE
+* Format of .wav files from the german Wikipedia (https://de.wikipedia.org/wiki/RIFF_WAVE)
+* Article about the Hammond-Organ from the german Wikiedia (https://de.wikipedia.org/wiki/Hammondorgel)
+* Modulation and Delay Line based Digital Audio Effects by Disch Sascha and Zöler Udo (2002); helped me implement the rotary speaker (https://www.researchgate.net/publication/2830823_Modulation_And_Delay_Line_Based_Digital_Audio_Effects)
+* Speed of the rotary speakers (https://www.musiker-board.de/threads/leslie-geschwindigkeiten-in-herz-frequenzen-fuer-die-vb3-orgel-gesucht.511349/)
 
