@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <cmath>
 
 
 struct WAVHeader {
@@ -34,6 +35,16 @@ struct WAVAudio {
 	unsigned int sample_rate;
 	unsigned int channels;
 	std::vector<double> samples;
+
+	double duration (unsigned int sample_rate) {
+		return samples.size()/channels * (double) sample_rate/this->sample_rate/this->sample_rate;
+	}
+
+	double sample(unsigned int channel, double time, unsigned int sample_rate) {
+		channel %= channels;
+		std::size_t index = (std::size_t) round(time * this->sample_rate * this->sample_rate/(double) sample_rate) + channel;
+		return index < samples.size() ? samples[index] : 0;
+	}
 };
 
 bool read_wav(WAVAudio& audio, std::string fname);

@@ -12,6 +12,8 @@
 #include "midi.h"
 #include "synthesis.h"
 #include "envelope.h"
+#include "wav.h"
+#include <unordered_map>
 #include <string>
 #include <array>
 
@@ -31,7 +33,7 @@ public:
 
 	};
 
-	virtual bool note_finished(TriggeredNote& note, double time) {
+	virtual bool note_finished(SampleInfo& info, TriggeredNote& note) {
 		return !note.pressed;
 	}
 
@@ -61,11 +63,36 @@ public:
 
 	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(TriggeredNote& note, double time);
+	bool note_finished(SampleInfo& info, TriggeredNote& note);
 
 	std::string get_name();
 
 };
+
+struct SampleDrumKit {
+	std::unordered_map<unsigned int, WAVAudio> notes;
+};
+
+
+class SampleDrums : public SoundEngine {
+
+private:
+	SampleDrumKit* drumkit;
+
+public:
+
+	SampleDrums();
+
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note);
+
+	bool note_finished(SampleInfo& info, TriggeredNote& note);
+
+	std::string get_name();
+
+	~SampleDrums();
+
+};
+
 
 #define ORGAN_DRAWBAR_COUNT 9
 #define ROTARY_CUTOFF 800

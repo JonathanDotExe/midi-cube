@@ -37,8 +37,8 @@ void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	}
 }
 
-bool PresetSynth::note_finished(TriggeredNote& note, double time) {
-	return !note.pressed && note.release_time + env.release < time;
+bool PresetSynth::note_finished(SampleInfo& info, TriggeredNote& note) {
+	return !note.pressed && note.release_time + env.release < info.time;
 }
 
 void PresetSynth::control_change(unsigned int control, unsigned int value) {
@@ -50,6 +50,56 @@ void PresetSynth::control_change(unsigned int control, unsigned int value) {
 std::string PresetSynth::get_name() {
 	return "Preset Synth";
 }
+
+//SampleDrums
+SampleDrums::SampleDrums () {
+	//Create Test drumkit for testing purposes
+	//TODO create universal drumkit loader
+	drumkit = new SampleDrumKit();
+	drumkit->notes[44] = {};
+	read_wav(drumkit->notes[44], "./data/drumkits/test/ride.wav");
+	drumkit->notes[45] = {};
+	read_wav(drumkit->notes[45], "./data/drumkits/test/snare.wav");
+	drumkit->notes[46] = {};
+	read_wav(drumkit->notes[46], "./data/drumkits/test/hi_hat.wav");
+	drumkit->notes[47] = {};
+	read_wav(drumkit->notes[47], "./data/drumkits/test/bass.wav");
+	drumkit->notes[48] = {};
+	read_wav(drumkit->notes[48], "./data/drumkits/test/percussion1.wav");
+	drumkit->notes[49] = {};
+	read_wav(drumkit->notes[49], "./data/drumkits/test/crash1.wav");
+	drumkit->notes[50] = {};
+	read_wav(drumkit->notes[50], "./data/drumkits/test/tom1.wav");
+	drumkit->notes[51] = {};
+	read_wav(drumkit->notes[51], "./data/drumkits/test/tom3.wav");
+}
+
+void SampleDrums::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note) {
+	if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
+		WAVAudio& audio = drumkit->notes[note.note];
+		for (size_t i = 0; i < channels.size(); ++i) {
+			channels[i] = audio.sample(i, info.time - note.start_time, info.sample_rate);
+		}
+	}
+}
+
+bool SampleDrums::note_finished(SampleInfo& info, TriggeredNote& note) {
+	if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
+		return info.time - note.start_time > (double) drumkit->notes[note.note].duration(info.sample_rate);
+	}
+	return true;
+}
+
+std::string SampleDrums::get_name() {
+	return "Sample Drums";
+}
+
+SampleDrums::~SampleDrums() {
+	delete drumkit;
+	drumkit = nullptr;
+}
+
+
 
 //B3Organ
 B3Organ::B3Organ() {
@@ -166,7 +216,7 @@ std::string B3Organ::get_name() {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice(std::string identifier) {
 	this->identifier = identifier;
-	engine = new B3Organ();
+	engine = new SampleDrums();
 	//Init notes
 	for (size_t i = 0; i < note.size(); ++i) {
 		note[i].start_time = -1024;
@@ -180,7 +230,7 @@ std::string SoundEngineDevice::get_identifier() {
 
 void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-		if (!engine->note_finished(note[i], info.time)) {
+		if (!engine->note_finished(info, note[i])) {
 			engine->process_note_sample(channels, info, note[i]);
 			note[i].phase_shift += pitch_bend * info.time_step;
 		}
