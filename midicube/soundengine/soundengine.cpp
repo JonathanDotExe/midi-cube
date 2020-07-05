@@ -7,11 +7,8 @@
 
 #include "soundengine.h"
 
-
-//SoundEngineDevice
-SoundEngineDevice::SoundEngineDevice(SoundEngine* engine, std::string identifier) {
-	this->identifier = identifier;
-	this->engine = engine;
+//SoundEngineChannel
+SoundEngineChannel::SoundEngineChannel() {
 	//Init notes
 	for (size_t i = 0; i < note.size(); ++i) {
 		note[i].start_time = -1024;
@@ -19,21 +16,19 @@ SoundEngineDevice::SoundEngineDevice(SoundEngine* engine, std::string identifier
 	}
 }
 
-std::string SoundEngineDevice::get_identifier() {
-	return identifier;
-}
-
-void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
-	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-		if (!engine->note_finished(info, note[i])) {
-			engine->process_note_sample(channels, info, note[i]);
-			note[i].phase_shift += pitch_bend * info.time_step;
+void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
+	if (engine) {
+		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+			if (!engine->note_finished(info, note[i])) {
+				engine->process_note_sample(channels, info, note[i]);
+				note[i].phase_shift += pitch_bend * info.time_step;
+			}
 		}
+		engine->process_sample(channels, info);
 	}
-	engine->process_sample(channels, info);
 }
 
-size_t SoundEngineDevice::next_freq_slot() {
+size_t SoundEngineChannel::next_freq_slot() {
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (!note[i].pressed) {
 			return i;
@@ -43,7 +38,7 @@ size_t SoundEngineDevice::next_freq_slot() {
 	return 0;
 }
 
-void SoundEngineDevice::send(MidiMessage &message) {
+void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 	//Note on
 	if (message.get_message_type() == MessageType::NOTE_ON) {
 		size_t slot = next_freq_slot();
@@ -51,7 +46,7 @@ void SoundEngineDevice::send(MidiMessage &message) {
 		note[slot].velocity = message.get_velocity()/127.0;
 		note[slot].note = message.get_note();
 		note[slot].pressed = true;
-		note[slot].start_time = handler->sample_info().time;
+		note[slot].start_time = info.time;
 		note[slot].release_time = 0;
 		note[slot].phase_shift = 0;
 	}
@@ -61,7 +56,7 @@ void SoundEngineDevice::send(MidiMessage &message) {
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 			if (note[i].freq == f) {
 				note[i].pressed = false;
-				note[i].release_time = handler->sample_info().time;
+				note[i].release_time = info.time;
 			}
 		}
 	}
@@ -76,7 +71,38 @@ void SoundEngineDevice::send(MidiMessage &message) {
 	}
 }
 
-SoundEngineDevice::~SoundEngineDevice() {
+SoundEngineChannel::~SoundEngineChannel() {
 	delete engine;
 	engine = nullptr;
+}
+
+
+//SoundEngineDevice
+SoundEngineDevice::SoundEngineDevice(std::string identifier) {
+	this->identifier = identifier;
+}
+
+std::string SoundEngineDevice::get_identifier() {
+	return identifier;
+}
+
+void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
+	for (size_t i = 0; i < this->channels.size(); ++i) {
+		this->channels[i].process_sample(channels, info);
+	}
+}
+
+void SoundEngineDevice::set_engine(unsigned int channel, SoundEngine* engine) {
+	SoundEngine* old = this->channels.at(channel).engine;
+	this->channels.at(channel).engine = engine;
+	delete old;
+}
+
+void SoundEngineDevice::send(MidiMessage &message) {
+	SampleInfo info =  handler->sample_info();
+	channels.at(message.get_channel()).send(message, info);
+}
+
+SoundEngineDevice::~SoundEngineDevice() {
+
 }

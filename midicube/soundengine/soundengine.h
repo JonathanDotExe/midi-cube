@@ -17,6 +17,7 @@
 #include <array>
 
 #define SOUND_ENGINE_POLYPHONY 30
+#define SOUND_ENGINE_MIDI_CHANNELS 16
 
 
 class SoundEngine {
@@ -44,23 +45,42 @@ public:
 
 };
 
+class SoundEngineChannel {
+private:
+	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
+	double pitch_bend = 0;
+
+	size_t next_freq_slot();
+
+public:
+	SoundEngine* engine = nullptr;
+
+
+	SoundEngineChannel();
+
+	void send(MidiMessage& message, SampleInfo& info);
+
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+
+	~SoundEngineChannel();
+
+};
+
 class SoundEngineDevice : public AudioDevice {
 
 private:
 	std::string identifier;
-	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
-	double pitch_bend = 0;
-	SoundEngine* engine;
-
-	size_t next_freq_slot();
+	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 
 public:
 
 	AudioHandler* handler = nullptr; //TODO remove this reference and pass time through send() to be thread-safe
 
-	SoundEngineDevice(SoundEngine* engine, std::string identifier);
+	SoundEngineDevice(std::string identifier);
 
 	std::string get_identifier();
+
+	void set_engine(unsigned int channel, SoundEngine* engine);
 
 	bool is_audio_input() {
 		return true;
