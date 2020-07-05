@@ -5,8 +5,8 @@
  *      Author: jojo
  */
 
-#ifndef MIDICUBE_WAV_H_
-#define MIDICUBE_WAV_H_
+#ifndef MIDICUBE_AUDIOFILE_H_
+#define MIDICUBE_AUDIOFILE_H_
 
 #include <cstdint>
 #include <vector>
@@ -31,23 +31,23 @@ struct WAVFormat {
 	std::uint16_t wBitsPerSample;
 } __attribute__((packed));
 
-struct WAVAudio {
+struct AudioSample {
 	unsigned int sample_rate;
 	unsigned int channels;
 	std::vector<double> samples;
 
-	double duration (unsigned int sample_rate) {
-		return samples.size()/channels * (double) sample_rate/this->sample_rate/this->sample_rate;
+	double duration () {
+		return samples.size()/channels/(double) sample_rate;
 	}
 
 	double sample(unsigned int channel, double time, unsigned int sample_rate) {
 		channel %= channels;
-		std::size_t index = (std::size_t) round(time * this->sample_rate * this->sample_rate/(double) sample_rate) + channel;
+		std::size_t index = (std::size_t) round(time * sample_rate) + channel;
 		return index < samples.size() ? samples[index] : 0;
 	}
 };
 
-bool read_wav(WAVAudio& audio, std::string fname);
+bool read_audio_file(AudioSample& audio, std::string fname);
 
 
-#endif /* MIDICUBE_WAV_H_ */
+#endif /* MIDICUBE_AUDIOFILE_H_ */

@@ -12,10 +12,10 @@
 #include "midi.h"
 #include "synthesis.h"
 #include "envelope.h"
-#include "wav.h"
 #include <unordered_map>
 #include <string>
 #include <array>
+#include "audiofile.h"
 
 #define SOUND_ENGINE_POLYPHONY 30
 
@@ -70,7 +70,7 @@ public:
 };
 
 struct SampleDrumKit {
-	std::unordered_map<unsigned int, WAVAudio> notes;
+	std::unordered_map<unsigned int, AudioSample> notes;
 };
 
 

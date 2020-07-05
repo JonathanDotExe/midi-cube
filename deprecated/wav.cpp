@@ -21,7 +21,7 @@ static void reverse (char arr[], std::size_t size) {
 
 static std::int64_t twos_complement(std::uint64_t num, std::uint16_t bits) {
 	std::uint64_t sign_mask = 1 << (bits - 1);
-	if (!(num & sign_mask)) {
+	if ((num & sign_mask) == 0) {
 		//Positive
 		return num;
 	}
@@ -31,17 +31,18 @@ static std::int64_t twos_complement(std::uint64_t num, std::uint16_t bits) {
 		mask += 1 << i;
 	}
 	num = num & mask;
-	num = !num;
+	num = ~num;
 	num = num & mask;
 	num += 1;
 	num = num & mask;
-	return -num;
+	return num;
 }
 
-bool read_wav(WAVAudio& audio, std::string fname) {
+bool read_wav(AudioSample& audio, std::string fname) {
 	std::ifstream in;
 	bool success = true;
 	char* buffer = nullptr;
+	std::cout << fname << std::endl;
 	try {
 		in.open(fname.c_str(), std::ios::binary | std::ios::in);
 		WAVHeader header;
@@ -58,6 +59,11 @@ bool read_wav(WAVAudio& audio, std::string fname) {
 		while (!in.eof()) {
 			in.read(buffer, format.wBlockAlign);
 			//Reverse buffer
+			for (size_t i = 0; i < sizeof(buffer); ++i) {
+				unsigned int ch = buffer[i];
+				std::cout << ch << " ";
+			}
+			std::cout << std::endl;
 			reverse(buffer, sizeof(buffer));
 			//To int
 			std::uint64_t sample = 0;
@@ -66,7 +72,9 @@ bool read_wav(WAVAudio& audio, std::string fname) {
 				size_t byte = bit/8;
 				sample += (std::uint64_t) (buffer[byte] & (1 << (bit % 8))) << byte;
 			}
-			audio.samples.push_back(twos_complement(sample, format.wBitsPerSample)/max_value * 2);
+			std::cout << "Decoded (unsigned): " << sample << std::endl;
+			std::cout << "Decoded (with sign): " << twos_complement(sample, format.wBitsPerSample) << std::endl;
+			audio.samples.push_back((twos_complement(sample, format.wBitsPerSample) - 0.5)/max_value * 2);
 		}
 	}
 	catch (const std::ifstream::failure& e) {
