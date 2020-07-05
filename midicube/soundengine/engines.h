@@ -11,6 +11,7 @@
 #include "organ.h"
 #include "drums.h"
 #include "presetsynth.h"
+#include "sampler.h"
 
 
 

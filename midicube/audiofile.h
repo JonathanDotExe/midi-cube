@@ -37,13 +37,24 @@ struct AudioSample {
 	std::vector<double> samples;
 
 	double duration () {
-		return samples.size()/channels/(double) sample_rate;
+		return sample_rate > 0 ? samples.size()/channels / (double) sample_rate : 0;
 	}
 
-	double sample(unsigned int channel, double time, unsigned int sample_rate) {
-		channel %= channels;
-		std::size_t index = (std::size_t) round(time * sample_rate) + channel;
-		return index < samples.size() ? samples[index] : 0;
+	double sample(unsigned int channel, double time,unsigned int sample_rate ) {
+		if (channels > 0) {
+			channel %= channels;
+			std::size_t index = (std::size_t) round(time * sample_rate) + channel;
+			return index < samples.size() ? samples[index] : 0;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	void clear () {
+		sample_rate = 0;
+		channels = 0;
+		samples.clear();
 	}
 };
 

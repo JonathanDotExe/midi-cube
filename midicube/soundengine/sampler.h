@@ -9,15 +9,24 @@
 #define MIDICUBE_SOUNDENGINE_SAMPLER_H_
 
 #include "soundengine.h"
-#include "audiofile.h"
+#include "../audiofile.h"
 
 struct SampleRegion {
 	AudioSample attack_sample;
 	AudioSample sustain_sample;
 	AudioSample release_sample;
-	unsigned int note;
-	unsigned int low_note;
-	unsigned int high_note;
+	double freq;
+	double low_freq;
+	double high_freq;
+
+	SampleRegion () {
+		attack_sample.clear();
+		sustain_sample.clear();
+		release_sample.clear();
+		freq = 0;
+		low_freq = 0;
+		high_freq = 0;
+	};
 
 };
 
@@ -27,7 +36,9 @@ private:
 
 public:
 
-	double get_sample(SampleInfo& info, TriggeredNote& note);
+	double get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note);
+
+	bool note_finished(SampleInfo& info, TriggeredNote& note);
 
 	void push_sample(SampleRegion* region);
 
@@ -42,11 +53,9 @@ private:
 
 public:
 
-	Sampler(SampleSound* sample);
+	Sampler();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note) {
-
-	}
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note);
 
 	bool note_finished(SampleInfo& info, TriggeredNote& note);
 
