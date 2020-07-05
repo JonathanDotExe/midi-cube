@@ -6,7 +6,8 @@
  */
 
 #include "midicube.h"
-#include "soundengine.h"
+#include "soundengine/soundengine.h"
+#include "soundengine/engines.h"
 #include <iostream>
 
 static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, void* user_data) {
@@ -55,7 +56,7 @@ void MidiCube::create_default_devices() {
 		}
 	}
 	//Sound Engine
-	SoundEngineDevice* device = new SoundEngineDevice("Sound Engine");
+	SoundEngineDevice* device = new SoundEngineDevice(new B3Organ(), "Sound Engine");
 	device->handler = &audio_handler; //TODO remove, bad practise
 	add_device(device);
 	//Bind devices to sound engine, will be removed later
