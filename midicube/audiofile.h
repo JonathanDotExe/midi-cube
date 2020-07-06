@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <iostream>
 
 
 struct WAVHeader {
@@ -45,6 +46,22 @@ struct AudioSample {
 			channel %= channels;
 			std::size_t index = (std::size_t) round(time * sample_rate) + channel;
 			return index < samples.size() ? samples[index] : 0;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	double isample(unsigned int channel, double time, unsigned int sample_rate) {
+		if (channels > 0) {
+			channel %= channels;
+			double index = time * sample_rate;
+			std::size_t index1 = (std::size_t) floor(index) + channel;
+			std::size_t index2 = (std::size_t) ceil(index) + channel;
+			double sample1 = index1 < samples.size() ? samples[index1] : 0;
+			double sample2 = index2 < samples.size() ? samples[index2] : 0;
+			double prog = 1 - index + floor(index);
+			return sample1 * prog + sample2 * (1 - prog);
 		}
 		else {
 			return 0;

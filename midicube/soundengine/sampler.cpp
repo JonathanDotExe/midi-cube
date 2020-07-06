@@ -23,7 +23,7 @@ double SampleSound::get_sample(unsigned int channel, SampleInfo& info, Triggered
 	}
 	//Play sound
 	//TODO use sustain and release samples as well
-	return region->attack_sample.sample(channel, (info.time - note.start_time + note.phase_shift) * note.freq/region->freq, info.sample_rate);
+	return region->attack_sample.isample(channel, (info.time - note.start_time + note.phase_shift) * note.freq/region->freq, info.sample_rate);
 }
 
 bool SampleSound::note_finished(SampleInfo& info, TriggeredNote& note) {
