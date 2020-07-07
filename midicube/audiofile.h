@@ -44,7 +44,7 @@ struct AudioSample {
 	double sample(unsigned int channel, double time,unsigned int sample_rate ) {
 		if (channels > 0) {
 			channel %= channels;
-			std::size_t index = (std::size_t) round(time * sample_rate) + channel;
+			std::size_t index = (std::size_t) round(time * sample_rate) * channels + channel;
 			return index < samples.size() ? samples[index] : 0;
 		}
 		else {
@@ -56,8 +56,8 @@ struct AudioSample {
 		if (channels > 0) {
 			channel %= channels;
 			double index = time * sample_rate;
-			std::size_t index1 = (std::size_t) floor(index) + channel;
-			std::size_t index2 = (std::size_t) ceil(index) + channel;
+			std::size_t index1 = (std::size_t) floor(index)  * channels + channel;
+			std::size_t index2 = (std::size_t) ceil(index) * channels + channel;
 			double sample1 = index1 < samples.size() ? samples[index1] : 0;
 			double sample2 = index2 < samples.size() ? samples[index2] : 0;
 			double prog = 1 - index + floor(index);
