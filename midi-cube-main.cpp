@@ -1,64 +1,27 @@
 #include <iostream>
-#include "midicube/audio.h"
-#include "midicube/synthesis.h"
-#include "midicube/midi.h"
 #include "midicube/midicube.h"
-#include "midicube/device.h"
+#include "midicube/gui/model.h"
+#include "midicube/gui/gui.h"
 using namespace std;
 
-double process(unsigned int channel, double time, void* user_data) {
-	double sample = square_wave(time, 440.0) * 0.3;
-	return sample;
-}
-
-void midi_callback(double deltatime, MidiMessage& msg, void* arg) {
-	cout << "Callback" << endl;
-	cout << msg.to_string() << endl;
-}
 
 int main(int argc, char **argv) {
-	/*cout << "Printing MIDI messages from device 1!" << endl;
-	MidiInput* input;
-	PortInputDevice* device = nullptr;
-	try {
-		input = new MidiInput();
-		std::string name = "PORT";
-		if (input->available_ports() > 1) {
-			name = input->port_name(1);
-			cout << "Using port " << name << endl;
-			input->open(1);
-			device = new PortInputDevice(input, name);
-			device->set_midi_callback(&midi_callback, nullptr);
-		}
-	}
-	catch (MidiException& e) {
-		cerr << e.what() << endl;
-	}
-
-	getchar();
-
-	delete device;*/
-
-	/*cout << "Playing a cool square wave sound!" << endl;
-
-	AudioHandler handler;
-	try {
-		handler.set_sample_callback(process, nullptr);
-		handler.init();
-		cout << "Press any key to exit!" << endl;
-		getchar();
-	}
-	catch (AudioException& e) {
-		cerr << e.what() << endl;
-	}*/
-
 	MidiCube cube;
 	try {
 		cube.init();
-		getchar();
+		//Model
+		GUIModel model;
+		model.midiCube = &cube;
+		//View
+		View* view = new MainMenuView();
+		Frame frame;
+		frame.change_view(view);
+		//Run frame
+		frame.run();
 	}
 	catch (AudioException& e) {
 		cerr << e.what() << endl;
+		return -1;
 	}
 
 	return 0;
