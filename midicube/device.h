@@ -13,6 +13,11 @@
 #include "midi.h"
 #include "audio.h"
 
+enum class DeviceType {
+	MIDI_INPUT, MIDI_OUTPUT, SOUND_ENGINE
+};
+
+
 class AudioDevice {
 
 private:
@@ -59,6 +64,8 @@ public:
 		return false;
 	}
 
+	virtual DeviceType type() = 0;
+
 	virtual std::string get_identifier() = 0;
 
 	virtual ~AudioDevice();
@@ -81,6 +88,10 @@ public:
 
 	std::string get_identifier();
 
+	DeviceType type() {
+		return DeviceType::MIDI_INPUT;
+	};
+
 	bool is_midi_input() {
 		return true;
 	}
@@ -101,6 +112,10 @@ public:
 	void send(MidiMessage& message);
 
 	std::string get_identifier();
+
+	DeviceType type() {
+		return DeviceType::MIDI_OUTPUT;
+	};
 
 	bool is_midi_output() {
 		return true;

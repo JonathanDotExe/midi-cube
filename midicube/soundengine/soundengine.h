@@ -86,6 +86,10 @@ public:
 		return true;
 	}
 
+	DeviceType type() {
+		return DeviceType::SOUND_ENGINE;
+	};
+
 	void send(MidiMessage& message);
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);

@@ -58,7 +58,13 @@ public:
 };
 
 
-class MainMenuView : public View{
+class MainMenuView : public View {
+
+	View* draw();
+
+};
+
+class DevicesMenuView : public View {
 
 	View* draw();
 

@@ -69,3 +69,15 @@ View* MainMenuView::draw() {
 	return view;
 }
 
+//DevicesMenuView
+View* DevicesMenuView::draw() {
+	View* view = this;
+
+	//Draw devices
+	for (auto dev : get_model()->device_positions) {
+
+	}
+
+	return view;
+}
+
