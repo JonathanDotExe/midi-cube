@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 		cube.init();
 		//Model
 		GUIModel model;
-		model.midiCube = &cube;
+		model.midi_cube = &cube;
 		//View
 		View* view = new MainMenuView();
 		Frame frame;

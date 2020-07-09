@@ -19,7 +19,7 @@ struct Position {
 
 class GUIModel {
 public:
-	MidiCube* midiCube;
+	MidiCube* midi_cube;
 	std::unordered_map<std::string, Position*> device_positions;
 
 	GUIModel();

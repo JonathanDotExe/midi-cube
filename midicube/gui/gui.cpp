@@ -10,6 +10,16 @@
 #define RAYGUI_IMPLEMENTATION
 #include <raygui.h>
 #include <exception>
+#include <unordered_map>
+
+
+std::unordered_map<DeviceType, Texture2D> device_textures;
+
+void load_gui_resources() {
+	device_textures[DeviceType::MIDI_INPUT] = LoadTexture("./resources/images/devices/midi_input.png");
+	device_textures[DeviceType::MIDI_OUTPUT] = LoadTexture("./resources/images/devices/midi_output.png");
+	device_textures[DeviceType::SOUND_ENGINE] = LoadTexture("./resources/images/devices/sound_engine.png");
+}
 
 //View
 GUIModel* View::get_model() {
@@ -64,7 +74,7 @@ View* MainMenuView::draw() {
 
 	//Button
 	if (GuiButton({SCREEN_WIDTH/2 - 200, 160, 400, 40}, "Devices")) {
-		//TODO open device menu
+		view = new DevicesMenuView();
 	}
 	return view;
 }
@@ -74,7 +84,8 @@ View* DevicesMenuView::draw() {
 	View* view = this;
 
 	//Draw devices
-	for (auto dev : get_model()->device_positions) {
+	for (auto device : get_model()->midi_cube->get_devices()) {
+		Texture2D tex = device_textures[device.second->type()];
 
 	}
 

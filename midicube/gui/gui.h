@@ -13,6 +13,8 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 480
 
+void load_gui_resources();
+
 
 class View {
 

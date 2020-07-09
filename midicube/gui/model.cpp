@@ -8,7 +8,7 @@
 #include "model.h"
 
 GUIModel::GUIModel() {
-	midiCube = nullptr;
+	midi_cube = nullptr;
 }
 
 Position* GUIModel::get_position(std::string device) {
