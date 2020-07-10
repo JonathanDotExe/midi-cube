@@ -12,6 +12,7 @@
 #include <exception>
 #include <unordered_map>
 #include <algorithm>
+#include <sstream>
 
 
 std::unordered_map<DeviceType, Texture2D> device_textures;
@@ -107,6 +108,36 @@ View* DevicesMenuView::draw() {
 		DrawTexture(tex, pos->x, pos->y, WHITE);
 		//Name
 		DrawText(device.first.c_str(), pos->x, pos->y + tex.height + 1, 4, BLACK);
+	}
+	//Bindings
+	for (DeviceBinding binding : model.midi_cube->get_bindings()) {
+		Position* pos1 = model.get_position(binding.input);
+		AudioDevice* device1 = model.midi_cube->get_devices()[binding.input];
+		Texture2D tex1 = device_textures[device1->type()];
+
+		Position* pos2= model.get_position(binding.output);
+		AudioDevice* device2 = model.midi_cube->get_devices()[binding.output];
+		Texture2D tex2 = device_textures[device2->type()];
+
+		//Lines
+		Vector2 start;
+		Vector2 end;
+
+		start.x = pos1->x + tex1.width/2;
+		start.y = pos1->y + tex1.height/2;
+
+		end.x = pos2->x + tex2.width/2;
+		end.y = pos2->y + tex2.height/2;
+
+		DrawLineEx(start, end, 2.0f, RED);
+
+		//Channels
+		Vector2 text_pos;
+		text_pos.x = (start.x + end.x) / 2;
+		text_pos.y = (start.y + end.y) / 2 - 20;
+		std::ostringstream text;
+		text << "Channel " << binding.input_channel << " - Channel " << binding.output_channel;
+		DrawText(text.str().c_str(), text_pos.x, text_pos.y, 4, BLACK);
 	}
 	//Move devices
 	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {

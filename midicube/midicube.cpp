@@ -103,6 +103,14 @@ void MidiCube::add_binding(DeviceBinding binding) {
 	bindings[binding.input].push_back(binding);
 }
 
+std::vector<DeviceBinding> MidiCube::get_bindings() {
+	std::vector<DeviceBinding> bindings;
+	for (auto b : this->bindings) {
+		bindings.insert(bindings.end(), b.second.begin(), b.second.end());
+	}
+	return bindings;
+}
+
 std::unordered_map<std::string, AudioDevice*> MidiCube::get_devices() {
 	return devices;
 }

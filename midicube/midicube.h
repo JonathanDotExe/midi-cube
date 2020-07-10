@@ -39,6 +39,7 @@ public:
 	~MidiCube();
 	void init();
 	std::unordered_map<std::string, AudioDevice*> get_devices();
+	std::vector<DeviceBinding> get_bindings();
 	void create_default_devices();
 	void add_device(AudioDevice* device);
 	void process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
