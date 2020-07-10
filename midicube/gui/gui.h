@@ -9,6 +9,7 @@
 #define MIDICUBE_GUI_GUI_H_
 
 #include "model.h"
+#include "../soundengine/soundengine.h"
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 480
@@ -90,6 +91,19 @@ private:
 public:
 
 	DevicesMenuView();
+
+	View* draw();
+
+};
+
+class SoundEngineDeviceMenuView : public View {
+
+private:
+	SoundEngineDevice* device;
+
+public:
+
+	SoundEngineDeviceMenuView(SoundEngineDevice* device);
 
 	View* draw();
 

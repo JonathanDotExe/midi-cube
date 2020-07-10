@@ -92,10 +92,16 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 	}
 }
 
+std::vector<SoundEngine*> SoundEngineDevice::get_sound_engines() {
+	return sound_engines;
+}
+
+void SoundEngineDevice::add_sound_engine(SoundEngine* engine) {
+	sound_engines.push_back(engine);
+}
+
 void SoundEngineDevice::set_engine(unsigned int channel, SoundEngine* engine) {
-	SoundEngine* old = this->channels.at(channel).engine;
 	this->channels.at(channel).engine = engine;
-	delete old;
 }
 
 void SoundEngineDevice::send(MidiMessage &message) {
@@ -104,5 +110,8 @@ void SoundEngineDevice::send(MidiMessage &message) {
 }
 
 SoundEngineDevice::~SoundEngineDevice() {
-
+	for (SoundEngine* engine : sound_engines) {
+		delete engine;
+	}
+	sound_engines.clear();
 }

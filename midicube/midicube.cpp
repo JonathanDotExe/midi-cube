@@ -57,8 +57,9 @@ void MidiCube::create_default_devices() {
 	}
 	//Sound Engine
 	SoundEngineDevice* device = new SoundEngineDevice("Sound Engine");
-	device->set_engine(0, new PresetSynth());
-	device->set_engine(9, new SampleDrums());
+	fill_sound_engine_device(device);
+	device->set_engine(0, device->get_sound_engines().at(0));
+	device->set_engine(9, device->get_sound_engines().at(2));
 	device->handler = &audio_handler; //TODO remove, bad practise
 	add_device(device);
 };

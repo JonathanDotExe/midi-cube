@@ -71,6 +71,7 @@ class SoundEngineDevice : public AudioDevice {
 private:
 	std::string identifier;
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
+	std::vector<SoundEngine*> sound_engines;
 
 public:
 
@@ -81,6 +82,10 @@ public:
 	std::string get_identifier();
 
 	void set_engine(unsigned int channel, SoundEngine* engine);
+
+	std::vector<SoundEngine*> get_sound_engines();
+
+	void add_sound_engine(SoundEngine* engine);
 
 	bool is_audio_input() {
 		return true;

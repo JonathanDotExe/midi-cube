@@ -260,3 +260,16 @@ View* DevicesMenuView::draw() {
 	return view;
 }
 
+SoundEngineDeviceMenuView::SoundEngineDeviceMenuView(SoundEngineDevice* device) {
+	this->device = device;
+}
+
+View* SoundEngineDeviceMenuView::draw() {
+	View* view = this;
+
+
+
+	return view;
+}
+
+

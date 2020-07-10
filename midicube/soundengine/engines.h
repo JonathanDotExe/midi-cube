@@ -13,6 +13,13 @@
 #include "presetsynth.h"
 #include "sampler.h"
 
+extern void fill_sound_engine_device(SoundEngineDevice* device) {
+	device->add_sound_engine(new PresetSynth());
+	device->add_sound_engine(new B3Organ());
+	device->add_sound_engine(new SampleDrums());
+	device->add_sound_engine(new Sampler());
+}
+
 
 
 #endif /* MIDICUBE_SOUNDENGINE_ENGINES_H_ */
