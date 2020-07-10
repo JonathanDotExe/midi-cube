@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
 		model.midi_cube = &cube;
 		//View
 		View* view = new MainMenuView();
+		view->init_model(&model);
 		Frame frame;
 		frame.change_view(view);
 		//Run frame

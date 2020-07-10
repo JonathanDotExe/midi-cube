@@ -12,7 +12,7 @@ GUIModel::GUIModel() {
 }
 
 Position* GUIModel::get_position(std::string device) {
-	if (device_positions.find(device) != device_positions.end()) {
+	if (device_positions.find(device) == device_positions.end()) {
 		device_positions[device] = new Position();
 	}
 	return device_positions[device];

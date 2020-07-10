@@ -13,8 +13,6 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 480
 
-void load_gui_resources();
-
 
 class View {
 
@@ -59,14 +57,27 @@ public:
 
 };
 
-
 class MainMenuView : public View {
+
+public:
 
 	View* draw();
 
 };
 
+struct DeviceDragInfo {
+	int last_x;
+	int last_y;
+	bool dragging;
+	std::string device;
+};
+
 class DevicesMenuView : public View {
+
+private:
+	DeviceDragInfo device_drag;
+
+public:
 
 	View* draw();
 
