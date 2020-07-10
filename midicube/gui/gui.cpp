@@ -53,7 +53,7 @@ void Frame::run () {
 	//Init
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "MIDICube - universal MIDI and synthesis workstation");
 	SetTargetFPS(60);
-	//Load ressources
+	//Load resources
 	if (!device_textures.size()) {
 		load_gui_resources();
 	}
@@ -97,6 +97,11 @@ View* MainMenuView::draw() {
 }
 
 //DevicesMenuView
+DevicesMenuView::DevicesMenuView() {
+	binding_drag = {};
+	device_drag = {};
+}
+
 View* DevicesMenuView::draw() {
 	View* view = this;
 	GUIModel& model = *get_model();
@@ -124,10 +129,10 @@ View* DevicesMenuView::draw() {
 		Vector2 end;
 
 		start.x = pos1->x + tex1.width/2;
-		start.y = pos1->y + tex1.height/2;
+		start.y = pos1->y + tex1.height/2 + binding.input_channel * 2 - 16;
 
 		end.x = pos2->x + tex2.width/2;
-		end.y = pos2->y + tex2.height/2;
+		end.y = pos2->y + tex2.height/2 + binding.output_channel * 2 - 16;
 
 		DrawLineEx(start, end, 2.0f, RED);
 
@@ -140,9 +145,8 @@ View* DevicesMenuView::draw() {
 		DrawText(text.str().c_str(), text_pos.x, text_pos.y, 4, BLACK);
 	}
 	//Move devices
+	Vector2 mouse_pos = GetMousePosition();
 	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-		Vector2 mouse_pos = GetMousePosition();
-		//Old click
 		if (device_drag.dragging) {
 			Position& pos = *model.device_positions[device_drag.device];
 			Texture2D tex = device_textures[model.midi_cube->get_devices()[device_drag.device]->type()];
@@ -160,6 +164,7 @@ View* DevicesMenuView::draw() {
 					//Clicked
 					device_drag.dragging = true;
 					device_drag.device = p.first;
+					break;
 				}
 			}
 		}
@@ -168,6 +173,88 @@ View* DevicesMenuView::draw() {
 	}
 	else {
 		device_drag.dragging = false;
+	}
+	//Bind devices
+	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+		if (binding_drag.dragging) {
+			//Draw
+			Position* pos = model.get_position(binding_drag.input_device);
+			AudioDevice* device = model.midi_cube->get_devices()[binding_drag.input_device];
+			Texture2D tex = device_textures[device->type()];
+
+			Vector2 start;
+
+			start.x = pos->x + tex.width/2;
+			start.y = pos->y + tex.height/2;
+
+			DrawLineEx(start, mouse_pos, 2.0f, BLUE);
+		}
+		else {
+			//Find position
+			for (auto p : model.device_positions) {
+				Position& pos = *p.second;
+				Texture2D tex = device_textures[model.midi_cube->get_devices()[p.first]->type()];
+				if (mouse_pos.x >= pos.x && mouse_pos.x <= pos.x + tex.width && mouse_pos.y >= pos.y && mouse_pos.y <= pos.y + tex.height) {
+					//Clicked
+					binding_drag.dragging = true;
+					binding_drag.input_device = p.first;
+					break;
+				}
+			}
+		}
+	}
+	else {
+		if (binding_drag.dragging) {
+			//Find position
+			for (auto p : model.device_positions) {
+				Position& pos = *p.second;
+				Texture2D tex = device_textures[model.midi_cube->get_devices()[p.first]->type()];
+				if (p.first != binding_drag.input_device && mouse_pos.x >= pos.x && mouse_pos.x <= pos.x + tex.width && mouse_pos.y >= pos.y && mouse_pos.y <= pos.y + tex.height) {
+					//Clicked
+					binding_drag.dialog = true;
+					binding_drag.output_device = p.first;
+					break;
+				}
+			}
+			binding_drag.dragging = false;
+		}
+	}
+
+	//Show channel dialog
+	if (binding_drag.dialog) {
+		const int input_width = 300;
+		const int input_height = 40;
+		const int text_height = 16;
+		const int box_width = input_width  + 10;
+		const int box_height = 3 * input_height + 5 + 2 * text_height + 10;
+		//Background
+		DrawRectangle(SCREEN_WIDTH/2 - box_width/2, SCREEN_HEIGHT/2 - box_height/2, box_width, box_height, GRAY);
+		//Components
+		int pos_y = SCREEN_HEIGHT/2 - box_height/2 + 5;
+		DrawText("Input Channel: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
+		pos_y += text_height;
+		Rectangle rect;
+		rect.x = SCREEN_WIDTH/2 - input_width/2;
+		rect.y = pos_y;
+		rect.width = input_width;
+		rect.height = input_height;
+		GuiSpinner(rect, "Input Channel: ", &binding_drag.input_channel, -1, 15, false);
+		pos_y += input_height;
+		DrawText("Output Channel: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
+		pos_y += text_height;
+		rect.y = pos_y;
+		GuiSpinner(rect, "Output Channel: ", &binding_drag.output_channel, -1, 15, false);
+		pos_y += input_height + 5;
+		rect.y = pos_y;
+		if (GuiButton(rect, "Create Binding")) {
+			binding_drag.dialog = false;
+			DeviceBinding binding;
+			binding.input = binding_drag.input_device;
+			binding.input_channel = binding_drag.input_channel;
+			binding.output = binding_drag.output_device;
+			binding.output_channel = binding_drag.output_channel;
+			model.midi_cube->add_binding(binding);
+		}
 	}
 
 	return view;

@@ -61,13 +61,6 @@ void MidiCube::create_default_devices() {
 	device->set_engine(9, new SampleDrums());
 	device->handler = &audio_handler; //TODO remove, bad practise
 	add_device(device);
-	//Bind devices to sound engine, will be removed later
-	for (std::pair<std::string, AudioDevice*> dev : devices) {
-		if (dev.second->is_midi_input()) {
-			DeviceBinding binding{dev.first, device->get_identifier(), -1, -1};
-			add_binding(binding);
-		}
-	}
 };
 
 /**

@@ -72,12 +72,24 @@ struct DeviceDragInfo {
 	std::string device;
 };
 
+struct BindingDragInfo {
+	bool dragging;
+	bool dialog;
+	std::string input_device;
+	std::string output_device;
+	int input_channel;
+	int output_channel;
+};
+
 class DevicesMenuView : public View {
 
 private:
 	DeviceDragInfo device_drag;
+	BindingDragInfo binding_drag;
 
 public:
+
+	DevicesMenuView();
 
 	View* draw();
 
