@@ -290,7 +290,12 @@ View* SoundEngineDeviceMenuView::draw() {
 		int selected = device->get_engine(channel) == nullptr ? 0 : find(engines.begin(), engines.end(), device->get_engine(channel)) - engines.begin() + 1;
 		int old = selected;
 		float y = 5 + channel * 25;
-		selected = GuiComboBox((Rectangle){5, y, 400, 20}, options.c_str(), selected);
+		//Text
+		std::ostringstream text;
+		text << "Channel " << channel;
+		DrawText(text.str().c_str(), 5, y + 6, 4, BLACK);
+		//ComboBox
+		selected = GuiComboBox((Rectangle){100, y, 400, 20}, options.c_str(), selected);
 		if (old != selected) {
 			device->set_engine(channel, selected > 0 ? engines.at(selected - 1): nullptr);
 		}
