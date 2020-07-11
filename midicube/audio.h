@@ -35,6 +35,7 @@ struct SampleInfo {
 	double time_step;
 	unsigned int sample_rate;
 	unsigned int sample_time;
+	double input_sample;
 };
 
 class AudioHandler {
@@ -43,6 +44,7 @@ private:
 	jack_client_t* client = NULL;
 	jack_port_t* output_port_1 = nullptr;
 	jack_port_t* output_port_2 = nullptr;
+	jack_port_t* input_port;
 	void* user_data = nullptr;
 	void (* get_sample) (std::array<double, OUTPUT_CHANNELS>&, SampleInfo&, void*) = nullptr;
 	/**

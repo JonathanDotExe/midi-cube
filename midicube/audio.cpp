@@ -45,12 +45,19 @@ void AudioHandler::init() {
 	if (output_port_2 == NULL) {
 		throw AudioException("Couldn't create output port!");
 	}
+	//Create input port
+	input_port = jack_port_register(client, "input", JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
+	if (input_port == NULL) {
+		throw AudioException("Couldn't create input port!");
+	}
+	std::cerr << "Create input ports" << std::endl;
+
 	//Start callback
 	if (jack_activate(client)) {
 		throw AudioException("Couldn't activate JACK client!");
 	}
 	//Connect output port
-	const char** ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+	const char **ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
 	if (ports == NULL) {
 		throw AudioException("No more open ports available!");
 	}
@@ -62,9 +69,21 @@ void AudioHandler::init() {
 		delete ports;
 		throw AudioException("Couldn't connect to output port!");
 	}
-
 	delete ports;
-	ports = NULL;
+	ports = nullptr;
+	std::cerr << "Connect input ports" << std::endl;
+	//Connect input port
+	ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
+	if (ports == NULL) {
+		throw AudioException("No more open ports available!");
+	}
+	if (jack_connect(client, ports[0], jack_port_name(input_port))) {
+		delete ports;
+		throw AudioException("Couldn't connect to input port!");
+	}
+	std::cerr << "Connected input ports" << std::endl;
+	delete ports;
+	ports = nullptr;
 };
 
 void AudioHandler::sample_rate_callback(jack_nframes_t nframes) {
@@ -76,11 +95,13 @@ int AudioHandler::process(jack_nframes_t nframes) {
 	jack_default_audio_sample_t* buffer1 = (jack_default_audio_sample_t*) jack_port_get_buffer(output_port_1, nframes);
 	jack_default_audio_sample_t* buffer2 = (jack_default_audio_sample_t*) jack_port_get_buffer(output_port_2, nframes);
 
+	jack_default_audio_sample_t* in_buffer = (jack_default_audio_sample_t*) jack_port_get_buffer(input_port, nframes);
+
 	SampleInfo info;
 	//Compute each sample
 	for (jack_nframes_t i = 0; i < nframes; ++i) {
 		//double sample = fmax(-1, fmin(1, get_sample(0, time, user_data)));
-		info = {time, time_step, sample_rate, sample_time};
+		info = {time, time_step, sample_rate, sample_time, in_buffer[i]};
 
 		sample_buf = {0, 0};
 		get_sample(sample_buf, info, user_data);
