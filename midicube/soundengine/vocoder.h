@@ -10,13 +10,23 @@
 
 #include "soundengine.h"
 
+struct VocoderData {
+	bool delay = true;
+	double delay_time = 0.5;
+	unsigned int delay_feedback = 4;
+	double delay_mul = 1;
+
+	unsigned int delay_control = 9;
+	unsigned int delay_time_control = 1;
+	unsigned int delay_feedback_control = 2;
+	unsigned int delay_mul_control = 3;
+};
+
 class Vocoder : public SoundEngine {
 
 private:
 	DelayBuffer delay;
-	bool delay_enabled = true;
-	double delay_time = 0.5;
-	unsigned int delay_repetition = 4;
+	VocoderData data;
 
 public:
 	Vocoder();
