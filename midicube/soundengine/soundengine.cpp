@@ -104,6 +104,10 @@ void SoundEngineDevice::set_engine(unsigned int channel, SoundEngine* engine) {
 	this->channels.at(channel).engine = engine;
 }
 
+SoundEngine* SoundEngineDevice::get_engine(unsigned int channel) {
+	return this->channels.at(channel).engine;
+}
+
 void SoundEngineDevice::send(MidiMessage &message) {
 	SampleInfo info =  handler->sample_info();
 	channels.at(message.get_channel()).send(message, info);

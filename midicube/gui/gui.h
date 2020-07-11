@@ -10,6 +10,7 @@
 
 #include "model.h"
 #include "../soundengine/soundengine.h"
+#include <type_traits>
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 480
@@ -71,6 +72,8 @@ struct DeviceDragInfo {
 	int last_y;
 	bool dragging;
 	std::string device;
+	int start_x;
+	int start_y;
 };
 
 struct BindingDragInfo {
@@ -96,10 +99,12 @@ public:
 
 };
 
+
 class SoundEngineDeviceMenuView : public View {
 
 private:
 	SoundEngineDevice* device;
+	std::string options;
 
 public:
 
@@ -108,5 +113,8 @@ public:
 	View* draw();
 
 };
+
+View* create_view_for_device(AudioDevice* device);
+
 
 #endif /* MIDICUBE_GUI_GUI_H_ */

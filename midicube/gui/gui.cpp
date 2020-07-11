@@ -167,12 +167,21 @@ View* DevicesMenuView::draw() {
 					break;
 				}
 			}
+			device_drag.start_x = mouse_pos.x;
+			device_drag.start_y = mouse_pos.y;
 		}
 		device_drag.last_x = mouse_pos.x;
 		device_drag.last_y = mouse_pos.y;
 	}
 	else {
 		device_drag.dragging = false;
+		//Edit device
+		if (device_drag.start_x == mouse_pos.x && device_drag.start_y == mouse_pos.y) {
+			view = create_view_for_device(model.midi_cube->get_devices().at(device_drag.device));
+			if (!view) {
+				view = this;
+			}
+		}
 	}
 	//Bind devices
 	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
@@ -262,14 +271,39 @@ View* DevicesMenuView::draw() {
 
 SoundEngineDeviceMenuView::SoundEngineDeviceMenuView(SoundEngineDevice* device) {
 	this->device = device;
+	//Options
+	std::ostringstream optionstr;
+	std::vector<SoundEngine*> engines = device->get_sound_engines();
+	optionstr << "None";
+	for (SoundEngine* engine : engines) {
+		optionstr << ";" << engine->get_name();
+	}
+	options = optionstr.str();
 }
 
 View* SoundEngineDeviceMenuView::draw() {
 	View* view = this;
-
-
+	std::vector<SoundEngine*> engines = device->get_sound_engines();
+	//Dropdowns
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		unsigned int channel = SOUND_ENGINE_MIDI_CHANNELS - 1 - i;
+		int selected = device->get_engine(channel) == nullptr ? 0 : find(engines.begin(), engines.end(), device->get_engine(channel)) - engines.begin() + 1;
+		int old = selected;
+		float y = 5 + channel * 25;
+		selected = GuiComboBox((Rectangle){5, y, 400, 20}, options.c_str(), selected);
+		if (old != selected) {
+			device->set_engine(channel, selected > 0 ? engines.at(selected - 1): nullptr);
+		}
+	}
 
 	return view;
+}
+
+View* create_view_for_device(AudioDevice* device) {
+	if (device->get_identifier() == "Sound Engine") { //TODO cleaner check
+		return new SoundEngineDeviceMenuView(static_cast<SoundEngineDevice*>(device));
+	}
+	return nullptr;
 }
 
 

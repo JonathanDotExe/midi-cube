@@ -87,6 +87,8 @@ public:
 
 	void add_sound_engine(SoundEngine* engine);
 
+	SoundEngine* get_engine(unsigned int channel);
+
 	bool is_audio_input() {
 		return true;
 	}
