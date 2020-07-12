@@ -44,4 +44,19 @@ public:
 
 };
 
+class LowPassFilter {
+
+private:
+
+	double last;
+	double cutoff;
+	double rc;
+
+public:
+
+	LowPassFilter(double cutoff);
+
+	double apply (double sample, double time_step);
+
+};
 #endif /* MIDICUBE_SYNTHESIS_H_ */

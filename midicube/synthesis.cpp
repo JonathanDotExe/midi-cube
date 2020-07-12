@@ -65,4 +65,21 @@ double DelayBuffer::process() {
 	return sample;
 }
 
+//LowPassFilter
+LowPassFilter::LowPassFilter(double cutoff) {
+	this->cutoff = cutoff;
+	this->last = 0;
+	this->rc = 1.0/(2 * M_PI * cutoff);
+	this->started = false;
+}
+
+double LowPassFilter::apply (double sample, double time_step) {
+	double filtered = 0;
+	double a = time_step / (rc + time_step);
+
+	filtered = a * sample + (1 - a) * last;
+
+	last = filtered;
+	return filtered;
+}
 
