@@ -83,4 +83,26 @@ public:
 
 	double get_cutoff();
 };
+
+class BandPassFilter {
+
+private:
+
+	LowPassFilter lowpass;
+	HighPassFilter highpass;
+
+public:
+
+	BandPassFilter(double low_cutoff = 21000, double high_cutoff = 0);
+
+	double apply (double sample, double time_step);
+
+	void set_low_cutoff(double cutoff);
+
+	double get_low_cutoff();
+
+	void set_high_cutoff(double cutoff);
+
+	double get_high_cutoff();
+};
 #endif /* MIDICUBE_SYNTHESIS_H_ */

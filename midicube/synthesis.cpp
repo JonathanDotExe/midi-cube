@@ -125,3 +125,31 @@ void HighPassFilter::set_cutoff(double cutoff) {
 double HighPassFilter::get_cutoff() {
 	return cutoff;
 }
+
+//BandPassFilter
+BandPassFilter::BandPassFilter(double low_cutoff = 21000, double high_cutoff = 0) {
+	set_low_cutoff(low_cutoff);
+	set_high_cutoff(high_cutoff);
+}
+
+double BandPassFilter::apply (double sample, double time_step) {
+	double filtered = lowpass.apply(highpass.apply(sample, time_step), time_step);
+	return filtered;
+}
+
+void BandPassFilter::set_low_cutoff(double cutoff) {
+	lowpass.set_cutoff(cutoff);
+}
+
+double BandPassFilter::get_low_cutoff() {
+	return lowpass.get_cutoff();
+}
+
+void BandPassFilter::set_high_cutoff(double cutoff) {
+	highpass.set_cutoff(cutoff);
+}
+
+double BandPassFilter::get_high_cutoff() {
+	return highpass.get_cutoff();
+}
+

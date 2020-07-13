@@ -23,3 +23,4 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 * Speed of the rotary speakers (https://www.musiker-board.de/threads/leslie-geschwindigkeiten-in-herz-frequenzen-fuer-die-vb3-orgel-gesucht.511349/)
 * Wikipedia article about low-pass-filters (https://en.wikipedia.org/wiki/Low-pass_filter)
 * Wikipedia article about high-pass-filter (https://en.wikipedia.org/wiki/High-pass_filter)
+* German articale about vocoders (https://www.amazona.de/was-ist-ein-vocoder-geschichte-funktionsweise-varianten/)
