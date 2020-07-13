@@ -127,7 +127,7 @@ double HighPassFilter::get_cutoff() {
 }
 
 //BandPassFilter
-BandPassFilter::BandPassFilter(double low_cutoff = 21000, double high_cutoff = 0) {
+BandPassFilter::BandPassFilter(double low_cutoff, double high_cutoff) {
 	set_low_cutoff(low_cutoff);
 	set_high_cutoff(high_cutoff);
 }

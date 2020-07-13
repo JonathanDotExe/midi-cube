@@ -10,11 +10,17 @@
 
 #include "soundengine.h"
 
+#define VOCODER_BAND_COUNT 30
+#define VOCODER_LOW_BAND 120
+#define VOCODER_HIGH_BAND 330
+
 struct VocoderData {
-	bool delay = true;
+	bool delay = false;
 	double delay_time = 0.5;
 	unsigned int delay_feedback = 4;
 	double delay_mul = 1;
+	double voice_amp = 0;
+	double vocoder_amp = 1;
 
 	unsigned int delay_control = 9;
 	unsigned int delay_time_control = 1;
@@ -25,8 +31,10 @@ struct VocoderData {
 class Vocoder : public SoundEngine {
 
 private:
-	DelayBuffer delay;
 	VocoderData data;
+	DelayBuffer delay;
+	std::array<BandPassFilter, VOCODER_BAND_COUNT> carrier_filters;
+	std::array<BandPassFilter, VOCODER_BAND_COUNT> modulator_filters;
 
 public:
 	Vocoder();
