@@ -14,7 +14,7 @@ PresetSynth::PresetSynth() {
 	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
 	vibrato = 0;
-	filter = LowPassFilter(20000);
+	filter = LowPassFilter(21000);
 }
 
 void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note) {

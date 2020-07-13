@@ -62,4 +62,25 @@ public:
 
 	double get_cutoff();
 };
+
+class HighPassFilter {
+
+private:
+
+	double lastFiltered;
+	double last;
+	double cutoff;
+	double rc;
+	bool started;
+
+public:
+
+	HighPassFilter(double cutoff = 21000);
+
+	double apply (double sample, double time_step);
+
+	void set_cutoff(double cutoff);
+
+	double get_cutoff();
+};
 #endif /* MIDICUBE_SYNTHESIS_H_ */

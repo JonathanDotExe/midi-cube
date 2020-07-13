@@ -91,3 +91,37 @@ double LowPassFilter::get_cutoff() {
 	return cutoff;
 }
 
+//HighPassFilter
+HighPassFilter::HighPassFilter(double cutoff) {
+	this->cutoff = cutoff;
+	this->lastFiltered = 0;
+	this->last = 0;
+	this->rc = 1.0/(2 * M_PI * cutoff);
+	this->started = false;
+}
+
+double HighPassFilter::apply (double sample, double time_step) {
+	double filtered = 0;
+	double a = rc / (rc + time_step);
+
+	if (started) {
+		filtered = a * lastFiltered + a * (sample - last);
+	}
+	else {
+		filtered = sample;
+		started = true;
+	}
+
+	last = sample;
+	lastFiltered = filtered;
+	return filtered;
+}
+
+void HighPassFilter::set_cutoff(double cutoff) {
+	this->cutoff = cutoff;
+	this->rc = 1.0/(2 * M_PI * cutoff);
+}
+
+double HighPassFilter::get_cutoff() {
+	return cutoff;
+}
