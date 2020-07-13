@@ -48,7 +48,7 @@ void PresetSynth::control_change(unsigned int control, unsigned int value) {
 	}
 	if (control == 2) {
 		std::cout << filter.get_cutoff() << std::endl;
-		filter.set_cutoff(20000/(128.0 - value));
+		filter.set_cutoff(21000/(128.0 - value));
 	}
 }
 

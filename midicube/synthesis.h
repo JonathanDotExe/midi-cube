@@ -54,7 +54,7 @@ private:
 
 public:
 
-	LowPassFilter(double cutoff = 20000);
+	LowPassFilter(double cutoff = 21000);
 
 	double apply (double sample, double time_step);
 
