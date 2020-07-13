@@ -147,41 +147,43 @@ View* DevicesMenuView::draw() {
 	//Move devices
 	Vector2 mouse_pos = GetMousePosition();
 	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-		if (device_drag.dragging) {
-			Position& pos = *model.device_positions[device_drag.device];
-			Texture2D tex = device_textures[model.midi_cube->get_devices()[device_drag.device]->type()];
-			pos.x += mouse_pos.x - device_drag.last_x;
-			pos.y += mouse_pos.y - device_drag.last_y;
-			pos.x = std::min(std::max(pos.x, 0), SCREEN_WIDTH - tex.width);
-			pos.y = std::min(std::max(pos.y, 0), SCREEN_HEIGHT - tex.height);
-		}
-		else {
-			//Find position
-			for (auto p : model.device_positions) {
-				Position& pos = *p.second;
-				Texture2D tex = device_textures[model.midi_cube->get_devices()[p.first]->type()];
-				if (mouse_pos.x >= pos.x && mouse_pos.x <= pos.x + tex.width && mouse_pos.y >= pos.y && mouse_pos.y <= pos.y + tex.height) {
-					//Clicked
-					device_drag.dragging = true;
-					device_drag.device = p.first;
-					break;
-				}
+		if (!binding_drag.dialog) {
+			if (device_drag.dragging) {
+				Position& pos = *model.device_positions[device_drag.device];
+				Texture2D tex = device_textures[model.midi_cube->get_devices()[device_drag.device]->type()];
+				pos.x += mouse_pos.x - device_drag.last_x;
+				pos.y += mouse_pos.y - device_drag.last_y;
+				pos.x = std::min(std::max(pos.x, 0), SCREEN_WIDTH - tex.width);
+				pos.y = std::min(std::max(pos.y, 0), SCREEN_HEIGHT - tex.height);
 			}
-			device_drag.start_x = mouse_pos.x;
-			device_drag.start_y = mouse_pos.y;
+			else {
+				//Find position
+				for (auto p : model.device_positions) {
+					Position& pos = *p.second;
+					Texture2D tex = device_textures[model.midi_cube->get_devices()[p.first]->type()];
+					if (mouse_pos.x >= pos.x && mouse_pos.x <= pos.x + tex.width && mouse_pos.y >= pos.y && mouse_pos.y <= pos.y + tex.height) {
+						//Clicked
+						device_drag.dragging = true;
+						device_drag.device = p.first;
+						break;
+					}
+				}
+				device_drag.start_x = mouse_pos.x;
+				device_drag.start_y = mouse_pos.y;
+			}
+			device_drag.last_x = mouse_pos.x;
+			device_drag.last_y = mouse_pos.y;
 		}
-		device_drag.last_x = mouse_pos.x;
-		device_drag.last_y = mouse_pos.y;
 	}
 	else {
-		device_drag.dragging = false;
 		//Edit device
-		if (device_drag.start_x == mouse_pos.x && device_drag.start_y == mouse_pos.y) {
+		if (device_drag.dragging && device_drag.start_x == mouse_pos.x && device_drag.start_y == mouse_pos.y) {
 			view = create_view_for_device(model.midi_cube->get_devices().at(device_drag.device));
 			if (!view) {
 				view = this;
 			}
 		}
+		device_drag.dragging = false;
 	}
 	//Bind devices
 	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
