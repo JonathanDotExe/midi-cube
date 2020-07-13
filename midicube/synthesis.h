@@ -54,9 +54,12 @@ private:
 
 public:
 
-	LowPassFilter(double cutoff);
+	LowPassFilter(double cutoff = 20000);
 
 	double apply (double sample, double time_step);
 
+	void set_cutoff(double cutoff);
+
+	double get_cutoff();
 };
 #endif /* MIDICUBE_SYNTHESIS_H_ */

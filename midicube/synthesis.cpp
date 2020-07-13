@@ -70,7 +70,6 @@ LowPassFilter::LowPassFilter(double cutoff) {
 	this->cutoff = cutoff;
 	this->last = 0;
 	this->rc = 1.0/(2 * M_PI * cutoff);
-	this->started = false;
 }
 
 double LowPassFilter::apply (double sample, double time_step) {
@@ -81,5 +80,14 @@ double LowPassFilter::apply (double sample, double time_step) {
 
 	last = filtered;
 	return filtered;
+}
+
+void LowPassFilter::set_cutoff(double cutoff) {
+	this->cutoff = cutoff;
+	this->rc = 1.0/(2 * M_PI * cutoff);
+}
+
+double LowPassFilter::get_cutoff() {
+	return cutoff;
 }
 
