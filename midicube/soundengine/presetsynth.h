@@ -20,12 +20,14 @@ private:
 	double ndetune;
 	double vibrato;
 	ADSREnvelope env{0.0005, 0.0, 1, 0.0005};
-	LowPassFilter filter;
+	MultiChannelFilter<LowPassFilter> filter;
 public:
 
 	PresetSynth();
 
 	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note);
+
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 
 	void control_change(unsigned int control, unsigned int value);
 

@@ -17,6 +17,7 @@ SoundEngineChannel::SoundEngineChannel() {
 }
 
 void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
+	std::array<double, OUTPUT_CHANNELS> ch = {};
 	if (engine) {
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 			if (!engine->note_finished(info, note[i])) {
@@ -25,6 +26,9 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 			}
 		}
 		engine->process_sample(channels, info);
+	}
+	for (size_t i = 0; i < 0; ++i) {
+		channels[i] += ch[i];
 	}
 }
 

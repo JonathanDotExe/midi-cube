@@ -14,7 +14,7 @@ PresetSynth::PresetSynth() {
 	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
 	vibrato = 0;
-	filter = LowPassFilter(21000);
+	filter.set_cutoff(21000);
 }
 
 void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note) {
@@ -31,12 +31,15 @@ void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 
 	double amp = env.amplitude(info.time, note);
 	sample *= 0.1 * amp;
-	sample = filter.apply(sample, info.time_step);
 
 	for (size_t i = 0; i < channels.size() ; ++i) {
 		channels[i] += sample;
 	}
 }
+
+void PresetSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+	filter.apply(channels, info.time_step);
+};
 
 bool PresetSynth::note_finished(SampleInfo& info, TriggeredNote& note) {
 	return !note.pressed && note.release_time + env.release < info.time;
@@ -47,7 +50,6 @@ void PresetSynth::control_change(unsigned int control, unsigned int value) {
 		vibrato = value/127.0;
 	}
 	if (control == 2) {
-		std::cout << filter.get_cutoff() << std::endl;
 		filter.set_cutoff(21000/(128.0 - value));
 	}
 }

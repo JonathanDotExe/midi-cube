@@ -9,6 +9,8 @@
 #define MIDICUBE_SYNTHESIS_H_
 
 #include <array>
+#include <type_traits>
+#include "audio.h"
 
 #define DELAY_BUFFER_SIZE 1048576
 
@@ -44,7 +46,23 @@ public:
 
 };
 
-class LowPassFilter {
+class Filter {
+
+public:
+
+	virtual double apply (double sample, double time_step) = 0;
+
+	virtual void set_cutoff(double cutoff) = 0;
+
+	virtual double get_cutoff() = 0;
+
+	virtual ~Filter() {
+
+	}
+
+};
+
+class LowPassFilter : public Filter {
 
 private:
 
@@ -61,9 +79,13 @@ public:
 	void set_cutoff(double cutoff);
 
 	double get_cutoff();
+
+	~LowPassFilter() {
+
+	}
 };
 
-class HighPassFilter {
+class HighPassFilter : public Filter {
 
 private:
 
@@ -82,9 +104,13 @@ public:
 	void set_cutoff(double cutoff);
 
 	double get_cutoff();
+
+	~HighPassFilter() {
+
+	}
 };
 
-class BandPassFilter {
+class BandPassFilter : public Filter {
 
 private:
 
@@ -104,5 +130,44 @@ public:
 	void set_high_cutoff(double cutoff);
 
 	double get_high_cutoff();
+
+	void set_cutoff(double cutoff);
+
+	double get_cutoff();
+
+	~BandPassFilter() {
+
+	}
 };
+
+template<typename T, typename = std::enable_if<std::is_base_of<Filter, T>::value>>
+class MultiChannelFilter {
+private:
+	std::array<T, OUTPUT_CHANNELS> channels;
+
+public:
+
+	void apply (std::array<double, OUTPUT_CHANNELS>& channels, double time_step) {
+		for (std::size_t i = 0; i < this->channels.size(); ++i) {
+			channels[i] = this->channels[i].apply(channels[i], time_step);
+		}
+	}
+
+	std::array<T, OUTPUT_CHANNELS>& get_channels () {
+		return channels;
+	}
+
+	void set_cutoff(double cutoff) {
+		for (std::size_t i = 0; i < this->channels.size(); ++i) {
+			this->channels[i].set_cutoff(cutoff);
+		}
+	}
+
+	double get_cutoff() {
+		return channels.at(0).get_cutoff();
+	}
+
+};
+
+
 #endif /* MIDICUBE_SYNTHESIS_H_ */

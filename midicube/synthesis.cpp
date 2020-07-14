@@ -153,3 +153,12 @@ double BandPassFilter::get_high_cutoff() {
 	return highpass.get_cutoff();
 }
 
+void BandPassFilter::set_cutoff(double cutoff) {
+	set_low_cutoff(cutoff);
+	set_high_cutoff(cutoff);
+}
+
+double BandPassFilter::get_cutoff() {
+	return (get_low_cutoff() + get_high_cutoff())/2.0;
+}
+
