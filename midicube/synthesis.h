@@ -142,7 +142,7 @@ public:
 
 template<typename T, typename = std::enable_if<std::is_base_of<Filter, T>::value>>
 class MultiChannelFilter {
-private:
+protected:
 	std::array<T, OUTPUT_CHANNELS> channels;
 
 public:
@@ -165,6 +165,32 @@ public:
 
 	double get_cutoff() {
 		return channels.at(0).get_cutoff();
+	}
+
+};
+
+class MultiChannelBandPassFilter : public MultiChannelFilter<BandPassFilter> {
+
+public:
+
+	void set_low_cutoff(double cutoff) {
+		for (std::size_t i = 0; i < this->channels.size(); ++i) {
+			this->channels[i].set_low_cutoff(cutoff);
+		}
+	}
+
+	double get_low_cutoff() {
+		return channels.at(0).get_low_cutoff();
+	}
+
+	void set_high_cutoff(double cutoff) {
+		for (std::size_t i = 0; i < this->channels.size(); ++i) {
+			this->channels[i].set_low_cutoff(cutoff);
+		}
+	}
+
+	double get_high_cutoff() {
+		return channels.at(0).get_low_cutoff();
 	}
 
 };

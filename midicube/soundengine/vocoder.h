@@ -33,8 +33,8 @@ class Vocoder : public SoundEngine {
 private:
 	VocoderData data;
 	DelayBuffer delay;
-	std::array<BandPassFilter, VOCODER_BAND_COUNT> carrier_filters;
-	std::array<BandPassFilter, VOCODER_BAND_COUNT> modulator_filters;
+	std::array<MultiChannelBandPassFilter, VOCODER_BAND_COUNT> carrier_filters;
+	std::array<MultiChannelBandPassFilter, VOCODER_BAND_COUNT> modulator_filters;
 
 public:
 	Vocoder();
