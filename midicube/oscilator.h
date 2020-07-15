@@ -27,7 +27,7 @@ class AnalogOscilator : public Oscilator {
 private:
 	AnalogWaveForm waveform;
 public:
-	AnalogOscilator();
+	AnalogOscilator(AnalogWaveForm waveform);
 	double signal(double time, double freq);
 	AnalogWaveForm get_waveform() const;
 	void set_waveform(AnalogWaveForm waveform);
@@ -54,7 +54,7 @@ private:
 	double detune;
 	AnalogWaveForm waveform;
 public:
-	SyncOscilator();
+	SyncOscilator(AnalogWaveForm waveform, double detune);
 	double signal(double time, double freq);
 	double get_detune() const;
 	void set_detune(double detune);

@@ -9,6 +9,7 @@
 #define MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 
 #include "soundengine.h"
+#include "../oscilator.h"
 
 #define SYNTH_VIBRATO_RATE 6
 #define SYNTH_VIBRATO_DETUNE 1
@@ -21,6 +22,7 @@ private:
 	double vibrato;
 	ADSREnvelope env{0.0005, 0.0, 1, 0.0005};
 	MultiChannelFilter<LowPassFilter> filter;
+	OscilatorSlot* osc;
 public:
 
 	PresetSynth();
@@ -34,6 +36,8 @@ public:
 	bool note_finished(SampleInfo& info, TriggeredNote& note);
 
 	std::string get_name();
+
+	~PresetSynth();
 
 };
 

@@ -19,6 +19,10 @@ Oscilator::~Oscilator() {
 }
 
 //AnalogOscilator
+AnalogOscilator::AnalogOscilator(AnalogWaveForm waveform) {
+	this->waveform = waveform;
+}
+
 double AnalogOscilator::signal(double time, double freq) {
 	double signal = 0;
 	switch(waveform) {
@@ -64,7 +68,16 @@ void AdditiveOscilator::add_sine(AdditiveSine sine) {
 	sines.push_back(sine);
 }
 
+AnalogOscilator::~AnalogOscilator() {
+
+}
+
 //SyncOscilator
+SyncOscilator::SyncOscilator(AnalogWaveForm waveform, double detune) {
+	this->waveform = waveform;
+	this->detune = detune;
+}
+
 double SyncOscilator::signal(double time, double freq) {
 	double signal = 0;
 	time = fmod(time, 1.0/freq);
@@ -101,6 +114,10 @@ void SyncOscilator::set_detune(double detune) {
 	this->detune = detune;
 }
 
+SyncOscilator::~SyncOscilator() {
+
+}
+
 
 //OscilatorSlot
 OscilatorSlot::OscilatorSlot(Oscilator* osc) {
@@ -124,7 +141,7 @@ unsigned int OscilatorSlot::get_unison() const {
 	return unison;
 }
 
-void OscilatorSlot::set_unison(unsigned int unison = 0) {
+void OscilatorSlot::set_unison(unsigned int unison) {
 	this->unison = unison;
 }
 
@@ -132,7 +149,7 @@ double OscilatorSlot::get_unison_detune() const {
 	return unison_detune;
 }
 
-void OscilatorSlot::set_unison_detune(double unison_detune = 0.1) {
+void OscilatorSlot::set_unison_detune(double unison_detune) {
 	this->unison_detune = unison_detune;
 	udetune = note_to_freq_transpose(unison_detune);
 	nudetune = note_to_freq_transpose(-unison_detune);
@@ -142,7 +159,7 @@ double OscilatorSlot::get_volume() const {
 	return volume;
 }
 
-void OscilatorSlot::set_volume(double volume = 1) {
+void OscilatorSlot::set_volume(double volume) {
 	this->volume = volume;
 }
 
