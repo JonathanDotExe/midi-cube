@@ -38,10 +38,10 @@ class B3Organ : public SoundEngine {
 private:
 	B3OrganData data;
 	std::array<double, ORGAN_DRAWBAR_COUNT> drawbar_harmonics;
-	DelayBuffer left_delay;
-	DelayBuffer right_delay;
-	HighPassFilter horn_filter;
-	LowPassFilter bass_filter;
+	DelayBuffer left_horn_del;
+	DelayBuffer left_bass_del;
+	DelayBuffer right_horn_del;
+	DelayBuffer right_bass_del;
 public:
 	B3Organ();
 

@@ -14,6 +14,8 @@
 
 #define DELAY_BUFFER_SIZE 1048576
 
+extern double db_to_amp(double db);
+
 extern double note_to_freq_transpose (double tnote);
 
 extern double note_to_freq (double note);

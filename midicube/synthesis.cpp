@@ -9,6 +9,10 @@
 #include <cmath>
 
 
+extern double db_to_amp(double db) {
+	return pow(10, db/10);
+}
+
 extern double note_to_freq_transpose (double tnote) {
 	return pow(2, (tnote)/12.0);
 }
