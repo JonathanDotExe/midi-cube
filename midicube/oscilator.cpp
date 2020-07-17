@@ -50,7 +50,15 @@ void AnalogOscilator::set_waveform(AnalogWaveForm waveform) {
 	this->waveform = waveform;
 }
 
+AnalogOscilator::~AnalogOscilator() {
+
+}
+
 //AdditiveOscilator
+AdditiveOscilator::AdditiveOscilator() {
+
+}
+
 double AdditiveOscilator::signal(double time, double freq) {
 	double sample = 0;
 	double amp = 0;
@@ -68,7 +76,7 @@ void AdditiveOscilator::add_sine(AdditiveSine sine) {
 	sines.push_back(sine);
 }
 
-AnalogOscilator::~AnalogOscilator() {
+AdditiveOscilator::~AdditiveOscilator() {
 
 }
 
@@ -130,11 +138,16 @@ double OscilatorSlot::signal(double time, double freq) {
 	double det = udetune;
 	double ndet = nudetune;
 	for (unsigned int i = 1; i <= unison; ++i) {
-		signal += osc->signal(time, freq * det) + osc->signal(time, freq * ndet);
-		det *= udetune;
-		ndet *= nudetune;
+		if (i % 2 == 0) {
+			signal += osc->signal(time, freq * ndet);
+			ndet *= nudetune;
+		}
+		else {
+			signal += osc->signal(time, freq * det);
+			det *= udetune;
+		}
 	}
-	return signal / (1 + 2 * unison);
+	return signal / (1 + unison) * volume;
 }
 
 unsigned int OscilatorSlot::get_unison() const {

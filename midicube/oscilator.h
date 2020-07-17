@@ -39,7 +39,7 @@ struct AdditiveSine {
 	double amp;
 };
 
-class AdditiveOscilator {
+class AdditiveOscilator : public Oscilator{
 private:
 	std::vector<AdditiveSine> sines;
 public:
@@ -49,7 +49,7 @@ public:
 	~AdditiveOscilator();
 };
 
-class SyncOscilator {
+class SyncOscilator : public Oscilator{
 private:
 	double detune;
 	AnalogWaveForm waveform;
