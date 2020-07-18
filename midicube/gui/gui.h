@@ -12,8 +12,8 @@
 #include "../soundengine/soundengine.h"
 #include <type_traits>
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 600
 
 
 class View {
