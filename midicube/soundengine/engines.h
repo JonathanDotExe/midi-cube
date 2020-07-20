@@ -13,6 +13,7 @@
 #include "presetsynth.h"
 #include "sampler.h"
 #include "vocoder.h"
+#include "synthesizer.h"
 
 extern void fill_sound_engine_device(SoundEngineDevice* device) {
 	device->add_sound_engine(new PresetSynth());
@@ -20,6 +21,7 @@ extern void fill_sound_engine_device(SoundEngineDevice* device) {
 	device->add_sound_engine(new SampleDrums());
 	device->add_sound_engine(new Sampler());
 	device->add_sound_engine(new Vocoder());
+	device->add_sound_engine(new Synthesizer());
 }
 
 

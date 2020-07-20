@@ -10,6 +10,15 @@
 Synthesizer::Synthesizer() {
 	preset = new SynthesizerPreset();
 
+	//Patch 1 -- Unison Saw Lead
+	OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
+	osc->set_unison(2);
+	preset->oscilators.push_back({osc, {0.0005, 0, 1, 0.0005}});
+
+	Filter* filter = new LowPassFilter(21000);
+	preset->filters.push_back({filter, 0});
+
+	//Calc release time
 	release_time = 0;
 	for (size_t i = 0; i < preset->oscilators.size(); ++i) {
 		if (preset->oscilators[i].env.release > release_time) {
@@ -32,9 +41,8 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 		osc->set_property(preset->envelope_bindings[i].property, val);
 	}
 	//Oscilator samples
-	samples.clear();
-	for (size_t i = 0; i < preset->oscilators.size(); ++i) {
-		samples.push_back(preset->oscilators[i].osc->signal(info.time + note.phase_shift, note.freq) * preset->oscilators[i].env.amplitude(info.time, note));
+	for (size_t i = 0; i < preset->oscilators.size() && i < samples.size(); ++i) {
+		samples[i] = preset->oscilators[i].osc->signal(info.time + note.phase_shift, note.freq) * preset->oscilators[i].env.amplitude(info.time, note);
 	}
 }
 
@@ -49,6 +57,11 @@ void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 		for (size_t j = 0; j < samples.size(); ++i) {
 			channels[i] += samples[j];
 		}
+	}
+
+	//Reset samples
+	for (size_t i = 0; i < samples.size(); ++i) {
+		samples[i] = 0;
 	}
 }
 
@@ -65,7 +78,7 @@ bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note) {
 	return !note.pressed && note.release_time + release_time < info.time;
 }
 
-std::string get_name() {
+std::string Synthesizer::get_name() {
 	return "Synthesizer";
 }
 

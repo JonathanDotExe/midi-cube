@@ -59,7 +59,7 @@ struct SynthesizerPreset {
 class Synthesizer: public SoundEngine {
 private:
 	SynthesizerPreset* preset = nullptr;
-	std::vector<double> samples;
+	std::array<double, 100> samples = {};
 	double release_time;
 public:
 	Synthesizer();
@@ -72,7 +72,7 @@ public:
 
 	bool note_finished(SampleInfo& info, TriggeredNote& note);
 
-	std::string get_name() = 0;
+	std::string get_name();
 
 	virtual ~Synthesizer();
 };
