@@ -11,11 +11,27 @@ Synthesizer::Synthesizer() {
 	preset = new SynthesizerPreset();
 
 	//Patch 1 -- Unison Saw Lead
-	OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
+	/*OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
 	osc->set_unison(2);
 	preset->oscilators.push_back({osc, {0.0005, 0, 1, 0.0005}});
 
 	Filter* filter = new LowPassFilter(21000);
+	preset->filters.push_back({filter, 0});*/
+
+	//Patch 2 -- Saw Bass
+	/*OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
+	osc->set_unison(1);
+	preset->oscilators.push_back({osc, {0.0005, 0, 1, 0.0005}});
+
+	Filter* filter = new LowPassFilter(6300);
+	preset->filters.push_back({filter, 0});*/
+
+	//Patch 3 -- Simple Saw Pad
+	OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
+	osc->set_unison(1);
+	preset->oscilators.push_back({osc, {0.12, 0, 1, 0.2}});
+
+	Filter* filter = new LowPassFilter(412);
 	preset->filters.push_back({filter, 0});
 
 	//Calc release time
