@@ -42,7 +42,7 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	}
 	//Oscilator samples
 	for (size_t i = 0; i < preset->oscilators.size() && i < samples.size(); ++i) {
-		samples[i] = preset->oscilators[i].osc->signal(info.time + note.phase_shift, note.freq) * preset->oscilators[i].env.amplitude(info.time, note);
+		samples[i] += preset->oscilators[i].osc->signal(info.time + note.phase_shift, note.freq) * preset->oscilators[i].env.amplitude(info.time, note);
 	}
 }
 
@@ -54,11 +54,10 @@ void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 	}
 	//Play samples
 	for (size_t i = 0; i < channels.size(); ++i) {
-		for (size_t j = 0; j < samples.size(); ++i) {
-			channels[i] += samples[j];
+		for (size_t j = 0; j < samples.size(); ++j) {
+			channels[i] += samples[j] * 0.3;
 		}
 	}
-
 	//Reset samples
 	for (size_t i = 0; i < samples.size(); ++i) {
 		samples[i] = 0;
