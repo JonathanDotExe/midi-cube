@@ -59,6 +59,7 @@ struct SynthesizerPreset {
 class Synthesizer: public SoundEngine {
 private:
 	SynthesizerPreset* preset = nullptr;
+	std::vector<double> samples;
 	double release_time;
 public:
 	Synthesizer();
