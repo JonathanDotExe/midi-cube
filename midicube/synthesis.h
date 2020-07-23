@@ -48,6 +48,13 @@ public:
 
 };
 
+extern double apply_low_pass(double sample, double time_step, double rc, double last_filtered);
+
+extern double apply_high_pass(double sample, double time_step, double rc, double last_filtered, double last, bool started);
+
+extern double cutoff_to_rc(double cutoff);
+
+
 class Filter {
 
 public:

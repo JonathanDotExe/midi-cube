@@ -13,15 +13,24 @@
 #include "../envelope.h"
 #include "../synthesis.h"
 
+#define MAX_OSCILATORS 20
+
+
+enum class FilterType {
+	LOW_PASS, HIGH_PASS
+};
+
+struct FilterData {
+	FilterType type;
+	double cutoff;
+};
+
 struct OscilatorEnvelope {
 	OscilatorSlot* osc;
 	ADSREnvelope env;
+	std::vector<FilterData> filters;
 };
 
-struct FilterOscilator {
-	Filter* filter;
-	size_t osc;
-};
 
 struct EnvelopeBinding {
 	std::string property;
@@ -39,9 +48,14 @@ struct ControlBinding {
 	double to;
 };
 
+struct FilterInstance {
+	double last_filtered;
+	double last;
+	bool started;
+};
+
 struct SynthesizerPreset {
 	std::vector<OscilatorEnvelope> oscilators;
-	std::vector<FilterOscilator> filters;
 	std::vector<ADSREnvelope> envelopes;
 	std::vector<EnvelopeBinding> envelope_bindings;
 	std::vector<ControlBinding> control_bindings;
@@ -50,21 +64,18 @@ struct SynthesizerPreset {
 		for (size_t i = 0; i < oscilators.size() ; ++i) {
 			delete oscilators[i].osc;
 		}
-		for (size_t i = 0; i < filters.size() ; ++i) {
-			delete filters[i].filter;
-		}
 	}
 };
 
 class Synthesizer: public SoundEngine {
 private:
 	SynthesizerPreset* preset = nullptr;
-	std::array<double, 100> samples = {};
+	std::array<std::array<FilterInstance, SOUND_ENGINE_POLYPHONY>, MAX_OSCILATORS> filters = {};
 	double release_time;
 public:
 	Synthesizer();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index);
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 

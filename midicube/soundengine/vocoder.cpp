@@ -18,7 +18,7 @@ Vocoder::Vocoder() {
 	}
 }
 
-void Vocoder::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note) {
+void Vocoder::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index) {
 	double sample = saw_wave(info.time - note.phase_shift, note.freq);
 	sample *= 0.3 * data.vocoder_amp;
 	for (size_t channel = 0; channel < channels.size(); ++channel) {

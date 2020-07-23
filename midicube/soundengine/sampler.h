@@ -55,7 +55,7 @@ public:
 
 	Sampler();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index);
 
 	bool note_finished(SampleInfo& info, TriggeredNote& note);
 

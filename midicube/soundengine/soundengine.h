@@ -23,7 +23,7 @@
 class SoundEngine {
 
 public:
-	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note) = 0;
+	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index) = 0;
 
 	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
 

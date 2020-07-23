@@ -21,7 +21,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 	if (engine) {
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 			if (!engine->note_finished(info, note[i])) {
-				engine->process_note_sample(channels, info, note[i]);
+				engine->process_note_sample(channels, info, note[i], i);
 				note[i].phase_shift += pitch_bend * info.time_step;
 			}
 		}

@@ -117,7 +117,7 @@ Sampler::Sampler() {
 	sample->push_sample(reg);
 }
 
-void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note) {
+void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index) {
 	for (size_t channel = 0; channel < channels.size(); ++channel) {
 		channels[channel] += this->sample->get_sample(channel, info, note);
 	}

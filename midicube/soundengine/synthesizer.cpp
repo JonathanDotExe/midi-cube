@@ -20,7 +20,6 @@ Synthesizer::Synthesizer() {
 
 	//Patch 2 -- Saw Bass
 	/*OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
-	osc->set_unison(1);
 	preset->oscilators.push_back({osc, {0.0005, 0, 1, 0.0005}});
 
 	Filter* filter = new LowPassFilter(6300);
@@ -29,10 +28,9 @@ Synthesizer::Synthesizer() {
 	//Patch 3 -- Simple Saw Pad
 	OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
 	osc->set_unison(1);
-	preset->oscilators.push_back({osc, {0.12, 0, 1, 0.2}});
-
-	Filter* filter = new LowPassFilter(412);
-	preset->filters.push_back({filter, 0});
+	std::vector<FilterData> filters;
+	filters.push_back({FilterType::LOW_PASS, 200});
+	preset->oscilators.push_back({osc, {0.2, 0, 1, 1}, filters});
 
 	//Calc release time
 	release_time = 0;
@@ -43,7 +41,23 @@ Synthesizer::Synthesizer() {
 	}
 }
 
-void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note) {
+static double apply_filter (FilterData& data, FilterInstance& inst, double sample, double time_step) {
+	double last = sample;
+	switch (data.type) {
+	case FilterType::LOW_PASS:
+		sample = apply_low_pass(sample, time_step, cutoff_to_rc(data.cutoff), inst.last_filtered);
+		break;
+	case FilterType::HIGH_PASS:
+		sample = apply_high_pass(sample, time_step, cutoff_to_rc(data.cutoff), inst.last_filtered, inst.last, inst.started);
+		break;
+	}
+	inst.last = last;
+	inst.last_filtered = sample;
+	inst.started = true;
+	return sample;
+}
+
+void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index) {
 	//Envelopes
 	std::vector<double> env_val;
 	for (size_t i = 0; i < preset->envelopes.size(); ++i) {
@@ -56,15 +70,30 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 		double val = preset->envelope_bindings[i].from + (preset->envelope_bindings[i].to - preset->envelope_bindings[i].from) * value;
 		osc->set_property(preset->envelope_bindings[i].property, val);
 	}
+	double sample = 0;
 	//Oscilator samples
-	for (size_t i = 0; i < preset->oscilators.size() && i < samples.size(); ++i) {
-		samples[i] += preset->oscilators[i].osc->signal(info.time + note.phase_shift, note.freq) * preset->oscilators[i].env.amplitude(info.time, note);
+	for (size_t i = 0; i < preset->oscilators.size() && i < filters.size(); ++i) {
+		OscilatorEnvelope& osc = preset->oscilators[i];
+		//Signal
+		double s = osc.osc->signal(info.time + note.phase_shift, note.freq);
+		//Filter
+		for (size_t j = 0; j < osc.filters.size(); ++j) {
+			s = apply_filter(osc.filters.at(j), filters[i].at(note_index), s, info.time_step);
+		}
+		//Envelope
+		s *= osc.env.amplitude(info.time, note);
+
+		sample += s;
+	}
+	//Play samples
+	for (size_t i = 0; i < channels.size(); ++i) {
+		channels[i] += sample;
 	}
 }
 
 void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
 	//Filters
-	for (size_t i = 0; i < preset->filters.size(); ++i) {
+	/*for (size_t i = 0; i < preset->filters.size(); ++i) {
 		double filtered  = preset->filters[i].filter->apply(samples.at(preset->filters[i].osc), info.time_step);
 		samples[preset->filters[i].osc] = filtered;
 	}
@@ -77,7 +106,7 @@ void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 	//Reset samples
 	for (size_t i = 0; i < samples.size(); ++i) {
 		samples[i] = 0;
-	}
+	}*/
 }
 
 void Synthesizer::control_change(unsigned int control, unsigned int value) {

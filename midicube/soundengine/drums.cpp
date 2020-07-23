@@ -32,7 +32,7 @@ SampleDrums::SampleDrums () {
 	read_audio_file(drumkit->notes[51], "./data/drumkits/test/tom3.wav");
 }
 
-void SampleDrums::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note) {
+void SampleDrums::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index) {
 	try {
 		if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
 			AudioSample& audio = drumkit->notes[note.note];

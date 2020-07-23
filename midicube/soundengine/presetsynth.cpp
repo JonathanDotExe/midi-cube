@@ -32,7 +32,7 @@ PresetSynth::PresetSynth() {
 	osc2->set_unison(2);
 }
 
-void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note) {
+void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, size_t note_index) {
 	double sample = 0.0;
 	double freq = note.freq;
 	double t = info.time + note.phase_shift;
