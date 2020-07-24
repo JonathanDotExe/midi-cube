@@ -20,7 +20,10 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 	std::array<double, OUTPUT_CHANNELS> ch = {};
 	if (engine) {
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-			if (!engine->note_finished(info, note[i])) {
+			if (engine->note_finished(info, note[i])) {
+				engine->note_not_pressed(info, note[i], i);
+			}
+			else {
 				engine->process_note_sample(channels, info, note[i], i);
 				note[i].phase_shift += pitch_bend * info.time_step;
 			}
@@ -32,9 +35,9 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 	}
 }
 
-size_t SoundEngineChannel::next_freq_slot() {
+size_t SoundEngineChannel::next_freq_slot(SampleInfo& info) {
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-		if (!note[i].pressed) {
+		if (!note[i].pressed && engine->note_finished(info, note[i])) {
 			return i;
 		}
 	}
@@ -45,7 +48,7 @@ size_t SoundEngineChannel::next_freq_slot() {
 void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 	//Note on
 	if (message.get_message_type() == MessageType::NOTE_ON) {
-		size_t slot = next_freq_slot();
+		size_t slot = next_freq_slot(info);
 		note[slot].freq = note_to_freq(message.get_note());
 		note[slot].velocity = message.get_velocity()/127.0;
 		note[slot].note = message.get_note();

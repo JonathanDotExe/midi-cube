@@ -25,6 +25,10 @@ class SoundEngine {
 public:
 	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index) = 0;
 
+	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
+
+	};
+
 	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
 
 	};
@@ -50,7 +54,7 @@ private:
 	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
 	double pitch_bend = 0;
 
-	size_t next_freq_slot();
+	size_t next_freq_slot(SampleInfo& info);
 
 public:
 	SoundEngine* engine = nullptr;

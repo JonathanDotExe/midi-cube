@@ -26,11 +26,11 @@ Synthesizer::Synthesizer() {
 	preset->filters.push_back({filter, 0});*/
 
 	//Patch 3 -- Simple Saw Pad
-	OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
-	osc->set_unison(1);
+	OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SINE));
+	osc->set_unison(0);
 	std::vector<FilterData> filters;
-	filters.push_back({FilterType::LOW_PASS, 200});
-	preset->oscilators.push_back({osc, {0.2, 0, 1, 1}, filters});
+	//filters.push_back({FilterType::LOW_PASS, 200});
+	preset->oscilators.push_back({osc, {0.0, 0, 1, 0}, filters});
 
 	//Calc release time
 	release_time = 0;
@@ -81,13 +81,26 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 			s = apply_filter(osc.filters.at(j), filters[i].at(note_index), s, info.time_step);
 		}
 		//Envelope
-		s *= osc.env.amplitude(info.time, note);
+		double env = osc.env.amplitude(info.time, note);
+		s *= env;
 
-		sample += s;
+		sample += s * 0.3;
 	}
 	//Play samples
 	for (size_t i = 0; i < channels.size(); ++i) {
 		channels[i] += sample;
+	}
+}
+
+void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
+	for (size_t i = 0; i < preset->oscilators.size() && i < filters.size(); ++i) {
+		OscilatorEnvelope& osc = preset->oscilators[i];
+		//Signal
+		double s = 0;
+		//Filter
+		for (size_t j = 0; j < osc.filters.size(); ++j) {
+			s = apply_filter(osc.filters.at(j), filters[i].at(note_index), s, info.time_step);
+		}
 	}
 }
 
