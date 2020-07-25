@@ -11,20 +11,35 @@
 
 //SampleSound
 double SampleSound::get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note) {
-	//Find region
-	SampleRegion* region = nullptr;
-	for (size_t i = 0; i < samples.size() && !region; ++i) {
-		if (samples[i]->high_freq >= note.freq) {
-			region = samples[i];
+	//Find regions
+	SampleRegion* region1 = nullptr;
+	SampleRegion* region2 = nullptr;
+	for (size_t i = 1; i < samples.size() && !region1 && !region2; ++i) {
+		if (samples[i]->freq >= note.freq) {
+			region1 = samples[i - 1];
+			region2 = samples[i];
 		}
 	}
-	if (region == nullptr) {
-		region =  samples.at(samples.size() - 1);
+	if (!region1) {
+		region1 =  samples.at(samples.size() - 1);
+	}
+	if (!region2) {
+		region2 =  samples.at(samples.size() - 1);
+	}
+	double prog = 0;
+	if (region2->freq != region1->freq) {
+		prog = (note.freq - region1->freq)/(region2->freq - region1->freq);
+	}
+	else {
+		prog = 0;
 	}
 	//Play sound
 	//TODO use sustain and release samples as well
-	return region->attack_sample.isample(channel, (info.time - note.start_time + note.phase_shift) * note.freq/region->freq, info.sample_rate);
-}
+	if (prog != 1) {
+		return region2->attack_sample.isample(channel, (info.time - note.start_time + note.phase_shift) * note.freq/region2->freq, info.sample_rate);
+	}
+	return region1->attack_sample.isample(channel, (info.time - note.start_time + note.phase_shift) * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
+			region2->attack_sample.isample(channel, (info.time - note.start_time + note.phase_shift) * note.freq/region2->freq, info.sample_rate) * (prog);}
 
 bool SampleSound::note_finished(SampleInfo& info, TriggeredNote& note) {
 	//Find region
