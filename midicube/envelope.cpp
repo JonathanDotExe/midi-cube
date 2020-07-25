@@ -22,6 +22,9 @@ double ADSREnvelope::amplitude(double time, TriggeredNote& note) {
 			return sustain;
 		}
 	}
+	else if (time - note.release_time > release) {
+		return 0;
+	}
 	else {
 		return sustain - (time - note.release_time)/release * sustain;
 	}

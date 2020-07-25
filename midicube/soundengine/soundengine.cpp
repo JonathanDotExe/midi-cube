@@ -20,12 +20,18 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 	std::array<double, OUTPUT_CHANNELS> ch = {};
 	if (engine) {
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-			if (engine->note_finished(info, note[i])) {
-				engine->note_not_pressed(info, note[i], i);
+			if (note[i].valid) {
+				if (engine->note_finished(info, note[i])) {
+					note[i].valid = false;
+					engine->note_not_pressed(info, note[i], i);
+				}
+				else {
+					engine->process_note_sample(channels, info, note[i], i);
+					note[i].phase_shift += pitch_bend * info.time_step;
+				}
 			}
 			else {
-				engine->process_note_sample(channels, info, note[i], i);
-				note[i].phase_shift += pitch_bend * info.time_step;
+				engine->note_not_pressed(info, note[i], i);
 			}
 		}
 		engine->process_sample(channels, info);
@@ -37,7 +43,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 
 size_t SoundEngineChannel::next_freq_slot(SampleInfo& info) {
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-		if (!note[i].pressed && engine->note_finished(info, note[i])) {
+		if (!note[i].valid) {
 			return i;
 		}
 	}
@@ -56,16 +62,18 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 		note[slot].start_time = info.time;
 		note[slot].release_time = 0;
 		note[slot].phase_shift = 0;
+		note[slot].valid = true;
 	}
 	//Note off
 	else if (message.get_message_type() == MessageType::NOTE_OFF) {
 		double f = note_to_freq(message.get_note());
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-			if (note[i].freq == f) {
+			if (note[i].freq == f && note[i].valid) {
 				note[i].pressed = false;
 				note[i].release_time = info.time;
 			}
 		}
+		std::cout << message.to_string() << std::endl;
 	}
 	//Control change
 	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {

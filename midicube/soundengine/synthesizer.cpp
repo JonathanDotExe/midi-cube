@@ -26,11 +26,11 @@ Synthesizer::Synthesizer() {
 	preset->filters.push_back({filter, 0});*/
 
 	//Patch 3 -- Simple Saw Pad
-	OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SINE));
-	osc->set_unison(0);
+	OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
+	osc->set_unison(3);
 	std::vector<FilterData> filters;
-	//filters.push_back({FilterType::LOW_PASS, 200});
-	preset->oscilators.push_back({osc, {0.0, 0, 1, 0}, filters});
+	filters.push_back({FilterType::LOW_PASS, 200});
+	preset->oscilators.push_back({osc, {0.0005, 0, 1, 0.0005}, filters});
 
 	//Calc release time
 	release_time = 0;

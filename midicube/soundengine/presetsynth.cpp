@@ -14,7 +14,7 @@ PresetSynth::PresetSynth() {
 	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
 	vibrato = 0;
-	filter.set_cutoff(21000);
+	filter.set_cutoff(1200);
 
 	AdditiveOscilator* aosc = new AdditiveOscilator();
 	std::vector<double> harmonics = { 0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8 };
@@ -23,13 +23,13 @@ PresetSynth::PresetSynth() {
 	}
 
 	osc = new OscilatorSlot(aosc);
-	osc->set_volume(0.3);
+	osc->set_volume(0.0);
 	osc->set_unison(2);
 	osc->set_unison_detune(0.05);
 
 	osc2 = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
-	osc2->set_volume(0.05);
-	osc2->set_unison(2);
+	osc2->set_volume(0.3);
+	osc2->set_unison(3);
 }
 
 void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, size_t note_index) {

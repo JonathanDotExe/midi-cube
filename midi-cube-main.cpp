@@ -4,7 +4,6 @@
 #include "midicube/gui/gui.h"
 using namespace std;
 
-
 int main(int argc, char **argv) {
 	MidiCube cube;
 	try {

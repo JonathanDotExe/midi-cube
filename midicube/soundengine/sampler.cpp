@@ -158,8 +158,7 @@ void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 }
 
 bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note) {
-	bool f = this->sample->note_finished(info, note);
-	return f;
+	return this->sample->note_finished(info, note);
 }
 
 std::string Sampler::get_name() {

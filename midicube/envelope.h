@@ -17,6 +17,7 @@ struct TriggeredNote {
 	double velocity = 0;
 	double aftertouch = 0;
 	double phase_shift = 0;
+	bool valid = false;
 };
 
 struct ADSREnvelope {
