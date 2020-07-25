@@ -10,6 +10,7 @@
 
 #include "soundengine.h"
 #include "../audiofile.h"
+#include "../envelope.h"
 
 struct SampleRegion {
 	AudioSample attack_sample;
@@ -18,6 +19,7 @@ struct SampleRegion {
 	double freq;
 	double low_freq;
 	double high_freq;
+
 
 	SampleRegion () {
 		attack_sample.clear();
@@ -33,14 +35,21 @@ struct SampleRegion {
 class SampleSound {
 private:
 	std::vector<SampleRegion*> samples;
+	ADSREnvelope envelope;
 
 public:
+
+	SampleSound();
 
 	double get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note);
 
 	bool note_finished(SampleInfo& info, TriggeredNote& note);
 
 	void push_sample(SampleRegion* region);
+
+	ADSREnvelope get_envelope();
+
+	void set_envelope(ADSREnvelope env);
 
 	~SampleSound();
 

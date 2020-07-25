@@ -10,6 +10,11 @@
 
 
 //SampleSound
+SampleSound::SampleSound() {
+	envelope = {0, 0, 1, 0};
+}
+
+
 double SampleSound::get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note) {
 	//Find regions
 	SampleRegion* region1 = nullptr;
@@ -35,11 +40,16 @@ double SampleSound::get_sample(unsigned int channel, SampleInfo& info, Triggered
 	}
 	//Play sound
 	//TODO use sustain and release samples as well
+	double time = (info.time - note.start_time + note.phase_shift);
+	double sample = 0;
 	if (prog != 1) {
-		return region2->attack_sample.isample(channel, (info.time - note.start_time + note.phase_shift) * note.freq/region2->freq, info.sample_rate);
+		sample = region2->attack_sample.isample(channel, time * note.freq/region2->freq, info.sample_rate);
 	}
-	return region1->attack_sample.isample(channel, (info.time - note.start_time + note.phase_shift) * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
-			region2->attack_sample.isample(channel, (info.time - note.start_time + note.phase_shift) * note.freq/region2->freq, info.sample_rate) * (prog);}
+	sample = region1->attack_sample.isample(channel, time * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
+			region2->attack_sample.isample(channel, time * note.freq/region2->freq, info.sample_rate) * (prog);
+	sample *= envelope.amplitude(info.time, note);
+	return sample;
+}
 
 bool SampleSound::note_finished(SampleInfo& info, TriggeredNote& note) {
 	//Find region
@@ -56,11 +66,19 @@ bool SampleSound::note_finished(SampleInfo& info, TriggeredNote& note) {
 	//TODO use sustain and release samples as well
 	double time = (info.time - note.start_time + note.phase_shift) * note.freq/region->freq;
 	return (region->attack_sample.duration() + region->sustain_sample.duration() + region->release_sample.duration()) < time;*/
-	return !note.pressed;
+	return !note.pressed && note.release_time + envelope.release < info.time;
 }
 
 void SampleSound::push_sample(SampleRegion* region) {
 	samples.push_back(region);
+}
+
+ADSREnvelope SampleSound::get_envelope() {
+	return envelope;
+}
+
+void SampleSound::set_envelope(ADSREnvelope env) {
+	this->envelope = env;
 }
 
 SampleSound::~SampleSound() {
@@ -73,6 +91,7 @@ SampleSound::~SampleSound() {
 //Sampler
 Sampler::Sampler() {
 	sample = new SampleSound();
+	sample->set_envelope({0.005, 0, 1, 0.2});
 	SampleRegion* reg;
 	//C1
 	reg = new SampleRegion();
