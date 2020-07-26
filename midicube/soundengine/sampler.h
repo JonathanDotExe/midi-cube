@@ -13,21 +13,13 @@
 #include "../envelope.h"
 
 struct SampleRegion {
-	AudioSample attack_sample;
-	AudioSample sustain_sample;
-	AudioSample release_sample;
+	AudioSample sample;
 	double freq;
-	double low_freq;
-	double high_freq;
 
 
 	SampleRegion () {
-		attack_sample.clear();
-		sustain_sample.clear();
-		release_sample.clear();
+		sample.clear();
 		freq = 0;
-		low_freq = 0;
-		high_freq = 0;
 	};
 
 };

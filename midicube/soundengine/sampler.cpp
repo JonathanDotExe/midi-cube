@@ -43,10 +43,10 @@ double SampleSound::get_sample(unsigned int channel, SampleInfo& info, Triggered
 	double time = (info.time - note.start_time + note.phase_shift);
 	double sample = 0;
 	if (prog != 1) {
-		sample = region2->attack_sample.isample(channel, time * note.freq/region2->freq, info.sample_rate);
+		sample = region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate);
 	}
-	sample = region1->attack_sample.isample(channel, time * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
-			region2->attack_sample.isample(channel, time * note.freq/region2->freq, info.sample_rate) * (prog);
+	sample = region1->sample.isample(channel, time * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
+			region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate) * (prog);
 	sample *= envelope.amplitude(info.time, note);
 	return sample;
 }
@@ -95,59 +95,43 @@ Sampler::Sampler() {
 	SampleRegion* reg;
 	//C1
 	reg = new SampleRegion();
-	read_audio_file(reg->attack_sample, "./data/samples/piano/c1.wav");
+	read_audio_file(reg->sample, "./data/samples/piano/c1.wav");
 	reg->freq = note_to_freq(24);
-	reg->low_freq = note_to_freq(0);
-	reg->high_freq = note_to_freq(30);
 	sample->push_sample(reg);
 	//C2
 	reg = new SampleRegion();
-	read_audio_file(reg->attack_sample, "./data/samples/piano/c2.wav");
+	read_audio_file(reg->sample, "./data/samples/piano/c2.wav");
 	reg->freq = note_to_freq(36);
-	reg->low_freq = note_to_freq(31);
-	reg->high_freq = note_to_freq(42);
 	sample->push_sample(reg);
 	//C3
 	reg = new SampleRegion();
-	read_audio_file(reg->attack_sample, "./data/samples/piano/c3.wav");
+	read_audio_file(reg->sample, "./data/samples/piano/c3.wav");
 	reg->freq = note_to_freq(48);
-	reg->low_freq = note_to_freq(43);
-	reg->high_freq = note_to_freq(54);
 	sample->push_sample(reg);
 	//C4
 	reg = new SampleRegion();
-	read_audio_file(reg->attack_sample, "./data/samples/piano/c4.wav");
+	read_audio_file(reg->sample, "./data/samples/piano/c4.wav");
 	reg->freq = note_to_freq(60);
-	reg->low_freq = note_to_freq(55);
-	reg->high_freq = note_to_freq(66);
 	sample->push_sample(reg);
 	//C5
 	reg = new SampleRegion();
-	read_audio_file(reg->attack_sample, "./data/samples/piano/c5.wav");
+	read_audio_file(reg->sample, "./data/samples/piano/c5.wav");
 	reg->freq = note_to_freq(72);
-	reg->low_freq = note_to_freq(67);
-	reg->high_freq = note_to_freq(78);
 	sample->push_sample(reg);
 	//C6
 	reg = new SampleRegion();
-	read_audio_file(reg->attack_sample, "./data/samples/piano/c6.wav");
+	read_audio_file(reg->sample, "./data/samples/piano/c6.wav");
 	reg->freq = note_to_freq(84);
-	reg->low_freq = note_to_freq(79);
-	reg->high_freq = note_to_freq(90);
 	sample->push_sample(reg);
 	//C7
 	reg = new SampleRegion();
-	read_audio_file(reg->attack_sample, "./data/samples/piano/c7.wav");
+	read_audio_file(reg->sample, "./data/samples/piano/c7.wav");
 	reg->freq = note_to_freq(96);
-	reg->low_freq = note_to_freq(91);
-	reg->high_freq = note_to_freq(102);
 	sample->push_sample(reg);
 	//C8
 	reg = new SampleRegion();
-	read_audio_file(reg->attack_sample, "./data/samples/piano/c8.wav");
+	read_audio_file(reg->sample, "./data/samples/piano/c8.wav");
 	reg->freq = note_to_freq(108);
-	reg->low_freq = note_to_freq(103);
-	reg->high_freq = note_to_freq(127);
 	sample->push_sample(reg);
 }
 
