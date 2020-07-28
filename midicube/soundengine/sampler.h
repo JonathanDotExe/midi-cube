@@ -11,6 +11,18 @@
 #include "soundengine.h"
 #include "../audiofile.h"
 #include "../envelope.h"
+#include <nlohmann/json.hpp>
+
+struct SampleRegionConfig {
+	std::string filename;
+	double freq;
+};
+
+struct SampleSoundConfig {
+	ADSREnvelope envelope;
+	std::vector<SampleRegionConfig> regions;
+};
+
 
 struct SampleRegion {
 	AudioSample sample;
@@ -65,5 +77,7 @@ public:
 	~Sampler();
 
 };
+
+extern SampleSound* load_sound(std::string folder);
 
 #endif /* MIDICUBE_SOUNDENGINE_SAMPLER_H_ */

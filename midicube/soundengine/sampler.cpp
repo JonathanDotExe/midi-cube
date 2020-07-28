@@ -7,6 +7,10 @@
 
 #include "sampler.h"
 #include <iostream>
+#include <fstream>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 
 //SampleSound
@@ -152,5 +156,35 @@ std::string Sampler::get_name() {
 Sampler::~Sampler() {
 	delete sample;
 	sample = nullptr;
+}
+
+
+extern SampleSound* load_sound(std::string folder) {
+	//Load file
+	std::ifstream def_file;
+	def_file.open(folder + "/sound.json");
+	if (def_file.is_open()) {
+		//Parse json
+		std::string json_text ((std::istreambuf_iterator<char>(def_file)), std::istreambuf_iterator<char>());
+		auto j = json::parse(json_text);
+		//Envelope
+		ADSREnvelope env;
+		env.attack = j["attack"].get<double>();
+		env.decay = j["decay"].get<double>();
+		env.sustain = j["sustain"].get<double>();
+		env.release = j["release"].get<double>();
+		//Load sounds
+		for (auto s : j["regions"].get<std::vector<json>>()) {
+			//TODO load
+		}
+		//Parse
+		SampleSound* sound = new SampleSound();
+		sound->set_envelope(env);
+		return sound;
+	}
+	else {
+		std::cerr << "Couldn't load sample sound" << std::endl;
+	}
+	return nullptr;
 }
 

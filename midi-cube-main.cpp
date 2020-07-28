@@ -2,7 +2,9 @@
 #include "midicube/midicube.h"
 #include "midicube/gui/model.h"
 #include "midicube/gui/gui.h"
+
 using namespace std;
+
 
 int main(int argc, char **argv) {
 	MidiCube cube;
