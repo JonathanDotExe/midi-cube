@@ -52,6 +52,8 @@ size_t SoundEngineChannel::next_freq_slot(SampleInfo& info) {
 }
 
 void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
+	unsigned int channel = message.get_channel();
+	std::cout << channel << std::endl;
 	//Note on
 	if (message.get_message_type() == MessageType::NOTE_ON) {
 		size_t slot = next_freq_slot(info);

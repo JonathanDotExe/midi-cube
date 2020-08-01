@@ -44,6 +44,26 @@ unsigned char MidiMessage::get_second_data_byte () {
 	return message.at(2) & 0x7F;
 }
 
+void MidiMessage::set_status_channel_byte(unsigned char v) {
+	message.at(0) = v;
+}
+
+void MidiMessage::set_message_type_bits(unsigned char v) {
+	set_status_channel_byte((v << 4) + get_channel_bits());
+}
+
+void MidiMessage::set_channel_bits(unsigned char v) {
+	set_status_channel_byte((message.at(0) & 0xF0) + (v & 0x0F));
+}
+
+void MidiMessage::set_first_data_byte(unsigned char v) {
+	message.at(1) = v;
+}
+
+void MidiMessage::set_second_data_byte(unsigned char v) {
+	message.at(2) = v;
+}
+
 MessageType MidiMessage::get_message_type() {
 	switch (get_message_type_bits()) {
 	case NOTE_OFF_BIT:
@@ -102,6 +122,79 @@ unsigned int MidiMessage::get_value () {
 unsigned int MidiMessage::get_pitch_bend () {
 	return (get_second_data_byte() << 7) + get_first_data_byte();
 }
+
+
+void MidiMessage::set_message_type(MessageType type) {
+	unsigned char byte = 0;
+	switch (type) {
+		case MessageType::NOTE_OFF:
+			byte =  NOTE_OFF_BIT;
+			break;
+		case MessageType::NOTE_ON:
+			byte = NOTE_ON_BIT;
+			break;
+		case MessageType::POLYPHONIC_AFTERTOUCH:
+			byte = POLYPHONIC_AFTERTOUCH_BIT;
+			break;
+		case MessageType::CONTROL_CHANGE:
+			byte = CONTROL_CHANGE_BIT;
+			break;
+		case MessageType::PROGRAM_CHANGE:
+			byte = PROGRAM_CHANGE_BIT;
+			break;
+		case MessageType::MONOPHONIC_AFTERTOUCH:
+			byte = MONOPHONIC_AFTERTOUCH_BIT;
+			break;
+		case MessageType::PITCH_BEND:
+			byte = PITCH_BEND_BIT;
+			break;
+		case MessageType::SYSEX:
+			byte = SYSEX_BIT;
+			break;
+		default:
+			byte = 0;
+	}
+	set_message_type_bits(byte);
+}
+
+
+void MidiMessage::set_channel(unsigned int v) {
+	set_channel_bits(v);
+}
+
+void MidiMessage::set_note(unsigned int v) {
+	set_first_data_byte(v);
+}
+
+void MidiMessage::set_velocity(unsigned int v) {
+	set_second_data_byte(v);
+}
+
+void MidiMessage::set_polyphonic_aftertouch(unsigned int v) {
+	set_second_data_byte(v);
+}
+
+void MidiMessage::set_monophonic_aftertouch(unsigned int v) {
+	set_first_data_byte(v);
+}
+
+void MidiMessage::set_program(unsigned int v) {
+	set_first_data_byte(v);
+}
+
+void MidiMessage::set_control(unsigned int v) {
+	set_first_data_byte(v);
+}
+
+void MidiMessage::set_value(unsigned int v) {
+	set_second_data_byte(v);
+}
+
+void MidiMessage::set_pitch_bend(unsigned int v) {
+	set_first_data_byte(v & 0x07);
+	set_second_data_byte(v & 0xF8);
+}
+
 
 size_t MidiMessage::get_message_length () {
 	return message.size();

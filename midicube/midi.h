@@ -54,6 +54,16 @@ private:
 
 	unsigned char get_second_data_byte();
 
+	void set_status_channel_byte(unsigned char v);
+
+	void set_message_type_bits(unsigned char v);
+
+	void set_channel_bits(unsigned char v);
+
+	void set_first_data_byte(unsigned char v);
+
+	void set_second_data_byte(unsigned char v);
+
 public:
 	MidiMessage(std::vector<unsigned char> message);
 
@@ -103,6 +113,54 @@ public:
 	 * PITCH_BEND
 	 */
 	unsigned int get_pitch_bend();
+
+
+	void set_message_type(MessageType type);
+
+	/**
+	 * Every type except SYSEX and INVALID
+	 */
+	void set_channel(unsigned int v);
+
+	/**
+	 * NOTE_ON, NOTE_OFF, POLYPHONIC_AFTERTOUCH
+	 */
+	void set_note(unsigned int v);
+
+	/**
+	 * NOTE_ON, NOTE_OFF
+	 */
+	void set_velocity(unsigned int v);
+
+	/**
+	 * POLYPHONIC_AFTERTOUCH
+	 */
+	void set_polyphonic_aftertouch(unsigned int v);
+
+	/**
+	 * MONOPHONIC_AFTERTOUCH
+	 */
+	void set_monophonic_aftertouch(unsigned int v);
+
+	/**
+	 * PROGRAM_CHANGE
+	 */
+	void set_program(unsigned int v);
+
+	/**
+	 * CONTROL_CHANGE
+	 */
+	void set_control(unsigned int v);
+
+	/**
+	 * CONTROL_CHANGE
+	 */
+	void set_value(unsigned int v);
+
+	/**
+	 * PITCH_BEND
+	 */
+	void set_pitch_bend(unsigned int v);
 
 	/**
 	 * SYSEX
