@@ -94,49 +94,7 @@ SampleSound::~SampleSound() {
 
 //Sampler
 Sampler::Sampler() {
-	sample = new SampleSound();
-	sample->set_envelope({0.005, 0, 1, 0.2});
-	SampleRegion* reg;
-	//C1
-	reg = new SampleRegion();
-	read_audio_file(reg->sample, "./data/samples/piano/c1.wav");
-	reg->freq = note_to_freq(24);
-	sample->push_sample(reg);
-	//C2
-	reg = new SampleRegion();
-	read_audio_file(reg->sample, "./data/samples/piano/c2.wav");
-	reg->freq = note_to_freq(36);
-	sample->push_sample(reg);
-	//C3
-	reg = new SampleRegion();
-	read_audio_file(reg->sample, "./data/samples/piano/c3.wav");
-	reg->freq = note_to_freq(48);
-	sample->push_sample(reg);
-	//C4
-	reg = new SampleRegion();
-	read_audio_file(reg->sample, "./data/samples/piano/c4.wav");
-	reg->freq = note_to_freq(60);
-	sample->push_sample(reg);
-	//C5
-	reg = new SampleRegion();
-	read_audio_file(reg->sample, "./data/samples/piano/c5.wav");
-	reg->freq = note_to_freq(72);
-	sample->push_sample(reg);
-	//C6
-	reg = new SampleRegion();
-	read_audio_file(reg->sample, "./data/samples/piano/c6.wav");
-	reg->freq = note_to_freq(84);
-	sample->push_sample(reg);
-	//C7
-	reg = new SampleRegion();
-	read_audio_file(reg->sample, "./data/samples/piano/c7.wav");
-	reg->freq = note_to_freq(96);
-	sample->push_sample(reg);
-	//C8
-	reg = new SampleRegion();
-	read_audio_file(reg->sample, "./data/samples/piano/c8.wav");
-	reg->freq = note_to_freq(108);
-	sample->push_sample(reg);
+	sample = load_sound("./data/samples/piano");
 }
 
 void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index) {
@@ -169,17 +127,47 @@ extern SampleSound* load_sound(std::string folder) {
 		auto j = json::parse(json_text);
 		//Envelope
 		ADSREnvelope env;
-		env.attack = j["attack"].get<double>();
-		env.decay = j["decay"].get<double>();
-		env.sustain = j["sustain"].get<double>();
-		env.release = j["release"].get<double>();
-		//Load sounds
-		for (auto s : j["regions"].get<std::vector<json>>()) {
-			//TODO load
-		}
+		env.attack = j.at("attack").get<double>();
+		env.decay = j.at("decay").get<double>();
+		env.sustain = j.at("sustain").get<double>();
+		env.release = j.at("release").get<double>();
 		//Parse
 		SampleSound* sound = new SampleSound();
 		sound->set_envelope(env);
+		try {
+			//Load sounds
+			for (auto r : j["regions"].get<std::vector<json>>()) {
+				SampleRegion* region = new SampleRegion();
+				try {
+					region->freq = note_to_freq(r.at("note").get<int>());
+					std::string file = folder + "/" + r.at("file").get<std::string>();
+					if (!read_audio_file(region->sample, file)) {
+						throw std::runtime_error("Couldn't load sample file " + file);
+					}
+				}
+				catch (json::exception& e) {
+					delete region;
+					region = nullptr;
+					throw e;
+				}
+				catch (std::exception& e) {
+					delete region;
+					region = nullptr;
+					throw e;
+				}
+				sound->push_sample(region);
+			}
+		}
+		catch (json::exception& e) {
+			delete sound;
+			sound = nullptr;
+			throw e;
+		}
+		catch (std::exception& e) {
+			delete sound;
+			sound = nullptr;
+			throw e;
+		}
 		return sound;
 	}
 	else {

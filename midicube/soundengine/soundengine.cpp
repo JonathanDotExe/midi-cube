@@ -68,7 +68,7 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 	else if (message.get_message_type() == MessageType::NOTE_OFF) {
 		double f = note_to_freq(message.get_note());
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-			if (note[i].freq == f && note[i].valid) {
+			if (note[i].freq == f && note[i].pressed) {
 				note[i].pressed = false;
 				note[i].release_time = info.time;
 			}
