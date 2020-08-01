@@ -78,7 +78,8 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 		double s = osc.osc->signal(info.time + note.phase_shift, note.freq);
 		//Filter
 		for (size_t j = 0; j < osc.filters.size(); ++j) {
-			s = apply_filter(osc.filters.at(j), filters[i].at(note_index), s, info.time_step);
+			s = apply_filter(osc.filters.at(j), filters[i].at(note_index)[0], s, info.time_step);
+			s = apply_filter(osc.filters.at(j), filters[i].at(note_index)[1], s, info.time_step);
 		}
 		//Envelope
 		double env = osc.env.amplitude(info.time, note);
@@ -99,7 +100,8 @@ void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t
 		double s = 0;
 		//Filter
 		for (size_t j = 0; j < osc.filters.size(); ++j) {
-			s = apply_filter(osc.filters.at(j), filters[i].at(note_index), s, info.time_step);
+			s = apply_filter(osc.filters.at(j), filters[i].at(note_index)[0], s, info.time_step);
+			s = apply_filter(osc.filters.at(j), filters[i].at(note_index)[1], s, info.time_step);
 		}
 	}
 }

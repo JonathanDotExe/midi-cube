@@ -70,7 +70,7 @@ struct SynthesizerPreset {
 class Synthesizer: public SoundEngine {
 private:
 	SynthesizerPreset* preset = nullptr;
-	std::array<std::array<FilterInstance, SOUND_ENGINE_POLYPHONY>, MAX_OSCILATORS> filters = {};
+	std::array<std::array<std::array<FilterInstance, 2>, SOUND_ENGINE_POLYPHONY>, MAX_OSCILATORS> filters = {};
 	double release_time;
 public:
 	Synthesizer();
