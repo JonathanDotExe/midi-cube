@@ -23,7 +23,7 @@
 class SoundEngine {
 
 public:
-	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index) = 0;
+	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
 
 	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
 
@@ -37,8 +37,8 @@ public:
 
 	};
 
-	virtual bool note_finished(SampleInfo& info, TriggeredNote& note) {
-		return !note.pressed;
+	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
 	}
 
 	virtual std::string get_name() = 0;
@@ -53,13 +53,15 @@ class SoundEngineChannel {
 private:
 	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
 	double pitch_bend = 0;
+	KeyboardEnvironment environment;
 
 	size_t next_freq_slot(SampleInfo& info);
 
 public:
 	SoundEngine* engine = nullptr;
 	double volume = 0.3;
-
+	unsigned int sustain_control = 64;
+	bool sustain = true;
 
 	SoundEngineChannel();
 

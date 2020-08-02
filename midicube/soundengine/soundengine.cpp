@@ -21,12 +21,12 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 	if (engine) {
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 			if (note[i].valid) {
-				if (engine->note_finished(info, note[i])) {
+				if (engine->note_finished(info, note[i], environment)) {
 					note[i].valid = false;
 					engine->note_not_pressed(info, note[i], i);
 				}
 				else {
-					engine->process_note_sample(ch, info, note[i], i);
+					engine->process_note_sample(ch, info, note[i], environment, i);
 					note[i].phase_shift += pitch_bend * info.time_step;
 				}
 			}
@@ -80,6 +80,13 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 	//Control change
 	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
 		engine->control_change(message.get_control(), message.get_value());
+		//Sustain
+		if (message.get_control() == sustain_control) {
+			if (!environment.sustain) {
+				environment.sustain_time = info.time;
+			}
+			environment.sustain = message.get_value();
+		}
 	}
 	//Pitch bend
 	else if (message.get_message_type() == MessageType::PITCH_BEND) {

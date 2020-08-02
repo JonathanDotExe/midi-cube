@@ -57,11 +57,11 @@ static double apply_filter (FilterData& data, FilterInstance& inst, double sampl
 	return sample;
 }
 
-void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index) {
+void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Envelopes
 	std::vector<double> env_val;
 	for (size_t i = 0; i < preset->envelopes.size(); ++i) {
-		env_val.push_back(preset->envelopes[i].amplitude(info.time, note));
+		env_val.push_back(preset->envelopes[i].amplitude(info.time, note, env));
 	}
 	//Envelope Bindings
 	for (size_t i = 0; i < preset->envelope_bindings.size(); ++i) {
@@ -82,8 +82,8 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 			s = apply_filter(osc.filters.at(j), filters[i].at(note_index)[1], s, info.time_step);
 		}
 		//Envelope
-		double env = osc.env.amplitude(info.time, note);
-		s *= env;
+		double env_val = osc.env.amplitude(info.time, note, env);
+		s *= env_val;
 
 		sample += s;
 	}
@@ -133,8 +133,8 @@ void Synthesizer::control_change(unsigned int control, unsigned int value) {
 	}
 }
 
-bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note) {
-	return !note.pressed && note.release_time + release_time < info.time;
+bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	return !note.pressed && (!env.sustain || env.sustain_time > note.release_time) && note.release_time + release_time < info.time;
 }
 
 std::string Synthesizer::get_name() {

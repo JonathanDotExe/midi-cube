@@ -20,13 +20,19 @@ struct TriggeredNote {
 	bool valid = false;
 };
 
+struct KeyboardEnvironment {
+	bool sustain = false;
+	double sustain_time = 0;
+};
+
 struct ADSREnvelope {
 	double attack;
 	double decay;
 	double sustain;
 	double release;
 
-	double amplitude(double time, TriggeredNote& note);
+	double amplitude(double time, TriggeredNote& note, KeyboardEnvironment& env);
+	double is_finished(double time, TriggeredNote& note, KeyboardEnvironment& env);
 };
 
 

@@ -19,7 +19,7 @@ SampleSound::SampleSound() {
 }
 
 
-double SampleSound::get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note) {
+double SampleSound::get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	//Find regions
 	SampleRegion* region1 = nullptr;
 	SampleRegion* region2 = nullptr;
@@ -51,7 +51,7 @@ double SampleSound::get_sample(unsigned int channel, SampleInfo& info, Triggered
 	}
 	sample = region1->sample.isample(channel, time * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
 			region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate) * (prog);
-	sample *= envelope.amplitude(info.time, note);
+	sample *= envelope.amplitude(info.time, note, env);
 	return sample;
 }
 
@@ -97,13 +97,13 @@ Sampler::Sampler() {
 	sample = load_sound("./data/samples/piano");
 }
 
-void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, size_t note_index) {
+void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	for (size_t channel = 0; channel < channels.size(); ++channel) {
-		channels[channel] += this->sample->get_sample(channel, info, note) * note.velocity;
+		channels[channel] += this->sample->get_sample(channel, info, note, env) * note.velocity;
 	}
 }
 
-bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note) {
+bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	return this->sample->note_finished(info, note);
 }
 

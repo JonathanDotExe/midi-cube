@@ -32,7 +32,7 @@ PresetSynth::PresetSynth() {
 	osc2->set_unison(3);
 }
 
-void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, size_t note_index) {
+void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	double sample = 0.0;
 	double freq = note.freq;
 	double t = info.time + note.phase_shift;
@@ -42,7 +42,7 @@ void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 		note.phase_shift += info.time_step * (note_to_freq_transpose(SYNTH_VIBRATO_DETUNE * sine_wave(info.time, SYNTH_VIBRATO_RATE) * vibrato) - 1);
 	}
 
-	double amp = env.amplitude(info.time, note);
+	double amp = this->env.amplitude(info.time, note, env);
 	sample *= amp;
 
 	for (size_t i = 0; i < channels.size() ; ++i) {
@@ -54,8 +54,8 @@ void PresetSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 	filter.apply(channels, info.time_step);
 };
 
-bool PresetSynth::note_finished(SampleInfo& info, TriggeredNote& note) {
-	return !note.pressed && note.release_time + env.release < info.time;
+bool PresetSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	return this->env.is_finished(info.time, note, env);
 }
 
 void PresetSynth::control_change(unsigned int control, unsigned int value) {

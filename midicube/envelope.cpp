@@ -7,8 +7,8 @@
 
 #include "envelope.h"
 
-double ADSREnvelope::amplitude(double time, TriggeredNote& note) {
-	if (note.pressed) {
+double ADSREnvelope::amplitude(double time, TriggeredNote& note, KeyboardEnvironment& env) {
+	if (note.pressed || (sustain && env.sustain_time <= note.release_time)) {
 		//Attack
 		if (time <= note.start_time + attack) {
 			return (time - note.start_time)/attack;
@@ -30,5 +30,9 @@ double ADSREnvelope::amplitude(double time, TriggeredNote& note) {
 	}
 
 	return 0;
+}
+
+double ADSREnvelope::is_finished(double time, TriggeredNote& note, KeyboardEnvironment& env) {
+	return !note.pressed && (!sustain || env.sustain_time > note.release_time) && time - note.release_time < release;
 }
 

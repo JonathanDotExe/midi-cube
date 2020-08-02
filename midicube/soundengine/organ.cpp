@@ -23,7 +23,7 @@ static inline unsigned int sound_delay(double rotation, double radius, unsigned 
 	return (1 + rotation) * radius / SOUND_SPEED * sample_rate;
 }
 
-void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, size_t note_index) {
+void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	double horn_sample = 0;
 	double bass_sample = 0;
 
