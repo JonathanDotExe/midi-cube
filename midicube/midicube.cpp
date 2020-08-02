@@ -86,8 +86,6 @@ void MidiCube::midi_callback(MidiMessage& message, std::string device) {
 			MidiMessage msg = message;
 			if (bindings[device][i].output_channel >= 0) {
 				msg.set_channel((unsigned int) bindings[device][i].output_channel);
-				std::cout << "Binding Channel: " << bindings[device][i].output_channel << std::endl;
-				std::cout << "Channel: " << msg.get_channel() << std::endl;
 			}
 			AudioDevice* dev = devices[bindings[device][i].output];
 			dev->send(msg);

@@ -55,22 +55,8 @@ double SampleSound::get_sample(unsigned int channel, SampleInfo& info, Triggered
 	return sample;
 }
 
-bool SampleSound::note_finished(SampleInfo& info, TriggeredNote& note) {
-	//Find region
-	/*SampleRegion* region = nullptr;
-	for (size_t i = 0; i < samples.size() && !region; ++i) {
-		if (samples[i]->high_freq >= note.freq) {
-			region = samples[i];
-		}
-	}
-	if (region == nullptr) {
-		region = samples.at(samples.size() - 1);
-	}
-	//Calculate length
-	//TODO use sustain and release samples as well
-	double time = (info.time - note.start_time + note.phase_shift) * note.freq/region->freq;
-	return (region->attack_sample.duration() + region->sustain_sample.duration() + region->release_sample.duration()) < time;*/
-	return !note.pressed && note.release_time + envelope.release < info.time;
+bool SampleSound::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	return this->envelope.is_finished(info.time, note, env);
 }
 
 void SampleSound::push_sample(SampleRegion* region) {
@@ -104,7 +90,7 @@ void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 }
 
 bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
-	return this->sample->note_finished(info, note);
+	return this->sample->note_finished(info, note, env);
 }
 
 std::string Sampler::get_name() {

@@ -47,7 +47,7 @@ public:
 
 	double get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note);
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
 	void push_sample(SampleRegion* region);
 

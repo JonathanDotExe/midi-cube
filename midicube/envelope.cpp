@@ -33,6 +33,6 @@ double ADSREnvelope::amplitude(double time, TriggeredNote& note, KeyboardEnviron
 }
 
 double ADSREnvelope::is_finished(double time, TriggeredNote& note, KeyboardEnvironment& env) {
-	return !note.pressed && (!sustain || env.sustain_time > note.release_time) && time - note.release_time < release;
+	return !note.pressed && (!env.sustain || env.sustain_time > note.release_time) && time - note.release_time < release;
 }
 
