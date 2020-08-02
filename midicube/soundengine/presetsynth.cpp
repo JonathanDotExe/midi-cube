@@ -28,7 +28,7 @@ PresetSynth::PresetSynth() {
 	osc->set_unison_detune(0.05);
 
 	osc2 = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
-	osc2->set_volume(0.3);
+	osc2->set_volume(1);
 	osc2->set_unison(3);
 }
 

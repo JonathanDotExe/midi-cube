@@ -286,7 +286,7 @@ SoundEngineDeviceMenuView::SoundEngineDeviceMenuView(SoundEngineDevice* device) 
 View* SoundEngineDeviceMenuView::draw() {
 	View* view = this;
 	std::vector<SoundEngine*> engines = device->get_sound_engines();
-	//Dropdowns
+	//Engines
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		unsigned int channel = SOUND_ENGINE_MIDI_CHANNELS - 1 - i;
 		int selected = device->get_engine(channel) == nullptr ? 0 : find(engines.begin(), engines.end(), device->get_engine(channel)) - engines.begin() + 1;
@@ -301,6 +301,8 @@ View* SoundEngineDeviceMenuView::draw() {
 		if (old != selected) {
 			device->set_engine(channel, selected > 0 ? engines.at(selected - 1): nullptr);
 		}
+		//Volume Slider
+		device->volume(channel) = GuiSlider((Rectangle){600, y, 300, 20}, "Vol ", TextFormat("%1.2f", device->volume(channel)), device->volume(channel), 0, 1);
 	}
 
 	return view;

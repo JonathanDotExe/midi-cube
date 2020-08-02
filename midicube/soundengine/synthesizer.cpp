@@ -85,7 +85,7 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 		double env = osc.env.amplitude(info.time, note);
 		s *= env;
 
-		sample += s * 0.3;
+		sample += s;
 	}
 	//Play samples
 	for (size_t i = 0; i < channels.size(); ++i) {

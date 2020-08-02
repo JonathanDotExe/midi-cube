@@ -79,7 +79,6 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 		right_bass_del.add_sample(bass_sample * (0.5 - bass_rot * 0.5), rbass_delay);
 	} else {
 		sample += horn_sample + bass_sample;
-		sample *= 0.3;
 		for (size_t i = 0; i < channels.size() ; ++i) {
 			channels[i] += sample;
 		}

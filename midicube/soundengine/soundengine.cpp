@@ -26,7 +26,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 					engine->note_not_pressed(info, note[i], i);
 				}
 				else {
-					engine->process_note_sample(channels, info, note[i], i);
+					engine->process_note_sample(ch, info, note[i], i);
 					note[i].phase_shift += pitch_bend * info.time_step;
 				}
 			}
@@ -34,10 +34,10 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 				engine->note_not_pressed(info, note[i], i);
 			}
 		}
-		engine->process_sample(channels, info);
-	}
-	for (size_t i = 0; i < 0; ++i) {
-		channels[i] += ch[i];
+		engine->process_sample(ch, info);
+		for (size_t i = 0; i < channels.size(); ++i) {
+			channels[i] += (ch[i] * volume);
+		}
 	}
 }
 
@@ -107,6 +107,10 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		this->channels[i].process_sample(channels, info);
 	}
+}
+
+double& SoundEngineDevice::volume(unsigned int channel) {
+	return channels.at(channel).volume;
 }
 
 std::vector<SoundEngine*> SoundEngineDevice::get_sound_engines() {

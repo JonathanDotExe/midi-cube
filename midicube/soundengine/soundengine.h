@@ -58,6 +58,7 @@ private:
 
 public:
 	SoundEngine* engine = nullptr;
+	double volume = 0.3;
 
 
 	SoundEngineChannel();
@@ -92,6 +93,8 @@ public:
 	void add_sound_engine(SoundEngine* engine);
 
 	SoundEngine* get_engine(unsigned int channel);
+
+	double& volume(unsigned int channel);
 
 	bool is_audio_input() {
 		return true;
