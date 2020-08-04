@@ -82,12 +82,17 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 		engine->control_change(message.get_control(), message.get_value());
 		//Sustain
 		if (message.get_control() == sustain_control) {
-			if (!environment.sustain) {
-				environment.sustain_time = info.time;
-				std::cout << "Sustain time: " << info.time << std::endl;
+			bool new_sustain = message.get_value() == 0;
+			if (new_sustain != environment.sustain) {
+				if (new_sustain) {
+					environment.sustain_time = info.time;
+				}
+				else {
+					environment.sustain_release_time = info.time;
+					std::cout << "Release sustain " << environment.sustain_release_time << std::endl;
+				}
+				environment.sustain = new_sustain;
 			}
-			std::cout << "Sustain change " << message.get_value() << std::endl;
-			environment.sustain = message.get_value() == 0;
 		}
 	}
 	//Pitch bend

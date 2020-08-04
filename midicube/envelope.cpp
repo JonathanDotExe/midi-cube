@@ -6,9 +6,11 @@
  */
 
 #include "envelope.h"
+#include <cmath>
 
 double ADSREnvelope::amplitude(double time, TriggeredNote& note, KeyboardEnvironment& env) {
-	if (note.pressed || (sustain && env.sustain_time <= note.release_time)) {
+	double release_time = fmax(note.release_time, env.sustain_release_time);
+	if (note.pressed || (env.sustain && env.sustain_time <= note.release_time)) {
 		//Attack
 		if (time <= note.start_time + attack) {
 			return (time - note.start_time)/attack;
@@ -22,17 +24,18 @@ double ADSREnvelope::amplitude(double time, TriggeredNote& note, KeyboardEnviron
 			return sustain;
 		}
 	}
-	else if (time - note.release_time > release) {
+	else if (time - release_time > release) {
 		return 0;
 	}
 	else {
-		return sustain - (time - note.release_time)/release * sustain;
+		return sustain - (time - release_time)/release * sustain;
 	}
 
 	return 0;
 }
 
 double ADSREnvelope::is_finished(double time, TriggeredNote& note, KeyboardEnvironment& env) {
-	return !note.pressed && (!env.sustain || env.sustain_time > note.release_time) && time - note.release_time < release;
+	double release_time = fmax(note.release_time, env.sustain_release_time);
+	return !note.pressed && (!env.sustain || env.sustain_time > note.release_time) && time - release_time > release;
 }
 

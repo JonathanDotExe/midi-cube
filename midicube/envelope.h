@@ -23,6 +23,7 @@ struct TriggeredNote {
 struct KeyboardEnvironment {
 	bool sustain = false;
 	double sustain_time = 0;
+	double sustain_release_time = 0;
 };
 
 struct ADSREnvelope {
