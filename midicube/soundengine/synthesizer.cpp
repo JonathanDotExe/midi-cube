@@ -135,7 +135,6 @@ void Synthesizer::control_change(unsigned int control, unsigned int value) {
 }
 
 bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
-	std::cout << note.release_time << "/" << env.sustain_release_time << std::endl;
 	return !note.pressed && (!env.sustain || env.sustain_time > note.release_time) && fmax(note.release_time, env.sustain_release_time) + release_time < info.time;
 }
 

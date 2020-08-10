@@ -26,11 +26,11 @@
 
 struct B3OrganData {
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbars = {8, 8, 8, 8, 8, 8, 8, 8, 8};
-	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs = {1, 2, 3, 4, 5, 6, 7, 8, 8};
+	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs = {67, 68, 69, 70, 87, 88, 89, 90, 92};
 	bool rotary = false;
 	bool rotary_fast = true;
-	unsigned int rotary_cc = 9;
-	unsigned int rotary_speed_cc = 10;
+	unsigned int rotary_cc = 22;
+	unsigned int rotary_speed_cc = 23;
 };
 
 class B3Organ : public SoundEngine {

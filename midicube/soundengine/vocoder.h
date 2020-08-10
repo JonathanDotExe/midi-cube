@@ -23,13 +23,13 @@ struct VocoderData {
 	double voice_amp = 0;
 	double carrier_amp = 0;
 
-	unsigned int delay_control = 9;
-	unsigned int delay_time_control = 1;
-	unsigned int delay_feedback_control = 2;
-	unsigned int delay_mul_control = 3;
-	unsigned int vocoder_amp_control = 4;
-	unsigned int voice_amp_control = 5;
-	unsigned int carrier_amp_control = 6;
+	unsigned int delay_control = 22;
+	unsigned int delay_time_control = 35;
+	unsigned int delay_feedback_control = 36;
+	unsigned int delay_mul_control = 37;
+	unsigned int vocoder_amp_control = 38;
+	unsigned int voice_amp_control = 39;
+	unsigned int carrier_amp_control = 40;
 };
 
 class Vocoder : public SoundEngine {

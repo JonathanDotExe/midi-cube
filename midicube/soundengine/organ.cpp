@@ -20,7 +20,7 @@ static inline unsigned int sound_delay(double rotation, double radius, unsigned 
 					(SPEAKER_RADIUS - radius * rotation) :
 					(SPEAKER_RADIUS + radius * rotation + radius * 2);
 	return round(dst / SOUND_SPEED * sample_rate);*/
-	return (1 + rotation) * radius / SOUND_SPEED * sample_rate;
+	return round((1 + rotation) * radius / SOUND_SPEED * sample_rate);
 }
 
 void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
@@ -86,8 +86,8 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 }
 
 void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
-	double left = (left_horn_del.process() + left_bass_del.process()) * 0.3;
-	double right = (right_horn_del.process() + right_bass_del.process()) * 0.3;
+	double left = (left_horn_del.process() + left_bass_del.process());
+	double right = (right_horn_del.process() + right_bass_del.process());
 
 	for (size_t i = 0; i < channels.size(); ++i) {
 		if (i % 2 == 0) {

@@ -82,7 +82,7 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 		engine->control_change(message.get_control(), message.get_value());
 		//Sustain
 		if (message.get_control() == sustain_control) {
-			bool new_sustain = message.get_value() == 0;
+			bool new_sustain = message.get_value() != 0;
 			if (new_sustain != environment.sustain) {
 				if (new_sustain) {
 					environment.sustain_time = info.time;

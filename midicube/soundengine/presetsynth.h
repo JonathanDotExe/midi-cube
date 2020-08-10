@@ -12,7 +12,7 @@
 #include "../oscilator.h"
 
 #define SYNTH_VIBRATO_RATE 6
-#define SYNTH_VIBRATO_DETUNE 1
+#define SYNTH_VIBRATO_DETUNE 0.25
 
 class PresetSynth : public SoundEngine {
 
