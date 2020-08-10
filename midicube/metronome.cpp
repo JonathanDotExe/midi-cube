@@ -4,7 +4,7 @@
  *  Created on: 10 Aug 2020
  *      Author: jojo
  */
-#include <metronome.h>
+#include "metronome.h"
 
 
 Metronome::Metronome(int bpm) {

@@ -7,8 +7,9 @@
 
 #include "soundengine.h"
 
-//SoundEngineChannel
-SoundEngineChannel::SoundEngineChannel() {
+
+//NoteBuffer
+NoteBuffer::NoteBuffer () {
 	//Init notes
 	for (size_t i = 0; i < note.size(); ++i) {
 		note[i].start_time = -1024;
@@ -16,32 +17,7 @@ SoundEngineChannel::SoundEngineChannel() {
 	}
 }
 
-void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
-	std::array<double, OUTPUT_CHANNELS> ch = {};
-	if (engine) {
-		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-			if (note[i].valid) {
-				if (engine->note_finished(info, note[i], environment)) {
-					note[i].valid = false;
-					engine->note_not_pressed(info, note[i], i);
-				}
-				else {
-					engine->process_note_sample(ch, info, note[i], environment, i);
-					note[i].phase_shift += pitch_bend * info.time_step;
-				}
-			}
-			else {
-				engine->note_not_pressed(info, note[i], i);
-			}
-		}
-		engine->process_sample(ch, info);
-		for (size_t i = 0; i < channels.size(); ++i) {
-			channels[i] += (ch[i] * volume);
-		}
-	}
-}
-
-size_t SoundEngineChannel::next_freq_slot(SampleInfo& info) {
+size_t NoteBuffer::next_freq_slot(SampleInfo& info) {
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (!note[i].valid) {
 			return i;
@@ -51,31 +27,69 @@ size_t SoundEngineChannel::next_freq_slot(SampleInfo& info) {
 	return 0;
 }
 
+void NoteBuffer::press_note(SampleInfo& info, unsigned int note, double velocity) {
+	size_t slot = next_freq_slot(info);
+	this->note[slot].freq = note_to_freq(note);
+	this->note[slot].velocity = velocity;
+	this->note[slot].note = note;
+	this->note[slot].pressed = true;
+	this->note[slot].start_time = info.time;
+	this->note[slot].release_time = 0;
+	this->note[slot].phase_shift = 0;
+	this->note[slot].valid = true;
+}
+
+void NoteBuffer::release_note(SampleInfo& info, unsigned int note) {
+	double f = note_to_freq(note);
+	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+		if (this->note[i].freq == f && this->note[i].pressed) {
+			this->note[i].pressed = false;
+			this->note[i].release_time = info.time;
+		}
+	}
+}
+
+
+//SoundEngineChannel
+SoundEngineChannel::SoundEngineChannel() {
+
+}
+
+void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
+	std::array<double, OUTPUT_CHANNELS> ch = {};
+	if (engine) {
+		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+			if (note.note[i].valid) {
+				if (engine->note_finished(info, note.note[i], environment)) {
+					note.note[i].valid = false;
+					engine->note_not_pressed(info, note.note[i], i);
+				}
+				else {
+					engine->process_note_sample(ch, info, note.note[i], environment, i);
+					note.note[i].phase_shift += pitch_bend * info.time_step;
+				}
+			}
+			else {
+				engine->note_not_pressed(info, note.note[i], i);
+			}
+		}
+		engine->process_sample(ch, info);
+		for (size_t i = 0; i < channels.size(); ++i) {
+			channels[i] += (ch[i] * volume);
+		}
+	}
+}
+
 void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 	unsigned int channel = message.get_channel();
 	std::cout << channel << std::endl;
 	//Note on
 	if (message.get_message_type() == MessageType::NOTE_ON) {
-		size_t slot = next_freq_slot(info);
-		note[slot].freq = note_to_freq(message.get_note());
-		note[slot].velocity = message.get_velocity()/127.0;
-		note[slot].note = message.get_note();
-		note[slot].pressed = true;
-		note[slot].start_time = info.time;
-		note[slot].release_time = 0;
-		note[slot].phase_shift = 0;
-		note[slot].valid = true;
+		note.press_note(info, message.get_note(), message.get_velocity()/127.0);
 	}
 	//Note off
 	else if (message.get_message_type() == MessageType::NOTE_OFF) {
-		double f = note_to_freq(message.get_note());
-		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-			if (note[i].freq == f && note[i].pressed) {
-				note[i].pressed = false;
-				note[i].release_time = info.time;
-			}
-		}
-		std::cout << message.to_string() << std::endl;
+		note.release_note(info, message.get_note());
 	}
 	//Control change
 	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {

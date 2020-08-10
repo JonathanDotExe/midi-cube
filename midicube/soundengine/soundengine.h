@@ -19,7 +19,6 @@
 #define SOUND_ENGINE_POLYPHONY 30
 #define SOUND_ENGINE_MIDI_CHANNELS 16
 
-
 class SoundEngine {
 
 public:
@@ -49,13 +48,26 @@ public:
 
 };
 
+class NoteBuffer {
+private:
+	size_t next_freq_slot(SampleInfo& info);
+
+public:
+	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
+
+	NoteBuffer();
+
+	void press_note(SampleInfo& info, unsigned int note, double velocity);
+	void release_note(SampleInfo& info, unsigned int note);
+
+};
+
+
 class SoundEngineChannel {
 private:
-	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
 	double pitch_bend = 0;
 	KeyboardEnvironment environment;
-
-	size_t next_freq_slot(SampleInfo& info);
+	NoteBuffer note;
 
 public:
 	SoundEngine* engine = nullptr;
