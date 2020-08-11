@@ -49,6 +49,75 @@ void NoteBuffer::release_note(SampleInfo& info, unsigned int note) {
 	}
 }
 
+//Arpeggiator
+Arpeggiator::Arpeggiator() {
+
+}
+
+void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
+	//Pattern
+	if (metronome.is_beat(info.sample_time, info.sample_rate, preset.value)) {
+		unsigned int next_note = 128;
+		long int next_index = -1;
+		std::cerr << "Pattern" << std::endl;
+		switch (preset.pattern) {
+		case ArpeggiatorPattern::UP:
+			std::cerr << "Up" << std::endl;
+			for (size_t i = 0; i < this->note.note.size(); ++i) {
+				if (this->note.note[i].pressed) {
+					std::cerr << "Note" << std::endl;
+					for (unsigned int octave = 0; octave < preset.octaves; ++octave) {
+						std::cerr << "Pressed" << std::endl;
+						unsigned int n = this->note.note[i].note + octave * 12;
+						if (n < next_note && (n > curr_note || (n == curr_note && note_index > i))) {
+							next_note = n;
+							next_index = i;
+							break;
+						}
+					}
+				}
+			}
+			break;
+		case ArpeggiatorPattern::DOWN:
+			for (size_t i = 0; i < this->note.note.size(); ++i) {
+				if (this->note.note[i].pressed) {
+					for (unsigned int o = 0; o < preset.octaves; ++o) {
+						unsigned int octave = preset.octaves - o - 1;
+						unsigned int n = this->note.note[i].note + octave * 12;
+						if (n > next_note && (n > curr_note || (n == curr_note && note_index > i))) {
+							next_note = n;
+							next_index = i;
+							break;
+						}
+					}
+				}
+			}
+			break;
+		case ArpeggiatorPattern::UP_DOWN:
+			//TODO
+			break;
+		case ArpeggiatorPattern::RANDOM:
+			//TODO
+			break;
+		case ArpeggiatorPattern::UP_CUSTOM:
+			break;
+		case ArpeggiatorPattern::DOWN_CUSTOM:
+			break;
+		}
+
+		std::cerr << "Press note" << std::endl;
+		std::cerr << next_note << "/" << next_index << std::endl;
+		//Press note
+		note.release_note(info, curr_note);
+		note.note.at(note_index).valid = false;
+		if (next_index >= 0) {
+			curr_note = next_note;
+			this->note_index = next_index;
+			note.press_note(info, curr_note, this->note.note[note_index].velocity);
+		}
+	}
+}
+
 
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {
@@ -58,6 +127,9 @@ SoundEngineChannel::SoundEngineChannel() {
 void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
 	std::array<double, OUTPUT_CHANNELS> ch = {};
 	if (engine) {
+		if (arp.on) {
+			arp.apply(info, note);
+		}
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 			if (note.note[i].valid) {
 				if (engine->note_finished(info, note.note[i], environment)) {
@@ -81,15 +153,19 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 }
 
 void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
-	unsigned int channel = message.get_channel();
-	std::cout << channel << std::endl;
 	//Note on
 	if (message.get_message_type() == MessageType::NOTE_ON) {
-		note.press_note(info, message.get_note(), message.get_velocity()/127.0);
+		if (!arp.on) {
+			note.press_note(info, message.get_note(), message.get_velocity()/127.0);
+		}
+		arp.note.press_note(info, message.get_note(), message.get_velocity()/127.0);
 	}
 	//Note off
 	else if (message.get_message_type() == MessageType::NOTE_OFF) {
-		note.release_note(info, message.get_note());
+		if (!arp.on) {
+			note.release_note(info, message.get_note());
+		}
+		arp.note.release_note(info, message.get_note());
 	}
 	//Control change
 	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
@@ -139,6 +215,10 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 
 double& SoundEngineDevice::volume(unsigned int channel) {
 	return channels.at(channel).volume;
+}
+
+Arpeggiator& SoundEngineDevice::arpeggiator(unsigned int channel) {
+	return channels.at(channel).arp;
 }
 
 std::vector<SoundEngine*> SoundEngineDevice::get_sound_engines() {

@@ -13,6 +13,7 @@
 #include "../audio.h"
 #include "../device.h"
 #include "../synthesis.h"
+#include "../metronome.h"
 #include <string>
 #include <array>
 
@@ -62,6 +63,36 @@ public:
 
 };
 
+enum class ArpeggiatorPattern {
+	UP, DOWN, RANDOM, UP_DOWN, UP_CUSTOM, DOWN_CUSTOM
+};
+
+struct ArpeggiatorPreset {
+	ArpeggiatorPattern pattern;
+	std::vector<unsigned int> data;
+	unsigned int octaves = 1;
+	int value;
+};
+
+class Arpeggiator {
+
+private:
+	unsigned int curr_note = 0;
+	std::size_t data_index = 0;
+	std::size_t note_index = 0;
+
+public:
+	bool on = false;
+	ArpeggiatorPreset preset;
+	NoteBuffer note;
+	Metronome metronome;
+
+	Arpeggiator();
+
+	void apply(SampleInfo& info, NoteBuffer& note);
+
+};
+
 
 class SoundEngineChannel {
 private:
@@ -74,6 +105,7 @@ public:
 	double volume = 0.3;
 	unsigned int sustain_control = 64;
 	bool sustain = true;
+	Arpeggiator arp; //TODO make private
 
 	SoundEngineChannel();
 
@@ -109,6 +141,8 @@ public:
 	SoundEngine* get_engine(unsigned int channel);
 
 	double& volume(unsigned int channel);
+
+	Arpeggiator& arpeggiator(unsigned int channel);
 
 	bool is_audio_input() {
 		return true;

@@ -17,7 +17,7 @@ private:
 	unsigned int start_time;
 
 public:
-	Metronome(int bpm);
+	Metronome(int bpm =120);
 
 	void init (unsigned int time);
 

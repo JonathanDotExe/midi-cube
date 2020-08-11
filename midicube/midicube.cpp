@@ -60,6 +60,10 @@ void MidiCube::create_default_devices() {
 	fill_sound_engine_device(device);
 	device->set_engine(0, device->get_sound_engines().at(0));
 	device->set_engine(9, device->get_sound_engines().at(2));
+	device->arpeggiator(1).on = true;
+	device->arpeggiator(1).preset.pattern = ArpeggiatorPattern::UP;
+	device->arpeggiator(1).preset.octaves = 3;
+	device->arpeggiator(1).preset.value = 1;
 	device->handler = &audio_handler; //TODO remove, bad practise
 	add_device(device);
 };
