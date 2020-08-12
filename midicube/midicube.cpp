@@ -62,8 +62,9 @@ void MidiCube::create_default_devices() {
 	device->set_engine(9, device->get_sound_engines().at(2));
 	device->arpeggiator(1).on = true;
 	device->arpeggiator(1).preset.pattern = ArpeggiatorPattern::UP;
-	device->arpeggiator(1).preset.octaves = 1;
-	device->arpeggiator(1).preset.value = 8;
+	device->arpeggiator(1).preset.octaves = 3;
+	device->arpeggiator(1).preset.value = 1;
+	device->arpeggiator(1).metronome.set_bpm(420);
 	device->handler = &audio_handler; //TODO remove, bad practise
 	add_device(device);
 };

@@ -55,6 +55,18 @@ Arpeggiator::Arpeggiator() {
 }
 
 void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
+	//Reset if no keys are pressed
+	if (!restart) {
+		bool released = true;
+		for (size_t i = 0; i < this->note.note.size() && released; ++i) {
+			released = !this->note.note[i].pressed;
+		}
+		restart = released;
+	}
+	if (restart) {
+		//Keyboard sync
+		metronome.init(info.sample_time);
+	}
 	//Pattern
 	if (metronome.is_beat(info.sample_time, info.sample_rate, preset.value)) {
 		unsigned int next_note = 128;
@@ -85,11 +97,10 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 				}
 			}
 			//Restart from lowest
-			if (next_index < 0) {
+			if (restart || next_index < 0) {
 				next_note = lowest_note;
 				next_index = lowest_index;
 			}
-			std::cout << next_note << std::endl;
 			break;
 		case ArpeggiatorPattern::DOWN:
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
@@ -111,7 +122,7 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 				}
 			}
 			//Restart from highest
-			if (next_index < 0) {
+			if (restart || next_index < 0) {
 				next_note = highest_note;
 				next_index = highest_index;
 			}
@@ -134,6 +145,7 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 			curr_note = next_note;
 			this->note_index = next_index;
 			note.press_note(info, curr_note, this->note.note[note_index].velocity);
+			restart = false;
 		}
 	}
 }

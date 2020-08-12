@@ -80,6 +80,7 @@ private:
 	unsigned int curr_note = 0;
 	std::size_t data_index = 0;
 	std::size_t note_index = 0;
+	bool restart = true;
 
 public:
 	bool on = false;
