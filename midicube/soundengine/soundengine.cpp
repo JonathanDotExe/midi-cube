@@ -59,15 +59,22 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 	if (metronome.is_beat(info.sample_time, info.sample_rate, preset.value)) {
 		unsigned int next_note = 128;
 		long int next_index = -1;
-		std::cerr << "Pattern" << std::endl;
+
+		unsigned int lowest_note = 128;
+		long int lowest_index = -1;
+		int highest_note = -1;
+		long int highest_index = -1;
+
 		switch (preset.pattern) {
 		case ArpeggiatorPattern::UP:
-			std::cerr << "Up" << std::endl;
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
 				if (this->note.note[i].pressed) {
-					std::cerr << "Note" << std::endl;
+					if (this->note.note[i].note < lowest_note) {
+						lowest_note = this->note.note[i].note;
+						lowest_index = i;
+					}
+					//Find next highest note
 					for (unsigned int octave = 0; octave < preset.octaves; ++octave) {
-						std::cerr << "Pressed" << std::endl;
 						unsigned int n = this->note.note[i].note + octave * 12;
 						if (n < next_note && (n > curr_note || (n == curr_note && note_index > i))) {
 							next_note = n;
@@ -77,10 +84,21 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 					}
 				}
 			}
+			//Restart from lowest
+			if (next_index < 0) {
+				next_note = lowest_note;
+				next_index = lowest_index;
+			}
+			std::cout << next_note << std::endl;
 			break;
 		case ArpeggiatorPattern::DOWN:
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
 				if (this->note.note[i].pressed) {
+					if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note) {
+						highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
+						highest_index = i;
+					}
+					//Find next lowest note
 					for (unsigned int o = 0; o < preset.octaves; ++o) {
 						unsigned int octave = preset.octaves - o - 1;
 						unsigned int n = this->note.note[i].note + octave * 12;
@@ -91,6 +109,11 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 						}
 					}
 				}
+			}
+			//Restart from highest
+			if (next_index < 0) {
+				next_note = highest_note;
+				next_index = highest_index;
 			}
 			break;
 		case ArpeggiatorPattern::UP_DOWN:
@@ -104,9 +127,6 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 		case ArpeggiatorPattern::DOWN_CUSTOM:
 			break;
 		}
-
-		std::cerr << "Press note" << std::endl;
-		std::cerr << next_note << "/" << next_index << std::endl;
 		//Press note
 		note.release_note(info, curr_note);
 		note.note.at(note_index).valid = false;

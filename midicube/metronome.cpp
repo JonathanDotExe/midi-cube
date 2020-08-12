@@ -17,8 +17,7 @@ void Metronome::init (unsigned int time) {
 }
 
 bool Metronome::is_beat(unsigned int time, unsigned int sample_rate, int value) {
-
-	unsigned int step = time/sample_rate;
+	unsigned int step = sample_rate/value;
 	return (time - start_time) % step == 0;
 }
 
