@@ -30,7 +30,7 @@ Synthesizer::Synthesizer() {
 	OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
 	osc->set_unison(3);
 	std::vector<FilterData> filters;
-	filters.push_back({FilterType::LOW_PASS, 200});
+	filters.push_back({FilterType::LOW_PASS, 1200});
 	preset->oscilators.push_back({osc, {0.1, 0, 1, 0.3}, filters});
 
 	//Calc release time
