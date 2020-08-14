@@ -39,12 +39,15 @@ void NoteBuffer::press_note(SampleInfo& info, unsigned int note, double velocity
 	this->note[slot].valid = true;
 }
 
-void NoteBuffer::release_note(SampleInfo& info, unsigned int note) {
+void NoteBuffer::release_note(SampleInfo& info, unsigned int note, bool invalidate) {
 	double f = note_to_freq(note);
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (this->note[i].freq == f && this->note[i].pressed) {
 			this->note[i].pressed = false;
 			this->note[i].release_time = info.time;
+			if (invalidate) {
+				this->note[i].valid = false;
+			}
 		}
 	}
 }
@@ -150,6 +153,13 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 	}
 }
 
+void Arpeggiator::press_note(SampleInfo& info, unsigned int note, double velocity) {
+	this->note.press_note(info, note, velocity);
+}
+
+void Arpeggiator::release_note(SampleInfo& info, unsigned int note) {
+	this->note.release_note(info, note, true);
+}
 
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {
@@ -190,14 +200,14 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 		if (!arp.on) {
 			note.press_note(info, message.get_note(), message.get_velocity()/127.0);
 		}
-		arp.note.press_note(info, message.get_note(), message.get_velocity()/127.0);
+		arp.press_note(info, message.get_note(), message.get_velocity()/127.0);
 	}
 	//Note off
 	else if (message.get_message_type() == MessageType::NOTE_OFF) {
 		if (!arp.on) {
 			note.release_note(info, message.get_note());
 		}
-		arp.note.release_note(info, message.get_note());
+		arp.release_note(info, message.get_note());
 	}
 	//Control change
 	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
@@ -211,7 +221,6 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 				}
 				else {
 					environment.sustain_release_time = info.time;
-					std::cout << "Release sustain " << environment.sustain_release_time << std::endl;
 				}
 				environment.sustain = new_sustain;
 			}

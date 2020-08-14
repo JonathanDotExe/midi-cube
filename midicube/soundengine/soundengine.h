@@ -59,7 +59,7 @@ public:
 	NoteBuffer();
 
 	void press_note(SampleInfo& info, unsigned int note, double velocity);
-	void release_note(SampleInfo& info, unsigned int note);
+	void release_note(SampleInfo& info, unsigned int note, bool invalidate = false);
 
 };
 
@@ -91,6 +91,10 @@ public:
 	Arpeggiator();
 
 	void apply(SampleInfo& info, NoteBuffer& note);
+
+	void press_note(SampleInfo& info, unsigned int note, double velocity);
+
+	void release_note(SampleInfo& info, unsigned int note);
 
 };
 
