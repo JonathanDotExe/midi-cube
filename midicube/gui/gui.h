@@ -9,6 +9,7 @@
 #define MIDICUBE_GUI_GUI_H_
 
 #include "model.h"
+#include "../soundengine/organ.h"
 #include "../soundengine/soundengine.h"
 #include <type_traits>
 
@@ -121,5 +122,16 @@ public:
 
 View* create_view_for_device(AudioDevice* device);
 
+class B3OrganEngineMenuView : public View {
+private:
+	B3OrganData* data;
+
+public:
+	B3OrganEngineMenuView(B3OrganData* device);
+	View* draw();
+
+};
+
+View* create_view_for_engine(std::string engine_name, SoundEngineData* data);
 
 #endif /* MIDICUBE_GUI_GUI_H_ */

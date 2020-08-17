@@ -294,7 +294,6 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 	}
 }
 
-
 std::vector<SoundEngine*> SoundEngineDevice::get_sound_engines() {
 	return sound_engines;
 }
@@ -305,6 +304,13 @@ void SoundEngineDevice::add_sound_engine(SoundEngine* engine) {
 
 SoundEngineChannel& SoundEngineDevice::get_channel(unsigned int channel) {
 	return channels.at(channel);
+}
+
+std::string SoundEngineChannel::get_engine_name() {
+	engine_mutex.lock();
+	std::string name = engine == nullptr ? "None" : engine->get_name();
+	engine_mutex.unlock();
+	return name;
 }
 
 void SoundEngineDevice::send(MidiMessage &message) {

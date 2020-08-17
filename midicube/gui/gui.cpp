@@ -330,6 +330,13 @@ View* SoundEngineDeviceMenuView::draw() {
 		if (old != selected) {
 			channel.set_engine(selected > 0 ? engines.at(selected - 1) : nullptr);
 		}
+		//Edit
+		if (GuiButton((Rectangle){510, y, 20, 20}, GuiIconText(RICON_PENCIL, ""))) {
+			view = create_view_for_engine(channel.get_engine_name(), channel.get_data()); //TODO Thread safety for data
+			if (!view) {
+				view = this;
+			}
+		}
 		//Volume Slider
 		channel.volume = GuiSlider((Rectangle){600, y, 300, 20}, "Vol ", TextFormat("%1.2f", channel.volume.load()), channel.volume, 0, 1);
 	}
@@ -346,4 +353,49 @@ View* create_view_for_device(AudioDevice* device) {
 	return nullptr;
 }
 
+//B3OrganEngineView
+static void draw_drawbar (int x, int y, int width, int height, std::array<int, ORGAN_DRAWBAR_COUNT>& drawbars, size_t index) {
+	int val = drawbars.at(index);
+	Color color = WHITE;
+	if (index <= 1) {
+		color = RED;
+	}
+	else if (index == 4 || index == 6 || index == 7) {
+		color = BLACK;
+	}
+	DrawRectangle(x + 5, y, width - 10 , height, RAYWHITE);
+	DrawRectangle(x, y + height/9 * val, width, height/9, color);
+}
+
+B3OrganEngineMenuView::B3OrganEngineMenuView(B3OrganData* data) {
+	this->data = data;
+}
+
+View* B3OrganEngineMenuView::draw() {
+	View* view = this;
+
+	ClearBackground(BROWN);
+
+	//Title
+	int title_width = MeasureText("B3-Organ", 32);
+	DrawText("B3-Organ", SCREEN_WIDTH/2 - title_width/2, 20, 32, BLACK);
+
+	//Drawbars
+	int width = 30;
+	int space = 20;
+	int total_width = width * data->preset.drawbars.size() + space * (data->preset.drawbars.size() - 1);
+	for (size_t i = 0; i < data->preset.drawbars.size(); ++i) {
+		draw_drawbar(SCREEN_WIDTH/2 - total_width/2 + (width + space) * i, 72 , width, 200, data->preset.drawbars, i);
+	}
+
+	draw_return_button(&view);
+	return view;
+}
+
+View* create_view_for_engine(std::string name, SoundEngineData* data) {
+	if (name == "B3 Organ") {
+		return new B3OrganEngineMenuView(dynamic_cast<B3OrganData*>(data));	//TODO cleaner check
+	}
+	return nullptr;
+}
 
