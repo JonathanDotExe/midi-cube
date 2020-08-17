@@ -20,32 +20,48 @@
 #define SOUND_ENGINE_POLYPHONY 30
 #define SOUND_ENGINE_MIDI_CHANNELS 16
 
+
+class SoundEngineData {
+public:
+	virtual SoundEngineData* copy() {
+		return new SoundEngineData();
+	}
+
+	virtual ~SoundEngineData() {
+
+	}
+};
+
 class SoundEngine {
 
 public:
-	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
+	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) = 0;
 
-	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
-
-	};
-
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index) {
 
 	};
 
-	virtual void control_change(unsigned int control, unsigned int value) {
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, SoundEngineData& data) {
 
 	};
 
-	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	virtual void control_change(unsigned int control, unsigned int value, SoundEngineData& data) {
+
+	};
+
+	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data) {
 		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
-	}
+	};
 
 	virtual std::string get_name() = 0;
 
+	virtual SoundEngineData* create_data() {
+		return new SoundEngineData();
+	}
+
 	virtual ~SoundEngine() {
 
-	}
+	};
 
 };
 
@@ -104,19 +120,28 @@ private:
 	double pitch_bend = 0;
 	KeyboardEnvironment environment;
 	NoteBuffer note;
+	SoundEngine* engine = nullptr;
+	SoundEngineData* data = nullptr;
+	Arpeggiator arp;
 
 public:
-	SoundEngine* engine = nullptr;
 	double volume = 0.3;
 	unsigned int sustain_control = 64;
 	bool sustain = true;
-	Arpeggiator arp; //TODO make private
 
 	SoundEngineChannel();
 
 	void send(MidiMessage& message, SampleInfo& info);
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+
+	void set_engine(SoundEngine* engine);
+
+	SoundEngine* get_engine();
+
+	SoundEngineData* get_data();
+
+	Arpeggiator& arpeggiator();
 
 	~SoundEngineChannel();
 

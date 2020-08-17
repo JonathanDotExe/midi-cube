@@ -14,7 +14,7 @@
 #define VOCODER_LOW_BAND 120
 #define VOCODER_HIGH_BAND 440
 
-struct VocoderData {
+struct VocoderPreset {
 	bool delay = true;
 	double delay_time = 0.5;
 	unsigned int delay_feedback = 4;
@@ -32,22 +32,34 @@ struct VocoderData {
 	unsigned int carrier_amp_control = 40;
 };
 
-class Vocoder : public SoundEngine {
-
-private:
-	VocoderData data;
+class VocoderData : public SoundEngineData {
+public:
+	VocoderPreset preset;
 	DelayBuffer delay;
 	std::array<BandPassFilter, VOCODER_BAND_COUNT> carrier_filters;
 	std::array<BandPassFilter, VOCODER_BAND_COUNT> modulator_filters;
 
+	VocoderData ();
+
+	virtual SoundEngineData* copy() {
+		return new VocoderData();
+	}
+};
+
+class Vocoder : public SoundEngine {
+
 public:
 	Vocoder();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, SoundEngineData& data);
 
-	void control_change(unsigned int control, unsigned int value);
+	void control_change(unsigned int control, unsigned int value, SoundEngineData& data);
+
+	SoundEngineData* create_data () {
+		return new VocoderData();	//TODO
+	}
 
 	std::string get_name();
 

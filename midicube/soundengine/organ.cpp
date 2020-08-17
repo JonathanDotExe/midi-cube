@@ -23,14 +23,16 @@ static inline unsigned int sound_delay(double rotation, double radius, unsigned 
 	return round((1 + rotation) * radius / SOUND_SPEED * sample_rate);
 }
 
-void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
+	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
+
 	double horn_sample = 0;
 	double bass_sample = 0;
 
 	double time = info.time + note.phase_shift;
 
 	//Organ sound
-	for (size_t i = 0; i < data.drawbars.size(); ++i) {
+	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
 		double f = note.freq * drawbar_harmonics[i];
 		while (f > 5593) {
 			f /= 2.0;
@@ -51,17 +53,17 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 		}*/
 
 		if (f > ROTARY_CUTOFF) {
-			horn_sample += data.drawbars[i] / 8.0 * sine_wave(time, f) / data.drawbars.size();
+			horn_sample += data.preset.drawbars[i] / 8.0 * sine_wave(time, f) / data.preset.drawbars.size();
 		} else {
-			bass_sample += data.drawbars[i] / 8.0 * sine_wave(time, f) / data.drawbars.size();
+			bass_sample += data.preset.drawbars[i] / 8.0 * sine_wave(time, f) / data.preset.drawbars.size();
 		}
 	}
 	double sample = 0;
 
 	//Rotary speaker
-	if (data.rotary) {
-		double horn_speed = data.rotary_fast ? ROTARY_HORN_FAST_FREQUENCY : ROTARY_HORN_SLOW_FREQUENCY;
-		double bass_speed = data.rotary_fast ? ROTARY_BASS_FAST_FREQUENCY : ROTARY_BASS_SLOW_FREQUENCY;
+	if (data.preset.rotary) {
+		double horn_speed = data.preset.rotary_fast ? ROTARY_HORN_FAST_FREQUENCY : ROTARY_HORN_SLOW_FREQUENCY;
+		double bass_speed = data.preset.rotary_fast ? ROTARY_BASS_FAST_FREQUENCY : ROTARY_BASS_SLOW_FREQUENCY;
 
 		//Horn
 		double horn_rot = sine_wave(info.time, horn_speed);
@@ -73,10 +75,10 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 		unsigned int rbass_delay = sound_delay(-bass_rot, BASS_RADIUS, info.sample_rate);
 
 		//Process
-		left_horn_del.add_sample(horn_sample * (0.5 + horn_rot * 0.5), lhorn_delay);
-		left_bass_del.add_sample(bass_sample * (0.5 + bass_rot * 0.5), lbass_delay);
-		right_horn_del.add_sample(horn_sample * (0.5 - horn_rot * 0.5), rhorn_delay);
-		right_bass_del.add_sample(bass_sample * (0.5 - bass_rot * 0.5), rbass_delay);
+		data.left_horn_del.add_sample(horn_sample * (0.5 + horn_rot * 0.5), lhorn_delay);
+		data.left_bass_del.add_sample(bass_sample * (0.5 + bass_rot * 0.5), lbass_delay);
+		data.right_horn_del.add_sample(horn_sample * (0.5 - horn_rot * 0.5), rhorn_delay);
+		data.right_bass_del.add_sample(bass_sample * (0.5 - bass_rot * 0.5), rbass_delay);
 	} else {
 		sample += horn_sample + bass_sample;
 		for (size_t i = 0; i < channels.size() ; ++i) {
@@ -85,9 +87,10 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	}
 }
 
-void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
-	double left = (left_horn_del.process() + left_bass_del.process());
-	double right = (right_horn_del.process() + right_bass_del.process());
+void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, SoundEngineData& d) {
+	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
+	double left = (data.left_horn_del.process() + data.left_bass_del.process());
+	double right = (data.right_horn_del.process() + data.right_bass_del.process());
 
 	for (size_t i = 0; i < channels.size(); ++i) {
 		if (i % 2 == 0) {
@@ -99,25 +102,28 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 	}
 }
 
-void B3Organ::control_change(unsigned int control, unsigned int value) {
+void B3Organ::control_change(unsigned int control, unsigned int value, SoundEngineData& d) {
+	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
 	//Drawbars
-	for (size_t i = 0; i < data.drawbar_ccs.size(); ++i) {
-		if (data.drawbar_ccs[i] == control) {
-			data.drawbars[i] = round((double) value/127 * 8);
+	for (size_t i = 0; i < data.preset.drawbar_ccs.size(); ++i) {
+		if (data.preset.drawbar_ccs[i] == control) {
+			data.preset.drawbars[i] = round((double) value/127 * 8);
 		}
 	}
 	//Rotary
-	if (control == data.rotary_cc) {
-		data.rotary = value > 0;
+	if (control == data.preset.rotary_cc) {
+		data.preset.rotary = value > 0;
 	}
-	if (control == data.rotary_speed_cc) {
-		data.rotary_fast = value > 0;
+	if (control == data.preset.rotary_speed_cc) {
+		data.preset.rotary_fast = value > 0;
 	}
+}
+
+SoundEngineData* B3Organ::create_data() {
+	return new B3OrganData();
 }
 
 std::string B3Organ::get_name() {
 	return "B3 Organ";
 }
-
-
 
