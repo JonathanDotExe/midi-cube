@@ -16,6 +16,7 @@
 #include "../metronome.h"
 #include <string>
 #include <array>
+#include <mutex>
 
 #define SOUND_ENGINE_POLYPHONY 30
 #define SOUND_ENGINE_MIDI_CHANNELS 16
@@ -123,6 +124,7 @@ private:
 	SoundEngine* engine = nullptr;
 	SoundEngineData* data = nullptr;
 	Arpeggiator arp;
+	std::mutex engine_mutex;
 
 public:
 	double volume = 0.3;
@@ -142,6 +144,8 @@ public:
 	SoundEngineData* get_data();
 
 	Arpeggiator& arpeggiator();
+
+	std::string get_engine_name();
 
 	~SoundEngineChannel();
 

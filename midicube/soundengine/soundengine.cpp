@@ -169,7 +169,8 @@ SoundEngineChannel::SoundEngineChannel() {
 
 void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
 	std::array<double, OUTPUT_CHANNELS> ch = {};
-	if (engine != nullptr && data != nullptr) {
+	engine_mutex.lock();
+	if (engine && data) {
 		if (arp.on) {
 			arp.apply(info, note);
 		}
@@ -193,9 +194,11 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 			channels[i] += (ch[i] * volume);
 		}
 	}
+	engine_mutex.unlock();
 }
 
 void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
+	engine_mutex.lock();
 	//Note on
 	if (message.get_message_type() == MessageType::NOTE_ON) {
 		if (!arp.on) {
@@ -232,18 +235,27 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
 		pitch_bend = note_to_freq_transpose(pitch) - 1;
 	}
+	engine_mutex.unlock();
 }
 
+/**
+ * May only be called from GUI thread after GUI has started
+ */
 void SoundEngineChannel::set_engine(SoundEngine* engine) {
-	SoundEngineData* data = engine->create_data();
-	delete this->engine;
+	SoundEngineData* data = nullptr;
+	if (engine) {
+		data = engine->create_data();
+	}
+
+	engine_mutex.lock();
 	delete this->data;
 	this->engine = engine;
 	this->data = data;
+	engine_mutex.unlock();
 }
 
 SoundEngine* SoundEngineChannel::get_engine() {
-	return engine;
+	return engine; //TODO ensure thread-safety
 }
 
 SoundEngineData* SoundEngineChannel::get_data() {
