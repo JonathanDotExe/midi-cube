@@ -21,6 +21,7 @@
 #define SOUND_ENGINE_POLYPHONY 30
 #define SOUND_ENGINE_MIDI_CHANNELS 16
 
+class SoundEngineDevice;
 
 class SoundEngineData {
 public:
@@ -127,9 +128,9 @@ private:
 	std::mutex engine_mutex;
 
 public:
-	double volume = 0.3;
-	unsigned int sustain_control = 64;
-	bool sustain = true;
+	std::atomic<double> volume{0.3};
+	std::atomic<unsigned int> sustain_control{64};
+	std::atomic<bool> sustain{true};
 
 	SoundEngineChannel();
 
@@ -137,9 +138,12 @@ public:
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 
+	/**
+	 * May only be called from GUI thread after GUI has started
+	 */
 	void set_engine(SoundEngine* engine);
 
-	SoundEngine* get_engine();
+	ssize_t get_engine_index(std::vector<SoundEngine*>& engines);
 
 	SoundEngineData* get_data();
 
@@ -164,17 +168,11 @@ public:
 
 	std::string get_identifier();
 
-	void set_engine(unsigned int channel, SoundEngine* engine);
-
 	std::vector<SoundEngine*> get_sound_engines();
 
 	void add_sound_engine(SoundEngine* engine);
 
-	SoundEngine* get_engine(unsigned int channel);
-
-	double& volume(unsigned int channel);
-
-	Arpeggiator& arpeggiator(unsigned int channel);
+	SoundEngineChannel& get_channel(unsigned int channel);
 
 	bool is_audio_input() {
 		return true;

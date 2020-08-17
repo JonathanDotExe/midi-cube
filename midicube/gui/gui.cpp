@@ -288,21 +288,22 @@ View* SoundEngineDeviceMenuView::draw() {
 	std::vector<SoundEngine*> engines = device->get_sound_engines();
 	//Engines
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-		unsigned int channel = SOUND_ENGINE_MIDI_CHANNELS - 1 - i;
-		int selected = device->get_engine(channel) == nullptr ? 0 : find(engines.begin(), engines.end(), device->get_engine(channel)) - engines.begin() + 1;
+		unsigned int ch = SOUND_ENGINE_MIDI_CHANNELS - 1 - i;
+		SoundEngineChannel& channel = device->get_channel(ch);
+		int selected = channel.get_engine_index(engines) + 1;
 		int old = selected;
-		float y = 5 + channel * 25;
+		float y = 5 + ch * 25;
 		//Text
 		std::ostringstream text;
-		text << "Channel " << channel;
+		text << "Channel " << ch;
 		DrawText(text.str().c_str(), 5, y + 6, 4, BLACK);
 		//ComboBox
 		selected = GuiComboBox((Rectangle){100, y, 400, 20}, options.c_str(), selected);
 		if (old != selected) {
-			device->set_engine(channel, selected > 0 ? engines.at(selected - 1): nullptr);
+			channel.set_engine(selected > 0 ? engines.at(selected - 1) : nullptr);
 		}
 		//Volume Slider
-		device->volume(channel) = GuiSlider((Rectangle){600, y, 300, 20}, "Vol ", TextFormat("%1.2f", device->volume(channel)), device->volume(channel), 0, 1);
+		channel.volume = GuiSlider((Rectangle){600, y, 300, 20}, "Vol ", TextFormat("%1.2f", channel.volume.load()), channel.volume, 0, 1);
 	}
 
 	return view;
@@ -310,7 +311,7 @@ View* SoundEngineDeviceMenuView::draw() {
 
 View* create_view_for_device(AudioDevice* device) {
 	if (device->get_identifier() == "Sound Engine") { //TODO cleaner check
-		return new SoundEngineDeviceMenuView(static_cast<SoundEngineDevice*>(device));
+		return new SoundEngineDeviceMenuView(dynamic_cast<SoundEngineDevice*>(device));
 	}
 	return nullptr;
 }

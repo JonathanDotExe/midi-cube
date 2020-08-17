@@ -7,6 +7,7 @@
 
 #include "soundengine.h"
 
+#include <algorithm>
 
 //NoteBuffer
 NoteBuffer::NoteBuffer () {
@@ -254,8 +255,14 @@ void SoundEngineChannel::set_engine(SoundEngine* engine) {
 	engine_mutex.unlock();
 }
 
-SoundEngine* SoundEngineChannel::get_engine() {
-	return engine; //TODO ensure thread-safety
+ssize_t SoundEngineChannel::get_engine_index(std::vector<SoundEngine*>& engines) {
+	engine_mutex.lock();
+	ssize_t index = find(engines.begin(), engines.end(), engine) - engines.begin();
+	engine_mutex.unlock();
+	if (index == engines.end() - engines.begin()) {
+		index = -1;
+	}
+	return index;
 }
 
 SoundEngineData* SoundEngineChannel::get_data() {
@@ -287,13 +294,6 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 	}
 }
 
-double& SoundEngineDevice::volume(unsigned int channel) {
-	return channels.at(channel).volume;
-}
-
-Arpeggiator& SoundEngineDevice::arpeggiator(unsigned int channel) {
-	return channels.at(channel).arpeggiator();
-}
 
 std::vector<SoundEngine*> SoundEngineDevice::get_sound_engines() {
 	return sound_engines;
@@ -303,12 +303,8 @@ void SoundEngineDevice::add_sound_engine(SoundEngine* engine) {
 	sound_engines.push_back(engine);
 }
 
-void SoundEngineDevice::set_engine(unsigned int channel, SoundEngine* engine) {
-	this->channels.at(channel).set_engine(engine);
-}
-
-SoundEngine* SoundEngineDevice::get_engine(unsigned int channel) {
-	return this->channels.at(channel).get_engine();
+SoundEngineChannel& SoundEngineDevice::get_channel(unsigned int channel) {
+	return channels.at(channel);
 }
 
 void SoundEngineDevice::send(MidiMessage &message) {
