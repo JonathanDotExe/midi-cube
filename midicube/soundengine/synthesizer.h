@@ -75,15 +75,15 @@ private:
 public:
 	Synthesizer();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index);
 
-	void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index);
+	void note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, SoundEngineData& data);
 
-	void control_change(unsigned int control, unsigned int value);
+	void control_change(unsigned int control, unsigned int value, SoundEngineData& data);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data);
 
 	std::string get_name();
 

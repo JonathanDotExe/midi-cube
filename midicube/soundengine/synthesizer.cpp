@@ -58,7 +58,7 @@ static double apply_filter (FilterData& data, FilterInstance& inst, double sampl
 	return sample;
 }
 
-void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) {
 	//Envelopes
 	std::vector<double> env_val;
 	for (size_t i = 0; i < preset->envelopes.size(); ++i) {
@@ -94,7 +94,7 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	}
 }
 
-void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
+void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index) {
 	for (size_t i = 0; i < preset->oscilators.size() && i < filters.size(); ++i) {
 		OscilatorEnvelope& osc = preset->oscilators[i];
 		//Signal
@@ -107,7 +107,7 @@ void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t
 	}
 }
 
-void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, SoundEngineData& data) {
 	//Filters
 	/*for (size_t i = 0; i < preset->filters.size(); ++i) {
 		double filtered  = preset->filters[i].filter->apply(samples.at(preset->filters[i].osc), info.time_step);
@@ -125,7 +125,7 @@ void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 	}*/
 }
 
-void Synthesizer::control_change(unsigned int control, unsigned int value) {
+void Synthesizer::control_change(unsigned int control, unsigned int value, SoundEngineData& data) {
 	//Control bindings
 	for (size_t i = 0; i < preset->control_bindings.size() ; ++i) {
 		OscilatorSlot* slot = preset->oscilators.at(preset->control_bindings[i].oscilator).osc;
@@ -134,7 +134,7 @@ void Synthesizer::control_change(unsigned int control, unsigned int value) {
 	}
 }
 
-bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data) {
 	return !note.pressed && (!env.sustain || env.sustain_time > note.release_time) && fmax(note.release_time, env.sustain_release_time) + release_time < info.time;
 }
 
