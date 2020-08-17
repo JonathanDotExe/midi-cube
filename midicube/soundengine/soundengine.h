@@ -145,8 +145,6 @@ public:
 
 	Arpeggiator& arpeggiator();
 
-	std::string get_engine_name();
-
 	~SoundEngineChannel();
 
 };
