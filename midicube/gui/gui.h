@@ -35,6 +35,10 @@ public:
 	 */
 	virtual View* draw() = 0;
 
+	virtual bool save_to_history() {
+		return true;
+	}
+
 	virtual ~View() {
 
 	};
@@ -45,6 +49,7 @@ class Frame {
 
 private:
 
+	std::vector<View*> history;
 	View* view;
 
 public:

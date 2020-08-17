@@ -8,6 +8,7 @@
 #include "gui.h"
 #include <raylib.h>
 #define RAYGUI_IMPLEMENTATION
+#define RAYGUI_SUPPORT_ICONS
 #include <raygui.h>
 #include <exception>
 #include <unordered_map>
@@ -71,14 +72,40 @@ void Frame::run () {
 
 void Frame::change_view(View* view) {
 	if (this->view != view) {
-		delete this->view;
-		this->view = view;
+		if (!view) {
+			if (history.size() > 0) {
+				delete this->view;
+				this->view = history.back();
+				history.pop_back();
+			}
+		}
+		else {
+			if (this->view && this->view->save_to_history()) {
+				history.push_back(this->view);
+			}
+			if (this->view && !this->view->save_to_history()) {
+				delete this->view;
+			}
+			this->view = view;
+		}
 	}
 }
 
 Frame::~Frame() {
 	delete view;
 	view = nullptr;
+
+	for (size_t i = 0; i < history.size(); ++i) {
+		delete history[i];
+	}
+	history.clear();
+}
+
+//GUI utils
+static void draw_return_button (View** view) {
+	if (GuiButton({SCREEN_WIDTH - 30, SCREEN_HEIGHT - 30, 30, 30}, GuiIconText(RICON_REREDO_FILL, ""))) {
+		*view = nullptr;
+	}
 }
 
 //MainMenuView
@@ -267,6 +294,7 @@ View* DevicesMenuView::draw() {
 			model.midi_cube->add_binding(binding);
 		}
 	}
+	draw_return_button(&view);
 
 	return view;
 }
@@ -305,6 +333,8 @@ View* SoundEngineDeviceMenuView::draw() {
 		//Volume Slider
 		channel.volume = GuiSlider((Rectangle){600, y, 300, 20}, "Vol ", TextFormat("%1.2f", channel.volume.load()), channel.volume, 0, 1);
 	}
+
+	draw_return_button(&view);
 
 	return view;
 }
