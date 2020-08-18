@@ -379,7 +379,8 @@ View* create_view_for_device(AudioDevice* device) {
 }
 
 //B3OrganEngineView
-void B3OrganEngineMenuView::draw_drawbar (int x, int y, int width, int height, std::array<int, ORGAN_DRAWBAR_COUNT>& drawbars, size_t index) {
+void B3OrganEngineMenuView::draw_drawbar (int x, int y, int width, int height, size_t index) {
+	std::array<int, ORGAN_DRAWBAR_COUNT>& drawbars = data->preset.drawbars;
 	//Move drawbar
 	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
 		int count = GetTouchPointsCount();
@@ -405,11 +406,28 @@ void B3OrganEngineMenuView::draw_drawbar (int x, int y, int width, int height, s
 	}
 	DrawRectangle(x + 5, y, width - 10 , height, RAYWHITE);
 	DrawRectangle(x, y + height/9 * val, width, height/(ORGAN_DRAWBAR_MAX + 1), color);
-	//Draw value
-	std::ostringstream valstr;
-	valstr << val;
-	int val_width = MeasureText(valstr.str().c_str(), 16);
-	DrawText(valstr.str().c_str(), x + width/2 - val_width/2, y + height + 4, 12, BLACK);
+
+	if (edit_midi) {
+		//CC input
+		int cc_value = data->preset.drawbar_ccs.at(index);
+		Rectangle rect;
+		rect.x = x;
+		rect.y = y + height + 4;
+		rect.width = width;
+		rect.height = 20;
+		DrawRectangle(rect.x, rect.y, rect.width, rect.height, RAYWHITE);
+		if (GuiValueBox(rect, "", &cc_value, 0, 127, drawbar_editmode.at(index))) {
+			drawbar_editmode.at(index) = !drawbar_editmode.at(index);
+		}
+		data->preset.drawbar_ccs.at(index) = cc_value;
+	}
+	else {
+		//Draw value
+		std::ostringstream valstr;
+		valstr << val;
+		int val_width = MeasureText(valstr.str().c_str(), 16);
+		DrawText(valstr.str().c_str(), x + width/2 - val_width/2, y + height + 4, 12, BLACK);
+	}
 }
 
 B3OrganEngineMenuView::B3OrganEngineMenuView(B3OrganData* data) {
@@ -430,14 +448,44 @@ View* B3OrganEngineMenuView::draw() {
 	int space = 20;
 	int total_width = width * data->preset.drawbars.size() + space * (data->preset.drawbars.size() - 1);
 	for (size_t i = 0; i < data->preset.drawbars.size(); ++i) {
-		draw_drawbar(SCREEN_WIDTH/2 - total_width/2 + (width + space) * i, 100, width, 200, data->preset.drawbars, i);
+		draw_drawbar(SCREEN_WIDTH/2 - total_width/2 + (width + space) * i, 100, width, 200, i);
 	}
 
 	//Rotary
-	data->preset.rotary = draw_switch(20, 100, 20, 30, data->preset.rotary);
-	DrawText("Rotary Speaker", 45, 108, 12, BLACK);
-	data->preset.rotary_fast = draw_switch(20, 150, 20, 30, data->preset.rotary_fast, "FST", "SLW");
-	DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 45, 158, 12, BLACK);
+	if (edit_midi) {
+		{
+			//Rotary CC
+			int cc_value = data->preset.rotary_cc;
+			DrawRectangle(20, 100, 30, 30, RAYWHITE);
+			if (GuiValueBox((Rectangle){20, 100, 30, 30}, "", &cc_value, 0, 127, rotary_editmode)) {
+				rotary_editmode = !rotary_editmode;
+			}
+			data->preset.rotary_cc = cc_value;
+		}
+		{
+			//Rotary Speed CC
+			int cc_value = data->preset.rotary_speed_cc;
+			DrawRectangle(20, 150, 30, 30, RAYWHITE);
+			if (GuiValueBox((Rectangle){20, 150, 30, 30}, "", &cc_value, 0, 127, rotary_speed_editmode)) {
+				rotary_speed_editmode = !rotary_speed_editmode;
+			}
+			data->preset.rotary_speed_cc = cc_value;
+		}
+		DrawText("Rotary Speaker", 55, 108, 12, BLACK);
+		DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 55, 158, 12, BLACK);
+	}
+	else {
+		data->preset.rotary = draw_switch(20, 100, 20, 30, data->preset.rotary);
+		data->preset.rotary_fast = draw_switch(20, 150, 20, 30, data->preset.rotary_fast, "FST", "SLW");
+		DrawText("Rotary Speaker", 45, 108, 12, BLACK);
+		DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 45, 158, 12, BLACK);
+	}
+
+	//Edit MIDI
+	if (GuiButton({SCREEN_WIDTH - 60, SCREEN_HEIGHT - 30, 30, 30}, GuiIconText(RICON_PENCIL, ""))) {
+		edit_midi = !edit_midi;
+	}
+
 
 	draw_return_button(&view);
 	return view;
