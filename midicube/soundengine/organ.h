@@ -13,6 +13,7 @@
 #include "../synthesis.h"
 
 #define ORGAN_DRAWBAR_COUNT 9
+#define ORGAN_DRAWBAR_MAX 8
 #define ROTARY_CUTOFF 800
 #define ROTARY_HORN_SLOW_FREQUENCY 0.8
 #define ROTARY_HORN_FAST_FREQUENCY 6.8

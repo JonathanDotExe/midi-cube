@@ -125,6 +125,8 @@ View* create_view_for_device(AudioDevice* device);
 class B3OrganEngineMenuView : public View {
 private:
 	B3OrganData* data;
+	std::array<std::string, ORGAN_DRAWBAR_COUNT> drawbar_titles = {"16'", "5 1/3'", "8'", "4'", "2 2/3'", "2'", "1 3/5'", "1 1/3'", "1"};
+	void draw_drawbar (int x, int y, int width, int height, std::array<int, ORGAN_DRAWBAR_COUNT>& drawbars, size_t index);
 
 public:
 	B3OrganEngineMenuView(B3OrganData* device);

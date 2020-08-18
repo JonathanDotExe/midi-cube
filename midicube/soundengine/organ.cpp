@@ -53,9 +53,9 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 		}*/
 
 		if (f > ROTARY_CUTOFF) {
-			horn_sample += data.preset.drawbars[i] / 8.0 * sine_wave(time, f) / data.preset.drawbars.size();
+			horn_sample += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX * sine_wave(time, f) / data.preset.drawbars.size();
 		} else {
-			bass_sample += data.preset.drawbars[i] / 8.0 * sine_wave(time, f) / data.preset.drawbars.size();
+			bass_sample += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX * sine_wave(time, f) / data.preset.drawbars.size();
 		}
 	}
 	double sample = 0;
@@ -107,7 +107,7 @@ void B3Organ::control_change(unsigned int control, unsigned int value, SoundEngi
 	//Drawbars
 	for (size_t i = 0; i < data.preset.drawbar_ccs.size(); ++i) {
 		if (data.preset.drawbar_ccs[i] == control) {
-			data.preset.drawbars[i] = round((double) value/127 * 8);
+			data.preset.drawbars[i] = round((double) value/127 * ORGAN_DRAWBAR_MAX);
 		}
 	}
 	//Rotary

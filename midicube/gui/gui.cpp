@@ -354,7 +354,7 @@ View* create_view_for_device(AudioDevice* device) {
 }
 
 //B3OrganEngineView
-static void draw_drawbar (int x, int y, int width, int height, std::array<int, ORGAN_DRAWBAR_COUNT>& drawbars, size_t index) {
+void B3OrganEngineMenuView::draw_drawbar (int x, int y, int width, int height, std::array<int, ORGAN_DRAWBAR_COUNT>& drawbars, size_t index) {
 	//Move drawbar
 	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
 		int count = GetTouchPointsCount();
@@ -362,10 +362,13 @@ static void draw_drawbar (int x, int y, int width, int height, std::array<int, O
 			Vector2 point = GetTouchPosition(i);
 			if (point.x >= x && point.x < x + width && point.y >= y && point.y < y + height) {
 				int val = 9.0 * (point.y - y)/height;
-				drawbars.at(index) = std::min(val, 8);	//TODO thread-safety
+				drawbars.at(index) = std::min(val, ORGAN_DRAWBAR_MAX);	//TODO thread-safety
 			}
 		}
 	}
+	//Draw caption
+	int title_width = MeasureText(drawbar_titles.at(index).c_str(), 16);
+	DrawText(drawbar_titles.at(index).c_str(), x + width/2 - title_width/2, y - 18, 16, YELLOW);
 	//Draw drawbar
 	int val = drawbars.at(index);
 	Color color = WHITE;
@@ -376,7 +379,12 @@ static void draw_drawbar (int x, int y, int width, int height, std::array<int, O
 		color = BLACK;
 	}
 	DrawRectangle(x + 5, y, width - 10 , height, RAYWHITE);
-	DrawRectangle(x, y + height/9 * val, width, height/9, color);
+	DrawRectangle(x, y + height/9 * val, width, height/(ORGAN_DRAWBAR_MAX + 1), color);
+	//Draw value
+	std::ostringstream valstr;
+	valstr << val;
+	int val_width = MeasureText(valstr.str().c_str(), 16);
+	DrawText(valstr.str().c_str(), x + width/2 - val_width/2, y + height + 4, 16, BLACK);
 }
 
 B3OrganEngineMenuView::B3OrganEngineMenuView(B3OrganData* data) {
