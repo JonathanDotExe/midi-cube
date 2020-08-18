@@ -108,6 +108,31 @@ static void draw_return_button (View** view) {
 	}
 }
 
+static bool draw_switch (int x, int y, int width, int height, bool value, std::string on_text = "ON", std::string off_text = "OFF") {
+	DrawRectangle(x, y, width, height, RAYWHITE);
+
+	//Click
+	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+		Vector2 point = GetMousePosition();
+		if (point.x >= x && point.x < x + width && point.y >= y && point.y < y + height) {
+			value = !value;
+		}
+	}
+
+	//Switch
+	DrawRectangle(x, y + height/2 * (value ? 0 : 1) , width, height/2, GRAY);
+	std::string text = value ? on_text : off_text;
+	int text_width = MeasureText(text.c_str(), 8);
+	if (value) {
+		DrawText(text.c_str(), x + width/2 - text_width/2, y + 2, 8, BLACK);
+	}
+	else {
+		DrawText(text.c_str(), x + width/2 - text_width/2, y + height - 10, 8, BLACK);
+	}
+
+	return value;
+}
+
 //MainMenuView
 View* MainMenuView::draw() {
 	View* view = this;
@@ -368,7 +393,7 @@ void B3OrganEngineMenuView::draw_drawbar (int x, int y, int width, int height, s
 	}
 	//Draw caption
 	int title_width = MeasureText(drawbar_titles.at(index).c_str(), 16);
-	DrawText(drawbar_titles.at(index).c_str(), x + width/2 - title_width/2, y - 18, 16, YELLOW);
+	DrawText(drawbar_titles.at(index).c_str(), x + width/2 - title_width/2, y - 14, 12, YELLOW);
 	//Draw drawbar
 	int val = drawbars.at(index);
 	Color color = WHITE;
@@ -384,7 +409,7 @@ void B3OrganEngineMenuView::draw_drawbar (int x, int y, int width, int height, s
 	std::ostringstream valstr;
 	valstr << val;
 	int val_width = MeasureText(valstr.str().c_str(), 16);
-	DrawText(valstr.str().c_str(), x + width/2 - val_width/2, y + height + 4, 16, BLACK);
+	DrawText(valstr.str().c_str(), x + width/2 - val_width/2, y + height + 4, 12, BLACK);
 }
 
 B3OrganEngineMenuView::B3OrganEngineMenuView(B3OrganData* data) {
@@ -398,15 +423,21 @@ View* B3OrganEngineMenuView::draw() {
 
 	//Title
 	int title_width = MeasureText("B3-Organ", 32);
-	DrawText("B3-Organ", SCREEN_WIDTH/2 - title_width/2, 20, 32, BLACK);
+	DrawText("B3-Organ", SCREEN_WIDTH/2 - title_width/2, 20, 36, BLACK);
 
 	//Drawbars
 	int width = 30;
 	int space = 20;
 	int total_width = width * data->preset.drawbars.size() + space * (data->preset.drawbars.size() - 1);
 	for (size_t i = 0; i < data->preset.drawbars.size(); ++i) {
-		draw_drawbar(SCREEN_WIDTH/2 - total_width/2 + (width + space) * i, 72 , width, 200, data->preset.drawbars, i);
+		draw_drawbar(SCREEN_WIDTH/2 - total_width/2 + (width + space) * i, 100, width, 200, data->preset.drawbars, i);
 	}
+
+	//Rotary
+	data->preset.rotary = draw_switch(20, 100, 20, 30, data->preset.rotary);
+	DrawText("Rotary Speaker", 45, 108, 12, BLACK);
+	data->preset.rotary_fast = draw_switch(20, 150, 20, 30, data->preset.rotary_fast, "FST", "SLW");
+	DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 45, 158, 12, BLACK);
 
 	draw_return_button(&view);
 	return view;
