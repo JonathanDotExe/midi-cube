@@ -380,7 +380,7 @@ View* create_view_for_device(AudioDevice* device) {
 
 //B3OrganEngineView
 void B3OrganEngineMenuView::draw_drawbar (int x, int y, int width, int height, size_t index) {
-	std::array<int, ORGAN_DRAWBAR_COUNT>& drawbars = data->preset.drawbars;
+	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT>& drawbars = data->preset.drawbars;
 	//Move drawbar
 	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
 		int count = GetTouchPointsCount();
@@ -419,7 +419,7 @@ void B3OrganEngineMenuView::draw_drawbar (int x, int y, int width, int height, s
 		if (GuiValueBox(rect, "", &cc_value, 0, 127, drawbar_editmode.at(index))) {
 			drawbar_editmode.at(index) = !drawbar_editmode.at(index);
 		}
-		data->preset.drawbar_ccs.at(index) = cc_value;
+		data->preset.drawbar_ccs.at(index) = cc_value; //TODO Thread-safety
 	}
 	else {
 		//Draw value

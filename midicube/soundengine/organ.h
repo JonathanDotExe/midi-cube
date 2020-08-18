@@ -26,12 +26,28 @@
 #define ORGAN_REP_DELAY 0.000728226
 
 struct B3OrganPreset {
-	std::array<int, ORGAN_DRAWBAR_COUNT> drawbars = {8, 8, 8, 8, 8, 8, 8, 8, 8};
-	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs = {67, 68, 69, 70, 87, 88, 89, 90, 92};
-	bool rotary = false;
-	bool rotary_fast = true;
-	unsigned int rotary_cc = 22;
-	unsigned int rotary_speed_cc = 23;
+	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbars;
+	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
+	std::atomic<bool> rotary{false};
+	std::atomic<bool> rotary_fast{true};
+	std::atomic<unsigned int> rotary_cc{22};
+	std::atomic<unsigned int> rotary_speed_cc{23};
+
+	B3OrganPreset () {
+		for (size_t i = 0; i < drawbars.size(); ++i) {
+			drawbars[i] = 8;
+		}
+		size_t i = 0;
+		drawbar_ccs.at(i++) = 67;
+		drawbar_ccs.at(i++) = 68;
+		drawbar_ccs.at(i++) = 69;
+		drawbar_ccs.at(i++) = 70;
+		drawbar_ccs.at(i++) = 87;
+		drawbar_ccs.at(i++) = 88;
+		drawbar_ccs.at(i++) = 89;
+		drawbar_ccs.at(i++) = 90;
+		drawbar_ccs.at(i++) = 92;
+	}
 };
 
 class B3OrganData : public SoundEngineData{
