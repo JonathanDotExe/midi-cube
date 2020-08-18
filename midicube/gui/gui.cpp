@@ -355,6 +355,18 @@ View* create_view_for_device(AudioDevice* device) {
 
 //B3OrganEngineView
 static void draw_drawbar (int x, int y, int width, int height, std::array<int, ORGAN_DRAWBAR_COUNT>& drawbars, size_t index) {
+	//Move drawbar
+	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+		int count = GetTouchPointsCount();
+		for (int i = 0; i < count; ++i) {
+			Vector2 point = GetTouchPosition(i);
+			if (point.x >= x && point.x < x + width && point.y >= y && point.y < y + height) {
+				int val = 9.0 * (point.y - y)/height;
+				drawbars.at(index) = std::min(val, 8);	//TODO thread-safety
+			}
+		}
+	}
+	//Draw drawbar
 	int val = drawbars.at(index);
 	Color color = WHITE;
 	if (index <= 1) {
