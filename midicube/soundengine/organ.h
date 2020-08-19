@@ -53,10 +53,8 @@ struct B3OrganPreset {
 class B3OrganData : public SoundEngineData{
 public:
 	B3OrganPreset preset;
-	DelayBuffer left_horn_del;
-	DelayBuffer left_bass_del;
-	DelayBuffer right_horn_del;
-	DelayBuffer right_bass_del;
+	DelayBuffer left_del;
+	DelayBuffer right_del;
 
 	virtual SoundEngineData* copy() {
 		return new B3OrganData();	//TODO

@@ -20,7 +20,7 @@ static inline unsigned int sound_delay(double rotation, double radius, unsigned 
 					(SPEAKER_RADIUS - radius * rotation) :
 					(SPEAKER_RADIUS + radius * rotation + radius * 2);
 	return round(dst / SOUND_SPEED * sample_rate);*/
-	return round((1 + rotation) * radius / SOUND_SPEED * sample_rate);
+	return round((1 + rotation) * 0.0005 * sample_rate);
 }
 
 void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
@@ -67,18 +67,20 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 
 		//Horn
 		double horn_rot = sine_wave(info.time, horn_speed);
-		unsigned int lhorn_delay = sound_delay(horn_rot, HORN_RADIUS, info.sample_rate);
-		unsigned int rhorn_delay = sound_delay(-horn_rot, HORN_RADIUS, info.sample_rate);
+		double horn_pitch_rot = cosine_wave(info.time, horn_speed);
+		unsigned int lhorn_delay = sound_delay(horn_pitch_rot, HORN_RADIUS, info.sample_rate);
+		unsigned int rhorn_delay = sound_delay(-horn_pitch_rot, HORN_RADIUS, info.sample_rate);
 		//Bass
 		double bass_rot = sine_wave(info.time, bass_speed);
-		unsigned int lbass_delay = sound_delay(bass_rot, BASS_RADIUS, info.sample_rate);
-		unsigned int rbass_delay = sound_delay(-bass_rot, BASS_RADIUS, info.sample_rate);
+		double bass_pitch_rot = cosine_wave(info.time,  bass_speed);
+		unsigned int lbass_delay = sound_delay(bass_pitch_rot, BASS_RADIUS, info.sample_rate);
+		unsigned int rbass_delay = sound_delay(-bass_pitch_rot, BASS_RADIUS, info.sample_rate);
 
 		//Process
-		data.left_horn_del.add_sample(horn_sample * (0.5 + horn_rot * 0.5), lhorn_delay);
-		data.left_bass_del.add_sample(bass_sample * (0.5 + bass_rot * 0.5), lbass_delay);
-		data.right_horn_del.add_sample(horn_sample * (0.5 - horn_rot * 0.5), rhorn_delay);
-		data.right_bass_del.add_sample(bass_sample * (0.5 - bass_rot * 0.5), rbass_delay);
+		data.left_del.add_sample(horn_sample * (0.5 + horn_rot * 0.5), lhorn_delay);
+		data.left_del.add_sample(bass_sample * (0.5 + bass_rot * 0.5), lbass_delay);
+		data.right_del.add_sample(horn_sample * (0.5 - horn_rot * 0.5), rhorn_delay);
+		data.right_del.add_sample(bass_sample * (0.5 - bass_rot * 0.5), rbass_delay);
 	} else {
 		sample += horn_sample + bass_sample;
 		for (size_t i = 0; i < channels.size() ; ++i) {
@@ -89,8 +91,8 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 
 void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, SoundEngineData& d) {
 	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
-	double left = (data.left_horn_del.process() + data.left_bass_del.process());
-	double right = (data.right_horn_del.process() + data.right_bass_del.process());
+	double left = (data.left_del.process());
+	double right = (data.right_del.process());
 
 	for (size_t i = 0; i < channels.size(); ++i) {
 		if (i % 2 == 0) {

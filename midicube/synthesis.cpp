@@ -29,6 +29,11 @@ extern double sine_wave(double time, double freq) {
 	return sin(freq_to_radians(freq) * time);
 }
 
+extern double cosine_wave(double time, double freq) {
+	return cos(freq_to_radians(freq) * time);
+}
+
+
 extern double square_wave(double time, double freq) {
 	return copysign(1.0, sin(freq_to_radians(freq) * time));
 }

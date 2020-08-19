@@ -24,6 +24,8 @@ extern double freq_to_radians(double freq);
 
 extern double sine_wave(double time, double freq);
 
+extern double cosine_wave(double time, double freq);
+
 extern double square_wave(double time, double freq);
 
 extern double saw_wave(double time, double freq);
