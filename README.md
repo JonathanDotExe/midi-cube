@@ -20,7 +20,10 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 ## Used ressources
 * Format of .wav files from the german Wikipedia (https://de.wikipedia.org/wiki/RIFF_WAVE)
 * Article about the Hammond-Organ from the german Wikiedia (https://de.wikipedia.org/wiki/Hammondorgel)
-* Modulation and Delay Line based Digital Audio Effects by Disch Sascha and Zöler Udo (2002); helped me implement the rotary speaker (https://www.researchgate.net/publication/2830823_Modulation_And_Delay_Line_Based_Digital_Audio_Effects)
+* Modulation and Delay Line based Digital Audio Effects by Disch Sascha and Zölzer Udo (2002); helped me implement the rotary speaker (https://www.researchgate.net/publication/2830823_Modulation_And_Delay_Line_Based_Digital_Audio_Effects)
+* Rotary Loudspeaker Effect by Ryan Brennan; helped me implementent the rotary speaker (https://ses.library.usyd.edu.au/bitstream/handle/2123/8310/Ryan%20review%20assignment%201.pdf)
+* Article about delay lines from McGill university (https://www.music.mcgill.ca/~gary/618/week1/delayline.html)
+* Effect Design Part 2 by Jon Datorro (https://ccrma.stanford.edu/~dattorro/EffectDesignPart2.pdf)
 * Speed of the rotary speakers (https://www.musiker-board.de/threads/leslie-geschwindigkeiten-in-herz-frequenzen-fuer-die-vb3-orgel-gesucht.511349/)
 * Wikipedia article about low-pass-filters (https://en.wikipedia.org/wiki/Low-pass_filter)
 * Wikipedia article about high-pass-filter (https://en.wikipedia.org/wiki/High-pass_filter)

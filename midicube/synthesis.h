@@ -46,6 +46,8 @@ public:
 
 	void add_sample(double sample, unsigned int delay);
 
+	void add_isample(double sample, double delay);
+
 	double process();
 
 };

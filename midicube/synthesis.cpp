@@ -58,6 +58,17 @@ void DelayBuffer::add_sample(double sample, unsigned int delay) {
 	}
 }
 
+void DelayBuffer::add_isample(double sample, double delay) {
+	unsigned int delay_int = (unsigned int) delay;
+	double delay_frac = delay - delay_int;
+	if (delay_int < buffer.size()) {
+		buffer[(index + delay_int) % buffer.size()] += sample * (1 - delay_frac);
+		if (delay_int + 1 < buffer.size()) {
+			buffer[(index + delay_int + 1) % buffer.size()] += sample * delay_frac;
+		}
+	}
+}
+
 void DelayBuffer::add_sample(double sample, unsigned int delay, unsigned int repetition, unsigned int rep_delay, double factor) {
 	for (unsigned int i = 0; i < repetition; ++i) {
 		add_sample(sample, delay);
