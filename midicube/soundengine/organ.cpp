@@ -62,17 +62,14 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 
 	//Rotary speaker
 	if (data.preset.rotary) {
-		double horn_speed = data.preset.rotary_fast ? ROTARY_HORN_FAST_FREQUENCY : ROTARY_HORN_SLOW_FREQUENCY;
-		double bass_speed = data.preset.rotary_fast ? ROTARY_BASS_FAST_FREQUENCY : ROTARY_BASS_SLOW_FREQUENCY;
-
 		//Horn
-		double horn_rot = sine_wave(info.time, horn_speed);
-		double horn_pitch_rot = cosine_wave(info.time, horn_speed);
+		double horn_rot = sin(freq_to_radians(data.horn_rotation));
+		double horn_pitch_rot = cos(freq_to_radians(data.horn_rotation));
 		double lhorn_delay = sound_delay(horn_pitch_rot, HORN_RADIUS, info.sample_rate);
 		double rhorn_delay = sound_delay(-horn_pitch_rot, HORN_RADIUS, info.sample_rate);
 		//Bass
-		double bass_rot = sine_wave(info.time, bass_speed);
-		double bass_pitch_rot = cosine_wave(info.time,  bass_speed);
+		double bass_rot = sin(freq_to_radians(data.bass_rotation));
+		double bass_pitch_rot = cos(freq_to_radians(data.bass_rotation));
 		double lbass_delay = sound_delay(bass_pitch_rot, BASS_RADIUS, info.sample_rate);
 		double rbass_delay = sound_delay(-bass_pitch_rot, BASS_RADIUS, info.sample_rate);
 
@@ -91,6 +88,22 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 
 void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, SoundEngineData& d) {
 	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
+
+	if (data.curr_rotary_fast != data.preset.rotary_fast) {
+		data.curr_rotary_fast = data.preset.rotary_fast;
+		if (data.curr_rotary_fast) {
+			data.horn_speed.set(ROTARY_HORN_FAST_FREQUENCY, info.time, ROTARY_HORN_FAST_RAMP);
+			data.bass_speed.set(ROTARY_BASS_FAST_FREQUENCY, info.time, ROTARY_BASS_FAST_RAMP);
+		}
+		else {
+			data.horn_speed.set(ROTARY_HORN_SLOW_FREQUENCY, info.time, ROTARY_HORN_SLOW_RAMP);
+			data.bass_speed.set(ROTARY_BASS_SLOW_FREQUENCY, info.time, ROTARY_BASS_SLOW_RAMP);
+		}
+	}
+
+	data.horn_rotation += data.horn_speed.get(info.time) * info.time_step;
+	data.bass_rotation += data.bass_speed.get(info.time) * info.time_step;
+
 	double left = (data.left_del.process());
 	double right = (data.right_del.process());
 

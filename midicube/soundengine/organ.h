@@ -19,11 +19,13 @@
 #define ROTARY_HORN_FAST_FREQUENCY 6.8
 #define ROTARY_BASS_SLOW_FREQUENCY 0.76
 #define ROTARY_BASS_FAST_FREQUENCY 6.5
-#define SPEAKER_RADIUS 0.25
+#define ROTARY_HORN_SLOW_RAMP 1.6
+#define ROTARY_HORN_FAST_RAMP 1.0
+#define ROTARY_BASS_SLOW_RAMP 5.5
+#define ROTARY_BASS_FAST_RAMP 5.5
 #define HORN_RADIUS 0.15
 #define BASS_RADIUS 0.15
 #define SOUND_SPEED 343.2
-#define ORGAN_REP_DELAY 0.000728226
 
 struct B3OrganPreset {
 	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbars;
@@ -55,6 +57,11 @@ public:
 	B3OrganPreset preset;
 	DelayBuffer left_del;
 	DelayBuffer right_del;
+	bool curr_rotary_fast = 0;
+	PortamendoBuffer horn_speed{ROTARY_HORN_SLOW_FREQUENCY, ROTARY_HORN_SLOW_RAMP};
+	PortamendoBuffer bass_speed{ROTARY_BASS_SLOW_FREQUENCY, ROTARY_BASS_SLOW_RAMP};
+	double horn_rotation = 0;
+	double bass_rotation = 0;
 
 	virtual SoundEngineData* copy() {
 		return new B3OrganData();	//TODO

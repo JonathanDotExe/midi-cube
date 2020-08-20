@@ -113,6 +113,31 @@ extern double cutoff_to_rc(double cutoff) {
 	return 1.0/(2 * M_PI * cutoff);
 }
 
+//PortamendoBuffer
+PortamendoBuffer::PortamendoBuffer(double value, double slope_time) {
+	this->last_value = value;
+	this->value = value;
+	this->last_time = 0;
+	this->slope_time = slope_time;
+}
+
+double PortamendoBuffer::get(double time) {
+	if (last_time + slope_time <= time) {
+		return value;
+	}
+	else {
+		double prog = (time - last_time)/slope_time;
+		return last_value * (1 - prog) + value * prog;
+	}
+}
+
+void PortamendoBuffer::set(double value, double time, double slope_time) {
+	last_value = get(time);
+	last_time = time;
+	this->value = value;
+	this->slope_time = slope_time;
+}
+
 //LowPassFilter
 LowPassFilter::LowPassFilter(double cutoff) {
 	this->cutoff = cutoff;

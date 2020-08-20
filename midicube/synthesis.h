@@ -52,6 +52,19 @@ public:
 
 };
 
+
+class PortamendoBuffer {
+private:
+	double value;
+	double last_value;
+	double slope_time;
+	double last_time;
+public:
+	PortamendoBuffer(double value, double slope_time);
+	double get(double time);
+	void set(double value, double time, double slope_time);
+};
+
 extern double apply_low_pass(double sample, double time_step, double rc, double last_filtered);
 
 extern double apply_high_pass(double sample, double time_step, double rc, double last_filtered, double last, bool started);
