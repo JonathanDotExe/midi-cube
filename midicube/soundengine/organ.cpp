@@ -12,6 +12,8 @@
 //B3Organ
 B3Organ::B3Organ() {
 	drawbar_harmonics = { 0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8 };
+	foldback_freq = note_to_freq(ORGAN_FOLDBACK_NOTE);
+	std::cout << foldback_freq << std::endl;
 }
 
 static inline double sound_delay(double rotation, double radius, unsigned int sample_rate) {
@@ -34,7 +36,7 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	//Organ sound
 	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
 		double f = note.freq * drawbar_harmonics[i];
-		while (f > 5593) {
+		while (f > foldback_freq) {
 			f /= 2.0;
 		}
 		/*double samp_off = f/ROTARY_CUTOFF;

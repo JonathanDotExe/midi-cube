@@ -14,15 +14,20 @@
 
 #define ORGAN_DRAWBAR_COUNT 9
 #define ORGAN_DRAWBAR_MAX 8
+#define ORGAN_FOLDBACK_NOTE 114
+
 #define ROTARY_CUTOFF 800
+
 #define ROTARY_HORN_SLOW_FREQUENCY 0.8
 #define ROTARY_HORN_FAST_FREQUENCY 6.8
 #define ROTARY_BASS_SLOW_FREQUENCY 0.76
 #define ROTARY_BASS_FAST_FREQUENCY 6.5
+
 #define ROTARY_HORN_SLOW_RAMP 1.6
 #define ROTARY_HORN_FAST_RAMP 1.0
 #define ROTARY_BASS_SLOW_RAMP 5.5
 #define ROTARY_BASS_FAST_RAMP 5.5
+
 #define HORN_RADIUS 0.15
 #define BASS_RADIUS 0.15
 #define SOUND_SPEED 343.2
@@ -73,6 +78,7 @@ class B3Organ : public SoundEngine {
 private:
 	B3OrganPreset data;
 	std::array<double, ORGAN_DRAWBAR_COUNT> drawbar_harmonics;
+	double foldback_freq = 0;
 public:
 	B3Organ();
 
