@@ -102,7 +102,7 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 	}
 
 	data.horn_rotation += data.horn_speed.get(info.time) * info.time_step;
-	data.bass_rotation += data.bass_speed.get(info.time) * info.time_step;
+	data.bass_rotation -= data.bass_speed.get(info.time) * info.time_step;
 
 	double left = (data.left_del.process());
 	double right = (data.right_del.process());
