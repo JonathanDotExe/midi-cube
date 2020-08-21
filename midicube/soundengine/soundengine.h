@@ -119,7 +119,6 @@ public:
 
 class SoundEngineChannel {
 private:
-	double pitch_bend = 0;
 	KeyboardEnvironment environment;
 	NoteBuffer note;
 	SoundEngine* engine = nullptr;

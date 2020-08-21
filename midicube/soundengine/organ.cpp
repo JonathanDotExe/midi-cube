@@ -9,11 +9,48 @@
 #include "organ.h"
 #include <cmath>
 
+//B3OrganTonewheel
+bool B3OrganTonewheel::has_turned_since(double time) {
+	return time <= last_turn;
+}
+
+double B3OrganTonewheel::process(SampleInfo& info, double freq) {
+	double volume = curr_vol + dynamic_vol;
+	//Rotation
+	double old_rot = rotation;
+	rotation += freq * info.time_step;
+	if ((int) (old_rot/0.5) != (int)(rotation/0.5)) {
+		last_turn = info.time;
+		curr_vol = static_vol;
+	}
+	//Reset
+	static_vol = 0;
+	dynamic_vol = 0;
+	//Signal
+	if (volume) {
+		return sin(freq_to_radians(rotation)) * volume;
+	}
+	else {
+		return 0;
+	}
+}
+
+
 //B3Organ
 B3Organ::B3Organ() {
 	drawbar_harmonics = { 0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8 };
+	drawbar_notes = {-12, 7, 0, 12, 19, 24, 28, 31, 36};
 	foldback_freq = note_to_freq(ORGAN_FOLDBACK_NOTE);
-	std::cout << foldback_freq << std::endl;
+
+	for (size_t i = 0; i < tonewheel_frequencies.size(); ++i) {
+		tonewheel_frequencies[i] = note_to_freq(ORGAN_LOWEST_TONEWHEEL_NOTE + i);
+	}
+
+	for (cutoff_tonewheel = 0; cutoff_tonewheel < tonewheel_frequencies.size(); ++cutoff_tonewheel) {
+		if (tonewheel_frequencies[cutoff_tonewheel] > ROTARY_CUTOFF) {
+			break;
+		}
+	}
 }
 
 static inline double sound_delay(double rotation, double radius, unsigned int sample_rate) {
@@ -28,42 +65,36 @@ static inline double sound_delay(double rotation, double radius, unsigned int sa
 void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
 	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
 
-	double horn_sample = 0;
-	double bass_sample = 0;
-
-	double time = info.time + note.phase_shift;
-
 	//Organ sound
 	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
-		double f = note.freq * drawbar_harmonics[i];
-		while (f > foldback_freq) {
-			f /= 2.0;
-		}
-		/*double samp_off = f/ROTARY_CUTOFF;
-		if (f > ROTARY_CUTOFF) {
-			double sample = data.drawbars[i] / 8.0 * sine_wave(time, f) / data.drawbars.size();
-			horn_sample += sample;
-			//Emulate filter
-			double amp = db_to_amp(1/samp_off * -12);
-			bass_sample += amp * sample;
-		} else {
-			double sample = data.drawbars[i] / 8.0 * sine_wave(time, f) / data.drawbars.size();
-			bass_sample += sample;
-			//Emulate filter
-			double amp = db_to_amp(samp_off/2 * -12);
-			horn_sample += amp * sample;
-		}*/
+		int tonewheel = note.note + drawbar_notes.at(i) - ORGAN_LOWEST_TONEWHEEL_NOTE;
 
-		if (f > ROTARY_CUTOFF) {
-			horn_sample += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX * sine_wave(time, f) / data.preset.drawbars.size();
-		} else {
-			bass_sample += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX * sine_wave(time, f) / data.preset.drawbars.size();
+		while (tonewheel >= (int) data.tonewheels.size()) {
+			tonewheel -= 12;
+		}
+		if (tonewheel >= 0) {
+			data.tonewheels[tonewheel].static_vol += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / data.preset.drawbars.size();
 		}
 	}
-	double sample = 0;
+}
 
-	//Rotary speaker
+void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, SoundEngineData& d) {
+	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
+
+	//Play organ sound
 	if (data.preset.rotary) {
+		double horn_sample = 0;
+		double bass_sample = 0;
+
+		//Compute samples
+		size_t i = 0;
+		for (; i < cutoff_tonewheel && i < data.tonewheels.size(); ++i) {
+			bass_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i]); //TODO pitch bend
+		}
+		for (; i < data.tonewheels.size(); ++i) {
+			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i]); //TODO pitch bend
+		}
+
 		//Horn
 		double horn_rot = sin(freq_to_radians(data.horn_rotation));
 		double horn_pitch_rot = cos(freq_to_radians(data.horn_rotation));
@@ -80,17 +111,20 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 		data.left_del.add_isample(bass_sample * (0.5 + bass_rot * 0.5), lbass_delay);
 		data.right_del.add_isample(horn_sample * (0.5 - horn_rot * 0.5), rhorn_delay);
 		data.right_del.add_isample(bass_sample * (0.5 - bass_rot * 0.5), rbass_delay);
-	} else {
-		sample += horn_sample + bass_sample;
+	}
+	else {
+		//Compute samples
+		double sample = 0;
+		for (size_t i = 0; i < data.tonewheels.size(); ++i) {
+			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i]); //TODO pitch bend
+		}
+		//Play
 		for (size_t i = 0; i < channels.size() ; ++i) {
 			channels[i] += sample;
 		}
 	}
-}
 
-void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, SoundEngineData& d) {
-	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
-
+	//Switch speaker speed
 	if (data.curr_rotary_fast != data.preset.rotary_fast) {
 		data.curr_rotary_fast = data.preset.rotary_fast;
 		if (data.curr_rotary_fast) {
@@ -103,9 +137,11 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		}
 	}
 
+	//Rotate speakers
 	data.horn_rotation += data.horn_speed.get(info.time) * info.time_step;
 	data.bass_rotation -= data.bass_speed.get(info.time) * info.time_step;
 
+	//Play delay
 	double left = (data.left_del.process());
 	double right = (data.right_del.process());
 

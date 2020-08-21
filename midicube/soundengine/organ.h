@@ -15,6 +15,8 @@
 #define ORGAN_DRAWBAR_COUNT 9
 #define ORGAN_DRAWBAR_MAX 8
 #define ORGAN_FOLDBACK_NOTE 114
+#define ORGAN_TONEWHEEL_AMOUNT 91
+#define ORGAN_LOWEST_TONEWHEEL_NOTE 24
 
 #define ROTARY_CUTOFF 800
 
@@ -57,9 +59,24 @@ struct B3OrganPreset {
 	}
 };
 
+class B3OrganTonewheel {
+private:
+	double rotation = 0;
+	double last_turn = 0;
+	double curr_vol = 0;
+public:
+	double static_vol = 0;
+	double dynamic_vol = 0;
+
+	bool has_turned_since(double time);
+	double process(SampleInfo& info, double freq);
+};
+
 class B3OrganData : public SoundEngineData{
 public:
 	B3OrganPreset preset;
+	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels;
+
 	DelayBuffer left_del;
 	DelayBuffer right_del;
 	bool curr_rotary_fast = 0;
@@ -78,6 +95,9 @@ class B3Organ : public SoundEngine {
 private:
 	B3OrganPreset data;
 	std::array<double, ORGAN_DRAWBAR_COUNT> drawbar_harmonics;
+	std::array<int, ORGAN_DRAWBAR_COUNT> drawbar_notes;
+	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_frequencies;
+	size_t cutoff_tonewheel = 0;
 	double foldback_freq = 0;
 public:
 	B3Organ();

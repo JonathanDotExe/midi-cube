@@ -183,7 +183,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 				}
 				else {
 					engine->process_note_sample(ch, info, note.note[i], environment, *data, i);
-					note.note[i].phase_shift += pitch_bend * info.time_step;
+					note.note[i].phase_shift += environment.pitch_bend * info.time_step;
 				}
 			}
 			else {
@@ -234,7 +234,7 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 	//Pitch bend
 	else if (message.get_message_type() == MessageType::PITCH_BEND) {
 		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
-		pitch_bend = note_to_freq_transpose(pitch) - 1;
+		environment.pitch_bend = note_to_freq_transpose(pitch) - 1;
 	}
 	engine_mutex.unlock();
 }
