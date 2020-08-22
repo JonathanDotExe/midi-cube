@@ -483,6 +483,12 @@ View* B3OrganEngineMenuView::draw() {
 		//Percussion
 		data->preset.percussion = draw_switch(20, 200, 20, 30, data->preset.percussion);
 		DrawText("Percussion", 45, 208, 12, BLACK);
+		data->preset.percussion_third_harmonic = draw_switch(20, 250, 20, 30, data->preset.percussion_third_harmonic, "3rd", "2nd");
+		DrawText(data->preset.percussion_third_harmonic ? "Third Harmonic" : "Second Harmonic", 45, 258, 12, BLACK);
+		data->preset.percussion_fast_decay = draw_switch(20, 300, 20, 30, data->preset.percussion_fast_decay, "FST", "SLW");
+		DrawText(data->preset.percussion_fast_decay ? "Fast Decay" : "Slow Decay", 45, 308, 12, BLACK);
+		data->preset.percussion_soft = draw_switch(20, 350, 20, 30, data->preset.percussion_soft, "SFT", "HRD");
+		DrawText(data->preset.percussion_soft ? "Soft Percussion" : "Hard Percussion", 45, 358, 12, BLACK);
 	}
 
 	//Harmonic foldback volume

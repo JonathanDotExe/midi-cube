@@ -45,8 +45,12 @@ struct B3OrganPreset {
 	std::atomic<bool> percussion{false};
 	std::atomic<unsigned int> percussion_cc{24};
 	std::atomic<bool> percussion_third_harmonic{true};
-	std::atomic<double> percussion_volume{1.0};
-	std::atomic<double> percussion_decay{0.2};
+	std::atomic<bool> percussion_soft{true};
+	std::atomic<bool> percussion_fast_decay{true};
+	std::atomic<double> percussion_soft_volume{0.5};
+	std::atomic<double> percussion_hard_volume{1.0};
+	std::atomic<double> percussion_fast_decay_time{0.2};
+	std::atomic<double> percussion_slow_decay_time{1.0};
 
 	B3OrganPreset () {
 		for (size_t i = 0; i < drawbars.size(); ++i) {

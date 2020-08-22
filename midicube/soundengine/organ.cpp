@@ -74,16 +74,17 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 		}
 	}
 	//Percussion
-	if (data.preset.percussion && info.time - data.percussion_start <= data.preset.percussion_decay) {
-		double vol = 1 - (info.time - data.percussion_start)/data.preset.percussion_decay;
+	double decay = data.preset.percussion_fast_decay ? data.preset.percussion_fast_decay_time : data.preset.percussion_slow_decay_time;
+	if (data.preset.percussion && info.time - data.percussion_start <= decay) {
+		double vol = (1 - (info.time - data.percussion_start)/decay) * (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12);
 
 		while (tonewheel >= (int) data.tonewheels.size()) {
 			tonewheel -= 12;
 			vol *= data.preset.harmonic_foldback_volume;
 		}
-		if (tonewheel >= 0 && data.tonewheels[tonewheel].has_turned_since(data.percussion_start)) {
-			data.tonewheels[tonewheel].dynamic_vol += vol;
+		if (tonewheel >= 0 /*&& data.tonewheels[tonewheel].has_turned_since(data.percussion_start)*/) {
+			data.tonewheels[tonewheel].static_vol += vol;
 		}
 	}
 }
