@@ -59,7 +59,7 @@ static inline double sound_delay(double rotation, double radius, unsigned int sa
 					(SPEAKER_RADIUS - radius * rotation) :
 					(SPEAKER_RADIUS + radius * rotation + radius * 2);
 	return round(dst / SOUND_SPEED * sample_rate);*/
-	return (1 + rotation) * 0.0005 * sample_rate;
+	return (1 + rotation) * 0.00025 * sample_rate;
 }
 
 void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
@@ -68,12 +68,14 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	//Organ sound
 	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
 		int tonewheel = note.note + drawbar_notes.at(i) - ORGAN_LOWEST_TONEWHEEL_NOTE;
+		double volume = 1;
 
 		while (tonewheel >= (int) data.tonewheels.size()) {
 			tonewheel -= 12;
+			volume *= data.preset.harmonic_foldback_volume;
 		}
 		if (tonewheel >= 0) {
-			data.tonewheels[tonewheel].static_vol += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / data.preset.drawbars.size();
+			data.tonewheels[tonewheel].static_vol += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / data.preset.drawbars.size() * volume;
 		}
 	}
 }

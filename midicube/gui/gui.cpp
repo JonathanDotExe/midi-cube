@@ -481,6 +481,11 @@ View* B3OrganEngineMenuView::draw() {
 		DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 45, 158, 12, BLACK);
 	}
 
+	//Harmonic foldback volume
+	DrawRectangle(18, 398, SCREEN_WIDTH/2 - 16, SCREEN_HEIGHT - 416, GRAY);
+	DrawRectangle(20, 400, SCREEN_WIDTH/2 - 20, SCREEN_HEIGHT - 420, RAYWHITE);
+	data->preset.harmonic_foldback_volume = GuiSlider((Rectangle) {130, 410, 300, 20}, "Harm. Foldback Vol.", TextFormat("%1.2f", data->preset.harmonic_foldback_volume.load()), data->preset.harmonic_foldback_volume, 0, 1.0);
+
 	//Edit MIDI
 	if (GuiButton({SCREEN_WIDTH - 60, SCREEN_HEIGHT - 30, 30, 30}, GuiIconText(RICON_PENCIL, ""))) {
 		edit_midi = !edit_midi;
