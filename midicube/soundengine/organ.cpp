@@ -190,6 +190,22 @@ void B3Organ::control_change(unsigned int control, unsigned int value, SoundEngi
 	if (control == data.preset.rotary_speed_cc) {
 		data.preset.rotary_fast = value > 0;
 	}
+	//Percussion
+	if (control == data.preset.percussion_cc) {
+		data.preset.percussion = value > 0;
+	}
+	//Percussion Third Harmonic
+	if (control == data.preset.percussion_third_harmonic_cc) {
+		data.preset.percussion_third_harmonic = value > 0;
+	}
+	//Percussion Fast Decay
+	if (control == data.preset.percussion_fast_decay_cc) {
+		data.preset.percussion_fast_decay = value > 0;
+	}
+	//Percussion Soft
+	if (control == data.preset.percussion_soft_cc) {
+		data.preset.percussion_soft = value > 0;
+	}
 }
 
 SoundEngineData* B3Organ::create_data() {

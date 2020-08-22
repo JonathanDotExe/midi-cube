@@ -132,6 +132,11 @@ private:
 	bool rotary_editmode = false;
 	bool rotary_speed_editmode = false;
 
+	bool percussion_editmode = false;
+	bool percussion_third_harmonic_editmode = false;
+	bool percussion_fast_decay_editmode = false;
+	bool percussion_soft_editmode = false;
+
 	void draw_drawbar (int x, int y, int width, int height, size_t index);
 
 public:

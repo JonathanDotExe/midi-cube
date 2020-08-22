@@ -461,34 +461,81 @@ View* B3OrganEngineMenuView::draw() {
 				rotary_editmode = !rotary_editmode;
 			}
 			data->preset.rotary_cc = cc_value;
+
+			DrawText("Rotary Speaker", 55, 108, 12, BLACK);
 		}
 		{
 			//Rotary Speed CC
 			int cc_value = data->preset.rotary_speed_cc;
-			DrawRectangle(20, 150, 30, 30, RAYWHITE);
-			if (GuiValueBox((Rectangle){20, 150, 30, 30}, "", &cc_value, 0, 127, rotary_speed_editmode)) {
+			DrawRectangle(20, 140, 30, 30, RAYWHITE);
+			if (GuiValueBox((Rectangle){20, 140, 30, 30}, "", &cc_value, 0, 127, rotary_speed_editmode)) {
 				rotary_speed_editmode = !rotary_speed_editmode;
 			}
 			data->preset.rotary_speed_cc = cc_value;
+
+			DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 55, 148, 12, BLACK);
 		}
-		DrawText("Rotary Speaker", 55, 108, 12, BLACK);
-		DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 55, 158, 12, BLACK);
+		{
+			//Percussion CC
+			int cc_value = data->preset.percussion_cc;
+			DrawRectangle(20, 180, 30, 30, RAYWHITE);
+			if (GuiValueBox((Rectangle){20, 180, 30, 30}, "", &cc_value, 0, 127, percussion_editmode)) {
+				percussion_editmode = !percussion_editmode;
+			}
+			data->preset.percussion_cc = cc_value;
+
+			DrawText("Percussion", 55, 188, 12, BLACK);
+		}
+		{
+			//Percussion Third Harmonic CC
+			int cc_value = data->preset.percussion_third_harmonic_cc;
+			DrawRectangle(20, 220, 30, 30, RAYWHITE);
+			if (GuiValueBox((Rectangle){20, 220, 30, 30}, "", &cc_value, 0, 127, percussion_third_harmonic_editmode)) {
+				percussion_third_harmonic_editmode = !percussion_third_harmonic_editmode;
+			}
+			data->preset.percussion_third_harmonic_cc = cc_value;
+
+			DrawText(data->preset.percussion_third_harmonic ? "Third Harmonic" : "Second Harmonic", 55, 228, 12, BLACK);
+		}
+		{
+			//Percussion Fast Decay CC
+			int cc_value = data->preset.percussion_fast_decay_cc;
+			DrawRectangle(20, 260, 30, 30, RAYWHITE);
+			if (GuiValueBox((Rectangle){20, 260, 30, 30}, "", &cc_value, 0, 127, percussion_fast_decay_editmode)) {
+				percussion_fast_decay_editmode = !percussion_fast_decay_editmode;
+			}
+			data->preset.percussion_fast_decay_cc = cc_value;
+
+			DrawText(data->preset.percussion_fast_decay ? "Fast Decay" : "Slow Decay", 55, 268, 12, BLACK);
+		}
+		{
+			//Percussion Soft CC
+			int cc_value = data->preset.percussion_soft_cc;
+			DrawRectangle(20, 300, 30, 30, RAYWHITE);
+			if (GuiValueBox((Rectangle){20, 300, 30, 30}, "", &cc_value, 0, 127, percussion_soft_editmode)) {
+				percussion_soft_editmode = !percussion_soft_editmode;
+			}
+			data->preset.percussion_soft_cc = cc_value;
+
+			DrawText(data->preset.percussion_soft ? "Soft Percussion" : "Hard Percussion", 55, 308, 12, BLACK);
+		}
+
 	}
 	else {
 		//Rotary speaker
 		data->preset.rotary = draw_switch(20, 100, 20, 30, data->preset.rotary);
 		DrawText("Rotary Speaker", 45, 108, 12, BLACK);
-		data->preset.rotary_fast = draw_switch(20, 150, 20, 30, data->preset.rotary_fast, "FST", "SLW");
-		DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 45, 158, 12, BLACK);
+		data->preset.rotary_fast = draw_switch(20, 140, 20, 30, data->preset.rotary_fast, "FST", "SLW");
+		DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 45, 148, 12, BLACK);
 		//Percussion
-		data->preset.percussion = draw_switch(20, 200, 20, 30, data->preset.percussion);
-		DrawText("Percussion", 45, 208, 12, BLACK);
-		data->preset.percussion_third_harmonic = draw_switch(20, 250, 20, 30, data->preset.percussion_third_harmonic, "3rd", "2nd");
-		DrawText(data->preset.percussion_third_harmonic ? "Third Harmonic" : "Second Harmonic", 45, 258, 12, BLACK);
-		data->preset.percussion_fast_decay = draw_switch(20, 300, 20, 30, data->preset.percussion_fast_decay, "FST", "SLW");
-		DrawText(data->preset.percussion_fast_decay ? "Fast Decay" : "Slow Decay", 45, 308, 12, BLACK);
-		data->preset.percussion_soft = draw_switch(20, 350, 20, 30, data->preset.percussion_soft, "SFT", "HRD");
-		DrawText(data->preset.percussion_soft ? "Soft Percussion" : "Hard Percussion", 45, 358, 12, BLACK);
+		data->preset.percussion = draw_switch(20, 180, 20, 30, data->preset.percussion);
+		DrawText("Percussion", 45, 188, 12, BLACK);
+		data->preset.percussion_third_harmonic = draw_switch(20, 220, 20, 30, data->preset.percussion_third_harmonic, "3rd", "2nd");
+		DrawText(data->preset.percussion_third_harmonic ? "Third Harmonic" : "Second Harmonic", 45, 228, 12, BLACK);
+		data->preset.percussion_fast_decay = draw_switch(20, 260, 20, 30, data->preset.percussion_fast_decay, "FST", "SLW");
+		DrawText(data->preset.percussion_fast_decay ? "Fast Decay" : "Slow Decay", 45, 268, 12, BLACK);
+		data->preset.percussion_soft = draw_switch(20, 300, 20, 30, data->preset.percussion_soft, "SFT", "HRD");
+		DrawText(data->preset.percussion_soft ? "Soft Percussion" : "Hard Percussion", 45, 308, 12, BLACK);
 	}
 
 	//Harmonic foldback volume
