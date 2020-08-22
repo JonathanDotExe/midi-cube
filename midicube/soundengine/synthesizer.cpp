@@ -107,7 +107,7 @@ void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundE
 	}
 }
 
-void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, SoundEngineData& data) {
+void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data) {
 	//Filters
 	/*for (size_t i = 0; i < preset->filters.size(); ++i) {
 		double filtered  = preset->filters[i].filter->apply(samples.at(preset->filters[i].osc), info.time_step);

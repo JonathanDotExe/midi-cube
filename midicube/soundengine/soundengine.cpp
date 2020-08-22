@@ -175,6 +175,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 		if (arp.on) {
 			arp.apply(info, note);
 		}
+		EngineStatus status = {0};
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 			if (note.note[i].valid) {
 				if (engine->note_finished(info, note.note[i], environment, *data)) {
@@ -182,6 +183,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 					engine->note_not_pressed(info, note.note[i], *data, i);
 				}
 				else {
+					++status.pressed_notes;
 					engine->process_note_sample(ch, info, note.note[i], environment, *data, i);
 					note.note[i].phase_shift += environment.pitch_bend * info.time_step;
 				}
@@ -190,7 +192,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 				engine->note_not_pressed(info, note.note[i], *data, i);
 			}
 		}
-		engine->process_sample(ch, info, *data);
+		engine->process_sample(ch, info, environment, status, *data);
 		for (size_t i = 0; i < channels.size(); ++i) {
 			channels[i] += (ch[i] * volume);
 		}

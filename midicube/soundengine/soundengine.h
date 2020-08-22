@@ -23,6 +23,11 @@
 
 class SoundEngineDevice;
 
+struct EngineStatus {
+	size_t pressed_notes;
+};
+
+
 class SoundEngineData {
 public:
 	virtual SoundEngineData* copy() {
@@ -43,7 +48,7 @@ public:
 
 	};
 
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, SoundEngineData& data) {
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data) {
 
 	};
 

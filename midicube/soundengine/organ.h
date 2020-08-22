@@ -42,6 +42,11 @@ struct B3OrganPreset {
 	std::atomic<bool> rotary_fast{true};
 	std::atomic<unsigned int> rotary_cc{22};
 	std::atomic<unsigned int> rotary_speed_cc{23};
+	std::atomic<bool> percussion{false};
+	std::atomic<unsigned int> percussion_cc{24};
+	std::atomic<bool> percussion_third_harmonic{true};
+	std::atomic<double> percussion_volume{1.0};
+	std::atomic<double> percussion_decay{0.2};
 
 	B3OrganPreset () {
 		for (size_t i = 0; i < drawbars.size(); ++i) {
@@ -86,6 +91,9 @@ public:
 	double horn_rotation = 0;
 	double bass_rotation = 0;
 
+	bool reset_percussion = true;
+	double percussion_start = 0;
+
 	virtual SoundEngineData* copy() {
 		return new B3OrganData();	//TODO
 	}
@@ -105,7 +113,7 @@ public:
 
 	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, SoundEngineData& data);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data);
 
 	void control_change(unsigned int control, unsigned int value, SoundEngineData& data);
 

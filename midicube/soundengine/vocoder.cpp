@@ -32,7 +32,7 @@ void Vocoder::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	}
 }
 
-void Vocoder::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, SoundEngineData& d) {
+void Vocoder::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& d) {
 	VocoderData& data = dynamic_cast<VocoderData&>(d);
 	double sample = 0;
 	//Vocoder

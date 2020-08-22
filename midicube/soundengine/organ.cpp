@@ -54,11 +54,6 @@ B3Organ::B3Organ() {
 }
 
 static inline double sound_delay(double rotation, double radius, unsigned int sample_rate) {
-	/*double dst =
-			rotation >= 0 ?
-					(SPEAKER_RADIUS - radius * rotation) :
-					(SPEAKER_RADIUS + radius * rotation + radius * 2);
-	return round(dst / SOUND_SPEED * sample_rate);*/
 	return (1 + rotation) * 0.00025 * sample_rate;
 }
 
@@ -78,9 +73,22 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 			data.tonewheels[tonewheel].static_vol += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / data.preset.drawbars.size() * volume;
 		}
 	}
+	//Percussion
+	if (data.preset.percussion && info.time - data.percussion_start <= data.preset.percussion_decay) {
+		double vol = 1 - (info.time - data.percussion_start)/data.preset.percussion_decay;
+		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12);
+
+		while (tonewheel >= (int) data.tonewheels.size()) {
+			tonewheel -= 12;
+			vol *= data.preset.harmonic_foldback_volume;
+		}
+		if (tonewheel >= 0 && data.tonewheels[tonewheel].has_turned_since(data.percussion_start)) {
+			data.tonewheels[tonewheel].dynamic_vol += vol;
+		}
+	}
 }
 
-void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, SoundEngineData& d) {
+void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& d) {
 	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
 
 	//Play organ sound
@@ -91,10 +99,10 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		//Compute samples
 		size_t i = 0;
 		for (; i < cutoff_tonewheel && i < data.tonewheels.size(); ++i) {
-			bass_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i]); //TODO pitch bend
+			bass_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * (env.pitch_bend + 1));
 		}
 		for (; i < data.tonewheels.size(); ++i) {
-			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i]); //TODO pitch bend
+			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * (env.pitch_bend + 1));
 		}
 
 		//Horn
@@ -118,12 +126,21 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		//Compute samples
 		double sample = 0;
 		for (size_t i = 0; i < data.tonewheels.size(); ++i) {
-			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i]); //TODO pitch bend
+			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * (env.pitch_bend + 1));
 		}
 		//Play
 		for (size_t i = 0; i < channels.size() ; ++i) {
 			channels[i] += sample;
 		}
+	}
+
+	//Trigger percussion
+	if (status.pressed_notes == 0) {
+		data.reset_percussion = true;
+	}
+	else if (data.reset_percussion) {
+		data.reset_percussion = false;
+		data.percussion_start = info.time + info.time_step; //TODO first pressed frame no percussion can be heard
 	}
 
 	//Switch speaker speed

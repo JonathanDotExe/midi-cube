@@ -451,7 +451,7 @@ View* B3OrganEngineMenuView::draw() {
 		draw_drawbar(SCREEN_WIDTH/2 - total_width/2 + (width + space) * i, 100, width, 200, i);
 	}
 
-	//Rotary
+	//Rotary and percussion
 	if (edit_midi) {
 		{
 			//Rotary CC
@@ -475,10 +475,14 @@ View* B3OrganEngineMenuView::draw() {
 		DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 55, 158, 12, BLACK);
 	}
 	else {
+		//Rotary speaker
 		data->preset.rotary = draw_switch(20, 100, 20, 30, data->preset.rotary);
-		data->preset.rotary_fast = draw_switch(20, 150, 20, 30, data->preset.rotary_fast, "FST", "SLW");
 		DrawText("Rotary Speaker", 45, 108, 12, BLACK);
+		data->preset.rotary_fast = draw_switch(20, 150, 20, 30, data->preset.rotary_fast, "FST", "SLW");
 		DrawText(data->preset.rotary_fast ? "Rotary Fast" : "Rotary Slow", 45, 158, 12, BLACK);
+		//Percussion
+		data->preset.percussion = draw_switch(20, 200, 20, 30, data->preset.percussion);
+		DrawText("Percussion", 45, 208, 12, BLACK);
 	}
 
 	//Harmonic foldback volume
