@@ -53,8 +53,8 @@ B3Organ::B3Organ() {
 	}
 }
 
-static inline double sound_delay(double rotation, double radius, unsigned int sample_rate) {
-	return (1 + rotation) * 0.00025 * sample_rate;
+static inline double sound_delay(double rotation, double max_delay, unsigned int sample_rate) {
+	return (1 + rotation) * max_delay * 0.5 * sample_rate;
 }
 
 void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
@@ -107,13 +107,13 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		}
 
 		//Horn
-		double horn_pitch_rot = cos(freq_to_radians(data.horn_rotation));
-		double lhorn_delay = sound_delay(horn_pitch_rot, HORN_RADIUS, info.sample_rate);
-		double rhorn_delay = sound_delay(-horn_pitch_rot, HORN_RADIUS, info.sample_rate);
+		double horn_pitch_rot = data.preset.rotary_type ? sin(freq_to_radians(data.horn_rotation)) :  cos(freq_to_radians(data.horn_rotation));
+		double lhorn_delay = sound_delay(horn_pitch_rot, data.preset.rotary_delay, info.sample_rate);
+		double rhorn_delay = sound_delay(-horn_pitch_rot, data.preset.rotary_delay, info.sample_rate);
 		//Bass
-		double bass_pitch_rot = cos(freq_to_radians(data.bass_rotation));
-		double lbass_delay = sound_delay(bass_pitch_rot, BASS_RADIUS, info.sample_rate);
-		double rbass_delay = sound_delay(-bass_pitch_rot, BASS_RADIUS, info.sample_rate);
+		double bass_pitch_rot = data.preset.rotary_type ? sin(freq_to_radians(data.bass_rotation)) : cos(freq_to_radians(data.bass_rotation));
+		double lbass_delay = sound_delay(bass_pitch_rot, data.preset.rotary_delay, info.sample_rate);
+		double rbass_delay = sound_delay(-bass_pitch_rot, data.preset.rotary_delay, info.sample_rate);
 
 		//Gain
 		bass_sample *= data.preset.rotary_gain;
