@@ -42,6 +42,8 @@ struct B3OrganPreset {
 	std::atomic<bool> rotary_fast{true};
 	std::atomic<unsigned int> rotary_cc{22};
 	std::atomic<unsigned int> rotary_speed_cc{23};
+	std::atomic<double> rotary_stereo_mix{0.7};
+	std::atomic<double> rotary_gain{1.2};
 
 	std::atomic<bool> percussion{false};
 	std::atomic<bool> percussion_third_harmonic{true};
