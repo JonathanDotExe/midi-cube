@@ -14,7 +14,48 @@
 #include "../synthesis.h"
 
 #define MAX_OSCILATORS 20
+#define MAX_COMPONENTS 100
 
+enum class BindingType {
+	SET, ADD, MUL
+};
+
+struct ComponentPropertyBinding {
+	BindingType type;
+	size_t property;
+	size_t component;
+};
+
+class SynthComponent {
+public:
+	virtual double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) = 0;
+	virtual void set_property(size_t index, double value, BindingType type) = 0;
+	virtual std::vector<std::string> property_names() = 0;
+	virtual size_t property_count() = 0;
+	virtual ~SynthComponent() {
+
+	}
+};
+
+class OscilatorComponent {
+public:
+	AnalogWaveForm waveform = AnalogWaveForm::SAW;
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	void set_property(size_t index, double value, BindingType type);
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
+class ComponentSlot {
+private:
+	SynthComponent* comp;
+	std::vector<ComponentPropertyBinding> bindings;
+public:
+	double process(std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	void set_component(SynthComponent* comp);
+	SynthComponent* get_component();
+};
 
 enum class FilterType {
 	LOW_PASS, HIGH_PASS

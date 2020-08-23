@@ -8,6 +8,51 @@
 #include "synthesizer.h"
 #include <cmath>
 
+//OscilatorComponent
+double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	double signal = 0;
+	switch(waveform) {
+	case AnalogWaveForm::SINE:
+		signal = sine_wave(info.time + note.phase_shift, note.freq);
+		break;
+	case AnalogWaveForm::SAW:
+		signal = saw_wave(info.time + note.phase_shift, note.freq);
+		break;
+	case AnalogWaveForm::SQUARE:
+		signal = square_wave(info.time + note.phase_shift, note.freq);
+		break;
+	case AnalogWaveForm::NOISE:
+		signal = noise_wave(info.time + note.phase_shift, note.freq);
+		break;
+	}
+	return signal;
+}
+
+void OscilatorComponent::set_property(size_t index, double value, BindingType type) {
+
+}
+
+std::vector<std::string> OscilatorComponent::property_names() {
+
+}
+
+size_t OscilatorComponent::property_count() {
+
+}
+
+
+class ComponentSlot {
+private:
+	SynthComponent* comp;
+	std::vector<ComponentPropertyBinding> bindings;
+public:
+	double process(std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	void set_component(SynthComponent* comp);
+	SynthComponent* get_component();
+};
+
+
+
 Synthesizer::Synthesizer() {
 	preset = new SynthesizerPreset();
 
