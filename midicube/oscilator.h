@@ -36,6 +36,7 @@ public:
 class AnalogOscilator : public Oscilator {
 private:
 	AnalogWaveForm waveform;
+	bool analog = false;
 public:
 	AnalogOscilator(AnalogWaveForm waveform);
 	double signal(double time, double freq);

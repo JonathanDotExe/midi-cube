@@ -38,8 +38,18 @@ public:
 };
 
 class OscilatorComponent {
+private:
+	double phase_shift = 0;
 public:
-	AnalogWaveForm waveform = AnalogWaveForm::SAW;
+	AnalogOscilator osc;
+	unsigned int unison_amount = 0;
+	double semi = 0;				//Static pitch offset in semitones
+	double transpose = 1;		//Static pitch offset as frequency multiplier
+	double volume = 1;
+	double sync = 1;			//Sync frequency factor
+	double fm = 0;				//Dynamic pitch offset in time shift
+	double pitch = 0;			//Dynamic pitch offset in semitones
+	double unison_detune = 0.1;
 
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 	void set_property(size_t index, double value, BindingType type);

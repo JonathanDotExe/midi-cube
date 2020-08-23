@@ -8,24 +8,44 @@
 #include "synthesizer.h"
 #include <cmath>
 
+static std::vector<std::string> oscilator_properties = {"Volume", "Sync", "FM", "Pitch", "Unison-Detune"};
+
 //OscilatorComponent
 double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
-	double signal = 0;
-	switch(waveform) {
-	case AnalogWaveForm::SINE:
-		signal = sine_wave(info.time + note.phase_shift, note.freq);
-		break;
-	case AnalogWaveForm::SAW:
-		signal = saw_wave(info.time + note.phase_shift, note.freq);
-		break;
-	case AnalogWaveForm::SQUARE:
-		signal = square_wave(info.time + note.phase_shift, note.freq);
-		break;
-	case AnalogWaveForm::NOISE:
-		signal = noise_wave(info.time + note.phase_shift, note.freq);
-		break;
+	//Pitch and FM
+	phase_shift += info.time_step * note_to_freq_transpose(pitch) + info.time_step * fm;
+	//Frequency
+	double time = info.time + note.phase_shift + phase_shift;
+	double freq = note.freq;
+	if (semi) {
+		freq *= note_to_freq_transpose(semi);
 	}
-	return signal;
+	freq *= transpose;
+
+	//Sync
+	if (sync != 1) {
+		time = fmod(time, freq * sync);
+	}
+	//Signal
+	double signal = osc.signal(time, freq);
+	//Unison
+	if (unison_amount) {
+		double udetune = note_to_freq_transpose(unison_detune);
+		double nudetune = note_to_freq_transpose(unison_detune);
+		double det = udetune;
+		double ndet = nudetune;
+		for (unsigned int i = 1; i <= unison_amount; ++i) {
+			if (i % 2 == 0) {
+				signal += osc.signal(time, freq * ndet);
+				ndet *= nudetune;
+			}
+			else {
+				signal += osc.signal(time, freq * det);
+				det *= udetune;
+			}
+		}
+	}
+	return signal / (1 + unison_amount) * volume;
 }
 
 void OscilatorComponent::set_property(size_t index, double value, BindingType type) {
@@ -33,24 +53,25 @@ void OscilatorComponent::set_property(size_t index, double value, BindingType ty
 }
 
 std::vector<std::string> OscilatorComponent::property_names() {
-
+	return oscilator_properties;
 }
 
 size_t OscilatorComponent::property_count() {
-
+	return oscilator_properties.size();
 }
 
 
-class ComponentSlot {
-private:
-	SynthComponent* comp;
-	std::vector<ComponentPropertyBinding> bindings;
-public:
-	double process(std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
-	void set_component(SynthComponent* comp);
-	SynthComponent* get_component();
-};
+double ComponentSlot::process(std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	return 0; //TODO
+}
 
+void ComponentSlot::set_component(SynthComponent* comp) {
+	//TODO
+}
+
+SynthComponent* ComponentSlot::get_component() {
+	return nullptr;	//TODO
+}
 
 
 Synthesizer::Synthesizer() {
