@@ -25,6 +25,7 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 * Article about delay lines from McGill university (https://www.music.mcgill.ca/~gary/618/week1/delayline.html)
 * Effect Design Part 2 by Jon Datorro (https://ccrma.stanford.edu/~dattorro/EffectDesignPart2.pdf)
 * Speed of the rotary speakers (https://www.musiker-board.de/threads/leslie-geschwindigkeiten-in-herz-frequenzen-fuer-die-vb3-orgel-gesucht.511349/)
+* Wikipedia article about leslie speakers (https://en.wikipedia.org/wiki/Leslie_speaker)
 * Wikipedia article about low-pass-filters (https://en.wikipedia.org/wiki/Low-pass_filter)
 * Wikipedia article about high-pass-filter (https://en.wikipedia.org/wiki/High-pass_filter)
 * German articale about vocoders (https://www.amazona.de/was-ist-ein-vocoder-geschichte-funktionsweise-varianten/)
