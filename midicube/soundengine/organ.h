@@ -93,8 +93,10 @@ public:
 	B3OrganPreset preset;
 	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels;
 
-	DelayBuffer left_del;
-	DelayBuffer right_del;
+	DelayBuffer left_horn_del;
+	DelayBuffer right_horn_del;
+	DelayBuffer left_bass_del;
+	DelayBuffer right_bass_del;
 	bool curr_rotary_fast = 0;
 	PortamendoBuffer horn_speed{ROTARY_HORN_SLOW_FREQUENCY, ROTARY_HORN_SLOW_RAMP};
 	PortamendoBuffer bass_speed{ROTARY_BASS_SLOW_FREQUENCY, ROTARY_BASS_SLOW_RAMP};
