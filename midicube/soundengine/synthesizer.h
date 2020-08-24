@@ -48,7 +48,7 @@ class OscilatorComponent {
 private:
 	double phase_shift = 0;
 public:
-	AnalogOscilator osc;
+	AnalogOscilator osc{AnalogWaveForm::SINE};
 	unsigned int unison_amount = 0;
 	double semi = 0;			//Static pitch offset in semitones
 	double transpose = 1;		//Static pitch offset as frequency multiplier
@@ -77,68 +77,33 @@ private:
 	SynthComponent* comp;
 	std::vector<ComponentPropertyBinding> bindings;
 public:
+	bool audible = false;
+
 	double process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 	void set_component(SynthComponent* comp);
 	SynthComponent* get_component();
 	double value_range();
-};
-
-enum class FilterType {
-	LOW_PASS, HIGH_PASS
-};
-
-struct FilterData {
-	FilterType type;
-	double cutoff;
-};
-
-struct OscilatorEnvelope {
-	OscilatorSlot* osc;
-	ADSREnvelope env;
-	std::vector<FilterData> filters;
-};
-
-
-struct EnvelopeBinding {
-	std::string property;
-	size_t oscilator;
-	size_t envelope;
-	double from;
-	double to;
-};
-
-struct ControlBinding {
-	std::string property;
-	size_t oscilator;
-	unsigned int control;
-	double from;
-	double to;
-};
-
-struct FilterInstance {
-	double last_filtered;
-	double last;
-	bool started;
+	~ComponentSlot();
 };
 
 struct SynthesizerPreset {
-	std::vector<OscilatorEnvelope> oscilators;
-	std::vector<ADSREnvelope> envelopes;
-	std::vector<EnvelopeBinding> envelope_bindings;
-	std::vector<ControlBinding> control_bindings;
+	std::array<ComponentSlot, MAX_COMPONENTS> components;
+};
 
-	~SynthesizerPreset() {
-		for (size_t i = 0; i < oscilators.size() ; ++i) {
-			delete oscilators[i].osc;
-		}
+class SynthesizerData : public SoundEngineData {
+public:
+	SynthesizerPreset preset;
+	double release_time;
+
+	SynthesizerData();
+
+	SoundEngineData* copy () {
+		return new SynthesizerData(); //TODO
 	}
 };
 
 class Synthesizer: public SoundEngine {
-private:
-	SynthesizerPreset* preset = nullptr;
-	std::array<std::array<std::array<FilterInstance, 2>, SOUND_ENGINE_POLYPHONY>, MAX_OSCILATORS> filters = {};
-	double release_time;
+
 public:
 	Synthesizer();
 
@@ -153,6 +118,10 @@ public:
 	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data);
 
 	std::string get_name();
+
+	SoundEngineData* create_data() {
+		return new SynthesizerData();
+	}
 
 	virtual ~Synthesizer();
 };
