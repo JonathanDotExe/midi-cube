@@ -13,8 +13,7 @@
 #include "../envelope.h"
 #include "../synthesis.h"
 
-#define MAX_OSCILATORS 20
-#define MAX_COMPONENTS 100
+#define MAX_COMPONENTS 25
 
 enum class BindingType {
 	SET, ADD, MUL
@@ -76,7 +75,6 @@ class ComponentSlot {
 private:
 	SynthComponent* comp = nullptr;
 	std::vector<ComponentPropertyBinding> bindings;
-	std::mutex comp_mutex;
 public:
 	bool audible = false;
 

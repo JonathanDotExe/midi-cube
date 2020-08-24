@@ -141,7 +141,6 @@ double OscilatorComponent::to() {
 
 //ComponentSlot
 double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
-	comp_mutex.lock();
 	double sample = 0;
 	if (comp) {
 		comp->reset_properties();
@@ -170,22 +169,17 @@ double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, 
 		//Process
 		sample = comp->process(info, note, env);
 	}
-	comp_mutex.unlock();
 	return sample;
 }
 
 double ComponentSlot::value_range() {
-	comp_mutex.lock();
 	double range = comp ? (comp->to() - comp->from()) : 0;
-	comp_mutex.unlock();
 	return range;
 }
 
 void ComponentSlot::set_component(SynthComponent* comp) {
-	comp_mutex.lock();
 	delete this->comp;
 	this->comp = comp;
-	comp_mutex.unlock();
 }
 
 ComponentSlot::~ComponentSlot() {
