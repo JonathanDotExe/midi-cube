@@ -24,6 +24,8 @@ struct ComponentPropertyBinding {
 	BindingType type;
 	size_t property;
 	size_t component;
+	double from;
+	double to;
 };
 
 class SynthComponent {
@@ -35,6 +37,8 @@ public:
 	virtual void reset_properties() = 0;
 	virtual std::vector<std::string> property_names() = 0;
 	virtual size_t property_count() = 0;
+	virtual double from() = 0;
+	virtual double to() = 0;
 	virtual ~SynthComponent() {
 
 	}
@@ -61,6 +65,8 @@ public:
 	void set_property(size_t index, double value);
 	void add_property(size_t index, double value);
 	void mul_property(size_t index, double value);
+	double from();
+	double to();
 	void reset_properties();
 	std::vector<std::string> property_names();
 	size_t property_count();
@@ -71,9 +77,10 @@ private:
 	SynthComponent* comp;
 	std::vector<ComponentPropertyBinding> bindings;
 public:
-	double process(std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	double process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 	void set_component(SynthComponent* comp);
 	SynthComponent* get_component();
+	double value_range();
 };
 
 enum class FilterType {

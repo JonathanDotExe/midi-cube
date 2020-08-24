@@ -130,19 +130,56 @@ size_t OscilatorComponent::property_count() {
 	return oscilator_properties.size();
 }
 
+double OscilatorComponent::from() {
+	return -1;
+}
 
-double ComponentSlot::process(std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
-	return 0; //TODO
+double OscilatorComponent::to() {
+	return 1;
+}
+
+double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	if (comp) {
+		//Apply bindings
+		for (size_t i = 0; i < bindings.size(); ++i) {
+			double value = values.at(bindings[i].component);
+			ComponentSlot& slot = slots.at(bindings[i].component);
+
+			double prog = value/(slot.value_range());
+			value = prog * comp->to() + (1 - comp) * comp->from();
+
+			//Update property
+			switch (bindings[i].type) {
+			case BindingType::SET:
+				comp->set_property(bindings[i].property, value);
+				break;
+			case BindingType::ADD:
+				comp->add_property(bindings[i].property, value);
+				break;
+			case BindingType::MUL:
+				comp->mul_property(bindings[i].property, value);
+				break;
+			}
+		}
+
+		//Process
+		comp->process(info, note, env);
+	}
+	return 0;
+}
+
+double ComponentSlot::value_range() {
+	return comp ? (comp->to() - comp->from()) : 0;
 }
 
 void ComponentSlot::set_component(SynthComponent* comp) {
-	//TODO
+	delete comp;
+	this->comp = comp;
 }
 
 SynthComponent* ComponentSlot::get_component() {
-	return nullptr;	//TODO
+	return comp;
 }
-
 
 Synthesizer::Synthesizer() {
 	preset = new SynthesizerPreset();
