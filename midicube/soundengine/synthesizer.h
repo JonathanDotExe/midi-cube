@@ -29,7 +29,10 @@ struct ComponentPropertyBinding {
 class SynthComponent {
 public:
 	virtual double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) = 0;
-	virtual void set_property(size_t index, double value, BindingType type) = 0;
+	virtual void set_property(size_t index, double value) = 0;
+	virtual void add_property(size_t index, double value) = 0;
+	virtual void mul_property(size_t index, double value) = 0;
+	virtual void reset_properties() = 0;
 	virtual std::vector<std::string> property_names() = 0;
 	virtual size_t property_count() = 0;
 	virtual ~SynthComponent() {
@@ -43,16 +46,22 @@ private:
 public:
 	AnalogOscilator osc;
 	unsigned int unison_amount = 0;
-	double semi = 0;				//Static pitch offset in semitones
+	double semi = 0;			//Static pitch offset in semitones
 	double transpose = 1;		//Static pitch offset as frequency multiplier
 	double volume = 1;
+	double amplitude = 1;
+	double unison_detune = 0.1;
 	double sync = 1;			//Sync frequency factor
+	double sync_mod = 1;		//Sync frequency factor (modulated)
 	double fm = 0;				//Dynamic pitch offset in time shift
 	double pitch = 0;			//Dynamic pitch offset in semitones
-	double unison_detune = 0.1;
+	double unison_detune_mod = 0.1;
 
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
-	void set_property(size_t index, double value, BindingType type);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	void reset_properties();
 	std::vector<std::string> property_names();
 	size_t property_count();
 };

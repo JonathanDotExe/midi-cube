@@ -8,7 +8,13 @@
 #include "synthesizer.h"
 #include <cmath>
 
-static std::vector<std::string> oscilator_properties = {"Volume", "Sync", "FM", "Pitch", "Unison-Detune"};
+static std::vector<std::string> oscilator_properties = {"Amplitude", "Sync", "FM", "Pitch", "Unison-Detune"};
+
+#define OSCILATOR_VOLUME_PROPERTY 0
+#define OSCILATOR_SYNC_PROPERTY 1
+#define OSCILATOR_FM_PROPERTY 2
+#define OSCILATOR_PITCH_PROPERTY 3
+#define OSCILATOR_UNISON_DETUNE_PROPERTY 4
 
 //OscilatorComponent
 double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
@@ -23,15 +29,15 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 	freq *= transpose;
 
 	//Sync
-	if (sync != 1) {
-		time = fmod(time, freq * sync);
+	if (sync_mod != 1) {
+		time = fmod(time, freq * sync_mod);
 	}
 	//Signal
 	double signal = osc.signal(time, freq);
 	//Unison
 	if (unison_amount) {
-		double udetune = note_to_freq_transpose(unison_detune);
-		double nudetune = note_to_freq_transpose(unison_detune);
+		double udetune = note_to_freq_transpose(unison_detune_mod);
+		double nudetune = note_to_freq_transpose(unison_detune_mod);
 		double det = udetune;
 		double ndet = nudetune;
 		for (unsigned int i = 1; i <= unison_amount; ++i) {
@@ -45,11 +51,75 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 			}
 		}
 	}
-	return signal / (1 + unison_amount) * volume;
+	return signal / (1 + unison_amount) * amplitude * volume;
 }
 
-void OscilatorComponent::set_property(size_t index, double value, BindingType type) {
+void OscilatorComponent::set_property(size_t index, double value) {
+	switch (index) {
+	case OSCILATOR_VOLUME_PROPERTY:
+		amplitude = value;
+		break;
+	case OSCILATOR_SYNC_PROPERTY:
+		sync_mod = value;
+		break;
+	case OSCILATOR_FM_PROPERTY:
+		fm = value;
+		break;
+	case OSCILATOR_PITCH_PROPERTY:
+		pitch = value;
+		break;
+	case OSCILATOR_UNISON_DETUNE_PROPERTY:
+		unison_detune_mod = value;
+		break;
+	}
+}
 
+void OscilatorComponent::add_property(size_t index, double value) {
+	switch (index) {
+		case OSCILATOR_VOLUME_PROPERTY:
+			amplitude += value;
+			break;
+		case OSCILATOR_SYNC_PROPERTY:
+			sync_mod += value;
+			break;
+		case OSCILATOR_FM_PROPERTY:
+			fm += value;
+			break;
+		case OSCILATOR_PITCH_PROPERTY:
+			pitch += value;
+			break;
+		case OSCILATOR_UNISON_DETUNE_PROPERTY:
+			unison_detune_mod += value;
+			break;
+	}
+}
+
+void OscilatorComponent::mul_property(size_t index, double value) {
+	switch (index) {
+		case OSCILATOR_VOLUME_PROPERTY:
+			amplitude *= value;
+			break;
+		case OSCILATOR_SYNC_PROPERTY:
+			sync_mod *= value;
+			break;
+		case OSCILATOR_FM_PROPERTY:
+			fm *= value;
+			break;
+		case OSCILATOR_PITCH_PROPERTY:
+			pitch *= value;
+			break;
+		case OSCILATOR_UNISON_DETUNE_PROPERTY:
+			unison_detune_mod *= value;
+			break;
+	}
+}
+
+void OscilatorComponent::reset_properties() {
+	amplitude = 1;
+	sync_mod = sync;
+	fm = 0;
+	pitch = 0;
+	unison_detune_mod = unison_detune;
 }
 
 std::vector<std::string> OscilatorComponent::property_names() {
