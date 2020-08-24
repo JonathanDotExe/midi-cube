@@ -140,6 +140,8 @@ double OscilatorComponent::to() {
 
 //ComponentSlot
 double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	comp_mutex.lock();
+	double sample = 0;
 	if (comp) {
 		//Apply bindings
 		for (size_t i = 0; i < bindings.size(); ++i) {
@@ -164,27 +166,28 @@ double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, 
 		}
 
 		//Process
-		comp->process(info, note, env);
+		sample = comp->process(info, note, env);
 	}
-	return 0;
+	comp_mutex.unlock();
+	return sample;
 }
 
 double ComponentSlot::value_range() {
-	return comp ? (comp->to() - comp->from()) : 0;
+	comp_mutex.lock();
+	double range = comp ? (comp->to() - comp->from()) : 0;
+	comp_mutex.unlock();
+	return range;
 }
 
 void ComponentSlot::set_component(SynthComponent* comp) {
-	delete comp;
+	comp_mutex.lock();
+	delete this->comp;
 	this->comp = comp;
-}
-
-SynthComponent* ComponentSlot::get_component() {
-	return comp;
+	comp_mutex.unlock();
 }
 
 ComponentSlot::~ComponentSlot() {
-	delete comp;
-	this->comp = nullptr;
+	set_component(nullptr);
 }
 
 //SynthesizerData
@@ -195,6 +198,8 @@ SynthesizerData::SynthesizerData() {
 	comp->osc.set_waveform(AnalogWaveForm::SAW);
 	comp->unison_amount = 2;
 	comp->unison_detune = 0.1;
+	preset.components[0].set_component(comp);
+	preset.components[0].audible = true;
 }
 
 //Synthesizer

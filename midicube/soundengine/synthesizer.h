@@ -44,7 +44,7 @@ public:
 	}
 };
 
-class OscilatorComponent {
+class OscilatorComponent : public SynthComponent {
 private:
 	double phase_shift = 0;
 public:
@@ -74,8 +74,9 @@ public:
 
 class ComponentSlot {
 private:
-	SynthComponent* comp;
+	SynthComponent* comp = nullptr;
 	std::vector<ComponentPropertyBinding> bindings;
+	std::mutex comp_mutex;
 public:
 	bool audible = false;
 
