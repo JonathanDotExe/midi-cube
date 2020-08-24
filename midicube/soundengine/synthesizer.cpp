@@ -19,7 +19,7 @@ static std::vector<std::string> oscilator_properties = {"Amplitude", "Sync", "FM
 //OscilatorComponent
 double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	//Pitch and FM
-	phase_shift += info.time_step * note_to_freq_transpose(pitch) + info.time_step * fm;
+	phase_shift += info.time_step * (note_to_freq_transpose(pitch) - 1) + info.time_step * fm;
 	//Frequency
 	double time = info.time + note.phase_shift + phase_shift;
 	double freq = note.freq;
@@ -31,6 +31,7 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 	//Sync
 	if (sync_mod != 1) {
 		time = fmod(time, freq * sync_mod);
+		std::cout << "Sync" << std::endl;
 	}
 	//Signal
 	double signal = osc.signal(time, freq);
@@ -143,6 +144,7 @@ double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, 
 	comp_mutex.lock();
 	double sample = 0;
 	if (comp) {
+		comp->reset_properties();
 		//Apply bindings
 		for (size_t i = 0; i < bindings.size(); ++i) {
 			double value = values.at(bindings[i].component);
