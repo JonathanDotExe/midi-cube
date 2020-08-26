@@ -129,7 +129,7 @@ public:
 
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 		T& filter = filters.at(note_index);
-		filter.set_cutoff(cutoff_mod); //TODO do something more performant than updateing every frame
+		filter.set_cutoff(cutoff_mod); //TODO do something more performant than updating every frame
 		return filter.apply(input, info.time_step);
 	}
 
@@ -205,6 +205,26 @@ class HighPassFilter12Component : public FilterComponent<HighPassFilter<2>> {
 
 class HighPassFilter24Component : public FilterComponent<HighPassFilter<4>> {
 
+};
+
+//LFO
+class LFOComponent : public SynthComponent {
+private:
+	double amplitude_mod = 1;
+public:
+	AnalogOscilator osc{AnalogWaveForm::SINE};
+	double freq = 1;	//TODO option to morph frequency
+	double amplitude = 1;
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	std::vector<std::string> property_names();
+	size_t property_count();
 };
 
 

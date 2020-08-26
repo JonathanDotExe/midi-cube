@@ -237,6 +237,60 @@ size_t ModEnvelopeComponent::property_count() {
 	return 0;
 }
 
+static std::vector<std::string> lfo_properties = {"Amplitude"};
+
+#define LFO_AMPLITUDE_PROPERTY 0
+
+//LFOComponent
+double LFOComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	return osc.signal(info.time, freq) * amplitude_mod;
+}
+
+void LFOComponent::set_property(size_t index, double value){
+	switch (index) {
+	case LFO_AMPLITUDE_PROPERTY:
+		amplitude_mod = amplitude;
+		break;
+	}
+}
+
+void LFOComponent::add_property(size_t index, double value){
+	switch (index) {
+	case LFO_AMPLITUDE_PROPERTY:
+		amplitude_mod += amplitude;
+		break;
+	}
+}
+
+void LFOComponent::mul_property(size_t index, double value){
+	switch (index) {
+	case LFO_AMPLITUDE_PROPERTY:
+		amplitude_mod *= amplitude;
+		break;
+	}
+}
+
+double LFOComponent::from(){
+	return -1;
+}
+
+double LFOComponent::to(){
+ return 1;
+}
+
+void LFOComponent::reset_properties(){
+	amplitude_mod = amplitude;
+}
+
+std::vector<std::string> LFOComponent::property_names(){
+	return lfo_properties;
+}
+
+size_t LFOComponent::property_count(){
+	return lfo_properties.size();
+}
+
+
 //ComponentSlot
 double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	double sample = 0;
@@ -250,7 +304,7 @@ double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, 
 			double from = slot.from();
 			double to = slot.to();
 			double prog = (value - from)/(to - from);
-			value = prog * comp->to() + (1 - prog) * comp->from();
+			value = prog * bindings[i].to + (1 - prog) * bindings[i].from;
 
 			//Update property
 			switch (bindings[i].type) {
@@ -325,7 +379,11 @@ SynthesizerData::SynthesizerData() {
 	preset.components[1].audible = true;
 	preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});*/
 
-	//Patch 2 -- Unison Saw Bass
+	//Patch 3 -- Simple Saw Pad
+	LFOComponent* lfo = new LFOComponent();
+	lfo->freq = 0.8;
+	preset.components[0].set_component(lfo);
+
 	OscilatorComponent* comp = new OscilatorComponent();
 	comp->osc.set_waveform(AnalogWaveForm::SAW);
 	comp->unison_amount = 3;
@@ -336,6 +394,7 @@ SynthesizerData::SynthesizerData() {
 	filter->cutoff = 1200;
 	preset.components[10].set_component(filter);
 	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
+	preset.components[10].bindings.push_back({BindingType::MUL, FILTER_CUTOFF_PROPERTY, 0, 0.9, 1.1});
 
 	AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
 	amp->envelope = {0.1, 0, 1, 0.3};
