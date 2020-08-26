@@ -11,10 +11,10 @@
 VocoderData::VocoderData() {
 	double step = (double) (VOCODER_HIGH_BAND - VOCODER_LOW_BAND)/(carrier_filters.size());
 	for (size_t i = 0; i < carrier_filters.size(); ++i) {
-		carrier_filters[i].set_low_cutoff(VOCODER_LOW_BAND + step * (i + i));
-		carrier_filters[i].set_high_cutoff(VOCODER_LOW_BAND + step * i);
-		modulator_filters[i].set_low_cutoff(VOCODER_LOW_BAND + step * (i + i));
-		modulator_filters[i].set_high_cutoff(VOCODER_LOW_BAND + step * i);
+		carrier_filters[i].set_cutoff(VOCODER_LOW_BAND + step * (i + 0.5));
+		carrier_filters[i].set_bandwidth(VOCODER_LOW_BAND + step * i);
+		modulator_filters[i].set_cutoff(VOCODER_LOW_BAND + step * (i + 0.5));
+		modulator_filters[i].set_bandwidth(VOCODER_LOW_BAND + step * i);
 	}
 }
 

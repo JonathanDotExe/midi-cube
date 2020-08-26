@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_SOUNDENGINE_VOCODER_H_
 #define MIDICUBE_SOUNDENGINE_VOCODER_H_
 
+#include "../filter.h"
 #include "soundengine.h"
 
 #define VOCODER_BAND_COUNT 40
@@ -36,8 +37,8 @@ class VocoderData : public SoundEngineData {
 public:
 	VocoderPreset preset;
 	DelayBuffer delay;
-	std::array<BandPassFilter, VOCODER_BAND_COUNT> carrier_filters;
-	std::array<BandPassFilter, VOCODER_BAND_COUNT> modulator_filters;
+	std::array<RCBandPassFilter, VOCODER_BAND_COUNT> carrier_filters;
+	std::array<RCBandPassFilter, VOCODER_BAND_COUNT> modulator_filters;
 
 	VocoderData ();
 

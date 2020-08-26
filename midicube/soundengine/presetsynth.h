@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 #define MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 
+#include "../filter.h"
 #include "soundengine.h"
 #include "../oscilator.h"
 
@@ -21,7 +22,7 @@ private:
 	double ndetune;
 	double vibrato;
 	ADSREnvelope env{0.0005, 0.5, 0, 0.0005};
-	MultiChannelFilter<LowPassFilter> filter;
+	MultiChannelFilter<RCLowPassFilter> filter;
 	OscilatorSlot* osc;
 	OscilatorSlot* osc2;
 public:
