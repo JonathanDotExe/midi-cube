@@ -350,21 +350,28 @@ ComponentSlot::~ComponentSlot() {
 //SynthesizerData
 SynthesizerData::SynthesizerData() {
 	//Patch 1 -- Unison Saw Lead/Brass
-	/*OscilatorComponent* comp = new OscilatorComponent();
+	ModEnvelopeComponent* env = new ModEnvelopeComponent();
+	env->envelope = {0.05, 0, 1, 10};
+	preset.components[0].set_component(env);
+
+	OscilatorComponent* comp = new OscilatorComponent();
 	comp->osc.set_waveform(AnalogWaveForm::SAW);
-	comp->unison_amount = 2;
+	comp->unison_amount = 3;
 	comp->unison_detune = 0.1;
 	preset.components[9].set_component(comp);
 
 	LowPassFilter24Component* filter = new LowPassFilter24Component();
-	filter->cutoff = 1200;
+	filter->cutoff = 7000;
+	preset.components[10].set_component(filter);
+	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
+	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_CUTOFF_PROPERTY, 0, 0, 21000 - 7000});
 
 	AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
-	amp->envelope = {0.1, 0, 1, 0.3};
+	amp->envelope = {0.0005, 0, 1, 0.03};
 
 	preset.components[11].set_component(amp);
 	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].audible = true;*/
+	preset.components[11].audible = true;
 
 	//Patch 2 -- Simple FM Keys
 	/*OscilatorComponent* comp1 = new OscilatorComponent();
@@ -380,7 +387,7 @@ SynthesizerData::SynthesizerData() {
 	preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});*/
 
 	//Patch 3 -- Simple Saw Pad
-	LFOComponent* lfo = new LFOComponent();
+	/*LFOComponent* lfo = new LFOComponent();
 	lfo->freq = 0.8;
 	preset.components[0].set_component(lfo);
 
@@ -401,7 +408,7 @@ SynthesizerData::SynthesizerData() {
 
 	preset.components[11].set_component(amp);
 	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].audible = true;
+	preset.components[11].audible = true;*/
 }
 
 //Synthesizer
