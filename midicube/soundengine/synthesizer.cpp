@@ -17,11 +17,11 @@ static std::vector<std::string> oscilator_properties = {"Amplitude", "Sync", "FM
 #define OSCILATOR_UNISON_DETUNE_PROPERTY 4
 
 //OscilatorComponent
-double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Pitch and FM
-	phase_shift += info.time_step * (note_to_freq_transpose(pitch) - 1) + info.time_step * fm;
+	phase_shift.at(note_index) += info.time_step * (note_to_freq_transpose(pitch) - 1) + info.time_step * fm;
 	//Frequency
-	double time = info.time + note.phase_shift + phase_shift;
+	double time = info.time + note.phase_shift + phase_shift.at(note_index);
 	double freq = note.freq;
 	if (semi) {
 		freq *= note_to_freq_transpose(semi);
@@ -31,7 +31,6 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 	//Sync
 	if (sync_mod != 1) {
 		time = fmod(time, freq * sync_mod);
-		std::cout << "Sync" << std::endl;
 	}
 	//Signal
 	double signal = osc.signal(time, freq);
@@ -140,7 +139,7 @@ double OscilatorComponent::to() {
 }
 
 //ComponentSlot
-double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	double sample = 0;
 	if (comp) {
 		comp->reset_properties();
@@ -149,7 +148,9 @@ double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, 
 			double value = values.at(bindings[i].component);
 			ComponentSlot& slot = slots.at(bindings[i].component);
 
-			double prog = value/(slot.value_range());
+			double from = slot.from();
+			double to = slot.to();
+			double prog = (value - from)/(to - from);
 			value = prog * comp->to() + (1 - prog) * comp->from();
 
 			//Update property
@@ -167,14 +168,17 @@ double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, 
 		}
 
 		//Process
-		sample = comp->process(info, note, env);
+		sample = comp->process(info, note, env, note_index);
 	}
 	return sample;
 }
 
-double ComponentSlot::value_range() {
-	double range = comp ? (comp->to() - comp->from()) : 0;
-	return range;
+double ComponentSlot::from() {
+	return comp ? comp->from() : 0;;
+}
+
+double ComponentSlot::to() {
+	return comp ? comp->to() : 0;
 }
 
 void ComponentSlot::set_component(SynthComponent* comp) {
@@ -190,12 +194,25 @@ ComponentSlot::~ComponentSlot() {
 SynthesizerData::SynthesizerData() {
 	release_time = 0; //TODO use release time
 	//Patch 1 -- Unison Saw Lead/Brass
-	OscilatorComponent* comp = new OscilatorComponent();
+	/*OscilatorComponent* comp = new OscilatorComponent();
 	comp->osc.set_waveform(AnalogWaveForm::SAW);
 	comp->unison_amount = 2;
 	comp->unison_detune = 0.1;
 	preset.components[0].set_component(comp);
-	preset.components[0].audible = true;
+	preset.components[0].audible = true;*/
+
+	//Patch 2 -- Simple FM Keys
+	OscilatorComponent* comp1 = new OscilatorComponent();
+	comp1->osc.set_waveform(AnalogWaveForm::SINE);
+	comp1->volume = 2;
+	preset.components[0].set_component(comp1);
+
+	OscilatorComponent* comp2 = new OscilatorComponent();
+	comp2->osc.set_waveform(AnalogWaveForm::SINE);
+
+	preset.components[1].set_component(comp2);
+	preset.components[1].audible = true;
+	preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});
 }
 
 //Synthesizer
@@ -246,7 +263,7 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	//Process components
 	std::array<double, MAX_COMPONENTS> values = {0};
 	for (size_t i = 0; i < data.preset.components.size(); ++i) {
-		double value = data.preset.components[i].process(data.preset.components, values, info, note, env);
+		double value = data.preset.components[i].process(data.preset.components, values, info, note, env, note_index);
 		values[i] = value;
 
 		if (data.preset.components[i].audible) {

@@ -29,7 +29,7 @@ struct ComponentPropertyBinding {
 
 class SynthComponent {
 public:
-	virtual double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) = 0;
+	virtual double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
 	virtual void set_property(size_t index, double value) = 0;
 	virtual void add_property(size_t index, double value) = 0;
 	virtual void mul_property(size_t index, double value) = 0;
@@ -45,7 +45,7 @@ public:
 
 class OscilatorComponent : public SynthComponent {
 private:
-	double phase_shift = 0;
+	std::array<double, SOUND_ENGINE_POLYPHONY> phase_shift = {0};
 public:
 	AnalogOscilator osc{AnalogWaveForm::SINE};
 	unsigned int unison_amount = 0;
@@ -60,7 +60,7 @@ public:
 	double pitch = 0;			//Dynamic pitch offset in semitones
 	double unison_detune_mod = 0.1;
 
-	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 	void set_property(size_t index, double value);
 	void add_property(size_t index, double value);
 	void mul_property(size_t index, double value);
@@ -74,14 +74,15 @@ public:
 class ComponentSlot {
 private:
 	SynthComponent* comp = nullptr;
-	std::vector<ComponentPropertyBinding> bindings;
 public:
+	std::vector<ComponentPropertyBinding> bindings;
 	bool audible = false;
 
-	double process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	double process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 	void set_component(SynthComponent* comp);
 	SynthComponent* get_component();
-	double value_range();
+	double from();
+	double to();
 	~ComponentSlot();
 };
 
