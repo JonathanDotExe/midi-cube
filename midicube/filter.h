@@ -130,7 +130,7 @@ public:
 template<std::size_t POLES>
 class HighPassFilter {
 private:
-	std::array<HighPassFilter, POLES> filters;		//TODO better implementation than array of rc high pass filters. Sound at cutoff will become more quiet the higher the amount of poles is
+	std::array<RCHighPassFilter, POLES> filters;		//TODO better implementation than array of rc high pass filters. Sound at cutoff will become more quiet the higher the amount of poles is
 
 public:
 

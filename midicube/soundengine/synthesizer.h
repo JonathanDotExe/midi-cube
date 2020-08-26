@@ -8,10 +8,12 @@
 #ifndef MIDICUBE_SOUNDENGINE_SYNTHESIZER_H_
 #define MIDICUBE_SOUNDENGINE_SYNTHESIZER_H_
 
+#include <type_traits>
 #include "soundengine.h"
 #include "../oscilator.h"
 #include "../envelope.h"
 #include "../synthesis.h"
+#include "../filter.h"
 
 #define MAX_COMPONENTS 25
 
@@ -109,6 +111,102 @@ public:
 	std::vector<std::string> property_names();
 	size_t property_count();
 };
+
+static std::vector<std::string> filter_properties = {"Input", "Cutoff"};
+
+#define FILTER_INPUT_PROPERTY 0
+#define FILTER_CUTOFF_PROPERTY 1
+
+template<typename T>
+class FilterComponent : public SynthComponent {
+
+private:
+	std::array<T, SOUND_ENGINE_POLYPHONY> filters = {};
+	double cutoff_mod = 21000;
+public:
+	double input = 0;
+	double cutoff = 21000;
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+		T& filter = filters.at(note_index);
+		filter.set_cutoff(cutoff_mod); //TODO do something more performant than updateing every frame
+		return filter.apply(input, info.time_step);
+	}
+
+	void set_property(size_t index, double value) {
+		switch (index) {
+		case FILTER_INPUT_PROPERTY:
+			input = value;
+			break;
+		case FILTER_CUTOFF_PROPERTY:
+			cutoff_mod = value;
+			break;
+		}
+	}
+
+	void add_property(size_t index, double value) {
+		switch (index) {
+		case FILTER_INPUT_PROPERTY:
+			input += value;
+			break;
+		case FILTER_CUTOFF_PROPERTY:
+			cutoff_mod += value;
+			break;
+		}
+	}
+
+	void mul_property(size_t index, double value) {
+		switch (index) {
+		case FILTER_INPUT_PROPERTY:
+			input *= value;
+			break;
+		case FILTER_CUTOFF_PROPERTY:
+			cutoff_mod *= value;
+			break;
+		}
+	}
+
+	double from() {
+		return -1;
+	}
+
+	double to() {
+		return 1;
+	}
+
+	void reset_properties() {
+		input = 0;
+		cutoff_mod = cutoff;
+	}
+	std::vector<std::string> property_names() {
+		return filter_properties;
+	}
+
+	size_t property_count() {
+		return filter_properties.size();
+	}
+
+	~FilterComponent() {
+
+	}
+};
+
+class LowPassFilter12Component : public FilterComponent<LowPassFilter<2>> {
+
+};
+
+class LowPassFilter24Component : public FilterComponent<LowPassFilter<4>> {
+
+};
+
+class HighPassFilter12Component : public FilterComponent<HighPassFilter<2>> {
+
+};
+
+class HighPassFilter24Component : public FilterComponent<HighPassFilter<4>> {
+
+};
+
 
 class ComponentSlot {
 private:
