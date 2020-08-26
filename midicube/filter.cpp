@@ -105,4 +105,3 @@ void RCBandPassFilter::set_bandwidth(double bandwidth) {
 double RCBandPassFilter::get_bandwidth() {
 	return lowpass.get_cutoff() - highpass.get_cutoff();
 }
-

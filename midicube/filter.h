@@ -11,7 +11,7 @@
 #include <type_traits>
 #include "audio.h"
 
-class RCFilter {
+class Filter {
 
 public:
 
@@ -21,13 +21,13 @@ public:
 
 	virtual double get_cutoff() = 0;
 
-	virtual ~RCFilter() {
+	virtual ~Filter() {
 
 	}
 
 };
 
-class RCLowPassFilter : public RCFilter {
+class RCLowPassFilter : public Filter {
 
 private:
 
@@ -50,7 +50,7 @@ public:
 	}
 };
 
-class RCHighPassFilter : public RCFilter {
+class RCHighPassFilter : public Filter {
 
 private:
 
@@ -75,7 +75,7 @@ public:
 	}
 };
 
-class RCBandPassFilter : public RCFilter {
+class RCBandPassFilter : public Filter {
 
 private:
 
@@ -101,9 +101,60 @@ public:
 	}
 };
 
+template<std::size_t POLES>
+class LowPassFilter {
+private:
+	std::array<RCLowPassFilter, POLES> filters;		//TODO better implementation than array of rc low pass filters. Sound at cutoff will become more quiet the higher the amount of poles is
+
+public:
+
+	double apply (double sample, double time_step) {
+		for (size_t i = 0; i < filters.size(); ++i) {
+			sample = filters[i].apply(sample, time_step);
+		}
+		return sample;
+	}
+
+	void set_cutoff(double cutoff) {
+		for (size_t i = 0; i < filters.size(); ++i) {
+			filters[i].set_cutoff(cutoff);
+		}
+	}
+
+	double get_cutoff() {
+		return filters.at(0).get_cutoff();
+	}
+
+};
+
+template<std::size_t POLES>
+class HighPassFilter {
+private:
+	std::array<HighPassFilter, POLES> filters;		//TODO better implementation than array of rc high pass filters. Sound at cutoff will become more quiet the higher the amount of poles is
+
+public:
+
+	double apply (double sample, double time_step) {
+		for (size_t i = 0; i < filters.size(); ++i) {
+			sample = filters[i].apply(sample, time_step);
+		}
+		return sample;
+	}
+
+	void set_cutoff(double cutoff) {
+		for (size_t i = 0; i < filters.size(); ++i) {
+			filters[i].set_cutoff(cutoff);
+		}
+	}
+
+	double get_cutoff() {
+		return filters.at(0).get_cutoff();
+	}
+
+};
 
 
-template<typename T, typename = std::enable_if<std::is_base_of<RCFilter, T>::value>>
+template<typename T, typename = std::enable_if<std::is_base_of<Filter, T>::value>>
 class MultiChannelFilter {
 protected:
 	std::array<T, OUTPUT_CHANNELS> channels;
