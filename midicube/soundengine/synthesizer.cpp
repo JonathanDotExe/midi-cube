@@ -138,6 +138,100 @@ double OscilatorComponent::to() {
 	return 1;
 }
 
+static std::vector<std::string> amplitude_properties = {"Input", "Amplitude"};
+
+#define AMP_ENVELOPE_INPUT_PROPERTY 0
+#define AMP_ENVELOPE_AMPLITUDE_PROPERTY 1
+
+//AmplitudeComponent
+double AmpEnvelopeComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	return input * amplitude_mod * envelope.amplitude(info.time, note, env);
+}
+
+void AmpEnvelopeComponent::set_property(size_t index, double value) {
+	switch (index) {
+	case AMP_ENVELOPE_INPUT_PROPERTY:
+		input = value;
+		break;
+	case AMP_ENVELOPE_AMPLITUDE_PROPERTY:
+		amplitude_mod = value;
+		break;
+	}
+}
+
+void AmpEnvelopeComponent::add_property(size_t index, double value) {
+	switch (index) {
+	case AMP_ENVELOPE_INPUT_PROPERTY:
+		input += value;
+		break;
+	case AMP_ENVELOPE_AMPLITUDE_PROPERTY:
+		amplitude_mod += value;
+		break;
+	}
+}
+
+void AmpEnvelopeComponent::mul_property(size_t index, double value) {
+	switch (index) {
+	case AMP_ENVELOPE_INPUT_PROPERTY:
+		input *= value;
+		break;
+	case AMP_ENVELOPE_AMPLITUDE_PROPERTY:
+		amplitude_mod *= value;
+		break;
+	}
+}
+
+double AmpEnvelopeComponent::from() {
+	return -1;
+}
+
+double AmpEnvelopeComponent::to() {
+	return 1;
+}
+void AmpEnvelopeComponent::reset_properties() {
+	amplitude_mod = amplitude;
+	input = 0;
+}
+std::vector<std::string> AmpEnvelopeComponent::property_names() {
+	return amplitude_properties;
+}
+size_t AmpEnvelopeComponent::property_count() {
+	return amplitude_properties.size();
+}
+
+//ModEnvelopeComponent
+double ModEnvelopeComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	return amplitude * envelope.amplitude(info.time, note, env);
+}
+void ModEnvelopeComponent::set_property(size_t index, double value) {
+
+}
+void ModEnvelopeComponent::add_property(size_t index, double value) {
+
+}
+void ModEnvelopeComponent::mul_property(size_t index, double value) {
+
+}
+
+double ModEnvelopeComponent::from() {
+	return 0;
+}
+double ModEnvelopeComponent::to() {
+	return 1;
+}
+
+void ModEnvelopeComponent::reset_properties() {
+
+}
+
+std::vector<std::string> ModEnvelopeComponent::property_names() {
+	return {};
+}
+
+size_t ModEnvelopeComponent::property_count() {
+	return 0;
+}
+
 //ComponentSlot
 double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	double sample = 0;
@@ -194,15 +288,21 @@ ComponentSlot::~ComponentSlot() {
 SynthesizerData::SynthesizerData() {
 	release_time = 0; //TODO use release time
 	//Patch 1 -- Unison Saw Lead/Brass
-	/*OscilatorComponent* comp = new OscilatorComponent();
+	OscilatorComponent* comp = new OscilatorComponent();
 	comp->osc.set_waveform(AnalogWaveForm::SAW);
 	comp->unison_amount = 2;
 	comp->unison_detune = 0.1;
-	preset.components[0].set_component(comp);
-	preset.components[0].audible = true;*/
+	preset.components[10].set_component(comp);
+
+	AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
+	amp->envelope = {0.1, 0, 1, 0.3};
+
+	preset.components[11].set_component(amp);
+	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
+	preset.components[11].audible = true;
 
 	//Patch 2 -- Simple FM Keys
-	OscilatorComponent* comp1 = new OscilatorComponent();
+	/*OscilatorComponent* comp1 = new OscilatorComponent();
 	comp1->osc.set_waveform(AnalogWaveForm::SINE);
 	comp1->volume = 2;
 	preset.components[0].set_component(comp1);
@@ -212,7 +312,7 @@ SynthesizerData::SynthesizerData() {
 
 	preset.components[1].set_component(comp2);
 	preset.components[1].audible = true;
-	preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});
+	preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});*/
 }
 
 //Synthesizer

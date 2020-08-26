@@ -71,6 +71,41 @@ public:
 	size_t property_count();
 };
 
+class AmpEnvelopeComponent : public SynthComponent {
+private:
+	double input = 0;
+	double amplitude_mod = 0;
+public:
+	double amplitude = 1;
+	ADSREnvelope envelope; //TODO Modulation for envelope parameters
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
+class ModEnvelopeComponent : public SynthComponent {
+public:
+	double amplitude = 1;
+	ADSREnvelope envelope; //TODO Modulation for envelope parameters
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
 class ComponentSlot {
 private:
 	SynthComponent* comp = nullptr;
