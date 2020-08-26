@@ -20,10 +20,10 @@
 
 #define ROTARY_CUTOFF 800
 
-#define ROTARY_HORN_SLOW_FREQUENCY 0.8
-#define ROTARY_HORN_FAST_FREQUENCY 6.8
-#define ROTARY_BASS_SLOW_FREQUENCY 0.76
-#define ROTARY_BASS_FAST_FREQUENCY 6.5
+#define ROTARY_HORN_SLOW_FREQUENCY 0.83333333333333
+#define ROTARY_HORN_FAST_FREQUENCY 6.66666666666667
+#define ROTARY_BASS_SLOW_FREQUENCY 0.66666666666667
+#define ROTARY_BASS_FAST_FREQUENCY 5.66666666666667
 
 #define ROTARY_HORN_SLOW_RAMP 1.6
 #define ROTARY_HORN_FAST_RAMP 1.0
@@ -37,11 +37,16 @@
 struct B3OrganPreset {
 	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbars;
 	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
-	std::atomic<double> harmonic_foldback_volume{0.5};
+	std::atomic<double> harmonic_foldback_volume{1.0};
 	std::atomic<bool> rotary{false};
 	std::atomic<bool> rotary_fast{true};
 	std::atomic<unsigned int> rotary_cc{22};
 	std::atomic<unsigned int> rotary_speed_cc{23};
+	std::atomic<double> rotary_stereo_mix{0.5};
+	std::atomic<double> rotary_gain{1.5};
+	std::atomic<bool> rotary_type{false};
+	std::atomic<double> rotary_delay{0.0005};
+
 
 	std::atomic<bool> percussion{false};
 	std::atomic<bool> percussion_third_harmonic{true};
@@ -93,8 +98,10 @@ public:
 	B3OrganPreset preset;
 	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels;
 
-	DelayBuffer left_del;
-	DelayBuffer right_del;
+	DelayBuffer left_horn_del;
+	DelayBuffer right_horn_del;
+	DelayBuffer left_bass_del;
+	DelayBuffer right_bass_del;
 	bool curr_rotary_fast = 0;
 	PortamendoBuffer horn_speed{ROTARY_HORN_SLOW_FREQUENCY, ROTARY_HORN_SLOW_RAMP};
 	PortamendoBuffer bass_speed{ROTARY_BASS_SLOW_FREQUENCY, ROTARY_BASS_SLOW_RAMP};

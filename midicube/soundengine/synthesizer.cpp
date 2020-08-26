@@ -416,10 +416,8 @@ Synthesizer::Synthesizer() {
 	//Patch 1 -- Unison Saw Lead
 	/*OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
 	osc->set_unison(2);
-	preset->oscilators.push_back({osc, {0.0005, 0, 1, 0.0005}});
-
-	Filter* filter = new LowPassFilter(21000);
-	preset->filters.push_back({filter, 0});*/
+	std::vector<FilterData> filters;
+	preset->oscilators.push_back({osc, {0.0005, 0, 1, 0.0005}});*/
 
 	//Patch 2 -- Saw Bass
 	/*OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));

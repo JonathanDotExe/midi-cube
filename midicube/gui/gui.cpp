@@ -519,7 +519,6 @@ View* B3OrganEngineMenuView::draw() {
 
 			DrawText(data->preset.percussion_soft ? "Soft Percussion" : "Hard Percussion", 55, 308, 12, BLACK);
 		}
-
 	}
 	else {
 		//Rotary speaker
@@ -538,10 +537,14 @@ View* B3OrganEngineMenuView::draw() {
 		DrawText(data->preset.percussion_soft ? "Soft Percussion" : "Hard Percussion", 45, 308, 12, BLACK);
 	}
 
-	//Harmonic foldback volume
+	//Modeling parameters
 	DrawRectangle(18, 398, SCREEN_WIDTH/2 - 16, SCREEN_HEIGHT - 416, GRAY);
 	DrawRectangle(20, 400, SCREEN_WIDTH/2 - 20, SCREEN_HEIGHT - 420, RAYWHITE);
 	data->preset.harmonic_foldback_volume = GuiSlider((Rectangle) {130, 410, 300, 20}, "Harm. Foldback Vol.", TextFormat("%1.2f", data->preset.harmonic_foldback_volume.load()), data->preset.harmonic_foldback_volume, 0, 1.0);
+	data->preset.rotary_gain = GuiSlider((Rectangle) {130, 440, 300, 20}, "Rotary Gain", TextFormat("%1.2f", data->preset.rotary_gain.load()), data->preset.rotary_gain, 0, 2.0);
+	data->preset.rotary_stereo_mix = GuiSlider((Rectangle) {130, 470, 300, 20}, "Rotary Stereo Mix", TextFormat("%1.2f", data->preset.rotary_stereo_mix.load()), data->preset.rotary_stereo_mix, 0, 1.0);
+	data->preset.rotary_delay = GuiSlider((Rectangle) {130, 500, 300, 20}, "Rotary Delay", TextFormat("%1.2f ms", data->preset.rotary_delay.load() * 1000), data->preset.rotary_delay, 0, 0.005);
+	data->preset.rotary_type = GuiCheckBox((Rectangle) {130, 530, 20, 20}, data->preset.rotary_type ? "Rotary Type 2" : "Rotary Type 1", data->preset.rotary_type);
 
 	//Edit MIDI
 	if (GuiButton({SCREEN_WIDTH - 60, SCREEN_HEIGHT - 30, 30, 30}, GuiIconText(RICON_PENCIL, ""))) {
