@@ -192,6 +192,11 @@ void AmpEnvelopeComponent::reset_properties() {
 	amplitude_mod = amplitude;
 	input = 0;
 }
+
+bool AmpEnvelopeComponent::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	return envelope.is_finished(info.time, note, env);
+}
+
 std::vector<std::string> AmpEnvelopeComponent::property_names() {
 	return amplitude_properties;
 }
@@ -280,13 +285,16 @@ void ComponentSlot::set_component(SynthComponent* comp) {
 	this->comp = comp;
 }
 
+bool ComponentSlot::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	return comp ? comp->note_finished(info, note, env) : true;
+}
+
 ComponentSlot::~ComponentSlot() {
 	set_component(nullptr);
 }
 
 //SynthesizerData
 SynthesizerData::SynthesizerData() {
-	release_time = 0; //TODO use release time
 	//Patch 1 -- Unison Saw Lead/Brass
 	OscilatorComponent* comp = new OscilatorComponent();
 	comp->osc.set_waveform(AnalogWaveForm::SAW);
@@ -388,8 +396,15 @@ void Synthesizer::control_change(unsigned int control, unsigned int value, Sound
 
 }
 
-bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data) {
-	return !note.pressed;
+bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d) {
+	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
+
+	for (size_t i = 0; i < data.preset.components.size(); ++i) {
+		if (!data.preset.components[i].note_finished(info, note, env)) {
+			return false;
+		}
+	}
+	return true;
 }
 
 std::string Synthesizer::get_name() {

@@ -38,6 +38,9 @@ public:
 	virtual size_t property_count() = 0;
 	virtual double from() = 0;
 	virtual double to() = 0;
+	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+		return !note.pressed;
+	}
 	virtual ~SynthComponent() {
 
 	}
@@ -86,6 +89,7 @@ public:
 	double from();
 	double to();
 	void reset_properties();
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 	std::vector<std::string> property_names();
 	size_t property_count();
 };
@@ -116,6 +120,7 @@ public:
 	double process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 	void set_component(SynthComponent* comp);
 	SynthComponent* get_component();
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 	double from();
 	double to();
 	~ComponentSlot();
@@ -128,7 +133,6 @@ struct SynthesizerPreset {
 class SynthesizerData : public SoundEngineData {
 public:
 	SynthesizerPreset preset;
-	double release_time;
 
 	SynthesizerData();
 
