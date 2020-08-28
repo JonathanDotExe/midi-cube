@@ -16,13 +16,14 @@
 #define VOCODER_HIGH_BAND 440
 
 struct VocoderPreset {
-	bool delay = true;
+	bool delay = false;
 	double delay_time = 0.5;
 	unsigned int delay_feedback = 4;
 	double delay_mul = 1;
 	double vocoder_amp = 1;
 	double voice_amp = 0;
 	double carrier_amp = 0;
+	double gate = 0.1;
 
 	unsigned int delay_control = 22;
 	unsigned int delay_time_control = 35;
@@ -31,6 +32,7 @@ struct VocoderPreset {
 	unsigned int vocoder_amp_control = 38;
 	unsigned int voice_amp_control = 39;
 	unsigned int carrier_amp_control = 40;
+	unsigned int gate_control = 41;
 };
 
 class VocoderData : public SoundEngineData {
@@ -39,6 +41,7 @@ public:
 	DelayBuffer delay;
 	std::array<RCBandPassFilter, VOCODER_BAND_COUNT> carrier_filters;
 	std::array<RCBandPassFilter, VOCODER_BAND_COUNT> modulator_filters;
+	std::array<EnvelopeFollower, VOCODER_BAND_COUNT> envelopes;
 
 	VocoderData ();
 

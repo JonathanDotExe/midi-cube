@@ -7,6 +7,7 @@
 
 #include "envelope.h"
 #include <cmath>
+#include <iostream>
 
 //ADSREnvelope
 double ADSREnvelope::amplitude(double time, TriggeredNote& note, KeyboardEnvironment& env) {
@@ -56,17 +57,18 @@ EnvelopeFollower::EnvelopeFollower(double step_time) {
 
 void EnvelopeFollower::apply(double signal, double time, double time_step) {
 	buffer[index] = signal;
-	if (abs(signal) >= highest_signal) {
-		highest_signal = abs(signal);
+	if (std::abs(signal) >= highest_signal) {
+		highest_signal = std::abs(signal);
 		highest_time = time;
 	}
 	else if (highest_time < time - step_time) {
+		highest_signal = -1;
 		//Look for new highest signal
-		size_t timespan = round(time / time_step);
+		size_t timespan = round(step_time / time_step);
 		for (size_t i = 0; i < timespan; ++i) {
 			size_t pos = (index - i)%buffer.size();
-			if (abs(buffer[pos]) >= highest_signal) {
-				highest_signal = abs(buffer[pos]);
+			if (std::abs(buffer[pos]) >= highest_signal) {
+				highest_signal = std::abs(buffer[pos]);
 				highest_time = time - time_step * i;
 			}
 		}

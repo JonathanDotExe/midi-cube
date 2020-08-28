@@ -43,7 +43,7 @@ struct ADSREnvelope {
 
 class EnvelopeFollower {
 private:
-	std::array<double, ENVELOPE_FOLLOWER_BUFFER_SIZE> buffer;
+	std::array<double, ENVELOPE_FOLLOWER_BUFFER_SIZE> buffer = {};
 	std::size_t index = 0;
 	double highest_signal = 0;
 	double highest_time = 0;

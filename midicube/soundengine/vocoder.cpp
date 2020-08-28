@@ -35,6 +35,7 @@ void Vocoder::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 void Vocoder::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& d) {
 	VocoderData& data = dynamic_cast<VocoderData&>(d);
 	double sample = 0;
+	std::cout << "Start" << std::endl;
 	//Vocoder
 	if (std::any_of(channels.begin(), channels.end(), [] (double s) {return s != 0;})) {
 		double carrier = channels.at(0);
@@ -42,13 +43,17 @@ void Vocoder::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		sample += carrier * data.preset.carrier_amp;
 		double filtered = 0;
 		double input = info.input_sample;
-		std::cout << info.input_sample << std::endl;
 		for (size_t i = 0; i < data.carrier_filters.size(); ++i) {
 			carrier = channels.at(0);
 			modulator = input;
 			carrier = data.carrier_filters[i].apply(carrier, info.time_step);
 			modulator = data.modulator_filters[i].apply(modulator, info.time_step);
-			filtered += carrier * modulator;
+			data.envelopes[i].apply(modulator, info.time, info.time_step);
+			double volume = data.envelopes[i].volume();
+			std::cout << volume << std::endl;
+			if (volume > data.preset.gate) {
+				filtered += carrier * volume;
+			}
 		}
 		sample += filtered * data.preset.vocoder_amp;
 	}
@@ -90,6 +95,9 @@ void Vocoder::control_change(unsigned int control, unsigned int value, SoundEngi
 	}
 	if (control == data.preset.carrier_amp_control) {
 		data.preset.carrier_amp = value/127.0;
+	}
+	if (control == data.preset.gate_control) {
+		data.preset.gate = value/127.0;
 	}
 }
 
