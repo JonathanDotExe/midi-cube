@@ -319,7 +319,7 @@ double ControlChangeComponent::to() {
 void ControlChangeComponent::control_change(unsigned int control, unsigned int value) {
 	if (control == this->control) {
 		value = std::min(end, std::max(start, value));
-		this->value = value/127.0;
+		this->value = (double) value/(end - start);
 	}
 }
 
@@ -332,6 +332,43 @@ std::vector<std::string> ControlChangeComponent::property_names() {
 }
 
 size_t ControlChangeComponent::property_count() {
+	return 0;
+}
+
+//VelocityComponent
+double VelocityComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	return (double) std::min(end, std::max(start, note.velocity));
+}
+
+void VelocityComponent::set_property(size_t index, double value) {
+
+}
+
+void VelocityComponent::add_property(size_t index, double value) {
+
+}
+
+void VelocityComponent::mul_property(size_t index, double value) {
+
+}
+
+double VelocityComponent::from() {
+	return 0;
+}
+
+double VelocityComponent::to() {
+	return 1;
+}
+
+void VelocityComponent::reset_properties() {
+
+}
+
+std::vector<std::string> VelocityComponent::property_names() {
+	return {};
+}
+
+size_t VelocityComponent::property_count() {
 	return 0;
 }
 
@@ -401,7 +438,7 @@ ComponentSlot::~ComponentSlot() {
 //SynthesizerData
 SynthesizerData::SynthesizerData() {
 	//Patch 1 -- Unison Saw Lead/Brass
-	ModEnvelopeComponent* env = new ModEnvelopeComponent();
+	/*ModEnvelopeComponent* env = new ModEnvelopeComponent();
 	env->envelope = {0.05, 0, 1, 10};
 	preset.components[0].set_component(env);
 
@@ -432,7 +469,7 @@ SynthesizerData::SynthesizerData() {
 
 	preset.components[11].set_component(amp);
 	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].audible = true;
+	preset.components[11].audible = true;*/
 
 	//Patch 2 -- Simple FM Keys
 	/*OscilatorComponent* comp1 = new OscilatorComponent();
@@ -448,9 +485,12 @@ SynthesizerData::SynthesizerData() {
 	preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});*/
 
 	//Patch 3 -- Simple Saw Pad
-	/*LFOComponent* lfo = new LFOComponent();
+	LFOComponent* lfo = new LFOComponent();
 	lfo->freq = 0.8;
 	preset.components[0].set_component(lfo);
+
+	VelocityComponent* velocity = new VelocityComponent();
+	preset.components[1].set_component(velocity);
 
 	OscilatorComponent* comp = new OscilatorComponent();
 	comp->osc.set_waveform(AnalogWaveForm::SAW);
@@ -469,7 +509,8 @@ SynthesizerData::SynthesizerData() {
 
 	preset.components[11].set_component(amp);
 	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].audible = true;*/
+	preset.components[11].bindings.push_back({BindingType::MUL, AMP_ENVELOPE_AMPLITUDE_PROPERTY, 1, 0.7, 1});
+	preset.components[11].audible = true;
 }
 
 //Synthesizer

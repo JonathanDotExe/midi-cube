@@ -250,6 +250,23 @@ public:
 	size_t property_count();
 };
 
+//Velocity
+class VelocityComponent : public SynthComponent {
+public:
+	double start = 0;
+	double end = 1;
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
 
 class ComponentSlot {
 private:
