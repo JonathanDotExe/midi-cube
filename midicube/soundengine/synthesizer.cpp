@@ -535,7 +535,7 @@ SynthesizerData::SynthesizerData() {
 	ModEnvelopeComponent* env = new ModEnvelopeComponent();
 	env->envelope = {0.0005, 0.7, 0, 0.3};
 	preset.components[1].set_component(env);
-	preset.components[1].bindings.push_back({BindingType::MUL, MOD_ENVELOPE_AMPLITUDE_PROPERTY, 0, 0.5, 1});
+	preset.components[1].bindings.push_back({BindingType::MUL, MOD_ENVELOPE_AMPLITUDE_PROPERTY, 0, 1, 0});
 
 	OscilatorComponent* comp = new OscilatorComponent();
 	comp->osc.set_waveform(AnalogWaveForm::SQUARE);

@@ -28,7 +28,15 @@ double ADSREnvelope::amplitude(double time, TriggeredNote& note, KeyboardEnviron
 		return 0;
 	}
 	else {
-		return sustain - (time - release_time)/release * sustain;
+		double last_vol = sustain;
+		double held_time = release_time - note.start_time;
+		if (held_time <= attack) {
+			last_vol = held_time/attack;
+		}
+		else if (held_time < attack + decay) {
+			last_vol = 1 - (held_time - attack)/decay * (1 - sustain);
+		}
+		return last_vol - (time - release_time)/release * last_vol;
 	}
 
 	return 0;
