@@ -8,6 +8,10 @@
 #ifndef MIDICUBE_ENVELOPE_H_
 #define MIDICUBE_ENVELOPE_H_
 
+#define ENVELOPE_FOLLOWER_BUFFER_SIZE 44100
+
+#include <array>
+
 struct TriggeredNote {
 	double start_time = 0;
 	bool pressed = false;
@@ -35,6 +39,21 @@ struct ADSREnvelope {
 
 	double amplitude(double time, TriggeredNote& note, KeyboardEnvironment& env);
 	double is_finished(double time, TriggeredNote& note, KeyboardEnvironment& env);
+};
+
+class EnvelopeFollower {
+private:
+	std::array<double, ENVELOPE_FOLLOWER_BUFFER_SIZE> buffer;
+	std::size_t index = 0;
+	double highest_signal = 0;
+	double highest_time = 0;
+
+	double step_time = 0.05;
+public:
+	EnvelopeFollower(double step_time = 0.05);
+	void apply(double signal, double time, double  time_step);
+	double volume();
+	void set_step_time(double step_time);
 };
 
 
