@@ -23,14 +23,6 @@ public:
 	Oscilator();
 	virtual double signal(double time, double freq) = 0;
 	virtual ~Oscilator();
-
-	virtual void set_property(std::string name, double value) {
-
-	}
-
-	std::vector<std::string> get_properties() {
-		return properties;
-	}
 };
 
 class AnalogOscilator : public Oscilator {
@@ -50,6 +42,7 @@ struct AdditiveSine {
 	double amp;
 };
 
+//Deprecated
 class AdditiveOscilator : public Oscilator{
 private:
 	std::vector<AdditiveSine> sines;
@@ -60,6 +53,7 @@ public:
 	~AdditiveOscilator();
 };
 
+//Deprecated
 class SyncOscilator : public Oscilator{
 private:
 	double detune;
@@ -67,7 +61,6 @@ private:
 public:
 	SyncOscilator(AnalogWaveForm waveform, double detune);
 	double signal(double time, double freq);
-	void set_property(std::string name, double value);
 	double get_detune() const;
 	void set_detune(double detune);
 	AnalogWaveForm get_waveform() const;
@@ -75,6 +68,7 @@ public:
 	~SyncOscilator();
 };
 
+//Deprecated
 class OscilatorSlot {
 private:
 	Oscilator* osc;
@@ -93,8 +87,6 @@ public:
 	void set_unison_detune(double unison_detune = 0.1);
 	double get_volume() const;
 	void set_volume(double volume = 1);
-	std::vector<std::string> get_properties();
-	void set_property(std::string name, double value);
 	~OscilatorSlot();
 };
 

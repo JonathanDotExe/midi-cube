@@ -107,12 +107,6 @@ double SyncOscilator::signal(double time, double freq) {
 	return signal;
 }
 
-void SyncOscilator::set_property(std::string name, double value) {
-	if (name == "detune") {
-		detune = value;
-	}
-}
-
 double SyncOscilator::get_detune() const {
 	return detune;
 }
@@ -181,22 +175,6 @@ double OscilatorSlot::get_volume() const {
 
 void OscilatorSlot::set_volume(double volume) {
 	this->volume = volume;
-}
-
-std::vector<std::string> OscilatorSlot::get_properties() {
-	std::vector<std::string> props = {"volume", "unison_detune"};
-	props.insert(props.end(), osc->get_properties().begin(), osc->get_properties().end());
-	return props;
-}
-
-void OscilatorSlot::set_property(std::string name, double value) {
-	osc->set_property(name, value);
-	if (name == "volume") {
-		set_volume(value);
-	}
-	else if (name == "unison_detune") {
-		set_unison_detune(value);
-	}
 }
 
 OscilatorSlot::~OscilatorSlot() {
