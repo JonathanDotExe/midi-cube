@@ -7,6 +7,7 @@
 
 #include "synthesizer.h"
 #include <cmath>
+#include <algorithm>
 
 static std::vector<std::string> oscilator_properties = {"Amplitude", "Sync", "FM", "Pitch", "Unison-Detune"};
 
@@ -249,7 +250,7 @@ double LFOComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvi
 void LFOComponent::set_property(size_t index, double value){
 	switch (index) {
 	case LFO_AMPLITUDE_PROPERTY:
-		amplitude_mod = amplitude;
+		amplitude_mod = value;
 		break;
 	}
 }
@@ -257,7 +258,7 @@ void LFOComponent::set_property(size_t index, double value){
 void LFOComponent::add_property(size_t index, double value){
 	switch (index) {
 	case LFO_AMPLITUDE_PROPERTY:
-		amplitude_mod += amplitude;
+		amplitude_mod += value;
 		break;
 	}
 }
@@ -265,7 +266,7 @@ void LFOComponent::add_property(size_t index, double value){
 void LFOComponent::mul_property(size_t index, double value){
 	switch (index) {
 	case LFO_AMPLITUDE_PROPERTY:
-		amplitude_mod *= amplitude;
+		amplitude_mod *= value;
 		break;
 	}
 }
@@ -288,6 +289,50 @@ std::vector<std::string> LFOComponent::property_names(){
 
 size_t LFOComponent::property_count(){
 	return lfo_properties.size();
+}
+
+//ControlChangeComponent
+double ControlChangeComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	return value;
+}
+
+void ControlChangeComponent::set_property(size_t index, double value) {
+
+}
+
+void ControlChangeComponent::add_property(size_t index, double value) {
+
+}
+
+void ControlChangeComponent::mul_property(size_t index, double value) {
+
+}
+
+double ControlChangeComponent::from() {
+	return 0;
+}
+
+double ControlChangeComponent::to() {
+	return 1;
+}
+
+void ControlChangeComponent::control_change(unsigned int control, unsigned int value) {
+	if (control == this->control) {
+		value = std::min(end, std::max(start, value));
+		this->value = value/127.0;
+	}
+}
+
+void ControlChangeComponent::reset_properties() {
+
+}
+
+std::vector<std::string> ControlChangeComponent::property_names() {
+	return {};
+}
+
+size_t ControlChangeComponent::property_count() {
+	return 0;
 }
 
 
@@ -339,6 +384,12 @@ void ComponentSlot::set_component(SynthComponent* comp) {
 	this->comp = comp;
 }
 
+void ComponentSlot::control_change(unsigned int control, unsigned int value) {
+	if (comp) {
+		comp->control_change(control, value);
+	}
+}
+
 bool ComponentSlot::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	return comp ? comp->note_finished(info, note, env) : true;
 }
@@ -354,11 +405,21 @@ SynthesizerData::SynthesizerData() {
 	env->envelope = {0.05, 0, 1, 10};
 	preset.components[0].set_component(env);
 
+	ControlChangeComponent* cc = new ControlChangeComponent();
+	cc->control = 1;
+	preset.components[1].set_component(cc);
+
+	LFOComponent* lfo = new LFOComponent();
+	lfo->freq = 6;
+	preset.components[2].set_component(lfo);
+	preset.components[2].bindings.push_back({BindingType::MUL, LFO_AMPLITUDE_PROPERTY, 1, 0, 1});
+
 	OscilatorComponent* comp = new OscilatorComponent();
 	comp->osc.set_waveform(AnalogWaveForm::SAW);
-	comp->unison_amount = 3;
+	comp->unison_amount = 2;
 	comp->unison_detune = 0.1;
 	preset.components[9].set_component(comp);
+	preset.components[9].bindings.push_back({BindingType::ADD, OSCILATOR_PITCH_PROPERTY, 2, -1, 1});
 
 	LowPassFilter24Component* filter = new LowPassFilter24Component();
 	filter->cutoff = 7000;
@@ -478,8 +539,12 @@ void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 
 }
 
-void Synthesizer::control_change(unsigned int control, unsigned int value, SoundEngineData& data) {
+void Synthesizer::control_change(unsigned int control, unsigned int value, SoundEngineData& d) {
+	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
 
+	for (size_t i = 0; i < data.preset.components.size(); ++i) {
+		data.preset.components[i].control_change(control, value);
+	}
 }
 
 bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d) {

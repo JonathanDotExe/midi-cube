@@ -43,6 +43,9 @@ public:
 	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 		return !note.pressed;
 	}
+	virtual void control_change(unsigned int control, unsigned int value) {
+
+	}
 	virtual ~SynthComponent() {
 
 	}
@@ -227,6 +230,26 @@ public:
 	size_t property_count();
 };
 
+//MIDI Control
+class ControlChangeComponent : public SynthComponent {
+public:
+	unsigned int control = 1;
+	unsigned int start = 0;
+	unsigned int end = 127;
+	double value = 0.0;
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	void control_change(unsigned int control, unsigned int value);
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
 
 class ComponentSlot {
 private:
@@ -236,6 +259,7 @@ public:
 	bool audible = false;
 
 	double process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void control_change(unsigned int control, unsigned int value);
 	void set_component(SynthComponent* comp);
 	SynthComponent* get_component();
 	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
