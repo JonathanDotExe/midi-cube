@@ -21,8 +21,8 @@ private:
 	double detune;
 	double ndetune;
 	double vibrato;
-	ADSREnvelope env{0.0005, 0.5, 0, 0.0005};
-	MultiChannelFilter<RCLowPassFilter> filter;
+	ADSREnvelope env{0.1, 0, 1, 0.3};
+	MultiChannelFilter<LowPassFilter<2>> filter;
 	OscilatorSlot* osc;
 	OscilatorSlot* osc2;
 public:

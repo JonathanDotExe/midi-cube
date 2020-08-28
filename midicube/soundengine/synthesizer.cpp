@@ -205,18 +205,33 @@ size_t AmpEnvelopeComponent::property_count() {
 	return amplitude_properties.size();
 }
 
+std::vector<std::string> mod_envelope_properties = {"Amplitude"};
+#define MOD_ENVELOPE_AMPLITUDE_PROPERTY 0
+
 //ModEnvelopeComponent
 double ModEnvelopeComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return amplitude * envelope.amplitude(info.time, note, env);
+	return amplitude_mod * envelope.amplitude(info.time, note, env);
 }
 void ModEnvelopeComponent::set_property(size_t index, double value) {
-
+	switch (index) {
+	case MOD_ENVELOPE_AMPLITUDE_PROPERTY:
+		amplitude_mod = value;
+		break;
+	}
 }
 void ModEnvelopeComponent::add_property(size_t index, double value) {
-
+	switch (index) {
+	case MOD_ENVELOPE_AMPLITUDE_PROPERTY:
+		amplitude_mod += value;
+		break;
+	}
 }
 void ModEnvelopeComponent::mul_property(size_t index, double value) {
-
+	switch (index) {
+	case MOD_ENVELOPE_AMPLITUDE_PROPERTY:
+		amplitude_mod *= value;
+		break;
+	}
 }
 
 double ModEnvelopeComponent::from() {
@@ -227,15 +242,15 @@ double ModEnvelopeComponent::to() {
 }
 
 void ModEnvelopeComponent::reset_properties() {
-
+	amplitude_mod = amplitude;
 }
 
 std::vector<std::string> ModEnvelopeComponent::property_names() {
-	return {};
+	return mod_envelope_properties;
 }
 
 size_t ModEnvelopeComponent::property_count() {
-	return 0;
+	return mod_envelope_properties.size();
 }
 
 static std::vector<std::string> lfo_properties = {"Amplitude"};
@@ -485,7 +500,7 @@ SynthesizerData::SynthesizerData() {
 	preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});*/
 
 	//Patch 3 -- Simple Saw Pad
-	LFOComponent* lfo = new LFOComponent();
+	/*LFOComponent* lfo = new LFOComponent();
 	lfo->freq = 0.8;
 	preset.components[0].set_component(lfo);
 
@@ -510,6 +525,32 @@ SynthesizerData::SynthesizerData() {
 	preset.components[11].set_component(amp);
 	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
 	preset.components[11].bindings.push_back({BindingType::MUL, AMP_ENVELOPE_AMPLITUDE_PROPERTY, 1, 0.7, 1});
+	preset.components[11].audible = true;*/
+
+	//Patch 4 -- Sweeping Square Bass
+	ControlChangeComponent* cc = new ControlChangeComponent();
+	cc->control = 1;
+	preset.components[0].set_component(cc);
+
+	ModEnvelopeComponent* env = new ModEnvelopeComponent();
+	env->envelope = {0.0005, 0.7, 0, 0.3};
+	preset.components[1].set_component(env);
+	preset.components[1].bindings.push_back({BindingType::MUL, MOD_ENVELOPE_AMPLITUDE_PROPERTY, 0, 0.5, 1});
+
+	OscilatorComponent* comp = new OscilatorComponent();
+	comp->osc.set_waveform(AnalogWaveForm::SQUARE);
+	preset.components[9].set_component(comp);
+
+	LowPassFilter24Component* filter = new LowPassFilter24Component();
+	filter->cutoff = 24;
+	preset.components[10].set_component(filter);
+	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
+	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_CUTOFF_PROPERTY, 1, 0, 4200 - 24});
+
+	AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
+	amp->envelope = {0.0005, 0.6, 0, 0.1};
+	preset.components[11].set_component(amp);
+	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
 	preset.components[11].audible = true;
 }
 

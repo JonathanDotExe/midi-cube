@@ -100,6 +100,8 @@ public:
 };
 
 class ModEnvelopeComponent : public SynthComponent {
+private:
+	double amplitude_mod = 1;
 public:
 	double amplitude = 1;
 	ADSREnvelope envelope; //TODO Modulation for envelope parameters
