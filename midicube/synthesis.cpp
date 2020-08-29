@@ -35,7 +35,7 @@ extern double cosine_wave(double time, double freq) {
 
 
 extern double square_wave(double time, double freq) {
-	return copysign(1.0, sin(freq_to_radians(freq) * time));
+	return fmod(time, 1/freq) * freq >= 0.5 ? -1 : 1;
 }
 
 extern double saw_wave(double time, double freq) {

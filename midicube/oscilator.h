@@ -21,17 +21,17 @@ protected:
 	std::vector<std::string> properties;
 public:
 	Oscilator();
-	virtual double signal(double time, double freq) = 0;
+	virtual double signal(double time, double freq, double time_step) = 0;
 	virtual ~Oscilator();
 };
 
 class AnalogOscilator : public Oscilator {
 private:
 	AnalogWaveForm waveform;
-	bool analog = false;
 public:
+	bool analog = false;
 	AnalogOscilator(AnalogWaveForm waveform);
-	double signal(double time, double freq);
+	double signal(double time, double freq, double time_step);
 	AnalogWaveForm get_waveform() const;
 	void set_waveform(AnalogWaveForm waveform);
 	~AnalogOscilator();
@@ -48,7 +48,7 @@ private:
 	std::vector<AdditiveSine> sines;
 public:
 	AdditiveOscilator();
-	double signal(double time, double freq);
+	double signal(double time, double freq, double time_step);
 	void add_sine(AdditiveSine sine);
 	~AdditiveOscilator();
 };
@@ -60,7 +60,7 @@ private:
 	AnalogWaveForm waveform;
 public:
 	SyncOscilator(AnalogWaveForm waveform, double detune);
-	double signal(double time, double freq);
+	double signal(double time, double freq, double time_step);
 	double get_detune() const;
 	void set_detune(double detune);
 	AnalogWaveForm get_waveform() const;
@@ -80,7 +80,7 @@ private:
 
 public:
 	OscilatorSlot(Oscilator* osc);
-	double signal(double time, double freq);
+	double signal(double time, double freq, double time_step);
 	unsigned int get_unison() const;
 	void set_unison(unsigned int unison = 0);
 	double get_unison_detune() const;

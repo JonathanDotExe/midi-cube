@@ -18,6 +18,10 @@ static std::vector<std::string> oscilator_properties = {"Amplitude", "Sync", "FM
 #define OSCILATOR_UNISON_DETUNE_PROPERTY 4
 
 //OscilatorComponent
+OscilatorComponent::OscilatorComponent() {
+	osc.analog = true;
+}
+
 double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Pitch and FM
 	phase_shift.at(note_index) += info.time_step * (note_to_freq_transpose(pitch) - 1) + info.time_step * fm;
@@ -34,7 +38,7 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 		time = fmod(time, freq * sync_mod);
 	}
 	//Signal
-	double signal = osc.signal(time, freq);
+	double signal = osc.signal(time, freq, info.time_step);
 	//Unison
 	if (unison_amount) {
 		double udetune = note_to_freq_transpose(unison_detune_mod);
@@ -43,11 +47,11 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 		double ndet = nudetune;
 		for (unsigned int i = 1; i <= unison_amount; ++i) {
 			if (i % 2 == 0) {
-				signal += osc.signal(time, freq * ndet);
+				signal += osc.signal(time, freq * ndet, info.time_step);
 				ndet *= nudetune;
 			}
 			else {
-				signal += osc.signal(time, freq * det);
+				signal += osc.signal(time, freq * det, info.time_step);
 				det *= udetune;
 			}
 		}
@@ -259,7 +263,7 @@ static std::vector<std::string> lfo_properties = {"Amplitude"};
 
 //LFOComponent
 double LFOComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return osc.signal(info.time, freq) * amplitude_mod;
+	return osc.signal(info.time, freq, info.time_step) * amplitude_mod;
 }
 
 void LFOComponent::set_property(size_t index, double value){
@@ -453,7 +457,7 @@ ComponentSlot::~ComponentSlot() {
 //SynthesizerData
 SynthesizerData::SynthesizerData() {
 	//Patch 1 -- Unison Saw Lead/Brass
-	/*ModEnvelopeComponent* env = new ModEnvelopeComponent();
+	ModEnvelopeComponent* env = new ModEnvelopeComponent();
 	env->envelope = {0.05, 0, 1, 10};
 	preset.components[0].set_component(env);
 
@@ -484,7 +488,7 @@ SynthesizerData::SynthesizerData() {
 
 	preset.components[11].set_component(amp);
 	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].audible = true;*/
+	preset.components[11].audible = true;
 
 	//Patch 2 -- Simple FM Keys
 	/*OscilatorComponent* comp1 = new OscilatorComponent();
@@ -528,7 +532,7 @@ SynthesizerData::SynthesizerData() {
 	preset.components[11].audible = true;*/
 
 	//Patch 4 -- Sweeping Square Bass
-	ControlChangeComponent* cc = new ControlChangeComponent();
+	/*ControlChangeComponent* cc = new ControlChangeComponent();
 	cc->control = 1;
 	preset.components[0].set_component(cc);
 
@@ -551,7 +555,7 @@ SynthesizerData::SynthesizerData() {
 	amp->envelope = {0.0005, 0.6, 0, 0.1};
 	preset.components[11].set_component(amp);
 	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].audible = true;
+	preset.components[11].audible = true;*/
 }
 
 //Synthesizer

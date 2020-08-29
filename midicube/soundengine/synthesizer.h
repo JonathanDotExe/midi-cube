@@ -68,6 +68,7 @@ public:
 	double pitch = 0;			//Dynamic pitch offset in semitones
 	double unison_detune_mod = 0.1;
 
+	OscilatorComponent();
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 	void set_property(size_t index, double value);
 	void add_property(size_t index, double value);

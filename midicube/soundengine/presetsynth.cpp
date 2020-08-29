@@ -56,7 +56,7 @@ void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	double sample = 0.0;
 	double freq = note.freq;
 	double t = info.time + note.phase_shift;
-	sample = osc->signal(t, freq) + osc2->signal(t, freq);
+	sample = osc->signal(t, freq, info.time_step) + osc2->signal(t, freq, info.time_step);
 
 	if (vibrato) {
 		note.phase_shift += info.time_step * (note_to_freq_transpose(SYNTH_VIBRATO_DETUNE * sine_wave(info.time, SYNTH_VIBRATO_RATE) * vibrato) - 1);
