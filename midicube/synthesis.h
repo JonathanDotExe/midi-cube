@@ -24,7 +24,7 @@ extern double sine_wave(double time, double freq);
 
 extern double cosine_wave(double time, double freq);
 
-extern double square_wave(double time, double freq);
+extern double square_wave(double time, double freq, double pulse_width = 0.5);
 
 extern double saw_wave(double time, double freq);
 

@@ -50,10 +50,10 @@ double AnalogOscilator::signal(double time, double freq, double time_step) {
 		}
 		break;
 	case AnalogWaveForm::SQUARE:
-		signal = square_wave(time, freq);
+		signal = square_wave(time, freq, pulse_width);
 		if (analog) {
 			signal += polyblep(time, freq, time_step);
-			signal -= polyblep(time + 1/(freq * 2), freq, time_step);
+			signal -= polyblep(time + pulse_width/freq, freq, time_step);
 		}
 		break;
 	case AnalogWaveForm::NOISE:
@@ -74,80 +74,6 @@ void AnalogOscilator::set_waveform(AnalogWaveForm waveform) {
 AnalogOscilator::~AnalogOscilator() {
 
 }
-
-//AdditiveOscilator
-AdditiveOscilator::AdditiveOscilator() {
-
-}
-
-double AdditiveOscilator::signal(double time, double freq, double time_step) {
-	double sample = 0;
-	double amp = 0;
-	for (size_t i = 0; i < sines.size(); ++i) {
-		sample += sine_wave(time, freq * sines[i].harmonic) * sines[i].amp;
-		amp += sines[i].amp;
-	}
-	if (amp) {
-		sample /= sines.size();
-	}
-	return sample;
-}
-
-void AdditiveOscilator::add_sine(AdditiveSine sine) {
-	sines.push_back(sine);
-}
-
-AdditiveOscilator::~AdditiveOscilator() {
-
-}
-
-//SyncOscilator
-SyncOscilator::SyncOscilator(AnalogWaveForm waveform, double detune) {
-	this->waveform = waveform;
-	this->detune = detune;
-	properties.push_back("detune");
-}
-
-double SyncOscilator::signal(double time, double freq, double time_step) {
-	double signal = 0;
-	time = fmod(time, 1.0/freq);
-	switch(waveform) {
-	case AnalogWaveForm::SINE:
-		signal = sine_wave(time, freq * detune);
-		break;
-	case AnalogWaveForm::SAW:
-		signal = saw_wave(time, freq * detune);
-		break;
-	case AnalogWaveForm::SQUARE:
-		signal = square_wave(time, freq * detune);
-		break;
-	case AnalogWaveForm::NOISE:
-		signal = noise_wave(time, freq * detune);
-		break;
-	}
-	return signal;
-}
-
-double SyncOscilator::get_detune() const {
-	return detune;
-}
-
-AnalogWaveForm SyncOscilator::get_waveform() const {
-	return waveform;
-}
-
-void SyncOscilator::set_waveform(AnalogWaveForm waveform) {
-	this->waveform = waveform;
-}
-
-void SyncOscilator::set_detune(double detune) {
-	this->detune = detune;
-}
-
-SyncOscilator::~SyncOscilator() {
-
-}
-
 
 //OscilatorSlot
 OscilatorSlot::OscilatorSlot(Oscilator* osc) {

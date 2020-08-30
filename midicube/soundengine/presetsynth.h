@@ -24,7 +24,6 @@ private:
 	ADSREnvelope env{0.1, 0, 1, 0.3};
 	MultiChannelFilter<LowPassFilter<2>> filter;
 	OscilatorSlot* osc;
-	OscilatorSlot* osc2;
 public:
 
 	PresetSynth();

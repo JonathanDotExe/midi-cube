@@ -9,13 +9,14 @@
 #include <cmath>
 #include <algorithm>
 
-static std::vector<std::string> oscilator_properties = {"Amplitude", "Sync", "FM", "Pitch", "Unison-Detune"};
+static std::vector<std::string> oscilator_properties = {"Amplitude", "Sync", "FM", "Pitch", "Unison-Detune", "Pulse Width"};
 
 #define OSCILATOR_VOLUME_PROPERTY 0
 #define OSCILATOR_SYNC_PROPERTY 1
 #define OSCILATOR_FM_PROPERTY 2
 #define OSCILATOR_PITCH_PROPERTY 3
 #define OSCILATOR_UNISON_DETUNE_PROPERTY 4
+#define OSCILATOR_PULSE_WIDTH_PROPERTY 5
 
 //OscilatorComponent
 OscilatorComponent::OscilatorComponent() {
@@ -23,6 +24,8 @@ OscilatorComponent::OscilatorComponent() {
 }
 
 double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	//Pulse Width
+	osc.pulse_width = pulse_width_mod;
 	//Pitch and FM
 	phase_shift.at(note_index) += info.time_step * (note_to_freq_transpose(pitch) - 1) + info.time_step * fm;
 	//Frequency
@@ -76,6 +79,9 @@ void OscilatorComponent::set_property(size_t index, double value) {
 	case OSCILATOR_UNISON_DETUNE_PROPERTY:
 		unison_detune_mod = value;
 		break;
+	case OSCILATOR_PULSE_WIDTH_PROPERTY:
+		pulse_width_mod = value;
+		break;
 	}
 }
 
@@ -95,6 +101,9 @@ void OscilatorComponent::add_property(size_t index, double value) {
 			break;
 		case OSCILATOR_UNISON_DETUNE_PROPERTY:
 			unison_detune_mod += value;
+			break;
+		case OSCILATOR_PULSE_WIDTH_PROPERTY:
+			pulse_width_mod += value;
 			break;
 	}
 }
@@ -116,6 +125,9 @@ void OscilatorComponent::mul_property(size_t index, double value) {
 		case OSCILATOR_UNISON_DETUNE_PROPERTY:
 			unison_detune_mod *= value;
 			break;
+		case OSCILATOR_PULSE_WIDTH_PROPERTY:
+			pulse_width_mod *= value;
+			break;
 	}
 }
 
@@ -125,6 +137,7 @@ void OscilatorComponent::reset_properties() {
 	fm = 0;
 	pitch = 0;
 	unison_detune_mod = unison_detune;
+	pulse_width_mod = pulse_width;
 }
 
 std::vector<std::string> OscilatorComponent::property_names() {
@@ -457,7 +470,7 @@ ComponentSlot::~ComponentSlot() {
 //SynthesizerData
 SynthesizerData::SynthesizerData() {
 	//Patch 1 -- Unison Saw Lead/Brass
-	ModEnvelopeComponent* env = new ModEnvelopeComponent();
+	/*ModEnvelopeComponent* env = new ModEnvelopeComponent();
 	env->envelope = {0.05, 0, 1, 10};
 	preset.components[0].set_component(env);
 
@@ -488,7 +501,7 @@ SynthesizerData::SynthesizerData() {
 
 	preset.components[11].set_component(amp);
 	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].audible = true;
+	preset.components[11].audible = true;*/
 
 	//Patch 2 -- Simple FM Keys
 	/*OscilatorComponent* comp1 = new OscilatorComponent();
@@ -532,30 +545,31 @@ SynthesizerData::SynthesizerData() {
 	preset.components[11].audible = true;*/
 
 	//Patch 4 -- Sweeping Square Bass
-	/*ControlChangeComponent* cc = new ControlChangeComponent();
+	ControlChangeComponent* cc = new ControlChangeComponent();
 	cc->control = 1;
 	preset.components[0].set_component(cc);
 
 	ModEnvelopeComponent* env = new ModEnvelopeComponent();
-	env->envelope = {0.0005, 0.7, 0, 0.3};
+	env->envelope = {0.0005, 0.3, 0, 0.3};
 	preset.components[1].set_component(env);
 	preset.components[1].bindings.push_back({BindingType::MUL, MOD_ENVELOPE_AMPLITUDE_PROPERTY, 0, 1, 0});
 
 	OscilatorComponent* comp = new OscilatorComponent();
 	comp->osc.set_waveform(AnalogWaveForm::SQUARE);
+	comp->pulse_width = 1.0/3;
 	preset.components[9].set_component(comp);
 
 	LowPassFilter24Component* filter = new LowPassFilter24Component();
 	filter->cutoff = 24;
 	preset.components[10].set_component(filter);
 	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
-	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_CUTOFF_PROPERTY, 1, 0, 4200 - 24});
+	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_CUTOFF_PROPERTY, 1, 0, 6300 - 24});
 
 	AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
 	amp->envelope = {0.0005, 0.6, 0, 0.1};
 	preset.components[11].set_component(amp);
 	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].audible = true;*/
+	preset.components[11].audible = true;
 }
 
 //Synthesizer

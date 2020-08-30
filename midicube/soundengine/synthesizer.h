@@ -67,6 +67,8 @@ public:
 	double fm = 0;				//Dynamic pitch offset in time shift
 	double pitch = 0;			//Dynamic pitch offset in semitones
 	double unison_detune_mod = 0.1;
+	double pulse_width = 0.5;
+	double pulse_width_mod = 0.5;
 
 	OscilatorComponent();
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);

@@ -17,8 +17,6 @@ enum class AnalogWaveForm {
 };
 
 class Oscilator {
-protected:
-	std::vector<std::string> properties;
 public:
 	Oscilator();
 	virtual double signal(double time, double freq, double time_step) = 0;
@@ -30,42 +28,12 @@ private:
 	AnalogWaveForm waveform;
 public:
 	bool analog = false;
+	double pulse_width = 0.5;
 	AnalogOscilator(AnalogWaveForm waveform);
 	double signal(double time, double freq, double time_step);
 	AnalogWaveForm get_waveform() const;
 	void set_waveform(AnalogWaveForm waveform);
 	~AnalogOscilator();
-};
-
-struct AdditiveSine {
-	double harmonic;
-	double amp;
-};
-
-//Deprecated
-class AdditiveOscilator : public Oscilator{
-private:
-	std::vector<AdditiveSine> sines;
-public:
-	AdditiveOscilator();
-	double signal(double time, double freq, double time_step);
-	void add_sine(AdditiveSine sine);
-	~AdditiveOscilator();
-};
-
-//Deprecated
-class SyncOscilator : public Oscilator{
-private:
-	double detune;
-	AnalogWaveForm waveform;
-public:
-	SyncOscilator(AnalogWaveForm waveform, double detune);
-	double signal(double time, double freq, double time_step);
-	double get_detune() const;
-	void set_detune(double detune);
-	AnalogWaveForm get_waveform() const;
-	void set_waveform(AnalogWaveForm waveform);
-	~SyncOscilator();
 };
 
 //Deprecated

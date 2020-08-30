@@ -34,8 +34,8 @@ extern double cosine_wave(double time, double freq) {
 }
 
 
-extern double square_wave(double time, double freq) {
-	return fmod(time, 1/freq) * freq >= 0.5 ? -1 : 1;
+extern double square_wave(double time, double freq, double pulse_width) {
+	return fmod(time, 1/freq) * freq >= pulse_width ? -1 : 1;
 }
 
 extern double saw_wave(double time, double freq) {
