@@ -153,6 +153,43 @@ public:
 
 };
 
+template<std::size_t POLES>
+class BandPassFilter {
+private:
+	std::array<RCBandPassFilter, POLES> filters;		//TODO better implementation than array of rc band pass filters. Sound at cutoff will become more quiet the higher the amount of poles is
+
+public:
+
+	double apply (double sample, double time_step) {
+		for (size_t i = 0; i < filters.size(); ++i) {
+			sample = filters[i].apply(sample, time_step);
+		}
+		return sample;
+	}
+
+	void set_cutoff(double cutoff) {
+		for (size_t i = 0; i < filters.size(); ++i) {
+			filters[i].set_cutoff(cutoff);
+		}
+	}
+
+	double get_cutoff() {
+		return filters.at(0).get_cutoff();
+	}
+
+	void set_bandwidth(double bandwidth) {
+		for (size_t i = 0; i < filters.size(); ++i) {
+			filters[i].set_bandwidth(bandwidth);
+		}
+	}
+
+	double get_bandwidth() {
+		return filters.at(0).get_bandwidth();
+	}
+
+};
+
+
 
 template<typename T, typename = std::enable_if<std::is_base_of<Filter, T>::value>>
 class MultiChannelFilter {

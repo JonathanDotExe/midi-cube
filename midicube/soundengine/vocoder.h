@@ -23,7 +23,7 @@ struct VocoderPreset {
 	double vocoder_amp = 1;
 	double voice_amp = 0;
 	double carrier_amp = 0;
-	double gate = 0.1;
+	double gate = 0.00;
 
 	unsigned int delay_control = 22;
 	unsigned int delay_time_control = 35;
@@ -39,8 +39,8 @@ class VocoderData : public SoundEngineData {
 public:
 	VocoderPreset preset;
 	DelayBuffer delay;
-	std::array<RCBandPassFilter, VOCODER_BAND_COUNT> carrier_filters;
-	std::array<RCBandPassFilter, VOCODER_BAND_COUNT> modulator_filters;
+	std::array<BandPassFilter<2>, VOCODER_BAND_COUNT> carrier_filters;
+	std::array<BandPassFilter<2>, VOCODER_BAND_COUNT> modulator_filters;
 	std::array<EnvelopeFollower, VOCODER_BAND_COUNT> envelopes;
 
 	VocoderData ();
