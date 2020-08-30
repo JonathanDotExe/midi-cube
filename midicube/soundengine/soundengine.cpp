@@ -276,8 +276,7 @@ Arpeggiator& SoundEngineChannel::arpeggiator() {
 }
 
 SoundEngineChannel::~SoundEngineChannel() {
-	delete engine;
-	engine = nullptr;
+	set_engine(nullptr);
 }
 
 
