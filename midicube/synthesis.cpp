@@ -34,8 +34,8 @@ extern double cosine_wave(double time, double freq) {
 }
 
 
-extern double square_wave(double time, double freq) {
-	return copysign(1.0, sin(freq_to_radians(freq) * time));
+extern double square_wave(double time, double freq, double pulse_width) {
+	return fmod(time, 1/freq) * freq >= pulse_width ? -1 : 1;
 }
 
 extern double saw_wave(double time, double freq) {
@@ -85,34 +85,6 @@ double DelayBuffer::process() {
 	return sample;
 }
 
-
-extern double apply_low_pass(double sample, double time_step, double rc, double last_filtered) {
-	double filtered = 0;
-	double a = time_step / (rc + time_step);
-
-	filtered = a * sample + (1 - a) * last_filtered;
-
-	return filtered;
-}
-
-extern double apply_high_pass(double sample, double time_step, double rc, double last_filtered, double last, bool started) {
-	double filtered = 0;
-	double a = rc / (rc + time_step);
-
-	if (started) {
-		filtered = a * last_filtered + a * (sample - last);
-	}
-	else {
-		filtered = sample;
-		started = true;
-	}
-	return filtered;
-}
-
-extern double cutoff_to_rc(double cutoff) {
-	return 1.0/(2 * M_PI * cutoff);
-}
-
 //PortamendoBuffer
 PortamendoBuffer::PortamendoBuffer(double value, double slope_time) {
 	this->last_value = value;
@@ -138,100 +110,4 @@ void PortamendoBuffer::set(double value, double time, double slope_time) {
 	this->slope_time = slope_time;
 }
 
-//LowPassFilter
-LowPassFilter::LowPassFilter(double cutoff) {
-	this->cutoff = cutoff;
-	this->last = 0;
-	this->rc = cutoff_to_rc(cutoff);
-}
-
-double LowPassFilter::apply (double sample, double time_step) {
-	double filtered = 0;
-	double a = time_step / (rc + time_step);
-
-	filtered = a * sample + (1 - a) * last;
-
-	last = filtered;
-	return filtered;
-}
-
-void LowPassFilter::set_cutoff(double cutoff) {
-	this->cutoff = cutoff;
-	this->rc = cutoff_to_rc(cutoff);
-}
-
-double LowPassFilter::get_cutoff() {
-	return cutoff;
-}
-
-//HighPassFilter
-HighPassFilter::HighPassFilter(double cutoff) {
-	this->cutoff = cutoff;
-	this->lastFiltered = 0;
-	this->last = 0;
-	this->rc = cutoff_to_rc(cutoff);
-	this->started = false;
-}
-
-double HighPassFilter::apply (double sample, double time_step) {
-	double filtered = 0;
-	double a = rc / (rc + time_step);
-
-	if (started) {
-		filtered = a * lastFiltered + a * (sample - last);
-	}
-	else {
-		filtered = sample;
-		started = true;
-	}
-
-	last = sample;
-	lastFiltered = filtered;
-	return filtered;
-}
-
-void HighPassFilter::set_cutoff(double cutoff) {
-	this->cutoff = cutoff;
-	this->rc = cutoff_to_rc(cutoff);
-}
-
-double HighPassFilter::get_cutoff() {
-	return cutoff;
-}
-
-//BandPassFilter
-BandPassFilter::BandPassFilter(double low_cutoff, double high_cutoff) {
-	set_low_cutoff(low_cutoff);
-	set_high_cutoff(high_cutoff);
-}
-
-double BandPassFilter::apply (double sample, double time_step) {
-	double filtered = lowpass.apply(highpass.apply(sample, time_step), time_step);
-	return filtered;
-}
-
-void BandPassFilter::set_low_cutoff(double cutoff) {
-	lowpass.set_cutoff(cutoff);
-}
-
-double BandPassFilter::get_low_cutoff() {
-	return lowpass.get_cutoff();
-}
-
-void BandPassFilter::set_high_cutoff(double cutoff) {
-	highpass.set_cutoff(cutoff);
-}
-
-double BandPassFilter::get_high_cutoff() {
-	return highpass.get_cutoff();
-}
-
-void BandPassFilter::set_cutoff(double cutoff) {
-	set_low_cutoff(cutoff);
-	set_high_cutoff(cutoff);
-}
-
-double BandPassFilter::get_cutoff() {
-	return (get_low_cutoff() + get_high_cutoff())/2.0;
-}
 

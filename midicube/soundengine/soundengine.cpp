@@ -144,7 +144,6 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 		}
 		//Press note
 		note.release_note(info, curr_note);
-		note.note.at(note_index).valid = false;
 		if (next_index >= 0) {
 			curr_note = next_note;
 			this->note_index = next_index;

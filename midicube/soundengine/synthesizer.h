@@ -8,70 +8,305 @@
 #ifndef MIDICUBE_SOUNDENGINE_SYNTHESIZER_H_
 #define MIDICUBE_SOUNDENGINE_SYNTHESIZER_H_
 
+#include <type_traits>
 #include "soundengine.h"
 #include "../oscilator.h"
 #include "../envelope.h"
 #include "../synthesis.h"
+#include "../filter.h"
 
-#define MAX_OSCILATORS 20
+#define MAX_COMPONENTS 25
 
-
-enum class FilterType {
-	LOW_PASS, HIGH_PASS
+enum class BindingType {
+	SET, ADD, MUL
 };
 
-struct FilterData {
-	FilterType type;
-	double cutoff;
-};
-
-struct OscilatorEnvelope {
-	OscilatorSlot* osc;
-	ADSREnvelope env;
-	std::vector<FilterData> filters;
-};
-
-
-struct EnvelopeBinding {
-	std::string property;
-	size_t oscilator;
-	size_t envelope;
+struct ComponentPropertyBinding {
+	BindingType type;
+	size_t property;
+	size_t component;
 	double from;
 	double to;
 };
 
-struct ControlBinding {
-	std::string property;
-	size_t oscilator;
-	unsigned int control;
-	double from;
-	double to;
+class SynthComponent {
+public:
+	virtual double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
+	virtual void set_property(size_t index, double value) = 0;
+	virtual void add_property(size_t index, double value) = 0;
+	virtual void mul_property(size_t index, double value) = 0;
+	virtual void reset_properties() = 0;
+	virtual std::vector<std::string> property_names() = 0;
+	virtual size_t property_count() = 0;
+	virtual double from() = 0;
+	virtual double to() = 0;
+	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+		return !note.pressed;
+	}
+	virtual void control_change(unsigned int control, unsigned int value) {
+
+	}
+	virtual ~SynthComponent() {
+
+	}
 };
 
-struct FilterInstance {
-	double last_filtered;
-	double last;
-	bool started;
+class OscilatorComponent : public SynthComponent {
+private:
+	std::array<double, SOUND_ENGINE_POLYPHONY> phase_shift = {0};
+public:
+	AnalogOscilator osc{AnalogWaveForm::SINE};
+	unsigned int unison_amount = 0;
+	double semi = 0;			//Static pitch offset in semitones
+	double transpose = 1;		//Static pitch offset as frequency multiplier
+	double volume = 1;
+	double amplitude = 1;
+	double unison_detune = 0.1;
+	double sync = 1;			//Sync frequency factor
+	double sync_mod = 1;		//Sync frequency factor (modulated)
+	double fm = 0;				//Dynamic pitch offset in time shift
+	double pitch = 0;			//Dynamic pitch offset in semitones
+	double unison_detune_mod = 0.1;
+	double pulse_width = 0.5;
+	double pulse_width_mod = 0.5;
+
+	OscilatorComponent();
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
+class AmpEnvelopeComponent : public SynthComponent {
+private:
+	double input = 0;
+	double amplitude_mod = 0;
+public:
+	double amplitude = 1;
+	ADSREnvelope envelope; //TODO Modulation for envelope parameters
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
+class ModEnvelopeComponent : public SynthComponent {
+private:
+	double amplitude_mod = 1;
+public:
+	double amplitude = 1;
+	ADSREnvelope envelope; //TODO Modulation for envelope parameters
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
+static std::vector<std::string> filter_properties = {"Input", "Cutoff"};
+
+#define FILTER_INPUT_PROPERTY 0
+#define FILTER_CUTOFF_PROPERTY 1
+
+template<typename T>
+class FilterComponent : public SynthComponent {
+
+private:
+	std::array<T, SOUND_ENGINE_POLYPHONY> filters = {};
+	double cutoff_mod = 21000;
+public:
+	double input = 0;
+	double cutoff = 21000;
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+		T& filter = filters.at(note_index);
+		filter.set_cutoff(cutoff_mod); //TODO do something more performant than updating every frame
+		return filter.apply(input, info.time_step);
+	}
+
+	void set_property(size_t index, double value) {
+		switch (index) {
+		case FILTER_INPUT_PROPERTY:
+			input = value;
+			break;
+		case FILTER_CUTOFF_PROPERTY:
+			cutoff_mod = value;
+			break;
+		}
+	}
+
+	void add_property(size_t index, double value) {
+		switch (index) {
+		case FILTER_INPUT_PROPERTY:
+			input += value;
+			break;
+		case FILTER_CUTOFF_PROPERTY:
+			cutoff_mod += value;
+			break;
+		}
+	}
+
+	void mul_property(size_t index, double value) {
+		switch (index) {
+		case FILTER_INPUT_PROPERTY:
+			input *= value;
+			break;
+		case FILTER_CUTOFF_PROPERTY:
+			cutoff_mod *= value;
+			break;
+		}
+	}
+
+	double from() {
+		return -1;
+	}
+
+	double to() {
+		return 1;
+	}
+
+	void reset_properties() {
+		input = 0;
+		cutoff_mod = cutoff;
+	}
+	std::vector<std::string> property_names() {
+		return filter_properties;
+	}
+
+	size_t property_count() {
+		return filter_properties.size();
+	}
+
+	~FilterComponent() {
+
+	}
+};
+
+class LowPassFilter12Component : public FilterComponent<LowPassFilter<2>> {
+
+};
+
+class LowPassFilter24Component : public FilterComponent<LowPassFilter<4>> {
+
+};
+
+class HighPassFilter12Component : public FilterComponent<HighPassFilter<2>> {
+
+};
+
+class HighPassFilter24Component : public FilterComponent<HighPassFilter<4>> {
+
+};
+
+//LFO
+class LFOComponent : public SynthComponent {
+private:
+	double amplitude_mod = 1;
+public:
+	AnalogOscilator osc{AnalogWaveForm::SINE};
+	double freq = 1;	//TODO option to morph frequency
+	double amplitude = 1;
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
+//MIDI Control
+class ControlChangeComponent : public SynthComponent {
+public:
+	unsigned int control = 1;
+	unsigned int start = 0;
+	unsigned int end = 127;
+	double value = 0.0;
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	void control_change(unsigned int control, unsigned int value);
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
+//Velocity
+class VelocityComponent : public SynthComponent {
+public:
+	double start = 0;
+	double end = 1;
+
+	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void set_property(size_t index, double value);
+	void add_property(size_t index, double value);
+	void mul_property(size_t index, double value);
+	double from();
+	double to();
+	void reset_properties();
+	std::vector<std::string> property_names();
+	size_t property_count();
+};
+
+
+class ComponentSlot {
+private:
+	SynthComponent* comp = nullptr;
+public:
+	std::vector<ComponentPropertyBinding> bindings;
+	bool audible = false;
+
+	double process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void control_change(unsigned int control, unsigned int value);
+	void set_component(SynthComponent* comp);
+	SynthComponent* get_component();
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	double from();
+	double to();
+	~ComponentSlot();
 };
 
 struct SynthesizerPreset {
-	std::vector<OscilatorEnvelope> oscilators;
-	std::vector<ADSREnvelope> envelopes;
-	std::vector<EnvelopeBinding> envelope_bindings;
-	std::vector<ControlBinding> control_bindings;
+	std::array<ComponentSlot, MAX_COMPONENTS> components;
+};
 
-	~SynthesizerPreset() {
-		for (size_t i = 0; i < oscilators.size() ; ++i) {
-			delete oscilators[i].osc;
-		}
+class SynthesizerData : public SoundEngineData {
+public:
+	SynthesizerPreset preset;
+
+	SynthesizerData();
+
+	SoundEngineData* copy () {
+		return new SynthesizerData(); //TODO
 	}
 };
 
 class Synthesizer: public SoundEngine {
-private:
-	SynthesizerPreset* preset = nullptr;
-	std::array<std::array<std::array<FilterInstance, 2>, SOUND_ENGINE_POLYPHONY>, MAX_OSCILATORS> filters = {};
-	double release_time;
+
 public:
 	Synthesizer();
 
@@ -86,6 +321,10 @@ public:
 	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data);
 
 	std::string get_name();
+
+	SoundEngineData* create_data() {
+		return new SynthesizerData();
+	}
 
 	virtual ~Synthesizer();
 };
