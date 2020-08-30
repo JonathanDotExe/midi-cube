@@ -485,7 +485,7 @@ SynthesizerData::SynthesizerData() {
 
 	OscilatorComponent* comp = new OscilatorComponent();
 	comp->osc.set_waveform(AnalogWaveForm::SAW);
-	comp->unison_amount = 2;
+	comp->unison_amount = 4;
 	comp->unison_detune = 0.1;
 	preset.components[9].set_component(comp);
 	preset.components[9].bindings.push_back({BindingType::ADD, OSCILATOR_PITCH_PROPERTY, 2, -1, 1});

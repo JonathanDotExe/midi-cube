@@ -36,7 +36,10 @@ PresetSynth::PresetSynth() {
 	vibrato = 0;
 	filter.set_cutoff(1200);
 
-	osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
+	AnalogOscilator* o = new AnalogOscilator(AnalogWaveForm::SAW);
+	o->analog = true;
+
+	osc = new OscilatorSlot(o);
 	osc->set_volume(1);
 	osc->set_unison(3);
 }
