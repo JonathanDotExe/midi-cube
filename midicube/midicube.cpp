@@ -86,14 +86,44 @@ void MidiCube::add_device(AudioDevice* device) {
 
 void MidiCube::midi_callback(MidiMessage& message, std::string device) {
 	size_t len = bindings[device].size();
+	MessageType t = message.get_message_type();
 	for (size_t i = 0; i < len; ++i) {
-		if ((bindings[device][i].input_channel < 0 || bindings[device][i].input_channel == (int) message.get_channel()) && devices.find(device) != devices.end()) {
-			MidiMessage msg = message;
-			if (bindings[device][i].output_channel >= 0) {
-				msg.set_channel((unsigned int) bindings[device][i].output_channel);
+		DeviceBinding& b = bindings[device][i];
+		if ((b.input_channel < 0 || b.input_channel == (int) message.get_channel()) && devices.find(device) != devices.end()) {
+			bool pass = true;
+			switch (t) {
+			case MessageType::NOTE_OFF:
+			case MessageType::NOTE_ON:
+			case MessageType::POLYPHONIC_AFTERTOUCH:
+				pass = b.start_note <= message.get_note() && b.end_note >= message.get_note();
+				break;
+			case MessageType::CONTROL_CHANGE:
+				pass = b.transfer_cc;
+				break;
+			case MessageType::PROGRAM_CHANGE:
+				pass = b.transfer_prog_change;
+				break;
+			case MessageType::MONOPHONIC_AFTERTOUCH:
+				pass = b.transfer_channel_aftertouch;
+				break;
+			case MessageType::PITCH_BEND:
+				pass = b.transfer_pitch_bend;
+				break;
+			case MessageType::SYSEX:
+				pass = b.transfer_other;
+				break;
+			case MessageType::INVALID:
+				pass = false;
 			}
-			AudioDevice* dev = devices[bindings[device][i].output];
-			dev->send(msg);
+			//Apply binding
+			if (pass) {
+				MidiMessage msg = message;
+				if (bindings[device][i].output_channel >= 0) {
+					msg.set_channel((unsigned int) bindings[device][i].output_channel);
+				}
+				AudioDevice* dev = devices[bindings[device][i].output];
+				dev->send(msg);
+			}
 		}
 	}
 }

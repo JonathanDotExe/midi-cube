@@ -26,6 +26,13 @@ struct DeviceBinding {
 	std::string output;
 	int input_channel;
 	int output_channel;
+	unsigned int start_note = 0;
+	unsigned int end_note = 127;
+	bool transfer_channel_aftertouch = true;
+	bool transfer_pitch_bend = true;
+	bool transfer_cc = true;
+	bool transfer_prog_change = true;
+	bool transfer_other = true;
 };
 
 class MidiCube {
