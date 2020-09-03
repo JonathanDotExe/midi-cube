@@ -39,5 +39,6 @@ public:
 
 };
 
+extern SampleDrumKit* load_drumkit(std::string folder);
 
 #endif /* MIDICUBE_SOUNDENGINE_DRUMS_H_ */

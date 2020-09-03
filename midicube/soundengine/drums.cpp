@@ -7,6 +7,10 @@
 
 
 #include "drums.h"
+#include <fstream>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 
 //SampleDrums
@@ -61,4 +65,43 @@ std::string SampleDrums::get_name() {
 SampleDrums::~SampleDrums() {
 	delete drumkit;
 	drumkit = nullptr;
+}
+
+extern SampleDrumKit* load_drumkit(std::string folder) {
+	//Load file
+	std::ifstream def_file;
+	def_file.open(folder + "/drumkit.json");
+	if (def_file.is_open()) {
+		//Parse json
+		std::string json_text ((std::istreambuf_iterator<char>(def_file)), std::istreambuf_iterator<char>());
+		auto j = json::parse(json_text);
+		//Parse
+		SampleDrumKit* drumkit = new SampleDrumKit();
+		try {
+			//Load sounds
+			for (auto r : j["sounds"].get<std::vector<json>>()) {
+				unsigned int index = r["note"].get<unsigned int>();
+				drumkit->notes.at(index) = {};
+				std::string file = folder + "/" + r.at("file").get<std::string>();
+				if (!read_audio_file(drumkit->notes.at(index), file)) {
+					throw std::runtime_error("Couldn't load drum sample " + file);
+				}
+			}
+		}
+		catch (json::exception& e) {
+			delete drumkit;
+			drumkit = nullptr;
+			throw e;
+		}
+		catch (std::exception& e) {
+			delete drumkit;
+			drumkit = nullptr;
+			throw e;
+		}
+		return drumkit;
+	}
+	else {
+		std::cerr << "Couldn't load sample sound" << std::endl;
+	}
+	return nullptr;
 }
