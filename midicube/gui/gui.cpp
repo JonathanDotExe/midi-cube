@@ -276,6 +276,15 @@ View* DevicesMenuView::draw() {
 					//Clicked
 					binding_drag.dialog = true;
 					binding_drag.output_device = p.first;
+					binding_drag.input_channel = -1;
+					binding_drag.output_channel = -1;
+					binding_drag.start_note = 0;
+					binding_drag.end_note = 127;
+					binding_drag.transfer_cc = true;
+					binding_drag.transfer_channel_aftertouch = true;
+					binding_drag.transfer_other = true;
+					binding_drag.transfer_pitch_bend = true;
+					binding_drag.transfer_prog_change = true;
 					break;
 				}
 			}
@@ -287,9 +296,10 @@ View* DevicesMenuView::draw() {
 	if (binding_drag.dialog) {
 		const int input_width = 300;
 		const int input_height = 40;
+		const int check_height = 20;
 		const int text_height = 16;
 		const int box_width = input_width  + 10;
-		const int box_height = 3 * input_height + 5 + 2 * text_height + 10;
+		const int box_height = 5 * input_height + 5 + 4 * text_height + (check_height + 5) * 3 + 10;
 		//Background
 		DrawRectangle(SCREEN_WIDTH/2 - box_width/2, SCREEN_HEIGHT/2 - box_height/2, box_width, box_height, GRAY);
 		//Components
@@ -303,11 +313,49 @@ View* DevicesMenuView::draw() {
 		rect.height = input_height;
 		GuiSpinner(rect, "Input Channel: ", &binding_drag.input_channel, -1, 15, false);
 		pos_y += input_height;
+
 		DrawText("Output Channel: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
 		pos_y += text_height;
 		rect.y = pos_y;
 		GuiSpinner(rect, "Output Channel: ", &binding_drag.output_channel, -1, 15, false);
+		pos_y += input_height;
+
+		DrawText("Start Note: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
+		pos_y += text_height;
+		rect.y = pos_y;
+		GuiSpinner(rect, "Start Note: ", &binding_drag.start_note, 0, 127, false);
+		pos_y += input_height;
+
+		DrawText("End Note: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
+		pos_y += text_height;
+		rect.y = pos_y;
+		GuiSpinner(rect, "End Note: ", &binding_drag.end_note, 0, 127, false);
 		pos_y += input_height + 5;
+
+		rect.height = check_height;
+		rect.width = check_height;
+		rect.y = pos_y;
+		binding_drag.transfer_cc = GuiCheckBox(rect, "CC", binding_drag.transfer_cc);
+
+		rect.x = SCREEN_WIDTH/2;
+		binding_drag.transfer_prog_change = GuiCheckBox(rect, "Prog.", binding_drag.transfer_prog_change);
+		pos_y += check_height + 5;
+
+		rect.x = SCREEN_WIDTH/2 - input_width/2;
+		rect.y = pos_y;
+		binding_drag.transfer_pitch_bend = GuiCheckBox(rect, "Pitch Bend", binding_drag.transfer_pitch_bend);
+
+		rect.x = SCREEN_WIDTH/2;
+		binding_drag.transfer_channel_aftertouch = GuiCheckBox(rect, "Channel Aftertouch", binding_drag.transfer_channel_aftertouch);
+		pos_y += check_height + 5;
+
+		rect.x = SCREEN_WIDTH/2 - input_width/2;
+		rect.y = pos_y;
+		binding_drag.transfer_other = GuiCheckBox(rect, "SYSEX", binding_drag.transfer_other);
+		pos_y += check_height + 5;
+
+		rect.height = input_height;
+		rect.width = input_width;
 		rect.y = pos_y;
 		if (GuiButton(rect, "Create Binding")) {
 			binding_drag.dialog = false;
@@ -316,6 +364,15 @@ View* DevicesMenuView::draw() {
 			binding.input_channel = binding_drag.input_channel;
 			binding.output = binding_drag.output_device;
 			binding.output_channel = binding_drag.output_channel;
+
+			binding.start_note = binding_drag.start_note;
+			binding.end_note = binding_drag.end_note;
+			binding.transfer_cc = binding_drag.transfer_cc;
+			binding.transfer_channel_aftertouch = binding_drag.transfer_channel_aftertouch;
+			binding.transfer_other = binding_drag.transfer_other;
+			binding.transfer_pitch_bend = binding_drag.transfer_pitch_bend;
+			binding.transfer_prog_change = binding_drag.transfer_prog_change;
+
 			model.midi_cube->add_binding(binding);
 		}
 	}

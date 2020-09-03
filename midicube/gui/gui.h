@@ -87,8 +87,15 @@ struct BindingDragInfo {
 	bool dialog;
 	std::string input_device;
 	std::string output_device;
-	int input_channel;
-	int output_channel;
+	int input_channel = -1;
+	int output_channel = -1;
+	int start_note = 0;
+	int end_note = 127;
+	bool transfer_channel_aftertouch = true;
+	bool transfer_pitch_bend = true;
+	bool transfer_cc = true;
+	bool transfer_prog_change = true;
+	bool transfer_other = true;
 };
 
 class DevicesMenuView : public View {
