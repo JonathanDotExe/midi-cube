@@ -18,6 +18,7 @@ static std::vector<std::string> oscilator_properties = {"Amplitude", "Sync", "FM
 #define OSCILATOR_UNISON_DETUNE_PROPERTY 4
 #define OSCILATOR_PULSE_WIDTH_PROPERTY 5
 
+
 //OscilatorComponent
 OscilatorComponent::OscilatorComponent() {
 	osc.analog = true;
@@ -468,148 +469,145 @@ ComponentSlot::~ComponentSlot() {
 }
 
 //SynthesizerData
+static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
+	//Clear patch
+	for (size_t i = 0; i < preset.components.size(); ++i) {
+		preset.components[i].set_component(nullptr);
+		preset.components[i].audible = false;
+		preset.components[i].bindings.clear();
+	}
+	//Apply preset
+	switch (preset_no) {
+	case 1:
+		//Patch 1 -- Unison Saw Lead/Brass
+	{
+		ModEnvelopeComponent *env = new ModEnvelopeComponent();
+		env->envelope = { 0.05, 0, 1, 10 };
+		preset.components[0].set_component(env);
+
+		ControlChangeComponent *cc = new ControlChangeComponent();
+		cc->control = 1;
+		preset.components[1].set_component(cc);
+
+		LFOComponent *lfo = new LFOComponent();
+		lfo->freq = 6;
+		preset.components[2].set_component(lfo);
+		preset.components[2].bindings.push_back( { BindingType::MUL,
+				LFO_AMPLITUDE_PROPERTY, 1, 0, 1 });
+
+		OscilatorComponent *comp = new OscilatorComponent();
+		comp->osc.set_waveform(AnalogWaveForm::SAW);
+		comp->unison_amount = 4;
+		comp->unison_detune = 0.1;
+		preset.components[9].set_component(comp);
+		preset.components[9].bindings.push_back( { BindingType::ADD,
+				OSCILATOR_PITCH_PROPERTY, 2, -1, 1 });
+
+		LowPassFilter24Component *filter = new LowPassFilter24Component();
+		filter->cutoff = 7000;
+		preset.components[10].set_component(filter);
+		preset.components[10].bindings.push_back( { BindingType::ADD,
+				FILTER_INPUT_PROPERTY, 9, -1, 1 });
+		preset.components[10].bindings.push_back( { BindingType::ADD,
+				FILTER_CUTOFF_PROPERTY, 0, 0, 21000 - 7000 });
+
+		AmpEnvelopeComponent *amp = new AmpEnvelopeComponent();
+		amp->envelope = { 0.0005, 0, 1, 0.03 };
+
+		preset.components[11].set_component(amp);
+		preset.components[11].bindings.push_back( { BindingType::ADD,
+				AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1 });
+		preset.components[11].audible = true;
+	}
+		break;
+	case 2:
+		//Patch 2 -- Simple FM Keys
+	{
+		OscilatorComponent* comp1 = new OscilatorComponent();
+		comp1->osc.set_waveform(AnalogWaveForm::SINE);
+		comp1->volume = 2;
+		preset.components[0].set_component(comp1);
+
+		OscilatorComponent* comp2 = new OscilatorComponent();
+		comp2->osc.set_waveform(AnalogWaveForm::SINE);
+
+		preset.components[1].set_component(comp2);
+		preset.components[1].audible = true;
+		preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});
+	}
+		break;
+	case 3:
+		//Patch 3 -- Simple Saw Pad
+	{
+		LFOComponent* lfo = new LFOComponent();
+		lfo->freq = 0.8;
+		preset.components[0].set_component(lfo);
+
+		VelocityComponent* velocity = new VelocityComponent();
+		preset.components[1].set_component(velocity);
+
+		OscilatorComponent* comp = new OscilatorComponent();
+		comp->osc.set_waveform(AnalogWaveForm::SAW);
+		comp->unison_amount = 3;
+		comp->unison_detune = 0.1;
+		preset.components[9].set_component(comp);
+
+		LowPassFilter12Component* filter = new LowPassFilter12Component();
+		filter->cutoff = 1200;
+		preset.components[10].set_component(filter);
+		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
+		preset.components[10].bindings.push_back({BindingType::MUL, FILTER_CUTOFF_PROPERTY, 0, 0.9, 1.1});
+
+		AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
+		amp->envelope = {0.1, 0, 1, 0.3};
+
+		preset.components[11].set_component(amp);
+		preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
+		preset.components[11].bindings.push_back({BindingType::MUL, AMP_ENVELOPE_AMPLITUDE_PROPERTY, 1, 0.7, 1});
+		preset.components[11].audible = true;
+	}
+		break;
+	case 4:
+		//Patch 4 -- Sweeping Square Bass
+	{
+		ControlChangeComponent* cc = new ControlChangeComponent();
+		cc->control = 1;
+		preset.components[0].set_component(cc);
+
+		ModEnvelopeComponent* env = new ModEnvelopeComponent();
+		env->envelope = {0.0005, 0.3, 0, 0.3};
+		preset.components[1].set_component(env);
+		preset.components[1].bindings.push_back({BindingType::MUL, MOD_ENVELOPE_AMPLITUDE_PROPERTY, 0, 1, 0});
+
+		OscilatorComponent* comp = new OscilatorComponent();
+		comp->osc.set_waveform(AnalogWaveForm::SQUARE);
+		comp->pulse_width = 1.0/3;
+		preset.components[9].set_component(comp);
+
+		LowPassFilter24Component* filter = new LowPassFilter24Component();
+		filter->cutoff = 24;
+		preset.components[10].set_component(filter);
+		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
+		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_CUTOFF_PROPERTY, 1, 0, 6300 - 24});
+
+		AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
+		amp->envelope = {0.0005, 0.6, 0, 0.1};
+		preset.components[11].set_component(amp);
+		preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
+		preset.components[11].audible = true;
+	}
+		break;
+	}
+}
+
 SynthesizerData::SynthesizerData() {
-	//Patch 1 -- Unison Saw Lead/Brass
-	/*ModEnvelopeComponent* env = new ModEnvelopeComponent();
-	env->envelope = {0.05, 0, 1, 10};
-	preset.components[0].set_component(env);
-
-	ControlChangeComponent* cc = new ControlChangeComponent();
-	cc->control = 1;
-	preset.components[1].set_component(cc);
-
-	LFOComponent* lfo = new LFOComponent();
-	lfo->freq = 6;
-	preset.components[2].set_component(lfo);
-	preset.components[2].bindings.push_back({BindingType::MUL, LFO_AMPLITUDE_PROPERTY, 1, 0, 1});
-
-	OscilatorComponent* comp = new OscilatorComponent();
-	comp->osc.set_waveform(AnalogWaveForm::SAW);
-	comp->unison_amount = 4;
-	comp->unison_detune = 0.1;
-	preset.components[9].set_component(comp);
-	preset.components[9].bindings.push_back({BindingType::ADD, OSCILATOR_PITCH_PROPERTY, 2, -1, 1});
-
-	LowPassFilter24Component* filter = new LowPassFilter24Component();
-	filter->cutoff = 7000;
-	preset.components[10].set_component(filter);
-	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
-	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_CUTOFF_PROPERTY, 0, 0, 21000 - 7000});
-
-	AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
-	amp->envelope = {0.0005, 0, 1, 0.03};
-
-	preset.components[11].set_component(amp);
-	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].audible = true;*/
-
-	//Patch 2 -- Simple FM Keys
-	/*OscilatorComponent* comp1 = new OscilatorComponent();
-	comp1->osc.set_waveform(AnalogWaveForm::SINE);
-	comp1->volume = 2;
-	preset.components[0].set_component(comp1);
-
-	OscilatorComponent* comp2 = new OscilatorComponent();
-	comp2->osc.set_waveform(AnalogWaveForm::SINE);
-
-	preset.components[1].set_component(comp2);
-	preset.components[1].audible = true;
-	preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});*/
-
-	//Patch 3 -- Simple Saw Pad
-	/*LFOComponent* lfo = new LFOComponent();
-	lfo->freq = 0.8;
-	preset.components[0].set_component(lfo);
-
-	VelocityComponent* velocity = new VelocityComponent();
-	preset.components[1].set_component(velocity);
-
-	OscilatorComponent* comp = new OscilatorComponent();
-	comp->osc.set_waveform(AnalogWaveForm::SAW);
-	comp->unison_amount = 3;
-	comp->unison_detune = 0.1;
-	preset.components[9].set_component(comp);
-
-	LowPassFilter12Component* filter = new LowPassFilter12Component();
-	filter->cutoff = 1200;
-	preset.components[10].set_component(filter);
-	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
-	preset.components[10].bindings.push_back({BindingType::MUL, FILTER_CUTOFF_PROPERTY, 0, 0.9, 1.1});
-
-	AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
-	amp->envelope = {0.1, 0, 1, 0.3};
-
-	preset.components[11].set_component(amp);
-	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].bindings.push_back({BindingType::MUL, AMP_ENVELOPE_AMPLITUDE_PROPERTY, 1, 0.7, 1});
-	preset.components[11].audible = true;*/
-
-	//Patch 4 -- Sweeping Square Bass
-	ControlChangeComponent* cc = new ControlChangeComponent();
-	cc->control = 1;
-	preset.components[0].set_component(cc);
-
-	ModEnvelopeComponent* env = new ModEnvelopeComponent();
-	env->envelope = {0.0005, 0.3, 0, 0.3};
-	preset.components[1].set_component(env);
-	preset.components[1].bindings.push_back({BindingType::MUL, MOD_ENVELOPE_AMPLITUDE_PROPERTY, 0, 1, 0});
-
-	OscilatorComponent* comp = new OscilatorComponent();
-	comp->osc.set_waveform(AnalogWaveForm::SQUARE);
-	comp->pulse_width = 1.0/3;
-	preset.components[9].set_component(comp);
-
-	LowPassFilter24Component* filter = new LowPassFilter24Component();
-	filter->cutoff = 24;
-	preset.components[10].set_component(filter);
-	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
-	preset.components[10].bindings.push_back({BindingType::ADD, FILTER_CUTOFF_PROPERTY, 1, 0, 6300 - 24});
-
-	AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
-	amp->envelope = {0.0005, 0.6, 0, 0.1};
-	preset.components[11].set_component(amp);
-	preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
-	preset.components[11].audible = true;
+	apply_preset(preset, 1);
 }
 
 //Synthesizer
 Synthesizer::Synthesizer() {
-	//Patch 1 -- Unison Saw Lead
-	/*OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
-	osc->set_unison(2);
-	std::vector<FilterData> filters;
-	preset->oscilators.push_back({osc, {0.0005, 0, 1, 0.0005}});*/
 
-	//Patch 2 -- Saw Bass
-	/*OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
-	std::vector<FilterData> filters;
-	filters.push_back({FilterType::LOW_PASS, 6300});
-	preset->oscilators.push_back({osc, {0.0005, 0, 1, 0.0005}, filters});*/
-
-
-	//Patch 3 -- Simple Saw Pad
-	/*OscilatorSlot* osc = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SAW));
-	osc->set_unison(3);
-	std::vector<FilterData> filters;
-	filters.push_back({FilterType::LOW_PASS, 1200});
-	preset->oscilators.push_back({osc, {0.1, 0, 1, 0.3}, filters});*/
 }
-
-/*static double apply_filter (FilterData& data, FilterInstance& inst, double sample, double time_step) {
-	double last = sample;
-	switch (data.type) {
-	case FilterType::LOW_PASS:
-		sample = apply_low_pass(sample, time_step, cutoff_to_rc(data.cutoff), inst.last_filtered);
-		break;
-	case FilterType::HIGH_PASS:
-		sample = apply_high_pass(sample, time_step, cutoff_to_rc(data.cutoff), inst.last_filtered, inst.last, inst.started);
-		break;
-	}
-	inst.last = last;
-	inst.last_filtered = sample;
-	inst.started = true;
-	return sample;
-}*/
 
 void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
 	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
@@ -635,8 +633,12 @@ void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundE
 
 }
 
-void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data) {
-
+void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& d) {
+	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
+	if (data.update_preset != -1) {
+		apply_preset(data.preset, data.update_preset);
+		data.update_preset = -1;
+	}
 }
 
 void Synthesizer::control_change(unsigned int control, unsigned int value, SoundEngineData& d) {
@@ -644,6 +646,10 @@ void Synthesizer::control_change(unsigned int control, unsigned int value, Sound
 
 	for (size_t i = 0; i < data.preset.components.size(); ++i) {
 		data.preset.components[i].control_change(control, value);
+	}
+
+	if (control == data.preset.preset_cc) {
+		data.update_preset = value/5;
 	}
 }
 

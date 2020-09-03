@@ -292,11 +292,13 @@ public:
 
 struct SynthesizerPreset {
 	std::array<ComponentSlot, MAX_COMPONENTS> components;
+	unsigned int preset_cc = 17; //Until there is a proper way to create sounds using GUI and save presets
 };
 
 class SynthesizerData : public SoundEngineData {
 public:
 	SynthesizerPreset preset;
+	int update_preset = -1;
 
 	SynthesizerData();
 
