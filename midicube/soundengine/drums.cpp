@@ -15,25 +15,7 @@ using json = nlohmann::json;
 
 //SampleDrums
 SampleDrums::SampleDrums () {
-	//Create Test drumkit for testing purposes
-	//TODO create universal drumkit loader
-	drumkit = new SampleDrumKit();
-	drumkit->notes[44] = {};
-	read_audio_file(drumkit->notes[44], "./data/drumkits/test/ride.wav");
-	drumkit->notes[45] = {};
-	read_audio_file(drumkit->notes[45], "./data/drumkits/test/snare.wav");
-	drumkit->notes[46] = {};
-	read_audio_file(drumkit->notes[46], "./data/drumkits/test/hi_hat.wav");
-	drumkit->notes[47] = {};
-	read_audio_file(drumkit->notes[47], "./data/drumkits/test/bass.wav");
-	drumkit->notes[48] = {};
-	read_audio_file(drumkit->notes[48], "./data/drumkits/test/percussion1.wav");
-	drumkit->notes[49] = {};
-	read_audio_file(drumkit->notes[49], "./data/drumkits/test/crash1.wav");
-	drumkit->notes[50] = {};
-	read_audio_file(drumkit->notes[50], "./data/drumkits/test/tom1.wav");
-	drumkit->notes[51] = {};
-	read_audio_file(drumkit->notes[51], "./data/drumkits/test/tom3.wav");
+	drumkit = load_drumkit("./data/drumkits/drums1");
 }
 
 void SampleDrums::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) {
@@ -79,11 +61,12 @@ extern SampleDrumKit* load_drumkit(std::string folder) {
 		SampleDrumKit* drumkit = new SampleDrumKit();
 		try {
 			//Load sounds
-			for (auto r : j["sounds"].get<std::vector<json>>()) {
-				unsigned int index = r["note"].get<unsigned int>();
-				drumkit->notes.at(index) = {};
+			for (auto r : j.at("sounds").get<std::vector<json>>()) {
+				unsigned int index = r.at("note").get<unsigned int>();
+				drumkit->notes[index] = {};
 				std::string file = folder + "/" + r.at("file").get<std::string>();
 				if (!read_audio_file(drumkit->notes.at(index), file)) {
+					std::cerr << "Couldn't load drum sample " << file << std::endl;
 					throw std::runtime_error("Couldn't load drum sample " + file);
 				}
 			}
@@ -101,7 +84,7 @@ extern SampleDrumKit* load_drumkit(std::string folder) {
 		return drumkit;
 	}
 	else {
-		std::cerr << "Couldn't load sample sound" << std::endl;
+		std::cerr << "Couldn't load drumkit" << std::endl;
 	}
 	return nullptr;
 }
