@@ -319,6 +319,11 @@ void SoundEngineDevice::send(MidiMessage &message) {
 }
 
 SoundEngineDevice::~SoundEngineDevice() {
+	//Clear channels
+	for (size_t i = 0; i < channels.size(); ++i) {
+		channels[i].set_engine(nullptr);
+	}
+	//Delete engines
 	for (SoundEngine* engine : sound_engines) {
 		delete engine;
 	}
