@@ -285,6 +285,11 @@ View* DevicesMenuView::draw() {
 					binding_drag.transfer_other = true;
 					binding_drag.transfer_pitch_bend = true;
 					binding_drag.transfer_prog_change = true;
+
+					binding_drag.input_channel_editmode = false;
+					binding_drag.output_channel_editmode = false;
+					binding_drag.start_note_editmode = false;
+					binding_drag.end_note_editmode = false;
 					break;
 				}
 			}
@@ -311,25 +316,33 @@ View* DevicesMenuView::draw() {
 		rect.y = pos_y;
 		rect.width = input_width;
 		rect.height = input_height;
-		GuiSpinner(rect, "Input Channel: ", &binding_drag.input_channel, -1, 15, false);
+		if (GuiSpinner(rect, "Input Channel: ", &binding_drag.input_channel, -1, 15, binding_drag.input_channel_editmode)) {
+			binding_drag.input_channel_editmode = !binding_drag.input_channel_editmode;
+		}
 		pos_y += input_height;
 
 		DrawText("Output Channel: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
 		pos_y += text_height;
 		rect.y = pos_y;
-		GuiSpinner(rect, "Output Channel: ", &binding_drag.output_channel, -1, 15, false);
+		if (GuiSpinner(rect, "Output Channel: ", &binding_drag.output_channel, -1, 15, binding_drag.output_channel_editmode))  {
+			binding_drag.output_channel_editmode = !binding_drag.output_channel_editmode;
+		}
 		pos_y += input_height;
 
 		DrawText("Start Note: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
 		pos_y += text_height;
 		rect.y = pos_y;
-		GuiSpinner(rect, "Start Note: ", &binding_drag.start_note, 0, 127, false);
+		if (GuiSpinner(rect, "Start Note: ", &binding_drag.start_note, 0, 127, binding_drag.start_note_editmode)) {
+			binding_drag.start_note_editmode = !binding_drag.start_note_editmode;
+		}
 		pos_y += input_height;
 
 		DrawText("End Note: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
 		pos_y += text_height;
 		rect.y = pos_y;
-		GuiSpinner(rect, "End Note: ", &binding_drag.end_note, 0, 127, false);
+		if (GuiSpinner(rect, "End Note: ", &binding_drag.end_note, 0, 127, binding_drag.end_note_editmode)) {
+			binding_drag.end_note_editmode = !binding_drag.end_note_editmode;
+		}
 		pos_y += input_height + 5;
 
 		rect.height = check_height;

@@ -87,6 +87,12 @@ struct BindingDragInfo {
 	bool dialog;
 	std::string input_device;
 	std::string output_device;
+
+	bool input_channel_editmode = false;
+	bool output_channel_editmode = false;
+	bool start_note_editmode = false;
+	bool end_note_editmode = false;
+
 	int input_channel = -1;
 	int output_channel = -1;
 	int start_note = 0;
