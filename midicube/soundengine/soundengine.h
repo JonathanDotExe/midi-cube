@@ -170,7 +170,7 @@ private:
 
 public:
 	Metronome metronome;
-	std::atomic<bool> play_metronome{true};
+	std::atomic<bool> play_metronome{false};
 	AudioHandler* handler = nullptr; //TODO remove this reference and pass time through send() to be thread-safe
 
 	SoundEngineDevice(std::string identifier);

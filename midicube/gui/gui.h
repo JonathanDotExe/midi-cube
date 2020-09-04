@@ -125,6 +125,7 @@ class SoundEngineDeviceMenuView : public View {
 private:
 	SoundEngineDevice* device;
 	std::string options;
+	bool bpm_editmode = false;
 
 public:
 

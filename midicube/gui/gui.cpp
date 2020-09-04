@@ -436,6 +436,16 @@ View* SoundEngineDeviceMenuView::draw() {
 		channel.volume = GuiSlider((Rectangle){600, y, 300, 20}, "Vol ", TextFormat("%1.2f", channel.volume.load()), channel.volume, 0, 1);
 	}
 
+	//Metronome
+	//Play
+	device->play_metronome = GuiCheckBox((Rectangle){10, SCREEN_HEIGHT - 35, 20, 20}, "Metronome", device->play_metronome);
+	//BPM
+	int bpm = device->metronome.get_bpm();
+	if (GuiSpinner((Rectangle){150, SCREEN_HEIGHT - 40, 150, 30}, "BPM", &bpm, 0, 1920, bpm_editmode)) {
+		bpm_editmode = !bpm_editmode;
+	}
+	device->metronome.set_bpm(bpm);
+
 	draw_return_button(&view);
 
 	return view;

@@ -296,7 +296,7 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 	}
 	//Metronome
 	if (play_metronome) {
-		double start =(double) metronome.last_beat(info.sample_time, info.sample_rate, 4)/info.sample_rate;
+		double start =(double) metronome.last_beat(info.sample_time, info.sample_rate, 1)/info.sample_rate;
 		double vol = metronome_env.amplitude(info.time, true, start, 0);
 		if (vol) {
 			double sample = sine_wave(info.time, 3520) * vol;
