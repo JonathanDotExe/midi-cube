@@ -145,6 +145,9 @@ std::unordered_map<std::string, AudioDevice*> MidiCube::get_devices() {
 }
 
 MidiCube::~MidiCube() {
+	//Stop audio thread first to prevent segmentation faults
+	audio_handler.close();
+	//Delete devices
 	for (std::pair<std::string, AudioDevice*> device : devices) {
 		delete device.second;
 	}
