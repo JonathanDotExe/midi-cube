@@ -5,7 +5,6 @@
  *      Author: jojo
  */
 #include "metronome.h"
-#include <iostream>
 
 Metronome::Metronome(int bpm) {
 	this->bpm = bpm;
@@ -17,11 +16,17 @@ void Metronome::init (unsigned int time) {
 }
 
 bool Metronome::is_beat(unsigned int time, unsigned int sample_rate, int value) {
+	if (!bpm) {
+		return time - start_time == 0;
+	}
 	unsigned int step = 60 * sample_rate/(value * bpm);
 	return (time - start_time) % step == 0;
 }
 
 unsigned int Metronome::last_beat(unsigned int time, unsigned int sample_rate, int value) {
+	if (!bpm) {
+		return 0;
+	}
 	unsigned int step = 60 * sample_rate/(value * bpm);
 	return ((time - start_time) / step) * step + start_time;
 }
