@@ -282,6 +282,7 @@ SoundEngineChannel::~SoundEngineChannel() {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice(std::string identifier) {
 	this->identifier = identifier;
+	metronome.init(0);
 }
 
 std::string SoundEngineDevice::get_identifier() {
@@ -289,8 +290,20 @@ std::string SoundEngineDevice::get_identifier() {
 }
 
 void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
+	//Channels
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		this->channels[i].process_sample(channels, info);
+	}
+	//Metronome
+	if (play_metronome) {
+		double start =(double) metronome.last_beat(info.sample_time, info.sample_rate, 4)/info.sample_rate;
+		double vol = metronome_env.amplitude(info.time, true, start, 0);
+		if (vol) {
+			double sample = sine_wave(info.time, 3520) * vol;
+			for (size_t i = 0; i < channels.size(); ++i) {
+				channels[i] += sample;
+			}
+		}
 	}
 }
 

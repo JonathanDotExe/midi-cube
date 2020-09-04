@@ -637,7 +637,7 @@ View* SynthesizerEngineMenuView::draw() {
 	int title_width = MeasureText("Synthesizer", 32);
 	DrawText("Synthesizer", SCREEN_WIDTH/2 - title_width/2, 20, 36, BLACK);
 
-	//PReset Input
+	//Preset Input
 	Rectangle rect;
 	rect.x = SCREEN_WIDTH/2 - 200;
 	rect.y = SCREEN_HEIGHT/2 - 40;

@@ -166,8 +166,11 @@ private:
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	std::vector<SoundEngine*> sound_engines;
 
-public:
+	ADSREnvelope metronome_env{0.0005, 0.02, 0, 0};
 
+public:
+	Metronome metronome;
+	std::atomic<bool> play_metronome{true};
 	AudioHandler* handler = nullptr; //TODO remove this reference and pass time through send() to be thread-safe
 
 	SoundEngineDevice(std::string identifier);

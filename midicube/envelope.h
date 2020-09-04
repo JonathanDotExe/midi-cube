@@ -37,7 +37,9 @@ struct ADSREnvelope {
 	double sustain;
 	double release;
 
+	double amplitude(double time, bool pressed, double note_start_time, double note_release_time, bool sustain = false, double sustain_time = 0, double sustain_release_time = 0);
 	double amplitude(double time, TriggeredNote& note, KeyboardEnvironment& env);
+	double is_finished(double time, bool pressed, double note_start_time, double note_release_time, bool sustain = false, double sustain_time = 0, double sustain_release_time = 0);
 	double is_finished(double time, TriggeredNote& note, KeyboardEnvironment& env);
 };
 

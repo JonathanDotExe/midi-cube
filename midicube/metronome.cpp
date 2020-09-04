@@ -21,6 +21,11 @@ bool Metronome::is_beat(unsigned int time, unsigned int sample_rate, int value) 
 	return (time - start_time) % step == 0;
 }
 
+unsigned int Metronome::last_beat(unsigned int time, unsigned int sample_rate, int value) {
+	unsigned int step = 60 * sample_rate/(value * bpm);
+	return ((time - start_time) / step) * step + start_time;
+}
+
 void Metronome::set_bpm(unsigned int bpm) {
 	this->bpm = bpm;
 }

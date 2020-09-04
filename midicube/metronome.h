@@ -8,13 +8,14 @@
 #ifndef MIDICUBE_METRONOME_H_
 #define MIDICUBE_METRONOME_H_
 
+#include <atomic>
 
 
 class Metronome {
 
 private:
-	unsigned int bpm;
-	unsigned int start_time;
+	std::atomic<unsigned int> bpm;
+	std::atomic<unsigned int> start_time;
 
 public:
 	Metronome(int bpm =120);
@@ -22,6 +23,8 @@ public:
 	void init (unsigned int time);
 
 	bool is_beat(unsigned int time, unsigned int sample_rate, int value);
+
+	unsigned int last_beat(unsigned int time, unsigned int sample_rate, int value);
 
 	void set_bpm(unsigned int bpm);
 
