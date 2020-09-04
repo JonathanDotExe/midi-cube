@@ -443,7 +443,7 @@ View* SoundEngineDeviceMenuView::draw() {
 		channel.get_looper().preset.bars = bars;
 		//Play and Record
 		channel.get_looper().play = GuiCheckBox((Rectangle){950, y, 20, 20}, "P", channel.get_looper().play);
-		channel.get_looper().record = GuiCheckBox((Rectangle){985, y, 20, 20}, "P", channel.get_looper().record);
+		channel.get_looper().record = GuiCheckBox((Rectangle){985, y, 20, 20}, "R", channel.get_looper().record);
 	}
 
 	//Metronome
