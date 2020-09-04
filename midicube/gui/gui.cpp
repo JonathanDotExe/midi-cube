@@ -433,7 +433,17 @@ View* SoundEngineDeviceMenuView::draw() {
 			}
 		}
 		//Volume Slider
-		channel.volume = GuiSlider((Rectangle){600, y, 300, 20}, "Vol ", TextFormat("%1.2f", channel.volume.load()), channel.volume, 0, 1);
+		channel.volume = GuiSlider((Rectangle){570, y, 200, 20}, "Vol", TextFormat("%1.2f", channel.volume.load()), channel.volume, 0, 1);
+
+		//Looper
+		channel.get_looper().preset.on = GuiCheckBox((Rectangle){800, y, 20, 20}, "Looper", channel.get_looper().preset.on);
+		//Bars
+		int bars = channel.get_looper().preset.bars;
+		GuiSpinner((Rectangle){870, y, 80, 20}, "", &bars, 1, 16, false);
+		channel.get_looper().preset.bars = bars;
+		//Play and Record
+		channel.get_looper().play = GuiCheckBox((Rectangle){950, y, 20, 20}, "P", channel.get_looper().play);
+		channel.get_looper().record = GuiCheckBox((Rectangle){985, y, 20, 20}, "P", channel.get_looper().record);
 	}
 
 	//Metronome
@@ -441,7 +451,7 @@ View* SoundEngineDeviceMenuView::draw() {
 	device->play_metronome = GuiCheckBox((Rectangle){10, SCREEN_HEIGHT - 35, 20, 20}, "Metronome", device->play_metronome);
 	//BPM
 	int bpm = device->metronome.get_bpm();
-	if (GuiSpinner((Rectangle){150, SCREEN_HEIGHT - 40, 150, 30}, "BPM", &bpm, 0, 1920, bpm_editmode)) {
+	if (GuiSpinner((Rectangle){150, SCREEN_HEIGHT - 40, 150, 30}, "BPM", &bpm, 10, 1920, bpm_editmode)) {
 		bpm_editmode = !bpm_editmode;
 	}
 	device->metronome.set_bpm(bpm);

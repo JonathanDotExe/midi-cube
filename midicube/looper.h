@@ -9,6 +9,7 @@
 #define MIDICUBE_SOUNDENGINE_LOOPER_H_
 
 #include <array>
+#include <atomic>
 #include "audio.h"
 #include "metronome.h"
 
@@ -16,8 +17,8 @@
 #define LOOPER_BUFFER_SIZE 16777216
 
 struct LooperPreset {
-	unsigned int bars = 4;
-	bool on = false;
+	std::atomic<unsigned int> bars{4};
+	std::atomic<bool> on{false};
 };
 
 class Looper {
@@ -26,8 +27,8 @@ private:
 
 public:
 	LooperPreset preset;
-	bool play = true;
-	bool record = true;
+	std::atomic<bool> play{true};
+	std::atomic<bool> record{true};
 
 	void apply(std::array<double, OUTPUT_CHANNELS>& channels, Metronome& metronome, SampleInfo& info);
 

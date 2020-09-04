@@ -6,10 +6,12 @@
  */
 
 #include "looper.h"
+#include <algorithm>
 
 void Looper::apply(std::array<double, OUTPUT_CHANNELS>& channels, Metronome& metronome, SampleInfo& info) {
 	if (preset.on) {
-		size_t index = info.sample_time % (preset.bars * info.sample_rate * 4 * 60 / metronome.get_bpm()); //Assuming its a 4/4 measure
+		unsigned int bpm = metronome.get_bpm();
+		size_t index = info.sample_time % (preset.bars * info.sample_rate * 4 * 60 / std::max(bpm, (unsigned int) 1)); //Assuming its a 4/4 measure
 
 		if (index < buffer.size()) {
 			std::array<double, OUTPUT_CHANNELS> ch = channels;
