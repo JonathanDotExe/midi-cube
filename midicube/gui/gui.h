@@ -10,6 +10,7 @@
 
 #include "model.h"
 #include "../soundengine/organ.h"
+#include "../soundengine/synthesizer.h"
 #include "../soundengine/soundengine.h"
 #include <type_traits>
 
@@ -154,6 +155,17 @@ private:
 
 public:
 	B3OrganEngineMenuView(B3OrganData* device);
+	View* draw();
+
+};
+
+class SynthesizerEngineMenuView : public View {
+private:
+	SynthesizerData* data;
+	int current_preset = 1;
+
+public:
+	SynthesizerEngineMenuView(SynthesizerData* data);
 	View* draw();
 
 };

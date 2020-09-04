@@ -521,11 +521,12 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 	}
 		break;
 	case 2:
-		//Patch 2 -- Simple FM Keys
+		//Patch 2 -- FM Bass
 	{
 		OscilatorComponent* comp1 = new OscilatorComponent();
 		comp1->osc.set_waveform(AnalogWaveForm::SINE);
-		comp1->volume = 2;
+		comp1->volume = 1;
+		comp1->transpose = 2;
 		preset.components[0].set_component(comp1);
 
 		OscilatorComponent* comp2 = new OscilatorComponent();

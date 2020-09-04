@@ -9,11 +9,14 @@
 #define MIDICUBE_SOUNDENGINE_SYNTHESIZER_H_
 
 #include <type_traits>
+#include <atomic>
+
 #include "soundengine.h"
 #include "../oscilator.h"
 #include "../envelope.h"
 #include "../synthesis.h"
 #include "../filter.h"
+
 
 #define MAX_COMPONENTS 25
 
@@ -298,7 +301,7 @@ struct SynthesizerPreset {
 class SynthesizerData : public SoundEngineData {
 public:
 	SynthesizerPreset preset;
-	int update_preset = -1;
+	std::atomic<int> update_preset{-1}; 	//TODO normally a mutex for the components would be better but since this feature is only temporary it is solved this way
 
 	SynthesizerData();
 

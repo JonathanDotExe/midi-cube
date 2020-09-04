@@ -626,9 +626,42 @@ View* B3OrganEngineMenuView::draw() {
 	return view;
 }
 
+SynthesizerEngineMenuView::SynthesizerEngineMenuView(SynthesizerData* data) {
+	this->data = data;
+}
+
+View* SynthesizerEngineMenuView::draw() {
+	View* view = this;
+
+	//Title
+	int title_width = MeasureText("Synthesizer", 32);
+	DrawText("Synthesizer", SCREEN_WIDTH/2 - title_width/2, 20, 36, BLACK);
+
+	//PReset Input
+	Rectangle rect;
+	rect.x = SCREEN_WIDTH/2 - 200;
+	rect.y = SCREEN_HEIGHT/2 - 40;
+	rect.width = 400;
+	rect.height = 40;
+
+	GuiSpinner(rect, "Preset No.", &current_preset, 0, 4, false);
+
+	//Preset Button
+	rect.y += 45;
+	if (GuiButton(rect, "Apply")) {
+		data->update_preset = current_preset;
+	}
+
+	draw_return_button(&view);
+	return view;
+}
+
 View* create_view_for_engine(std::string name, SoundEngineData* data) {
 	if (name == "B3 Organ") {
 		return new B3OrganEngineMenuView(dynamic_cast<B3OrganData*>(data));	//TODO cleaner check
+	}
+	else if (name == "Synthesizer") {
+		return new SynthesizerEngineMenuView(dynamic_cast<SynthesizerData*>(data));	//TODO cleaner check
 	}
 	return nullptr;
 }
