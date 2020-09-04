@@ -14,6 +14,7 @@
 #include "../device.h"
 #include "../synthesis.h"
 #include "../metronome.h"
+#include "../looper.h"
 #include <string>
 #include <array>
 #include <mutex>
@@ -122,6 +123,7 @@ public:
 };
 
 
+
 class SoundEngineChannel {
 private:
 	KeyboardEnvironment environment;
@@ -129,6 +131,7 @@ private:
 	SoundEngine* engine = nullptr;
 	SoundEngineData* data = nullptr;
 	Arpeggiator arp;
+	Looper looper;
 	std::mutex engine_mutex;
 
 public:
@@ -140,7 +143,7 @@ public:
 
 	void send(MidiMessage& message, SampleInfo& info);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome);
 
 	/**
 	 * May only be called from GUI thread after GUI has started
@@ -152,6 +155,8 @@ public:
 	SoundEngineData* get_data();
 
 	Arpeggiator& arpeggiator();
+
+	Looper& get_looper();
 
 	std::string get_engine_name();
 

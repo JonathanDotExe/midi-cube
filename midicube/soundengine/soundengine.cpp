@@ -167,7 +167,7 @@ SoundEngineChannel::SoundEngineChannel() {
 	data = nullptr;
 }
 
-void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
+void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome) {
 	std::array<double, OUTPUT_CHANNELS> ch = {};
 	engine_mutex.lock();
 	if (engine && data) {
@@ -175,6 +175,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 			arp.apply(info, note);
 		}
 		EngineStatus status = {0};
+		//Notes
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 			if (note.note[i].valid) {
 				if (engine->note_finished(info, note.note[i], environment, *data)) {
@@ -191,7 +192,11 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 				engine->note_not_pressed(info, note.note[i], *data, i);
 			}
 		}
+		//Static sample
 		engine->process_sample(ch, info, environment, status, *data);
+		//Looper
+		looper.apply(ch, metronome, info);
+		//Playback
 		for (size_t i = 0; i < channels.size(); ++i) {
 			channels[i] += (ch[i] * volume);
 		}
@@ -274,6 +279,10 @@ Arpeggiator& SoundEngineChannel::arpeggiator() {
 	return arp;
 }
 
+Looper& SoundEngineChannel::get_looper() {
+	return looper;
+}
+
 SoundEngineChannel::~SoundEngineChannel() {
 	set_engine(nullptr);
 }
@@ -292,7 +301,7 @@ std::string SoundEngineDevice::get_identifier() {
 void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
 	//Channels
 	for (size_t i = 0; i < this->channels.size(); ++i) {
-		this->channels[i].process_sample(channels, info);
+		this->channels[i].process_sample(channels, info, metronome);
 	}
 	//Metronome
 	if (play_metronome) {
