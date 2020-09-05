@@ -198,7 +198,7 @@ View* DevicesMenuView::draw() {
 	}
 	//Move devices
 	Vector2 mouse_pos = GetMousePosition();
-	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && GetTouchPointsCount() <= 1) {
 		if (!binding_drag.dialog) {
 			if (device_drag.dragging) {
 				Position& pos = *model.device_positions[device_drag.device];
@@ -238,7 +238,7 @@ View* DevicesMenuView::draw() {
 		device_drag.dragging = false;
 	}
 	//Bind devices
-	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON) || GetTouchPointsCount() > 1) {
+	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON) || (GetTouchPointsCount() > 1 && IsMouseButtonDown(MOUSE_LEFT_BUTTON))) {
 		if (binding_drag.dragging) {
 			//Draw
 			Position* pos = model.get_position(binding_drag.input_device);
