@@ -14,7 +14,7 @@
 #include "metronome.h"
 
 //16 MB
-#define LOOPER_BUFFER_SIZE 16777216
+#define LOOPER_BUFFER_SIZE 1048576
 
 struct LooperPreset {
 	std::atomic<unsigned int> bars{4};
