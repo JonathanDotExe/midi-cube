@@ -238,7 +238,7 @@ View* DevicesMenuView::draw() {
 		device_drag.dragging = false;
 	}
 	//Bind devices
-	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON) || GetTouchPointsCount() > 1) {
 		if (binding_drag.dragging) {
 			//Draw
 			Position* pos = model.get_position(binding_drag.input_device);
