@@ -598,6 +598,48 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[11].audible = true;
 	}
 		break;
+	case 5:
+		//Patch 5 -- Soft Pad
+	{
+		ModEnvelopeComponent* mod = new ModEnvelopeComponent();
+		mod->envelope = {1.0, 1.0, 0.2, 0.3};
+		mod->amplitude = 0.7;
+		preset.components[0].set_component(mod);
+
+		VelocityComponent* velocity = new VelocityComponent();
+		preset.components[1].set_component(velocity);
+
+		OscilatorComponent* comp1 = new OscilatorComponent();
+		comp1->osc.set_waveform(AnalogWaveForm::SINE);
+		comp1->unison_amount = 3;
+		comp1->unison_detune = 0.1;
+		preset.components[8].set_component(comp1);
+		preset.components[8].bindings.push_back({BindingType::MUL, OSCILATOR_VOLUME_PROPERTY, 0, 0, 1});
+
+		OscilatorComponent* comp2 = new OscilatorComponent();
+		comp2->osc.set_waveform(AnalogWaveForm::SAW);
+		comp2->unison_amount = 1;
+		comp2->unison_detune = 0.1;
+		preset.components[9].set_component(comp2);
+		preset.components[9].bindings.push_back({BindingType::MUL, OSCILATOR_VOLUME_PROPERTY, 0, 1, 0});
+
+		LowPassFilter12Component* filter = new LowPassFilter12Component();
+		filter->cutoff = 200;
+		preset.components[10].set_component(filter);
+		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 8, -1, 1});
+		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
+		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_CUTOFF_PROPERTY, 1, 0, 350});
+		preset.components[10].bindings.push_back({BindingType::MUL, FILTER_CUTOFF_PROPERTY, 0, 0.9, 1.1});
+
+		AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
+		amp->envelope = {0.15, 0, 1, 0.5};
+
+		preset.components[11].set_component(amp);
+		preset.components[11].bindings.push_back({BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1});
+		preset.components[11].bindings.push_back({BindingType::MUL, AMP_ENVELOPE_AMPLITUDE_PROPERTY, 1, 0.7, 1});
+		preset.components[11].audible = true;
+	}
+		break;
 	}
 }
 

@@ -29,9 +29,9 @@ public:
 	LooperPreset preset;
 	std::atomic<bool> play{true};
 	std::atomic<bool> record{true};
+	std::atomic<bool> reset{false};	//true will invoke a reset next sample
 
 	void apply(std::array<double, OUTPUT_CHANNELS>& channels, Metronome& metronome, SampleInfo& info);
-
 };
 
 

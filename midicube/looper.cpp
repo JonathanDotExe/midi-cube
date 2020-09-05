@@ -10,6 +10,11 @@
 
 void Looper::apply(std::array<double, OUTPUT_CHANNELS>& channels, Metronome& metronome, SampleInfo& info) {
 	if (preset.on) {
+		if (reset) {
+			buffer = {};
+			reset = false;
+		}
+
 		unsigned int bpm = metronome.get_bpm();
 		size_t index = info.sample_time % (preset.bars * info.sample_rate * 4 * 60 / std::max(bpm, (unsigned int) 1)); //Assuming its a 4/4 measure
 
@@ -30,3 +35,4 @@ void Looper::apply(std::array<double, OUTPUT_CHANNELS>& channels, Metronome& met
 		}
 	}
 }
+
