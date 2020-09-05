@@ -110,6 +110,8 @@ class DevicesMenuView : public View {
 private:
 	DeviceDragInfo device_drag;
 	BindingDragInfo binding_drag;
+	bool drag_binding = false;
+	double press_time = -2;
 
 public:
 

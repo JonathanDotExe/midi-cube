@@ -198,8 +198,8 @@ View* DevicesMenuView::draw() {
 	}
 	//Move devices
 	Vector2 mouse_pos = GetMousePosition();
-	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && GetTouchPointsCount() <= 1) {
-		if (!binding_drag.dialog) {
+	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+		if (!binding_drag.dialog && !drag_binding) {
 			if (device_drag.dragging) {
 				Position& pos = *model.device_positions[device_drag.device];
 				Texture2D tex = device_textures[model.midi_cube->get_devices()[device_drag.device]->type()];
@@ -207,8 +207,13 @@ View* DevicesMenuView::draw() {
 				pos.y += mouse_pos.y - device_drag.last_y;
 				pos.x = std::min(std::max(pos.x, 0), SCREEN_WIDTH - tex.width);
 				pos.y = std::min(std::max(pos.y, 0), SCREEN_HEIGHT - tex.height);
+
+				if (device_drag.dragging && GetTime() > press_time + 1 && device_drag.start_x == mouse_pos.x && device_drag.start_y == mouse_pos.y) {
+					drag_binding = true;
+				}
 			}
 			else {
+				press_time = GetTime();
 				//Find position
 				for (auto p : model.device_positions) {
 					Position& pos = *p.second;
@@ -238,7 +243,11 @@ View* DevicesMenuView::draw() {
 		device_drag.dragging = false;
 	}
 	//Bind devices
-	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON) || (GetTouchPointsCount() > 1 && IsMouseButtonDown(MOUSE_LEFT_BUTTON))) {
+	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+		drag_binding = true;
+	}
+	drag_binding = drag_binding && (IsMouseButtonDown(MOUSE_RIGHT_BUTTON) || IsMouseButtonDown(MOUSE_LEFT_BUTTON));
+	if (drag_binding) {
 		if (binding_drag.dragging) {
 			//Draw
 			Position* pos = model.get_position(binding_drag.input_device);
