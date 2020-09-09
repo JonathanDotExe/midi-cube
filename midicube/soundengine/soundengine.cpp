@@ -224,7 +224,9 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 	}
 	//Control change
 	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
-		engine->control_change(message.get_control(), message.get_value(), *data);
+		if (engine && data) {
+			engine->control_change(message.get_control(), message.get_value(), *data);
+		}
 		//Sustain
 		if (message.get_control() == sustain_control) {
 			bool new_sustain = message.get_value() != 0;
