@@ -93,11 +93,14 @@ struct BindingDragInfo {
 	bool output_channel_editmode = false;
 	bool start_note_editmode = false;
 	bool end_note_editmode = false;
+	bool octave_editmode = false;
 
 	int input_channel = -1;
 	int output_channel = -1;
 	int start_note = 0;
 	int end_note = 127;
+	int octave = 0;
+
 	bool transfer_channel_aftertouch = true;
 	bool transfer_pitch_bend = true;
 	bool transfer_cc = true;

@@ -98,7 +98,7 @@ void MidiCube::midi_callback(MidiMessage& message, std::string device) {
 			case MessageType::POLYPHONIC_AFTERTOUCH:
 				pass = b.start_note <= message.get_note() && b.end_note >= message.get_note();
 				if (b.octave) {
-					message.set_note(message.get_note() + b.octave * 12);
+					msg.set_note(msg.get_note() + b.octave * 12);
 				}
 				break;
 			case MessageType::CONTROL_CHANGE:

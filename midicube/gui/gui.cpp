@@ -289,6 +289,7 @@ View* DevicesMenuView::draw() {
 					binding_drag.output_channel = -1;
 					binding_drag.start_note = 0;
 					binding_drag.end_note = 127;
+					binding_drag.octave = 0;
 					binding_drag.transfer_cc = true;
 					binding_drag.transfer_channel_aftertouch = true;
 					binding_drag.transfer_other = true;
@@ -299,6 +300,7 @@ View* DevicesMenuView::draw() {
 					binding_drag.output_channel_editmode = false;
 					binding_drag.start_note_editmode = false;
 					binding_drag.end_note_editmode = false;
+					binding_drag.octave_editmode = false;
 					break;
 				}
 			}
@@ -313,7 +315,7 @@ View* DevicesMenuView::draw() {
 		const int check_height = 20;
 		const int text_height = 16;
 		const int box_width = input_width  + 10;
-		const int box_height = 5 * input_height + 5 + 4 * text_height + (check_height + 5) * 3 + 10;
+		const int box_height = 6 * input_height + 5 + 5 * text_height + (check_height + 5) * 3 + 10;
 		//Background
 		DrawRectangle(SCREEN_WIDTH/2 - box_width/2, SCREEN_HEIGHT/2 - box_height/2, box_width, box_height, GRAY);
 		//Components
@@ -352,6 +354,14 @@ View* DevicesMenuView::draw() {
 		if (GuiSpinner(rect, "End Note: ", &binding_drag.end_note, 0, 127, binding_drag.end_note_editmode)) {
 			binding_drag.end_note_editmode = !binding_drag.end_note_editmode;
 		}
+		pos_y += input_height;
+
+		DrawText("Octave: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
+		pos_y += text_height;
+		rect.y = pos_y;
+		if (GuiSpinner(rect, "Octave: ", &binding_drag.octave, -4, 4, binding_drag.octave_editmode)) {
+			binding_drag.octave_editmode = !binding_drag.octave_editmode;
+		}
 		pos_y += input_height + 5;
 
 		rect.height = check_height;
@@ -386,6 +396,7 @@ View* DevicesMenuView::draw() {
 			binding.input_channel = binding_drag.input_channel;
 			binding.output = binding_drag.output_device;
 			binding.output_channel = binding_drag.output_channel;
+			binding.octave = binding_drag.octave;
 
 			binding.start_note = binding_drag.start_note;
 			binding.end_note = binding_drag.end_note;
