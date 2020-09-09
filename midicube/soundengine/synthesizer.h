@@ -59,7 +59,7 @@ class OscilatorComponent : public SynthComponent {
 private:
 	std::array<double, SOUND_ENGINE_POLYPHONY> phase_shift = {0};
 public:
-	AnalogOscilator osc{AnalogWaveForm::SINE};
+	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY> osc;
 	unsigned int unison_amount = 0;
 	double semi = 0;			//Static pitch offset in semitones
 	double transpose = 1;		//Static pitch offset as frequency multiplier
@@ -227,11 +227,13 @@ class HighPassFilter24Component : public FilterComponent<HighPassFilter<4>> {
 class LFOComponent : public SynthComponent {
 private:
 	double amplitude_mod = 1;
+	AnalogOscilator aosc;
 public:
-	AnalogOscilator osc{AnalogWaveForm::SINE};
+	AnalogOscilatorData osc;
 	double freq = 1;	//TODO option to morph frequency
 	double amplitude = 1;
 
+	LFOComponent();
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 	void set_property(size_t index, double value);
 	void add_property(size_t index, double value);

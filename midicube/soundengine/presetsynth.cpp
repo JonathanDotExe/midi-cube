@@ -36,19 +36,17 @@ PresetSynth::PresetSynth() {
 	vibrato = 0;
 	filter.set_cutoff(1200);
 
-	AnalogOscilator* o = new AnalogOscilator(AnalogWaveForm::SAW);
-	o->analog = true;
-
-	osc = new OscilatorSlot(o);
-	osc->set_volume(1);
-	osc->set_unison(3);
+	osc.osc.data.analog = true;
+	osc.osc.data.waveform = AnalogWaveForm::SAW;
+	osc.set_volume(1);
+	osc.set_unison(3);
 }
 
 void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) {
 	double sample = 0.0;
 	double freq = note.freq;
 	double t = info.time + note.phase_shift;
-	sample = osc->signal(t, freq, info.time_step);
+	sample = osc.signal(t, freq, info.time_step, note_index);
 
 	if (vibrato) {
 		note.phase_shift += info.time_step * (note_to_freq_transpose(SYNTH_VIBRATO_DETUNE * sine_wave(info.time, SYNTH_VIBRATO_RATE) * vibrato) - 1);
@@ -84,7 +82,6 @@ std::string PresetSynth::get_name() {
 }
 
 PresetSynth::~PresetSynth() {
-	delete osc;
-	osc = nullptr;
+
 }
 
