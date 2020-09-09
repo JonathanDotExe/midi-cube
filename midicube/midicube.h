@@ -29,6 +29,7 @@ struct DeviceBinding {
 	int output_channel;
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
+	int octave = 0;
 	bool transfer_channel_aftertouch = true;
 	bool transfer_pitch_bend = true;
 	bool transfer_cc = true;

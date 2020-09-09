@@ -91,11 +91,15 @@ void MidiCube::midi_callback(MidiMessage& message, std::string device) {
 		DeviceBinding& b = bindings[device][i];
 		if ((b.input_channel < 0 || b.input_channel == (int) message.get_channel()) && devices.find(device) != devices.end()) {
 			bool pass = true;
+			MidiMessage msg = message;
 			switch (t) {
 			case MessageType::NOTE_OFF:
 			case MessageType::NOTE_ON:
 			case MessageType::POLYPHONIC_AFTERTOUCH:
 				pass = b.start_note <= message.get_note() && b.end_note >= message.get_note();
+				if (b.octave) {
+					message.set_note(message.get_note() + b.octave * 12);
+				}
 				break;
 			case MessageType::CONTROL_CHANGE:
 				pass = b.transfer_cc;
@@ -117,7 +121,6 @@ void MidiCube::midi_callback(MidiMessage& message, std::string device) {
 			}
 			//Apply binding
 			if (pass) {
-				MidiMessage msg = message;
 				if (bindings[device][i].output_channel >= 0) {
 					msg.set_channel((unsigned int) bindings[device][i].output_channel);
 				}
