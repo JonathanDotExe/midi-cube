@@ -693,7 +693,7 @@ View* SynthesizerEngineMenuView::draw() {
 	rect.width = 400;
 	rect.height = 40;
 
-	GuiSpinner(rect, "Preset No.", &current_preset, 0, 5, false);
+	GuiSpinner(rect, "Preset No.", &current_preset, 0, 6, false);
 
 	//Preset Button
 	rect.y += 45;

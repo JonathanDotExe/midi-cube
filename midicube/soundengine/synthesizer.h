@@ -10,6 +10,7 @@
 
 #include <type_traits>
 #include <atomic>
+#include <algorithm>
 
 #include "soundengine.h"
 #include "../oscilator.h"
@@ -137,9 +138,13 @@ private:
 public:
 	double input = 0;
 	double cutoff = 21000;
+	double keyboard_tracking = 0;
 
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 		T& filter = filters.at(note_index);
+		if (keyboard_tracking) {
+			cutoff_mod *= 1 + std::max(0.0, ((double) note.note - 36)/12.0 * keyboard_tracking);
+		}
 		filter.set_cutoff(cutoff_mod); //TODO do something more performant than updating every frame
 		return filter.apply(input, info.time_step);
 	}

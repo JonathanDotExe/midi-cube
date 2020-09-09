@@ -647,6 +647,63 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[11].audible = true;
 	}
 		break;
+	case 6:
+		//Patch 5 -- Bright Lead
+	{
+		ModEnvelopeComponent *mod = new ModEnvelopeComponent();
+		mod->envelope = { 1.0, 1.0, 0.2, 0.3 };
+		mod->amplitude = 0.7;
+		preset.components[0].set_component(mod);
+
+		ControlChangeComponent *cc = new ControlChangeComponent();
+		cc->control = 1;
+		preset.components[1].set_component(cc);
+
+		LFOComponent *lfo = new LFOComponent();
+		lfo->freq = 6;
+		preset.components[2].set_component(lfo);
+		preset.components[2].bindings.push_back( { BindingType::MUL,
+				LFO_AMPLITUDE_PROPERTY, 1, 0, 1 });
+
+		OscilatorComponent *comp1 = new OscilatorComponent();
+		comp1->osc.set_waveform(AnalogWaveForm::SAW);
+		comp1->unison_amount = 1;
+		comp1->unison_detune = 0.1;
+		preset.components[8].set_component(comp1);
+		preset.components[8].bindings.push_back( { BindingType::MUL,
+				OSCILATOR_VOLUME_PROPERTY, 0, 1, 0.5 });
+		preset.components[8].bindings.push_back( { BindingType::ADD,
+						OSCILATOR_PITCH_PROPERTY, 2, -1, 1 });
+
+		OscilatorComponent *comp2 = new OscilatorComponent();
+		comp2->osc.set_waveform(AnalogWaveForm::SAW);
+		comp2->unison_amount = 1;
+		comp2->unison_detune = 0.1;
+		comp2->transpose = 2;
+		preset.components[9].set_component(comp2);
+		preset.components[9].bindings.push_back( { BindingType::MUL,
+				OSCILATOR_VOLUME_PROPERTY, 0, 0.5, 1 });
+		preset.components[9].bindings.push_back( { BindingType::ADD,
+						OSCILATOR_PITCH_PROPERTY, 2, -1, 1 });
+
+		LowPassFilter24Component *filter = new LowPassFilter24Component();
+		filter->cutoff = 7800;
+		filter->keyboard_tracking = 0.7;
+		preset.components[10].set_component(filter);
+		preset.components[10].bindings.push_back( { BindingType::ADD,
+				FILTER_INPUT_PROPERTY, 8, -1, 1 });
+		preset.components[10].bindings.push_back( { BindingType::ADD,
+				FILTER_INPUT_PROPERTY, 9, -1, 1 });
+
+		AmpEnvelopeComponent *amp = new AmpEnvelopeComponent();
+		amp->envelope = { 0.0005, 0, 1, 0.003 };
+
+		preset.components[11].set_component(amp);
+		preset.components[11].bindings.push_back( { BindingType::ADD,
+				AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1 });
+		preset.components[11].audible = true;
+	}
+		break;
 	}
 }
 
