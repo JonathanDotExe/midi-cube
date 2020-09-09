@@ -174,26 +174,28 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 		if (arp.on) {
 			arp.apply(info, note);
 		}
-		EngineStatus status = {0};
-		//Notes
-		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-			if (note.note[i].valid) {
-				if (engine->note_finished(info, note.note[i], environment, *data)) {
-					note.note[i].valid = false;
-					engine->note_not_pressed(info, note.note[i], *data, i);
+		if (active) {
+			EngineStatus status = {0};
+			//Notes
+			for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+				if (note.note[i].valid) {
+					if (engine->note_finished(info, note.note[i], environment, *data)) {
+						note.note[i].valid = false;
+						engine->note_not_pressed(info, note.note[i], *data, i);
+					}
+					else {
+						++status.pressed_notes;
+						engine->process_note_sample(ch, info, note.note[i], environment, *data, i);
+						note.note[i].phase_shift += environment.pitch_bend * info.time_step;
+					}
 				}
 				else {
-					++status.pressed_notes;
-					engine->process_note_sample(ch, info, note.note[i], environment, *data, i);
-					note.note[i].phase_shift += environment.pitch_bend * info.time_step;
+					engine->note_not_pressed(info, note.note[i], *data, i);
 				}
 			}
-			else {
-				engine->note_not_pressed(info, note.note[i], *data, i);
-			}
+			//Static sample
+			engine->process_sample(ch, info, environment, status, *data);
 		}
-		//Static sample
-		engine->process_sample(ch, info, environment, status, *data);
 		//Looper
 		looper.apply(ch, metronome, info);
 		//Playback
@@ -339,6 +341,13 @@ void SoundEngineDevice::send(MidiMessage &message) {
 	SampleInfo info =  handler->sample_info();
 	channels.at(message.get_channel()).send(message, info);
 }
+
+void SoundEngineDevice::solo (unsigned int channel) {
+	for (size_t i = 0; i < channels.size(); ++i) {
+		channels[i].active = channel == i;
+	}
+}
+
 
 SoundEngineDevice::~SoundEngineDevice() {
 	//Clear channels

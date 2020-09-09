@@ -533,8 +533,15 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		comp2->osc.set_waveform(AnalogWaveForm::SINE);
 
 		preset.components[1].set_component(comp2);
-		preset.components[1].audible = true;
 		preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});
+
+		AmpEnvelopeComponent *amp = new AmpEnvelopeComponent();
+		amp->envelope = { 0.0005, 0, 1, 0.03 };
+
+		preset.components[11].set_component(amp);
+		preset.components[11].bindings.push_back( { BindingType::ADD,
+				AMP_ENVELOPE_INPUT_PROPERTY, 1, -1, 1 });
+		preset.components[11].audible = true;
 	}
 		break;
 	case 3:

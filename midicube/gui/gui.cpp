@@ -430,23 +430,29 @@ View* SoundEngineDeviceMenuView::draw() {
 		text << "Channel " << ch;
 		DrawText(text.str().c_str(), 5, y + 6, 4, BLACK);
 		//ComboBox
-		selected = GuiComboBox((Rectangle){100, y, 300, 20}, options.c_str(), selected);
+		selected = GuiComboBox((Rectangle){100, y, 250, 20}, options.c_str(), selected);
 		if (old != selected) {
 			channel.set_engine(selected > 0 ? engines.at(selected - 1) : nullptr);
 		}
 		//Edit
-		if (GuiButton((Rectangle){410, y, 20, 20}, GuiIconText(RICON_PENCIL, ""))) {
+		if (GuiButton((Rectangle){360, y, 20, 20}, GuiIconText(RICON_PENCIL, ""))) {
 			view = create_view_for_engine(channel.get_engine_name(), channel.get_data()); //TODO Thread safety for data
 			if (!view) {
 				view = this;
 			}
 		}
 		//Volume Slider
-		channel.volume = GuiSlider((Rectangle){470, y, 200, 20}, "Vol", TextFormat("%1.2f", channel.volume.load()), channel.volume, 0, 1);
+		channel.volume = GuiSlider((Rectangle){420, y, 200, 20}, "Vol", TextFormat("%1.2f", channel.volume.load()), channel.volume, 0, 1);
+
+		//Active and solo
+		channel.active = GuiCheckBox((Rectangle){650, y, 20, 20}, "A", channel.active);
+		if (GuiButton((Rectangle){690, y, 20, 20}, "S")) {
+			device->solo(ch);
+		}
 
 		//Looper
-		channel.get_looper().preset.on = GuiCheckBox((Rectangle){700, y, 20, 20}, "Looper", channel.get_looper().preset.on);
-		if (GuiButton((Rectangle){770, y, 90, 20}, "Clear")) {
+		channel.get_looper().preset.on = GuiCheckBox((Rectangle){730, y, 20, 20}, "Looper", channel.get_looper().preset.on);
+		if (GuiButton((Rectangle){810, y, 50, 20}, "Clear")) {
 			channel.get_looper().reset = true;
 		}
 		//Bars

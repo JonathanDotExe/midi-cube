@@ -138,6 +138,7 @@ public:
 	std::atomic<double> volume{0.3};
 	std::atomic<unsigned int> sustain_control{64};
 	std::atomic<bool> sustain{true};
+	std::atomic<bool> active{true};
 
 	SoundEngineChannel();
 
@@ -199,6 +200,8 @@ public:
 	void send(MidiMessage& message);
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+
+	void solo (unsigned int channel);
 
 	~SoundEngineDevice();
 
