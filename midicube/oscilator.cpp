@@ -28,9 +28,13 @@ static double polyblep(double rotation, double freq, double time_step) {
 }
 
 double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data) {
+	//Update parameters
+	if (rotation - (long int) rotation < freq * time_step) {
+		sync = data.sync;
+		pulse_width = data.pulse_width;
+	}
 	//Move
 	rotation += freq * time_step;
-
 	//Compute wave
 	double signal = 0;
 	switch(data.waveform) {
@@ -44,10 +48,10 @@ double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorDat
 		}
 		break;
 	case AnalogWaveForm::SQUARE:
-		signal = square_wave(rotation, 1, data.pulse_width);
+		signal = square_wave(rotation, 1, pulse_width);
 		if (data.analog) {
 			signal += polyblep(rotation, freq, time_step);
-			signal -= polyblep(rotation + data.pulse_width/freq, freq, time_step);
+			signal -= polyblep(rotation + pulse_width/freq, freq, time_step);
 		}
 		break;
 	case AnalogWaveForm::NOISE:

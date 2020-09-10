@@ -28,6 +28,8 @@ struct AnalogOscilatorData {
 class AnalogOscilator {
 private:
 	double rotation = 0;
+	double sync = 1;
+	double pulse_width = 0.5;
 public:
 	AnalogOscilator();
 	double signal(double freq, double time_step, AnalogOscilatorData& data);
