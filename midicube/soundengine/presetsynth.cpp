@@ -39,7 +39,7 @@ PresetSynth::PresetSynth() {
 
 	osc.data.analog = true;
 	osc.data.waveform = AnalogWaveForm::SAW;
-	osc.data.unison_amount = 3;
+	osc.unison_amount = 3;
 }
 
 void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) {

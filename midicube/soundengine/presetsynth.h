@@ -23,7 +23,7 @@ private:
 	double vibrato;
 	ADSREnvelope env{0.1, 0, 1, 0.3};
 	MultiChannelFilter<LowPassFilter<2>> filter;
-	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY> osc;
+	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 8> osc;
 public:
 
 	PresetSynth();

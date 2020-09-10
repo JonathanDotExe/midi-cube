@@ -57,7 +57,7 @@ public:
 
 class OscilatorComponent : public SynthComponent {
 public:
-	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY> osc;
+	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 8> osc;
 	double semi = 0;			//Static pitch offset in semitones
 	double transpose = 1;		//Static pitch offset as frequency multiplier
 	double volume = 1;
@@ -225,7 +225,7 @@ class LFOComponent : public SynthComponent {
 private:
 	double amplitude_mod = 1;
 public:
-	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY> osc;
+	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 1> osc;
 	double freq = 1;	//TODO option to morph frequency
 	double amplitude = 1;
 

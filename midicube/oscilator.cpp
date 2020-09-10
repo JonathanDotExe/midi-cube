@@ -33,43 +33,28 @@ double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorDat
 
 	//Compute wave
 	double signal = 0;
-	double detune = note_to_freq_transpose(data.unison_detune);
-	double ndetune = note_to_freq_transpose(-data.unison_detune);
-	double det = detune;
-	double ndet = 1;
-	for (size_t i = 0; i <= data.unison_amount; ++i) {
-		double d = 1;
-		if (i % 2 == 0) {
-			d = ndet;
-			ndet *= ndetune;
+	switch(data.waveform) {
+	case AnalogWaveForm::SINE:
+		signal = sine_wave(rotation, 1);
+		break;
+	case AnalogWaveForm::SAW:
+		signal = saw_wave(rotation, 1);
+		if (data.analog) {
+			signal -= polyblep(rotation, freq, time_step);
 		}
-		else {
-			d = det;
-			det *= detune;
+		break;
+	case AnalogWaveForm::SQUARE:
+		signal = square_wave(rotation, 1, data.pulse_width);
+		if (data.analog) {
+			signal += polyblep(rotation, freq, time_step);
+			signal -= polyblep(rotation + data.pulse_width/freq, freq, time_step);
 		}
-		switch(data.waveform) {
-		case AnalogWaveForm::SINE:
-			signal += sine_wave(rotation * d, 1);
-			break;
-		case AnalogWaveForm::SAW:
-			signal += saw_wave(rotation * d, 1);
-			if (data.analog) {
-				signal -= polyblep(rotation * d, freq, time_step);
-			}
-			break;
-		case AnalogWaveForm::SQUARE:
-			signal += square_wave(rotation * d, 1, data.pulse_width);
-			if (data.analog) {
-				signal += polyblep(rotation * d, freq, time_step);
-				signal -= polyblep(rotation * d + data.pulse_width/freq * d, freq, time_step);
-			}
-			break;
-		case AnalogWaveForm::NOISE:
-			signal += noise_wave(rotation * d, 1);
-			break;
-		}
+		break;
+	case AnalogWaveForm::NOISE:
+		signal = noise_wave(rotation, 1);
+		break;
 	}
-	return signal / (data.unison_amount + 1);
+	return signal;
 }
 
 AnalogOscilator::~AnalogOscilator() {
