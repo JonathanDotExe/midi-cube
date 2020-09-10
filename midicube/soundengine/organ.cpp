@@ -99,11 +99,30 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 
 		//Compute samples
 		size_t i = 0;
+		double horn_count = 0;
+		double bass_count = 0;
 		for (; i < cutoff_tonewheel && i < data.tonewheels.size(); ++i) {
+			if (data.tonewheels[i].dynamic_vol + data.tonewheels[i].static_vol) {
+				++bass_count;
+			}
 			bass_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * (env.pitch_bend + 1));
 		}
 		for (; i < data.tonewheels.size(); ++i) {
+			if (data.tonewheels[i].dynamic_vol + data.tonewheels[i].static_vol) {
+				++horn_count;
+			}
 			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * (env.pitch_bend + 1));
+		}
+
+		//Overdrive
+		double total_count = bass_count + horn_count;
+		if (data.preset.overdrive && total_count) {
+			double bass_clip = data.preset.overdrive_clip * bass_count / total_count;
+			double horn_clip = data.preset.overdrive_clip - bass_clip;
+			bass_sample *= data.preset.overdrive_gain;
+			bass_sample = fmax(fmin(bass_sample, bass_clip), -bass_clip);
+			horn_sample *= data.preset.overdrive_gain;
+			horn_sample = fmax(fmin(horn_sample, horn_clip), -horn_clip);
 		}
 
 		//Horn
@@ -130,6 +149,11 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		double sample = 0;
 		for (size_t i = 0; i < data.tonewheels.size(); ++i) {
 			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * (env.pitch_bend + 1));
+		}
+		//Overdrive
+		if (data.preset.overdrive) {
+			sample *= data.preset.overdrive_gain;
+			sample = fmax(fmin(sample, data.preset.overdrive_clip), -data.preset.overdrive_clip);
 		}
 		//Play
 		for (size_t i = 0; i < channels.size() ; ++i) {
@@ -195,6 +219,16 @@ void B3Organ::control_change(unsigned int control, unsigned int value, SoundEngi
 	if (control == data.preset.rotary_speed_cc) {
 		data.preset.rotary_fast = value > 0;
 	}
+	//Overdrive
+	if (control == data.preset.overdrive_cc) {
+		data.preset.overdrive = value > 0;
+	}
+	if (control == data.preset.overdrive_gain_cc) {
+			data.preset.overdrive_gain = value/127.0 * 2;
+		}
+	if (control == data.preset.overdrive_clip_cc) {
+			data.preset.overdrive_clip = value/127.0 * 2;
+		}
 	//Percussion
 	if (control == data.preset.percussion_cc) {
 		data.preset.percussion = value > 0;

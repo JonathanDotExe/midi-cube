@@ -74,7 +74,7 @@ void PresetSynth::control_change(unsigned int control, unsigned int value, Sound
 	if (control == 1) {
 		vibrato = value/127.0;
 	}
-	if (control == 35) {
+	if (control == 74) {
 		filter.set_cutoff(21000/(128.0 - value));
 	}
 }
