@@ -481,7 +481,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 
 		OscilatorComponent *comp = new OscilatorComponent();
 		comp->osc.data.waveform = AnalogWaveForm::SAW;
-		comp->osc.data.unison_amount = 4;
+		comp->osc.data.unison_amount = 2;
 		comp->unison_detune = 0.1;
 		preset.components[9].set_component(comp);
 		preset.components[9].bindings.push_back( { BindingType::ADD,
@@ -632,7 +632,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 	}
 		break;
 	case 6:
-		//Patch 5 -- Bright Lead
+		//Patch 6 -- Bright Lead
 	{
 		ModEnvelopeComponent *mod = new ModEnvelopeComponent();
 		mod->envelope = { 1.0, 1.0, 0.2, 0.3 };
@@ -685,6 +685,23 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[11].set_component(amp);
 		preset.components[11].bindings.push_back( { BindingType::ADD,
 				AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1 });
+		preset.components[11].audible = true;
+	}
+		break;
+	case 7:
+		//Patch 7 -- Sawtooth wave
+	{
+		OscilatorComponent *comp1 = new OscilatorComponent();
+		comp1->osc.data.waveform = AnalogWaveForm::SAW;
+		preset.components[8].set_component(comp1);
+
+
+		AmpEnvelopeComponent *amp = new AmpEnvelopeComponent();
+		amp->envelope = { 0.0005, 0, 1, 0.003 };
+
+		preset.components[11].set_component(amp);
+		preset.components[11].bindings.push_back( { BindingType::ADD,
+				AMP_ENVELOPE_INPUT_PROPERTY, 8, -1, 1 });
 		preset.components[11].audible = true;
 	}
 		break;
