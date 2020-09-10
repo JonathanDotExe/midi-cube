@@ -60,12 +60,11 @@ private:
 	std::array<double, SOUND_ENGINE_POLYPHONY> phase_shift = {0};
 public:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY> osc;
-	unsigned int unison_amount = 0;
 	double semi = 0;			//Static pitch offset in semitones
 	double transpose = 1;		//Static pitch offset as frequency multiplier
 	double volume = 1;
 	double amplitude = 1;
-	double unison_detune = 0.1;
+	double unison_detune = 0.1;	//Set the unison amount here instead of using data.unison detune which is used internally
 	double sync = 1;			//Sync frequency factor
 	double sync_mod = 1;		//Sync frequency factor (modulated)
 	double fm = 0;				//Dynamic pitch offset in time shift
