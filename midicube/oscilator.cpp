@@ -44,14 +44,14 @@ double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorDat
 		case AnalogWaveForm::SAW:
 			signal += saw_wave(rotation * det, 1);
 			if (data.analog) {
-				signal -= polyblep(rotation, freq, time_step);
+				signal -= polyblep(rotation* det, freq, time_step);
 			}
 			break;
 		case AnalogWaveForm::SQUARE:
 			signal += square_wave(rotation * det, 1, data.pulse_width);
 			if (data.analog) {
-				signal += polyblep(rotation, freq, time_step);
-				signal -= polyblep(rotation + data.pulse_width/freq, freq, time_step);
+				signal += polyblep(rotation * det, freq, time_step);
+				signal -= polyblep(rotation * det + data.pulse_width/freq * det, freq, time_step);
 			}
 			break;
 		case AnalogWaveForm::NOISE:

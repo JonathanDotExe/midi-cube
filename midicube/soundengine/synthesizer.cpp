@@ -115,7 +115,7 @@ void OscilatorComponent::mul_property(size_t index, double value) {
 void OscilatorComponent::reset_properties() {
 	amplitude = 1;
 	sync_mod = sync;
-	fm = 0;
+	fm = 1;
 	pitch = 0;
 	unison_detune_mod = unison_detune;
 	pulse_width_mod = pulse_width;

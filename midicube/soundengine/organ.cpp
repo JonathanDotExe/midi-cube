@@ -100,10 +100,10 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		//Compute samples
 		size_t i = 0;
 		for (; i < cutoff_tonewheel && i < data.tonewheels.size(); ++i) {
-			bass_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * (env.pitch_bend + 1));
+			bass_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
 		}
 		for (; i < data.tonewheels.size(); ++i) {
-			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * (env.pitch_bend + 1));
+			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
 		}
 
 		//Horn
@@ -129,7 +129,7 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		//Compute samples
 		double sample = 0;
 		for (size_t i = 0; i < data.tonewheels.size(); ++i) {
-			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * (env.pitch_bend + 1));
+			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
 		}
 		//Play
 		for (size_t i = 0; i < channels.size() ; ++i) {

@@ -7,6 +7,7 @@
 
 #include "presetsynth.h"
 #include "../synthesis.h"
+#include <iostream>
 
 
 //PresetSynth
@@ -15,7 +16,7 @@ PresetSynth::PresetSynth() {
 	ndetune = note_to_freq_transpose(-0.1);
 	vibrato = 0;
 	filter.set_cutoff(6300);
-
+)
 	AdditiveOscilator* aosc = new AdditiveOscilator();
 	std::vector<double> harmonics = { 0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8 };
 	for (size_t i = 0; i < harmonics.size(); ++i) {
