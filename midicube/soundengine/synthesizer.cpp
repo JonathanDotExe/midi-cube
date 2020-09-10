@@ -690,12 +690,16 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 	}
 		break;
 	case 7:
-		//Patch 7 -- Sawtooth wave
+		//Patch 7 -- Syncing Sawtooth wave
 	{
+		ControlChangeComponent *cc = new ControlChangeComponent();
+		cc->control = 1;
+		preset.components[0].set_component(cc);
+
 		OscilatorComponent *comp1 = new OscilatorComponent();
 		comp1->osc.data.waveform = AnalogWaveForm::SAW;
 		preset.components[8].set_component(comp1);
-
+		preset.components[8].bindings.push_back({BindingType::MUL, OSCILATOR_SYNC_PROPERTY, 0, 1, 10});
 
 		AmpEnvelopeComponent *amp = new AmpEnvelopeComponent();
 		amp->envelope = { 0.0005, 0, 1, 0.003 };
