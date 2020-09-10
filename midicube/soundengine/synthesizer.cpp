@@ -257,11 +257,11 @@ static std::vector<std::string> lfo_properties = {"Amplitude"};
 
 //LFOComponent
 LFOComponent::LFOComponent() {
-	osc.waveform = AnalogWaveForm::SINE;
+	osc.data.waveform = AnalogWaveForm::SINE;
 }
 
 double LFOComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return aosc.signal(freq, info.time_step, osc) * amplitude_mod;
+	return osc.signal(freq, info.time_step, note_index) * amplitude_mod;
 }
 
 void LFOComponent::set_property(size_t index, double value){

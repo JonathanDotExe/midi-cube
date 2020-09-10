@@ -224,9 +224,8 @@ class HighPassFilter24Component : public FilterComponent<HighPassFilter<4>> {
 class LFOComponent : public SynthComponent {
 private:
 	double amplitude_mod = 1;
-	AnalogOscilator aosc;
 public:
-	AnalogOscilatorData osc;
+	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY> osc;
 	double freq = 1;	//TODO option to morph frequency
 	double amplitude = 1;
 
