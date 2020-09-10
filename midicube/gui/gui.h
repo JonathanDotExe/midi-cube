@@ -157,6 +157,10 @@ private:
 	bool percussion_fast_decay_editmode = false;
 	bool percussion_soft_editmode = false;
 
+	bool overdrive_editmode = false;
+	bool overdrive_gain_editmode = false;
+	bool overdrive_clip_editmode = false;
+
 	void draw_drawbar (int x, int y, int width, int height, size_t index);
 
 public:
