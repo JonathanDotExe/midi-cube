@@ -56,8 +56,6 @@ public:
 };
 
 class OscilatorComponent : public SynthComponent {
-private:
-	std::array<double, SOUND_ENGINE_POLYPHONY> phase_shift = {0};
 public:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY> osc;
 	double semi = 0;			//Static pitch offset in semitones

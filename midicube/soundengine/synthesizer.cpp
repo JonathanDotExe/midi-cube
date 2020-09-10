@@ -29,21 +29,17 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 	osc.data.pulse_width = pulse_width_mod;
 	osc.data.unison_detune = unison_detune_mod;
 	//Pitch and FM
-	phase_shift.at(note_index) += info.time_step * (note_to_freq_transpose(pitch) - 1) + info.time_step * fm;
 	//Frequency
-	double time = info.time + note.phase_shift + phase_shift.at(note_index);
-	double freq = note.freq;
+	double freq = note.freq * env.pitch_bend * transpose * fm;
 	if (semi) {
 		freq *= note_to_freq_transpose(semi);
 	}
-	freq *= transpose;
-
-	//Sync
-	if (sync_mod != 1) {
-		time = fmod(time, freq * sync_mod);
+	if (pitch) {
+		freq *= note_to_freq_transpose(pitch);
 	}
+
 	//Signal
-	double signal = osc.signal(time, freq, info.time_step, note_index);
+	double signal = osc.signal(freq, info.time_step, note_index);
 	return amplitude * volume * signal;
 }
 
@@ -265,7 +261,7 @@ LFOComponent::LFOComponent() {
 }
 
 double LFOComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return aosc.signal(info.time, freq, info.time_step, osc) * amplitude_mod;
+	return aosc.signal(freq, info.time_step, osc) * amplitude_mod;
 }
 
 void LFOComponent::set_property(size_t index, double value){

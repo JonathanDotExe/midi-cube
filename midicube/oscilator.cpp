@@ -13,21 +13,21 @@ AnalogOscilator::AnalogOscilator() {
 
 }
 
-static double polyblep(double time, double freq, double time_step) {
-	double phase_dur = 1/freq;
-	time = fmod(time, phase_dur);
-	if (time < time_step) {
-		time /= time_step;
-		return - time * time + 2 * time - 1;
+static double polyblep(double rotation, double freq, double time_step) {
+	double phase = rotation - (long int) rotation;
+	double step = freq * time_step;
+	if (phase < step) {
+		phase /= step;
+		return - phase * phase + 2 * phase - 1;
 	}
-	else if (time > phase_dur - time_step) {
-		time = (time - phase_dur)/time_step;
-		return time * time + 2 * time + 1;
+	else if (phase > 1 - step) {
+		phase = (phase - 1)/step;
+		return phase * phase + 2 * phase + 1;
 	}
 	return 0;
 }
 
-double AnalogOscilator::signal(double time, double freq, double time_step, AnalogOscilatorData& data) {
+double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data) {
 	//Move
 	rotation += freq * time_step;
 
@@ -44,14 +44,14 @@ double AnalogOscilator::signal(double time, double freq, double time_step, Analo
 		case AnalogWaveForm::SAW:
 			signal += saw_wave(rotation * det, 1);
 			if (data.analog) {
-				signal -= polyblep(time, freq, time_step);
+				signal -= polyblep(rotation, freq, time_step);
 			}
 			break;
 		case AnalogWaveForm::SQUARE:
 			signal += square_wave(rotation * det, 1, data.pulse_width);
 			if (data.analog) {
-				signal += polyblep(time, freq, time_step);
-				signal -= polyblep(time + data.pulse_width/freq, freq, time_step);
+				signal += polyblep(rotation, freq, time_step);
+				signal -= polyblep(rotation + data.pulse_width/freq, freq, time_step);
 			}
 			break;
 		case AnalogWaveForm::NOISE:

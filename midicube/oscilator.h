@@ -32,7 +32,7 @@ private:
 	double rotation = 0;
 public:
 	AnalogOscilator();
-	double signal(double time, double freq, double time_step, AnalogOscilatorData& data);
+	double signal(double freq, double time_step, AnalogOscilatorData& data);
 	~AnalogOscilator();
 };
 
@@ -47,8 +47,8 @@ public:
 
 	}
 
-	double signal(double time, double freq, double time_step, size_t index) {
-		return oscilators.at(index).signal(time, freq, time_step, data);
+	double signal(double freq, double time_step, size_t index) {
+		return oscilators.at(index).signal(freq, time_step, data);
 	}
 
 	~AnalogOscilatorBank() {

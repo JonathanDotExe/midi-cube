@@ -43,9 +43,8 @@ PresetSynth::PresetSynth() {
 
 void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) {
 	double sample = 0.0;
-	double freq = note.freq;
-	double t = info.time + note.phase_shift;
-	sample = osc.signal(t, freq, info.time_step, note_index);
+	double freq = note.freq * env.pitch_bend;
+	sample = osc.signal(freq, info.time_step, note_index);
 
 	if (vibrato) {
 		note.phase_shift += info.time_step * (note_to_freq_transpose(SYNTH_VIBRATO_DETUNE * sine_wave(info.time, SYNTH_VIBRATO_RATE) * vibrato) - 1);
