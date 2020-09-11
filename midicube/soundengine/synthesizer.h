@@ -36,6 +36,9 @@ struct ComponentPropertyBinding {
 class SynthComponent {
 public:
 	virtual double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
+	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
+
+	}
 	virtual void set_property(size_t index, double value) = 0;
 	virtual void add_property(size_t index, double value) = 0;
 	virtual void mul_property(size_t index, double value) = 0;
@@ -144,6 +147,11 @@ public:
 		}
 		filter.set_cutoff(cutoff_mod); //TODO do something more performant than updating every frame
 		return filter.apply(input, info.time_step);
+	}
+
+	void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
+		T& filter = filters.at(note_index);
+		filter.apply(0, info.time_step);
 	}
 
 	void set_property(size_t index, double value) {
@@ -287,6 +295,7 @@ public:
 	bool audible = false;
 
 	double process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, std::array<double, MAX_COMPONENTS>& values, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index);
 	void control_change(unsigned int control, unsigned int value);
 	void set_component(SynthComponent* comp);
 	SynthComponent* get_component();

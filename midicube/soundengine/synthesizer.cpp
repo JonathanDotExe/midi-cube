@@ -8,6 +8,7 @@
 #include "synthesizer.h"
 #include <cmath>
 #include <algorithm>
+#include <iostream>
 
 static std::vector<std::string> oscilator_properties = {"Amplitude", "Sync", "FM", "Pitch", "Unison-Detune", "Pulse Width"};
 
@@ -426,6 +427,12 @@ double ComponentSlot::process(std::array<ComponentSlot, MAX_COMPONENTS>& slots, 
 	return sample;
 }
 
+void ComponentSlot::note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
+	if (comp) {
+		comp->note_not_pressed(info, note, note_index);
+	}
+}
+
 double ComponentSlot::from() {
 	return comp ? comp->from() : 0;;
 }
@@ -744,8 +751,11 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	}
 }
 
-void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index) {
-
+void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& d, size_t note_index) {
+	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
+	for (size_t i = 0; i < data.preset.components.size(); ++i) {
+		data.preset.components[i].note_not_pressed(info, note, note_index);
+	}
 }
 
 void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& d) {
