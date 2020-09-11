@@ -25,7 +25,7 @@ Vocoder::Vocoder() {
 
 void Vocoder::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
 	VocoderData& data = dynamic_cast<VocoderData&>(d);
-	double sample = saw_wave(info.time - note.phase_shift, note.freq);
+	double sample = saw_wave_down(info.time - note.phase_shift, note.freq);
 	sample *= data.preset.vocoder_amp;
 	for (size_t channel = 0; channel < channels.size(); ++channel) {
 		channels[channel] += sample;

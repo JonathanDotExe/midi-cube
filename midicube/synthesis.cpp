@@ -38,9 +38,14 @@ extern double square_wave(double time, double freq, double pulse_width) {
 	return fmod(time, 1/freq) * freq >= pulse_width ? -1 : 1;
 }
 
-extern double saw_wave(double time, double freq) {
+extern double saw_wave_down(double time, double freq) {
 	double interval = 1.0/freq;
 	return -fmod(time, interval)/interval * 2 + 1;
+}
+
+extern double saw_wave_up(double time, double freq) {
+	double interval = 1.0/freq;
+	return fmod(time, interval)/interval * 2 - 1;
 }
 
 /**

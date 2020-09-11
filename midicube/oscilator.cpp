@@ -61,12 +61,21 @@ double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorDat
 			signal -= polyblep(sync_phase, sync_step) * (sine_wave(last_phase, 1) + 1) / 2;
 		}
 		break;
-	case AnalogWaveForm::SAW:
-		signal = saw_wave(rotation, 1);
+	case AnalogWaveForm::SAW_DOWN:
+		signal = saw_wave_down(rotation, 1);
 		if (data.analog) {
 			signal += polyblep(phase, step);
 			if (data.sync && data.sync_mul != 1) {
-				signal += polyblep(sync_phase, sync_step) * (1 - (saw_wave(last_phase, 1) + 1) / 2);
+				signal += polyblep(sync_phase, sync_step) * (1 - (saw_wave_down(last_phase, 1) + 1) / 2);
+			}
+		}
+		break;
+	case AnalogWaveForm::SAW_UP:
+		signal = saw_wave_up(rotation, 1);
+		if (data.analog) {
+			signal -= polyblep(phase, step);
+			if (data.sync && data.sync_mul != 1) {
+				signal += polyblep(sync_phase, sync_step) * (saw_wave_up(last_phase, 1) + 1) / 2;
 			}
 		}
 		break;

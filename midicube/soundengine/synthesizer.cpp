@@ -481,7 +481,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 				LFO_AMPLITUDE_PROPERTY, 1, 0, 1 });
 
 		OscilatorComponent *comp = new OscilatorComponent();
-		comp->osc.data.waveform = AnalogWaveForm::SAW;
+		comp->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
 		comp->osc.unison_amount = 2;
 		comp->unison_detune = 0.1;
 		preset.components[9].set_component(comp);
@@ -540,7 +540,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[1].set_component(velocity);
 
 		OscilatorComponent* comp = new OscilatorComponent();
-		comp->osc.data.waveform = AnalogWaveForm::SAW;
+		comp->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
 		comp->osc.unison_amount = 3;
 		comp->unison_detune = 0.1;
 		preset.components[9].set_component(comp);
@@ -609,7 +609,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[8].bindings.push_back({BindingType::MUL, OSCILATOR_VOLUME_PROPERTY, 0, 0, 1});
 
 		OscilatorComponent* comp2 = new OscilatorComponent();
-		comp2->osc.data.waveform = AnalogWaveForm::SAW;
+		comp2->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
 		comp2->osc.unison_amount = 1;
 		comp2->unison_detune = 0.1;
 		preset.components[9].set_component(comp2);
@@ -651,7 +651,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 				LFO_AMPLITUDE_PROPERTY, 1, 0, 1 });
 
 		OscilatorComponent *comp1 = new OscilatorComponent();
-		comp1->osc.data.waveform = AnalogWaveForm::SAW;
+		comp1->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
 		comp1->osc.unison_amount = 1;
 		comp1->unison_detune = 0.1;
 		preset.components[8].set_component(comp1);
@@ -661,7 +661,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 						OSCILATOR_PITCH_PROPERTY, 2, -1, 1 });
 
 		OscilatorComponent *comp2 = new OscilatorComponent();
-		comp2->osc.data.waveform = AnalogWaveForm::SAW;
+		comp2->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
 		comp2->osc.unison_amount = 1;
 		comp2->unison_detune = 0.1;
 		comp2->transpose = 2;
@@ -697,7 +697,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[0].set_component(cc);
 
 		OscilatorComponent *comp1 = new OscilatorComponent();
-		comp1->osc.data.waveform = AnalogWaveForm::SAW;
+		comp1->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
 		comp1->osc.data.sync = false;
 		comp1->osc.data.analog = true;
 		preset.components[8].set_component(comp1);

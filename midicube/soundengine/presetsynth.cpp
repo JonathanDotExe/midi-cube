@@ -38,7 +38,7 @@ PresetSynth::PresetSynth() {
 	filter.set_cutoff(1200);
 
 	osc.data.analog = true;
-	osc.data.waveform = AnalogWaveForm::SAW;
+	osc.data.waveform = AnalogWaveForm::SAW_DOWN;
 	osc.unison_amount = 3;
 }
 
