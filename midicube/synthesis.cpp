@@ -40,7 +40,7 @@ extern double square_wave(double time, double freq, double pulse_width) {
 
 extern double saw_wave(double time, double freq) {
 	double interval = 1.0/freq;
-	return fmod(time, interval)/interval * 2 - 1;
+	return -fmod(time, interval)/interval * 2 + 1;
 }
 
 /**
