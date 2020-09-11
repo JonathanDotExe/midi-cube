@@ -10,52 +10,72 @@
 
 #include "envelope.h"
 #include "audio.h"
+#include "synthesis.h"
 #include <vector>
+#include <array>
 
 enum class AnalogWaveForm {
-	SINE, SAW, SQUARE, NOISE
+	SINE, SAW_DOWN, SAW_UP, SQUARE, NOISE
 };
 
-class Oscilator {
-public:
-	Oscilator();
-	virtual double signal(double time, double freq, double time_step) = 0;
-	virtual ~Oscilator();
-};
-
-class AnalogOscilator : public Oscilator {
-private:
-	AnalogWaveForm waveform;
-public:
+struct AnalogOscilatorData {
+	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
 	bool analog = false;
+	bool sync = false;
 	double pulse_width = 0.5;
-	AnalogOscilator(AnalogWaveForm waveform);
-	double signal(double time, double freq, double time_step);
-	AnalogWaveForm get_waveform() const;
-	void set_waveform(AnalogWaveForm waveform);
+	double sync_mul = 1;
+};
+
+class AnalogOscilator {
+private:
+	double rotation = 0;
+	double sync_rotation = 0;
+	double pulse_width = 0.5;
+	double last_phase = 0;
+public:
+	AnalogOscilator();
+	double signal(double freq, double time_step, AnalogOscilatorData& data);
 	~AnalogOscilator();
 };
 
-//Deprecated
-class OscilatorSlot {
+template<std::size_t N, std::size_t U>
+class AnalogOscilatorBank {
 private:
-	Oscilator* osc;
-	double volume = 1;
-	unsigned int unison = 0;
-	double unison_detune = 0.1;
-	double udetune;
-	double nudetune;
-
+	std::array<std::array<AnalogOscilator, U>, N> oscilators;
 public:
-	OscilatorSlot(Oscilator* osc);
-	double signal(double time, double freq, double time_step);
-	unsigned int get_unison() const;
-	void set_unison(unsigned int unison = 0);
-	double get_unison_detune() const;
-	void set_unison_detune(double unison_detune = 0.1);
-	double get_volume() const;
-	void set_volume(double volume = 1);
-	~OscilatorSlot();
+	AnalogOscilatorData data;
+	double unison_detune = 0.1;
+	size_t unison_amount = 0;
+
+	AnalogOscilatorBank() {
+
+	}
+
+	double signal(double freq, double time_step, size_t index) {
+		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
+		double signal = 0;
+		double detune = note_to_freq_transpose(unison_detune);
+		double ndetune = note_to_freq_transpose(-unison_detune);
+		double det = detune;
+		double ndet = 1;
+		for (size_t i = 0; i <= unison_amount && i < osc.size(); ++i) {
+			double d = 1;
+			if (i % 2 == 0) {
+				d = ndet;
+				ndet *= ndetune;
+			}
+			else {
+				d = det;
+				det *= detune;
+			}
+			signal += osc[i].signal(freq * d, time_step, data);
+		}
+		return signal / (unison_amount + 1);
+	}
+
+	~AnalogOscilatorBank() {
+
+	}
 };
 
 #endif /* MIDICUBE_OSCILATOR_H_ */

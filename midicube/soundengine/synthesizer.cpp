@@ -21,46 +21,27 @@ static std::vector<std::string> oscilator_properties = {"Amplitude", "Sync", "FM
 
 //OscilatorComponent
 OscilatorComponent::OscilatorComponent() {
-	osc.analog = true;
+	osc.data.analog = true;
 }
 
 double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	//Pulse Width
-	osc.pulse_width = pulse_width_mod;
+	//Data
+	osc.data.pulse_width = pulse_width_mod;
+	osc.data.sync_mul = sync_mod;
+	osc.unison_detune = unison_detune_mod;
 	//Pitch and FM
-	phase_shift.at(note_index) += info.time_step * (note_to_freq_transpose(pitch) - 1) + info.time_step * fm;
 	//Frequency
-	double time = info.time + note.phase_shift + phase_shift.at(note_index);
-	double freq = note.freq;
+	double freq = note.freq * env.pitch_bend * transpose * fm;
 	if (semi) {
 		freq *= note_to_freq_transpose(semi);
 	}
-	freq *= transpose;
+	if (pitch) {
+		freq *= note_to_freq_transpose(pitch);
+	}
 
-	//Sync
-	if (sync_mod != 1) {
-		time = fmod(time, freq * sync_mod);
-	}
 	//Signal
-	double signal = osc.signal(time, freq, info.time_step);
-	//Unison
-	if (unison_amount) {
-		double udetune = note_to_freq_transpose(unison_detune_mod);
-		double nudetune = note_to_freq_transpose(unison_detune_mod);
-		double det = udetune;
-		double ndet = nudetune;
-		for (unsigned int i = 1; i <= unison_amount; ++i) {
-			if (i % 2 == 0) {
-				signal += osc.signal(time, freq * ndet, info.time_step);
-				ndet *= nudetune;
-			}
-			else {
-				signal += osc.signal(time, freq * det, info.time_step);
-				det *= udetune;
-			}
-		}
-	}
-	return signal / (1 + unison_amount) * amplitude * volume;
+	double signal = osc.signal(freq, info.time_step, note_index);
+	return amplitude * volume * signal;
 }
 
 void OscilatorComponent::set_property(size_t index, double value) {
@@ -135,7 +116,7 @@ void OscilatorComponent::mul_property(size_t index, double value) {
 void OscilatorComponent::reset_properties() {
 	amplitude = 1;
 	sync_mod = sync;
-	fm = 0;
+	fm = 1;
 	pitch = 0;
 	unison_detune_mod = unison_detune;
 	pulse_width_mod = pulse_width;
@@ -276,8 +257,12 @@ static std::vector<std::string> lfo_properties = {"Amplitude"};
 #define LFO_AMPLITUDE_PROPERTY 0
 
 //LFOComponent
+LFOComponent::LFOComponent() {
+	osc.data.waveform = AnalogWaveForm::SINE;
+}
+
 double LFOComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return osc.signal(info.time, freq, info.time_step) * amplitude_mod;
+	return osc.signal(freq, info.time_step, note_index) * amplitude_mod;
 }
 
 void LFOComponent::set_property(size_t index, double value){
@@ -496,8 +481,8 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 				LFO_AMPLITUDE_PROPERTY, 1, 0, 1 });
 
 		OscilatorComponent *comp = new OscilatorComponent();
-		comp->osc.set_waveform(AnalogWaveForm::SAW);
-		comp->unison_amount = 4;
+		comp->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
+		comp->osc.unison_amount = 2;
 		comp->unison_detune = 0.1;
 		preset.components[9].set_component(comp);
 		preset.components[9].bindings.push_back( { BindingType::ADD,
@@ -524,13 +509,13 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		//Patch 2 -- FM Bass
 	{
 		OscilatorComponent* comp1 = new OscilatorComponent();
-		comp1->osc.set_waveform(AnalogWaveForm::SINE);
+		comp1->osc.data.waveform = AnalogWaveForm::SINE;
 		comp1->volume = 1;
 		comp1->transpose = 2;
 		preset.components[0].set_component(comp1);
 
 		OscilatorComponent* comp2 = new OscilatorComponent();
-		comp2->osc.set_waveform(AnalogWaveForm::SINE);
+		comp2->osc.data.waveform = AnalogWaveForm::SINE;
 
 		preset.components[1].set_component(comp2);
 		preset.components[1].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 0, -1, 1});
@@ -555,8 +540,8 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[1].set_component(velocity);
 
 		OscilatorComponent* comp = new OscilatorComponent();
-		comp->osc.set_waveform(AnalogWaveForm::SAW);
-		comp->unison_amount = 3;
+		comp->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
+		comp->osc.unison_amount = 3;
 		comp->unison_detune = 0.1;
 		preset.components[9].set_component(comp);
 
@@ -588,7 +573,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[1].bindings.push_back({BindingType::MUL, MOD_ENVELOPE_AMPLITUDE_PROPERTY, 0, 1, 0});
 
 		OscilatorComponent* comp = new OscilatorComponent();
-		comp->osc.set_waveform(AnalogWaveForm::SQUARE);
+		comp->osc.data.waveform = AnalogWaveForm::SQUARE;
 		comp->pulse_width = 1.0/3;
 		preset.components[9].set_component(comp);
 
@@ -617,15 +602,15 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[1].set_component(velocity);
 
 		OscilatorComponent* comp1 = new OscilatorComponent();
-		comp1->osc.set_waveform(AnalogWaveForm::SINE);
-		comp1->unison_amount = 3;
+		comp1->osc.data.waveform = AnalogWaveForm::SINE;
+		comp1->osc.unison_amount = 3;
 		comp1->unison_detune = 0.1;
 		preset.components[8].set_component(comp1);
 		preset.components[8].bindings.push_back({BindingType::MUL, OSCILATOR_VOLUME_PROPERTY, 0, 0, 1});
 
 		OscilatorComponent* comp2 = new OscilatorComponent();
-		comp2->osc.set_waveform(AnalogWaveForm::SAW);
-		comp2->unison_amount = 1;
+		comp2->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
+		comp2->osc.unison_amount = 1;
 		comp2->unison_detune = 0.1;
 		preset.components[9].set_component(comp2);
 		preset.components[9].bindings.push_back({BindingType::MUL, OSCILATOR_VOLUME_PROPERTY, 0, 1, 0});
@@ -648,7 +633,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 	}
 		break;
 	case 6:
-		//Patch 5 -- Bright Lead
+		//Patch 6 -- Bright Lead
 	{
 		ModEnvelopeComponent *mod = new ModEnvelopeComponent();
 		mod->envelope = { 1.0, 1.0, 0.2, 0.3 };
@@ -666,8 +651,8 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 				LFO_AMPLITUDE_PROPERTY, 1, 0, 1 });
 
 		OscilatorComponent *comp1 = new OscilatorComponent();
-		comp1->osc.set_waveform(AnalogWaveForm::SAW);
-		comp1->unison_amount = 1;
+		comp1->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
+		comp1->osc.unison_amount = 1;
 		comp1->unison_detune = 0.1;
 		preset.components[8].set_component(comp1);
 		preset.components[8].bindings.push_back( { BindingType::MUL,
@@ -676,8 +661,8 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 						OSCILATOR_PITCH_PROPERTY, 2, -1, 1 });
 
 		OscilatorComponent *comp2 = new OscilatorComponent();
-		comp2->osc.set_waveform(AnalogWaveForm::SAW);
-		comp2->unison_amount = 1;
+		comp2->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
+		comp2->osc.unison_amount = 1;
 		comp2->unison_detune = 0.1;
 		comp2->transpose = 2;
 		preset.components[9].set_component(comp2);
@@ -701,6 +686,29 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[11].set_component(amp);
 		preset.components[11].bindings.push_back( { BindingType::ADD,
 				AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1 });
+		preset.components[11].audible = true;
+	}
+		break;
+	case 7:
+		//Patch 7 -- Syncing Sawtooth wave
+	{
+		ControlChangeComponent *cc = new ControlChangeComponent();
+		cc->control = 1;
+		preset.components[0].set_component(cc);
+
+		OscilatorComponent *comp1 = new OscilatorComponent();
+		comp1->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
+		comp1->osc.data.sync = false;
+		comp1->osc.data.analog = true;
+		preset.components[8].set_component(comp1);
+		preset.components[8].bindings.push_back({BindingType::SET, OSCILATOR_SYNC_PROPERTY, 0, 1, 100});
+
+		AmpEnvelopeComponent *amp = new AmpEnvelopeComponent();
+		amp->envelope = { 0.0005, 0, 1, 0.003 };
+
+		preset.components[11].set_component(amp);
+		preset.components[11].bindings.push_back( { BindingType::ADD,
+				AMP_ENVELOPE_INPUT_PROPERTY, 8, -1, 1 });
 		preset.components[11].audible = true;
 	}
 		break;

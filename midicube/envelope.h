@@ -28,7 +28,7 @@ struct KeyboardEnvironment {
 	bool sustain = false;
 	double sustain_time = 0;
 	double sustain_release_time = 0;
-	double pitch_bend = 0;
+	double pitch_bend = 1;
 };
 
 struct ADSREnvelope {

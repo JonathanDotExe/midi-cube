@@ -56,19 +56,16 @@ public:
 };
 
 class OscilatorComponent : public SynthComponent {
-private:
-	std::array<double, SOUND_ENGINE_POLYPHONY> phase_shift = {0};
 public:
-	AnalogOscilator osc{AnalogWaveForm::SINE};
-	unsigned int unison_amount = 0;
+	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 8> osc;
 	double semi = 0;			//Static pitch offset in semitones
 	double transpose = 1;		//Static pitch offset as frequency multiplier
 	double volume = 1;
 	double amplitude = 1;
-	double unison_detune = 0.1;
+	double unison_detune = 0.1;	//Set the unison amount here instead of using data.unison detune which is used internally
 	double sync = 1;			//Sync frequency factor
 	double sync_mod = 1;		//Sync frequency factor (modulated)
-	double fm = 0;				//Dynamic pitch offset in time shift
+	double fm = 1;				//Dynamic pitch offset in frequency multiplier
 	double pitch = 0;			//Dynamic pitch offset in semitones
 	double unison_detune_mod = 0.1;
 	double pulse_width = 0.5;
@@ -228,10 +225,11 @@ class LFOComponent : public SynthComponent {
 private:
 	double amplitude_mod = 1;
 public:
-	AnalogOscilator osc{AnalogWaveForm::SINE};
+	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 1> osc;
 	double freq = 1;	//TODO option to morph frequency
 	double amplitude = 1;
 
+	LFOComponent();
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 	void set_property(size_t index, double value);
 	void add_property(size_t index, double value);

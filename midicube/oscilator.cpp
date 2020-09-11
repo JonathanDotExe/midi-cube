@@ -6,125 +6,99 @@
  */
 
 #include "oscilator.h"
-#include "synthesis.h"
 #include <cmath>
 
-Oscilator::Oscilator() {
-	// TODO Auto-generated constructor stub
-
-}
-
-Oscilator::~Oscilator() {
-	// TODO Auto-generated destructor stub
-}
-
 //AnalogOscilator
-AnalogOscilator::AnalogOscilator(AnalogWaveForm waveform) {
-	this->waveform = waveform;
+AnalogOscilator::AnalogOscilator() {
+
 }
 
-static double polyblep(double time, double freq, double time_step) {
-	double phase_dur = 1/freq;
-	time = fmod(time, phase_dur);
-	if (time < time_step) {
-		time /= time_step;
-		return - time * time + 2 * time - 1;
+static double polyblep(double phase, double step) {
+	if (phase < step) {
+		phase /= step;
+		return - phase * phase + 2 * phase - 1;
 	}
-	else if (time > phase_dur - time_step) {
-		time = (time - phase_dur)/time_step;
-		return time * time + 2 * time + 1;
+	else if (phase > 1 - step) {
+		phase = (phase - 1)/step;
+		return phase * phase + 2 * phase + 1;
 	}
 	return 0;
 }
 
-double AnalogOscilator::signal(double time, double freq, double time_step) {
+double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data) {
+	//Move
+	double step = freq * time_step;
+	rotation += freq * time_step;
+
+	double phase = rotation - (long int) rotation;
+	//Update parameters
+	if (phase < step) {
+		pulse_width = data.pulse_width;
+	}
+	//Sync
+	double sync_step = data.sync_mul * freq * time_step;
+	double sync_phase = 0;
+	if (data.sync) {
+		sync_rotation += sync_step;
+		sync_phase = rotation - (long int) rotation;
+		//Sync now
+		if (sync_phase < sync_step) {
+			//Reset phase
+			rotation += 1 - phase + sync_step;
+			phase = rotation - (long int) rotation;
+		}
+		//Sync next sample
+		else if (sync_phase + sync_step >= 1) {
+			last_phase = phase;
+		}
+	}
+	//Compute wave
 	double signal = 0;
-	switch(waveform) {
+	switch(data.waveform) {
 	case AnalogWaveForm::SINE:
-		signal = sine_wave(time, freq);
+		signal = sine_wave(rotation, 1);
+		if (data.analog && data.sync && data.sync_mul != 1) {
+			signal -= polyblep(sync_phase, sync_step) * (sine_wave(last_phase, 1) + 1) / 2;
+		}
 		break;
-	case AnalogWaveForm::SAW:
-		signal = saw_wave(time, freq);
-		if (analog) {
-			signal -= polyblep(time, freq, time_step);
+	case AnalogWaveForm::SAW_DOWN:
+		signal = saw_wave_down(rotation, 1);
+		if (data.analog) {
+			signal += polyblep(phase, step);
+			if (data.sync && data.sync_mul != 1) {
+				signal += polyblep(sync_phase, sync_step) * (1 - (saw_wave_down(last_phase, 1) + 1) / 2);
+			}
+		}
+		break;
+	case AnalogWaveForm::SAW_UP:
+		signal = saw_wave_up(rotation, 1);
+		if (data.analog) {
+			signal -= polyblep(phase, step);
+			if (data.sync && data.sync_mul != 1) {
+				signal += polyblep(sync_phase, sync_step) * (saw_wave_up(last_phase, 1) + 1) / 2;
+			}
 		}
 		break;
 	case AnalogWaveForm::SQUARE:
-		signal = square_wave(time, freq, pulse_width);
-		if (analog) {
-			signal += polyblep(time, freq, time_step);
-			signal -= polyblep(time + pulse_width/freq, freq, time_step);
+		signal = square_wave(rotation, 1, pulse_width);
+		if (data.analog) {
+			signal += polyblep(phase, step);
+			double protation = rotation + pulse_width;
+			signal -= polyblep(protation - (long int) protation, step);
+
+			if (data.sync && data.sync_mul != 1) {
+				signal += polyblep(sync_phase, sync_step) *  (1 - (square_wave(rotation, 1, pulse_width) + 1) / 2);
+			}
 		}
 		break;
 	case AnalogWaveForm::NOISE:
-		signal = noise_wave(time, freq);
+		signal = noise_wave(rotation, 1);
 		break;
 	}
 	return signal;
-}
-
-AnalogWaveForm AnalogOscilator::get_waveform() const {
-	return waveform;
-}
-
-void AnalogOscilator::set_waveform(AnalogWaveForm waveform) {
-	this->waveform = waveform;
 }
 
 AnalogOscilator::~AnalogOscilator() {
 
 }
 
-//OscilatorSlot
-OscilatorSlot::OscilatorSlot(Oscilator* osc) {
-	this->osc = osc;
-	set_unison_detune();
-}
-
-double OscilatorSlot::signal(double time, double freq, double time_step) {
-	double signal = osc->signal(time, freq, time_step);
-	double det = udetune;
-	double ndet = nudetune;
-	for (unsigned int i = 1; i <= unison; ++i) {
-		if (i % 2 == 0) {
-			signal += osc->signal(time, freq * ndet, time_step);
-			ndet *= nudetune;
-		}
-		else {
-			signal += osc->signal(time, freq * det, time_step);
-			det *= udetune;
-		}
-	}
-	return signal / (1 + unison) * volume;
-}
-
-unsigned int OscilatorSlot::get_unison() const {
-	return unison;
-}
-
-void OscilatorSlot::set_unison(unsigned int unison) {
-	this->unison = unison;
-}
-
-double OscilatorSlot::get_unison_detune() const {
-	return unison_detune;
-}
-
-void OscilatorSlot::set_unison_detune(double unison_detune) {
-	this->unison_detune = unison_detune;
-	udetune = note_to_freq_transpose(unison_detune);
-	nudetune = note_to_freq_transpose(-unison_detune);
-}
-
-double OscilatorSlot::get_volume() const {
-	return volume;
-}
-
-void OscilatorSlot::set_volume(double volume) {
-	this->volume = volume;
-}
-
-OscilatorSlot::~OscilatorSlot() {
-	delete osc;
-	osc = nullptr;
-}

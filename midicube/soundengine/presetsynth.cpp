@@ -7,6 +7,7 @@
 
 #include "presetsynth.h"
 #include "../synthesis.h"
+#include <iostream>
 
 
 //PresetSynth
@@ -15,7 +16,7 @@ PresetSynth::PresetSynth() {
 	ndetune = note_to_freq_transpose(-0.1);
 	vibrato = 0;
 	filter.set_cutoff(6300);
-
+)
 	AdditiveOscilator* aosc = new AdditiveOscilator();
 	std::vector<double> harmonics = { 0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8 };
 	for (size_t i = 0; i < harmonics.size(); ++i) {
@@ -36,19 +37,15 @@ PresetSynth::PresetSynth() {
 	vibrato = 0;
 	filter.set_cutoff(1200);
 
-	AnalogOscilator* o = new AnalogOscilator(AnalogWaveForm::SAW);
-	o->analog = true;
-
-	osc = new OscilatorSlot(o);
-	osc->set_volume(1);
-	osc->set_unison(3);
+	osc.data.analog = true;
+	osc.data.waveform = AnalogWaveForm::SAW_DOWN;
+	osc.unison_amount = 3;
 }
 
 void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) {
 	double sample = 0.0;
-	double freq = note.freq;
-	double t = info.time + note.phase_shift;
-	sample = osc->signal(t, freq, info.time_step);
+	double freq = note.freq * env.pitch_bend;
+	sample = osc.signal(freq, info.time_step, note_index);
 
 	if (vibrato) {
 		note.phase_shift += info.time_step * (note_to_freq_transpose(SYNTH_VIBRATO_DETUNE * sine_wave(info.time, SYNTH_VIBRATO_RATE) * vibrato) - 1);
@@ -84,7 +81,6 @@ std::string PresetSynth::get_name() {
 }
 
 PresetSynth::~PresetSynth() {
-	delete osc;
-	osc = nullptr;
+
 }
 
