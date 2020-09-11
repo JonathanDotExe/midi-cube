@@ -705,10 +705,10 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 
 		OscilatorComponent *comp1 = new OscilatorComponent();
 		comp1->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
-		comp1->osc.data.sync = false;
+		comp1->osc.data.sync = true;
 		comp1->osc.data.analog = true;
 		preset.components[8].set_component(comp1);
-		preset.components[8].bindings.push_back({BindingType::SET, OSCILATOR_SYNC_PROPERTY, 0, 1, 100});
+		preset.components[8].bindings.push_back({BindingType::SET, OSCILATOR_SYNC_PROPERTY, 0, 1, 2});
 
 		AmpEnvelopeComponent *amp = new AmpEnvelopeComponent();
 		amp->envelope = { 0.0005, 0, 1, 0.003 };

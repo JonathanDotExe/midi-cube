@@ -40,7 +40,7 @@ double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorDat
 	double sync_phase = 0;
 	if (data.sync) {
 		sync_rotation += sync_step;
-		sync_phase = rotation - (long int) rotation;
+		sync_phase = sync_rotation - (long int) sync_rotation;
 		//Sync now
 		if (sync_phase < sync_step) {
 			//Reset phase
