@@ -27,7 +27,7 @@ OscilatorComponent::OscilatorComponent() {
 double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Data
 	osc.data.pulse_width = pulse_width_mod;
-	osc.data.sync = sync_mod;
+	osc.data.sync_mul = sync_mod;
 	osc.unison_detune = unison_detune_mod;
 	//Pitch and FM
 	//Frequency
@@ -698,8 +698,10 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 
 		OscilatorComponent *comp1 = new OscilatorComponent();
 		comp1->osc.data.waveform = AnalogWaveForm::SAW;
+		comp1->osc.data.sync = true;
+		comp1->osc.data.analog = true;
 		preset.components[8].set_component(comp1);
-		preset.components[8].bindings.push_back({BindingType::MUL, OSCILATOR_SYNC_PROPERTY, 0, 1, 10});
+		preset.components[8].bindings.push_back({BindingType::SET, OSCILATOR_SYNC_PROPERTY, 0, 1, 100});
 
 		AmpEnvelopeComponent *amp = new AmpEnvelopeComponent();
 		amp->envelope = { 0.0005, 0, 1, 0.003 };

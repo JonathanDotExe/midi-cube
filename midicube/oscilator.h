@@ -21,15 +21,17 @@ enum class AnalogWaveForm {
 struct AnalogOscilatorData {
 	AnalogWaveForm waveform = AnalogWaveForm::SAW;
 	bool analog = false;
+	bool sync = false;
 	double pulse_width = 0.5;
-	double sync = 1;
+	double sync_mul = 1;
 };
 
 class AnalogOscilator {
 private:
 	double rotation = 0;
-	double sync = 1;
+	double sync_rotation = 0;
 	double pulse_width = 0.5;
+	double last_phase = 0;
 public:
 	AnalogOscilator();
 	double signal(double freq, double time_step, AnalogOscilatorData& data);

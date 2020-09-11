@@ -27,21 +27,29 @@ static double polyblep(double phase, double step) {
 
 double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data) {
 	//Move
+	double step = freq * time_step;
 	rotation += freq * time_step;
 
 	double phase = rotation - (long int) rotation;
-	double step = freq * time_step;
 	//Update parameters
-	if (rotation - (long int) rotation < freq * time_step) {
-		sync = data.sync;
+	if (phase < step) {
 		pulse_width = data.pulse_width;
 	}
 	//Sync
-	double f = 1/sync;
-	if (sync != 1) {
-		if (phase >= f) {
-			rotation += 1 - f;
+	double sync_step = data.sync_mul * freq * time_step;
+	double sync_phase = 0;
+	if (data.sync) {
+		sync_rotation += sync_step;
+		sync_phase = rotation - (long int) rotation;
+		//Sync now
+		if (sync_phase < sync_step) {
+			//Reset phase
+			rotation += 1 - phase + sync_step;
 			phase = rotation - (long int) rotation;
+		}
+		//Sync next sample
+		else if (sync_phase + sync_step >= 1) {
+			last_phase = phase;
 		}
 	}
 	//Compute wave
@@ -49,23 +57,29 @@ double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorDat
 	switch(data.waveform) {
 	case AnalogWaveForm::SINE:
 		signal = sine_wave(rotation, 1);
-		if (sync != 1) {
-			double sync_sig = sine_wave(f, 1); //TODO safe somewhere
-			signal -= polyblep(phase * sync, step) * sync_sig;
+		if (data.analog && data.sync && data.sync_mul != 1) {
+			signal -= polyblep(sync_phase, sync_step) * (sine_wave(last_phase, 1) + 1) / 2;
 		}
 		break;
 	case AnalogWaveForm::SAW:
 		signal = saw_wave(rotation, 1);
 		if (data.analog) {
-			signal -= polyblep(phase * sync, step) * f;
+			signal -= polyblep(phase, step);
+			if (data.sync && data.sync_mul != 1) {
+				signal -= polyblep(sync_phase, sync_step) * (saw_wave(last_phase, 1) + 1) / 2;
+			}
 		}
 		break;
 	case AnalogWaveForm::SQUARE:
 		signal = square_wave(rotation, 1, pulse_width);
 		if (data.analog) {
-			signal += polyblep(phase * (sync >= pulse_width ? sync : 1), step);
-			double protation = rotation + pulse_width/freq;
+			signal += polyblep(phase, step);
+			double protation = rotation + pulse_width;
 			signal -= polyblep(protation - (long int) protation, step);
+
+			if (data.sync && data.sync_mul != 1) {
+				signal += polyblep(sync_phase, sync_step) *  (1 - (square_wave(rotation, 1, pulse_width) + 1) / 2);
+			}
 		}
 		break;
 	case AnalogWaveForm::NOISE:
