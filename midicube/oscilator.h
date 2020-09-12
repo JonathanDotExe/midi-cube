@@ -35,6 +35,8 @@ private:
 public:
 	AnalogOscilator();
 	double signal(double freq, double time_step, AnalogOscilatorData& data);
+	void randomize();
+	void reset();
 	~AnalogOscilator();
 };
 
@@ -71,6 +73,20 @@ public:
 			signal += osc[i].signal(freq * d, time_step, data);
 		}
 		return signal / (unison_amount + 1);
+	}
+
+	void randomize(size_t index) {
+		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
+		for (size_t i = 0; i < osc.size(); ++i) {
+			osc[i].randomize();
+		}
+	}
+
+	void reset(size_t index) {
+		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
+		for (size_t i = 0; i < osc.size(); ++i) {
+			osc[i].reset();
+		}
 	}
 
 	~AnalogOscilatorBank() {

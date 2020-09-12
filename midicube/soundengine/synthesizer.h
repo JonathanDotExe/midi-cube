@@ -73,6 +73,8 @@ public:
 	double unison_detune_mod = 0.1;
 	double pulse_width = 0.5;
 	double pulse_width_mod = 0.5;
+	bool reset = false;
+	bool randomize = true;
 
 	OscilatorComponent();
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
