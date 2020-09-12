@@ -46,6 +46,16 @@ public:
 	};
 };
 
+class Dialog {
+public:
+	virtual bool draw(double x, double y) = 0;
+	virtual double width() = 0;
+	virtual double height() = 0;
+	virtual ~Dialog() {
+
+	}
+};
+
 
 class Frame {
 
@@ -172,6 +182,7 @@ public:
 class SynthesizerEngineMenuView : public View {
 private:
 	SynthesizerData* data;
+	Dialog* dialog = nullptr;
 	int current_preset = 1;
 
 public:

@@ -764,6 +764,18 @@ View* SynthesizerEngineMenuView::draw() {
 		data->update_preset = current_preset;
 	}
 
+	//Dialog
+	if (dialog) {
+		double width = dialog->width();
+		double height = dialog->height();
+		double x = SCREEN_WIDTH/2 - width/2;
+		double y = SCREEN_HEIGHT/2 - height/2;
+		DrawRectangle(x - 5, y - 5, width + 10, height + 10, GRAY);
+		if (dialog->draw(x, y)) {
+			dialog = nullptr;
+		}
+	}
+
 	draw_return_button(&view);
 	return view;
 }
