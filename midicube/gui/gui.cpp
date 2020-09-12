@@ -780,6 +780,29 @@ View* SynthesizerEngineMenuView::draw() {
 	return view;
 }
 
+OscilatorDialog::OscilatorDialog(OscilatorComponent* osc) {
+	this->osc = osc;
+}
+
+bool OscilatorDialog::draw(double x, double y) {
+	std::string options = "SINE;SAW DOWN;SAW UP;SQUARE;NOISE";
+	std::vector<AnalogWaveForm> waveforms = {AnalogWaveForm::SINE, AnalogWaveForm::SAW_DOWN, AnalogWaveForm::SAW_UP, AnalogWaveForm::SQUARE, AnalogWaveForm::NOISE};
+	int waveform = std::find(waveforms.begin(), waveforms.end(), osc->osc.data.waveform) - waveforms.end();
+	DrawText("Waveform", x, y, 12, BLACK);
+	x += 15;
+	waveform = GuiComboBox((Rectangle){x, y, 400, 20}, options.c_str(), waveform);
+	osc->osc.data.waveform = waveforms.at(waveform);
+	x += 25;
+
+	return false;
+}
+double OscilatorDialog::width() {
+	return 400;
+}
+double OscilatorDialog::height() {
+	return 0;
+}
+
 View* create_view_for_engine(std::string name, SoundEngineData* data) {
 	if (name == "B3 Organ") {
 		return new B3OrganEngineMenuView(dynamic_cast<B3OrganData*>(data));	//TODO cleaner check

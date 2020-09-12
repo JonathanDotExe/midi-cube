@@ -191,6 +191,16 @@ public:
 
 };
 
+class OscilatorDialog : public Dialog {
+private:
+	OscilatorComponent* osc = nullptr;
+public:
+	OscilatorDialog(OscilatorComponent* osc);
+	bool draw(double x, double y);
+	double width();
+	double height();
+};
+
 View* create_view_for_engine(std::string engine_name, SoundEngineData* data);
 
 #endif /* MIDICUBE_GUI_GUI_H_ */
