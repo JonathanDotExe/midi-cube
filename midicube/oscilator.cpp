@@ -98,6 +98,15 @@ double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorDat
 	return signal;
 }
 
+void AnalogOscilator::reset() {
+	rotation = 0;
+}
+
+void AnalogOscilator::randomize() {
+	rotation = ((double) rand())/RAND_MAX;
+}
+
+
 AnalogOscilator::~AnalogOscilator() {
 
 }

@@ -40,6 +40,16 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 		freq *= note_to_freq_transpose(pitch);
 	}
 
+	//Reset and randomize
+	if (note.start_time  + info.time_step > info.time) {
+		if (reset) {
+			osc.reset(note_index);
+		}
+		else if (randomize) {
+			osc.randomize(note_index);
+		}
+	}
+
 	//Signal
 	double signal = osc.signal(freq, info.time_step, note_index);
 	return amplitude * volume * signal;
@@ -566,6 +576,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		comp->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
 		comp->osc.unison_amount = 2;
 		comp->unison_detune = 0.1;
+		comp->reset = true;
 		preset.components[9].set_component(comp);
 		preset.components[9].bindings.push_back( { BindingType::ADD,
 				OSCILATOR_PITCH_PROPERTY, 2, -1, 1 });
