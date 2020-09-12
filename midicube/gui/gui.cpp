@@ -731,17 +731,27 @@ View* SynthesizerEngineMenuView::draw() {
 	int title_width = MeasureText("Synthesizer", 32);
 	DrawText("Synthesizer", SCREEN_WIDTH/2 - title_width/2, 20, 36, BLACK);
 
+	//Grid
+	int length = sqrt(MAX_COMPONENTS);
+	for (size_t i = 0; i < data->preset.components.size(); ++i) {
+		ComponentSlot& comp = data->preset.components[i];
+		int x = i % length;
+		int y = i / length;
+		Color c(comp.get_component() ? BLUE : GRAY);
+		DrawRectangle(20 + 60 * x, 70 + 60 * y, 50, 50, c);
+	}
+
 	//Preset Input
 	Rectangle rect;
-	rect.x = SCREEN_WIDTH/2 - 200;
-	rect.y = SCREEN_HEIGHT/2 - 40;
-	rect.width = 400;
-	rect.height = 40;
+	rect.x = 70;
+	rect.y = SCREEN_HEIGHT - 20;
+	rect.width = 100;
+	rect.height = 20;
 
 	GuiSpinner(rect, "Preset No.", &current_preset, 0, 7, false);
 
 	//Preset Button
-	rect.y += 45;
+	rect.x += 100;
 	if (GuiButton(rect, "Apply")) {
 		data->update_preset = current_preset;
 	}

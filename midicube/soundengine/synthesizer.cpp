@@ -446,6 +446,10 @@ void ComponentSlot::set_component(SynthComponent* comp) {
 	this->comp = comp;
 }
 
+SynthComponent* ComponentSlot::get_component() {
+	return comp;
+}
+
 void ComponentSlot::control_change(unsigned int control, unsigned int value) {
 	if (comp) {
 		comp->control_change(control, value);
