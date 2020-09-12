@@ -48,9 +48,9 @@ public:
 
 class Dialog {
 public:
-	virtual bool draw(double x, double y) = 0;
-	virtual double width() = 0;
-	virtual double height() = 0;
+	virtual bool draw(float x, float y) = 0;
+	virtual float width() = 0;
+	virtual float height() = 0;
 	virtual ~Dialog() {
 
 	}
@@ -196,11 +196,13 @@ private:
 	OscilatorComponent* osc = nullptr;
 public:
 	OscilatorDialog(OscilatorComponent* osc);
-	bool draw(double x, double y);
-	double width();
-	double height();
+	bool draw(float x, float y);
+	float width();
+	float height();
 };
 
 View* create_view_for_engine(std::string engine_name, SoundEngineData* data);
+
+Dialog* create_dialog_for_component(std::string component_name, SynthComponent* data);
 
 #endif /* MIDICUBE_GUI_GUI_H_ */

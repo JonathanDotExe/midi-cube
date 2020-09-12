@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 
 
 std::unordered_map<DeviceType, Texture2D> device_textures;
@@ -737,6 +738,10 @@ View* SynthesizerEngineMenuView::draw() {
 		ComponentSlot& comp = data->preset.components[i];
 		int x = i % length;
 		int y = i / length;
+		//Click
+		if (GuiButton((Rectangle){20.0f + 90 * x, 70.0f + 90 * y, 80, 80}, "") && comp.get_component()) {
+			dialog = create_dialog_for_component(comp.get_component()->get_name(), comp.get_component());
+		}
 		Color c(comp.get_component() ? BLUE : GRAY);
 		DrawRectangle(20 + 90 * x, 70 + 90 * y, 80, 80, c);
 		if (comp.get_component()) {
@@ -784,23 +789,27 @@ OscilatorDialog::OscilatorDialog(OscilatorComponent* osc) {
 	this->osc = osc;
 }
 
-bool OscilatorDialog::draw(double x, double y) {
+bool OscilatorDialog::draw(float x, float y) {
+	//Waveform
 	std::string options = "SINE;SAW DOWN;SAW UP;SQUARE;NOISE";
 	std::vector<AnalogWaveForm> waveforms = {AnalogWaveForm::SINE, AnalogWaveForm::SAW_DOWN, AnalogWaveForm::SAW_UP, AnalogWaveForm::SQUARE, AnalogWaveForm::NOISE};
-	int waveform = std::find(waveforms.begin(), waveforms.end(), osc->osc.data.waveform) - waveforms.end();
+	int waveform = std::find(waveforms.begin(), waveforms.end(), osc->osc.data.waveform) - waveforms.begin();
+	std::cout << waveform << std::endl;
 	DrawText("Waveform", x, y, 12, BLACK);
-	x += 15;
+	y += 15;
 	waveform = GuiComboBox((Rectangle){x, y, 400, 20}, options.c_str(), waveform);
 	osc->osc.data.waveform = waveforms.at(waveform);
-	x += 25;
+	y += 25;
 
-	return false;
+	//Close
+	y += 10;
+	return GuiButton((Rectangle){x, y, 400, 20}, "Close");
 }
-double OscilatorDialog::width() {
+float OscilatorDialog::width() {
 	return 400;
 }
-double OscilatorDialog::height() {
-	return 0;
+float OscilatorDialog::height() {
+	return 70;
 }
 
 View* create_view_for_engine(std::string name, SoundEngineData* data) {
@@ -809,6 +818,13 @@ View* create_view_for_engine(std::string name, SoundEngineData* data) {
 	}
 	else if (name == "Synthesizer") {
 		return new SynthesizerEngineMenuView(dynamic_cast<SynthesizerData*>(data));	//TODO cleaner check
+	}
+	return nullptr;
+}
+
+Dialog* create_dialog_for_component(std::string name, SynthComponent* data) {
+	if (name == "Oscilator") {
+		return new OscilatorDialog(dynamic_cast<OscilatorComponent*>(data));	//TODO cleaner check
 	}
 	return nullptr;
 }
