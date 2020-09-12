@@ -738,7 +738,15 @@ View* SynthesizerEngineMenuView::draw() {
 		int x = i % length;
 		int y = i / length;
 		Color c(comp.get_component() ? BLUE : GRAY);
-		DrawRectangle(20 + 60 * x, 70 + 60 * y, 50, 50, c);
+		DrawRectangle(20 + 90 * x, 70 + 90 * y, 80, 80, c);
+		if (comp.get_component()) {
+			double twidth = MeasureText(comp.get_component()->get_name().c_str(), 10);
+			DrawText(comp.get_component()->get_name().c_str(), 20 + 90 * x + 40 - twidth/2, 70 + 90 * y + 2, 10, BLACK);
+			std::vector<std::string> desc = comp.get_component()->get_description();
+			for (size_t j = 0; j < desc.size(); ++j) {
+				DrawText(desc[j].c_str(), 20 + 90 * x + 3, 70 + 90 * y + 15 + j * 10, 8, BLACK);
+			}
+		}
 	}
 
 	//Preset Input

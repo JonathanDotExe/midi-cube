@@ -53,6 +53,8 @@ public:
 	virtual void control_change(unsigned int control, unsigned int value) {
 
 	}
+	virtual std::string get_name() = 0;
+	virtual std::vector<std::string> get_description() = 0;
 	virtual ~SynthComponent() {
 
 	}
@@ -82,6 +84,8 @@ public:
 	double from();
 	double to();
 	void reset_properties();
+	std::string get_name();
+	std::vector<std::string> get_description();
 	std::vector<std::string> property_names();
 	size_t property_count();
 };
@@ -102,6 +106,8 @@ public:
 	double to();
 	void reset_properties();
 	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	std::string get_name();
+	std::vector<std::string> get_description();
 	std::vector<std::string> property_names();
 	size_t property_count();
 };
@@ -120,6 +126,8 @@ public:
 	double from();
 	double to();
 	void reset_properties();
+	std::string get_name();
+	std::vector<std::string> get_description();
 	std::vector<std::string> property_names();
 	size_t property_count();
 };
@@ -135,10 +143,15 @@ class FilterComponent : public SynthComponent {
 private:
 	std::array<T, SOUND_ENGINE_POLYPHONY> filters = {};
 	double cutoff_mod = 21000;
+	std::string name;
 public:
 	double input = 0;
 	double cutoff = 21000;
 	double keyboard_tracking = 0;
+
+	FilterComponent (std::string name) {
+		this->name = name;
+	}
 
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 		T& filter = filters.at(note_index);
@@ -199,6 +212,15 @@ public:
 		input = 0;
 		cutoff_mod = cutoff;
 	}
+
+	std::string get_name() {
+		return name;
+	}
+
+	std::vector<std::string> get_description() {
+		return {"Cutoff: " + std::to_string(cutoff)};
+	}
+
 	std::vector<std::string> property_names() {
 		return filter_properties;
 	}
@@ -213,19 +235,31 @@ public:
 };
 
 class LowPassFilter12Component : public FilterComponent<LowPassFilter<2>> {
+public:
+	LowPassFilter12Component() : FilterComponent<LowPassFilter<2>>("LP12 Filter") {
 
+	}
 };
 
 class LowPassFilter24Component : public FilterComponent<LowPassFilter<4>> {
+public:
+	LowPassFilter24Component() : FilterComponent<LowPassFilter<4>>("LP24 Filter") {
 
+	}
 };
 
 class HighPassFilter12Component : public FilterComponent<HighPassFilter<2>> {
+public:
+	HighPassFilter12Component() : FilterComponent<HighPassFilter<2>>("HP12 Filter") {
 
+	}
 };
 
 class HighPassFilter24Component : public FilterComponent<HighPassFilter<4>> {
+public:
+	HighPassFilter24Component() : FilterComponent<HighPassFilter<4>>("HP24 Filter") {
 
+	}
 };
 
 //LFO
@@ -245,6 +279,8 @@ public:
 	double from();
 	double to();
 	void reset_properties();
+	std::string get_name();
+	std::vector<std::string> get_description();
 	std::vector<std::string> property_names();
 	size_t property_count();
 };
@@ -265,6 +301,8 @@ public:
 	double to();
 	void reset_properties();
 	void control_change(unsigned int control, unsigned int value);
+	std::string get_name();
+	std::vector<std::string> get_description();
 	std::vector<std::string> property_names();
 	size_t property_count();
 };
@@ -282,6 +320,8 @@ public:
 	double from();
 	double to();
 	void reset_properties();
+	std::string get_name();
+	std::vector<std::string> get_description();
 	std::vector<std::string> property_names();
 	size_t property_count();
 };
