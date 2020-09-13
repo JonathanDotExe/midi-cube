@@ -211,7 +211,17 @@ class AmpEnvelopeDialog : public Dialog {
 private:
 	AmpEnvelopeComponent* amp = nullptr;
 public:
-	AmpEnvelopeDialog(AmpEnvelopeComponent* osc);
+	AmpEnvelopeDialog(AmpEnvelopeComponent* amp);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
+class ModEnvelopeDialog : public Dialog {
+private:
+	ModEnvelopeComponent* env = nullptr;
+public:
+	ModEnvelopeDialog(ModEnvelopeComponent* env);
 	bool draw(float x, float y);
 	float width();
 	float height();

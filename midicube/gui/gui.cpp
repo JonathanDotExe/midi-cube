@@ -879,6 +879,35 @@ float AmpEnvelopeDialog::height() {
 	return 150;
 }
 
+//ModEnvelopeDialog
+ModEnvelopeDialog::ModEnvelopeDialog(ModEnvelopeComponent* env) {
+	this->env = env;
+}
+
+bool ModEnvelopeDialog::draw(float x, float y) {
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "A", env->envelope.attack, ATTACK_SCALE, "%1.4f");
+	y += 25;
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "D", env->envelope.decay, DECAY_SCALE, "%1.4f");
+	y += 25;
+	env->envelope.sustain = GuiSlider((Rectangle){x + 20, y, 320, 20}, "S", TextFormat("%1.4f", env->envelope.sustain), env->envelope.sustain, 0, 1);
+	y += 25;
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "R", env->envelope.release, RELEASE_SCALE, "%1.4f");
+	y += 25;
+	env->amplitude = GuiSlider((Rectangle){x + 20, y, 320, 20}, "Vol.", TextFormat("%1.2f", env->amplitude), env->amplitude, 0, 1);
+	y += 25;
+	//Close
+	y += 10;
+	return GuiButton((Rectangle){x, y, 400, 20}, "Close");
+}
+
+float ModEnvelopeDialog::width() {
+	return 400;
+}
+
+float ModEnvelopeDialog::height() {
+	return 150;
+}
+
 
 View* create_view_for_engine(std::string name, SoundEngineData* data) {
 	if (name == "B3 Organ") {
@@ -896,6 +925,9 @@ Dialog* create_dialog_for_component(std::string name, SynthComponent* data) {
 	}
 	else if (name == "Amp Envelope") {
 		return new AmpEnvelopeDialog(dynamic_cast<AmpEnvelopeComponent*>(data));	//TODO cleaner check
+	}
+	else if (name == "Mod Envelope") {
+		return new ModEnvelopeDialog(dynamic_cast<ModEnvelopeComponent*>(data));	//TODO cleaner check
 	}
 	return nullptr;
 }
