@@ -9,6 +9,7 @@
 #define MIDICUBE_GUI_GUI_H_
 
 #include "model.h"
+#include "../util.h"
 #include "../soundengine/organ.h"
 #include "../soundengine/synthesizer.h"
 #include "../soundengine/soundengine.h"
@@ -16,6 +17,7 @@
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 600
+
 
 
 class View {
@@ -200,6 +202,10 @@ public:
 	float width();
 	float height();
 };
+
+const FixedScale ATTACK_SCALE(0.0005, {{0.35, 1}, {0.5, 2}, {0.6, 3}, {0.7, 4}, {0.75, 5}, {0.9, 10}}, 15);
+const FixedScale DECAY_SCALE(0.0, {{0.35, 1}, {0.5, 2}, {0.6, 3}, {0.65, 4}, {0.8, 10}}, 50);
+const FixedScale RELEASE_SCALE(0.003, {{0.35, 1}, {0.5, 2}, {0.6, 3}, {0.65, 4}, {0.8, 10}}, 50);
 
 class AmpEnvelopeDialog : public Dialog {
 private:

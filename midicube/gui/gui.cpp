@@ -134,6 +134,10 @@ static bool draw_switch (int x, int y, int width, int height, bool value, std::s
 	return value;
 }
 
+static void scaled_slider(Rectangle pos, std::string text, double& value, const FixedScale& scale, std::string format = "1.2f%") {
+	value = scale.value(GuiSlider(pos, text.c_str(), TextFormat(format.c_str(), value), scale.progress(value), 0, 1));
+}
+
 //MainMenuView
 View* MainMenuView::draw() {
 	View* view = this;
@@ -852,13 +856,13 @@ AmpEnvelopeDialog::AmpEnvelopeDialog(AmpEnvelopeComponent* amp) {
 }
 
 bool AmpEnvelopeDialog::draw(float x, float y) {
-	amp->envelope.attack = GuiSlider((Rectangle){x + 20, y, 320, 20}, "A", TextFormat("%1.4f", amp->envelope.attack), amp->envelope.attack, 0.0005, 10);
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "A", amp->envelope.attack, ATTACK_SCALE, "%1.4f");
 	y += 25;
-	amp->envelope.decay = GuiSlider((Rectangle){x + 20, y, 320, 20}, "D", TextFormat("%1.4f", amp->envelope.decay), amp->envelope.decay, 00, 10);
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "D", amp->envelope.decay, DECAY_SCALE, "%1.4f");
 	y += 25;
 	amp->envelope.sustain = GuiSlider((Rectangle){x + 20, y, 320, 20}, "S", TextFormat("%1.4f", amp->envelope.sustain), amp->envelope.sustain, 0, 1);
 	y += 25;
-	amp->envelope.release = GuiSlider((Rectangle){x + 20, y, 320, 20}, "R", TextFormat("%1.4f", amp->envelope.release), amp->envelope.release, 0.0005, 10);
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "R", amp->envelope.release, RELEASE_SCALE, "%1.4f");
 	y += 25;
 	amp->amplitude = GuiSlider((Rectangle){x + 20, y, 320, 20}, "Vol.", TextFormat("%1.2f", amp->amplitude), amp->amplitude, 0, 1);
 	y += 25;
