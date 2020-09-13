@@ -243,6 +243,39 @@ public:
 	float height();
 };
 
+const FixedScale LFO_FREQ_SCALE(0, {{0.2, 0.2}, {0.3, 0.4}, {0.4, 1}, {0.6, 3}, {0.7, 6}, {0.8, 20}, {0.9, 100}}, 512);
+
+class LFODialog: public Dialog {
+private:
+	LFOComponent* lfo = nullptr;
+public:
+	LFODialog(LFOComponent* lfo);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
+class ControlChangeDialog: public Dialog {
+private:
+	ControlChangeComponent* cc = nullptr;
+	bool cc_editmode = false;
+public:
+	ControlChangeDialog(ControlChangeComponent* cc);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
+class VelocityDialog: public Dialog {
+private:
+	VelocityComponent* vel = nullptr;
+public:
+	VelocityDialog(VelocityComponent* vel);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
 View* create_view_for_engine(std::string engine_name, SoundEngineData* data);
 
 Dialog* create_dialog_for_component(std::string component_name, SynthComponent* data);

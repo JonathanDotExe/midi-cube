@@ -929,6 +929,69 @@ void __filter_dialig_link_fix_dont_call__ () {
 	FilterDialog<LowPassFilter12Component> f(nullptr);
 }
 
+//LFODialog
+LFODialog::LFODialog(LFOComponent* lfo) {
+	this->lfo = lfo;
+}
+
+bool LFODialog::draw(float x, float y) {
+	scaled_slider((Rectangle){x + 60, y, 320, 20}, "Freq", lfo->freq, LFO_FREQ_SCALE, "%1.3f");
+	y += 25;
+	lfo->amplitude = GuiSlider((Rectangle){x + 60, y, 320, 20}, "Amp", TextFormat("%1.2f", lfo->amplitude), lfo->amplitude, 0, 1);
+	y += 25;
+	return false;
+}
+float LFODialog::width() {
+	return 400;
+}
+float LFODialog::height() {
+	return 50;
+}
+
+//ControlChangeDialog
+ControlChangeDialog::ControlChangeDialog(ControlChangeComponent* cc) {
+	this->cc = cc;
+}
+bool ControlChangeDialog::draw(float x, float y) {
+	int control = cc->control;
+	if (GuiSpinner((Rectangle){x + 60, y, 320, 20}, "Control", &control, 0, 127, cc_editmode)) {
+		cc_editmode = !cc_editmode;
+	}
+	cc->control = control;
+	y += 25;
+	cc->start = GuiSlider((Rectangle){x + 60, y, 320, 20}, "Start", TextFormat("%d", cc->start), cc->start, 0, 127);
+	y += 25;
+	cc->end = GuiSlider((Rectangle){x + 60, y, 320, 20}, "End", TextFormat("%d", cc->end), cc->end, 0, 127);
+	y += 25;
+	return false;
+}
+float ControlChangeDialog::width() {
+	return 400;
+}
+
+float ControlChangeDialog::height() {
+	return 75;
+}
+
+//VelocityDialog
+VelocityDialog::VelocityDialog(VelocityComponent* vel) {
+	this->vel = vel;
+}
+bool VelocityDialog::draw(float x, float y) {
+	vel->start = GuiSlider((Rectangle){x + 60, y, 320, 20}, "Start", TextFormat("%1.2f", vel->start), vel->start, 0, 1);
+	y += 25;
+	vel->end = GuiSlider((Rectangle){x + 60, y, 320, 20}, "End", TextFormat("%1.2f", vel->end), vel->end, 0, 1);
+	y += 25;
+	return false;
+}
+float VelocityDialog::width() {
+	return 400;
+}
+
+float VelocityDialog::height() {
+	return 50;
+}
+
 
 View* create_view_for_engine(std::string name, SoundEngineData* data) {
 	if (name == "B3 Organ") {
@@ -962,6 +1025,14 @@ Dialog* create_dialog_for_component(std::string name, SynthComponent* data) {
 	else if (name == "HP24 Filter") {
 		return new FilterDialog<HighPassFilter24Component>(dynamic_cast<HighPassFilter24Component*>(data));	//TODO cleaner check
 	}
+	else if (name == "LFO") {
+		return new LFODialog(dynamic_cast<LFOComponent*>(data));	//TODO cleaner check
+	}
+	else if (name == "MIDI Control") {
+		return new ControlChangeDialog(dynamic_cast<ControlChangeComponent*>(data));	//TODO cleaner check
+	}
+	else if (name == "Velocity") {
+		return new VelocityDialog(dynamic_cast<VelocityComponent*>(data));	//TODO cleaner check
+	}
 	return nullptr;
 }
-
