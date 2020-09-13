@@ -834,6 +834,9 @@ bool OscilatorDialog::draw(float x, float y) {
 	waveform = GuiComboBox((Rectangle){x, y, 400, 20}, options.c_str(), waveform);
 	osc->osc.data.waveform = waveforms.at(waveform);
 	y += 25;
+	//Volumne
+	osc->volume = GuiSlider((Rectangle){x + 40, y, 320, 20}, "Vol.", TextFormat("%1.2f", osc->volume), osc->volume, 0, 1);
+	y += 25;
 	//Unison
 	int unison = osc->osc.unison_amount;
 	GuiSpinner((Rectangle){x + 100, y, 90, 20}, "Unison", &unison, 0, 7, false); //TODO use value of template
@@ -854,7 +857,7 @@ bool OscilatorDialog::draw(float x, float y) {
 	osc->transpose = GuiSlider((Rectangle){x + 40, y, 320, 20}, "F", TextFormat("%1.2f", osc->transpose), osc->transpose, 0, 25);
 	y += 25;
 	//Pulse width
-	osc->pulse_width = GuiSlider((Rectangle){x + 80, y, 280, 20}, "Pulse Width", TextFormat("%1.2f", osc->pulse_width), osc->pulse_width, 0.1, 0.5);
+	osc->pulse_width = GuiSlider((Rectangle){x + 40, y, 320, 20}, "Pulse Width", TextFormat("%1.2f", osc->pulse_width), osc->pulse_width, 0.1, 0.5);
 	y += 25;
 	//Analog and sync
 	osc->osc.data.analog = GuiCheckBox((Rectangle){x, y, 20, 20}, "Analog", osc->osc.data.analog);
@@ -870,7 +873,7 @@ bool OscilatorDialog::draw(float x, float y) {
 	return false;
 }
 float OscilatorDialog::width() {
-	return 400;
+	return 425;
 }
 float OscilatorDialog::height() {
 	return 215;
