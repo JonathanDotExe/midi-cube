@@ -743,7 +743,7 @@ View* SynthesizerEngineMenuView::draw() {
 		int x = i % length;
 		int y = i / length;
 		//Click
-		if (!dialog && GuiButton((Rectangle){20.0f + 90 * x, 70.0f + 90 * y, 80, 80}, "") && comp.get_component()) {
+		if (GuiButton((Rectangle){20.0f + 90 * x, 70.0f + 90 * y, 80, 80}, "") && comp.get_component()) {
 			dialog = create_dialog_for_component(comp.get_component()->get_name(), comp.get_component());
 		}
 		Color c(comp.get_component() ? BLUE : GRAY);
@@ -776,10 +776,8 @@ View* SynthesizerEngineMenuView::draw() {
 	//Dialog
 	if (dialog) {
 		double width = dialog->width();
-		double height = dialog->height();
-		double x = SCREEN_WIDTH/2 - width/2;
-		double y = SCREEN_HEIGHT/2 - height/2;
-		DrawRectangle(x - 5, y - 5, width + 10, height + 10, GRAY);
+		double x = SCREEN_WIDTH - width - 20;
+		double y = 70;
 		if (dialog->draw(x, y)) {
 			dialog = nullptr;
 		}
