@@ -1030,59 +1030,123 @@ ComponentSlotDialog::ComponentSlotDialog(ComponentSlot* slot) {
 	this->slot = slot;
 }
 bool ComponentSlotDialog::draw(float x, float y) {
+	bool close = false;
 	if (!slot->get_component()) {
 		//Create component
 		if (GuiButton({x, y, 400, 20}, "Oscilator")) {
 			slot->set_component(new OscilatorComponent());
+			close = true;
 		}
 		else if (GuiButton({x, y += 20, 400, 20}, "Amp Envelope")) {
 			slot->set_component(new AmpEnvelopeComponent());
+			close = true;
 		}
 		else if (GuiButton({x, y += 20, 400, 20}, "Mod Envelope")) {
 			slot->set_component(new ModEnvelopeComponent());
+			close = true;
 		}
 		else if (GuiButton({x, y += 20, 400, 20}, "LP12 Filter")) {
 			slot->set_component(new LowPassFilter12Component());
+			close = true;
 		}
 		else if (GuiButton({x, y += 20, 400, 20}, "LP24 Filter")) {
 			slot->set_component(new LowPassFilter24Component());
+			close = true;
 		}
 		else if (GuiButton({x, y += 20, 400, 20}, "HP12 Filter")) {
 			slot->set_component(new HighPassFilter12Component());
+			close = true;
 		}
 		else if (GuiButton({x, y += 20, 400, 20}, "HP24 Filter")) {
 			slot->set_component(new HighPassFilter24Component());
+			close = true;
 		}
 		else if (GuiButton({x, y += 20, 400, 20}, "LFO")) {
 			slot->set_component(new LFOComponent());
+			close = true;
 		}
 		else if (GuiButton({x, y += 20, 400, 20}, "MIDI Control")) {
 			slot->set_component(new ControlChangeComponent());
+			close = true;
 		}
 		else if (GuiButton({x, y += 20, 400, 20}, "Velocity")) {
 			slot->set_component(new VelocityComponent());
+			close = true;
 		}
 		y += 25;
 	}
 	else {
-		//Bindings
-		DrawText("Bindings", x, y, 12, BLACK);
-		y += 15;
-		std::vector<ComponentPropertyBinding> bindings = slot->bindings;
-		std::vector<std::string> props = slot->get_component()->property_names();
-		for (size_t i = 0; i < bindings.size(); ++i) {
-			std::string name = props.at(bindings[i].property) + " to " + std::to_string(bindings[i].component);
-			if (GuiButton({x, y, 400, 20}, name.c_str())) {
-				//TODO
+		if (edit_binding) {
+			//Type
+			std::string options = "set;add;multiply";
+			std::vector<BindingType> types = {BindingType::SET, BindingType::ADD, BindingType::MUL};
+			int type = std::find(types.begin(), types.end(), binding.type) - types.begin();
+			DrawText("Binding Type", x, y, 12, BLACK);
+			y += 15;
+			type = GuiComboBox((Rectangle){x, y, 400, 20}, options.c_str(), type);
+			binding.type = types.at(type);
+			y += 25;
+			//Property
+			std::string prop_options = "";
+			std::vector<std::string> props = slot->get_component()->property_names();
+			for (size_t i = 0; i < props.size(); ++i) {
+				if ( i != 0) {
+					prop_options += ";";
+				}
+				prop_options += props[i];
 			}
-			y += 20;
+			binding.property = GuiComboBox((Rectangle){x, y, 400, 20}, prop_options.c_str(), binding.property);
+			y += 25;
+			//Component
+			int comp = binding.component;
+			GuiSpinner((Rectangle){x + 60, y, 340, 20}, "Component", &comp, 0, MAX_COMPONENTS - 1, false);
+			binding.component = comp;
+			y += 25;
+			//From and to
+			binding.from = GuiSlider((Rectangle){x + 60, y, 320, 20}, "From", TextFormat("%1.3f", binding.from), binding.from, -1, 1);
+			y += 25;
+			binding.to = GuiSlider((Rectangle){x + 60, y, 320, 20}, "To", TextFormat("%1.3f", binding.to), binding.to, -1, 1);
+			y += 25;
+			//Apply
+			if (GuiButton((Rectangle){x, y, 400, 20}, "Apply")) {
+				if (binding_index < slot->bindings.size()) {
+					slot->bindings[binding_index] = binding;
+				}
+				else {
+					slot->bindings.push_back(binding);
+				}
+				edit_binding = false;
+				binding = {};
+				}
+			y += 25;
 		}
-		y += 5;
+		else {
+			//Bindings
+			DrawText("Bindings", x, y, 12, BLACK);
+			y += 15;
+			std::vector<ComponentPropertyBinding> bindings = slot->bindings;
+			std::vector<std::string> props = slot->get_component()->property_names();
+			for (size_t i = 0; i < bindings.size(); ++i) {
+				std::string name = props.at(bindings[i].property) + " to " + std::to_string(bindings[i].component);
+				if (GuiButton({x, y, 400, 20}, name.c_str())) {
+					edit_binding = true;
+					binding = bindings[i];
+					binding_index = i;
+				}
+				y += 20;
+			}
+			y += 5;
+			if (GuiButton({x, y, 400, 20}, "New Binding")) {
+				edit_binding = true;
+				binding = {};
+				binding_index = bindings.size();
+			}
+			y += 25;
+		}
 	}
-
 	slot->audible = GuiCheckBox({x, y, 20, 20}, "Audible", slot->audible);
 	y += 20;
-	return false;
+	return close;
 }
 
 float ComponentSlotDialog::width() {
@@ -1090,7 +1154,7 @@ float ComponentSlotDialog::width() {
 }
 
 float ComponentSlotDialog::height() {
-	return 20 + slot->get_component() ? 205 : (slot->bindings.size() * 20 + 20);
+	return 20 + (slot->get_component() ? (edit_binding ? 165 : (slot->bindings.size() * 20 + 40)) : 205);
 }
 
 View* create_view_for_engine(std::string name, SoundEngineData* data) {

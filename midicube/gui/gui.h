@@ -282,6 +282,9 @@ public:
 class ComponentSlotDialog : public Dialog {
 private:
 	ComponentSlot* slot = nullptr;
+	ComponentPropertyBinding binding;
+	size_t binding_index = 0;
+	bool edit_binding = false;
 public:
 	ComponentSlotDialog(ComponentSlot* slot);
 	bool draw(float x, float y);
