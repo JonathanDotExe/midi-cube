@@ -743,8 +743,14 @@ View* SynthesizerEngineMenuView::draw() {
 		int x = i % length;
 		int y = i / length;
 		//Click
-		if (GuiButton((Rectangle){20.0f + 90 * x, 70.0f + 90 * y, 80, 80}, "") && comp.get_component()) {
-			dialog = create_dialog_for_component(comp.get_component()->get_name(), comp.get_component());
+		if (GuiButton((Rectangle){20.0f + 90 * x, 70.0f + 90 * y, 80, 80}, "")) {
+			if (comp.get_component()) {
+				set_comp_dialog(create_dialog_for_component(comp.get_component()->get_name(), comp.get_component()));
+			}
+			else {
+				set_comp_dialog(nullptr);
+			}
+			set_slot_dialog(new ComponentSlotDialog(&comp));
 		}
 		Color c(comp.get_component() ? BLUE : GRAY);
 		DrawRectangle(20 + 90 * x, 70 + 90 * y, 80, 80, c);
@@ -770,22 +776,46 @@ View* SynthesizerEngineMenuView::draw() {
 	//Preset Button
 	rect.x += 100;
 	if (GuiButton(rect, "Apply")) {
-		dialog = nullptr;
+		set_comp_dialog(nullptr);
 		data->update_preset = current_preset;
 	}
 
 	//Dialog
-	if (dialog) {
-		double width = dialog->width();
+	double y = 70;
+	if (comp_dialog) {
+		double width = comp_dialog->width();
+		double height = comp_dialog->height();
 		double x = SCREEN_WIDTH - width - 20;
-		double y = 70;
-		if (dialog->draw(x, y)) {
-			dialog = nullptr;
+		if (comp_dialog->draw(x, y)) {
+			set_comp_dialog(nullptr);
+		}
+		y += height + 20;
+	}
+	if (slot_dialog) {
+		double width = slot_dialog->width();
+		double x = SCREEN_WIDTH - width - 20;
+		if (slot_dialog->draw(x, y)) {
+			set_slot_dialog(nullptr);
 		}
 	}
 
 	draw_return_button(&view);
 	return view;
+}
+
+void SynthesizerEngineMenuView::set_comp_dialog(Dialog* d) {
+	delete comp_dialog;
+	comp_dialog = d;
+}
+
+void SynthesizerEngineMenuView::set_slot_dialog(Dialog* d) {
+	delete slot_dialog;
+	slot_dialog = d;
+}
+
+SynthesizerEngineMenuView::~SynthesizerEngineMenuView() {
+	set_comp_dialog(nullptr);
+	set_slot_dialog(nullptr);
 }
 
 //OscilatorDialog
@@ -992,6 +1022,58 @@ float VelocityDialog::height() {
 	return 50;
 }
 
+//ComponentSlotDialog
+ComponentSlotDialog::ComponentSlotDialog(ComponentSlot* slot) {
+	this->slot = slot;
+}
+bool ComponentSlotDialog::draw(float x, float y) {
+	//Create component
+	if (!slot->get_component()) {
+		if (GuiButton({x, y, 400, 20}, "Oscilator")) {
+			slot->set_component(new OscilatorComponent());
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "Amp Envelope")) {
+			slot->set_component(new AmpEnvelopeComponent());
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "Mod Envelope")) {
+			slot->set_component(new ModEnvelopeComponent());
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "LP12 Filter")) {
+			slot->set_component(new LowPassFilter12Component());
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "LP24 Filter")) {
+			slot->set_component(new LowPassFilter24Component());
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "HP12 Filter")) {
+			slot->set_component(new HighPassFilter12Component());
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "HP24 Filter")) {
+			slot->set_component(new HighPassFilter24Component());
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "LFO")) {
+			slot->set_component(new LFOComponent());
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "MIDI Control")) {
+			slot->set_component(new ControlChangeComponent());
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "Velocity")) {
+			slot->set_component(new VelocityComponent());
+		}
+		y += 25;
+	}
+
+	slot->audible = GuiCheckBox({x, y, 20, 20}, "Audible", slot->audible);
+	y += 25;
+	return false;
+}
+
+float ComponentSlotDialog::width() {
+	return 400;
+}
+
+float ComponentSlotDialog::height() {
+	return 20 + slot->get_component() ? 205 : 10;
+}
 
 View* create_view_for_engine(std::string name, SoundEngineData* data) {
 	if (name == "B3 Organ") {

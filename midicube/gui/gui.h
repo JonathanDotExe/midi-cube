@@ -184,13 +184,16 @@ public:
 class SynthesizerEngineMenuView : public View {
 private:
 	SynthesizerData* data;
-	Dialog* dialog = nullptr;
+	Dialog* comp_dialog = nullptr;
+	Dialog* slot_dialog = nullptr;
 	int current_preset = 1;
+	void set_comp_dialog(Dialog* d);
+	void set_slot_dialog(Dialog* d);
 
 public:
 	SynthesizerEngineMenuView(SynthesizerData* data);
 	View* draw();
-
+	~SynthesizerEngineMenuView();
 };
 
 class OscilatorDialog : public Dialog {
@@ -266,11 +269,21 @@ public:
 	float height();
 };
 
-class VelocityDialog: public Dialog {
+class VelocityDialog : public Dialog {
 private:
 	VelocityComponent* vel = nullptr;
 public:
 	VelocityDialog(VelocityComponent* vel);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
+class ComponentSlotDialog : public Dialog {
+private:
+	ComponentSlot* slot = nullptr;
+public:
+	ComponentSlotDialog(ComponentSlot* slot);
 	bool draw(float x, float y);
 	float width();
 	float height();
