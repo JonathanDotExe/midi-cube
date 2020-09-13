@@ -770,6 +770,7 @@ View* SynthesizerEngineMenuView::draw() {
 	//Preset Button
 	rect.x += 100;
 	if (GuiButton(rect, "Apply")) {
+		dialog = nullptr;
 		data->update_preset = current_preset;
 	}
 
@@ -836,16 +837,13 @@ bool OscilatorDialog::draw(float x, float y) {
 	osc->reset = GuiCheckBox((Rectangle){x, y, 20, 20}, "Reset", osc->reset);
 	osc->randomize = GuiCheckBox((Rectangle){x + 200, y, 20, 20}, "Randomize", osc->randomize);
 	y += 25;
-
-	//Close
-	y += 10;
-	return GuiButton((Rectangle){x, y, 400, 20}, "Close");
+	return false;
 }
 float OscilatorDialog::width() {
 	return 400;
 }
 float OscilatorDialog::height() {
-	return 245;
+	return 215;
 }
 
 //AmpEnvelopeDialog
@@ -864,9 +862,7 @@ bool AmpEnvelopeDialog::draw(float x, float y) {
 	y += 25;
 	amp->amplitude = GuiSlider((Rectangle){x + 20, y, 320, 20}, "Vol.", TextFormat("%1.2f", amp->amplitude), amp->amplitude, 0, 1);
 	y += 25;
-	//Close
-	y += 10;
-	return GuiButton((Rectangle){x, y, 400, 20}, "Close");
+	return false;
 }
 
 float AmpEnvelopeDialog::width() {
@@ -874,7 +870,7 @@ float AmpEnvelopeDialog::width() {
 }
 
 float AmpEnvelopeDialog::height() {
-	return 150;
+	return 120;
 }
 
 //ModEnvelopeDialog
@@ -893,9 +889,7 @@ bool ModEnvelopeDialog::draw(float x, float y) {
 	y += 25;
 	env->amplitude = GuiSlider((Rectangle){x + 20, y, 320, 20}, "Vol.", TextFormat("%1.2f", env->amplitude), env->amplitude, 0, 1);
 	y += 25;
-	//Close
-	y += 10;
-	return GuiButton((Rectangle){x, y, 400, 20}, "Close");
+	return false;
 }
 
 float ModEnvelopeDialog::width() {
@@ -903,7 +897,36 @@ float ModEnvelopeDialog::width() {
 }
 
 float ModEnvelopeDialog::height() {
-	return 150;
+	return 120;
+}
+
+//FilterDialog
+template<typename T>
+FilterDialog<T>::FilterDialog(T* filter) {
+	this->filter = filter;
+}
+
+template<typename T>
+bool FilterDialog<T>::draw(float x, float y) {
+	scaled_slider((Rectangle){x + 60, y, 320, 20}, "Cutoff", filter->cutoff, FILTER_CUTOFF_SCALE, "%1.0f");
+	y += 25;
+	filter->keyboard_tracking = GuiSlider((Rectangle){x + 60, y, 320, 20}, "KB Track", TextFormat("%1.3f", filter->keyboard_tracking), filter->keyboard_tracking, 0, 1);
+	y += 25;
+	return false;
+}
+
+template<typename T>
+float FilterDialog<T>::width() {
+	return 400;
+}
+
+template<typename T>
+float FilterDialog<T>::height() {
+	return 50;
+}
+
+void __filter_dialig_link_fix_dont_call__ () {
+	FilterDialog<LowPassFilter12Component> f(nullptr);
 }
 
 
@@ -926,6 +949,18 @@ Dialog* create_dialog_for_component(std::string name, SynthComponent* data) {
 	}
 	else if (name == "Mod Envelope") {
 		return new ModEnvelopeDialog(dynamic_cast<ModEnvelopeComponent*>(data));	//TODO cleaner check
+	}
+	else if (name == "LP12 Filter") {
+		return new FilterDialog<LowPassFilter12Component>(dynamic_cast<LowPassFilter12Component*>(data));	//TODO cleaner check
+	}
+	else if (name == "LP24 Filter") {
+		return new FilterDialog<LowPassFilter24Component>(dynamic_cast<LowPassFilter24Component*>(data));	//TODO cleaner check
+	}
+	else if (name == "HP12 Filter") {
+		return new FilterDialog<HighPassFilter12Component>(dynamic_cast<HighPassFilter12Component*>(data));	//TODO cleaner check
+	}
+	else if (name == "HP24 Filter") {
+		return new FilterDialog<HighPassFilter24Component>(dynamic_cast<HighPassFilter24Component*>(data));	//TODO cleaner check
 	}
 	return nullptr;
 }
