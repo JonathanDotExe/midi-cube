@@ -761,6 +761,7 @@ View* SynthesizerEngineMenuView::draw() {
 			for (size_t j = 0; j < desc.size(); ++j) {
 				DrawText(desc[j].c_str(), 20 + 90 * x + 3, 70 + 90 * y + 15 + j * 10, 8, BLACK);
 			}
+			DrawText(std::to_string(i).c_str(), 20 + 90 * x + 73, 70 + 90 * y + 70, 8, WHITE);
 		}
 	}
 
@@ -828,7 +829,6 @@ bool OscilatorDialog::draw(float x, float y) {
 	std::string options = "SINE;SAW DOWN;SAW UP;SQUARE;NOISE";
 	std::vector<AnalogWaveForm> waveforms = {AnalogWaveForm::SINE, AnalogWaveForm::SAW_DOWN, AnalogWaveForm::SAW_UP, AnalogWaveForm::SQUARE, AnalogWaveForm::NOISE};
 	int waveform = std::find(waveforms.begin(), waveforms.end(), osc->osc.data.waveform) - waveforms.begin();
-	std::cout << waveform << std::endl;
 	DrawText("Waveform", x, y, 12, BLACK);
 	y += 15;
 	waveform = GuiComboBox((Rectangle){x, y, 400, 20}, options.c_str(), waveform);
@@ -873,10 +873,10 @@ bool OscilatorDialog::draw(float x, float y) {
 	return false;
 }
 float OscilatorDialog::width() {
-	return 425;
+	return 400;
 }
 float OscilatorDialog::height() {
-	return 215;
+	return 240;
 }
 
 //AmpEnvelopeDialog
@@ -958,7 +958,7 @@ float FilterDialog<T>::height() {
 	return 50;
 }
 
-void __filter_dialig_link_fix_dont_call__ () {
+void __filter_dialog_link_fix_dont_call__ () {
 	FilterDialog<LowPassFilter12Component> f(nullptr);
 }
 
@@ -1030,8 +1030,8 @@ ComponentSlotDialog::ComponentSlotDialog(ComponentSlot* slot) {
 	this->slot = slot;
 }
 bool ComponentSlotDialog::draw(float x, float y) {
-	//Create component
 	if (!slot->get_component()) {
+		//Create component
 		if (GuiButton({x, y, 400, 20}, "Oscilator")) {
 			slot->set_component(new OscilatorComponent());
 		}
@@ -1064,9 +1064,24 @@ bool ComponentSlotDialog::draw(float x, float y) {
 		}
 		y += 25;
 	}
+	else {
+		//Bindings
+		DrawText("Bindings", x, y, 12, BLACK);
+		y += 15;
+		std::vector<ComponentPropertyBinding> bindings = slot->bindings;
+		std::vector<std::string> props = slot->get_component()->property_names();
+		for (size_t i = 0; i < bindings.size(); ++i) {
+			std::string name = props.at(bindings[i].property) + " to " + std::to_string(bindings[i].component);
+			if (GuiButton({x, y, 400, 20}, name.c_str())) {
+				//TODO
+			}
+			y += 20;
+		}
+		y += 5;
+	}
 
 	slot->audible = GuiCheckBox({x, y, 20, 20}, "Audible", slot->audible);
-	y += 25;
+	y += 20;
 	return false;
 }
 
@@ -1075,7 +1090,7 @@ float ComponentSlotDialog::width() {
 }
 
 float ComponentSlotDialog::height() {
-	return 20 + slot->get_component() ? 205 : 10;
+	return 20 + slot->get_component() ? 205 : (slot->bindings.size() * 20 + 20);
 }
 
 View* create_view_for_engine(std::string name, SoundEngineData* data) {
