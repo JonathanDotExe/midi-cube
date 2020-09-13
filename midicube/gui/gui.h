@@ -201,6 +201,16 @@ public:
 	float height();
 };
 
+class AmpEnvelopeDialog : public Dialog {
+private:
+	AmpEnvelopeComponent* amp = nullptr;
+public:
+	AmpEnvelopeDialog(AmpEnvelopeComponent* osc);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
 View* create_view_for_engine(std::string engine_name, SoundEngineData* data);
 
 Dialog* create_dialog_for_component(std::string component_name, SynthComponent* data);

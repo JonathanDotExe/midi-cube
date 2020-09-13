@@ -739,7 +739,7 @@ View* SynthesizerEngineMenuView::draw() {
 		int x = i % length;
 		int y = i / length;
 		//Click
-		if (GuiButton((Rectangle){20.0f + 90 * x, 70.0f + 90 * y, 80, 80}, "") && comp.get_component()) {
+		if (!dialog && GuiButton((Rectangle){20.0f + 90 * x, 70.0f + 90 * y, 80, 80}, "") && comp.get_component()) {
 			dialog = create_dialog_for_component(comp.get_component()->get_name(), comp.get_component());
 		}
 		Color c(comp.get_component() ? BLUE : GRAY);
@@ -785,6 +785,7 @@ View* SynthesizerEngineMenuView::draw() {
 	return view;
 }
 
+//OscilatorDialog
 OscilatorDialog::OscilatorDialog(OscilatorComponent* osc) {
 	this->osc = osc;
 }
@@ -845,6 +846,36 @@ float OscilatorDialog::height() {
 	return 245;
 }
 
+//AmpEnvelopeDialog
+AmpEnvelopeDialog::AmpEnvelopeDialog(AmpEnvelopeComponent* amp) {
+	this->amp = amp;
+}
+
+bool AmpEnvelopeDialog::draw(float x, float y) {
+	amp->envelope.attack = GuiSlider((Rectangle){x + 20, y, 320, 20}, "A", TextFormat("%1.4f", amp->envelope.attack), amp->envelope.attack, 0.0005, 10);
+	y += 25;
+	amp->envelope.decay = GuiSlider((Rectangle){x + 20, y, 320, 20}, "D", TextFormat("%1.4f", amp->envelope.decay), amp->envelope.decay, 00, 10);
+	y += 25;
+	amp->envelope.sustain = GuiSlider((Rectangle){x + 20, y, 320, 20}, "S", TextFormat("%1.4f", amp->envelope.sustain), amp->envelope.sustain, 0, 1);
+	y += 25;
+	amp->envelope.release = GuiSlider((Rectangle){x + 20, y, 320, 20}, "R", TextFormat("%1.4f", amp->envelope.release), amp->envelope.release, 0.0005, 10);
+	y += 25;
+	amp->amplitude = GuiSlider((Rectangle){x + 20, y, 320, 20}, "Vol.", TextFormat("%1.2f", amp->amplitude), amp->amplitude, 0, 1);
+	y += 25;
+	//Close
+	y += 10;
+	return GuiButton((Rectangle){x, y, 400, 20}, "Close");
+}
+
+float AmpEnvelopeDialog::width() {
+	return 400;
+}
+
+float AmpEnvelopeDialog::height() {
+	return 150;
+}
+
+
 View* create_view_for_engine(std::string name, SoundEngineData* data) {
 	if (name == "B3 Organ") {
 		return new B3OrganEngineMenuView(dynamic_cast<B3OrganData*>(data));	//TODO cleaner check
@@ -858,6 +889,9 @@ View* create_view_for_engine(std::string name, SoundEngineData* data) {
 Dialog* create_dialog_for_component(std::string name, SynthComponent* data) {
 	if (name == "Oscilator") {
 		return new OscilatorDialog(dynamic_cast<OscilatorComponent*>(data));	//TODO cleaner check
+	}
+	else if (name == "Amp Envelope") {
+		return new AmpEnvelopeDialog(dynamic_cast<AmpEnvelopeComponent*>(data));	//TODO cleaner check
 	}
 	return nullptr;
 }
