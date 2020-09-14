@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 
 
 std::unordered_map<DeviceType, Texture2D> device_textures;
@@ -131,6 +132,10 @@ static bool draw_switch (int x, int y, int width, int height, bool value, std::s
 	}
 
 	return value;
+}
+
+static void scaled_slider(Rectangle pos, std::string text, double& value, const FixedScale& scale, std::string format = "1.2f%") {
+	value = scale.value(GuiSlider(pos, text.c_str(), TextFormat(format.c_str(), value), scale.progress(value), 0, 1));
 }
 
 //MainMenuView
@@ -731,23 +736,425 @@ View* SynthesizerEngineMenuView::draw() {
 	int title_width = MeasureText("Synthesizer", 32);
 	DrawText("Synthesizer", SCREEN_WIDTH/2 - title_width/2, 20, 36, BLACK);
 
+	//Grid
+	int length = sqrt(MAX_COMPONENTS);
+	for (size_t i = 0; i < data->preset.components.size(); ++i) {
+		ComponentSlot& comp = data->preset.components[i];
+		int x = i % length;
+		int y = i / length;
+		//Click
+		if (GuiButton((Rectangle){20.0f + 90 * x, 70.0f + 90 * y, 80, 80}, "")) {
+			if (comp.get_component()) {
+				set_comp_dialog(create_dialog_for_component(comp.get_component()->get_name(), comp.get_component()));
+			}
+			else {
+				set_comp_dialog(nullptr);
+			}
+			set_slot_dialog(new ComponentSlotDialog(&comp));
+		}
+		Color c(comp.get_component() ? BLUE : GRAY);
+		DrawRectangle(20 + 90 * x, 70 + 90 * y, 80, 80, c);
+		if (comp.get_component()) {
+			double twidth = MeasureText(comp.get_component()->get_name().c_str(), 10);
+			DrawText(comp.get_component()->get_name().c_str(), 20 + 90 * x + 40 - twidth/2, 70 + 90 * y + 2, 10, BLACK);
+			std::vector<std::string> desc = comp.get_component()->get_description();
+			for (size_t j = 0; j < desc.size(); ++j) {
+				DrawText(desc[j].c_str(), 20 + 90 * x + 3, 70 + 90 * y + 15 + j * 10, 8, BLACK);
+			}
+			DrawText(std::to_string(i).c_str(), 20 + 90 * x + 73, 70 + 90 * y + 70, 8, WHITE);
+		}
+	}
+
 	//Preset Input
 	Rectangle rect;
-	rect.x = SCREEN_WIDTH/2 - 200;
-	rect.y = SCREEN_HEIGHT/2 - 40;
-	rect.width = 400;
-	rect.height = 40;
+	rect.x = 70;
+	rect.y = SCREEN_HEIGHT - 20;
+	rect.width = 100;
+	rect.height = 20;
 
 	GuiSpinner(rect, "Preset No.", &current_preset, 0, 7, false);
 
 	//Preset Button
-	rect.y += 45;
+	rect.x += 100;
 	if (GuiButton(rect, "Apply")) {
+		set_comp_dialog(nullptr);
 		data->update_preset = current_preset;
+	}
+
+	//Dialog
+	double y = 70;
+	if (comp_dialog) {
+		double width = comp_dialog->width();
+		double height = comp_dialog->height();
+		double x = SCREEN_WIDTH - width - 20;
+		if (comp_dialog->draw(x, y)) {
+			set_comp_dialog(nullptr);
+		}
+		y += height + 20;
+	}
+	if (slot_dialog) {
+		double width = slot_dialog->width();
+		double x = SCREEN_WIDTH - width - 20;
+		if (slot_dialog->draw(x, y)) {
+			set_slot_dialog(nullptr);
+		}
 	}
 
 	draw_return_button(&view);
 	return view;
+}
+
+void SynthesizerEngineMenuView::set_comp_dialog(Dialog* d) {
+	delete comp_dialog;
+	comp_dialog = d;
+}
+
+void SynthesizerEngineMenuView::set_slot_dialog(Dialog* d) {
+	delete slot_dialog;
+	slot_dialog = d;
+}
+
+SynthesizerEngineMenuView::~SynthesizerEngineMenuView() {
+	set_comp_dialog(nullptr);
+	set_slot_dialog(nullptr);
+}
+
+//OscilatorDialog
+OscilatorDialog::OscilatorDialog(OscilatorComponent* osc) {
+	this->osc = osc;
+}
+
+bool OscilatorDialog::draw(float x, float y) {
+	//Waveform
+	std::string options = "SINE;SAW DOWN;SAW UP;SQUARE;NOISE";
+	std::vector<AnalogWaveForm> waveforms = {AnalogWaveForm::SINE, AnalogWaveForm::SAW_DOWN, AnalogWaveForm::SAW_UP, AnalogWaveForm::SQUARE, AnalogWaveForm::NOISE};
+	int waveform = std::find(waveforms.begin(), waveforms.end(), osc->osc.data.waveform) - waveforms.begin();
+	DrawText("Waveform", x, y, 12, BLACK);
+	y += 15;
+	waveform = GuiComboBox((Rectangle){x, y, 400, 20}, options.c_str(), waveform);
+	osc->osc.data.waveform = waveforms.at(waveform);
+	y += 25;
+	//Volumne
+	osc->volume = GuiSlider((Rectangle){x + 40, y, 320, 20}, "Vol.", TextFormat("%1.2f", osc->volume), osc->volume, 0, 1);
+	y += 25;
+	//Unison
+	int unison = osc->osc.unison_amount;
+	GuiSpinner((Rectangle){x + 100, y, 90, 20}, "Unison", &unison, 0, 7, false); //TODO use value of template
+	osc->osc.unison_amount = unison;
+	osc->unison_detune = GuiSlider((Rectangle){x + 240, y, 120, 20}, "Det.", TextFormat("%1.2f", osc->unison_detune), osc->unison_detune, 0, 1);
+	y += 25;
+	//Semi
+	int semi = osc->semi;
+	GuiSpinner((Rectangle){x + 100, y, 90, 20}, "Semi", &semi, -48, 48, false); //TODO use value of template
+	double fine = osc->semi - semi;
+	fine = GuiSlider((Rectangle){x + 240, y, 120, 20}, "Fine", TextFormat("%1.2f", fine), fine, 0, 0.99999f);
+	osc->semi = semi + fine;
+	y += 25;
+	//Transpose
+	if (GuiButton((Rectangle){x + 20, y, 20, 20}, "")) {
+		osc->transpose = 1;
+	}
+	osc->transpose = GuiSlider((Rectangle){x + 40, y, 320, 20}, "F", TextFormat("%1.2f", osc->transpose), osc->transpose, 0, 25);
+	y += 25;
+	//Pulse width
+	osc->pulse_width = GuiSlider((Rectangle){x + 40, y, 320, 20}, "Pulse Width", TextFormat("%1.2f", osc->pulse_width), osc->pulse_width, 0.1, 0.5);
+	y += 25;
+	//Analog and sync
+	osc->osc.data.analog = GuiCheckBox((Rectangle){x, y, 20, 20}, "Analog", osc->osc.data.analog);
+	osc->osc.data.sync = GuiCheckBox((Rectangle){x + 200, y, 20, 20}, "Sync", osc->osc.data.sync);
+	y += 25;
+	//Sync amount
+	osc->sync = GuiSlider((Rectangle){x + 80, y, 280, 20}, "Sync", TextFormat("%1.2f", osc->sync), osc->sync, 1, 10);
+	y += 25;
+	//Reset and randomize
+	osc->reset = GuiCheckBox((Rectangle){x, y, 20, 20}, "Reset", osc->reset);
+	osc->randomize = GuiCheckBox((Rectangle){x + 200, y, 20, 20}, "Randomize", osc->randomize);
+	y += 25;
+	return false;
+}
+float OscilatorDialog::width() {
+	return 400;
+}
+float OscilatorDialog::height() {
+	return 240;
+}
+
+//AmpEnvelopeDialog
+AmpEnvelopeDialog::AmpEnvelopeDialog(AmpEnvelopeComponent* amp) {
+	this->amp = amp;
+}
+
+bool AmpEnvelopeDialog::draw(float x, float y) {
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "A", amp->envelope.attack, ATTACK_SCALE, "%1.4f");
+	y += 25;
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "D", amp->envelope.decay, DECAY_SCALE, "%1.4f");
+	y += 25;
+	amp->envelope.sustain = GuiSlider((Rectangle){x + 20, y, 320, 20}, "S", TextFormat("%1.4f", amp->envelope.sustain), amp->envelope.sustain, 0, 1);
+	y += 25;
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "R", amp->envelope.release, RELEASE_SCALE, "%1.4f");
+	y += 25;
+	amp->amplitude = GuiSlider((Rectangle){x + 20, y, 320, 20}, "Vol.", TextFormat("%1.2f", amp->amplitude), amp->amplitude, 0, 1);
+	y += 25;
+	return false;
+}
+
+float AmpEnvelopeDialog::width() {
+	return 400;
+}
+
+float AmpEnvelopeDialog::height() {
+	return 120;
+}
+
+//ModEnvelopeDialog
+ModEnvelopeDialog::ModEnvelopeDialog(ModEnvelopeComponent* env) {
+	this->env = env;
+}
+
+bool ModEnvelopeDialog::draw(float x, float y) {
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "A", env->envelope.attack, ATTACK_SCALE, "%1.4f");
+	y += 25;
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "D", env->envelope.decay, DECAY_SCALE, "%1.4f");
+	y += 25;
+	env->envelope.sustain = GuiSlider((Rectangle){x + 20, y, 320, 20}, "S", TextFormat("%1.4f", env->envelope.sustain), env->envelope.sustain, 0, 1);
+	y += 25;
+	scaled_slider((Rectangle){x + 20, y, 320, 20}, "R", env->envelope.release, RELEASE_SCALE, "%1.4f");
+	y += 25;
+	env->amplitude = GuiSlider((Rectangle){x + 20, y, 320, 20}, "Vol.", TextFormat("%1.2f", env->amplitude), env->amplitude, 0, 1);
+	y += 25;
+	return false;
+}
+
+float ModEnvelopeDialog::width() {
+	return 400;
+}
+
+float ModEnvelopeDialog::height() {
+	return 120;
+}
+
+//FilterDialog
+template<typename T>
+FilterDialog<T>::FilterDialog(T* filter) {
+	this->filter = filter;
+}
+
+template<typename T>
+bool FilterDialog<T>::draw(float x, float y) {
+	scaled_slider((Rectangle){x + 60, y, 320, 20}, "Cutoff", filter->cutoff, FILTER_CUTOFF_SCALE, "%1.0f");
+	y += 25;
+	filter->keyboard_tracking = GuiSlider((Rectangle){x + 60, y, 320, 20}, "KB Track", TextFormat("%1.3f", filter->keyboard_tracking), filter->keyboard_tracking, 0, 1);
+	y += 25;
+	return false;
+}
+
+template<typename T>
+float FilterDialog<T>::width() {
+	return 400;
+}
+
+template<typename T>
+float FilterDialog<T>::height() {
+	return 50;
+}
+
+void __filter_dialog_link_fix_dont_call__ () {
+	FilterDialog<LowPassFilter12Component> f(nullptr);
+}
+
+//LFODialog
+LFODialog::LFODialog(LFOComponent* lfo) {
+	this->lfo = lfo;
+}
+
+bool LFODialog::draw(float x, float y) {
+	scaled_slider((Rectangle){x + 60, y, 320, 20}, "Freq", lfo->freq, LFO_FREQ_SCALE, "%1.3f");
+	y += 25;
+	lfo->amplitude = GuiSlider((Rectangle){x + 60, y, 320, 20}, "Amp", TextFormat("%1.2f", lfo->amplitude), lfo->amplitude, 0, 1);
+	y += 25;
+	return false;
+}
+float LFODialog::width() {
+	return 400;
+}
+float LFODialog::height() {
+	return 50;
+}
+
+//ControlChangeDialog
+ControlChangeDialog::ControlChangeDialog(ControlChangeComponent* cc) {
+	this->cc = cc;
+}
+bool ControlChangeDialog::draw(float x, float y) {
+	int control = cc->control;
+	if (GuiSpinner((Rectangle){x + 60, y, 320, 20}, "Control", &control, 0, 127, cc_editmode)) {
+		cc_editmode = !cc_editmode;
+	}
+	cc->control = control;
+	y += 25;
+	cc->start = GuiSlider((Rectangle){x + 60, y, 320, 20}, "Start", TextFormat("%d", cc->start), cc->start, 0, 127);
+	y += 25;
+	cc->end = GuiSlider((Rectangle){x + 60, y, 320, 20}, "End", TextFormat("%d", cc->end), cc->end, 0, 127);
+	y += 25;
+	return false;
+}
+float ControlChangeDialog::width() {
+	return 400;
+}
+
+float ControlChangeDialog::height() {
+	return 75;
+}
+
+//VelocityDialog
+VelocityDialog::VelocityDialog(VelocityComponent* vel) {
+	this->vel = vel;
+}
+bool VelocityDialog::draw(float x, float y) {
+	vel->start = GuiSlider((Rectangle){x + 60, y, 320, 20}, "Start", TextFormat("%1.2f", vel->start), vel->start, 0, 1);
+	y += 25;
+	vel->end = GuiSlider((Rectangle){x + 60, y, 320, 20}, "End", TextFormat("%1.2f", vel->end), vel->end, 0, 1);
+	y += 25;
+	return false;
+}
+float VelocityDialog::width() {
+	return 400;
+}
+
+float VelocityDialog::height() {
+	return 50;
+}
+
+//ComponentSlotDialog
+ComponentSlotDialog::ComponentSlotDialog(ComponentSlot* slot) {
+	this->slot = slot;
+}
+bool ComponentSlotDialog::draw(float x, float y) {
+	bool close = false;
+	if (!slot->get_component()) {
+		//Create component
+		if (GuiButton({x, y, 400, 20}, "Oscilator")) {
+			slot->set_component(new OscilatorComponent());
+			close = true;
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "Amp Envelope")) {
+			slot->set_component(new AmpEnvelopeComponent());
+			close = true;
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "Mod Envelope")) {
+			slot->set_component(new ModEnvelopeComponent());
+			close = true;
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "LP12 Filter")) {
+			slot->set_component(new LowPassFilter12Component());
+			close = true;
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "LP24 Filter")) {
+			slot->set_component(new LowPassFilter24Component());
+			close = true;
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "HP12 Filter")) {
+			slot->set_component(new HighPassFilter12Component());
+			close = true;
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "HP24 Filter")) {
+			slot->set_component(new HighPassFilter24Component());
+			close = true;
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "LFO")) {
+			slot->set_component(new LFOComponent());
+			close = true;
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "MIDI Control")) {
+			slot->set_component(new ControlChangeComponent());
+			close = true;
+		}
+		else if (GuiButton({x, y += 20, 400, 20}, "Velocity")) {
+			slot->set_component(new VelocityComponent());
+			close = true;
+		}
+		y += 25;
+	}
+	else {
+		if (edit_binding) {
+			//Type
+			std::string options = "set;add;multiply";
+			std::vector<BindingType> types = {BindingType::SET, BindingType::ADD, BindingType::MUL};
+			int type = std::find(types.begin(), types.end(), binding.type) - types.begin();
+			DrawText("Binding Type", x, y, 12, BLACK);
+			y += 15;
+			type = GuiComboBox((Rectangle){x, y, 400, 20}, options.c_str(), type);
+			binding.type = types.at(type);
+			y += 25;
+			//Property
+			std::string prop_options = "";
+			std::vector<std::string> props = slot->get_component()->property_names();
+			for (size_t i = 0; i < props.size(); ++i) {
+				if ( i != 0) {
+					prop_options += ";";
+				}
+				prop_options += props[i];
+			}
+			binding.property = GuiComboBox((Rectangle){x, y, 400, 20}, prop_options.c_str(), binding.property);
+			y += 25;
+			//Component
+			int comp = binding.component;
+			GuiSpinner((Rectangle){x + 60, y, 340, 20}, "Component", &comp, 0, MAX_COMPONENTS - 1, false);
+			binding.component = comp;
+			y += 25;
+			//From and to
+			binding.from = GuiSlider((Rectangle){x + 60, y, 320, 20}, "From", TextFormat("%1.3f", binding.from), binding.from, -1, 1);
+			y += 25;
+			binding.to = GuiSlider((Rectangle){x + 60, y, 320, 20}, "To", TextFormat("%1.3f", binding.to), binding.to, -1, 1);
+			y += 25;
+			//Apply
+			if (GuiButton((Rectangle){x, y, 400, 20}, "Apply")) {
+				if (binding_index < slot->bindings.size()) {
+					slot->bindings[binding_index] = binding;
+				}
+				else {
+					slot->bindings.push_back(binding);
+				}
+				edit_binding = false;
+				binding = {};
+				}
+			y += 25;
+		}
+		else {
+			//Bindings
+			DrawText("Bindings", x, y, 12, BLACK);
+			y += 15;
+			std::vector<ComponentPropertyBinding> bindings = slot->bindings;
+			std::vector<std::string> props = slot->get_component()->property_names();
+			for (size_t i = 0; i < bindings.size(); ++i) {
+				std::string name = props.at(bindings[i].property) + " to " + std::to_string(bindings[i].component);
+				if (GuiButton({x, y, 400, 20}, name.c_str())) {
+					edit_binding = true;
+					binding = bindings[i];
+					binding_index = i;
+				}
+				y += 20;
+			}
+			y += 5;
+			if (GuiButton({x, y, 400, 20}, "New Binding")) {
+				edit_binding = true;
+				binding = {};
+				binding_index = bindings.size();
+			}
+			y += 25;
+		}
+	}
+	slot->audible = GuiCheckBox({x, y, 20, 20}, "Audible", slot->audible);
+	y += 20;
+	return close;
+}
+
+float ComponentSlotDialog::width() {
+	return 400;
+}
+
+float ComponentSlotDialog::height() {
+	return 20 + (slot->get_component() ? (edit_binding ? 165 : (slot->bindings.size() * 20 + 40)) : 205);
 }
 
 View* create_view_for_engine(std::string name, SoundEngineData* data) {
@@ -760,3 +1167,36 @@ View* create_view_for_engine(std::string name, SoundEngineData* data) {
 	return nullptr;
 }
 
+Dialog* create_dialog_for_component(std::string name, SynthComponent* data) {
+	if (name == "Oscilator") {
+		return new OscilatorDialog(dynamic_cast<OscilatorComponent*>(data));	//TODO cleaner check
+	}
+	else if (name == "Amp Envelope") {
+		return new AmpEnvelopeDialog(dynamic_cast<AmpEnvelopeComponent*>(data));	//TODO cleaner check
+	}
+	else if (name == "Mod Envelope") {
+		return new ModEnvelopeDialog(dynamic_cast<ModEnvelopeComponent*>(data));	//TODO cleaner check
+	}
+	else if (name == "LP12 Filter") {
+		return new FilterDialog<LowPassFilter12Component>(dynamic_cast<LowPassFilter12Component*>(data));	//TODO cleaner check
+	}
+	else if (name == "LP24 Filter") {
+		return new FilterDialog<LowPassFilter24Component>(dynamic_cast<LowPassFilter24Component*>(data));	//TODO cleaner check
+	}
+	else if (name == "HP12 Filter") {
+		return new FilterDialog<HighPassFilter12Component>(dynamic_cast<HighPassFilter12Component*>(data));	//TODO cleaner check
+	}
+	else if (name == "HP24 Filter") {
+		return new FilterDialog<HighPassFilter24Component>(dynamic_cast<HighPassFilter24Component*>(data));	//TODO cleaner check
+	}
+	else if (name == "LFO") {
+		return new LFODialog(dynamic_cast<LFOComponent*>(data));	//TODO cleaner check
+	}
+	else if (name == "MIDI Control") {
+		return new ControlChangeDialog(dynamic_cast<ControlChangeComponent*>(data));	//TODO cleaner check
+	}
+	else if (name == "Velocity") {
+		return new VelocityDialog(dynamic_cast<VelocityComponent*>(data));	//TODO cleaner check
+	}
+	return nullptr;
+}

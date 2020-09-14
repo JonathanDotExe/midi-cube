@@ -9,6 +9,7 @@
 #define MIDICUBE_GUI_GUI_H_
 
 #include "model.h"
+#include "../util.h"
 #include "../soundengine/organ.h"
 #include "../soundengine/synthesizer.h"
 #include "../soundengine/soundengine.h"
@@ -16,6 +17,7 @@
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 600
+
 
 
 class View {
@@ -44,6 +46,16 @@ public:
 	virtual ~View() {
 
 	};
+};
+
+class Dialog {
+public:
+	virtual bool draw(float x, float y) = 0;
+	virtual float width() = 0;
+	virtual float height() = 0;
+	virtual ~Dialog() {
+
+	}
 };
 
 
@@ -172,14 +184,116 @@ public:
 class SynthesizerEngineMenuView : public View {
 private:
 	SynthesizerData* data;
+	Dialog* comp_dialog = nullptr;
+	Dialog* slot_dialog = nullptr;
 	int current_preset = 1;
+	void set_comp_dialog(Dialog* d);
+	void set_slot_dialog(Dialog* d);
 
 public:
 	SynthesizerEngineMenuView(SynthesizerData* data);
 	View* draw();
+	~SynthesizerEngineMenuView();
+};
 
+class OscilatorDialog : public Dialog {
+private:
+	OscilatorComponent* osc = nullptr;
+public:
+	OscilatorDialog(OscilatorComponent* osc);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
+const FixedScale ATTACK_SCALE(0.0005, {{0.35, 1}, {0.5, 2}, {0.6, 3}, {0.7, 4}, {0.75, 5}, {0.9, 10}}, 15);
+const FixedScale DECAY_SCALE(0.0, {{0.35, 1}, {0.5, 2}, {0.6, 3}, {0.65, 4}, {0.8, 10}}, 50);
+const FixedScale RELEASE_SCALE(0.003, {{0.35, 1}, {0.5, 2}, {0.6, 3}, {0.65, 4}, {0.8, 10}}, 50);
+
+class AmpEnvelopeDialog : public Dialog {
+private:
+	AmpEnvelopeComponent* amp = nullptr;
+public:
+	AmpEnvelopeDialog(AmpEnvelopeComponent* amp);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
+class ModEnvelopeDialog : public Dialog {
+private:
+	ModEnvelopeComponent* env = nullptr;
+public:
+	ModEnvelopeDialog(ModEnvelopeComponent* env);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
+
+const FixedScale FILTER_CUTOFF_SCALE(14, {{0.2, 200}, {0.3, 400}, {0.4, 800}, {0.7, 2500}, {0.8, 5000}, {0.9, 10000}}, 21000);
+template <typename T>
+class FilterDialog : public Dialog {
+private:
+	T* filter = nullptr;
+public:
+	FilterDialog(T* filter);
+
+	bool draw(float x, float y);
+
+	float width();
+
+	float height();
+};
+
+const FixedScale LFO_FREQ_SCALE(0, {{0.2, 0.2}, {0.3, 0.4}, {0.4, 1}, {0.6, 3}, {0.7, 6}, {0.8, 20}, {0.9, 100}}, 512);
+
+class LFODialog: public Dialog {
+private:
+	LFOComponent* lfo = nullptr;
+public:
+	LFODialog(LFOComponent* lfo);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
+class ControlChangeDialog: public Dialog {
+private:
+	ControlChangeComponent* cc = nullptr;
+	bool cc_editmode = false;
+public:
+	ControlChangeDialog(ControlChangeComponent* cc);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
+class VelocityDialog : public Dialog {
+private:
+	VelocityComponent* vel = nullptr;
+public:
+	VelocityDialog(VelocityComponent* vel);
+	bool draw(float x, float y);
+	float width();
+	float height();
+};
+
+class ComponentSlotDialog : public Dialog {
+private:
+	ComponentSlot* slot = nullptr;
+	ComponentPropertyBinding binding;
+	size_t binding_index = 0;
+	bool edit_binding = false;
+public:
+	ComponentSlotDialog(ComponentSlot* slot);
+	bool draw(float x, float y);
+	float width();
+	float height();
 };
 
 View* create_view_for_engine(std::string engine_name, SoundEngineData* data);
+
+Dialog* create_dialog_for_component(std::string component_name, SynthComponent* data);
 
 #endif /* MIDICUBE_GUI_GUI_H_ */

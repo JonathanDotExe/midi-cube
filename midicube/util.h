@@ -9,7 +9,7 @@
 #define MIDICUBE_UTIL_H_
 
 #include <array>
-#include <iostream>
+#include <vector>
 
 
 template<class T, std::size_t N> class CircularBuffer {
@@ -36,7 +36,6 @@ public:
 		end %= buffer.size();
 		if (end == start) {
 			start++;
-			std::cerr << "Buffer overflow" << std::endl;
 		}
 	};
 
@@ -56,6 +55,22 @@ public:
 	std::size_t buffer_size() {
 		return buffer.size();
 	};
+};
+
+struct ScaleItem {
+	double prog;
+	double value;
+};
+
+class FixedScale {
+private:
+	double start = 0;
+	std::vector<ScaleItem> items;
+	double end = 1;
+public:
+	FixedScale(double start, std::vector<ScaleItem>items, double end);
+	double value(double progress) const;
+	double progress(double value) const;
 };
 
 

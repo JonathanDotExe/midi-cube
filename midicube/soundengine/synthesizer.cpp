@@ -141,6 +141,32 @@ size_t OscilatorComponent::property_count() {
 	return oscilator_properties.size();
 }
 
+std::string OscilatorComponent::get_name() {
+	return "Oscilator";
+}
+
+std::vector<std::string> OscilatorComponent::get_description() {
+	std::vector<std::string> desc;
+	switch(osc.data.waveform) {
+	case AnalogWaveForm::SINE:
+		desc.push_back("SINE");
+		break;
+	case AnalogWaveForm::SAW_DOWN:
+		desc.push_back("SAW DOWN");
+		break;
+	case AnalogWaveForm::SAW_UP:
+		desc.push_back("SAW UP");
+		break;
+	case AnalogWaveForm::SQUARE:
+		desc.push_back("SQUARE");
+		break;
+	case AnalogWaveForm::NOISE:
+		desc.push_back("NOISE");
+		break;
+	}
+	return desc;
+}
+
 double OscilatorComponent::from() {
 	return -1;
 }
@@ -208,6 +234,15 @@ bool AmpEnvelopeComponent::note_finished(SampleInfo& info, TriggeredNote& note, 
 	return envelope.is_finished(info.time, note, env);
 }
 
+std::string AmpEnvelopeComponent::get_name() {
+	return "Amp Envelope";
+}
+
+std::vector<std::string> AmpEnvelopeComponent::get_description() {
+	return {"Volume: " + std::to_string(amplitude)};
+}
+
+
 std::vector<std::string> AmpEnvelopeComponent::property_names() {
 	return amplitude_properties;
 }
@@ -263,6 +298,15 @@ size_t ModEnvelopeComponent::property_count() {
 	return mod_envelope_properties.size();
 }
 
+std::string ModEnvelopeComponent::get_name() {
+	return "Mod Envelope";
+}
+
+std::vector<std::string> ModEnvelopeComponent::get_description() {
+	return {"Volume: " + std::to_string(amplitude)};
+}
+
+
 static std::vector<std::string> lfo_properties = {"Amplitude"};
 
 #define LFO_AMPLITUDE_PROPERTY 0
@@ -312,6 +356,15 @@ void LFOComponent::reset_properties(){
 	amplitude_mod = amplitude;
 }
 
+std::string LFOComponent::get_name() {
+	return "LFO";
+}
+
+std::vector<std::string> LFOComponent::get_description() {
+	return {"Freq: " + std::to_string(freq)};
+}
+
+
 std::vector<std::string> LFOComponent::property_names(){
 	return lfo_properties;
 }
@@ -356,6 +409,15 @@ void ControlChangeComponent::reset_properties() {
 
 }
 
+std::string ControlChangeComponent::get_name() {
+	return "MIDI Control";
+}
+
+std::vector<std::string> ControlChangeComponent::get_description() {
+	return {"CC: " + std::to_string(control)};
+}
+
+
 std::vector<std::string> ControlChangeComponent::property_names() {
 	return {};
 }
@@ -392,6 +454,15 @@ double VelocityComponent::to() {
 void VelocityComponent::reset_properties() {
 
 }
+
+std::string VelocityComponent::get_name() {
+	return "Velocity";
+}
+
+std::vector<std::string> VelocityComponent::get_description() {
+	return {};
+}
+
 
 std::vector<std::string> VelocityComponent::property_names() {
 	return {};
@@ -454,6 +525,10 @@ double ComponentSlot::to() {
 void ComponentSlot::set_component(SynthComponent* comp) {
 	delete this->comp;
 	this->comp = comp;
+}
+
+SynthComponent* ComponentSlot::get_component() {
+	return comp;
 }
 
 void ComponentSlot::control_change(unsigned int control, unsigned int value) {
