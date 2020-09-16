@@ -789,6 +789,7 @@ View* SynthesizerEngineMenuView::draw() {
 		double x = SCREEN_WIDTH - width - 20;
 		if (comp_dialog->draw(x, y)) {
 			set_comp_dialog(nullptr);
+			set_slot_dialog(nullptr);
 		}
 		y += height + 20;
 	}
@@ -796,6 +797,7 @@ View* SynthesizerEngineMenuView::draw() {
 		double width = slot_dialog->width();
 		double x = SCREEN_WIDTH - width - 20;
 		if (slot_dialog->draw(x, y)) {
+			set_comp_dialog(nullptr);
 			set_slot_dialog(nullptr);
 		}
 	}
@@ -834,7 +836,7 @@ bool OscilatorDialog::draw(float x, float y) {
 	waveform = GuiComboBox((Rectangle){x, y, 400, 20}, options.c_str(), waveform);
 	osc->osc.data.waveform = waveforms.at(waveform);
 	y += 25;
-	//Volumne
+	//Volume
 	osc->volume = GuiSlider((Rectangle){x + 40, y, 320, 20}, "Vol.", TextFormat("%1.2f", osc->volume), osc->volume, 0, 1);
 	y += 25;
 	//Unison
@@ -1117,7 +1119,16 @@ bool ComponentSlotDialog::draw(float x, float y) {
 				}
 				edit_binding = false;
 				binding = {};
+			}
+			y += 25;
+			//Delete
+			if (GuiButton((Rectangle){x, y, 400, 20}, "Delete")) {
+				if (binding_index < slot->bindings.size()) {
+					slot->bindings.erase(slot->bindings.begin() + binding_index);
 				}
+				edit_binding = false;
+				binding = {};
+			}
 			y += 25;
 		}
 		else {
@@ -1142,6 +1153,11 @@ bool ComponentSlotDialog::draw(float x, float y) {
 				binding_index = bindings.size();
 			}
 			y += 25;
+			if (GuiButton({x, y, 400, 20}, "Delete Component")) {
+				slot->set_component(nullptr);
+				close = true;
+			}
+			y += 25;
 		}
 	}
 	slot->audible = GuiCheckBox({x, y, 20, 20}, "Audible", slot->audible);
@@ -1154,7 +1170,7 @@ float ComponentSlotDialog::width() {
 }
 
 float ComponentSlotDialog::height() {
-	return 20 + (slot->get_component() ? (edit_binding ? 165 : (slot->bindings.size() * 20 + 40)) : 205);
+	return 20 + (slot->get_component() ? (edit_binding ? 190 : (slot->bindings.size() * 20 + 65)) : 205);
 }
 
 View* create_view_for_engine(std::string name, SoundEngineData* data) {
