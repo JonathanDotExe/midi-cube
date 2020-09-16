@@ -349,6 +349,8 @@ public:
 
 struct SynthesizerPreset {
 	std::array<ComponentSlot, MAX_COMPONENTS> components;
+	bool mono = false;
+	double portamendo_time = 0;
 	unsigned int preset_cc = 17; //Until there is a proper way to create sounds using GUI and save presets
 };
 

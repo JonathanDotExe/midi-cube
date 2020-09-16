@@ -26,6 +26,8 @@ class SoundEngineDevice;
 
 struct EngineStatus {
 	size_t pressed_notes;
+	size_t latest_note_index;
+	TriggeredNote* latest_note;
 };
 
 

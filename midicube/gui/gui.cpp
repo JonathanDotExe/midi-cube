@@ -765,6 +765,9 @@ View* SynthesizerEngineMenuView::draw() {
 		}
 	}
 
+	//Mono
+	data->preset.mono = GuiCheckBox((Rectangle){20, 520, 20, 20}, "Mono", data->preset.mono);
+
 	//Preset Input
 	Rectangle rect;
 	rect.x = 70;

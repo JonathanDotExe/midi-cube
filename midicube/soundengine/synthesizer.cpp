@@ -820,20 +820,22 @@ Synthesizer::Synthesizer() {
 void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
 	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
 
-	double sample = 0;
-	//Process components
-	std::array<double, MAX_COMPONENTS> values = {0};
-	for (size_t i = 0; i < data.preset.components.size(); ++i) {
-		double value = data.preset.components[i].process(data.preset.components, values, info, note, env, note_index);
-		values[i] = value;
+	if (!data.preset.mono) {
+		double sample = 0;
+		//Process components
+		std::array<double, MAX_COMPONENTS> values = {0};
+		for (size_t i = 0; i < data.preset.components.size(); ++i) {
+			double value = data.preset.components[i].process(data.preset.components, values, info, note, env, note_index);
+			values[i] = value;
 
-		if (data.preset.components[i].audible) {
-			sample += value;
+			if (data.preset.components[i].audible) {
+				sample += value;
+			}
 		}
-	}
-	//Play samples
-	for (size_t i = 0; i < channels.size(); ++i) {
-		channels[i] += sample;
+		//Play samples
+		for (size_t i = 0; i < channels.size(); ++i) {
+			channels[i] += sample;
+		}
 	}
 }
 
@@ -846,6 +848,25 @@ void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundE
 
 void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& d) {
 	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
+
+	if (data.preset.mono && status.latest_note) {
+		double sample = 0;
+		//Process components
+		std::array<double, MAX_COMPONENTS> values = {0};
+		for (size_t i = 0; i < data.preset.components.size(); ++i) {
+			double value = data.preset.components[i].process(data.preset.components, values, info, *status.latest_note, env, status.latest_note_index);
+			values[i] = value;
+
+			if (data.preset.components[i].audible) {
+				sample += value;
+			}
+		}
+		//Play samples
+		for (size_t i = 0; i < channels.size(); ++i) {
+			channels[i] += sample;
+		}
+	}
+
 	if (data.update_preset != -1) {
 		apply_preset(data.preset, data.update_preset);
 		data.update_preset = -1;
