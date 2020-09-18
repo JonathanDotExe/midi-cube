@@ -767,6 +767,7 @@ View* SynthesizerEngineMenuView::draw() {
 
 	//Mono
 	data->preset.mono = GuiCheckBox((Rectangle){20, 520, 20, 20}, "Mono", data->preset.mono);
+	data->preset.portamendo_time = GuiSlider((Rectangle){150, 520, 250, 20}, "Portamendo", TextFormat("%1.4f", data->preset.portamendo_time), data->preset.portamendo_time, 0, 1);
 
 	//Preset Input
 	Rectangle rect;
