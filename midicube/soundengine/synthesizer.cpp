@@ -780,6 +780,9 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[11].bindings.push_back( { BindingType::ADD,
 				AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1 });
 		preset.components[11].audible = true;
+
+		preset.portamendo_time = 0.02;
+		preset.mono = true;
 	}
 		break;
 	case 7:
@@ -850,11 +853,18 @@ void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
 
 	if (data.preset.mono && status.latest_note) {
+		//Update portamendo
+		data.note_port.set(status.latest_note->note, info.time, data.first_port ? 0 : data.preset.portamendo_time);
+		data.first_port = false;
+		double pitch = data.note_port.get(info.time);
+		KeyboardEnvironment e = env;
+		e.pitch_bend *= note_to_freq_transpose(pitch - status.latest_note->note);
+
 		double sample = 0;
 		//Process components
 		std::array<double, MAX_COMPONENTS> values = {0};
 		for (size_t i = 0; i < data.preset.components.size(); ++i) {
-			double value = data.preset.components[i].process(data.preset.components, values, info, *status.latest_note, env, status.latest_note_index);
+			double value = data.preset.components[i].process(data.preset.components, values, info, *status.latest_note, e, status.latest_note_index);
 			values[i] = value;
 
 			if (data.preset.components[i].audible) {

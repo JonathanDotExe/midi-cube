@@ -358,6 +358,8 @@ class SynthesizerData : public SoundEngineData {
 public:
 	SynthesizerPreset preset;
 	std::atomic<int> update_preset{-1}; 	//TODO normally a mutex for the components would be better but since this feature is only temporary it is solved this way
+	PortamendoBuffer note_port{0, 0};
+	bool first_port = true;
 
 	SynthesizerData();
 
