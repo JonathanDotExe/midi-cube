@@ -54,7 +54,9 @@ void NoteBuffer::release_note(SampleInfo& info, unsigned int note, bool invalida
 }
 
 //BaseSoundEngine
-void BaseSoundEngine::midi_message(MidiMessage& message, SampleInfo& info) {
+template <typename T>
+void BaseSoundEngine<T>::midi_message(MidiMessage& message, SampleInfo& info) {
+	ChannelData<T>& data = datas.at(message.get_channel());
 	//Note on
 	if (message.get_message_type() == MessageType::NOTE_ON) {
 		note.press_note(info, message.get_note(), message.get_velocity()/127.0);
@@ -67,7 +69,7 @@ void BaseSoundEngine::midi_message(MidiMessage& message, SampleInfo& info) {
 	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
 		control_change(message.get_control(), message.get_value(), *data);
 		//Sustain
-		if (message.get_control() == sustain_control) {
+		if (message.get_control() == data.sustain_control) {
 			bool new_sustain = message.get_value() != 0;
 			if (new_sustain != environment.sustain) {
 				if (new_sustain) {
@@ -87,12 +89,14 @@ void BaseSoundEngine::midi_message(MidiMessage& message, SampleInfo& info) {
 	}
 }
 
-void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, unsigned int channel) {
+template <typename T>
+void BaseSoundEngine<T>::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, unsigned int channel) {
+	ChannelData<T>& data = datas.at(channel);
 	EngineStatus status = {0, 0, nullptr};
 	//Notes
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (note.note[i].valid) {
-			if (note_finished(info, note.note[i], environment, *data)) {
+			if (note_finished(info, note.note[i], environment, data.t)) {
 				note.note[i].valid = false;
 				note_not_pressed(info, note.note[i], *data, i);
 			}
@@ -107,11 +111,11 @@ void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channe
 			}
 		}
 		else {
-			note_not_pressed(info, note.note[i], *data, i);
+			note_not_pressed(info, note.note[i], data.t, i);
 		}
 	}
 	//Static sample
-	process_sample(channels, info, environment, status, *data);
+	process_sample(channels, info, environment, status, data.t);
 }
 
 

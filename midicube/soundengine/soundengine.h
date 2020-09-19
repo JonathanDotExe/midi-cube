@@ -88,32 +88,39 @@ public:
 
 };
 
+template <typename T>
+struct ChannelData {
+	std::atomic<unsigned int> sustain_control{64};
+	std::atomic<bool> sustain{true};
+	T t;
+};
+
+template <typename T>
 class BaseSoundEngine {
 private:
 	KeyboardEnvironment environment;
 	NoteBuffer note;
-	std::atomic<unsigned int> sustain_control{64};
-	std::atomic<bool> sustain{true};
-public:
+	std::array<ChannelData<T>, SOUND_ENGINE_MIDI_CHANNELS> datas;
+
 	void midi_message(MidiMessage& msg, SampleInfo& info);
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, unsigned int channel);
 
-	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) = 0;
+	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, T& data, size_t note_index) = 0;
 
-	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index) {
-
-	};
-
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data) {
+	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, T& data, size_t note_index) {
 
 	};
 
-	virtual void control_change(unsigned int control, unsigned int value, SoundEngineData& data) {
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, T& data) {
 
 	};
 
-	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data) {
+	virtual void control_change(unsigned int control, unsigned int value, T& data) {
+
+	};
+
+	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, T& data) {
 		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
 	};
 
