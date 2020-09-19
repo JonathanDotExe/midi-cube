@@ -61,7 +61,7 @@ class SoundEngine {
 public:
 	virtual void midi_message(MidiMessage& msg, SampleInfo& info) = 0;
 
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, unsigned int channel) = 0;
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) = 0;
 	/*virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) = 0;
 
 	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index) {
@@ -80,47 +80,40 @@ public:
 		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
 	};*/
 
-	virtual std::string get_name() = 0;
-
 	virtual ~SoundEngine() {
 
 	};
 
 };
 
-template <typename T>
-struct ChannelData {
-	KeyboardEnvironment environment;
-	NoteBuffer note;
-	std::atomic<unsigned int> sustain_control{64};
-	std::atomic<bool> sustain{true};
-	T t;
-};
-
-template <typename T>
 class BaseSoundEngine {
 private:
-	std::array<ChannelData<T>, SOUND_ENGINE_MIDI_CHANNELS> datas;
+	KeyboardEnvironment environment;
+	NoteBuffer note;
+
+public:
+	std::atomic<unsigned int> sustain_control{64};
+	std::atomic<bool> sustain{true};
 
 	void midi_message(MidiMessage& msg, SampleInfo& info);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, unsigned int channel);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 
-	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, T& data, size_t note_index) = 0;
+	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
 
-	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, T& data, size_t note_index) {
-
-	};
-
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, T& data) {
+	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
 
 	};
 
-	virtual void control_change(unsigned int control, unsigned int value, T& data) {
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 
 	};
 
-	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, T& data) {
+	virtual void control_change(unsigned int control, unsigned int value) {
+
+	};
+
+	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
 	};
 
@@ -128,6 +121,35 @@ private:
 
 	};
 
+};
+
+
+template <typename T>
+std::string get_engine_name();
+
+class SoundEngineBank {
+public:
+	virtual SoundEngine& channel(unsigned int channel) = 0;
+
+	virtual std::string get_name() = 0;
+
+	virtual ~SoundEngineBank() {
+
+	};
+};
+
+template <typename T>
+class TemplateSoundEngineBank : public SoundEngineBank {
+private:
+	std::array<T, SOUND_ENGINE_MIDI_CHANNELS> engines;
+
+public:
+	SoundEngine& channel(unsigned int channel) {
+		return engines.at(channel);
+	}
+	std::string get_name() {
+		return get_engine_name<T>();
+	}
 };
 
 enum class ArpeggiatorPattern {
@@ -169,10 +191,9 @@ public:
 
 class SoundEngineChannel {
 private:
-	SoundEngine* engine = nullptr;
 	Arpeggiator arp;
 	Looper looper;
-	std::mutex engine_mutex;
+	std::atomic<size_t> engine_index{0};
 
 public:
 	std::atomic<double> volume{0.3};
@@ -180,22 +201,20 @@ public:
 
 	SoundEngineChannel();
 
-	void send(MidiMessage& message, SampleInfo& info);
+	void send(MidiMessage& message, SampleInfo& info, );
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome, unsigned int channel);
 
 	/**
 	 * May only be called from GUI thread after GUI has started
 	 */
-	void set_engine(SoundEngine* engine);
+	void set_engine(size_t engine);
 
-	ssize_t get_engine_index(std::vector<SoundEngine*>& engines);
+	size_t get_engine();
 
 	Arpeggiator& arpeggiator();
 
 	Looper& get_looper();
-
-	std::string get_engine_name();
 
 	~SoundEngineChannel();
 
@@ -206,7 +225,7 @@ class SoundEngineDevice : public AudioDevice {
 private:
 	std::string identifier;
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
-	std::vector<SoundEngine*> sound_engines;
+	std::vector<SoundEngineBank*> sound_engines;
 
 	ADSREnvelope metronome_env{0.0005, 0.02, 0, 0};
 
@@ -219,9 +238,9 @@ public:
 
 	std::string get_identifier();
 
-	std::vector<SoundEngine*> get_sound_engines();
+	std::vector<SoundEngineBank*> get_sound_engines();
 
-	void add_sound_engine(SoundEngine* engine);
+	void add_sound_engine(SoundEngineBank* engine);
 
 	SoundEngineChannel& get_channel(unsigned int channel);
 
