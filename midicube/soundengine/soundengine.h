@@ -69,7 +69,7 @@ public:
 
 };
 
-class BaseSoundEngine {
+class BaseSoundEngine : public SoundEngine {
 private:
 	KeyboardEnvironment environment;
 	NoteBuffer note;
@@ -187,6 +187,8 @@ public:
 	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine);
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome, SoundEngine& engine);
+
+	SoundEngine* get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel);
 
 	/**
 	 * May only be called from GUI thread after GUI has started

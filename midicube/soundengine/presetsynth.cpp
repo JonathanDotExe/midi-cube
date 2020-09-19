@@ -76,6 +76,16 @@ void PresetSynth::control_change(unsigned int control, unsigned int value) {
 	}
 }
 
+
+template<>
+std::string get_engine_name<PresetSynth>() {
+	return "Preset Synth";
+}
+
+void __fix_link_preset_synth_name__ () {
+	get_engine_name<PresetSynth>();
+}
+
 PresetSynth::~PresetSynth() {
 
 }

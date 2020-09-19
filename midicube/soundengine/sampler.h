@@ -59,7 +59,7 @@ public:
 
 };
 
-class Sampler : public SoundEngine {
+class Sampler : public BaseSoundEngine {
 
 private:
 	SampleSound* sample;
@@ -79,12 +79,6 @@ public:
 };
 
 extern SampleSound* load_sound(std::string folder);
-
-
-template<>
-std::string get_engine_name<Sampler>() {
-	return "Sampler";
-}
 
 
 #endif /* MIDICUBE_SOUNDENGINE_SAMPLER_H_ */

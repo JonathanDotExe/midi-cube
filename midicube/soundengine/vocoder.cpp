@@ -98,3 +98,11 @@ Vocoder::~Vocoder() {
 
 }
 
+template<>
+std::string get_engine_name<Vocoder>() {
+	return "Vocoder";
+}
+
+void __fix_link_vocoder_name__ () {
+	get_engine_name<Vocoder>();
+}

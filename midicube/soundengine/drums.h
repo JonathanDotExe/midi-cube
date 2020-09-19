@@ -37,11 +37,6 @@ public:
 
 };
 
-template<>
-std::string get_engine_name<SampleDrums>() {
-	return "Sample Drums";
-}
-
 extern SampleDrumKit* load_drumkit(std::string folder);
 
 #endif /* MIDICUBE_SOUNDENGINE_DRUMS_H_ */

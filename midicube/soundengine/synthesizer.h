@@ -369,10 +369,9 @@ public:
 };
 
 class Synthesizer: public BaseSoundEngine {
-private:
+public:
 	SynthesizerData data;
 
-public:
 	Synthesizer();
 
 	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
@@ -387,12 +386,6 @@ public:
 
 	virtual ~Synthesizer();
 };
-
-
-template<>
-std::string get_engine_name<Synthesizer>() {
-	return "Synthesizer";
-}
 
 
 #endif /* MIDICUBE_SOUNDENGINE_SYNTHESIZER_H_ */

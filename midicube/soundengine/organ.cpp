@@ -243,3 +243,13 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	}
 }
 
+template<>
+std::string get_engine_name<B3Organ>() {
+	return "B3 Organ";
+}
+
+void __fix_link_organ_name__ () {
+	get_engine_name<B3Organ>();
+}
+
+

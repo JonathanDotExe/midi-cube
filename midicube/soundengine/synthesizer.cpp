@@ -901,3 +901,11 @@ Synthesizer::~Synthesizer() {
 
 }
 
+template<>
+std::string get_engine_name<Synthesizer>() {
+	return "Synthesizer";
+}
+
+void __fix_link_synthesizer_name__ () {
+	get_engine_name<Synthesizer>();
+}

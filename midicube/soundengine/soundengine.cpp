@@ -234,7 +234,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 		arp.apply(info, note);
 	}*/
 	if (active) {
-		engine.process_sample(channels, info);
+		engine.process_sample(ch, info);
 	}
 	//Looper
 	looper.apply(ch, metronome, info);
@@ -267,6 +267,13 @@ Looper& SoundEngineChannel::get_looper() {
 	return looper;
 }
 
+SoundEngine* SoundEngineChannel::get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel) {
+	if (engine_index >= 0 && engine_index < (ssize_t) engines.size()) {
+		return &engines[engine_index]->channel(channel);
+	}
+	return nullptr;
+}
+
 SoundEngineChannel::~SoundEngineChannel() {
 	set_engine(-1);
 }
@@ -286,9 +293,9 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 	//Channels
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
-		ssize_t index = ch.get_engine();
-		if (index >= 0 && index < (ssize_t) sound_engines.size()) {
-			ch.process_sample(channels, info, metronome, sound_engines[index]->channel(i));
+		SoundEngine* engine = ch.get_engine(sound_engines, i);
+		if (engine) {
+			ch.process_sample(channels, info, metronome, *engine);
 		}
 	}
 	//Metronome
@@ -319,9 +326,9 @@ SoundEngineChannel& SoundEngineDevice::get_channel(unsigned int channel) {
 void SoundEngineDevice::send(MidiMessage &message) {
 	SampleInfo info =  handler->sample_info();
 	SoundEngineChannel& ch = this->channels.at(message.get_channel());
-	ssize_t index = ch.get_engine();
-	if (index >= 0 && index < (ssize_t) sound_engines.size()) {
-		channels.at(message.get_channel()).send(message, info, sound_engines[index]->channel(message.get_channel()));
+	SoundEngine* engine = ch.get_engine(sound_engines, message.get_channel());
+	if (engine) {
+		ch.send(message, info, *engine);
 	}
 }
 
@@ -330,7 +337,6 @@ void SoundEngineDevice::solo (unsigned int channel) {
 		channels[i].active = channel == i;
 	}
 }
-
 
 SoundEngineDevice::~SoundEngineDevice() {
 	//Clear channels

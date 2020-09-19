@@ -162,3 +162,12 @@ extern SampleSound* load_sound(std::string folder) {
 	return nullptr;
 }
 
+template<>
+std::string get_engine_name<Sampler>() {
+	return "Sampler";
+}
+
+void __fix_link_sampler_name__ () {
+	get_engine_name<Sampler>();
+}
+

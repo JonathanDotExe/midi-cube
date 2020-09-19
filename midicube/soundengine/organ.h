@@ -128,8 +128,6 @@ public:
 class B3Organ : public BaseSoundEngine {
 
 private:
-	B3OrganData data;
-
 	//Static values
 	std::array<double, ORGAN_DRAWBAR_COUNT> drawbar_harmonics;
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbar_notes;
@@ -138,6 +136,8 @@ private:
 	double foldback_freq = 0;
 
 public:
+	B3OrganData data;
+
 	B3Organ();
 
 	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
@@ -147,11 +147,5 @@ public:
 	void control_change(unsigned int control, unsigned int value);
 
 };
-
-template<>
-std::string get_engine_name<B3Organ>() {
-	return "B3 Organ";
-}
-
 
 #endif /* MIDICUBE_SOUNDENGINE_ORGAN_H_ */
