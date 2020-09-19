@@ -225,41 +225,37 @@ void Arpeggiator::release_note(SampleInfo& info, unsigned int note) {
 
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {
-	engine = nullptr;
+	engine_index = -1;
 }
 
-void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome, unsigned int channel) {
+void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome, SoundEngine& engine) {
 	std::array<double, OUTPUT_CHANNELS> ch = {};
-	engine_mutex.lock();
-	if (engine) {
-		/*if (arp.on) {
-			arp.apply(info, note);
-		}*/
-		if (active) {
-			engine->process_sample(channels, info, channel);
-		}
-		//Looper
-		looper.apply(ch, metronome, info);
-		//Playback
-		for (size_t i = 0; i < channels.size(); ++i) {
-			channels[i] += (ch[i] * volume);
-		}
+	/*if (arp.on) {
+		arp.apply(info, note);
+	}*/
+	if (active) {
+		engine.process_sample(channels, info);
 	}
-	engine_mutex.unlock();
+	//Looper
+	looper.apply(ch, metronome, info);
+	//Playback
+	for (size_t i = 0; i < channels.size(); ++i) {
+		channels[i] += (ch[i] * volume);
+	}
 }
 
-void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
-	engine->midi_message(message, info);
+void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine) {
+	engine.midi_message(message, info);
 }
 
 /**
  * May only be called from GUI thread after GUI has started
  */
-void SoundEngineChannel::set_engine(size_t engine_index) {
+void SoundEngineChannel::set_engine(ssize_t engine_index) {
 	this->engine_index = engine_index;
 }
 
-size_t SoundEngineChannel::get_engine() {
+ssize_t SoundEngineChannel::get_engine() {
 	return engine_index;
 }
 
@@ -289,7 +285,11 @@ std::string SoundEngineDevice::get_identifier() {
 void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
 	//Channels
 	for (size_t i = 0; i < this->channels.size(); ++i) {
-		this->channels[i].process_sample(channels, info, metronome, i);
+		SoundEngineChannel& ch = this->channels[i];
+		ssize_t index = ch.get_engine();
+		if (index >= 0 && index < (ssize_t) sound_engines.size()) {
+			ch.process_sample(channels, info, metronome, sound_engines[index]->channel(i));
+		}
 	}
 	//Metronome
 	if (play_metronome) {
@@ -318,7 +318,11 @@ SoundEngineChannel& SoundEngineDevice::get_channel(unsigned int channel) {
 
 void SoundEngineDevice::send(MidiMessage &message) {
 	SampleInfo info =  handler->sample_info();
-	channels.at(message.get_channel()).send(message, info);
+	SoundEngineChannel& ch = this->channels.at(message.get_channel());
+	ssize_t index = ch.get_engine();
+	if (index >= 0 && index < (ssize_t) sound_engines.size()) {
+		channels.at(message.get_channel()).send(message, info, sound_engines[index]->channel(message.get_channel()));
+	}
 }
 
 void SoundEngineDevice::solo (unsigned int channel) {

@@ -124,9 +124,6 @@ public:
 };
 
 
-template <typename T>
-std::string get_engine_name();
-
 class SoundEngineBank {
 public:
 	virtual SoundEngine& channel(unsigned int channel) = 0;
@@ -137,6 +134,9 @@ public:
 
 	};
 };
+
+template <typename T>
+std::string get_engine_name();
 
 template <typename T>
 class TemplateSoundEngineBank : public SoundEngineBank {
@@ -193,7 +193,7 @@ class SoundEngineChannel {
 private:
 	Arpeggiator arp;
 	Looper looper;
-	std::atomic<size_t> engine_index{0};
+	std::atomic<ssize_t> engine_index{0};
 
 public:
 	std::atomic<double> volume{0.3};
@@ -201,16 +201,16 @@ public:
 
 	SoundEngineChannel();
 
-	void send(MidiMessage& message, SampleInfo& info, );
+	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome, unsigned int channel);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome, SoundEngine& engine);
 
 	/**
 	 * May only be called from GUI thread after GUI has started
 	 */
-	void set_engine(size_t engine);
+	void set_engine(ssize_t engine);
 
-	size_t get_engine();
+	ssize_t get_engine();
 
 	Arpeggiator& arpeggiator();
 
