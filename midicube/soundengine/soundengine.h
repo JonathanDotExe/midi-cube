@@ -61,7 +61,7 @@ class SoundEngine {
 public:
 	virtual void midi_message(MidiMessage& msg, SampleInfo& info) = 0;
 
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, unsigned int channel) = 0;
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, unsigned int channel) = 0;
 	/*virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) = 0;
 
 	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index) {
@@ -90,6 +90,8 @@ public:
 
 template <typename T>
 struct ChannelData {
+	KeyboardEnvironment environment;
+	NoteBuffer note;
 	std::atomic<unsigned int> sustain_control{64};
 	std::atomic<bool> sustain{true};
 	T t;
@@ -98,13 +100,11 @@ struct ChannelData {
 template <typename T>
 class BaseSoundEngine {
 private:
-	KeyboardEnvironment environment;
-	NoteBuffer note;
 	std::array<ChannelData<T>, SOUND_ENGINE_MIDI_CHANNELS> datas;
 
 	void midi_message(MidiMessage& msg, SampleInfo& info);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, unsigned int channel);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, unsigned int channel);
 
 	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, T& data, size_t note_index) = 0;
 
@@ -169,25 +169,20 @@ public:
 
 class SoundEngineChannel {
 private:
-	KeyboardEnvironment environment;
-	NoteBuffer note;
 	SoundEngine* engine = nullptr;
-	SoundEngineData* data = nullptr;
 	Arpeggiator arp;
 	Looper looper;
 	std::mutex engine_mutex;
 
 public:
 	std::atomic<double> volume{0.3};
-	std::atomic<unsigned int> sustain_control{64};
-	std::atomic<bool> sustain{true};
 	std::atomic<bool> active{true};
 
 	SoundEngineChannel();
 
 	void send(MidiMessage& message, SampleInfo& info);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome, unsigned int channel);
 
 	/**
 	 * May only be called from GUI thread after GUI has started
@@ -195,8 +190,6 @@ public:
 	void set_engine(SoundEngine* engine);
 
 	ssize_t get_engine_index(std::vector<SoundEngine*>& engines);
-
-	SoundEngineData* get_data();
 
 	Arpeggiator& arpeggiator();
 
