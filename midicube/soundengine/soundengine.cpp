@@ -53,6 +53,68 @@ void NoteBuffer::release_note(SampleInfo& info, unsigned int note, bool invalida
 	}
 }
 
+//BaseSoundEngine
+void BaseSoundEngine::midi_message(MidiMessage& message, SampleInfo& info) {
+	//Note on
+	if (message.get_message_type() == MessageType::NOTE_ON) {
+		note.press_note(info, message.get_note(), message.get_velocity()/127.0);
+	}
+	//Note off
+	else if (message.get_message_type() == MessageType::NOTE_OFF) {
+		note.release_note(info, message.get_note());
+	}
+	//Control change
+	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
+		control_change(message.get_control(), message.get_value(), *data);
+		//Sustain
+		if (message.get_control() == sustain_control) {
+			bool new_sustain = message.get_value() != 0;
+			if (new_sustain != environment.sustain) {
+				if (new_sustain) {
+					environment.sustain_time = info.time;
+				}
+				else {
+					environment.sustain_release_time = info.time;
+				}
+				environment.sustain = new_sustain;
+			}
+		}
+	}
+	//Pitch bend
+	else if (message.get_message_type() == MessageType::PITCH_BEND) {
+		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
+		environment.pitch_bend = note_to_freq_transpose(pitch);
+	}
+}
+
+void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, unsigned int channel) {
+	EngineStatus status = {0, 0, nullptr};
+	//Notes
+	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+		if (note.note[i].valid) {
+			if (note_finished(info, note.note[i], environment, *data)) {
+				note.note[i].valid = false;
+				note_not_pressed(info, note.note[i], *data, i);
+			}
+			else {
+				++status.pressed_notes;
+				note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
+				process_note_sample(channels, info, note.note[i], environment, *data, i);
+				if (!status.latest_note || status.latest_note->start_time < note.note[i].start_time) {
+					status.latest_note = &note.note[i];
+					status.latest_note_index = i;
+				}
+			}
+		}
+		else {
+			note_not_pressed(info, note.note[i], *data, i);
+		}
+	}
+	//Static sample
+	process_sample(channels, info, environment, status, *data);
+}
+
+
 //Arpeggiator
 Arpeggiator::Arpeggiator() {
 

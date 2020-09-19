@@ -30,6 +30,20 @@ struct EngineStatus {
 	TriggeredNote* latest_note;
 };
 
+class NoteBuffer {
+private:
+	size_t next_freq_slot(SampleInfo& info);
+
+public:
+	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
+
+	NoteBuffer();
+
+	void press_note(SampleInfo& info, unsigned int note, double velocity);
+	void release_note(SampleInfo& info, unsigned int note, bool invalidate = false);
+
+};
+
 
 class SoundEngineData {
 public:
@@ -45,6 +59,46 @@ public:
 class SoundEngine {
 
 public:
+	virtual void midi_message(MidiMessage& msg, SampleInfo& info) = 0;
+
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, unsigned int channel) = 0;
+	/*virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) = 0;
+
+	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index) {
+
+	};
+
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data) {
+
+	};
+
+	virtual void control_change(unsigned int control, unsigned int value, SoundEngineData& data) {
+
+	};
+
+	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data) {
+		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
+	};*/
+
+	virtual std::string get_name() = 0;
+
+	virtual ~SoundEngine() {
+
+	};
+
+};
+
+class BaseSoundEngine {
+private:
+	KeyboardEnvironment environment;
+	NoteBuffer note;
+	std::atomic<unsigned int> sustain_control{64};
+	std::atomic<bool> sustain{true};
+public:
+	void midi_message(MidiMessage& msg, SampleInfo& info);
+
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, unsigned int channel);
+
 	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) = 0;
 
 	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index) {
@@ -63,29 +117,9 @@ public:
 		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
 	};
 
-	virtual std::string get_name() = 0;
-
-	virtual SoundEngineData* create_data() {
-		return new SoundEngineData();
-	}
-
-	virtual ~SoundEngine() {
+	virtual ~BaseSoundEngine() {
 
 	};
-
-};
-
-class NoteBuffer {
-private:
-	size_t next_freq_slot(SampleInfo& info);
-
-public:
-	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
-
-	NoteBuffer();
-
-	void press_note(SampleInfo& info, unsigned int note, double velocity);
-	void release_note(SampleInfo& info, unsigned int note, bool invalidate = false);
 
 };
 
