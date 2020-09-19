@@ -553,6 +553,8 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[i].audible = false;
 		preset.components[i].bindings.clear();
 	}
+	preset.mono = false;
+	preset.portamendo_time = 0;
 	//Apply preset
 	switch (preset_no) {
 	case 1:

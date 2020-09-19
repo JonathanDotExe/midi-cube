@@ -17,7 +17,6 @@
 #include "../looper.h"
 #include <string>
 #include <array>
-#include <mutex>
 
 #define SOUND_ENGINE_POLYPHONY 30
 #define SOUND_ENGINE_MIDI_CHANNELS 16
