@@ -23,8 +23,7 @@ Vocoder::Vocoder() {
 
 }
 
-void Vocoder::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
-	VocoderData& data = dynamic_cast<VocoderData&>(d);
+void Vocoder::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	double sample = saw_wave_down(info.time - note.phase_shift, note.freq);
 	sample *= data.preset.vocoder_amp;
 	for (size_t channel = 0; channel < channels.size(); ++channel) {
@@ -32,8 +31,7 @@ void Vocoder::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	}
 }
 
-void Vocoder::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& d) {
-	VocoderData& data = dynamic_cast<VocoderData&>(d);
+void Vocoder::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 	double sample = 0;
 	//Vocoder
 	double carrier = channels.at(0);
@@ -69,8 +67,7 @@ void Vocoder::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 	}
 }
 
-void Vocoder::control_change(unsigned int control, unsigned int value, SoundEngineData& d) {
-	VocoderData& data = dynamic_cast<VocoderData&>(d);
+void Vocoder::control_change(unsigned int control, unsigned int value) {
 	if (control == data.preset.delay_control) {
 		data.preset.delay = value > 0;
 	}
@@ -95,10 +92,6 @@ void Vocoder::control_change(unsigned int control, unsigned int value, SoundEngi
 	if (control == data.preset.gate_control) {
 		data.preset.gate = value/127.0;
 	}
-}
-
-std::string Vocoder::get_name() {
-	return "Vocoder";
 }
 
 Vocoder::~Vocoder() {

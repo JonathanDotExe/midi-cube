@@ -42,7 +42,7 @@ PresetSynth::PresetSynth() {
 	osc.unison_amount = 3;
 }
 
-void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) {
+void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	double sample = 0.0;
 	double freq = note.freq * env.pitch_bend;
 	sample = osc.signal(freq, info.time_step, note_index);
@@ -59,25 +59,21 @@ void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	}
 }
 
-void PresetSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data) {
+void PresetSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 	filter.apply(channels, info.time_step);
 };
 
-bool PresetSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data) {
+bool PresetSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	return this->env.is_finished(info.time, note, env);
 }
 
-void PresetSynth::control_change(unsigned int control, unsigned int value, SoundEngineData& data) {
+void PresetSynth::control_change(unsigned int control, unsigned int value) {
 	if (control == 1) {
 		vibrato = value/127.0;
 	}
 	if (control == 74) {
 		filter.set_cutoff(21000/(128.0 - value));
 	}
-}
-
-std::string PresetSynth::get_name() {
-	return "Preset Synth";
 }
 
 PresetSynth::~PresetSynth() {

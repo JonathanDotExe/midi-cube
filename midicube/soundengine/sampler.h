@@ -68,9 +68,9 @@ public:
 
 	Sampler();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data);
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
 	std::string get_name();
 
@@ -79,5 +79,12 @@ public:
 };
 
 extern SampleSound* load_sound(std::string folder);
+
+
+template<>
+std::string get_engine_name<Sampler>() {
+	return "Sampler";
+}
+
 
 #endif /* MIDICUBE_SOUNDENGINE_SAMPLER_H_ */

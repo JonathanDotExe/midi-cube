@@ -50,22 +50,17 @@ public:
 	}
 };
 
-class Vocoder : public SoundEngine {
-
+class Vocoder : public BaseSoundEngine {
+private:
+	VocoderData data;
 public:
 	Vocoder();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
-	void control_change(unsigned int control, unsigned int value, SoundEngineData& data);
-
-	SoundEngineData* create_data () {
-		return new VocoderData();	//TODO
-	}
-
-	std::string get_name();
+	void control_change(unsigned int control, unsigned int value);
 
 	~Vocoder();
 };

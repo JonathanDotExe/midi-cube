@@ -20,7 +20,7 @@ struct SampleDrumKit {
 
 
 
-class SampleDrums : public SoundEngine {
+class SampleDrums : public BaseSoundEngine {
 
 private:
 	SampleDrumKit* drumkit;
@@ -29,15 +29,18 @@ public:
 
 	SampleDrums();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data);
-
-	std::string get_name();
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
 	~SampleDrums();
 
 };
+
+template<>
+std::string get_engine_name<SampleDrums>() {
+	return "Sample Drums";
+}
 
 extern SampleDrumKit* load_drumkit(std::string folder);
 

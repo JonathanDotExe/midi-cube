@@ -28,19 +28,24 @@ public:
 
 	PresetSynth();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
-	void control_change(unsigned int control, unsigned int value, SoundEngineData& data);
+	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data);
-
-	std::string get_name();
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
 	~PresetSynth();
 
 };
+
+
+template<>
+std::string get_engine_name<PresetSynth>() {
+	return "Preset Synth";
+}
+
 
 
 #endif /* MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_ */

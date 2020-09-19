@@ -57,9 +57,7 @@ static inline double sound_delay(double rotation, double max_delay, unsigned int
 	return (1 + rotation) * max_delay * 0.5 * sample_rate;
 }
 
-void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
-	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
-
+void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Organ sound
 	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
 		int tonewheel = note.note + drawbar_notes.at(i) - ORGAN_LOWEST_TONEWHEEL_NOTE;
@@ -89,8 +87,7 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	}
 }
 
-void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& d) {
-	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
+void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
 
 	//Play organ sound
 	if (data.preset.rotary) {
@@ -204,8 +201,7 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 	}
 }
 
-void B3Organ::control_change(unsigned int control, unsigned int value, SoundEngineData& d) {
-	B3OrganData& data = dynamic_cast<B3OrganData&>(d);
+void B3Organ::control_change(unsigned int control, unsigned int value) {
 	//Drawbars
 	for (size_t i = 0; i < data.preset.drawbar_ccs.size(); ++i) {
 		if (data.preset.drawbar_ccs[i] == control) {
@@ -245,13 +241,5 @@ void B3Organ::control_change(unsigned int control, unsigned int value, SoundEngi
 	if (control == data.preset.percussion_soft_cc) {
 		data.preset.percussion_soft = value > 0;
 	}
-}
-
-SoundEngineData* B3Organ::create_data() {
-	return new B3OrganData();
-}
-
-std::string B3Organ::get_name() {
-	return "B3 Organ";
 }
 

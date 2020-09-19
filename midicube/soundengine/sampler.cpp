@@ -83,13 +83,13 @@ Sampler::Sampler() {
 	sample = load_sound("./data/samples/piano");
 }
 
-void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) {
+void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	for (size_t channel = 0; channel < channels.size(); ++channel) {
 		channels[channel] += this->sample->get_sample(channel, info, note, env) * note.velocity;
 	}
 }
 
-bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data) {
+bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	return this->sample->note_finished(info, note, env);
 }
 
