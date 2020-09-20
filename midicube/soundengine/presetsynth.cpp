@@ -8,7 +8,7 @@
 #include "presetsynth.h"
 #include "../synthesis.h"
 #include <iostream>
-
+#include <cmath>
 
 //PresetSynth
 PresetSynth::PresetSynth() {
@@ -40,19 +40,31 @@ PresetSynth::PresetSynth() {
 	osc.data.analog = true;
 	osc.data.waveform = AnalogWaveForm::SAW_DOWN;
 	osc.unison_amount = 3;
+
+	phase = 0;
+	fm_phase = 0;
 }
 
 void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	double sample = 0.0;
 	double freq = note.freq * env.pitch_bend;
-	sample = osc.signal(freq, info.time_step, note_index);
+	double fm_freq = note.freq * env.pitch_bend;
+	/*sample = osc.signal(freq, info.time_step, note_index);
 
 	if (vibrato) {
 		note.phase_shift += info.time_step * (note_to_freq_transpose(SYNTH_VIBRATO_DETUNE * sine_wave(info.time, SYNTH_VIBRATO_RATE) * vibrato) - 1);
 	}
 
 	double amp = this->env.amplitude(info.time, note, env);
-	sample *= amp;
+	sample *= amp;*/
+	fm_phase += info.time_step * fm_freq;
+	phase += freq * info.time_step;
+	double mod = sine_wave(fm_phase, 1) * vibrato;
+	double mul = (freq + mod)/freq;
+
+	sample = sine_wave(phase * mul, 1);
+
+	//sample = sine_wave(info.time, freq + sine_wave(info.time, fm_freq) * vibrato);
 
 	for (size_t i = 0; i < channels.size() ; ++i) {
 		channels[i] += sample;
@@ -60,7 +72,7 @@ void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 }
 
 void PresetSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
-	filter.apply(channels, info.time_step);
+	//filter.apply(channels, info.time_step);
 };
 
 bool PresetSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
