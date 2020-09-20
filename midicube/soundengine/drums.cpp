@@ -18,7 +18,7 @@ SampleDrums::SampleDrums () {
 	drumkit = load_drumkit("./data/drumkits/drums1");
 }
 
-void SampleDrums::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) {
+void SampleDrums::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	try {
 		if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
 			AudioSample& audio = drumkit->notes[note.note];
@@ -33,15 +33,11 @@ void SampleDrums::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	}
 }
 
-bool SampleDrums::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data) {
+bool SampleDrums::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
 		return info.time - note.start_time > (double) drumkit->notes[note.note].duration();
 	}
 	return true;
-}
-
-std::string SampleDrums::get_name() {
-	return "Sample Drums";
 }
 
 SampleDrums::~SampleDrums() {
@@ -87,4 +83,13 @@ extern SampleDrumKit* load_drumkit(std::string folder) {
 		std::cerr << "Couldn't load drumkit" << std::endl;
 	}
 	return nullptr;
+}
+
+template<>
+std::string get_engine_name<SampleDrums>() {
+	return "Sample Drums";
+}
+
+void __fix_link_drums_name__ () {
+	get_engine_name<SampleDrums>();
 }

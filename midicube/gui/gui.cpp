@@ -423,9 +423,9 @@ SoundEngineDeviceMenuView::SoundEngineDeviceMenuView(SoundEngineDevice* device) 
 	this->device = device;
 	//Options
 	std::ostringstream optionstr;
-	std::vector<SoundEngine*> engines = device->get_sound_engines();
+	std::vector<SoundEngineBank*> engines = device->get_sound_engines();
 	optionstr << "None";
-	for (SoundEngine* engine : engines) {
+	for (SoundEngineBank* engine : engines) {
 		optionstr << ";" << engine->get_name();
 	}
 	options = optionstr.str();
@@ -433,12 +433,12 @@ SoundEngineDeviceMenuView::SoundEngineDeviceMenuView(SoundEngineDevice* device) 
 
 View* SoundEngineDeviceMenuView::draw() {
 	View* view = this;
-	std::vector<SoundEngine*> engines = device->get_sound_engines();
+	std::vector<SoundEngineBank*> engines = device->get_sound_engines();
 	//Engines
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		unsigned int ch = SOUND_ENGINE_MIDI_CHANNELS - 1 - i;
 		SoundEngineChannel& channel = device->get_channel(ch);
-		int selected = channel.get_engine_index(engines) + 1;
+		int selected = channel.get_engine() + 1;
 		int old = selected;
 		float y = 5 + ch * 25;
 		//Text
@@ -448,11 +448,11 @@ View* SoundEngineDeviceMenuView::draw() {
 		//ComboBox
 		selected = GuiComboBox((Rectangle){100, y, 250, 20}, options.c_str(), selected);
 		if (old != selected) {
-			channel.set_engine(selected > 0 ? engines.at(selected - 1) : nullptr);
+			channel.set_engine(selected - 1);
 		}
 		//Edit
-		if (GuiButton((Rectangle){360, y, 20, 20}, GuiIconText(RICON_PENCIL, ""))) {
-			view = create_view_for_engine(channel.get_engine_name(), channel.get_data()); //TODO Thread safety for data
+		if (GuiButton((Rectangle){360, y, 20, 20}, GuiIconText(RICON_PENCIL, "")) && selected > 0) {
+			view = create_view_for_engine(engines.at(selected - 1)->get_name(), channel.get_engine(engines, ch)); //TODO Thread safety for data
 			if (!view) {
 				view = this;
 			}
@@ -1177,12 +1177,12 @@ float ComponentSlotDialog::height() {
 	return 20 + (slot->get_component() ? (edit_binding ? 190 : (slot->bindings.size() * 20 + 65)) : 205);
 }
 
-View* create_view_for_engine(std::string name, SoundEngineData* data) {
+View* create_view_for_engine(std::string name, SoundEngine*engine) {
 	if (name == "B3 Organ") {
-		return new B3OrganEngineMenuView(dynamic_cast<B3OrganData*>(data));	//TODO cleaner check
+		return new B3OrganEngineMenuView(&dynamic_cast<B3Organ*>(engine)->data);	//TODO cleaner check
 	}
 	else if (name == "Synthesizer") {
-		return new SynthesizerEngineMenuView(dynamic_cast<SynthesizerData*>(data));	//TODO cleaner check
+		return new SynthesizerEngineMenuView(&dynamic_cast<Synthesizer*>(engine)->data);	//TODO cleaner check
 	}
 	return nullptr;
 }

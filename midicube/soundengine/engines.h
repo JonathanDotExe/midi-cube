@@ -16,12 +16,12 @@
 #include "synthesizer.h"
 
 extern void fill_sound_engine_device(SoundEngineDevice* device) {
-	device->add_sound_engine(new PresetSynth());
-	device->add_sound_engine(new B3Organ());
-	device->add_sound_engine(new SampleDrums());
-	device->add_sound_engine(new Sampler());
-	device->add_sound_engine(new Vocoder());
-	device->add_sound_engine(new Synthesizer());
+	device->add_sound_engine(new TemplateSoundEngineBank<PresetSynth>());
+	device->add_sound_engine(new TemplateSoundEngineBank<B3Organ>());
+	device->add_sound_engine(new TemplateSoundEngineBank<SampleDrums>());
+	device->add_sound_engine(new TemplateSoundEngineBank<Sampler>());
+	device->add_sound_engine(new TemplateSoundEngineBank<Vocoder>());
+	device->add_sound_engine(new TemplateSoundEngineBank<Synthesizer>());
 }
 
 

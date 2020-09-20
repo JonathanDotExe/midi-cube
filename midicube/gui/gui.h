@@ -292,7 +292,7 @@ public:
 	float height();
 };
 
-View* create_view_for_engine(std::string engine_name, SoundEngineData* data);
+View* create_view_for_engine(std::string engine_name, SoundEngine* engine);
 
 Dialog* create_dialog_for_component(std::string component_name, SynthComponent* data);
 

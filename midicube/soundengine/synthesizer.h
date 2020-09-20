@@ -368,28 +368,24 @@ public:
 	}
 };
 
-class Synthesizer: public SoundEngine {
-
+class Synthesizer: public BaseSoundEngine {
 public:
+	SynthesizerData data;
+
 	Synthesizer();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
-	void note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index);
+	void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
-	void control_change(unsigned int control, unsigned int value, SoundEngineData& data);
+	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data);
-
-	std::string get_name();
-
-	SoundEngineData* create_data() {
-		return new SynthesizerData();
-	}
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
 	virtual ~Synthesizer();
 };
+
 
 #endif /* MIDICUBE_SOUNDENGINE_SYNTHESIZER_H_ */

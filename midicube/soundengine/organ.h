@@ -125,29 +125,27 @@ public:
 	}
 };
 
-class B3Organ : public SoundEngine {
+class B3Organ : public BaseSoundEngine {
 
 private:
-	B3OrganPreset data;
+	//Static values
 	std::array<double, ORGAN_DRAWBAR_COUNT> drawbar_harmonics;
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbar_notes;
 	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_frequencies;
 	size_t cutoff_tonewheel = 0;
 	double foldback_freq = 0;
+
 public:
+	B3OrganData data;
+
 	B3Organ();
 
-	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index);
+	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
-	void control_change(unsigned int control, unsigned int value, SoundEngineData& data);
-
-	SoundEngineData* create_data();
-
-	std::string get_name();
+	void control_change(unsigned int control, unsigned int value);
 
 };
-
 
 #endif /* MIDICUBE_SOUNDENGINE_ORGAN_H_ */

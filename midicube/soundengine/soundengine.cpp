@@ -53,12 +53,82 @@ void NoteBuffer::release_note(SampleInfo& info, unsigned int note, bool invalida
 	}
 }
 
+//BaseSoundEngine
+void BaseSoundEngine::midi_message(MidiMessage& message, SampleInfo& info) {
+	//Note on
+	if (message.get_message_type() == MessageType::NOTE_ON) {
+		press_note(info, message.get_note(), message.get_velocity()/127.0);
+	}
+	//Note off
+	else if (message.get_message_type() == MessageType::NOTE_OFF) {
+		release_note(info, message.get_note());
+	}
+	//Control change
+	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
+		control_change(message.get_control(), message.get_value());
+		//Sustain
+		if (message.get_control() == sustain_control) {
+			bool new_sustain = message.get_value() != 0;
+			if (new_sustain != environment.sustain) {
+				if (new_sustain) {
+					environment.sustain_time = info.time;
+				}
+				else {
+					environment.sustain_release_time = info.time;
+				}
+				environment.sustain = new_sustain;
+			}
+		}
+	}
+	//Pitch bend
+	else if (message.get_message_type() == MessageType::PITCH_BEND) {
+		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
+		environment.pitch_bend = note_to_freq_transpose(pitch);
+	}
+}
+
+inline void BaseSoundEngine::press_note(SampleInfo& info, unsigned int note, double velocity) {
+	this->note.press_note(info, note, velocity);
+}
+
+inline void BaseSoundEngine::release_note(SampleInfo& info, unsigned int note) {
+	this->note.release_note(info, note);
+}
+
+void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+	EngineStatus status = {0, 0, nullptr};
+	//Notes
+	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+		if (note.note[i].valid) {
+			if (note_finished(info, note.note[i], environment)) {
+				note.note[i].valid = false;
+				note_not_pressed(info, note.note[i], i);
+			}
+			else {
+				++status.pressed_notes;
+				note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
+				process_note_sample(channels, info, note.note[i], environment, i);
+				if (!status.latest_note || status.latest_note->start_time < note.note[i].start_time) {
+					status.latest_note = &note.note[i];
+					status.latest_note_index = i;
+				}
+			}
+		}
+		else {
+			note_not_pressed(info, note.note[i], i);
+		}
+	}
+	//Static sample
+	process_sample(channels, info, environment, status);
+}
+
+
 //Arpeggiator
 Arpeggiator::Arpeggiator() {
 
 }
 
-void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
+void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release) {
 	//Reset if no keys are pressed
 	if (!restart) {
 		bool released = true;
@@ -143,11 +213,11 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 			break;
 		}
 		//Press note
-		note.release_note(info, curr_note);
+		release(info, curr_note);
 		if (next_index >= 0) {
 			curr_note = next_note;
 			this->note_index = next_index;
-			note.press_note(info, curr_note, this->note.note[note_index].velocity);
+			press(info, curr_note, this->note.note[note_index].velocity);
 			restart = false;
 		}
 	}
@@ -163,124 +233,58 @@ void Arpeggiator::release_note(SampleInfo& info, unsigned int note) {
 
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {
-	engine = nullptr;
-	data = nullptr;
+	engine_index = -1;
 }
 
-void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome) {
+void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome, SoundEngine& engine) {
 	std::array<double, OUTPUT_CHANNELS> ch = {};
-	engine_mutex.lock();
-	if (engine && data) {
-		if (arp.on) {
-			arp.apply(info, note);
-		}
-		if (active) {
-			EngineStatus status = {0, 0, nullptr};
-			//Notes
-			for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
-				if (note.note[i].valid) {
-					if (engine->note_finished(info, note.note[i], environment, *data)) {
-						note.note[i].valid = false;
-						engine->note_not_pressed(info, note.note[i], *data, i);
-					}
-					else {
-						++status.pressed_notes;
-						note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
-						engine->process_note_sample(ch, info, note.note[i], environment, *data, i);
-						if (!status.latest_note || status.latest_note->start_time < note.note[i].start_time) {
-							status.latest_note = &note.note[i];
-							status.latest_note_index = i;
-						}
-					}
-				}
-				else {
-					engine->note_not_pressed(info, note.note[i], *data, i);
-				}
-			}
-			//Static sample
-			engine->process_sample(ch, info, environment, status, *data);
-		}
-		//Looper
-		looper.apply(ch, metronome, info);
-		//Playback
-		for (size_t i = 0; i < channels.size(); ++i) {
-			channels[i] += (ch[i] * volume);
-		}
+	if (arp.on) {
+		arp.apply(info,
+		[&engine](SampleInfo& i, unsigned int note, double velocity) {
+			std::cout << note << std::endl;
+			engine.press_note(i, note, velocity);
+		},
+		[&engine](SampleInfo& i, unsigned int note) {
+			engine.release_note(i, note);
+		});
 	}
-	engine_mutex.unlock();
+	if (active) {
+		engine.process_sample(ch, info);
+	}
+	//Looper
+	looper.apply(ch, metronome, info);
+	//Playback
+	for (size_t i = 0; i < channels.size(); ++i) {
+		channels[i] += (ch[i] * volume);
+	}
 }
 
-void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
-	engine_mutex.lock();
-	//Note on
-	if (message.get_message_type() == MessageType::NOTE_ON) {
-		if (!arp.on) {
-			note.press_note(info, message.get_note(), message.get_velocity()/127.0);
+void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine) {
+	if (arp.on) {
+		if (message.get_message_type() == MessageType::NOTE_ON) {
+			arp.note.press_note(info, message.get_note(), message.get_velocity()/127.0);
 		}
-		arp.press_note(info, message.get_note(), message.get_velocity()/127.0);
-	}
-	//Note off
-	else if (message.get_message_type() == MessageType::NOTE_OFF) {
-		if (!arp.on) {
-			note.release_note(info, message.get_note());
+		else if (message.get_message_type() == MessageType::NOTE_OFF) {
+			arp.note.release_note(info, message.get_note(), true);
 		}
-		arp.release_note(info, message.get_note());
-	}
-	//Control change
-	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
-		if (engine && data) {
-			engine->control_change(message.get_control(), message.get_value(), *data);
-		}
-		//Sustain
-		if (message.get_control() == sustain_control) {
-			bool new_sustain = message.get_value() != 0;
-			if (new_sustain != environment.sustain) {
-				if (new_sustain) {
-					environment.sustain_time = info.time;
-				}
-				else {
-					environment.sustain_release_time = info.time;
-				}
-				environment.sustain = new_sustain;
-			}
+		else {
+			engine.midi_message(message, info);
 		}
 	}
-	//Pitch bend
-	else if (message.get_message_type() == MessageType::PITCH_BEND) {
-		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
-		environment.pitch_bend = note_to_freq_transpose(pitch);
+	else {
+		engine.midi_message(message, info);
 	}
-	engine_mutex.unlock();
 }
 
 /**
  * May only be called from GUI thread after GUI has started
  */
-void SoundEngineChannel::set_engine(SoundEngine* engine) {
-	SoundEngineData* data = nullptr;
-	if (engine) {
-		data = engine->create_data();
-	}
-
-	engine_mutex.lock();
-	delete this->data;
-	this->engine = engine;
-	this->data = data;
-	engine_mutex.unlock();
+void SoundEngineChannel::set_engine(ssize_t engine_index) {
+	this->engine_index = engine_index;
 }
 
-ssize_t SoundEngineChannel::get_engine_index(std::vector<SoundEngine*>& engines) {
-	engine_mutex.lock();
-	ssize_t index = find(engines.begin(), engines.end(), engine) - engines.begin();
-	engine_mutex.unlock();
-	if (index == engines.end() - engines.begin()) {
-		index = -1;
-	}
-	return index;
-}
-
-SoundEngineData* SoundEngineChannel::get_data() {
-	return data;
+ssize_t SoundEngineChannel::get_engine() {
+	return engine_index;
 }
 
 Arpeggiator& SoundEngineChannel::arpeggiator() {
@@ -291,8 +295,15 @@ Looper& SoundEngineChannel::get_looper() {
 	return looper;
 }
 
+SoundEngine* SoundEngineChannel::get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel) {
+	if (engine_index >= 0 && engine_index < (ssize_t) engines.size()) {
+		return &engines[engine_index]->channel(channel);
+	}
+	return nullptr;
+}
+
 SoundEngineChannel::~SoundEngineChannel() {
-	set_engine(nullptr);
+	set_engine(-1);
 }
 
 
@@ -309,7 +320,11 @@ std::string SoundEngineDevice::get_identifier() {
 void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
 	//Channels
 	for (size_t i = 0; i < this->channels.size(); ++i) {
-		this->channels[i].process_sample(channels, info, metronome);
+		SoundEngineChannel& ch = this->channels[i];
+		SoundEngine* engine = ch.get_engine(sound_engines, i);
+		if (engine) {
+			ch.process_sample(channels, info, metronome, *engine);
+		}
 	}
 	//Metronome
 	if (play_metronome) {
@@ -324,11 +339,11 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 	}
 }
 
-std::vector<SoundEngine*> SoundEngineDevice::get_sound_engines() {
+std::vector<SoundEngineBank*> SoundEngineDevice::get_sound_engines() {
 	return sound_engines;
 }
 
-void SoundEngineDevice::add_sound_engine(SoundEngine* engine) {
+void SoundEngineDevice::add_sound_engine(SoundEngineBank* engine) {
 	sound_engines.push_back(engine);
 }
 
@@ -336,16 +351,13 @@ SoundEngineChannel& SoundEngineDevice::get_channel(unsigned int channel) {
 	return channels.at(channel);
 }
 
-std::string SoundEngineChannel::get_engine_name() {
-	engine_mutex.lock();
-	std::string name = engine == nullptr ? "None" : engine->get_name();
-	engine_mutex.unlock();
-	return name;
-}
-
 void SoundEngineDevice::send(MidiMessage &message) {
 	SampleInfo info =  handler->sample_info();
-	channels.at(message.get_channel()).send(message, info);
+	SoundEngineChannel& ch = this->channels.at(message.get_channel());
+	SoundEngine* engine = ch.get_engine(sound_engines, message.get_channel());
+	if (engine) {
+		ch.send(message, info, *engine);
+	}
 }
 
 void SoundEngineDevice::solo (unsigned int channel) {
@@ -354,14 +366,13 @@ void SoundEngineDevice::solo (unsigned int channel) {
 	}
 }
 
-
 SoundEngineDevice::~SoundEngineDevice() {
 	//Clear channels
 	for (size_t i = 0; i < channels.size(); ++i) {
-		channels[i].set_engine(nullptr);
+		channels[i].set_engine(-1);
 	}
 	//Delete engines
-	for (SoundEngine* engine : sound_engines) {
+	for (SoundEngineBank* engine : sound_engines) {
 		delete engine;
 	}
 	sound_engines.clear();

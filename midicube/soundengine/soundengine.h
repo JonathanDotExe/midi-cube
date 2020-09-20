@@ -17,7 +17,7 @@
 #include "../looper.h"
 #include <string>
 #include <array>
-#include <mutex>
+#include <functional>
 
 #define SOUND_ENGINE_POLYPHONY 30
 #define SOUND_ENGINE_MIDI_CHANNELS 16
@@ -28,6 +28,20 @@ struct EngineStatus {
 	size_t pressed_notes;
 	size_t latest_note_index;
 	TriggeredNote* latest_note;
+};
+
+class NoteBuffer {
+private:
+	size_t next_freq_slot(SampleInfo& info);
+
+public:
+	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
+
+	NoteBuffer();
+
+	void press_note(SampleInfo& info, unsigned int note, double velocity);
+	void release_note(SampleInfo& info, unsigned int note, bool invalidate = false);
+
 };
 
 
@@ -45,29 +59,13 @@ public:
 class SoundEngine {
 
 public:
-	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data, size_t note_index) = 0;
+	virtual void midi_message(MidiMessage& msg, SampleInfo& info) = 0;
 
-	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& data, size_t note_index) {
+	virtual inline void press_note(SampleInfo& info, unsigned int note, double velocity) = 0;
 
-	};
+	virtual inline void release_note(SampleInfo& info, unsigned int note) = 0;
 
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& data) {
-
-	};
-
-	virtual void control_change(unsigned int control, unsigned int value, SoundEngineData& data) {
-
-	};
-
-	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& data) {
-		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
-	};
-
-	virtual std::string get_name() = 0;
-
-	virtual SoundEngineData* create_data() {
-		return new SoundEngineData();
-	}
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) = 0;
 
 	virtual ~SoundEngine() {
 
@@ -75,18 +73,74 @@ public:
 
 };
 
-class NoteBuffer {
+class BaseSoundEngine : public SoundEngine {
 private:
-	size_t next_freq_slot(SampleInfo& info);
+	KeyboardEnvironment environment;
+	NoteBuffer note;
 
 public:
-	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
+	std::atomic<unsigned int> sustain_control{64};
+	std::atomic<bool> sustain{true};
 
-	NoteBuffer();
+	void midi_message(MidiMessage& msg, SampleInfo& info);
 
 	void press_note(SampleInfo& info, unsigned int note, double velocity);
-	void release_note(SampleInfo& info, unsigned int note, bool invalidate = false);
 
+	void release_note(SampleInfo& info, unsigned int note);
+
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+
+	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
+
+	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
+
+	};
+
+	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
+
+	};
+
+	virtual void control_change(unsigned int control, unsigned int value) {
+
+	};
+
+	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
+	};
+
+	virtual ~BaseSoundEngine() {
+
+	};
+
+};
+
+
+class SoundEngineBank {
+public:
+	virtual SoundEngine& channel(unsigned int channel) = 0;
+
+	virtual std::string get_name() = 0;
+
+	virtual ~SoundEngineBank() {
+
+	};
+};
+
+template <typename T>
+std::string get_engine_name();
+
+template <typename T>
+class TemplateSoundEngineBank : public SoundEngineBank {
+private:
+	std::array<T, SOUND_ENGINE_MIDI_CHANNELS> engines;
+
+public:
+	SoundEngine& channel(unsigned int channel) {
+		return engines.at(channel);
+	}
+	std::string get_name() {
+		return get_engine_name<T>();
+	}
 };
 
 enum class ArpeggiatorPattern {
@@ -116,7 +170,7 @@ public:
 
 	Arpeggiator();
 
-	void apply(SampleInfo& info, NoteBuffer& note);
+	void apply(SampleInfo& info, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release);
 
 	void press_note(SampleInfo& info, unsigned int note, double velocity);
 
@@ -128,40 +182,32 @@ public:
 
 class SoundEngineChannel {
 private:
-	KeyboardEnvironment environment;
-	NoteBuffer note;
-	SoundEngine* engine = nullptr;
-	SoundEngineData* data = nullptr;
 	Arpeggiator arp;
 	Looper looper;
-	std::mutex engine_mutex;
+	std::atomic<ssize_t> engine_index{0};
 
 public:
 	std::atomic<double> volume{0.3};
-	std::atomic<unsigned int> sustain_control{64};
-	std::atomic<bool> sustain{true};
 	std::atomic<bool> active{true};
 
 	SoundEngineChannel();
 
-	void send(MidiMessage& message, SampleInfo& info);
+	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome);
+	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome, SoundEngine& engine);
+
+	SoundEngine* get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel);
 
 	/**
 	 * May only be called from GUI thread after GUI has started
 	 */
-	void set_engine(SoundEngine* engine);
+	void set_engine(ssize_t engine);
 
-	ssize_t get_engine_index(std::vector<SoundEngine*>& engines);
-
-	SoundEngineData* get_data();
+	ssize_t get_engine();
 
 	Arpeggiator& arpeggiator();
 
 	Looper& get_looper();
-
-	std::string get_engine_name();
 
 	~SoundEngineChannel();
 
@@ -172,7 +218,7 @@ class SoundEngineDevice : public AudioDevice {
 private:
 	std::string identifier;
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
-	std::vector<SoundEngine*> sound_engines;
+	std::vector<SoundEngineBank*> sound_engines;
 
 	ADSREnvelope metronome_env{0.0005, 0.02, 0, 0};
 
@@ -185,9 +231,9 @@ public:
 
 	std::string get_identifier();
 
-	std::vector<SoundEngine*> get_sound_engines();
+	std::vector<SoundEngineBank*> get_sound_engines();
 
-	void add_sound_engine(SoundEngine* engine);
+	void add_sound_engine(SoundEngineBank* engine);
 
 	SoundEngineChannel& get_channel(unsigned int channel);
 

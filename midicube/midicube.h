@@ -10,7 +10,6 @@
 
 #include <unordered_map>
 #include <vector>
-#include <mutex>
 
 #include "audio.h"
 #include "device.h"

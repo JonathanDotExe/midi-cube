@@ -553,6 +553,8 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[i].audible = false;
 		preset.components[i].bindings.clear();
 	}
+	preset.mono = false;
+	preset.portamendo_time = 0;
 	//Apply preset
 	switch (preset_no) {
 	case 1:
@@ -820,9 +822,7 @@ Synthesizer::Synthesizer() {
 
 }
 
-void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d, size_t note_index) {
-	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
-
+void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	if (!data.preset.mono) {
 		double sample = 0;
 		//Process components
@@ -842,16 +842,13 @@ void Synthesizer::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	}
 }
 
-void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, SoundEngineData& d, size_t note_index) {
-	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
+void Synthesizer::note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
 	for (size_t i = 0; i < data.preset.components.size(); ++i) {
 		data.preset.components[i].note_not_pressed(info, note, note_index);
 	}
 }
 
-void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineData& d) {
-	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
-
+void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 	if (data.preset.mono && status.latest_note) {
 		//Update portamendo
 		data.note_port.set(status.latest_note->note, info.time, data.first_port ? 0 : data.preset.portamendo_time);
@@ -878,14 +875,12 @@ void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 	}
 
 	if (data.update_preset != -1) {
-		apply_preset(data.preset, data.update_preset);
+		apply_preset(data.preset, data.update_preset.load());
 		data.update_preset = -1;
 	}
 }
 
-void Synthesizer::control_change(unsigned int control, unsigned int value, SoundEngineData& d) {
-	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
-
+void Synthesizer::control_change(unsigned int control, unsigned int value) {
 	for (size_t i = 0; i < data.preset.components.size(); ++i) {
 		data.preset.components[i].control_change(control, value);
 	}
@@ -895,9 +890,7 @@ void Synthesizer::control_change(unsigned int control, unsigned int value, Sound
 	}
 }
 
-bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, SoundEngineData& d) {
-	SynthesizerData& data = dynamic_cast<SynthesizerData&>(d);
-
+bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	for (size_t i = 0; i < data.preset.components.size(); ++i) {
 		if (!data.preset.components[i].note_finished(info, note, env)) {
 			return false;
@@ -906,12 +899,15 @@ bool Synthesizer::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardE
 	return true;
 }
 
-std::string Synthesizer::get_name() {
-	return "Synthesizer";
-}
-
-
 Synthesizer::~Synthesizer() {
 
 }
 
+template<>
+std::string get_engine_name<Synthesizer>() {
+	return "Synthesizer";
+}
+
+void __fix_link_synthesizer_name__ () {
+	get_engine_name<Synthesizer>();
+}
