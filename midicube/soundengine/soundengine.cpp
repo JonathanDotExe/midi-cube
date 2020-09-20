@@ -57,11 +57,11 @@ void NoteBuffer::release_note(SampleInfo& info, unsigned int note, bool invalida
 void BaseSoundEngine::midi_message(MidiMessage& message, SampleInfo& info) {
 	//Note on
 	if (message.get_message_type() == MessageType::NOTE_ON) {
-		note.press_note(info, message.get_note(), message.get_velocity()/127.0);
+		press_note(info, message.get_note(), message.get_velocity()/127.0);
 	}
 	//Note off
 	else if (message.get_message_type() == MessageType::NOTE_OFF) {
-		note.release_note(info, message.get_note());
+		release_note(info, message.get_note());
 	}
 	//Control change
 	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
@@ -85,6 +85,14 @@ void BaseSoundEngine::midi_message(MidiMessage& message, SampleInfo& info) {
 		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
 		environment.pitch_bend = note_to_freq_transpose(pitch);
 	}
+}
+
+inline void BaseSoundEngine::press_note(SampleInfo& info, unsigned int note, double velocity) {
+	this->note.press_note(info, note, velocity);
+}
+
+inline void BaseSoundEngine::release_note(SampleInfo& info, unsigned int note) {
+	this->note.release_note(info, note);
 }
 
 void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
@@ -120,7 +128,7 @@ Arpeggiator::Arpeggiator() {
 
 }
 
-void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
+void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release) {
 	//Reset if no keys are pressed
 	if (!restart) {
 		bool released = true;
@@ -205,11 +213,11 @@ void Arpeggiator::apply(SampleInfo& info, NoteBuffer& note) {
 			break;
 		}
 		//Press note
-		note.release_note(info, curr_note);
+		release(info, curr_note);
 		if (next_index >= 0) {
 			curr_note = next_note;
 			this->note_index = next_index;
-			note.press_note(info, curr_note, this->note.note[note_index].velocity);
+			press(info, curr_note, this->note.note[note_index].velocity);
 			restart = false;
 		}
 	}
@@ -230,9 +238,16 @@ SoundEngineChannel::SoundEngineChannel() {
 
 void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome, SoundEngine& engine) {
 	std::array<double, OUTPUT_CHANNELS> ch = {};
-	/*if (arp.on) {
-		arp.apply(info, note);
-	}*/
+	if (arp.on) {
+		arp.apply(info,
+		[&engine](SampleInfo& i, unsigned int note, double velocity) {
+			std::cout << note << std::endl;
+			engine.press_note(i, note, velocity);
+		},
+		[&engine](SampleInfo& i, unsigned int note) {
+			engine.release_note(i, note);
+		});
+	}
 	if (active) {
 		engine.process_sample(ch, info);
 	}
@@ -245,7 +260,20 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 }
 
 void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine) {
-	engine.midi_message(message, info);
+	if (arp.on) {
+		if (message.get_message_type() == MessageType::NOTE_ON) {
+			arp.note.press_note(info, message.get_note(), message.get_velocity()/127.0);
+		}
+		else if (message.get_message_type() == MessageType::NOTE_OFF) {
+			arp.note.release_note(info, message.get_note(), true);
+		}
+		else {
+			engine.midi_message(message, info);
+		}
+	}
+	else {
+		engine.midi_message(message, info);
+	}
 }
 
 /**

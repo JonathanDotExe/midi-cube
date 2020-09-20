@@ -17,6 +17,7 @@
 #include "../looper.h"
 #include <string>
 #include <array>
+#include <functional>
 
 #define SOUND_ENGINE_POLYPHONY 30
 #define SOUND_ENGINE_MIDI_CHANNELS 16
@@ -60,6 +61,10 @@ class SoundEngine {
 public:
 	virtual void midi_message(MidiMessage& msg, SampleInfo& info) = 0;
 
+	virtual inline void press_note(SampleInfo& info, unsigned int note, double velocity) = 0;
+
+	virtual inline void release_note(SampleInfo& info, unsigned int note) = 0;
+
 	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) = 0;
 
 	virtual ~SoundEngine() {
@@ -78,6 +83,10 @@ public:
 	std::atomic<bool> sustain{true};
 
 	void midi_message(MidiMessage& msg, SampleInfo& info);
+
+	void press_note(SampleInfo& info, unsigned int note, double velocity);
+
+	void release_note(SampleInfo& info, unsigned int note);
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 
@@ -161,7 +170,7 @@ public:
 
 	Arpeggiator();
 
-	void apply(SampleInfo& info, NoteBuffer& note);
+	void apply(SampleInfo& info, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release);
 
 	void press_note(SampleInfo& info, unsigned int note, double velocity);
 
