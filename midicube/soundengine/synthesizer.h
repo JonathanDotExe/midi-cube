@@ -70,13 +70,13 @@ public:
 	double unison_detune = 0.1;	//Set the unison amount here instead of using data.unison detune which is used internally
 	double sync = 1;			//Sync frequency factor
 	double sync_mod = 1;		//Sync frequency factor (modulated)
-	double fm = 1;				//Dynamic pitch offset in frequency multiplier
+	double fm = 0;				//Frequency modulation (pitch change in frequency addition)
 	double pitch = 0;			//Dynamic pitch offset in semitones
 	double unison_detune_mod = 0.1;
 	double pulse_width = 0.5;
 	double pulse_width_mod = 0.5;
 	bool reset = false;
-	bool randomize = true;
+	bool randomize = false;
 
 	OscilatorComponent();
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
