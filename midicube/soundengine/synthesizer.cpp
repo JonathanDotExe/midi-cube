@@ -32,7 +32,7 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 	osc.unison_detune = unison_detune_mod;
 	//Pitch and FM
 	//Frequency
-	double freq = note.freq * env.pitch_bend * transpose + fm * 10;
+	double freq = note.freq * env.pitch_bend * transpose + fm * 5;
 	if (semi) {
 		freq *= note_to_freq_transpose(semi);
 	}
@@ -809,6 +809,55 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[11].bindings.push_back( { BindingType::ADD,
 				AMP_ENVELOPE_INPUT_PROPERTY, 8, -1, 1 });
 		preset.components[11].audible = true;
+	}
+		break;
+	case 8:
+		//Patch 8 -- Electric FM Piano
+	{
+		ModEnvelopeComponent* mod1 = new ModEnvelopeComponent();
+		mod1->envelope = {0.0005, 0.45, 0.05, 0.3};
+		preset.components[0].set_component(mod1);
+		ModEnvelopeComponent* mod2 = new ModEnvelopeComponent();
+		mod2->envelope = {0.0005, 1.7, 0.25, 0.2};
+		preset.components[1].set_component(mod2);
+
+		OscilatorComponent *comp1 = new OscilatorComponent();
+		comp1->osc.data.waveform = AnalogWaveForm::SINE;
+		comp1->modulator = true;
+		comp1->volume = 0.50;
+		preset.components[5].set_component(comp1);
+		preset.components[5].bindings.push_back({BindingType::MUL, OSCILATOR_VOLUME_PROPERTY, 0, 0, 1});
+
+		OscilatorComponent *comp2 = new OscilatorComponent();
+		comp2->osc.data.waveform = AnalogWaveForm::SINE;
+		comp2->transpose = 15;
+		comp2->modulator = true;
+		comp2->volume = 0.15;
+		preset.components[6].set_component(comp2);
+		preset.components[6].bindings.push_back({BindingType::MUL, OSCILATOR_VOLUME_PROPERTY, 1, 0, 1});
+
+		OscilatorComponent *comp3 = new OscilatorComponent();
+		comp3->osc.data.waveform = AnalogWaveForm::SINE;
+		comp3->volume = 0.70;
+		preset.components[10].set_component(comp3);
+		preset.components[10].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 5, -1, 1});
+
+		OscilatorComponent *comp4 = new OscilatorComponent();
+		comp4->osc.data.waveform = AnalogWaveForm::SINE;
+		comp4->volume = 0.50;
+		preset.components[11].set_component(comp4);
+		preset.components[11].bindings.push_back({BindingType::ADD, OSCILATOR_FM_PROPERTY, 6, -1, 1});
+
+		AmpEnvelopeComponent *amp1 = new AmpEnvelopeComponent();
+		amp1->envelope = { 0.0005, 0.8, 0.4, 0.3 };
+		preset.components[20].set_component(amp1);
+		preset.components[20].bindings.push_back( { BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1 });
+		preset.components[20].audible = true;
+		AmpEnvelopeComponent *amp2 = new AmpEnvelopeComponent();
+		amp2->envelope = { 0.0005, 1.3, 0.15, 0.2 };
+		preset.components[21].set_component(amp2);
+		preset.components[21].bindings.push_back( { BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 11, -1, 1 });
+		preset.components[21].audible = true;
 	}
 		break;
 	}

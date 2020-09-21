@@ -61,7 +61,7 @@ double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorDat
 		//Modulator
 		if (modulator) {
 			//TODO sync polyblep
-			signal = (-cosine_wave(rotation, 1) + cosine_wave(last_rotation, 1))/(time_step) / 2 * M_PI;
+			signal = (-cosine_wave(rotation, 1) + cosine_wave(last_rotation, 1))/(time_step * 2 * M_PI);
 		}
 		else {
 			signal = sine_wave(rotation, 1);
