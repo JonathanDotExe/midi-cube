@@ -32,7 +32,7 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 	osc.unison_detune = unison_detune_mod;
 	//Pitch and FM
 	//Frequency
-	double freq = note.freq * env.pitch_bend * transpose + fm;
+	double freq = note.freq * env.pitch_bend * transpose + fm * 10;
 	if (semi) {
 		freq *= note_to_freq_transpose(semi);
 	}

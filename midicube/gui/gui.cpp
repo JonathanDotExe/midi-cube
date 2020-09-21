@@ -876,6 +876,9 @@ bool OscilatorDialog::draw(float x, float y) {
 	osc->reset = GuiCheckBox((Rectangle){x, y, 20, 20}, "Reset", osc->reset);
 	osc->randomize = GuiCheckBox((Rectangle){x + 200, y, 20, 20}, "Randomize", osc->randomize);
 	y += 25;
+	//Modulator
+	osc->modulator = GuiCheckBox((Rectangle){x, y, 20, 20}, "Modulator", osc->modulator);
+	y += 25;
 	return false;
 }
 float OscilatorDialog::width() {
