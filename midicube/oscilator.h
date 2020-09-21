@@ -34,7 +34,7 @@ private:
 	double last_phase = 0;
 public:
 	AnalogOscilator();
-	double signal(double freq, double time_step, AnalogOscilatorData& data);
+	double signal(double freq, double time_step, AnalogOscilatorData& data, bool modulator = false);
 	void randomize();
 	void reset();
 	~AnalogOscilator();
@@ -53,7 +53,7 @@ public:
 
 	}
 
-	double signal(double freq, double time_step, size_t index) {
+	double signal(double freq, double time_step, size_t index, bool modulator = false) {
 		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
 		double signal = 0;
 		double detune = note_to_freq_transpose(unison_detune);
@@ -70,7 +70,7 @@ public:
 				d = det;
 				det *= detune;
 			}
-			signal += osc[i].signal(freq * d, time_step, data);
+			signal += osc[i].signal(freq * d, time_step, data, modulator);
 		}
 		return signal / (unison_amount + 1);
 	}

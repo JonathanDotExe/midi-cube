@@ -32,7 +32,7 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 	osc.unison_detune = unison_detune_mod;
 	//Pitch and FM
 	//Frequency
-	double freq = note.freq * env.pitch_bend * transpose + fm * info.sample_rate/4;
+	double freq = note.freq * env.pitch_bend * transpose + fm;
 	if (semi) {
 		freq *= note_to_freq_transpose(semi);
 	}
@@ -51,8 +51,8 @@ double OscilatorComponent::process(SampleInfo& info, TriggeredNote& note, Keyboa
 	}
 
 	//Signal
-	double signal = osc.signal(freq, info.time_step, note_index);
-	return amplitude * volume * signal;
+	double signal = osc.signal(freq, info.time_step, note_index, modulator);
+	return signal * amplitude * volume;
 }
 
 void OscilatorComponent::set_property(size_t index, double value) {
@@ -607,6 +607,7 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		comp1->osc.data.waveform = AnalogWaveForm::SINE;
 		comp1->volume = 1;
 		comp1->transpose = 1;
+		comp1->modulator = true;
 		preset.components[0].set_component(comp1);
 
 		OscilatorComponent* comp2 = new OscilatorComponent();

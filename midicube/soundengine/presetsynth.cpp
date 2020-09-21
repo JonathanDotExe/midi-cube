@@ -57,14 +57,15 @@ void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 
 	double amp = this->env.amplitude(info.time, note, env);
 	sample *= amp;*/
-	fm_phase += info.time_step * fm_freq;
+
+	/*fm_phase += info.time_step * fm_freq;
 	phase += freq * info.time_step;
 	double mod = sine_wave(fm_phase, 1) * vibrato;
 	double mul = (freq + mod)/freq;
 
-	sample = sine_wave(phase * mul, 1);
+	sample = sine_wave(phase * mul, 1);*/
 
-	//sample = sine_wave(info.time, freq + sine_wave(info.time, fm_freq) * vibrato);
+	sample = sine_wave(info.time, freq + sine_wave(info.time, fm_freq) * vibrato);
 
 	for (size_t i = 0; i < channels.size() ; ++i) {
 		channels[i] += sample;

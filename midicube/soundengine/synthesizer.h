@@ -77,6 +77,7 @@ public:
 	double pulse_width_mod = 0.5;
 	bool reset = false;
 	bool randomize = false;
+	bool modulator = false;
 
 	OscilatorComponent();
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);

@@ -7,6 +7,7 @@
 
 #include "oscilator.h"
 #include <cmath>
+#include <iostream>
 
 //AnalogOscilator
 AnalogOscilator::AnalogOscilator() {
@@ -25,10 +26,11 @@ static double polyblep(double phase, double step) {
 	return 0;
 }
 
-double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data) {
+double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data, bool modulator) {
 	//Move
+	double last_rotation = rotation;
 	double step = freq * time_step;
-	rotation += freq * time_step;
+	rotation += step;
 
 	double phase = rotation - (long int) rotation;
 	//Update parameters
@@ -56,9 +58,16 @@ double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorDat
 	double signal = 0;
 	switch(data.waveform) {
 	case AnalogWaveForm::SINE:
-		signal = sine_wave(rotation, 1);
-		if (data.analog && data.sync && data.sync_mul != 1) {
-			signal -= polyblep(sync_phase, sync_step) * (sine_wave(last_phase, 1) + 1) / 2;
+		//Modulator
+		if (modulator) {
+			//TODO sync polyblep
+			signal = (-cosine_wave(rotation, 1) + cosine_wave(last_rotation, 1))/(time_step) * 2 * M_PI;
+		}
+		else {
+			signal = sine_wave(rotation, 1);
+			if (data.analog && data.sync && data.sync_mul != 1) {
+				signal -= polyblep(sync_phase, sync_step) * (sine_wave(last_phase, 1) + 1) / 2;
+			}
 		}
 		break;
 	case AnalogWaveForm::SAW_DOWN:
