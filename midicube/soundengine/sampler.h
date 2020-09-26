@@ -59,6 +59,20 @@ public:
 
 };
 
+class SampleSoundStore {
+private:
+	std::unordered_map<std::string, SampleSound*> samples;
+public:
+
+	SampleSound* get_sound(std::string name);
+
+	void load_sounds(std::string folder);
+
+	void load_sound(std::string folder);
+
+	~SampleSoundStore();
+};
+
 class Sampler : public BaseSoundEngine {
 
 private:

@@ -78,6 +78,25 @@ SampleSound::~SampleSound() {
 	samples.clear();
 }
 
+//SampleSoundStore
+SampleSound* SampleSoundStore::get_sound(std::string name) {
+	return samples[name];
+}
+
+void SampleSoundStore::load_sounds(std::string folder) {
+	//TODO
+}
+
+void SampleSoundStore::load_sound(std::string folder) {
+	//TODO
+}
+
+SampleSoundStore::~SampleSoundStore() {
+	for (std::pair<std::string, SampleSound*> s : samples) {
+		delete s;
+	}
+}
+
 //Sampler
 Sampler::Sampler() {
 	sample = load_sound("./data/samples/piano");
