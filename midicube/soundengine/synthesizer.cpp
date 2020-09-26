@@ -915,7 +915,7 @@ void Synthesizer::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 		//Process components
 		std::array<double, MAX_COMPONENTS> values = {0};
 		for (size_t i = 0; i < data.preset.components.size(); ++i) {
-			double value = data.preset.components[i].process(data.preset.components, values, info, *status.latest_note, e, status.latest_note_index);
+			double value = data.preset.components[i].process(data.preset.components, values, info, *status.latest_note, e, 0);
 			values[i] = value;
 
 			if (data.preset.components[i].audible) {

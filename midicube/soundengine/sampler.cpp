@@ -93,7 +93,7 @@ void SampleSoundStore::load_sound(std::string folder) {
 
 SampleSoundStore::~SampleSoundStore() {
 	for (std::pair<std::string, SampleSound*> s : samples) {
-		delete s;
+		delete s.second;
 	}
 }
 
