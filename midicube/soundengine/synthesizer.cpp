@@ -317,7 +317,7 @@ LFOComponent::LFOComponent() {
 }
 
 double LFOComponent::process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return osc.signal(freq, info.time_step, note_index) * amplitude_mod;
+	return osc.signal(freq, info.time_step, note_index, modulator) * amplitude_mod;
 }
 
 void LFOComponent::set_property(size_t index, double value){
@@ -570,6 +570,8 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 
 		LFOComponent *lfo = new LFOComponent();
 		lfo->freq = 6;
+		lfo->modulator = true;
+		lfo->amplitude = 0.5;
 		preset.components[2].set_component(lfo);
 		preset.components[2].bindings.push_back( { BindingType::MUL,
 				LFO_AMPLITUDE_PROPERTY, 1, 0, 1 });
@@ -742,6 +744,8 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 
 		LFOComponent *lfo = new LFOComponent();
 		lfo->freq = 6;
+		lfo->modulator = true;
+		lfo->amplitude = 0.5;
 		preset.components[2].set_component(lfo);
 		preset.components[2].bindings.push_back( { BindingType::MUL,
 				LFO_AMPLITUDE_PROPERTY, 1, 0, 1 });

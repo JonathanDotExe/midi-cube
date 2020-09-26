@@ -981,13 +981,16 @@ bool LFODialog::draw(float x, float y) {
 	y += 25;
 	lfo->amplitude = GuiSlider((Rectangle){x + 60, y, 320, 20}, "Amp", TextFormat("%1.2f", lfo->amplitude), lfo->amplitude, 0, 1);
 	y += 25;
+	//Modulator
+	lfo->modulator = GuiCheckBox((Rectangle){x, y, 20, 20}, "Modulator", lfo->modulator);
+	y += 25;
 	return false;
 }
 float LFODialog::width() {
 	return 400;
 }
 float LFODialog::height() {
-	return 50;
+	return 75;
 }
 
 //ControlChangeDialog

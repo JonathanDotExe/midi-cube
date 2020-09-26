@@ -273,6 +273,7 @@ public:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 1> osc;
 	double freq = 1;	//TODO option to morph frequency
 	double amplitude = 1;
+	bool modulator = false;
 
 	LFOComponent();
 	double process(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
