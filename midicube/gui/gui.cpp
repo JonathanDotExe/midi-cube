@@ -54,7 +54,7 @@ Frame::Frame() {
 void Frame::run () {
 	//Init
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "MIDICube - universal MIDI and synthesis workstation");
-	SetTargetFPS(60);
+	SetTargetFPS(30);
 	//Load resources
 	if (!device_textures.size()) {
 		load_gui_resources();
