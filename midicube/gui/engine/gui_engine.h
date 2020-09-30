@@ -12,6 +12,14 @@
 #include <string>
 #include <raylib.h>
 
+enum class VerticalAlignment {
+	TOP, CENTER, BOTTOM
+};
+
+enum class HorizontalAlignment {
+	LEFT, CENTER, RIGHT
+};
+
 class Parent;
 
 class Node {
@@ -56,18 +64,49 @@ struct NodeStyle {
 	Color border_color;
 	int border_radius;
 	int border_thickness;
+	HorizontalAlignment text_halignment;
+	VerticalAlignment text_valignment;
 };
 
 class StyleableNode : public Node {
 
-public:
+protected:
 	NodeStyle style;
 
 public:
 
 	StyleableNode(int x, int y, int width, int height);
 
+	virtual NodeStyle get_style();
+
+	virtual void set_style(NodeStyle style);
+
 	virtual ~StyleableNode();
+
+};
+
+class Label : public StyleableNode {
+
+
+public:
+
+	Label(int x, int y, int width, int height);
+
+	virtual void draw(int parentX, int parentY);
+
+	virtual ~Label();
+
+};
+
+class Button : public StyleableNode {
+
+public:
+
+	Button(int x, int y, int width, int height);
+
+	virtual void draw(int parentX, int parentY);
+
+	virtual ~Button();
 
 };
 
