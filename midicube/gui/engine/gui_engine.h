@@ -116,11 +116,18 @@ public:
 
 class Button : public StyleableNode {
 
+private:
+	TextPositioner positioner;
+	std::string text;
+	int inner_padding = 5;
+
 public:
 
-	Button(int x, int y, int width, int height);
+	Button(std::string text, int x, int y, int width, int height);
 
 	virtual void draw(int parentX, int parentY);
+
+	virtual void update_style();
 
 	virtual ~Button();
 

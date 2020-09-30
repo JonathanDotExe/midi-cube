@@ -113,3 +113,26 @@ void Label::update_style() {
 Label::~Label() {
 
 }
+
+//Button
+Button::Button(std::string text, int x, int y, int width, int height) : StyleableNode(x, y, width, height) {
+	this->text = text;
+}
+
+void Button::draw(int parentX, int parentY) {
+	//Background
+	DrawRectangle(parentX + x, parentY + y, width, height, style.fill_color);
+	//Border
+	DrawRectangleLines(parentX + y, parentY + y, width, height, style.border_color);
+	//TODO Border radius and tickness
+	//Text
+	positioner.draw(parentX + x + inner_padding, parentY + y + inner_padding, text, style);
+}
+
+void Button::update_style() {
+	positioner.recalc(width + inner_padding * 2, height - inner_padding * 2, text, style);
+}
+
+Button::~Button() {
+
+}
