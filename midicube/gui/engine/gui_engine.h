@@ -56,15 +56,15 @@ public:
 };
 
 struct NodeStyle {
-	std::string font;
-	int font_size = 0;
-	Color font_color;
-	Color fill_color;
-	Color border_color;
-	int border_radius;
-	int border_thickness;
-	HorizontalAlignment text_halignment;
-	VerticalAlignment text_valignment;
+	std::string font = "";
+	int font_size = 12;
+	Color font_color = BLACK;
+	Color fill_color = RAYWHITE;
+	Color border_color = BLANK;
+	int border_radius = 0;
+	int border_thickness = 0;
+	HorizontalAlignment text_halignment = HorizontalAlignment::CENTER ;
+	VerticalAlignment text_valignment = VerticalAlignment::CENTER;
 };
 
 class StyleableNode : public Node {
@@ -87,11 +87,19 @@ public:
 
 };
 
+class TextPositioner {
+private:
+	int x_off = 0;
+	int y_off = 0;
+public:
+	void draw(int x, int y, std::string text, NodeStyle& style);
+	void recalc(int width, int height, std::string text, NodeStyle& style);
+};
+
 class Label : public StyleableNode {
 
 private:
-	int text_x = 0;
-	int text_y = 0;
+	TextPositioner positioner;
 	std::string text;
 
 public:
