@@ -9,6 +9,8 @@
 #define MIDICUBE_GUI_ENGINE_GUI_ENGINE_H_
 
 #include <vector>
+#include <string>
+#include <raylib.h>
 
 class Parent;
 
@@ -45,5 +47,29 @@ public:
 	virtual ~Parent();
 
 };
+
+struct NodeStyle {
+	std::string font;
+	int font_size = 0;
+	Color font_color;
+	Color fill_color;
+	Color border_color;
+	int border_radius;
+	int border_thickness;
+};
+
+class StyleableNode : public Node {
+
+public:
+	NodeStyle style;
+
+public:
+
+	StyleableNode(int x, int y, int width, int height);
+
+	virtual ~StyleableNode();
+
+};
+
 
 #endif /* MIDICUBE_GUI_ENGINE_GUI_ENGINE_H_ */
