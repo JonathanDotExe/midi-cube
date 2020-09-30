@@ -20,7 +20,6 @@ enum class HorizontalAlignment {
 	LEFT, CENTER, RIGHT
 };
 
-class Parent;
 
 class Node {
 protected:
@@ -72,6 +71,9 @@ class StyleableNode : public Node {
 
 protected:
 	NodeStyle style;
+	virtual void update_style() {
+
+	}
 
 public:
 
@@ -87,12 +89,18 @@ public:
 
 class Label : public StyleableNode {
 
+private:
+	int text_x = 0;
+	int text_y = 0;
+	std::string text;
 
 public:
 
-	Label(int x, int y, int width, int height);
+	Label(std::string text, int x, int y, int width, int height);
 
 	virtual void draw(int parentX, int parentY);
+
+	virtual void update_style();
 
 	virtual ~Label();
 
