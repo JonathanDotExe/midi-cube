@@ -45,6 +45,45 @@ Parent::~Parent() {
 	children.clear();
 }
 
+//Frame
+Frame::Frame(std::string title, int width, int height) {
+	this->title = title;
+	this->width = width;
+	this->height = height;
+	view = nullptr;
+	root = nullptr;
+}
+
+void Frame::run () {
+	//Init
+	InitWindow(width, height, title.c_str());
+	SetTargetFPS(30);
+	//Loop
+	while (!WindowShouldClose()) {
+		BeginDrawing();
+			ClearBackground(RAYWHITE);
+			if (root) {
+				root->draw(0, 0);
+			}
+		EndDrawing();
+	}
+	//Cleanup
+	CloseWindow();
+}
+
+void Frame::change_view(ViewController* view) {
+	delete this->view;
+	delete this->root;
+	this->view = view;
+	this->root = view ? view->init(this) : nullptr;
+}
+
+Frame::~Frame() {
+	delete this->view;
+	delete this->root;
+}
+
+
 
 //StylableNode
 StyleableNode::StyleableNode(int x, int y, int width, int height) : Node(x, y, width, height) {
@@ -125,7 +164,6 @@ void Button::draw(int parentX, int parentY) {
 	DrawRectangleRounded(rect, style.border_radius, 1, style.fill_color);
 	//Border
 	DrawRectangleRoundedLines(rect, style.border_radius, 1, style.border_thickness, style.border_color);
-	//TODO Border radius and tickness
 	//Text
 	positioner.draw(parentX + x + inner_padding, parentY + y + inner_padding, text, style);
 }

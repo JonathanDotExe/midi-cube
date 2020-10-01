@@ -55,6 +55,41 @@ public:
 
 };
 
+class Frame;
+
+//View
+class ViewController {
+public:
+	virtual Node* init(Frame* frame) = 0;
+	virtual ~ViewController() {
+
+	}
+};
+
+//Frame
+class Frame {
+
+private:
+
+	ViewController* view;
+	Node* root;
+	std::string title;
+	int width;
+	int height;
+
+public:
+
+	Frame(std::string title, int width, int height);
+
+	void run ();
+
+	void change_view(ViewController* view);
+
+	~Frame();
+
+};
+
+
 struct NodeStyle {
 	std::string font = "";
 	int font_size = 12;
