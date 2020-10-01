@@ -120,10 +120,11 @@ Button::Button(std::string text, int x, int y, int width, int height) : Styleabl
 }
 
 void Button::draw(int parentX, int parentY) {
+	Rectangle rect{parentX + x + .0f, parentY + y + .0f, width + .0f, height + .0f};
 	//Background
-	DrawRectangle(parentX + x, parentY + y, width, height, style.fill_color);
+	DrawRectangleRounded(rect, style.border_radius, 1, style.fill_color);
 	//Border
-	DrawRectangleLines(parentX + y, parentY + y, width, height, style.border_color);
+	DrawRectangleRoundedLines(rect, style.border_radius, 1, style.border_thickness, style.border_color);
 	//TODO Border radius and tickness
 	//Text
 	positioner.draw(parentX + x + inner_padding, parentY + y + inner_padding, text, style);

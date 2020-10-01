@@ -61,7 +61,7 @@ struct NodeStyle {
 	Color font_color = BLACK;
 	Color fill_color = RAYWHITE;
 	Color border_color = BLANK;
-	int border_radius = 0;
+	float border_radius = 0;
 	int border_thickness = 0;
 	HorizontalAlignment text_halignment = HorizontalAlignment::CENTER ;
 	VerticalAlignment text_valignment = VerticalAlignment::CENTER;
