@@ -81,12 +81,21 @@ public:
 
 	Frame(std::string title, int width, int height);
 
-	void run ();
+	void run (ViewController* view);
 
 	void change_view(ViewController* view);
 
+
+
 	~Frame();
 
+	int get_height() const {
+		return height;
+	}
+
+	int get_width() const {
+		return width;
+	}
 };
 
 

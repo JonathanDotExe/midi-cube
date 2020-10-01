@@ -14,12 +14,10 @@ int main(int argc, char **argv) {
 		GUIModel model;
 		model.midi_cube = &cube;
 		//View
-		View* view = new MainMenuView();
-		view->init_model(&model);
-		Frame frame;
-		frame.change_view(view);
+		ViewController* view = new MainMenuView();
+		Frame frame("MIDICube - universal MIDI and synthesis workstation", 1024, 600);
 		//Run frame
-		frame.run();
+		frame.run(view);
 	}
 	catch (AudioException& e) {
 		cerr << e.what() << endl;

@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_GUI_GUI_H_
 #define MIDICUBE_GUI_GUI_H_
 
+#include "engine/gui_engine.h"
 #include "model.h"
 #include "../util.h"
 #include "../soundengine/organ.h"
@@ -17,36 +18,6 @@
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 600
-
-
-
-class View {
-
-private:
-	GUIModel* model;
-
-protected:
-	GUIModel* get_model();
-
-public:
-
-	void init_model(GUIModel* model);
-
-	/**
-	 * For drawing the components and calling events
-	 *
-	 * @return the new view
-	 */
-	virtual View* draw() = 0;
-
-	virtual bool save_to_history() {
-		return true;
-	}
-
-	virtual ~View() {
-
-	};
-};
 
 class Dialog {
 public:
@@ -58,34 +29,15 @@ public:
 	}
 };
 
-
-class Frame {
-
-private:
-
-	std::vector<View*> history;
-	View* view;
+class MainMenuView : public ViewController {
 
 public:
 
-	Frame();
-
-	void run ();
-
-	void change_view(View* view);
-
-	~Frame();
+	Node* init(Frame* frame);
 
 };
 
-class MainMenuView : public View {
-
-public:
-
-	View* draw();
-
-};
-
+/*
 struct DeviceDragInfo {
 	int last_x;
 	int last_y;
@@ -294,6 +246,6 @@ public:
 
 View* create_view_for_engine(std::string engine_name, SoundEngine* engine);
 
-Dialog* create_dialog_for_component(std::string component_name, SynthComponent* data);
+Dialog* create_dialog_for_component(std::string component_name, SynthComponent* data);*/
 
 #endif /* MIDICUBE_GUI_GUI_H_ */

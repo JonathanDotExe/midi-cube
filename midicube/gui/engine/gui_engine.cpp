@@ -54,10 +54,11 @@ Frame::Frame(std::string title, int width, int height) {
 	root = nullptr;
 }
 
-void Frame::run () {
+void Frame::run (ViewController* view) {
 	//Init
 	InitWindow(width, height, title.c_str());
 	SetTargetFPS(30);
+	change_view(view);
 	//Loop
 	while (!WindowShouldClose()) {
 		BeginDrawing();

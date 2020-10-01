@@ -19,6 +19,7 @@
 
 std::unordered_map<DeviceType, Texture2D> device_textures;
 
+/*
 void load_gui_resources() {
 	device_textures[DeviceType::MIDI_OUTPUT] = LoadTexture("./resources/images/devices/midi_output.png");
 	device_textures[DeviceType::MIDI_INPUT] = LoadTexture("./resources/images/devices/midi_input.png");
@@ -32,75 +33,6 @@ void unload_gui_ressources() {
 	device_textures.clear();
 }
 
-//View
-GUIModel* View::get_model() {
-	return model;
-}
-
-void View::init_model(GUIModel* model) {
-	if (this->model) {
-		throw std::runtime_error("Model already set");
-	}
-	else  {
-		this->model = model;
-	}
-}
-
-//Frame
-Frame::Frame() {
-	view = nullptr;
-}
-
-void Frame::run () {
-	//Init
-	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "MIDICube - universal MIDI and synthesis workstation");
-	SetTargetFPS(30);
-	//Load resources
-	if (!device_textures.size()) {
-		load_gui_resources();
-	}
-	//Loop
-	while (!WindowShouldClose()) {
-		BeginDrawing();
-			ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
-			change_view(view->draw());
-		EndDrawing();
-	}
-	//Cleanup
-	unload_gui_ressources();
-	CloseWindow();
-}
-
-void Frame::change_view(View* view) {
-	if (this->view != view) {
-		if (!view) {
-			if (history.size() > 0) {
-				delete this->view;
-				this->view = history.back();
-				history.pop_back();
-			}
-		}
-		else {
-			if (this->view && this->view->save_to_history()) {
-				history.push_back(this->view);
-			}
-			if (this->view && !this->view->save_to_history()) {
-				delete this->view;
-			}
-			this->view = view;
-		}
-	}
-}
-
-Frame::~Frame() {
-	delete view;
-	view = nullptr;
-
-	for (size_t i = 0; i < history.size(); ++i) {
-		delete history[i];
-	}
-	history.clear();
-}
 
 //GUI utils
 static void draw_return_button (View** view) {
@@ -137,22 +69,26 @@ static bool draw_switch (int x, int y, int width, int height, bool value, std::s
 static void scaled_slider(Rectangle pos, std::string text, double& value, const FixedScale& scale, std::string format = "1.2f%") {
 	value = scale.value(GuiSlider(pos, text.c_str(), TextFormat(format.c_str(), value), scale.progress(value), 0, 1));
 }
+*/
 
 //MainMenuView
-View* MainMenuView::draw() {
-	View* view = this;
+Node* MainMenuView::init(Frame* frame) {
+	Parent* parent = new Parent(0, 0, frame->get_width(), frame->get_height());
+
 	//Title
-	int titleWidth = MeasureText("MIDICube", 72);
-	DrawText("MIDICube", SCREEN_WIDTH/2 - titleWidth/2, 30, 72, BLACK);
+	Label* title = new Label("MIDICube", 0, 30, frame->get_width(), 72);
+	NodeStyle style;
+	style.font_size = 72;
+	title->set_style(style);
+	parent->add_child(title);
 
 	//Button
-	if (GuiButton({SCREEN_WIDTH/2 - 200, 160, 400, 40}, "Devices")) {
-		view = new DevicesMenuView();
-		view->init_model(get_model());
-	}
-	return view;
+	Button* button = new Button("Devices", frame->get_width()/2 - 200, 160, 400, 40);
+	parent->add_child(button);
+	return parent;
 }
 
+/*
 //DevicesMenuView
 DevicesMenuView::DevicesMenuView() {
 	binding_drag = {};
@@ -1225,4 +1161,4 @@ Dialog* create_dialog_for_component(std::string name, SynthComponent* data) {
 		return new VelocityDialog(dynamic_cast<VelocityComponent*>(data));	//TODO cleaner check
 	}
 	return nullptr;
-}
+}*/
