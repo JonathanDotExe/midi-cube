@@ -140,6 +140,7 @@ void TextPositioner::recalc(int width, int height, std::string text, NodeStyle& 
 //Label
 Label::Label(std::string text, int x, int y, int width, int height) : StyleableNode(x, y, width, height) {
 	this->text = text;
+	update_style();
 }
 
 void Label::draw(int parentX, int parentY) {
@@ -157,14 +158,21 @@ Label::~Label() {
 //Button
 Button::Button(std::string text, int x, int y, int width, int height) : StyleableNode(x, y, width, height) {
 	this->text = text;
+	NodeStyle style = get_style();
+	style.border_color = BLACK;
+	style.border_thickness = 2;
+	style.border_radius = 5;
+	style.fill_color = LIGHTGRAY;
+	set_style(style);
 }
 
 void Button::draw(int parentX, int parentY) {
 	Rectangle rect{parentX + x + .0f, parentY + y + .0f, width + .0f, height + .0f};
+	int segments = std::min(width, height);
 	//Background
-	DrawRectangleRounded(rect, style.border_radius, 1, style.fill_color);
+	DrawRectangleRounded(rect, style.border_radius/segments, 1, style.fill_color);
 	//Border
-	DrawRectangleRoundedLines(rect, style.border_radius, 1, style.border_thickness, style.border_color);
+	DrawRectangleRoundedLines(rect, style.border_radius/segments, 1, style.border_thickness, style.border_color);
 	//Text
 	positioner.draw(parentX + x + inner_padding, parentY + y + inner_padding, text, style);
 }
