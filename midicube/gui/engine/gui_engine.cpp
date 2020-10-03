@@ -73,6 +73,16 @@ void Frame::run (ViewController* view) {
 		if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
 			root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE);
 		}
+
+		if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+			root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT);
+		}
+		if (IsMouseButtonReleased(MOUSE_MIDDLE_BUTTON)) {
+			root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE);
+		}
+		if (IsMouseButtonReleased(MOUSE_RIGHT_BUTTON)) {
+			root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE);
+		}
 		//Render
 		BeginDrawing();
 			ClearBackground(RAYWHITE);
