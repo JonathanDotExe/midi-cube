@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <string>
+#include <functional>
 #include <raylib.h>
 
 enum class VerticalAlignment {
@@ -194,12 +195,24 @@ private:
 	TextPositioner positioner;
 	std::string text;
 	int inner_padding = 5;
+	std::function<void()> on_click = nullptr;
 
 public:
 
 	Button(std::string text, int x, int y, int width, int height);
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
+
+	void set_on_click(std::function<void()> on_click);
+
+	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
+		if (env.focused == this && button == MouseButtonType::LEFT) {
+			//Actions
+			if (on_click) {
+				on_click();
+			}
+		}
+	}
 
 	virtual void update_style();
 

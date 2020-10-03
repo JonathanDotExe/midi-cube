@@ -239,6 +239,10 @@ void Button::draw(int parentX, int parentY, NodeEnv env) {
 	positioner.draw(parentX + x + inner_padding, parentY + y + inner_padding, text, style);
 }
 
+void Button::set_on_click(std::function<void()> on_click) {
+	this->on_click = on_click;
+}
+
 void Button::update_style() {
 	positioner.recalc(width + inner_padding * 2, height - inner_padding * 2, text, style);
 }
