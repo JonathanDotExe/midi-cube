@@ -84,6 +84,9 @@ Node* MainMenuView::init(Frame* frame) {
 
 	//Button
 	Button* button = new Button("Devices", frame->get_width()/2 - 200, 160, 400, 40);
+	button->set_on_click([]() {
+		std::cout << "I have been clicked!";
+	});
 	parent->add_child(button);
 	return parent;
 }
