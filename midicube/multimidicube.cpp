@@ -15,11 +15,6 @@ static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleIn
 	((MultiMidiCube*) user_data)->process(channels, info);
 }
 
-static void midi_callback_func(double deltatime, MidiMessage& msg, void* arg) {
-	MultiCallbackUserData* data = (MultiCallbackUserData*) arg;
-	data->cube->midi_callback(msg, data->device);
-}
-
 MultiMidiCube::MultiMidiCube() {
 	audio_handler.set_sample_callback(&process_func, this);
 };
@@ -80,8 +75,12 @@ void MultiMidiCube::add_device(AudioDevice* device) {
 		data->cube = this;
 		data->device = device->get_identifier();
 		callback_data.push_back(data);
-		device->set_midi_callback(&midi_callback_func, data);
-		devices[device->get_identifier()] = device;
+		std::string name = device->get_identifier();
+		MultiMidiCube* self = this;
+		device->set_midi_callback([&self, &name](double delta, MidiMessage& msg){
+			self->midi_callback(msg, name);
+		});
+		devices[name] = device;
 	}
 };
 

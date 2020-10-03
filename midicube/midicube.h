@@ -37,7 +37,7 @@ struct ChannelSource {
 class MidiCube {
 private:
 	AudioHandler audio_handler;
-	SoundEngineDevice engine;
+	SoundEngineDevice engine{"Sound Engine"};
 	std::array<ChannelSource, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	std::vector<MidiCubeInput> inputs;
 public:

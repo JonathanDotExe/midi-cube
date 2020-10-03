@@ -292,12 +292,11 @@ MidiInput::MidiInput() : MidiHandler::MidiHandler() {
 
 void MidiInput::call_callback(double delta, std::vector<unsigned char>* msg) {
 	MidiMessage message(*msg);
-	callback(delta, message, user_data);
+	callback(delta, message);
 }
 
-void MidiInput::set_callback(void (*callback)(double deltatime, MidiMessage&, void*), void* user_data) {
+void MidiInput::set_callback(std::function<void(double, MidiMessage&)>) {
 	this->callback = callback;
-	this->user_data = user_data;
 }
 
 RtMidi& MidiInput::rtmidi() {
