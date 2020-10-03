@@ -19,6 +19,11 @@ void Node::draw(int parentX, int parentY, NodeEnv env) {
 
 }
 
+
+bool Node::collides (int x, int y) {
+	return this->x <= x && this->x + this->width > x && this->y <= y && this->y + this->height > y;
+}
+
 Node::~Node() {
 
 }
@@ -34,11 +39,13 @@ void Parent::draw(int parentX, int parentY, NodeEnv env) {
 	}
 }
 
-void Parent::on_mouse_pressed(int x, int y, MouseButtonType button) {
+void Parent::on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env) {
 	x -= this->x;
 	y -= this->y;
 	for (Node* node : children) {
-		node->on_mouse_pressed(x, y, button);
+		if (node->collides(x, y)) {
+			node->on_mouse_pressed(x, y, button, env);
+		}
 	}
 }
 
@@ -46,19 +53,23 @@ Node* Parent::traverse_focus(int x, int y) {
 	x -= this->x;
 	y -= this->y;
 	for (Node* node : children) {
-		Node* n = node->traverse_focus(x, y);
-		if (n) {
-			return n;
+		if (node->collides(x, y)) {
+			Node* n = node->traverse_focus(x, y);
+			if (n) {
+				return n;
+			}
 		}
 	}
 	return nullptr;
 }
 
-void Parent::on_mouse_released(int x, int y, MouseButtonType button) {
+void Parent::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
 	x -= this->x;
 	y -= this->y;
 	for (Node* node : children) {
-		node->on_mouse_released(x, y, button);
+		if (node->collides(x, y)) {
+			node->on_mouse_released(x, y, button, env);
+		}
 	}
 }
 
@@ -91,25 +102,27 @@ void Frame::run (ViewController* view) {
 	while (!WindowShouldClose()) {
 		//Events
 		Vector2 mouse_pos = GetMousePosition();
-		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-			root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT);
-			root->traverse_focus(mouse_pos.x, mouse_pos.y);
-		}
-		if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
-			root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE);
-		}
-		if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-			root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE);
-		}
+		if (root->collides(mouse_pos.x, mouse_pos.y)) {
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+				root->traverse_focus(mouse_pos.x, mouse_pos.y);
+				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT, {focused});
+			}
+			if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
+				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused});
+			}
+			if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused});
+			}
 
-		if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-			root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT);
-		}
-		if (IsMouseButtonReleased(MOUSE_MIDDLE_BUTTON)) {
-			root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE);
-		}
-		if (IsMouseButtonReleased(MOUSE_RIGHT_BUTTON)) {
-			root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE);
+			if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT, {focused});
+			}
+			if (IsMouseButtonReleased(MOUSE_MIDDLE_BUTTON)) {
+				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused});
+			}
+			if (IsMouseButtonReleased(MOUSE_RIGHT_BUTTON)) {
+				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused});
+			}
 		}
 		//Render
 		BeginDrawing();

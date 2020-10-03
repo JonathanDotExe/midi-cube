@@ -44,7 +44,7 @@ public:
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
-	virtual void on_mouse_pressed(int x, int y, MouseButtonType button) {
+	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env) {
 
 	}
 
@@ -52,9 +52,11 @@ public:
 		return nullptr;
 	}
 
-	virtual void on_mouse_released(int x, int y, MouseButtonType button) {
+	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
 
 	}
+
+	bool collides (int x, int y);
 
 	virtual ~Node();
 
@@ -73,11 +75,11 @@ public:
 
 	virtual void add_child(Node* child);
 
-	virtual void on_mouse_pressed(int x, int y, MouseButtonType button);
+	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env);
 
 	virtual Node* traverse_focus(int x, int y);
 
-	virtual void on_mouse_released(int x, int y, MouseButtonType button);
+	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
 
 	virtual ~Parent();
 
