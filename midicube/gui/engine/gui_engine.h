@@ -73,6 +73,12 @@ public:
 
 	virtual void add_child(Node* child);
 
+	virtual void on_mouse_pressed(int x, int y, MouseButtonType button);
+
+	virtual Node* traverse_focus(int x, int y);
+
+	virtual void on_mouse_released(int x, int y, MouseButtonType button);
+
 	virtual ~Parent();
 
 };

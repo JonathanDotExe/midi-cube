@@ -34,6 +34,34 @@ void Parent::draw(int parentX, int parentY, NodeEnv env) {
 	}
 }
 
+void Parent::on_mouse_pressed(int x, int y, MouseButtonType button) {
+	x -= this->x;
+	y -= this->y;
+	for (Node* node : children) {
+		node->on_mouse_pressed(x, y, button);
+	}
+}
+
+Node* Parent::traverse_focus(int x, int y) {
+	x -= this->x;
+	y -= this->y;
+	for (Node* node : children) {
+		Node* n = node->traverse_focus(x, y);
+		if (n) {
+			return n;
+		}
+	}
+	return nullptr;
+}
+
+void Parent::on_mouse_released(int x, int y, MouseButtonType button) {
+	x -= this->x;
+	y -= this->y;
+	for (Node* node : children) {
+		node->on_mouse_released(x, y, button);
+	}
+}
+
 void Parent::add_child(Node* child) {
 	children.push_back(child);
 }
