@@ -29,6 +29,11 @@ void MidiCube::init() {
 		}
 		if (input != nullptr) {
 			inputs.push_back({input, name});
+			size_t index = inputs.size() - 1;
+			MidiCube* self = this;
+			input->set_callback([index, self](double delta, MidiMessage& msg) {
+				self->midi_callback(msg, index);
+			});
 		}
 	}
 	//Init audio
@@ -39,7 +44,7 @@ void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo
 
 }
 
-void MidiCube::midi_callback(MidiMessage& message, std::string device) {
+void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 
 }
 

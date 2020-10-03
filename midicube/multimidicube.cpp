@@ -77,7 +77,7 @@ void MultiMidiCube::add_device(AudioDevice* device) {
 		callback_data.push_back(data);
 		std::string name = device->get_identifier();
 		MultiMidiCube* self = this;
-		device->set_midi_callback([&self, &name](double delta, MidiMessage& msg){
+		device->set_midi_callback([self, name](double delta, MidiMessage& msg){
 			self->midi_callback(msg, name);
 		});
 		devices[name] = device;
