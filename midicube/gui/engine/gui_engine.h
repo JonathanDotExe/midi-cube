@@ -13,6 +13,8 @@
 #include <functional>
 #include <raylib.h>
 
+#define FOCUS_TRAVERSABLE virtual Node* traverse_focus(int x, int y) { return this; }
+
 enum class VerticalAlignment {
 	TOP, CENTER, BOTTOM
 };
@@ -205,14 +207,9 @@ public:
 
 	void set_on_click(std::function<void()> on_click);
 
-	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
-		if (env.focused == this && button == MouseButtonType::LEFT) {
-			//Actions
-			if (on_click) {
-				on_click();
-			}
-		}
-	}
+	FOCUS_TRAVERSABLE
+
+	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
 
 	virtual void update_style();
 

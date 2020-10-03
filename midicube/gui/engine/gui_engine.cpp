@@ -104,7 +104,7 @@ void Frame::run (ViewController* view) {
 		Vector2 mouse_pos = GetMousePosition();
 		if (root->collides(mouse_pos.x, mouse_pos.y)) {
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-				root->traverse_focus(mouse_pos.x, mouse_pos.y);
+				focused = root->traverse_focus(mouse_pos.x, mouse_pos.y);
 				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT, {focused});
 			}
 			if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
@@ -241,6 +241,15 @@ void Button::draw(int parentX, int parentY, NodeEnv env) {
 
 void Button::set_on_click(std::function<void()> on_click) {
 	this->on_click = on_click;
+}
+
+void Button::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
+	if (env.focused == this && button == MouseButtonType::LEFT) {
+		//Actions
+		if (on_click) {
+			on_click();
+		}
+	}
 }
 
 void Button::update_style() {
