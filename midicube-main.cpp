@@ -1,13 +1,14 @@
 #include <iostream>
-#include "midicube/midicube.h"
+
 #include "midicube/gui/model.h"
 #include "midicube/gui/gui.h"
+#include "midicube/multimidicube.h"
 
 using namespace std;
 
 
 int main(int argc, char **argv) {
-	MidiCube cube;
+	MultiMidiCube cube;
 	try {
 		cube.init();
 		//Model

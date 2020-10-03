@@ -10,7 +10,8 @@
 
 #include <unordered_map>
 #include <string>
-#include "../midicube.h"
+
+#include "../multimidicube.h"
 
 struct Position {
 	int x;
@@ -19,7 +20,7 @@ struct Position {
 
 class GUIModel {
 public:
-	MidiCube* midi_cube;
+	MultiMidiCube* midi_cube;
 	std::unordered_map<std::string, Position*> device_positions;
 
 	GUIModel();
