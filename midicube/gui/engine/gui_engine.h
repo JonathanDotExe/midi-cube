@@ -20,6 +20,16 @@ enum class HorizontalAlignment {
 	LEFT, CENTER, RIGHT
 };
 
+enum class MouseButtonType {
+	LEFT, RIGHT, MIDDLE
+};
+
+class Node;
+
+struct NodeEnv {
+	Node* focused;
+};
+
 
 class Node {
 protected:
@@ -32,7 +42,19 @@ public:
 
 	Node(int x, int y, int width, int height);
 
-	virtual void draw(int parentX, int parentY);
+	virtual void draw(int parentX, int parentY, NodeEnv env);
+
+	virtual void on_mouse_pressed(int x, int y, MouseButtonType button) {
+
+	}
+
+	virtual Node* traverse_focus(int x, int y) {
+		return nullptr;
+	}
+
+	virtual void on_mouse_released(int x, int y, MouseButtonType button) {
+
+	}
 
 	virtual ~Node();
 
@@ -47,7 +69,7 @@ public:
 
 	Parent(int x, int y, int width, int height);
 
-	virtual void draw(int parentX, int parentY);
+	virtual void draw(int parentX, int parentY, NodeEnv env);
 
 	virtual void add_child(Node* child);
 
@@ -77,6 +99,8 @@ private:
 	int width;
 	int height;
 
+	Node* focused = nullptr;
+
 public:
 
 	Frame(std::string title, int width, int height);
@@ -84,8 +108,6 @@ public:
 	void run (ViewController* view);
 
 	void change_view(ViewController* view);
-
-
 
 	~Frame();
 
@@ -150,7 +172,7 @@ public:
 
 	Label(std::string text, int x, int y, int width, int height);
 
-	virtual void draw(int parentX, int parentY);
+	virtual void draw(int parentX, int parentY, NodeEnv env);
 
 	virtual void update_style();
 
@@ -169,7 +191,7 @@ public:
 
 	Button(std::string text, int x, int y, int width, int height);
 
-	virtual void draw(int parentX, int parentY);
+	virtual void draw(int parentX, int parentY, NodeEnv env);
 
 	virtual void update_style();
 

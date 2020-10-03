@@ -15,7 +15,7 @@ Node::Node(int x, int y, int width, int height) {
 	this->height = height;
 }
 
-void Node::draw(int parentX, int parentY) {
+void Node::draw(int parentX, int parentY, NodeEnv env) {
 
 }
 
@@ -28,9 +28,9 @@ Parent::Parent(int x, int y, int width, int height) : Node(x, y, width, height) 
 
 }
 
-void Parent::draw(int parentX, int parentY) {
+void Parent::draw(int parentX, int parentY, NodeEnv env) {
 	for (Node* node : children) {
-		node->draw(parentX + x, parentY + y);
+		node->draw(parentX + x, parentY + y, env);
 	}
 }
 
@@ -61,11 +61,22 @@ void Frame::run (ViewController* view) {
 	change_view(view);
 	//Loop
 	while (!WindowShouldClose()) {
+		//Events
+		Vector2 mouse_pos = GetMousePosition();
+		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+			root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT);
+			root->traverse_focus(mouse_pos.x, mouse_pos.y);
+		}
+		if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
+			root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE);
+		}
+		if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+			root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE);
+		}
+		//Render
 		BeginDrawing();
 			ClearBackground(RAYWHITE);
-			if (root) {
-				root->draw(0, 0);
-			}
+			root->draw(0, 0, {focused});
 		EndDrawing();
 	}
 	//Cleanup
@@ -143,7 +154,7 @@ Label::Label(std::string text, int x, int y, int width, int height) : StyleableN
 	update_style();
 }
 
-void Label::draw(int parentX, int parentY) {
+void Label::draw(int parentX, int parentY, NodeEnv env) {
 	positioner.draw(parentX + x, parentY + y, text, style);
 }
 
@@ -166,7 +177,7 @@ Button::Button(std::string text, int x, int y, int width, int height) : Styleabl
 	set_style(style);
 }
 
-void Button::draw(int parentX, int parentY) {
+void Button::draw(int parentX, int parentY, NodeEnv env) {
 	Rectangle rect{parentX + x + .0f, parentY + y + .0f, width + .0f, height + .0f};
 	int segments = std::min(width, height);
 	//Background
