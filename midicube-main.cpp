@@ -2,18 +2,17 @@
 
 #include "midicube/gui/model.h"
 #include "midicube/gui/gui.h"
-#include "midicube/multimidicube.h"
+#include "midicube/midicube.h"
 
 using namespace std;
 
+static MidiCube cube;
 
 int main(int argc, char **argv) {
-	MultiMidiCube cube;
 	try {
 		cube.init();
 		//Model
-		GUIModel model;
-		model.midi_cube = &cube;
+
 		//View
 		ViewController* view = new MainMenuView();
 		Frame frame("MIDICube - universal MIDI and synthesis workstation", 1024, 600);

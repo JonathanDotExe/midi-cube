@@ -15,15 +15,11 @@
 struct MidiCubeInput {
 	MidiInput* in = nullptr;
 	std::string name = "";
-
-	~MidiCubeInput() {
-		delete in;
-	}
 };
 
 struct ChannelSource {
 	ssize_t input = -1;
-	int channel;
+	unsigned int channel;
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
 	int octave = 0;
