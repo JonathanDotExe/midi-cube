@@ -19,6 +19,29 @@ void Node::draw(int parentX, int parentY, NodeEnv env) {
 
 }
 
+void Node::update_layout(int parent_width, int parent_height) {
+	Vector content = get_content_size();
+	//Width
+	if (layout.width == MATCH_PARENT) {
+		width = parent_width - layout.margin_left - layout.margin_right;
+	}
+	else if (layout.width == WRAP_CONTENT) {
+		width = content.x;
+	}
+	else {
+		width = layout.width;
+	}
+	//Height
+	if (layout.height == MATCH_PARENT) {
+		height = parent_height - layout.margin_top - layout.margin_bottom;
+	}
+	else if (layout.height == WRAP_CONTENT) {
+		height =  content.y;
+	}
+	else {
+		height = parent_height;
+	}
+}
 
 bool Node::collides (int x, int y) {
 	return this->x <= x && this->x + this->width > x && this->y <= y && this->y + this->height > y;
@@ -63,8 +86,9 @@ Node* Parent::traverse_focus(int x, int y) {
 	return nullptr;
 }
 
-void Parent::position_children() {
-	//TODO
+Vector Parent::get_content_size() {
+	Vector size{0, 0};
+	return size;
 }
 
 void Parent::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {

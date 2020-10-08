@@ -33,7 +33,7 @@ struct NodeEnv {
 	Node* focused;
 };
 
-struct Position {
+struct Vector {
 	int x;
 	int y;
 };
@@ -67,13 +67,16 @@ protected:
 	int y = 0;
 	int width = 0;
 	int height = 0;
+	NodeLayout layout;
 
 public:
 
 	Node(int x, int y, int width, int height);
 
-	virtual void position_children() {
+	virtual void update_layout(int parent_width, int parent_height);
 
+	virtual Vector get_content_size() {
+		return {0, 0};
 	}
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
@@ -94,6 +97,13 @@ public:
 
 	virtual ~Node();
 
+	const NodeLayout get_layout() const {
+		return layout;
+	}
+
+	virtual void set_layout(const NodeLayout &layout) {
+		this->layout = layout;	//TODO relayout
+	}
 };
 
 class Parent : public Node {
@@ -105,11 +115,11 @@ public:
 
 	Parent(int x, int y, int width, int height);
 
-	virtual void position_children();
-
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
 	virtual void add_child(Node* child);
+
+	virtual Vector get_content_size();
 
 	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env);
 
