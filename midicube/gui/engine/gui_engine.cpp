@@ -63,6 +63,10 @@ Node* Parent::traverse_focus(int x, int y) {
 	return nullptr;
 }
 
+void Parent::position_children() {
+	//TODO
+}
+
 void Parent::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
 	x -= this->x;
 	y -= this->y;

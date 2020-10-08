@@ -33,6 +33,33 @@ struct NodeEnv {
 	Node* focused;
 };
 
+struct Position {
+	int x;
+	int y;
+};
+
+#define MATCH_PARENT -1
+#define WRAP_CONTENT -2
+
+struct NodeLayout {
+	int width = WRAP_CONTENT;
+	int height = WRAP_CONTENT;
+	VerticalAlignment valignment;
+	HorizontalAlignment halignment;
+
+	int padding_left = 0;
+	int padding_right = 0;
+	int padding_top = 0;
+	int padding_bottom = 0;
+
+	int margin_left = 0;
+	int margin_right = 0;
+	int margin_top = 0;
+	int margin_bottom = 0;
+
+	int layout_weight = 0;
+};
+
 
 class Node {
 protected:
@@ -44,6 +71,10 @@ protected:
 public:
 
 	Node(int x, int y, int width, int height);
+
+	virtual void position_children() {
+
+	}
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
@@ -73,6 +104,8 @@ private:
 public:
 
 	Parent(int x, int y, int width, int height);
+
+	virtual void position_children();
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 

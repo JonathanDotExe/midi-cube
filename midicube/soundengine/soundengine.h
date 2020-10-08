@@ -61,9 +61,9 @@ class SoundEngine {
 public:
 	virtual void midi_message(MidiMessage& msg, SampleInfo& info) = 0;
 
-	virtual inline void press_note(SampleInfo& info, unsigned int note, double velocity) = 0;
+	virtual void press_note(SampleInfo& info, unsigned int note, double velocity) = 0;
 
-	virtual inline void release_note(SampleInfo& info, unsigned int note) = 0;
+	virtual void release_note(SampleInfo& info, unsigned int note) = 0;
 
 	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) = 0;
 
