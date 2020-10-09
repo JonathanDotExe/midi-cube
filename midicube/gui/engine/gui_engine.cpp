@@ -8,11 +8,8 @@
 #include "gui_engine.h"
 
 //Node
-Node::Node(int x, int y, int width, int height) {
-	this->x = x;
-	this->y = y;
-	this->width = width;
-	this->height = height;
+Node::Node() {
+
 }
 
 void Node::draw(int parentX, int parentY, NodeEnv env) {
@@ -63,7 +60,7 @@ Node::~Node() {
 }
 
 //Parent
-Parent::Parent(int x, int y, int width, int height) : Node(x, y, width, height) {
+Parent::Parent() : Node() {
 
 }
 
@@ -114,7 +111,7 @@ Vector Parent::get_content_size() {
 void Parent::update_layout(int parent_width, int parent_height, int x, int y) {
 	Node::update_layout(parent_width, parent_height, x, y);
 	for (Node* node : children) {
-		node->update_layout(width, height, node->get_layout().margin_top, node->get_layout().margin_bottom);
+		node->update_layout(width, height, node->get_layout().margin_left, node->get_layout().margin_top);
 	}
 }
 
@@ -137,6 +134,17 @@ Parent::~Parent() {
 		delete node;
 	}
 	children.clear();
+}
+
+//VBox
+void VBox::update_layout(int parent_width, int parent_height, int x, int y) {
+	Node::update_layout(parent_width, parent_height, x, y);
+	int curr_y = layout.padding_left;
+	for (Node* node : get_children()) {
+		curr_y += node->get_layout().margin_top;
+		node->update_layout(width, height, node->get_layout().margin_left, curr_y);
+		curr_y += node->get_layout().margin_bottom;
+	}
 }
 
 //Frame
@@ -194,6 +202,9 @@ void Frame::change_view(ViewController* view) {
 	delete this->root;
 	this->view = view;
 	this->root = view ? view->init(this) : nullptr;
+	if (root) {
+		root->update_layout(width, height, 0, 0);
+	}
 }
 
 Frame::~Frame() {
@@ -204,7 +215,7 @@ Frame::~Frame() {
 
 
 //StylableNode
-StyleableNode::StyleableNode(int x, int y, int width, int height) : Node(x, y, width, height) {
+StyleableNode::StyleableNode() : Node() {
 
 }
 
@@ -261,8 +272,10 @@ Vector TextPositioner::size() {
 }
 
 //Label
-Label::Label(std::string text, int x, int y, int width, int height) : StyleableNode(x, y, width, height) {
+Label::Label(std::string text) : StyleableNode() {
 	this->text = text;
+	get_layout().width = WRAP_CONTENT;
+	get_layout().height = WRAP_CONTENT;
 	update_style();
 }
 
@@ -279,8 +292,12 @@ Label::~Label() {
 }
 
 //Button
-Button::Button(std::string text, int x, int y, int width, int height) : StyleableNode(x, y, width, height) {
+Button::Button(std::string text) : StyleableNode() {
 	this->text = text;
+
+	get_layout().width = WRAP_CONTENT;
+	get_layout().height = WRAP_CONTENT;
+
 	NodeStyle style = get_style();
 	style.border_color = BLACK;
 	style.border_thickness = 2;

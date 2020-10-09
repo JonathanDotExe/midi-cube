@@ -71,7 +71,7 @@ protected:
 
 public:
 
-	Node(int x, int y, int width, int height);
+	Node();
 
 	virtual void update_layout(int parent_width, int parent_height, int x, int y);
 
@@ -99,7 +99,7 @@ public:
 
 	virtual ~Node();
 
-	const NodeLayout get_layout() const {
+	NodeLayout& get_layout() {
 		return layout;
 	}
 
@@ -115,7 +115,7 @@ private:
 
 public:
 
-	Parent(int x, int y, int width, int height);
+	Parent();
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
@@ -131,8 +131,27 @@ public:
 
 	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
 
+	std::vector<Node*> get_children() {
+		return children;
+	}
+
 	virtual ~Parent();
 
+};
+
+class VBox : public Parent {
+public:
+
+	VBox() : Parent() {
+		get_layout().width = MATCH_PARENT;
+		get_layout().height = MATCH_PARENT;
+	}
+
+	virtual void update_layout(int parent_width, int parent_height, int x, int y);
+
+	virtual ~VBox() {
+
+	}
 };
 
 class Frame;
@@ -201,7 +220,7 @@ protected:
 
 public:
 
-	StyleableNode(int x, int y, int width, int height);
+	StyleableNode();
 
 	virtual NodeStyle get_style();
 
@@ -231,7 +250,7 @@ private:
 
 public:
 
-	Label(std::string text, int x, int y, int width, int height);
+	Label(std::string text);
 
 	virtual Vector get_content_size() {
 		return positioner.size();
@@ -254,7 +273,7 @@ private:
 
 public:
 
-	Button(std::string text, int x, int y, int width, int height);
+	Button(std::string text);
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 

@@ -73,17 +73,17 @@ static void scaled_slider(Rectangle pos, std::string text, double& value, const 
 
 //MainMenuView
 Node* MainMenuView::init(Frame* frame) {
-	Parent* parent = new Parent(0, 0, frame->get_width(), frame->get_height());
+	Parent* parent = new VBox();
 
 	//Title
-	Label* title = new Label("MIDICube", 0, 30, frame->get_width(), 72);
+	Label* title = new Label("MIDICube");
 	NodeStyle style;
 	style.font_size = 72;
 	title->set_style(style);
 	parent->add_child(title);
 
 	//Button
-	Button* button = new Button("Devices", frame->get_width()/2 - 200, 160, 400, 40);
+	Button* button = new Button("Devices");
 	button->set_on_click([]() {
 		std::cout << "I have been clicked!" << std::endl;
 	});
