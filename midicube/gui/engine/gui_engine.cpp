@@ -19,28 +19,39 @@ void Node::draw(int parentX, int parentY, NodeEnv env) {
 
 }
 
-void Node::update_layout(int parent_width, int parent_height) {
+void Node::update_layout(int parent_width, int parent_height, int x, int y) {
+	Vector size = calc_size(parent_width, parent_height, false);
+	width = size.x;
+	height = size.y;
+	this->x = x;
+	this->y = y;
+}
+
+Vector Node::calc_size(int parent_width, int parent_height, bool fit) {
 	Vector content = get_content_size();
+	int width = 0;
+	int height = 0;
 	//Width
-	if (layout.width == MATCH_PARENT) {
+	if (layout.width == MATCH_PARENT && !fit) {
 		width = parent_width - layout.margin_left - layout.margin_right;
 	}
-	else if (layout.width == WRAP_CONTENT) {
-		width = content.x;
+	else if (layout.width == WRAP_CONTENT || (layout.width == MATCH_PARENT && fit)) {
+		width = content.x + layout.padding_right + layout.padding_left;
 	}
 	else {
 		width = layout.width;
 	}
 	//Height
-	if (layout.height == MATCH_PARENT) {
+	if (layout.height == MATCH_PARENT && !fit) {
 		height = parent_height - layout.margin_top - layout.margin_bottom;
 	}
-	else if (layout.height == WRAP_CONTENT) {
-		height =  content.y;
+	else if (layout.height == WRAP_CONTENT || (layout.height == MATCH_PARENT && fit)) {
+		height =  content.y + layout.padding_top + layout.padding_bottom;
 	}
 	else {
-		height = parent_height;
+		height = layout.height;
 	}
+	return {width, height};
 }
 
 bool Node::collides (int x, int y) {
@@ -88,7 +99,23 @@ Node* Parent::traverse_focus(int x, int y) {
 
 Vector Parent::get_content_size() {
 	Vector size{0, 0};
+	for (Node* node : children) {
+		Vector node_size = node->calc_size(0, 0, true);
+		if (node_size.x > size.x) {
+			size.x = node_size.x;
+		}
+		if (node_size.y > size.y) {
+			size.y = node_size.y;
+		}
+	}
 	return size;
+}
+
+void Parent::update_layout(int parent_width, int parent_height, int x, int y) {
+	Node::update_layout(parent_width, parent_height, x, y);
+	for (Node* node : children) {
+		node->update_layout(width, height, node->layout.margin_top, node->layout.margin_bottom);
+	}
 }
 
 void Parent::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {

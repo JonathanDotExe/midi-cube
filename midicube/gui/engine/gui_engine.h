@@ -73,7 +73,9 @@ public:
 
 	Node(int x, int y, int width, int height);
 
-	virtual void update_layout(int parent_width, int parent_height);
+	virtual void update_layout(int parent_width, int parent_height, int x, int y);
+
+	virtual Vector calc_size(int parent_width, int parent_height, bool fit);
 
 	virtual Vector get_content_size() {
 		return {0, 0};
@@ -120,6 +122,8 @@ public:
 	virtual void add_child(Node* child);
 
 	virtual Vector get_content_size();
+
+	virtual void update_layout(int parent_width, int parent_height, int x, int y);
 
 	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env);
 
