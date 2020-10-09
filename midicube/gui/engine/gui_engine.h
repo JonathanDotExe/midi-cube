@@ -215,9 +215,12 @@ class TextPositioner {
 private:
 	int x_off = 0;
 	int y_off = 0;
+	int width = 0;
+	int height = 0;
 public:
 	void draw(int x, int y, std::string text, NodeStyle& style);
 	void recalc(int width, int height, std::string text, NodeStyle& style);
+	Vector size();
 };
 
 class Label : public StyleableNode {
@@ -229,6 +232,10 @@ private:
 public:
 
 	Label(std::string text, int x, int y, int width, int height);
+
+	virtual Vector get_content_size() {
+		return positioner.size();
+	}
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
@@ -243,7 +250,6 @@ class Button : public StyleableNode {
 private:
 	TextPositioner positioner;
 	std::string text;
-	int inner_padding = 5;
 	std::function<void()> on_click = nullptr;
 
 public:
@@ -253,6 +259,10 @@ public:
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
 	void set_on_click(std::function<void()> on_click);
+
+	virtual Vector get_content_size() {
+		return positioner.size();
+	}
 
 	FOCUS_TRAVERSABLE
 

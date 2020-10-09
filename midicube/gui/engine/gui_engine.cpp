@@ -114,7 +114,7 @@ Vector Parent::get_content_size() {
 void Parent::update_layout(int parent_width, int parent_height, int x, int y) {
 	Node::update_layout(parent_width, parent_height, x, y);
 	for (Node* node : children) {
-		node->update_layout(width, height, node->layout.margin_top, node->layout.margin_bottom);
+		node->update_layout(width, height, node->get_layout().margin_top, node->get_layout().margin_bottom);
 	}
 }
 
@@ -228,6 +228,8 @@ void TextPositioner::draw(int x, int y, std::string text, NodeStyle& style) {
 
 void TextPositioner::recalc(int width, int height, std::string text, NodeStyle& style) {
 	Vector2 dim = MeasureTextEx(GetFontDefault(), text.c_str(), style.font_size, 0);
+	this->width = dim.x;
+	this->height = dim.y;
 	//X
 	switch (style.text_halignment) {
 	case HorizontalAlignment::LEFT:
@@ -254,6 +256,10 @@ void TextPositioner::recalc(int width, int height, std::string text, NodeStyle& 
 	}
 }
 
+Vector TextPositioner::size() {
+	return {width, height};
+}
+
 //Label
 Label::Label(std::string text, int x, int y, int width, int height) : StyleableNode(x, y, width, height) {
 	this->text = text;
@@ -261,11 +267,11 @@ Label::Label(std::string text, int x, int y, int width, int height) : StyleableN
 }
 
 void Label::draw(int parentX, int parentY, NodeEnv env) {
-	positioner.draw(parentX + x, parentY + y, text, style);
+	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, style);
 }
 
 void Label::update_style() {
-	positioner.recalc(width, height, text, style);
+	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, style);
 }
 
 Label::~Label() {
@@ -291,7 +297,7 @@ void Button::draw(int parentX, int parentY, NodeEnv env) {
 	//Border
 	DrawRectangleRoundedLines(rect, style.border_radius/segments, 1, style.border_thickness, style.border_color);
 	//Text
-	positioner.draw(parentX + x + inner_padding, parentY + y + inner_padding, text, style);
+	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, style);
 }
 
 void Button::set_on_click(std::function<void()> on_click) {
@@ -308,7 +314,7 @@ void Button::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env
 }
 
 void Button::update_style() {
-	positioner.recalc(width + inner_padding * 2, height - inner_padding * 2, text, style);
+	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, style);
 }
 
 Button::~Button() {

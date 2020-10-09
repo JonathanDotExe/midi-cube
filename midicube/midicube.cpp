@@ -52,7 +52,7 @@ void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 	MessageType t = message.get_message_type();
 	for (size_t i = 0; i < channels.size(); ++i) {
 		ChannelSource& s = channels[i];
-		if (s.input == input && s.channel == message.get_channel()) {
+		if (s.input == static_cast<ssize_t>(input) && s.channel == message.get_channel()) {
 			bool pass = true;
 			MidiMessage msg = message;
 			switch (t) {
