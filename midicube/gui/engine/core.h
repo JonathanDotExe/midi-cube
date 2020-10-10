@@ -5,8 +5,8 @@
  *      Author: jojo
  */
 
-#ifndef MIDICUBE_GUI_ENGINE_GUI_ENGINE_H_
-#define MIDICUBE_GUI_ENGINE_GUI_ENGINE_H_
+#ifndef MIDICUBE_GUI_ENGINE_CORE_H_
+#define MIDICUBE_GUI_ENGINE_CORE_H_
 
 #include <vector>
 #include <string>
@@ -157,40 +157,6 @@ public:
 
 };
 
-class VBox : public Parent {
-public:
-
-	VBox() : Parent() {
-		get_layout().width = MATCH_PARENT;
-		get_layout().height = MATCH_PARENT;
-	}
-
-	virtual void update_layout(int parent_width, int parent_height);
-
-	virtual Vector get_content_size();
-
-	virtual ~VBox() {
-
-	}
-};
-
-class HBox : public Parent {
-public:
-
-	HBox() : Parent() {
-		get_layout().width = MATCH_PARENT;
-		get_layout().height = MATCH_PARENT;
-	}
-
-	virtual void update_layout(int parent_width, int parent_height);
-
-	virtual Vector get_content_size();
-
-	virtual ~HBox() {
-
-	}
-};
-
 class Frame;
 
 //View
@@ -272,68 +238,5 @@ public:
 
 };
 
-class TextPositioner {
-private:
-	int x_off = 0;
-	int y_off = 0;
-	int width = 0;
-	int height = 0;
-public:
-	void draw(int x, int y, std::string text, NodeStyle& style);
-	void recalc(int width, int height, std::string text, NodeStyle& style);
-	Vector size();
-};
 
-class Label : public StyleableNode {
-
-private:
-	TextPositioner positioner;
-	std::string text;
-
-public:
-
-	Label(std::string text);
-
-	virtual Vector get_content_size() {
-		return positioner.size();
-	}
-
-	virtual void draw(int parentX, int parentY, NodeEnv env);
-
-	virtual void update_style();
-
-	virtual ~Label();
-
-};
-
-class Button : public StyleableNode {
-
-private:
-	TextPositioner positioner;
-	std::string text;
-	std::function<void()> on_click = nullptr;
-
-public:
-
-	Button(std::string text);
-
-	virtual void draw(int parentX, int parentY, NodeEnv env);
-
-	void set_on_click(std::function<void()> on_click);
-
-	virtual Vector get_content_size() {
-		return positioner.size();
-	}
-
-	FOCUS_TRAVERSABLE
-
-	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
-
-	virtual void update_style();
-
-	virtual ~Button();
-
-};
-
-
-#endif /* MIDICUBE_GUI_ENGINE_GUI_ENGINE_H_ */
+#endif /* MIDICUBE_GUI_ENGINE_CORE_H_ */

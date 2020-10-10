@@ -8,13 +8,16 @@
 #ifndef MIDICUBE_GUI_GUI_H_
 #define MIDICUBE_GUI_GUI_H_
 
-#include "engine/gui_engine.h"
 #include "model.h"
 #include "../util.h"
 #include "../soundengine/organ.h"
 #include "../soundengine/synthesizer.h"
 #include "../soundengine/soundengine.h"
 #include <type_traits>
+
+#include "engine/core.h"
+#include "engine/container.h"
+#include "engine/control.h"
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 600
