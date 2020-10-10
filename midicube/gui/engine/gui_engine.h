@@ -174,6 +174,23 @@ public:
 	}
 };
 
+class HBox : public Parent {
+public:
+
+	HBox() : Parent() {
+		get_layout().width = MATCH_PARENT;
+		get_layout().height = MATCH_PARENT;
+	}
+
+	virtual void update_layout(int parent_width, int parent_height);
+
+	virtual Vector get_content_size();
+
+	virtual ~HBox() {
+
+	}
+};
+
 class Frame;
 
 //View
