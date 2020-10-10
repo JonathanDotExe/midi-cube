@@ -17,10 +17,13 @@ void Node::draw(int parentX, int parentY, NodeEnv env) {
 
 }
 
-void Node::update_layout(int parent_width, int parent_height, int x, int y) {
+void Node::update_layout(int parent_width, int parent_height) {
 	Vector size = calc_size(parent_width, parent_height, false);
 	width = size.x;
 	height = size.y;
+}
+
+void Node::update_position(int x, int y) {
 	this->x = x;
 	this->y = y;
 }
@@ -109,10 +112,11 @@ Vector Parent::get_content_size() {
 	return size;
 }
 
-void Parent::update_layout(int parent_width, int parent_height, int x, int y) {
-	Node::update_layout(parent_width, parent_height, x, y);
+void Parent::update_layout(int parent_width, int parent_height) {
+	Node::update_layout(parent_width, parent_height);
 	for (Node* node : children) {
-		node->update_layout(width, height, node->get_layout().margin_left, node->get_layout().margin_top);
+		node->update_layout(width, height);
+		node->update_position(node->get_layout().margin_left, node->get_layout().margin_top);
 	}
 }
 
@@ -138,14 +142,31 @@ Parent::~Parent() {
 }
 
 //VBox
-void VBox::update_layout(int parent_width, int parent_height, int x, int y) {
-	Node::update_layout(parent_width, parent_height, x, y);
+void VBox::update_layout(int parent_width, int parent_height) {
+	Node::update_layout(parent_width, parent_height);
 	int curr_y = layout.padding_left;
 	for (Node* node : get_children()) {
-		curr_y += node->get_layout().margin_top;
-		node->update_layout(width, height, node->get_layout().margin_left, curr_y);
+		NodeLayout& layout = node->get_layout();
+		//Position
+		curr_y += layout.margin_top;
+		node->update_layout(width, height);
+		//Alignment
+		int x = 0;
+		switch (layout.halignment) {
+		case HorizontalAlignment::LEFT:
+			x = layout.margin_left;
+			break;
+		case HorizontalAlignment::CENTER:
+			x = width/2 - node->get_width()/2;
+			break;
+		case HorizontalAlignment::RIGHT:
+			x = width - layout.margin_right - width;
+			break;
+		}
+		node->update_position(x, curr_y);
 		curr_y += node->get_height();
-		curr_y += node->get_layout().margin_bottom;
+		curr_y += layout.margin_bottom;
+
 	}
 }
 
@@ -221,7 +242,8 @@ void Frame::change_view(ViewController* view) {
 	this->view = view;
 	this->root = view ? view->init(this) : nullptr;
 	if (root) {
-		root->update_layout(width, height, 0, 0);
+		root->update_layout(width, height);
+		root->update_position(0, 0);
 	}
 }
 
@@ -256,7 +278,7 @@ void TextPositioner::draw(int x, int y, std::string text, NodeStyle& style) {
 }
 
 void TextPositioner::recalc(int width, int height, std::string text, NodeStyle& style) {
-	Vector2 dim = MeasureTextEx(GetFontDefault(), text.c_str(), style.font_size, 1);
+	Vector2 dim = MeasureTextEx(GetFontDefault(), text.c_str(), style.font_size, style.font_size/10);
 	this->width = dim.x;
 	this->height = dim.y;
 	//X

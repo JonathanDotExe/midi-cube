@@ -79,6 +79,7 @@ Node* MainMenuView::init(Frame* frame) {
 	Label* title = new Label("MIDICube");
 	NodeStyle style;
 	style.font_size = 72;
+	title->get_layout().halignment = HorizontalAlignment::CENTER;
 	title->set_style(style);
 	parent->add_child(title);
 
@@ -86,6 +87,8 @@ Node* MainMenuView::init(Frame* frame) {
 	Button* button = new Button("Devices");
 	button->get_layout().margin_top = 150;
 	button->get_layout().width = 400;
+	button->get_layout().halignment = HorizontalAlignment::CENTER;
+
 	button->set_on_click([]() {
 		std::cout << "I have been clicked!" << std::endl;
 	});

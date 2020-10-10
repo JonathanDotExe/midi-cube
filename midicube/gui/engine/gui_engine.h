@@ -73,7 +73,9 @@ public:
 
 	Node();
 
-	virtual void update_layout(int parent_width, int parent_height, int x, int y);
+	virtual void update_layout(int parent_width, int parent_height);
+
+	virtual void update_position(int x, int y);
 
 	virtual Vector calc_size(int parent_width, int parent_height, bool fit);
 
@@ -139,7 +141,7 @@ public:
 
 	virtual Vector get_content_size();
 
-	virtual void update_layout(int parent_width, int parent_height, int x, int y);
+	virtual void update_layout(int parent_width, int parent_height);
 
 	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env);
 
@@ -163,7 +165,7 @@ public:
 		get_layout().height = MATCH_PARENT;
 	}
 
-	virtual void update_layout(int parent_width, int parent_height, int x, int y);
+	virtual void update_layout(int parent_width, int parent_height);
 
 	virtual Vector get_content_size();
 
@@ -240,8 +242,8 @@ public:
 
 	StyleableNode();
 
-	virtual void update_layout(int parent_width, int parent_height, int x, int y) {
-		Node::update_layout(parent_width, parent_height, x, y);
+	virtual void update_layout(int parent_width, int parent_height) {
+		Node::update_layout(parent_width, parent_height);
 		update_style();
 	}
 
