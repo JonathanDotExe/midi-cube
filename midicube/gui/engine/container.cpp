@@ -10,11 +10,25 @@
 //VBox
 void VBox::update_layout(int parent_width, int parent_height) {
 	Node::update_layout(parent_width, parent_height);
+	//Calculate values for layout weight
+	int weight_sum = 0;
+	int height_sum = layout.padding_left;
+	for (Node* node : get_children()) {
+		NodeLayout& layout = node->get_layout();
+		weight_sum += node->layout.layout_weight;
+		height_sum += layout.padding_top;
+		if (!node->layout.layout_weight) {
+			height_sum += node->calc_size(width, height, true).y;
+		}
+		height_sum += layout.padding_bottom;
+	}
+	height_sum += layout.padding_bottom;
 	int curr_y = layout.padding_left;
 	for (Node* node : get_children()) {
 		NodeLayout& layout = node->get_layout();
 		//Position
 		curr_y += layout.margin_top;
+		//TODO layout weight
 		node->update_layout(width, height);
 		//Alignment
 		int x = 0;
@@ -32,7 +46,6 @@ void VBox::update_layout(int parent_width, int parent_height) {
 		node->update_position(x, curr_y);
 		curr_y += node->get_height();
 		curr_y += layout.margin_right;
-
 	}
 }
 
@@ -42,7 +55,7 @@ Vector VBox::get_content_size() {
 	for (Node* node : get_children()) {
 		Vector size = node->calc_size(0, 0, true);
 		curr_y += node->get_layout().margin_top;
-		curr_y += size.y;
+		curr_y += node->get_layout().layout_weight ? 0 : size.y;
 		curr_y += node->get_layout().margin_bottom;
 
 		if (curr_x < size.x) {
