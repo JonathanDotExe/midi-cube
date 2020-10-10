@@ -44,8 +44,8 @@ struct Vector {
 struct NodeLayout {
 	int width = WRAP_CONTENT;
 	int height = WRAP_CONTENT;
-	VerticalAlignment valignment;
-	HorizontalAlignment halignment;
+	VerticalAlignment valignment = VerticalAlignment::TOP;
+	HorizontalAlignment halignment = HorizontalAlignment::LEFT;
 
 	int padding_left = 0;
 	int padding_right = 0;
@@ -106,6 +106,22 @@ public:
 	virtual void set_layout(const NodeLayout &layout) {
 		this->layout = layout;	//TODO relayout
 	}
+
+	int get_height() const {
+		return height;
+	}
+
+	int get_width() const {
+		return width;
+	}
+
+	int get_x() const {
+		return x;
+	}
+
+	int get_y() const {
+		return y;
+	}
 };
 
 class Parent : public Node {
@@ -148,6 +164,8 @@ public:
 	}
 
 	virtual void update_layout(int parent_width, int parent_height, int x, int y);
+
+	virtual Vector get_content_size();
 
 	virtual ~VBox() {
 
@@ -221,6 +239,11 @@ protected:
 public:
 
 	StyleableNode();
+
+	virtual void update_layout(int parent_width, int parent_height, int x, int y) {
+		Node::update_layout(parent_width, parent_height, x, y);
+		update_style();
+	}
 
 	virtual NodeStyle get_style();
 

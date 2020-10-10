@@ -7,6 +7,7 @@
 
 #include "gui_engine.h"
 
+
 //Node
 Node::Node() {
 
@@ -143,8 +144,25 @@ void VBox::update_layout(int parent_width, int parent_height, int x, int y) {
 	for (Node* node : get_children()) {
 		curr_y += node->get_layout().margin_top;
 		node->update_layout(width, height, node->get_layout().margin_left, curr_y);
+		curr_y += node->get_height();
 		curr_y += node->get_layout().margin_bottom;
 	}
+}
+
+Vector VBox::get_content_size() {
+	int curr_y = 0;
+	int curr_x = 0;
+	for (Node* node : get_children()) {
+		Vector size = node->calc_size(0, 0, true);
+		curr_y += node->get_layout().margin_top;
+		curr_y += size.y;
+		curr_y += node->get_layout().margin_bottom;
+
+		if (curr_x < size.x) {
+			curr_x = size.x;
+		}
+	}
+	return {curr_x, curr_y};
 }
 
 //Frame
@@ -238,7 +256,7 @@ void TextPositioner::draw(int x, int y, std::string text, NodeStyle& style) {
 }
 
 void TextPositioner::recalc(int width, int height, std::string text, NodeStyle& style) {
-	Vector2 dim = MeasureTextEx(GetFontDefault(), text.c_str(), style.font_size, 0);
+	Vector2 dim = MeasureTextEx(GetFontDefault(), text.c_str(), style.font_size, 1);
 	this->width = dim.x;
 	this->height = dim.y;
 	//X
@@ -297,6 +315,10 @@ Button::Button(std::string text) : StyleableNode() {
 
 	get_layout().width = WRAP_CONTENT;
 	get_layout().height = WRAP_CONTENT;
+	get_layout().padding_left = 5;
+	get_layout().padding_right = 5;
+	get_layout().padding_top = 5;
+	get_layout().padding_bottom = 5;
 
 	NodeStyle style = get_style();
 	style.border_color = BLACK;
