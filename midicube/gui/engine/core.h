@@ -12,6 +12,7 @@
 #include <string>
 #include <functional>
 #include <raylib.h>
+#include <iostream>
 
 #define FOCUS_TRAVERSABLE virtual Node* traverse_focus(int x, int y) { return this; }
 
@@ -228,6 +229,7 @@ public:
 	StyleableNode();
 
 	virtual void update_layout(int parent_width, int parent_height) {
+		update_style();		//TODO calling update_layout() twice is a kinda dirty fix
 		Node::update_layout(parent_width, parent_height);
 		update_style();
 	}

@@ -12,7 +12,6 @@ Label::Label(std::string text) : StyleableNode() {
 	this->text = text;
 	get_layout().width = WRAP_CONTENT;
 	get_layout().height = WRAP_CONTENT;
-	update_style();
 }
 
 void Label::draw(int parentX, int parentY, NodeEnv env) {
