@@ -12,12 +12,12 @@ void VBox::update_layout(int parent_width, int parent_height) {
 	Node::update_layout(parent_width, parent_height);
 	//Calculate values for layout weight
 	int weight_sum = 0;
-	int height_sum = layout.padding_left;
+	int height_sum = layout.padding_top;
 	for (Node* node : get_children()) {
 		NodeLayout& layout = node->get_layout();
-		weight_sum += node->layout.layout_weight;
+		weight_sum += layout.y_weight;
 		height_sum += layout.padding_top;
-		if (!node->layout.layout_weight) {
+		if (!layout.y_weight) {
 			height_sum += node->calc_size(width, height, true).y;
 		}
 		height_sum += layout.padding_bottom;
@@ -55,7 +55,7 @@ Vector VBox::get_content_size() {
 	for (Node* node : get_children()) {
 		Vector size = node->calc_size(0, 0, true);
 		curr_y += node->get_layout().margin_top;
-		curr_y += node->get_layout().layout_weight ? 0 : size.y;
+		curr_y += node->get_layout().y_weight ? 0 : size.y;
 		curr_y += node->get_layout().margin_bottom;
 
 		if (curr_x < size.x) {

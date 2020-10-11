@@ -57,7 +57,8 @@ struct NodeLayout {
 	int margin_top = 0;
 	int margin_bottom = 0;
 
-	int layout_weight = 0;
+	int x_weight = 0;
+	int y_weight = 0;
 };
 
 

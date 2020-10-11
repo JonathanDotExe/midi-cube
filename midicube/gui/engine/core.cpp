@@ -33,21 +33,25 @@ Vector Node::calc_size(int parent_width, int parent_height, bool fit) {
 	int width = 0;
 	int height = 0;
 	//Width
-	if (layout.width == MATCH_PARENT && !fit) {
-		width = parent_width - layout.margin_left - layout.margin_right;
-	}
-	else if (layout.width == WRAP_CONTENT || (layout.width == MATCH_PARENT && fit)) {
+	//Wrap content/fit
+	if (layout.width == WRAP_CONTENT || (layout.width == MATCH_PARENT && fit)) {
 		width = content.x + layout.padding_right + layout.padding_left;
+	}
+	//Match parent
+	else if (layout.width == MATCH_PARENT && !fit) {
+		width = parent_width - layout.margin_left - layout.margin_right;
 	}
 	else {
 		width = layout.width;
 	}
 	//Height
-	if (layout.height == MATCH_PARENT && !fit) {
-		height = parent_height - layout.margin_top - layout.margin_bottom;
-	}
-	else if (layout.height == WRAP_CONTENT || (layout.height == MATCH_PARENT && fit)) {
+	//Wrap content/fit
+	if (layout.height == WRAP_CONTENT || (layout.height == MATCH_PARENT && fit)) {
 		height =  content.y + layout.padding_top + layout.padding_bottom;
+	}
+	//Match parent
+	else if (layout.height == MATCH_PARENT && !fit) {
+		height = parent_height - layout.margin_top - layout.margin_bottom;
 	}
 	else {
 		height = layout.height;
