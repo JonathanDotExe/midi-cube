@@ -38,12 +38,10 @@ Button::Button(std::string text) : StyleableNode() {
 	get_layout().padding_top = 5;
 	get_layout().padding_bottom = 5;
 
-	NodeStyle style = get_style();
 	style.border_color = BLACK;
 	style.border_thickness = 2;
 	style.border_radius = 5;
 	style.fill_color = LIGHTGRAY;
-	set_style(style);
 }
 
 void Button::draw(int parentX, int parentY, NodeEnv env) {
@@ -54,7 +52,7 @@ void Button::draw(int parentX, int parentY, NodeEnv env) {
 	//Border
 	DrawRectangleRoundedLines(rect, style.border_radius/segments, 1, style.border_thickness, style.border_color);
 	//Text
-	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, style);
+	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, text_style);
 }
 
 void Button::set_on_click(std::function<void()> on_click) {
@@ -71,7 +69,7 @@ void Button::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env
 }
 
 void Button::update_style() {
-	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, style);
+	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, text_style);
 }
 
 Button::~Button() {

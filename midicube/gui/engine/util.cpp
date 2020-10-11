@@ -8,11 +8,11 @@
 #include "util.h"
 
 //TextPositioner
-void TextPositioner::draw(int x, int y, std::string text, NodeStyle& style) {
+void TextPositioner::draw(int x, int y, std::string text, TextStyle& style) {
 	DrawText(text.c_str(), x + x_off, y + y_off, style.font_size, style.font_color);
 }
 
-void TextPositioner::recalc(int width, int height, std::string text, NodeStyle& style) {
+void TextPositioner::recalc(int width, int height, std::string text, TextStyle& style) {
 	Vector2 dim = MeasureTextEx(GetFontDefault(), text.c_str(), style.font_size, style.font_size/10);
 	this->width = dim.x;
 	this->height = dim.y;

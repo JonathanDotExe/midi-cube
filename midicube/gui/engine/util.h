@@ -17,8 +17,8 @@ private:
 	int width = 0;
 	int height = 0;
 public:
-	void draw(int x, int y, std::string text, NodeStyle& style);
-	void recalc(int width, int height, std::string text, NodeStyle& style);
+	void draw(int x, int y, std::string text, TextStyle& style);
+	void recalc(int width, int height, std::string text, TextStyle& style);
 	Vector size();
 };
 

@@ -77,10 +77,8 @@ Node* MainMenuView::init(Frame* frame) {
 
 	//Title
 	Label* title = new Label("MIDICube");
-	NodeStyle style;
-	style.font_size = 72;
+	title->style.font_size = 72;
 	title->get_layout().halignment = HorizontalAlignment::CENTER;
-	title->set_style(style);
 	parent->add_child(title);
 
 	//Button

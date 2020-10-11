@@ -201,23 +201,24 @@ public:
 	}
 };
 
-
-struct NodeStyle {
+struct TextStyle {
 	std::string font = "";
 	int font_size = 12;
 	Color font_color = BLACK;
+	HorizontalAlignment text_halignment = HorizontalAlignment::CENTER;
+	VerticalAlignment text_valignment = VerticalAlignment::CENTER;
+};
+
+struct BoxStyle {
 	Color fill_color = RAYWHITE;
 	Color border_color = BLANK;
 	float border_radius = 0;
 	int border_thickness = 0;
-	HorizontalAlignment text_halignment = HorizontalAlignment::CENTER ;
-	VerticalAlignment text_valignment = VerticalAlignment::CENTER;
 };
 
 class StyleableNode : public Node {
 
 protected:
-	NodeStyle style;
 	virtual void update_style() {
 
 	}
@@ -230,10 +231,6 @@ public:
 		Node::update_layout(parent_width, parent_height);
 		update_style();
 	}
-
-	virtual NodeStyle get_style();
-
-	virtual void set_style(NodeStyle style);
 
 	virtual ~StyleableNode();
 

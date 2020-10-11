@@ -18,6 +18,7 @@ private:
 	std::string text;
 
 public:
+	TextStyle style;
 
 	Label(std::string text);
 
@@ -41,6 +42,8 @@ private:
 	std::function<void()> on_click = nullptr;
 
 public:
+	BoxStyle style;
+	TextStyle text_style;
 
 	Button(std::string text);
 

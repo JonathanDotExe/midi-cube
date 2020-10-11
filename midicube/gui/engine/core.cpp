@@ -218,15 +218,6 @@ StyleableNode::StyleableNode() : Node() {
 
 }
 
-NodeStyle StyleableNode::get_style() {
-	return style;
-}
-
-void StyleableNode::set_style(NodeStyle style) {
-	this->style = style;
-	update_style();
-}
-
 StyleableNode::~StyleableNode() {
 
 }
