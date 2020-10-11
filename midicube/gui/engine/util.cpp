@@ -45,3 +45,14 @@ void TextPositioner::recalc(int width, int height, std::string text, TextStyle& 
 Vector TextPositioner::size() {
 	return {width, height};
 }
+
+extern void render_box(int x, int y, int width, int height, BoxStyle& style, bool hover) {
+	Rectangle rect{x + .0f, y + .0f, width + .0f, height + .0f};
+	int segments = std::min(width, height);
+	//Background
+	DrawRectangleRounded(rect, style.border_radius/segments, 1, hover ? style.hover_color : style.fill_color);
+	//Border
+	DrawRectangleRoundedLines(rect, style.border_radius/segments, 1, style.border_thickness, style.border_color);
+}
+
+

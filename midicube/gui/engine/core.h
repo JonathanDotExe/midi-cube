@@ -32,6 +32,7 @@ class Node;
 
 struct NodeEnv {
 	Node* focused;
+	Node* hovered;
 };
 
 struct Vector {
@@ -182,6 +183,10 @@ private:
 	int height;
 
 	Node* focused = nullptr;
+	Node* hovered = nullptr;
+
+	int last_mouse_x = -1;
+	int last_mouse_y = -1;
 
 public:
 
@@ -213,6 +218,7 @@ struct TextStyle {
 struct BoxStyle {
 	Color fill_color = RAYWHITE;
 	Color border_color = BLANK;
+	Color hover_color = RAYWHITE;
 	float border_radius = 0;
 	int border_thickness = 0;
 };

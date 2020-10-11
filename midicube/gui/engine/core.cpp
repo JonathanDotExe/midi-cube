@@ -163,32 +163,38 @@ void Frame::run (ViewController* view) {
 	while (!WindowShouldClose()) {
 		//Events
 		Vector2 mouse_pos = GetMousePosition();
+		//Selected
+		if ((int) mouse_pos.x != last_mouse_x || (int) mouse_pos.y != last_mouse_y) {
+			last_mouse_x = mouse_pos.x;
+			last_mouse_y = mouse_pos.y;
+			hovered = root->traverse_focus(mouse_pos.x, mouse_pos.y);
+		}
 		if (root->collides(mouse_pos.x, mouse_pos.y)) {
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				focused = root->traverse_focus(mouse_pos.x, mouse_pos.y);
-				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT, {focused});
+				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT, {focused, hovered});
 			}
 			if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
-				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused});
+				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused, hovered});
 			}
 			if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused});
+				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused, hovered});
 			}
 
 			if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT, {focused});
+				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT, {focused, hovered});
 			}
 			if (IsMouseButtonReleased(MOUSE_MIDDLE_BUTTON)) {
-				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused});
+				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused, hovered});
 			}
 			if (IsMouseButtonReleased(MOUSE_RIGHT_BUTTON)) {
-				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused});
+				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused, hovered});
 			}
 		}
 		//Render
 		BeginDrawing();
 			ClearBackground(RAYWHITE);
-			root->draw(0, 0, {focused});
+			root->draw(0, 0, {focused, hovered});
 		EndDrawing();
 	}
 	//Cleanup

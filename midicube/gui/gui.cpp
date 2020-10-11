@@ -86,6 +86,12 @@ Node* MainMenuView::init(Frame* frame) {
 	button->get_layout().margin_top = 150;
 	button->get_layout().width = 400;
 	button->get_layout().halignment = HorizontalAlignment::CENTER;
+	button->get_layout().padding_bottom = 10;
+	button->get_layout().padding_top = 10;
+	button->get_layout().padding_left = 10;
+	button->get_layout().padding_right = 10;
+	button->style.fill_color = GREEN;
+	button->style.hover_color = DARKGREEN;
 
 	button->set_on_click([]() {
 		std::cout << "I have been clicked!" << std::endl;

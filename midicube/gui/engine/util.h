@@ -22,4 +22,6 @@ public:
 	Vector size();
 };
 
+extern void render_box(int x, int y, int width, int height, BoxStyle& style, bool hover = false);
+
 #endif /* MIDICUBE_GUI_ENGINE_UTIL_H_ */

@@ -44,12 +44,7 @@ Button::Button(std::string text) : StyleableNode() {
 }
 
 void Button::draw(int parentX, int parentY, NodeEnv env) {
-	Rectangle rect{parentX + x + .0f, parentY + y + .0f, width + .0f, height + .0f};
-	int segments = std::min(width, height);
-	//Background
-	DrawRectangleRounded(rect, style.border_radius/segments, 1, style.fill_color);
-	//Border
-	DrawRectangleRoundedLines(rect, style.border_radius/segments, 1, style.border_thickness, style.border_color);
+	render_box(parentX + x, parentY + y, width, height, style, env.hovered == this);
 	//Text
 	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, text_style);
 }
