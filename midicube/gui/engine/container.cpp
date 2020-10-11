@@ -6,6 +6,7 @@
  */
 
 #include "container.h"
+#include <cmath>
 
 //VBox
 void VBox::update_layout(int parent_width, int parent_height) {
@@ -15,21 +16,25 @@ void VBox::update_layout(int parent_width, int parent_height) {
 	int height_sum = layout.padding_top;
 	for (Node* node : get_children()) {
 		NodeLayout& layout = node->get_layout();
-		weight_sum += layout.y_weight;
 		height_sum += layout.padding_top;
-		if (!layout.y_weight) {
+		if (!layout.height == MATCH_PARENT) {
 			height_sum += node->calc_size(width, height, true).y;
+		}
+		else {
+			weight_sum += layout.y_weight;
 		}
 		height_sum += layout.padding_bottom;
 	}
 	height_sum += layout.padding_bottom;
+	int rest_height = height - height_sum;
+	//Layout vertically
 	int curr_y = layout.padding_left;
 	for (Node* node : get_children()) {
 		NodeLayout& layout = node->get_layout();
 		//Position
 		curr_y += layout.margin_top;
-		//TODO layout weight
-		node->update_layout(width, height);
+		float factor = weight_sum == 0 ? 0 : (float) layout.y_weight/weight_sum;
+		node->update_layout(width, round(rest_height * factor));
 		//Alignment
 		int x = 0;
 		switch (layout.halignment) {
