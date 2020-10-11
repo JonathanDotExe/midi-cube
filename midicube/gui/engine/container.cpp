@@ -16,14 +16,14 @@ void VBox::update_layout(int parent_width, int parent_height) {
 	int height_sum = layout.padding_top;
 	for (Node* node : get_children()) {
 		NodeLayout& layout = node->get_layout();
-		height_sum += layout.padding_top;
-		if (!layout.height == MATCH_PARENT) {
-			height_sum += node->calc_size(width, height, true).y;
-		}
-		else {
+		height_sum += layout.margin_top;
+		if (layout.height == MATCH_PARENT) {
 			weight_sum += layout.y_weight;
 		}
-		height_sum += layout.padding_bottom;
+		else {
+			height_sum += node->calc_size(width, height, true).y;
+		}
+		height_sum += layout.margin_bottom;
 	}
 	height_sum += layout.padding_bottom;
 	int rest_height = height - height_sum;
@@ -73,12 +73,30 @@ Vector VBox::get_content_size() {
 //HBox
 void HBox::update_layout(int parent_width, int parent_height) {
 	Node::update_layout(parent_width, parent_height);
+	//Calculate values for layout weight
+	int weight_sum = 0;
+	int width_sum = layout.padding_left;
+	for (Node* node : get_children()) {
+		NodeLayout& layout = node->get_layout();
+		width_sum += layout.margin_left;
+		if (layout.width == MATCH_PARENT) {
+			weight_sum += layout.x_weight;
+		}
+		else {
+			width_sum += node->calc_size(width, height, true).x;
+		}
+		width_sum += layout.margin_right;
+	}
+	width_sum += layout.padding_right;
+	int rest_width = width - width_sum;
+	//Layout horizontally
 	int curr_x = layout.padding_top;
 	for (Node* node : get_children()) {
 		NodeLayout& layout = node->get_layout();
 		//Position
 		curr_x += layout.margin_left;
-		node->update_layout(width, height);
+		float factor = weight_sum == 0 ? 0 : (float) layout.x_weight/weight_sum;
+		node->update_layout(round(rest_width * factor), height);
 		//Alignment
 		int y = 0;
 		switch (layout.valignment) {
