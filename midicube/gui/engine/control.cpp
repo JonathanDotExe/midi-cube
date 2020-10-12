@@ -69,3 +69,47 @@ void Button::update_style() {
 Button::~Button() {
 
 }
+
+//CheckBox
+CheckBox::CheckBox() {
+	get_layout().width = WRAP_CONTENT;
+	get_layout().height = WRAP_CONTENT;
+	get_layout().padding_left = 2;
+	get_layout().padding_right = 2;
+	get_layout().padding_top = 2;
+	get_layout().padding_bottom = 2;
+
+	style.border_color = BLACK;
+	style.border_thickness = 1;
+	style.border_radius = 0;
+	style.fill_color = RAYWHITE;
+	style.hover_color = LIGHTGRAY;
+
+	inner_style.fill_color = {50, 50, 110, 255};
+	inner_style.hover_color = BLACK;
+};
+
+void CheckBox::draw(int parentX, int parentY, NodeEnv env) {
+	render_box(parentX + x, parentY + y, width, height, style, env.hovered == this);
+	if (checked) {
+		render_box(parentX + x + layout.padding_left, parentY + y + layout.padding_top, width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, inner_style, env.hovered == this);
+	}
+}
+
+void CheckBox::set_on_change(std::function<void (bool)> on_change) {
+	this->on_change = on_change;
+}
+
+void CheckBox::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
+	if (env.focused == this && button == MouseButtonType::LEFT) {
+		checked = !checked;
+		//Actions
+		if (on_change) {
+			on_change(checked);
+		}
+	}
+}
+
+CheckBox::~CheckBox() {
+
+}

@@ -97,6 +97,9 @@ Node* MainMenuView::init(Frame* frame) {
 		std::cout << "I have been clicked!" << std::endl;
 	});
 	parent->add_child(button);
+	//Checkbox
+	CheckBox* box = new CheckBox();
+	parent->add_child(box);
 	return parent;
 }
 

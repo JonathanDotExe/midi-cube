@@ -65,6 +65,35 @@ public:
 
 };
 
+class CheckBox : public StyleableNode {
+
+private:
+	std::function<void (bool)> on_change;
+
+public:
+	BoxStyle style;
+	BoxStyle inner_style;
+	bool checked = false;
+
+	CheckBox();
+
+	virtual void draw(int parentX, int parentY, NodeEnv env);
+
+	virtual void set_on_change(std::function<void (bool)> on_change);
+
+	FOCUS_TRAVERSABLE
+
+	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
+
+	virtual Vector get_content_size() {
+		return {20, 20};
+	}
+
+	virtual ~CheckBox();
+
+};
+
+
 
 
 #endif /* MIDICUBE_GUI_ENGINE_CONTROL_H_ */
