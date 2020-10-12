@@ -50,7 +50,7 @@ void VBox::update_layout(int parent_width, int parent_height) {
 		}
 		node->update_position(x, curr_y);
 		curr_y += node->get_height();
-		curr_y += layout.margin_right;
+		curr_y += layout.margin_bottom;
 	}
 }
 
@@ -112,7 +112,7 @@ void HBox::update_layout(int parent_width, int parent_height) {
 		}
 		node->update_position(curr_x, y);
 		curr_x += node->get_width();
-		curr_x += layout.margin_bottom;
+		curr_x += layout.margin_right;
 
 	}
 }

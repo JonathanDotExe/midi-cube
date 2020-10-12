@@ -98,7 +98,7 @@ Node* MainMenuView::init(Frame* frame) {
 	});
 	parent->add_child(button);
 	//Checkbox
-	CheckBox* box = new CheckBox();
+	TextCheckBox* box = new TextCheckBox("Test Checkbox");
 	parent->add_child(box);
 	return parent;
 }

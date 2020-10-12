@@ -10,6 +10,7 @@
 
 #include "core.h"
 #include "util.h"
+#include "container.h"
 
 class Label : public StyleableNode {
 
@@ -93,7 +94,36 @@ public:
 
 };
 
+class TextCheckBox : public HBox {
+public:
+	CheckBox* checkbox;
+	Label* label;
 
+	TextCheckBox(std::string text) {
+		layout.width = WRAP_CONTENT;
+		layout.height = WRAP_CONTENT;
+
+		checkbox = new CheckBox();
+		checkbox->get_layout().valignment = VerticalAlignment::CENTER;
+		checkbox->get_layout().margin_right = 2;
+		label = new Label(text);
+		label->get_layout().valignment = VerticalAlignment::CENTER;
+		add_child(checkbox);
+		add_child(label);
+	}
+
+	virtual ~TextCheckBox() {
+
+	}
+	const CheckBox& get_checkbox() const {
+		return *checkbox;
+	}
+
+	const Label& get_label() const {
+		return *label;
+	}
+
+};
 
 
 #endif /* MIDICUBE_GUI_ENGINE_CONTROL_H_ */
