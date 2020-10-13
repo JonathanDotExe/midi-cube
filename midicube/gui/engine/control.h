@@ -11,6 +11,7 @@
 #include "core.h"
 #include "util.h"
 #include "container.h"
+#include "../../util.h"
 
 class Label : public StyleableNode {
 
@@ -122,6 +123,36 @@ public:
 	const Label& get_label() const {
 		return *label;
 	}
+
+};
+
+class Slider : public StyleableNode {
+
+private:
+	std::function<void (double)> on_change;
+
+public:
+	BoxStyle style;
+	BoxStyle button_style;
+	double progress;
+	FixedScale scale{0, {} , 1};
+	double ratio = 0.3;
+
+	Slider();
+
+	virtual void draw(int parentX, int parentY, NodeEnv env);
+
+	virtual void set_on_change(std::function<void (double)> on_change);
+
+	FOCUS_TRAVERSABLE
+
+	virtual void on_mouse_drag(int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
+
+	virtual Vector get_content_size() {
+		return {100, 30};
+	}
+
+	virtual ~Slider();
 
 };
 

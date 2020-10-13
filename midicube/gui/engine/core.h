@@ -92,6 +92,10 @@ public:
 
 	}
 
+	virtual void on_mouse_drag(int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
+
+	}
+
 	virtual Node* traverse_focus(int x, int y) {
 		return nullptr;
 	}

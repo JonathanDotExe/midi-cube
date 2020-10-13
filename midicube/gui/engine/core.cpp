@@ -165,9 +165,20 @@ void Frame::run (ViewController* view) {
 		Vector2 mouse_pos = GetMousePosition();
 		//Selected
 		if ((int) mouse_pos.x != last_mouse_x || (int) mouse_pos.y != last_mouse_y) {
+			hovered = root->traverse_focus(mouse_pos.x, mouse_pos.y);
+			if (focused) {
+				if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+					focused->on_mouse_drag(mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::LEFT, {focused, hovered});
+				}
+				if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
+					focused->on_mouse_drag(mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::MIDDLE, {focused, hovered});
+				}
+				if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+					focused->on_mouse_drag(mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::RIGHT, {focused, hovered});
+				}
+			}
 			last_mouse_x = mouse_pos.x;
 			last_mouse_y = mouse_pos.y;
-			hovered = root->traverse_focus(mouse_pos.x, mouse_pos.y);
 		}
 		if (root->collides(mouse_pos.x, mouse_pos.y)) {
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
