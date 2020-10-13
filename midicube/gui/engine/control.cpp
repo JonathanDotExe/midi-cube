@@ -113,3 +113,41 @@ void CheckBox::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv e
 CheckBox::~CheckBox() {
 
 }
+
+//Slider
+Slider::Slider(double value, FixedScale scale) {
+	this->scale = scale;
+	progress = this->scale.progress(value);
+}
+
+void Slider::draw(int parentX, int parentY, NodeEnv env) {
+	render_box(parentX + x + (width - inner_width)/2 , parentY + y, inner_width, height, style, env.hovered == this);
+	int button_height = height - layout.padding_top - layout.padding_bottom - this->button_height;
+	render_box(parentX + x, parentY + y + layout.padding_top + button_height * (1 - progress), width, this->button_height, button_style, env.hovered == this);
+}
+
+void Slider::set_on_change(std::function<void (double)> on_change) {
+	this->on_change = on_change;
+}
+
+void Slider::on_mouse_drag(int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
+	if (button == MouseButtonType::LEFT) {
+		double change = (double) y_motion/height;
+		double old_prog = progress;
+		progress -= change;
+		if (progress < 0) {
+			progress = 0;
+		}
+		else if (progress > 1) {
+			progress = 1;
+		}
+		if (progress != old_prog && on_change) {
+			on_change(scale.value(progress));
+		}
+	}
+}
+
+Slider::~Slider() {
+
+}
+

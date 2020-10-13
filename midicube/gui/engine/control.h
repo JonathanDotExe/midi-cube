@@ -135,10 +135,11 @@ public:
 	BoxStyle style;
 	BoxStyle button_style;
 	double progress;
-	FixedScale scale{0, {} , 1};
-	double ratio = 0.3;
+	FixedScale scale{0, {}, 1};
+	int inner_width = 10;
+	int button_height = 10;
 
-	Slider();
+	Slider(double value, FixedScale scale);
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
