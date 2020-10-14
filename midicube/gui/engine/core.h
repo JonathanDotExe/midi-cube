@@ -228,7 +228,7 @@ struct BoxStyle {
 };
 
 struct BackgroundStyle {
-	Color fill_color = RAYWHITE;
+	Color fill_color = BLANK;
 };
 
 class StyleableNode : public Node {

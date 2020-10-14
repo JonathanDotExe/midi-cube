@@ -39,7 +39,7 @@ Button::Button(std::string text) : StyleableNode() {
 
 	style.border_color = BLACK;
 	style.border_thickness = 2;
-	style.border_radius = 5;
+	style.border_radius = 0.2f;
 	style.fill_color = LIGHTGRAY;
 }
 
@@ -87,6 +87,7 @@ CheckBox::CheckBox() {
 
 	inner_style.fill_color = {50, 50, 110, 255};
 	inner_style.hover_color = BLACK;
+	inner_style.border_radius = 0;
 };
 
 void CheckBox::draw(int parentX, int parentY, NodeEnv env) {
@@ -125,13 +126,13 @@ Slider::Slider(double value, FixedScale scale) {
 
 	style.border_color = BLACK;
 	style.border_thickness = 1;
-	style.border_radius = 5;
+	style.border_radius = 1;
 	style.fill_color =  RAYWHITE;
 	style.hover_color = LIGHTGRAY;
 
 	button_style.border_color = BLACK;
 	button_style.border_thickness = 1;
-	button_style.border_radius = 2;
+	button_style.border_radius = 0.2f;
 	button_style.fill_color = LIGHTGRAY;
 	button_style.hover_color = GRAY;
 }
