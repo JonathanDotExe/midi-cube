@@ -100,6 +100,9 @@ Node* MainMenuView::init(Frame* frame) {
 	//Checkbox
 	TextCheckBox* box = new TextCheckBox("Test Checkbox");
 	parent->add_child(box);
+	//Slider
+	Slider* slider = new Slider(0, {0, {}, 1});
+	parent->add_child(slider);
 	return parent;
 }
 

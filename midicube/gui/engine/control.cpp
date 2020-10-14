@@ -118,6 +118,22 @@ CheckBox::~CheckBox() {
 Slider::Slider(double value, FixedScale scale) {
 	this->scale = scale;
 	progress = this->scale.progress(value);
+	get_layout().padding_left = 2;
+	get_layout().padding_right = 2;
+	get_layout().padding_top = 2;
+	get_layout().padding_bottom = 2;
+
+	style.border_color = BLACK;
+	style.border_thickness = 1;
+	style.border_radius = 5;
+	style.fill_color =  RAYWHITE;
+	style.hover_color = LIGHTGRAY;
+
+	button_style.border_color = BLACK;
+	button_style.border_thickness = 1;
+	button_style.border_radius = 2;
+	button_style.fill_color = LIGHTGRAY;
+	button_style.hover_color = GRAY;
 }
 
 void Slider::draw(int parentX, int parentY, NodeEnv env) {

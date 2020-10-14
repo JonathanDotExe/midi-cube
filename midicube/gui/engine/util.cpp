@@ -50,9 +50,13 @@ extern void render_box(int x, int y, int width, int height, BoxStyle& style, boo
 	Rectangle rect{x + .0f, y + .0f, width + .0f, height + .0f};
 	int segments = std::min(width, height);
 	//Background
-	DrawRectangleRounded(rect, style.border_radius/segments, 1, hover ? style.hover_color : style.fill_color);
+	DrawRectangleRounded(rect, style.border_radius/segments, 0, hover ? style.hover_color : style.fill_color);
 	//Border
-	DrawRectangleRoundedLines(rect, style.border_radius/segments, 1, style.border_thickness, style.border_color);
+	rect.x += style.border_thickness;
+	rect.y += style.border_thickness;
+	rect.width -= style.border_thickness * 2;
+	rect.height -= style.border_thickness * 2;
+	DrawRectangleRoundedLines(rect, style.border_radius/segments, 0, style.border_thickness, style.border_color);
 }
 
 

@@ -150,7 +150,7 @@ public:
 	virtual void on_mouse_drag(int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
 
 	virtual Vector get_content_size() {
-		return {100, 30};
+		return {30, 100};
 	}
 
 	virtual ~Slider();
