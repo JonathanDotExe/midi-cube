@@ -52,7 +52,6 @@ extern void render_box(int x, int y, int width, int height, BoxStyle& style, boo
 		//Background
 		DrawRectangleRounded(rect, style.border_radius, 60, hover ? style.hover_color : style.fill_color);
 		//Border
-
 		DrawRectangleRoundedLines(rect, style.border_radius, 60, style.border_thickness, style.border_color);
 	}
 	else {

@@ -40,6 +40,19 @@ public:
 
 };
 
+class SoundEngineMenuView : public ViewController {
+
+private:
+	SoundEngineDevice* engine;
+
+public:
+
+	SoundEngineMenuView(SoundEngineDevice* engine);
+
+	Node* init(Frame* frame);
+
+};
+
 /*
 struct DeviceDragInfo {
 	int last_x;

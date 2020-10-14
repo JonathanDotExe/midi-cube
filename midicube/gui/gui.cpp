@@ -107,6 +107,30 @@ Node* MainMenuView::init(Frame* frame) {
 	return parent;
 }
 
+//SoundEngineMenuView
+SoundEngineMenuView::SoundEngineMenuView(SoundEngineDevice* engine) {
+	this->engine = engine;
+}
+
+Node* SoundEngineMenuView::init(Frame* frame) {
+	HBox* box = new HBox();
+
+	//Channels
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		SoundEngineChannel& ch = engine->get_channel(i);
+		VBox* col = new VBox();
+		col->get_layout().x_weight = 1;
+		//Title
+		Label* title = new Label("Ch. " + (i + 1));
+		title->style.font_size = 20;
+		title->get_layout().halignment = HorizontalAlignment::CENTER;
+		col->add_child(title);
+		box->add_child(col);
+	}
+
+	return box;
+}
+
 /*
 //DevicesMenuView
 DevicesMenuView::DevicesMenuView() {
