@@ -227,6 +227,10 @@ struct BoxStyle {
 	int border_thickness = 0;
 };
 
+struct BackgroundStyle {
+	Color fill_color = RAYWHITE;
+};
+
 class StyleableNode : public Node {
 
 protected:

@@ -54,6 +54,11 @@ void VBox::update_layout(int parent_width, int parent_height) {
 	}
 }
 
+void VBox::draw(int parentX, int parentY, NodeEnv env) {
+	DrawRectangle(parentX + x, parentY + y, width, height, style.fill_color);
+	Parent::draw(parentX, parentY, env);
+}
+
 Vector VBox::get_content_size() {
 	int curr_y = 0;
 	int curr_x = 0;
@@ -115,6 +120,11 @@ void HBox::update_layout(int parent_width, int parent_height) {
 		curr_x += layout.margin_right;
 
 	}
+}
+
+void HBox::draw(int parentX, int parentY, NodeEnv env) {
+	DrawRectangle(parentX + x, parentY + y, width, height, style.fill_color);
+	Parent::draw(parentX, parentY, env);
 }
 
 Vector HBox::get_content_size() {

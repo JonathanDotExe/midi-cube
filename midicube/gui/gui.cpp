@@ -73,7 +73,8 @@ static void scaled_slider(Rectangle pos, std::string text, double& value, const 
 
 //MainMenuView
 Node* MainMenuView::init(Frame* frame) {
-	Parent* parent = new VBox();
+	VBox* parent = new VBox();
+	parent->style.fill_color = DARKGRAY;
 
 	//Title
 	Label* title = new Label("MIDICube");

@@ -13,10 +13,14 @@
 class VBox : public Parent {
 public:
 
+	BackgroundStyle style;
+
 	VBox() : Parent() {
 		get_layout().width = MATCH_PARENT;
 		get_layout().height = MATCH_PARENT;
 	}
+
+	virtual void draw(int parentX, int parentY, NodeEnv env);
 
 	virtual void update_layout(int parent_width, int parent_height);
 
@@ -30,10 +34,14 @@ public:
 class HBox : public Parent {
 public:
 
+	BackgroundStyle style;
+
 	HBox() : Parent() {
 		get_layout().width = MATCH_PARENT;
 		get_layout().height = MATCH_PARENT;
 	}
+
+	virtual void draw(int parentX, int parentY, NodeEnv env);
 
 	virtual void update_layout(int parent_width, int parent_height);
 
