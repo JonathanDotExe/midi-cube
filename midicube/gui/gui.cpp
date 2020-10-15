@@ -79,6 +79,7 @@ Node* MainMenuView::init(Frame* frame) {
 	//Title
 	Label* title = new Label("MIDICube");
 	title->style.font_size = 72;
+	title->style.font_color = WHITE;
 	title->get_layout().halignment = HorizontalAlignment::CENTER;
 	parent->add_child(title);
 
@@ -93,17 +94,14 @@ Node* MainMenuView::init(Frame* frame) {
 	button->get_layout().padding_right = 10;
 	button->style.fill_color = GREEN;
 	button->style.hover_color = DARKGREEN;
+	button->style.border_color = BLANK;
+	button->style.border_thickness = 0;
 
 	button->set_on_click([]() {
 		std::cout << "I have been clicked!" << std::endl;
 	});
 	parent->add_child(button);
-	//Checkbox
-	TextCheckBox* box = new TextCheckBox("Test Checkbox");
-	parent->add_child(box);
-	//Slider
-	Slider* slider = new Slider(0, {0, {}, 1});
-	parent->add_child(slider);
+
 	return parent;
 }
 
@@ -117,7 +115,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-		SoundEngineChannel& ch = engine->get_channel(i);
+		//SoundEngineChannel& ch = engine->get_channel(i);
 		VBox* col = new VBox();
 		col->get_layout().x_weight = 1;
 		//Title
