@@ -132,7 +132,7 @@ Slider::Slider(double value, FixedScale scale) {
 
 	button_style.border_color = BLACK;
 	button_style.border_thickness = 1;
-	button_style.border_radius = 0.2f;
+	button_style.border_radius = 0.3f;
 	button_style.fill_color = LIGHTGRAY;
 	button_style.hover_color = GRAY;
 }

@@ -49,10 +49,14 @@ Vector TextPositioner::size() {
 extern void render_box(int x, int y, int width, int height, BoxStyle& style, bool hover) {
 	Rectangle rect{x + .0f, y + .0f, width + .0f, height + .0f};
 	if (style.border_radius) {
+		//Border
+		DrawRectangleRounded(rect, style.border_radius, 60, style.border_color);
+		rect.x += style.border_thickness;
+		rect.y += style.border_thickness;
+		rect.width -= style.border_thickness * 2;
+		rect.height -= style.border_thickness * 2;
 		//Background
 		DrawRectangleRounded(rect, style.border_radius, 60, hover ? style.hover_color : style.fill_color);
-		//Border
-		DrawRectangleRoundedLines(rect, style.border_radius, 60, style.border_thickness, style.border_color);
 	}
 	else {
 		//Background
