@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 		//Model
 
 		//View
-		ViewController* view = new MainMenuView();
+		ViewController* view = new MainMenuView(&cube);
 		Frame frame("MIDICube - universal MIDI and synthesis workstation", 1024, 600);
 		//Run frame
 		frame.run(view);

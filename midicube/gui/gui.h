@@ -10,6 +10,7 @@
 
 #include "model.h"
 #include "../util.h"
+#include "../midicube.h"
 #include "../soundengine/organ.h"
 #include "../soundengine/synthesizer.h"
 #include "../soundengine/soundengine.h"
@@ -34,7 +35,12 @@ public:
 
 class MainMenuView : public ViewController {
 
+private:
+	MidiCube* cube;
+
 public:
+
+	MainMenuView(MidiCube* cube);
 
 	Node* init(Frame* frame);
 
@@ -43,11 +49,11 @@ public:
 class SoundEngineMenuView : public ViewController {
 
 private:
-	SoundEngineDevice* engine;
+	MidiCube* cube;
 
 public:
 
-	SoundEngineMenuView(SoundEngineDevice* engine);
+	SoundEngineMenuView(MidiCube* cube);
 
 	Node* init(Frame* frame);
 

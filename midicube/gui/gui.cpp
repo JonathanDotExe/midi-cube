@@ -72,6 +72,10 @@ static void scaled_slider(Rectangle pos, std::string text, double& value, const 
 */
 
 //MainMenuView
+MainMenuView::MainMenuView(MidiCube* cube) {
+	this->cube = cube;
+}
+
 Node* MainMenuView::init(Frame* frame) {
 	VBox* parent = new VBox();
 	parent->style.fill_color = DARKGRAY;
@@ -84,7 +88,7 @@ Node* MainMenuView::init(Frame* frame) {
 	parent->add_child(title);
 
 	//Button
-	Button* button = new Button("Devices");
+	Button* button = new Button("Sound Engine");
 	button->get_layout().margin_top = 150;
 	button->get_layout().width = 400;
 	button->get_layout().halignment = HorizontalAlignment::CENTER;
@@ -97,8 +101,9 @@ Node* MainMenuView::init(Frame* frame) {
 	button->style.border_color = BLANK;
 	button->style.border_thickness = 0;
 
-	button->set_on_click([]() {
-		std::cout << "I have been clicked!" << std::endl;
+	MidiCube* cube = this->cube;
+	button->set_on_click([frame, cube]() {
+		frame->change_view(new SoundEngineMenuView(cube));
 	});
 	parent->add_child(button);
 
@@ -106,21 +111,23 @@ Node* MainMenuView::init(Frame* frame) {
 }
 
 //SoundEngineMenuView
-SoundEngineMenuView::SoundEngineMenuView(SoundEngineDevice* engine) {
-	this->engine = engine;
+SoundEngineMenuView::SoundEngineMenuView(MidiCube* cube) {
+	this->cube = cube;
 }
 
 Node* SoundEngineMenuView::init(Frame* frame) {
 	HBox* box = new HBox();
+	box->style.fill_color = DARKGRAY;
 
 	//Channels
-	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+	for (unsigned int i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		//SoundEngineChannel& ch = engine->get_channel(i);
 		VBox* col = new VBox();
 		col->get_layout().x_weight = 1;
 		//Title
-		Label* title = new Label("Ch. " + (i + 1));
+		Label* title = new Label("Ch. " + std::to_string(i + 1));
 		title->style.font_size = 20;
+		title->style.font_color = YELLOW;
 		title->get_layout().halignment = HorizontalAlignment::CENTER;
 		col->add_child(title);
 		box->add_child(col);
