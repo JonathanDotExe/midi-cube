@@ -121,15 +121,47 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 
 	//Channels
 	for (unsigned int i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-		//SoundEngineChannel& ch = engine->get_channel(i);
+		SoundEngineChannel& channel = cube->engine.get_channel(i);
 		VBox* col = new VBox();
 		col->get_layout().x_weight = 1;
 		//Title
-		Label* title = new Label("Ch. " + std::to_string(i + 1));
-		title->style.font_size = 20;
-		title->style.font_color = YELLOW;
-		title->get_layout().halignment = HorizontalAlignment::CENTER;
-		col->add_child(title);
+		{
+			Label* title = new Label("Ch. " + std::to_string(i + 1));
+			title->style.font_size = 20;
+			title->style.font_color = YELLOW;
+			title->get_layout().halignment = HorizontalAlignment::CENTER;
+			col->add_child(title);
+		}
+		//Volume
+		{
+			Label* vol_text = new Label("Volume");
+			vol_text->style.font_size = 10;
+			vol_text->style.font_color = BLACK;
+			vol_text->get_layout().margin_top = 10;
+
+			Slider* volume = new Slider(channel.volume, {0, {}, 1});
+			volume->style.border_color = BLANK;
+			volume->style.border_thickness = 0;
+			volume->button_style.border_color = BLANK;
+			volume->button_style.border_thickness = 0;
+			volume->button_style.fill_color = GREEN;
+			volume->button_style.hover_color = DARKGREEN;
+			volume->get_layout().halignment = HorizontalAlignment::CENTER;
+
+			Label* vol_val = new Label(std::to_string(channel.volume));
+			vol_val->style.font_size = 8;
+			vol_val->get_layout().width = MATCH_PARENT;
+			vol_val->style.text_halignment = HorizontalAlignment::LEFT;
+
+			volume->set_on_change([&channel, &vol_val](double val) {
+				channel.volume = val;
+				//vol_val->update_text(std::to_string(val));
+			});
+			col->add_child(vol_text);
+			col->add_child(volume);
+			col->add_child(vol_val);
+		}
+		//Add
 		box->add_child(col);
 	}
 

@@ -18,6 +18,11 @@ void Label::draw(int parentX, int parentY, NodeEnv env) {
 	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, style);
 }
 
+void Label::update_text(std::string text) {
+	this->text = text;
+	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, style);
+}
+
 void Label::update_style() {
 	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, style);
 }

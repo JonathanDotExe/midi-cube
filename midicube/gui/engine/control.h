@@ -30,6 +30,8 @@ public:
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
+	virtual void update_text(std::string text);
+
 	virtual void update_style();
 
 	virtual ~Label();
