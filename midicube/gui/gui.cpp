@@ -153,9 +153,9 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			vol_val->get_layout().width = MATCH_PARENT;
 			vol_val->style.text_halignment = HorizontalAlignment::LEFT;
 
-			volume->set_on_change([&channel, &vol_val](double val) {
+			volume->set_on_change([&channel, vol_val](double val) {
 				channel.volume = val;
-				//vol_val->update_text(std::to_string(val));
+				vol_val->update_text(std::to_string(val));
 			});
 			col->add_child(vol_text);
 			col->add_child(volume);
