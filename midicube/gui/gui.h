@@ -230,8 +230,6 @@ public:
 	float height();
 };
 
-
-const FixedScale FILTER_CUTOFF_SCALE(14, {{0.2, 200}, {0.3, 400}, {0.4, 800}, {0.7, 2500}, {0.8, 5000}, {0.9, 10000}}, 21000);
 template <typename T>
 class FilterDialog : public Dialog {
 private:
