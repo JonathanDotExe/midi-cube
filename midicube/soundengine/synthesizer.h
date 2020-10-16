@@ -151,7 +151,7 @@ private:
 	std::string name;
 public:
 	double input = 0;
-	double cutoff = 1;
+	double cutoff = 21000;
 	double keyboard_tracking = 0;
 
 	FilterComponent (std::string name) {
@@ -178,7 +178,7 @@ public:
 			input = value;
 			break;
 		case FILTER_CUTOFF_PROPERTY:
-			cutoff_mod = value;
+			cutoff_mod = FILTER_CUTOFF_SCALE.progress(value);
 			break;
 		}
 	}
@@ -189,7 +189,7 @@ public:
 			input += value;
 			break;
 		case FILTER_CUTOFF_PROPERTY:
-			cutoff_mod += value;
+			cutoff_mod = FILTER_CUTOFF_SCALE.progress(FILTER_CUTOFF_SCALE.value(cutoff_mod) + value);
 			break;
 		}
 	}
@@ -215,7 +215,7 @@ public:
 
 	void reset_properties() {
 		input = 0;
-		cutoff_mod = cutoff;
+		cutoff_mod = FILTER_CUTOFF_SCALE.progress(cutoff);
 	}
 
 	std::string get_name() {
