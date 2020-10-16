@@ -8,24 +8,23 @@
 #ifndef MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 #define MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 
-#include "../filter.h"
 #include "soundengine.h"
 #include "../oscilator.h"
 
-#define SYNTH_VIBRATO_RATE 6
-#define SYNTH_VIBRATO_DETUNE 0.25
+#define FM_OPERATOR_COUNT 8
+
+class FMOperator {
+public:
+	double volume;
+	ADSREnvelope env{0.0, 0, 1, 0.0};
+	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 8> osc;
+
+};
 
 class FMSynth : public BaseSoundEngine {
 
 private:
-	double detune;
-	double ndetune;
-	double vibrato;
-	double phase;
-	double fm_phase;
-	ADSREnvelope env{0.0, 0, 1, 0.0};
-	MultiChannelFilter<LowPassFilter<2>> filter;
-	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 8> osc;
+	std::array<FMOperator, FM_OPERATOR_COUNT> operators;
 public:
 
 	FMSynth();
