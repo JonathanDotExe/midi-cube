@@ -6,6 +6,12 @@
  */
 
 #include "midicube.h"
+#include "soundengine/organ.h"
+#include "soundengine/drums.h"
+#include "soundengine/presetsynth.h"
+#include "soundengine/sampler.h"
+#include "soundengine/vocoder.h"
+#include "soundengine/synthesizer.h"
 
 static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, void* user_data) {
 	((MidiCube*) user_data)->process(channels, info);
@@ -40,6 +46,13 @@ void MidiCube::init() {
 			});
 		}
 	}
+	//Sound Engines
+	engine.add_sound_engine(new TemplateSoundEngineBank<PresetSynth>());
+	engine.add_sound_engine(new TemplateSoundEngineBank<B3Organ>());
+	engine.add_sound_engine(new TemplateSoundEngineBank<SampleDrums>());
+	engine.add_sound_engine(new TemplateSoundEngineBank<Sampler>());
+	engine.add_sound_engine(new TemplateSoundEngineBank<Vocoder>());
+	engine.add_sound_engine(new TemplateSoundEngineBank<Synthesizer>());
 	//Init audio
 	audio_handler.init();
 }

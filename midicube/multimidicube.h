@@ -13,6 +13,7 @@
 
 #include "audio.h"
 #include "device.h"
+#include "soundengine/engines.h"
 
 class MultiMidiCube;
 

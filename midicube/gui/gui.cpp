@@ -146,9 +146,9 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 				engines.push_back(i);
 			}
 
-			std::vector<SoundEngineBank*> es = cube->engine.get_sound_engines();
-			ComboBox<ssize_t>* engine = new ComboBox<ssize_t>(engines, [&es](ssize_t b) {
-				return b < 0 ? "None" : es.at(b)->get_name();
+			SoundEngineDevice& e = cube->engine;
+			ComboBox<ssize_t>* engine = new ComboBox<ssize_t>(engines, [&e](ssize_t b) {
+				return b < 0 ? "None" : e.get_sound_engines().at(b)->get_name();
 			});
 
 			engine->style.border_color = BLANK;

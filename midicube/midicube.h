@@ -12,6 +12,7 @@
 #include "device.h"
 #include "soundengine/soundengine.h"
 
+
 struct MidiCubeInput {
 	MidiInput* in = nullptr;
 	std::string name = "";

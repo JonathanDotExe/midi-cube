@@ -8,7 +8,6 @@
 #ifndef MIDICUBE_GUI_GUI_H_
 #define MIDICUBE_GUI_GUI_H_
 
-#include "model.h"
 #include "../util.h"
 #include "../midicube.h"
 #include "../soundengine/organ.h"

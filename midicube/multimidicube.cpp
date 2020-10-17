@@ -6,9 +6,6 @@
  */
 
 #include "multimidicube.h"
-
-#include "soundengine/soundengine.h"
-#include "soundengine/engines.h"
 #include <iostream>
 
 static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, void* user_data) {
