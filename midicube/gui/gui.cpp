@@ -150,6 +150,9 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			ComboBox<ssize_t>* engine = new ComboBox<ssize_t>(engines, [&e](ssize_t b) {
 				return b < 0 ? "None" : e.get_sound_engines().at(b)->get_name();
 			});
+			engine->set_on_change([&channel](ssize_t index) {
+				channel.set_engine(index);
+			});
 
 			engine->style.border_color = BLANK;
 			engine->style.border_thickness = 0;
@@ -203,19 +206,24 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 				inputs.push_back(i);
 			}
 
-			ComboBox<ssize_t>* engine = new ComboBox<ssize_t>(inputs, [](ssize_t b) {
+			ComboBox<ssize_t>* input = new ComboBox<ssize_t>(inputs, [](ssize_t b) {
 				return std::to_string(b);
 			});
 
-			engine->style.border_color = BLACK;
-			engine->style.border_thickness = 1;
-			engine->style.fill_color = WHITE;
-			engine->style.hover_color = LIGHTGRAY;
-			engine->text_style.font_size = 10;
-			engine->get_layout().width = MATCH_PARENT;
+			ChannelSource& source = cube->channels.at(i);
+			input->set_on_change([&source](ssize_t index) {
+				source.input = index;
+			});
+
+			input->style.border_color = BLACK;
+			input->style.border_thickness = 1;
+			input->style.fill_color = WHITE;
+			input->style.hover_color = LIGHTGRAY;
+			input->text_style.font_size = 10;
+			input->get_layout().width = MATCH_PARENT;
 
 			col->add_child(engine_text);
-			col->add_child(engine);
+			col->add_child(input);
 		}
 		//Add
 		box->add_child(col);
