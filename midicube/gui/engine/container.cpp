@@ -21,7 +21,7 @@ void VBox::update_layout(int parent_width, int parent_height) {
 			weight_sum += layout.y_weight;
 		}
 		else {
-			height_sum += node->calc_size(width, height, true).y;
+			height_sum += node->calc_size(width - this->layout.padding_left - this->layout.padding_right, height - this->layout.padding_top - this->layout.padding_bottom, true).y;
 		}
 		height_sum += layout.margin_bottom;
 	}
@@ -34,18 +34,18 @@ void VBox::update_layout(int parent_width, int parent_height) {
 		//Position
 		curr_y += layout.margin_top;
 		float factor = weight_sum == 0 ? 0 : (float) layout.y_weight/weight_sum;
-		node->update_layout(width, round(rest_height * factor));
+		node->update_layout(width - this->layout.padding_left - this->layout.padding_right, round(rest_height * factor));
 		//Alignment
 		int x = 0;
 		switch (layout.halignment) {
 		case HorizontalAlignment::LEFT:
-			x = layout.margin_left;
+			x = this->layout.padding_left;
 			break;
 		case HorizontalAlignment::CENTER:
 			x = width/2 - node->get_width()/2;
 			break;
 		case HorizontalAlignment::RIGHT:
-			x = width - layout.margin_right - width;
+			x = width - this->layout.padding_right - width;
 			break;
 		}
 		node->update_position(x, curr_y);
@@ -88,7 +88,7 @@ void HBox::update_layout(int parent_width, int parent_height) {
 			weight_sum += layout.x_weight;
 		}
 		else {
-			width_sum += node->calc_size(width, height, true).x;
+			width_sum += node->calc_size(width - this->layout.padding_left - this->layout.padding_right, height - this->layout.padding_top - this->layout.padding_bottom, true).x;
 		}
 		width_sum += layout.margin_right;
 	}
@@ -101,18 +101,18 @@ void HBox::update_layout(int parent_width, int parent_height) {
 		//Position
 		curr_x += layout.margin_left;
 		float factor = weight_sum == 0 ? 0 : (float) layout.x_weight/weight_sum;
-		node->update_layout(round(rest_width * factor), height);
+		node->update_layout(round(rest_width * factor), height - this->layout.padding_top - this->layout.padding_bottom);
 		//Alignment
 		int y = 0;
 		switch (layout.valignment) {
 		case VerticalAlignment::TOP:
-			y = layout.margin_top;
+			y = this->layout.padding_top;
 			break;
 		case VerticalAlignment::CENTER:
 			y = height/2 - node->get_height()/2;
 			break;
 		case VerticalAlignment::BOTTOM:
-			y = height - layout.margin_bottom - height;
+			y = height - this->layout.padding_bottom - height;
 			break;
 		}
 		node->update_position(curr_x, y);

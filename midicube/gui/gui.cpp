@@ -118,13 +118,13 @@ SoundEngineMenuView::SoundEngineMenuView(MidiCube* cube) {
 Node* SoundEngineMenuView::init(Frame* frame) {
 	HBox* box = new HBox();
 	box->style.fill_color = DARKGRAY;
-	box->get_layout().padding_left = 1;
-	box->get_layout().padding_right = 1;
 
 	//Channels
 	for (unsigned int i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = cube->engine.get_channel(i);
 		VBox* col = new VBox();
+		col->get_layout().padding_left = 1;
+		col->get_layout().padding_right = 1;
 		col->get_layout().x_weight = 1;
 		//Title
 		{

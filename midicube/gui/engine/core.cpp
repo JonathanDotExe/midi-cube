@@ -119,7 +119,7 @@ Vector Parent::get_content_size() {
 void Parent::update_layout(int parent_width, int parent_height) {
 	Node::update_layout(parent_width, parent_height);
 	for (Node* node : children) {
-		node->update_layout(width, height);
+		node->update_layout(width - this->layout.padding_left - this->layout.padding_right, height - this->layout.padding_top - this->layout.padding_bottom);
 		node->update_position(node->get_layout().margin_left, node->get_layout().margin_top);
 	}
 }
