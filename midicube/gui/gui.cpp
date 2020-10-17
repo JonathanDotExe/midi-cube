@@ -153,8 +153,8 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 
 			engine->style.border_color = BLANK;
 			engine->style.border_thickness = 0;
-			engine->style.fill_color = GREEN;
-			engine->style.hover_color = DARKGREEN;
+			engine->style.fill_color = YELLOW;
+			engine->style.hover_color = ORANGE;
 			engine->text_style.font_size = 10;
 			engine->get_layout().width = MATCH_PARENT;
 
@@ -190,6 +190,32 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			col->add_child(vol_text);
 			col->add_child(volume);
 			col->add_child(vol_val);
+		}
+		//Input
+		{
+			Label* engine_text = new Label("Input");
+			engine_text->style.font_size = 10;
+			engine_text->style.font_color = BLACK;
+			engine_text->get_layout().margin_top = 10;
+
+			std::vector<ssize_t> inputs = {};
+			for (ssize_t i = -1; i < (ssize_t) cube->get_inputs().size(); ++i) {
+				inputs.push_back(i);
+			}
+
+			ComboBox<ssize_t>* engine = new ComboBox<ssize_t>(inputs, [](ssize_t b) {
+				return std::to_string(b);
+			});
+
+			engine->style.border_color = BLACK;
+			engine->style.border_thickness = 1;
+			engine->style.fill_color = WHITE;
+			engine->style.hover_color = LIGHTGRAY;
+			engine->text_style.font_size = 10;
+			engine->get_layout().width = MATCH_PARENT;
+
+			col->add_child(engine_text);
+			col->add_child(engine);
 		}
 		//Add
 		box->add_child(col);

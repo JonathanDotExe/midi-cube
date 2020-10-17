@@ -61,6 +61,10 @@ void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo
 	engine.process_sample(channels, info);
 }
 
+std::vector<MidiCubeInput> MidiCube::get_inputs() {
+	return inputs;
+}
+
 void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 	MessageType t = message.get_message_type();
 	for (size_t i = 0; i < channels.size(); ++i) {
