@@ -69,6 +69,41 @@ public:
 
 };
 
+template <typename T>
+class ComboBox : public StyleableNode {
+
+private:
+	TextPositioner positioner;
+	std::vector<T> values;
+	std::function<std::string(T)> to_string = nullptr;
+	std::function<void(T)> on_change = nullptr;
+	size_t index = 0;
+	std::string text;
+
+public:
+	BoxStyle style;
+	TextStyle text_style;
+
+	ComboBox(std::vector<T> values, std::function<std::string(T)> to_string);
+
+	virtual void draw(int parentX, int parentY, NodeEnv env);
+
+	void set_on_change(std::function<void(T)> on_change);
+
+	virtual Vector get_content_size() {
+		return positioner.size();
+	}
+
+	FOCUS_TRAVERSABLE
+
+	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
+
+	virtual void update_style();
+
+	virtual ~ComboBox();
+
+};
+
 class CheckBox : public StyleableNode {
 
 private:
