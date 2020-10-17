@@ -104,6 +104,65 @@ public:
 
 };
 
+//ComboBox
+template<typename T>
+ComboBox<T>::ComboBox(std::vector<T> values, std::function<std::string(T)> to_string) : StyleableNode() {
+	this->values = values;
+	this->to_string = to_string;
+
+	get_layout().width = WRAP_CONTENT;
+	get_layout().height = WRAP_CONTENT;
+	get_layout().padding_left = 5;
+	get_layout().padding_right = 5;
+	get_layout().padding_top = 5;
+	get_layout().padding_bottom = 5;
+
+	style.border_color = BLACK;
+	style.border_thickness = 2;
+	style.border_radius = 0.2f;
+	style.fill_color = LIGHTGRAY;
+
+	text = to_string(values.at(index));
+}
+
+template<typename T>
+void ComboBox<T>::draw(int parentX, int parentY, NodeEnv env) {
+	render_box(parentX + x, parentY + y, width, height, style, env.hovered == this);
+	//Text
+	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, text_style);
+}
+
+template<typename T>
+void ComboBox<T>::set_on_change(std::function<void(T)> on_change) {
+	this->on_change = on_change;
+}
+
+template<typename T>
+void ComboBox<T>::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
+	if (env.focused == this && button == MouseButtonType::LEFT) {
+		index++;
+		if (index >= values.size()) {
+			index = 0;
+		}
+		text = to_string(values.at(index));
+		update_style();
+		//Actions
+		if (on_change) {
+			on_change(values.at(index));
+		}
+	}
+}
+
+template<typename T>
+void ComboBox<T>::update_style() {
+	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, text_style);
+}
+
+template<typename T>
+ComboBox<T>::~ComboBox() {
+
+}
+
 class CheckBox : public StyleableNode {
 
 private:

@@ -118,6 +118,8 @@ SoundEngineMenuView::SoundEngineMenuView(MidiCube* cube) {
 Node* SoundEngineMenuView::init(Frame* frame) {
 	HBox* box = new HBox();
 	box->style.fill_color = DARKGRAY;
+	box->get_layout().padding_left = 1;
+	box->get_layout().padding_right = 1;
 
 	//Channels
 	for (unsigned int i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
@@ -131,6 +133,34 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			title->style.font_color = YELLOW;
 			title->get_layout().halignment = HorizontalAlignment::CENTER;
 			col->add_child(title);
+		}
+		//Engine
+		{
+			Label* engine_text = new Label("Engine");
+			engine_text->style.font_size = 10;
+			engine_text->style.font_color = BLACK;
+			engine_text->get_layout().margin_top = 10;
+
+			std::vector<ssize_t> engines = {};
+			for (ssize_t i = -1; i < (ssize_t) cube->engine.get_sound_engines().size(); ++i) {
+				engines.push_back(i);
+			}
+
+			std::vector<SoundEngineBank*> es = cube->engine.get_sound_engines();
+			ComboBox<ssize_t>* engine = new ComboBox<ssize_t>(engines, [&es](ssize_t b) {
+				return b < 0 ? "None" : es.at(b)->get_name();
+			});
+
+			engine->style.border_color = BLANK;
+			engine->style.border_thickness = 0;
+			engine->style.fill_color = GREEN;
+			engine->style.hover_color = DARKGREEN;
+			engine->text_style.font_size = 10;
+			engine->get_layout().width = MATCH_PARENT;
+
+			col->add_child(engine_text);
+			col->add_child(engine);
+
 		}
 		//Volume
 		{
