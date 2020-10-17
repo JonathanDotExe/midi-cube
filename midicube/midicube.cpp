@@ -40,9 +40,8 @@ void MidiCube::init() {
 		if (input != nullptr) {
 			inputs.push_back({input, name});
 			size_t index = inputs.size() - 1;
-			MidiCube* self = this;
-			input->set_callback([index, self](double delta, MidiMessage& msg) {
-				self->midi_callback(msg, index);
+			input->set_callback([index, this](double delta, MidiMessage& msg) {
+				midi_callback(msg, index);
 			});
 		}
 	}

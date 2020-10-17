@@ -277,7 +277,7 @@ MidiHandler::~MidiHandler() {
 
 
 void input_callback (double delta, std::vector<unsigned char>* msg, void* arg) {
-	((MidiInput*) arg)->call_callback(delta, msg);
+	static_cast<MidiInput*>(arg)->call_callback(delta, msg);
 }
 
 //MidiInput
