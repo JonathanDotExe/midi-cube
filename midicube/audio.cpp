@@ -109,7 +109,7 @@ int AudioHandler::process(jack_nframes_t nframes) {
 		buffer1[i] = sample_buf[0];
 		buffer2[i] = sample_buf[1];
 
-		time += time_step;
+		time = time + time_step;
 		++sample_time;
 	}
 	return 0;

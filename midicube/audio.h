@@ -50,10 +50,10 @@ private:
 	/**
 	 * Only for use in the jack audio thread
 	 */
-	double time = 0.0;
+	std::atomic<double> time{0.0};
 	std::atomic<double> time_step{0.0};
 	std::atomic<unsigned int> sample_rate{0};
-	unsigned int sample_time = 0;
+	std::atomic<unsigned int> sample_time{0};
 	std::array<double, OUTPUT_CHANNELS> sample_buf = {};
 public:
 

@@ -5,13 +5,20 @@
 
 using namespace std;
 
-static MidiCube cube;
+struct MidiCubePtr {
+	MidiCube* cube;
+	~MidiCubePtr() {
+		delete cube;
+	}
+};
 
 int main(int argc, char **argv) {
+	MidiCubePtr ptr;
 	try {
-		cube.init();
+		ptr.cube = new MidiCube();
+		ptr.cube->init();
 		//View
-		ViewController* view = new MainMenuView(&cube);
+		ViewController* view = new MainMenuView(ptr.cube);
 		Frame frame("MIDICube - universal MIDI and synthesis workstation", 1024, 600);
 		//Run frame
 		frame.run(view);
