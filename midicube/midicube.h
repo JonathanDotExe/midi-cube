@@ -41,7 +41,7 @@ public:
 
 	MidiCube();
 	void init();
-	void process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+	inline void process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 	std::vector<MidiCubeInput> get_inputs();
 	void midi_callback(MidiMessage& message, size_t input);
 	~MidiCube();

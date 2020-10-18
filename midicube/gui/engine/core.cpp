@@ -17,6 +17,10 @@ void Node::draw(int parentX, int parentY, NodeEnv env) {
 
 }
 
+void Node::set_frame(Frame* frame) {
+	this->frame = frame;
+}
+
 void Node::update_layout(int parent_width, int parent_height) {
 	Vector size = calc_size(parent_width, parent_height, false);
 	width = size.x;
@@ -70,6 +74,13 @@ Node::~Node() {
 //Parent
 Parent::Parent() : Node() {
 
+}
+
+void Parent::set_frame(Frame* frame) {
+	Node::set_frame(frame);
+	for (Node* node : children) {
+		node->set_frame(frame);
+	}
 }
 
 void Parent::draw(int parentX, int parentY, NodeEnv env) {
@@ -136,6 +147,7 @@ void Parent::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env
 
 void Parent::add_child(Node* child) {
 	children.push_back(child);
+	child->set_frame(frame);
 }
 
 Parent::~Parent() {
@@ -218,6 +230,7 @@ void Frame::change_view(ViewController* view) {
 	this->view = view;
 	this->root = view ? view->init(this) : nullptr;
 	if (root) {
+		root->set_frame(this);
 		root->update_layout(width, height);
 		root->update_position(0, 0);
 	}

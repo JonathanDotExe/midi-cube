@@ -63,6 +63,7 @@ struct NodeLayout {
 	int y_weight = 1;
 };
 
+class Frame;
 
 class Node {
 protected:
@@ -71,6 +72,7 @@ protected:
 	int width = 0;
 	int height = 0;
 	NodeLayout layout;
+	Frame* frame;
 
 public:
 
@@ -79,6 +81,8 @@ public:
 	virtual void update_layout(int parent_width, int parent_height);
 
 	virtual void update_position(int x, int y);
+
+	virtual void set_frame(Frame* frame);
 
 	virtual Vector calc_size(int parent_width, int parent_height, bool fit);
 
@@ -143,6 +147,8 @@ public:
 	Parent();
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
+
+	virtual void set_frame(Frame* frame);
 
 	virtual void add_child(Node* child);
 
