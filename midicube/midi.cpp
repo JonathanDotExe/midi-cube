@@ -295,7 +295,7 @@ void MidiInput::call_callback(double delta, std::vector<unsigned char>* msg) {
 	callback(delta, message);
 }
 
-void MidiInput::set_callback(std::function<void(double, MidiMessage&)>) {
+void MidiInput::set_callback(std::function<void(double, MidiMessage&)> callback) {
 	this->callback = callback;
 }
 
