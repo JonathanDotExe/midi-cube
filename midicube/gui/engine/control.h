@@ -145,7 +145,7 @@ void ComboBox<T>::on_mouse_released(int x, int y, MouseButtonType button, NodeEn
 			index = 0;
 		}
 		text = to_string(values.at(index));
-		update_style();
+		frame->request_relayout();
 		//Actions
 		if (on_change) {
 			on_change(values.at(index));

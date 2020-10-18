@@ -177,7 +177,11 @@ void Frame::run (ViewController* view) {
 		Vector2 mouse_pos = GetMousePosition();
 		//Selected
 		if ((int) mouse_pos.x != last_mouse_x || (int) mouse_pos.y != last_mouse_y) {
+			Node* old_hovered = hovered;
 			hovered = root->traverse_focus(mouse_pos.x, mouse_pos.y);
+			if (old_hovered != hovered) {
+				request_redraw();
+			}
 			if (focused) {
 				if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
 					focused->on_mouse_drag(mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::LEFT, {focused, hovered});
@@ -218,6 +222,7 @@ void Frame::run (ViewController* view) {
 		if (relayout) {
 			root->update_layout(width, height);
 			root->update_position(0, 0);
+			request_redraw();
 			relayout = false;
 		}
 		//Render
@@ -242,7 +247,7 @@ void Frame::change_view(ViewController* view) {
 		root->set_frame(this);
 		root->update_layout(width, height);
 		root->update_position(0, 0);
-		redraw = true;
+		request_redraw();
 	}
 }
 

@@ -20,7 +20,7 @@ void Label::draw(int parentX, int parentY, NodeEnv env) {
 
 void Label::update_text(std::string text) {
 	this->text = text;
-	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, style);
+	frame->request_relayout();
 }
 
 void Label::update_style() {
@@ -163,8 +163,11 @@ void Slider::on_mouse_drag(int x_motion, int y_motion, MouseButtonType button, N
 		else if (progress > 1) {
 			progress = 1;
 		}
-		if (progress != old_prog && on_change) {
-			on_change(scale.value(progress));
+		if (progress != old_prog) {
+			if (on_change) {
+				on_change(scale.value(progress));
+			}
+			frame->request_redraw();
 		}
 	}
 }
