@@ -19,6 +19,7 @@ static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleIn
 
 MidiCube::MidiCube() {
 	audio_handler.set_sample_callback(&process_func, this);
+	engine.handler = &audio_handler;
 }
 
 void MidiCube::init() {
