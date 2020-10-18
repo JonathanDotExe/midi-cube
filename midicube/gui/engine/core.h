@@ -198,6 +198,9 @@ private:
 	int last_mouse_x = -1;
 	int last_mouse_y = -1;
 
+	bool redraw = false;
+	bool relayout = false;
+
 public:
 
 	Frame(std::string title, int width, int height);
@@ -205,6 +208,14 @@ public:
 	void run (ViewController* view);
 
 	void change_view(ViewController* view);
+
+	void request_relayout() {
+		relayout = true;
+	}
+
+	void request_redraw() {
+		redraw = true;
+	}
 
 	~Frame();
 

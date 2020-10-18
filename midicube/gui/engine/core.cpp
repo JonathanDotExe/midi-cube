@@ -10,7 +10,7 @@
 
 //Node
 Node::Node() {
-
+	frame = nullptr;
 }
 
 void Node::draw(int parentX, int parentY, NodeEnv env) {
@@ -214,10 +214,19 @@ void Frame::run (ViewController* view) {
 				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused, hovered});
 			}
 		}
+		//Relayout
+		if (relayout) {
+			root->update_layout(width, height);
+			root->update_position(0, 0);
+			relayout = false;
+		}
 		//Render
 		BeginDrawing();
-			ClearBackground(RAYWHITE);
-			root->draw(0, 0, {focused, hovered});
+			if (redraw) {
+				ClearBackground(RAYWHITE);
+				root->draw(0, 0, {focused, hovered});
+				redraw = false;
+			}
 		EndDrawing();
 	}
 	//Cleanup
@@ -233,6 +242,7 @@ void Frame::change_view(ViewController* view) {
 		root->set_frame(this);
 		root->update_layout(width, height);
 		root->update_position(0, 0);
+		redraw = true;
 	}
 }
 
