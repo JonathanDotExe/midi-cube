@@ -253,5 +253,42 @@ public:
 
 };
 
+class Spinner : public StyleableNode {
+
+private:
+	TextPositioner positioner;
+	int min;
+	int max;
+	int value;
+	std::string text;
+	std::function<void(int)> on_change = nullptr;
+
+public:
+	BoxStyle style;
+	BoxStyle button_style;
+	TextStyle text_style;
+	int button_width = 10;
+
+	Spinner(int min, int max, int value);
+
+	virtual void draw(int parentX, int parentY, NodeEnv env);
+
+	void set_on_change(std::function<void(int)> on_change);
+
+	virtual Vector get_content_size() {
+		Vector size = positioner.size();
+		size.x += button_width * 2;
+		return size;
+	}
+
+	FOCUS_TRAVERSABLE
+
+	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
+
+	virtual void update_style();
+
+	virtual ~Spinner();
+
+};
 
 #endif /* MIDICUBE_GUI_ENGINE_CONTROL_H_ */
