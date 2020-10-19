@@ -185,7 +185,12 @@ Spinner::Spinner(int min, int max, int value) {
 }
 
 void Spinner::draw(int parentX, int parentY, NodeEnv env) {
-
+	//Left Button
+	render_box(parentX + x, parentY + y, button_width, height, button_style, env.hovered == this);
+	//Center
+	render_box(parentX + x + button_width, parentY + y, width - 2 * button_width, height, style, env.hovered == this);
+	//Right Button
+	render_box(parentX + x + width - button_width, parentY + y, button_width, height, button_style, env.hovered == this);
 }
 
 void Spinner::set_on_change(std::function<void(int)> on_change) {
@@ -193,7 +198,30 @@ void Spinner::set_on_change(std::function<void(int)> on_change) {
 }
 
 void Spinner::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
-
+	x -= this->x;
+	y -= this->y;
+	int old = value;
+	//Left Button
+	if (x >= 0 && x < button_width) {
+		value--;
+		if (value < min) {
+			value = min;
+		}
+	}
+	//Right Button
+	else if (x >= 0 && x < button_width) {
+		value++;
+		if (value > max) {
+			value = max;
+		}
+	}
+	if (old != value) {
+		text = std::to_string(value);
+		frame->request_relayout();
+		if (on_change) {
+			on_change(value);
+		}
+	}
 }
 
 void Spinner::update_style() {
