@@ -133,6 +133,10 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
 		}
 
+		//Gain
+		bass_sample *= data.preset.rotary_gain;
+		horn_sample *= data.preset.rotary_gain;
+
 		//Overdrive
 		double total_count = bass_count + horn_count;
 		if (data.preset.overdrive && total_count) {
@@ -148,10 +152,6 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		double bass_pitch_rot = data.preset.rotary_type ? sin(freq_to_radians(data.bass_rotation)) : cos(freq_to_radians(data.bass_rotation));
 		double lbass_delay = sound_delay(bass_pitch_rot, data.preset.rotary_delay, info.sample_rate);
 		double rbass_delay = sound_delay(-bass_pitch_rot, data.preset.rotary_delay, info.sample_rate);
-
-		//Gain
-		bass_sample *= data.preset.rotary_gain;
-		horn_sample *= data.preset.rotary_gain;
 
 		//Process
 		data.left_horn_del.add_isample(horn_sample, lhorn_delay);
