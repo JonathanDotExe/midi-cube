@@ -87,8 +87,25 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	}
 }
 
-void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
+static double apply_distortion(double sample, double overdrive, DisctortionType type, double vol) {
+	switch (type) {
+	case DisctortionType::DIGITAL:
+	{
+		double clip = (1 - overdrive) * vol;
+		sample = fmax(fmin(sample, clip), -clip);
+		sample *= clip ? 1/clip : 0;
+	}
+		break;
+	case DisctortionType::ANALOG_1:
+	{
+		sample -= (sample * sample * sample) * overdrive * (vol ? 1/vol : 0);
+	}
+		break;
+	}
+	return sample;
+}
 
+void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
 	//Play organ sound
 	if (data.preset.rotary) {
 		double horn_sample = 0;
@@ -114,13 +131,8 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		//Overdrive
 		double total_count = bass_count + horn_count;
 		if (data.preset.overdrive && total_count) {
-			double bass_clip = (1 - data.preset.overdrive) * bass_count / total_count;
-			bass_sample = fmax(fmin(bass_sample, bass_clip), -bass_clip);
-			bass_sample *= bass_clip ? 1/bass_clip : 0;
-
-			double horn_clip = (1 - data.preset.overdrive) * horn_count / total_count;
-			horn_sample = fmax(fmin(horn_sample, horn_clip), -horn_clip);
-			horn_sample *= horn_clip ? 1/horn_clip : 0;
+			bass_sample = apply_distortion(bass_sample, data.preset.overdrive, data.preset.distortion_type, bass_count/total_count);
+			horn_sample = apply_distortion(horn_sample, data.preset.overdrive, data.preset.distortion_type, horn_count/total_count);
 		}
 
 		//Horn
@@ -150,9 +162,7 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		}
 		//Overdrive
 		if (data.preset.overdrive) {
-			double clip = 1 - data.preset.overdrive;
-			sample = fmax(fmin(sample, clip), -clip);
-			sample *= clip ? 1/clip : 0;
+			sample = apply_distortion(sample, data.preset.overdrive, data.preset.distortion_type, 1);
 		}
 		//Play
 		for (size_t i = 0; i < channels.size() ; ++i) {
