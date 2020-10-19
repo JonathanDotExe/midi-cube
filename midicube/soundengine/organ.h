@@ -34,7 +34,7 @@
 #define BASS_RADIUS 0.15
 #define SOUND_SPEED 343.2
 
-enum class DisctortionType {
+enum class DistortionType {
 	DIGITAL, ANALOG_1, ANALOG_2
 };
 
@@ -43,7 +43,7 @@ struct B3OrganPreset {
 	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	std::atomic<double> harmonic_foldback_volume{1.0};
 
-	std::atomic<DisctortionType> distortion_type{DisctortionType::ANALOG_2};
+	std::atomic<DistortionType> distortion_type{DistortionType::ANALOG_2};
 	std::atomic<double> overdrive{false};
 	std::atomic<unsigned int> overdrive_cc{35};
 

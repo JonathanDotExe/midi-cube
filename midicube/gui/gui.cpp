@@ -670,10 +670,10 @@ View* B3OrganEngineMenuView::draw() {
 	data->preset.rotary_delay = GuiSlider((Rectangle) {130, 500, 300, 20}, "Rotary Delay", TextFormat("%1.2f ms", data->preset.rotary_delay.load() * 1000), data->preset.rotary_delay, 0, 0.005);
 	data->preset.rotary_type = GuiCheckBox((Rectangle) {130, 530, 20, 20}, data->preset.rotary_type ? "Rotary Type 2" : "Rotary Type 1", data->preset.rotary_type);
 	//Amplifier
+	float x = SCREEN_WIDTH/2 + 120;
 	if (edit_midi) {
 		DrawRectangle(SCREEN_WIDTH/2 + 8, 398, SCREEN_WIDTH/2 - 26, SCREEN_HEIGHT - 416, GRAY);
 		DrawRectangle(SCREEN_WIDTH/2 + 10, 400, SCREEN_WIDTH/2 - 30, SCREEN_HEIGHT - 420, GOLD);
-		float x = SCREEN_WIDTH/2 + 120;
 		data->preset.overdrive = GuiSlider((Rectangle) {x, 420, 300, 20}, "Overdrive", TextFormat("%1.2f", data->preset.overdrive.load()), data->preset.overdrive, 0, 1.0);
 
 		{
@@ -688,9 +688,14 @@ View* B3OrganEngineMenuView::draw() {
 	}
 	else {
 		DrawRectangle(SCREEN_WIDTH/2 + 8, 398, SCREEN_WIDTH/2 - 26, SCREEN_HEIGHT - 416, GRAY);
-		DrawRectangle(SCREEN_WIDTH/2 + 10, 420, SCREEN_WIDTH/2 - 30, SCREEN_HEIGHT - 420, GOLD);
-		float x = SCREEN_WIDTH/2 + 120;
+		DrawRectangle(SCREEN_WIDTH/2 + 10, 400, SCREEN_WIDTH/2 - 30, SCREEN_HEIGHT - 420, GOLD);
 		data->preset.overdrive = GuiSlider((Rectangle) {x, 400, 300, 20}, "Overdrive", TextFormat("%1.2f", data->preset.overdrive.load()), data->preset.overdrive, 0, 1.0);
+	}
+	std::vector<DistortionType> types{DistortionType::DIGITAL, DistortionType::ANALOG_1, DistortionType::ANALOG_2};
+	int type = std::find(types.begin(), types.end(), data->preset.distortion_type.load()) - types.begin();
+	GuiSpinner((Rectangle) {x, 430, 150, 20}, "Type", &type, 0, types.size() - 1, false);
+	if (type >= 0 && (size_t) type < types.size()) {
+		data->preset.distortion_type = types[type];
 	}
 
 	//Edit MIDI
