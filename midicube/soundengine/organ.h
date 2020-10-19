@@ -35,7 +35,7 @@
 #define SOUND_SPEED 343.2
 
 enum class DisctortionType {
-	DIGITAL, ANALOG_1
+	DIGITAL, ANALOG_1, ANALOG_2
 };
 
 struct B3OrganPreset {
@@ -43,7 +43,7 @@ struct B3OrganPreset {
 	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	std::atomic<double> harmonic_foldback_volume{1.0};
 
-	std::atomic<DisctortionType> distortion_type{DisctortionType::ANALOG_1};
+	std::atomic<DisctortionType> distortion_type{DisctortionType::ANALOG_2};
 	std::atomic<double> overdrive{false};
 	std::atomic<unsigned int> overdrive_cc{35};
 

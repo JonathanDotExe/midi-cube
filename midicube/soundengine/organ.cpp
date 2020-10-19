@@ -101,6 +101,11 @@ static double apply_distortion(double sample, double overdrive, DisctortionType 
 		sample -= (sample * sample * sample) * overdrive * (vol ? 1/vol : 0);
 	}
 		break;
+	case DisctortionType::ANALOG_2:
+	{
+		sample = 2 / M_PI * atan(sample * overdrive * 10 * (vol ? 1/vol : 0)) * vol;
+	}
+	break;
 	}
 	return sample;
 }
