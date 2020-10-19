@@ -114,12 +114,13 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		//Overdrive
 		double total_count = bass_count + horn_count;
 		if (data.preset.overdrive && total_count) {
-			double bass_clip = data.preset.overdrive_clip * bass_count / total_count;
-			double horn_clip = data.preset.overdrive_clip - bass_clip;
-			bass_sample *= data.preset.overdrive_gain;
+			double bass_clip = (1 - data.preset.overdrive) * bass_count / total_count;
 			bass_sample = fmax(fmin(bass_sample, bass_clip), -bass_clip);
-			horn_sample *= data.preset.overdrive_gain;
+			bass_sample *= bass_clip ? 1/bass_clip : 0;
+
+			double horn_clip = (1 - data.preset.overdrive) * horn_count / total_count;
 			horn_sample = fmax(fmin(horn_sample, horn_clip), -horn_clip);
+			horn_sample *= horn_clip ? 1/horn_clip : 0;
 		}
 
 		//Horn
@@ -149,8 +150,9 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		}
 		//Overdrive
 		if (data.preset.overdrive) {
-			sample *= data.preset.overdrive_gain;
-			sample = fmax(fmin(sample, data.preset.overdrive_clip), -data.preset.overdrive_clip);
+			double clip = 1 - data.preset.overdrive;
+			sample = fmax(fmin(sample, clip), -clip);
+			sample *= clip ? 1/clip : 0;
 		}
 		//Play
 		for (size_t i = 0; i < channels.size() ; ++i) {
@@ -217,14 +219,8 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	}
 	//Overdrive
 	if (control == data.preset.overdrive_cc) {
-		data.preset.overdrive = value > 0;
+		data.preset.overdrive = value/127.0;
 	}
-	if (control == data.preset.overdrive_gain_cc) {
-			data.preset.overdrive_gain = value/127.0 * 2;
-		}
-	if (control == data.preset.overdrive_clip_cc) {
-			data.preset.overdrive_clip = value/127.0 * 2;
-		}
 	//Percussion
 	if (control == data.preset.percussion_cc) {
 		data.preset.percussion = value > 0;

@@ -674,45 +674,23 @@ View* B3OrganEngineMenuView::draw() {
 		DrawRectangle(SCREEN_WIDTH/2 + 8, 398, SCREEN_WIDTH/2 - 26, SCREEN_HEIGHT - 416, GRAY);
 		DrawRectangle(SCREEN_WIDTH/2 + 10, 400, SCREEN_WIDTH/2 - 30, SCREEN_HEIGHT - 420, GOLD);
 		float x = SCREEN_WIDTH/2 + 120;
-		data->preset.overdrive = GuiCheckBox((Rectangle) {x, 410, 20, 20}, "Digital Overdrive", data->preset.overdrive);
-		data->preset.overdrive_gain = GuiSlider((Rectangle) {x, 440, 300, 20}, "Overdrive Gain", TextFormat("%1.2f", data->preset.overdrive_gain.load()), data->preset.overdrive_gain, 0, 2.0);
-		data->preset.overdrive_clip = GuiSlider((Rectangle) {x, 470, 300, 20}, "Overdrive Clip", TextFormat("%1.2f", data->preset.overdrive_clip.load()), data->preset.overdrive_clip, 0, 2.0);
+		data->preset.overdrive = GuiSlider((Rectangle) {x, 420, 300, 20}, "Overdrive", TextFormat("%1.2f", data->preset.overdrive.load()), data->preset.overdrive, 0, 1.0);
 
 		{
-			//Overdrive CC
+			//Overdrive Gain CC
 			int cc_value = data->preset.overdrive_cc;
-			DrawRectangle(SCREEN_WIDTH - 60, 410, 30, 20, RAYWHITE);
-			if (GuiValueBox((Rectangle){SCREEN_WIDTH - 60, 410, 30, 20}, "", &cc_value, 0, 127, overdrive_editmode)) {
+			DrawRectangle(SCREEN_WIDTH - 60, 420, 30, 20, RAYWHITE);
+			if (GuiValueBox((Rectangle){SCREEN_WIDTH - 60, 420, 30, 20}, "", &cc_value, 0, 127, overdrive_editmode)) {
 				overdrive_editmode = !overdrive_editmode;
 			}
 			data->preset.overdrive_cc = cc_value;
 		}
-		{
-			//Overdrive Gain CC
-			int cc_value = data->preset.overdrive_gain_cc;
-			DrawRectangle(SCREEN_WIDTH - 60, 440, 30, 20, RAYWHITE);
-			if (GuiValueBox((Rectangle){SCREEN_WIDTH - 60, 440, 30, 20}, "", &cc_value, 0, 127, overdrive_gain_editmode)) {
-				overdrive_gain_editmode = !overdrive_gain_editmode;
-			}
-			data->preset.overdrive_gain_cc = cc_value;
-		}
-		{
-			//Overdrive Clip CC
-			int cc_value = data->preset.overdrive_clip_cc;
-			DrawRectangle(SCREEN_WIDTH - 60, 470, 30, 20, RAYWHITE);
-			if (GuiValueBox((Rectangle){SCREEN_WIDTH - 60, 470, 30, 20}, "", &cc_value, 0, 127, overdrive_clip_editmode)) {
-				overdrive_clip_editmode = !overdrive_clip_editmode;
-			}
-			data->preset.overdrive_clip_cc = cc_value;
-		}
 	}
 	else {
 		DrawRectangle(SCREEN_WIDTH/2 + 8, 398, SCREEN_WIDTH/2 - 26, SCREEN_HEIGHT - 416, GRAY);
-		DrawRectangle(SCREEN_WIDTH/2 + 10, 400, SCREEN_WIDTH/2 - 30, SCREEN_HEIGHT - 420, GOLD);
+		DrawRectangle(SCREEN_WIDTH/2 + 10, 420, SCREEN_WIDTH/2 - 30, SCREEN_HEIGHT - 420, GOLD);
 		float x = SCREEN_WIDTH/2 + 120;
-		data->preset.overdrive = GuiCheckBox((Rectangle) {x, 410, 20, 20}, "Digital Overdrive", data->preset.overdrive);
-		data->preset.overdrive_gain = GuiSlider((Rectangle) {x, 440, 300, 20}, "Overdrive Gain", TextFormat("%1.2f", data->preset.overdrive_gain.load()), data->preset.overdrive_gain, 0, 2.0);
-		data->preset.overdrive_clip = GuiSlider((Rectangle) {x, 470, 300, 20}, "Overdrive Clip", TextFormat("%1.2f", data->preset.overdrive_clip.load()), data->preset.overdrive_clip, 0, 2.0);
+		data->preset.overdrive = GuiSlider((Rectangle) {x, 400, 300, 20}, "Overdrive", TextFormat("%1.2f", data->preset.overdrive.load()), data->preset.overdrive, 0, 1.0);
 	}
 
 	//Edit MIDI

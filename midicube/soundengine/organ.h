@@ -39,12 +39,8 @@ struct B3OrganPreset {
 	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	std::atomic<double> harmonic_foldback_volume{1.0};
 
-	std::atomic<bool> overdrive{false};
-	std::atomic<double> overdrive_gain{1};
-	std::atomic<double> overdrive_clip{1};
-	std::atomic<unsigned int> overdrive_cc{28};
-	std::atomic<unsigned int> overdrive_gain_cc{35};
-	std::atomic<unsigned int> overdrive_clip_cc{36};
+	std::atomic<double> overdrive{false};
+	std::atomic<unsigned int> overdrive_cc{35};
 
 	std::atomic<bool> rotary{false};
 	std::atomic<bool> rotary_fast{true};
