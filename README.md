@@ -30,3 +30,4 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 * Wikipedia article about high-pass-filter (https://en.wikipedia.org/wiki/High-pass_filter)
 * German articale about vocoders (https://www.amazona.de/was-ist-ein-vocoder-geschichte-funktionsweise-varianten/)
 * Very helpful blog post about PolyBLEP - oscilators for anti-alising by Martin Finke (I wrote my polyblep function based on his) (http://www.martin-finke.de/blog/articles/audio-plugins-018-polyblep-oscillator/)
+* https://www.hackaudio.com/digital-signal-processing/distortion-effects/soft-clipping/

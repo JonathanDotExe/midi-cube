@@ -87,8 +87,30 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	}
 }
 
-void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
+static double apply_distortion(double sample, double overdrive, DistortionType type, double vol) {
+	switch (type) {
+	case DistortionType::DIGITAL:
+	{
+		double clip = (1 - overdrive) * vol;
+		sample = fmax(fmin(sample, clip), -clip);
+		sample *= clip ? 1/clip : 0;
+	}
+		break;
+	case DistortionType::ANALOG_1:
+	{
+		sample -= (sample * sample * sample) * overdrive * (vol ? 1/vol : 0);
+	}
+		break;
+	case DistortionType::ANALOG_2:
+	{
+		sample = 2 / M_PI * atan(sample * overdrive * 10 * (vol ? 1/vol : 0)) * vol;
+	}
+	break;
+	}
+	return sample;
+}
 
+void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
 	//Play organ sound
 	if (data.preset.rotary) {
 		double horn_sample = 0;
@@ -111,15 +133,15 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
 		}
 
+		//Gain
+		bass_sample *= data.preset.rotary_gain;
+		horn_sample *= data.preset.rotary_gain;
+
 		//Overdrive
 		double total_count = bass_count + horn_count;
 		if (data.preset.overdrive && total_count) {
-			double bass_clip = data.preset.overdrive_clip * bass_count / total_count;
-			double horn_clip = data.preset.overdrive_clip - bass_clip;
-			bass_sample *= data.preset.overdrive_gain;
-			bass_sample = fmax(fmin(bass_sample, bass_clip), -bass_clip);
-			horn_sample *= data.preset.overdrive_gain;
-			horn_sample = fmax(fmin(horn_sample, horn_clip), -horn_clip);
+			bass_sample = apply_distortion(bass_sample, data.preset.overdrive, data.preset.distortion_type, bass_count/total_count);
+			horn_sample = apply_distortion(horn_sample, data.preset.overdrive, data.preset.distortion_type, horn_count/total_count);
 		}
 
 		//Horn
@@ -130,10 +152,6 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		double bass_pitch_rot = data.preset.rotary_type ? sin(freq_to_radians(data.bass_rotation)) : cos(freq_to_radians(data.bass_rotation));
 		double lbass_delay = sound_delay(bass_pitch_rot, data.preset.rotary_delay, info.sample_rate);
 		double rbass_delay = sound_delay(-bass_pitch_rot, data.preset.rotary_delay, info.sample_rate);
-
-		//Gain
-		bass_sample *= data.preset.rotary_gain;
-		horn_sample *= data.preset.rotary_gain;
 
 		//Process
 		data.left_horn_del.add_isample(horn_sample, lhorn_delay);
@@ -149,8 +167,7 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		}
 		//Overdrive
 		if (data.preset.overdrive) {
-			sample *= data.preset.overdrive_gain;
-			sample = fmax(fmin(sample, data.preset.overdrive_clip), -data.preset.overdrive_clip);
+			sample = apply_distortion(sample, data.preset.overdrive, data.preset.distortion_type, 1);
 		}
 		//Play
 		for (size_t i = 0; i < channels.size() ; ++i) {
@@ -217,14 +234,8 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	}
 	//Overdrive
 	if (control == data.preset.overdrive_cc) {
-		data.preset.overdrive = value > 0;
+		data.preset.overdrive = value/127.0;
 	}
-	if (control == data.preset.overdrive_gain_cc) {
-			data.preset.overdrive_gain = value/127.0 * 2;
-		}
-	if (control == data.preset.overdrive_clip_cc) {
-			data.preset.overdrive_clip = value/127.0 * 2;
-		}
 	//Percussion
 	if (control == data.preset.percussion_cc) {
 		data.preset.percussion = value > 0;
