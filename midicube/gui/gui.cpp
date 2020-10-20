@@ -694,6 +694,7 @@ View* B3OrganEngineMenuView::draw() {
 	std::vector<DistortionType> types{DistortionType::DIGITAL, DistortionType::ANALOG_1, DistortionType::ANALOG_2};
 	int type = std::find(types.begin(), types.end(), data->preset.distortion_type.load()) - types.begin();
 	GuiSpinner((Rectangle) {x, 430, 150, 20}, "Type", &type, 0, types.size() - 1, false);
+	data->preset.normalize_overdrive = GuiCheckBox((Rectangle) {x + 170, 430, 20, 20}, "Normalize", data->preset.normalize_overdrive);
 	if (type >= 0 && (size_t) type < types.size()) {
 		data->preset.distortion_type = types[type];
 	}
