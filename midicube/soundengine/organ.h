@@ -43,7 +43,8 @@ struct B3OrganPreset {
 	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	std::atomic<double> harmonic_foldback_volume{1.0};
 
-	std::atomic<DistortionType> distortion_type{DistortionType::ANALOG_2};
+	std::atomic<DistortionType> distortion_type{DistortionType::ANALOG_1};
+	std::atomic<bool> normalize_overdrive{true};
 	std::atomic<double> overdrive{false};
 	std::atomic<unsigned int> overdrive_cc{35};
 
