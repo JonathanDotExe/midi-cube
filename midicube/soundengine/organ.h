@@ -44,7 +44,7 @@ struct B3OrganPreset {
 	std::atomic<double> harmonic_foldback_volume{1.0};
 
 	std::atomic<DistortionType> distortion_type{DistortionType::ANALOG_1};
-	std::atomic<bool> normalize_overdrive{true};
+	std::atomic<bool> normalize_overdrive{false};
 	std::atomic<double> overdrive{false};
 	std::atomic<unsigned int> overdrive_cc{35};
 
