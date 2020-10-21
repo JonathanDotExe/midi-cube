@@ -12,6 +12,8 @@ SoundFontSynth::SoundFontSynth() {
 	fluid_settings_setint(settings, "synth.polyphony", 128);
 
 	synth = new_fluid_synth(settings);
+
+	fluid_synth_sfload(synth, "./data/soundfonts/epiano.sf2", 0);
 }
 
 void SoundFontSynth::midi_message(MidiMessage& msg, SampleInfo& info) {

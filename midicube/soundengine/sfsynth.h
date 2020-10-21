@@ -11,7 +11,7 @@
 #include "soundengine.h"
 #include <fluidsynth.h>
 
-class SoundFontSynth {
+class SoundFontSynth : public SoundEngine {
 
 private:
 	fluid_settings_t* settings = nullptr;
