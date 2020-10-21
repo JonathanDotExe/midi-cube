@@ -18,6 +18,8 @@ private:
 	fluid_synth_t* synth = nullptr;
 
 public:
+	SoundFontSynth();
+
 	void midi_message(MidiMessage& msg, SampleInfo& info);
 
 	void press_note(SampleInfo& info, unsigned int note, double velocity);
@@ -26,10 +28,7 @@ public:
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 
-	virtual ~SoundFontSynth() {
-		delete_fluid_synth(synth);
-		delete_fluid_settings(settings);
-	};
+	virtual ~SoundFontSynth();
 
 };
 
