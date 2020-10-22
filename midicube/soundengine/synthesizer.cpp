@@ -586,12 +586,12 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 				OSCILATOR_PITCH_PROPERTY, 2, -1, 1 });
 
 		LowPassFilter24Component *filter = new LowPassFilter24Component();
-		filter->cutoff = 7000;
+		filter->cutoff = 21000;
 		preset.components[10].set_component(filter);
 		preset.components[10].bindings.push_back( { BindingType::ADD,
 				FILTER_INPUT_PROPERTY, 9, -1, 1 });
-		preset.components[10].bindings.push_back( { BindingType::ADD,
-				FILTER_CUTOFF_PROPERTY, 0, 0, 21000 - 7000 });
+		preset.components[10].bindings.push_back( { BindingType::MUL,
+				FILTER_CUTOFF_PROPERTY, 0, 0.3, 1 });
 
 		AmpEnvelopeComponent *amp = new AmpEnvelopeComponent();
 		amp->envelope = { 0.0005, 0, 1, 0.03 };
@@ -676,10 +676,10 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[9].set_component(comp);
 
 		LowPassFilter24Component* filter = new LowPassFilter24Component();
-		filter->cutoff = 24;
+		filter->cutoff = 6300;
 		preset.components[10].set_component(filter);
 		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
-		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_CUTOFF_PROPERTY, 1, 0, 6300 - 24});
+		preset.components[10].bindings.push_back({BindingType::MUL, FILTER_CUTOFF_PROPERTY, 1, 0, 1});
 
 		AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
 		amp->envelope = {0.0005, 0.6, 0, 0.1};
@@ -714,11 +714,11 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[9].bindings.push_back({BindingType::MUL, OSCILATOR_VOLUME_PROPERTY, 0, 1, 0});
 
 		LowPassFilter12Component* filter = new LowPassFilter12Component();
-		filter->cutoff = 200;
+		filter->cutoff = 550;
 		preset.components[10].set_component(filter);
 		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 8, -1, 1});
 		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_INPUT_PROPERTY, 9, -1, 1});
-		preset.components[10].bindings.push_back({BindingType::ADD, FILTER_CUTOFF_PROPERTY, 1, 0, 350});
+		preset.components[10].bindings.push_back({BindingType::MUL, FILTER_CUTOFF_PROPERTY, 1, 0.35, 1});
 		preset.components[10].bindings.push_back({BindingType::MUL, FILTER_CUTOFF_PROPERTY, 0, 0.9, 1.1});
 
 		AmpEnvelopeComponent* amp = new AmpEnvelopeComponent();
@@ -862,6 +862,56 @@ static void apply_preset(SynthesizerPreset& preset, unsigned int preset_no) {
 		preset.components[21].set_component(amp2);
 		preset.components[21].bindings.push_back( { BindingType::ADD, AMP_ENVELOPE_INPUT_PROPERTY, 11, -1, 1 });
 		preset.components[21].audible = true;
+	}
+		break;
+	case 9:
+			//Patch 9 -- Poly Sweep
+	{
+		ControlChangeComponent *cc = new ControlChangeComponent();
+		cc->control = 1;
+		preset.components[0].set_component(cc);
+
+		OscilatorComponent *comp1 = new OscilatorComponent();
+		comp1->osc.data.waveform = AnalogWaveForm::SINE;
+		comp1->osc.unison_amount = 7;
+		comp1->volume = 0.75;
+		comp1->unison_detune = 0.05;
+		preset.components[7].set_component(comp1);
+
+		OscilatorComponent *comp2 = new OscilatorComponent();
+		comp2->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
+		comp2->osc.unison_amount = 3;
+		comp2->volume = 0.75;
+		comp2->unison_detune = 0.05;
+		preset.components[8].set_component(comp2);
+
+		OscilatorComponent *comp3 = new OscilatorComponent();
+		comp3->osc.data.waveform = AnalogWaveForm::SAW_DOWN;
+		comp3->osc.unison_amount = 3;
+		comp3->volume = 0.75;
+		comp3->unison_detune = 0.05;
+		comp3->semi = 12;
+		preset.components[9].set_component(comp3);
+
+		LowPassFilter12Component *filter = new LowPassFilter12Component();
+		filter->cutoff = 21000;
+		preset.components[10].set_component(filter);
+		preset.components[10].bindings.push_back( { BindingType::ADD,
+				FILTER_INPUT_PROPERTY, 7, -1, 1 });
+		preset.components[10].bindings.push_back( { BindingType::ADD,
+				FILTER_INPUT_PROPERTY, 8, -1, 1 });
+		preset.components[10].bindings.push_back( { BindingType::ADD,
+				FILTER_INPUT_PROPERTY, 9, -1, 1 });
+		preset.components[10].bindings.push_back( { BindingType::MUL,
+				FILTER_CUTOFF_PROPERTY, 0, 0, 1 });
+
+		AmpEnvelopeComponent *amp = new AmpEnvelopeComponent();
+		amp->envelope = { 0.0005, 0, 1, 0.03 };
+
+		preset.components[11].set_component(amp);
+		preset.components[11].bindings.push_back( { BindingType::ADD,
+				AMP_ENVELOPE_INPUT_PROPERTY, 10, -1, 1 });
+			preset.components[11].audible = true;
 	}
 		break;
 	}

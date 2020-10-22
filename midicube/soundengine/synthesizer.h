@@ -17,6 +17,7 @@
 #include "../envelope.h"
 #include "../synthesis.h"
 #include "../filter.h"
+#include "../util.h"
 
 
 #define MAX_COMPONENTS 25
@@ -140,12 +141,13 @@ static std::vector<std::string> filter_properties = {"Input", "Cutoff"};
 #define FILTER_INPUT_PROPERTY 0
 #define FILTER_CUTOFF_PROPERTY 1
 
+const FixedScale FILTER_CUTOFF_SCALE(14, {{0.2, 200}, {0.3, 400}, {0.4, 800}, {0.7, 2500}, {0.8, 5000}, {0.9, 10000}}, 21000);
 template<typename T>
 class FilterComponent : public SynthComponent {
 
 private:
 	std::array<T, SOUND_ENGINE_POLYPHONY> filters = {};
-	double cutoff_mod = 21000;
+	double cutoff_mod = 1;
 	std::string name;
 public:
 	double input = 0;
@@ -161,7 +163,7 @@ public:
 		if (keyboard_tracking) {
 			cutoff_mod *= 1 + std::max(0.0, ((double) note.note - 36)/12.0 * keyboard_tracking);
 		}
-		filter.set_cutoff(cutoff_mod); //TODO do something more performant than updating every frame
+		filter.set_cutoff(FILTER_CUTOFF_SCALE.value(cutoff_mod)); //TODO do something more performant than updating every frame
 		return filter.apply(input, info.time_step);
 	}
 
@@ -176,7 +178,7 @@ public:
 			input = value;
 			break;
 		case FILTER_CUTOFF_PROPERTY:
-			cutoff_mod = value;
+			cutoff_mod = FILTER_CUTOFF_SCALE.progress(value);
 			break;
 		}
 	}
@@ -187,7 +189,7 @@ public:
 			input += value;
 			break;
 		case FILTER_CUTOFF_PROPERTY:
-			cutoff_mod += value;
+			cutoff_mod = FILTER_CUTOFF_SCALE.progress(FILTER_CUTOFF_SCALE.value(cutoff_mod) + value);
 			break;
 		}
 	}
@@ -213,7 +215,7 @@ public:
 
 	void reset_properties() {
 		input = 0;
-		cutoff_mod = cutoff;
+		cutoff_mod = FILTER_CUTOFF_SCALE.progress(cutoff);
 	}
 
 	std::string get_name() {
@@ -221,7 +223,7 @@ public:
 	}
 
 	std::vector<std::string> get_description() {
-		return {"Cutoff: " + std::to_string(cutoff)};
+		return {"Cutoff: " + std::to_string(FILTER_CUTOFF_SCALE.value(cutoff))};
 	}
 
 	std::vector<std::string> property_names() {
