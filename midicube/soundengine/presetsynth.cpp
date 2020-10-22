@@ -11,7 +11,7 @@
 #include <cmath>
 
 //PresetSynth
-FMSynth::FMSynth() {
+PresetSynth::PresetSynth() {
 	/*detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
 	vibrato = 0;
@@ -45,7 +45,7 @@ FMSynth::FMSynth() {
 	fm_phase = 0;
 }
 
-void FMSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	double sample = 0.0;
 	double freq = note.freq * env.pitch_bend;
 	double fm_freq = note.freq * env.pitch_bend;
@@ -72,15 +72,15 @@ void FMSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	}
 }
 
-void FMSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
+void PresetSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 	//filter.apply(channels, info.time_step);
 };
 
-bool FMSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+bool PresetSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	return this->env.is_finished(info.time, note, env);
 }
 
-void FMSynth::control_change(unsigned int control, unsigned int value) {
+void PresetSynth::control_change(unsigned int control, unsigned int value) {
 	if (control == 1) {
 		vibrato = value/127.0;
 	}
@@ -91,15 +91,15 @@ void FMSynth::control_change(unsigned int control, unsigned int value) {
 
 
 template<>
-std::string get_engine_name<FMSynth>() {
+std::string get_engine_name<PresetSynth>() {
 	return "Preset Synth";
 }
 
 void __fix_link_preset_synth_name__ () {
-	get_engine_name<FMSynth>();
+	get_engine_name<PresetSynth>();
 }
 
-FMSynth::~FMSynth() {
+PresetSynth::~PresetSynth() {
 
 }
 

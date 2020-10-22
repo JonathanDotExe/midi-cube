@@ -15,7 +15,7 @@
 #define SYNTH_VIBRATO_RATE 6
 #define SYNTH_VIBRATO_DETUNE 0.25
 
-class FMSynth : public BaseSoundEngine {
+class PresetSynth : public BaseSoundEngine {
 
 private:
 	double detune;
@@ -28,7 +28,7 @@ private:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 8> osc;
 public:
 
-	FMSynth();
+	PresetSynth();
 
 	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
@@ -38,7 +38,7 @@ public:
 
 	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
-	~FMSynth();
+	~PresetSynth();
 
 };
 
