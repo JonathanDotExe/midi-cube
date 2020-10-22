@@ -116,8 +116,9 @@ SoundEngineMenuView::SoundEngineMenuView(MidiCube* cube) {
 }
 
 Node* SoundEngineMenuView::init(Frame* frame) {
+	VBox* container = new VBox();
+	container->style.fill_color = DARKGRAY;
 	HBox* box = new HBox();
-	box->style.fill_color = DARKGRAY;
 
 	//Channels
 	for (unsigned int i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
@@ -228,8 +229,22 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		//Add
 		box->add_child(col);
 	}
+	//Meronome
+	HBox* footer = new HBox();
+	footer->get_layout().height = WRAP_CONTENT;
 
-	return box;
+	Spinner* bpm = new Spinner(10, 480, 120);
+	footer->add_child(bpm);
+	//Label* bpm_text = new Label("BPM");
+
+	TextCheckBox* metronome = new TextCheckBox("Metronome");
+	metronome->label->style.font_color = WHITE;
+	footer->add_child(metronome);
+
+	container->add_child(box);
+	container->add_child(footer);
+
+	return container;
 }
 
 /*
