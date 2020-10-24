@@ -229,11 +229,18 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		//Add
 		box->add_child(col);
 	}
-	//Meronome
+	//Metronome
 	HBox* footer = new HBox();
 	footer->get_layout().height = WRAP_CONTENT;
+	footer->get_layout().padding_top = 5;
+	footer->get_layout().padding_bottom = 5;
+	footer->get_layout().padding_left = 5;
+	footer->get_layout().padding_right = 5;
 
-	Spinner* bpm = new Spinner(10, 480, 120);
+	LabeledControl<Spinner>* bpm = new LabeledControl<Spinner>("BPM", new Spinner(10, 480, 120), false);
+	bpm->label->style.font_color = WHITE;
+	bpm->control->get_layout().height = 20;
+	bpm->control->get_layout().width = 100;
 	footer->add_child(bpm);
 	//Label* bpm_text = new Label("BPM");
 

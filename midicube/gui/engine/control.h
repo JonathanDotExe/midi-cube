@@ -197,11 +197,11 @@ public:
 	T* control;
 	Label* label;
 
-	LabeledControl(std::string text, bool after = true) {
+	LabeledControl(std::string text, T* control = new T(), bool after = true) {
 		layout.width = WRAP_CONTENT;
 		layout.height = WRAP_CONTENT;
 
-		control = new T();
+		this->control = control;
 		control->get_layout().valignment = VerticalAlignment::CENTER;
 		control->get_layout().margin_left = 2;
 		control->get_layout().margin_right = 2;
@@ -286,7 +286,8 @@ public:
 
 	virtual Vector get_content_size() {
 		Vector size = positioner.size();
-		size.x += button_width * 2;
+		size.x += button_width * 2 + layout.padding_left + layout.padding_right;
+		size.y += layout.padding_top + layout.padding_bottom;
 		return size;
 	}
 

@@ -182,6 +182,27 @@ Spinner::Spinner(int min, int max, int value) {
 	this->max = max;
 	this->value = value;
 	text = std::to_string(value);
+
+	style.border_color = BLACK;
+	style.border_thickness = 1;
+	style.border_radius = 0;
+	style.fill_color =  RAYWHITE;
+	style.hover_color = LIGHTGRAY;
+
+	button_style.border_color = BLACK;
+	button_style.border_thickness = 1;
+	button_style.border_radius = 0.5f;
+	button_style.fill_color = LIGHTGRAY;
+	button_style.hover_color = GRAY;
+
+	text_style.font_size = 10;
+	text_style.text_valignment = VerticalAlignment::CENTER;
+	text_style.text_halignment = HorizontalAlignment::CENTER;
+
+	layout.padding_top = 2;
+	layout.padding_bottom = 2;
+	layout.padding_left = 2;
+	layout.padding_right = 2;
 }
 
 void Spinner::draw(int parentX, int parentY, NodeEnv env) {
@@ -189,6 +210,7 @@ void Spinner::draw(int parentX, int parentY, NodeEnv env) {
 	render_box(parentX + x, parentY + y, button_width, height, button_style, env.hovered == this);
 	//Center
 	render_box(parentX + x + button_width, parentY + y, width - 2 * button_width, height, style, env.hovered == this);
+	positioner.draw(parentX + x + layout.padding_left + button_width, parentY + y + layout.padding_top, text, text_style);
 	//Right Button
 	render_box(parentX + x + width - button_width, parentY + y, button_width, height, button_style, env.hovered == this);
 }
