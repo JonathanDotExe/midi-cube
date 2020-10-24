@@ -239,7 +239,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 
 	LabeledControl<Spinner>* bpm = new LabeledControl<Spinner>("BPM", new Spinner(10, 480, 120), false);
 	bpm->label->style.font_color = WHITE;
-	bpm->control->get_layout().height = 20;
+	bpm->control->get_layout().height = MATCH_PARENT;
 	bpm->control->get_layout().width = 100;
 	footer->add_child(bpm);
 	//Label* bpm_text = new Label("BPM");

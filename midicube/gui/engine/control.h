@@ -286,8 +286,7 @@ public:
 
 	virtual Vector get_content_size() {
 		Vector size = positioner.size();
-		size.x += button_width * 2 + layout.padding_left + layout.padding_right;
-		size.y += layout.padding_top + layout.padding_bottom;
+		size.x += button_width * 2;
 		return size;
 	}
 

@@ -109,6 +109,7 @@ void CheckBox::set_on_change(std::function<void (bool)> on_change) {
 void CheckBox::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
 	if (env.focused == this && button == MouseButtonType::LEFT) {
 		checked = !checked;
+		frame->request_redraw();
 		//Actions
 		if (on_change) {
 			on_change(checked);
@@ -203,6 +204,7 @@ Spinner::Spinner(int min, int max, int value) {
 	layout.padding_bottom = 2;
 	layout.padding_left = 2;
 	layout.padding_right = 2;
+	update_style();
 }
 
 void Spinner::draw(int parentX, int parentY, NodeEnv env) {
@@ -231,7 +233,7 @@ void Spinner::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv en
 		}
 	}
 	//Right Button
-	else if (x >= 0 && x < button_width) {
+	else if (x >= width - button_width && x < width) {
 		value++;
 		if (value > max) {
 			value = max;
