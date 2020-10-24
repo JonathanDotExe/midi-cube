@@ -191,29 +191,38 @@ public:
 
 };
 
-class TextCheckBox : public HBox {
+template <typename T>
+class LabeledControl : public HBox {
 public:
-	CheckBox* checkbox;
+	T* control;
 	Label* label;
 
-	TextCheckBox(std::string text) {
+	LabeledControl(std::string text, bool after = true) {
 		layout.width = WRAP_CONTENT;
 		layout.height = WRAP_CONTENT;
 
-		checkbox = new CheckBox();
-		checkbox->get_layout().valignment = VerticalAlignment::CENTER;
-		checkbox->get_layout().margin_right = 2;
+		control = new T();
+		control->get_layout().valignment = VerticalAlignment::CENTER;
+		control->get_layout().margin_left = 2;
+		control->get_layout().margin_right = 2;
 		label = new Label(text);
 		label->get_layout().valignment = VerticalAlignment::CENTER;
-		add_child(checkbox);
-		add_child(label);
+
+		if (after) {
+			add_child(control);
+			add_child(label);
+		}
+		else {
+			add_child(label);
+			add_child(control);
+		}
 	}
 
-	virtual ~TextCheckBox() {
+	virtual ~LabeledControl() {
 
 	}
-	const CheckBox& get_checkbox() const {
-		return *checkbox;
+	const T& get_checkbox() const {
+		return *control;
 	}
 
 	const Label& get_label() const {

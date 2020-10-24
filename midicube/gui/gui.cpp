@@ -237,7 +237,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 	footer->add_child(bpm);
 	//Label* bpm_text = new Label("BPM");
 
-	TextCheckBox* metronome = new TextCheckBox("Metronome");
+	LabeledControl<CheckBox>* metronome = new LabeledControl<CheckBox>("Metronome");
 	metronome->label->style.font_color = WHITE;
 	footer->add_child(metronome);
 
