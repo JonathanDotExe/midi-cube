@@ -305,6 +305,28 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			col->add_child(engine_text);
 			col->add_child(input);
 		}
+		//Channel
+		{
+			Label* channel_text = new Label("Channel");
+			channel_text->style.font_size = 10;
+			channel_text->style.font_color = BLACK;
+			channel_text->get_layout().margin_top = 10;
+
+			std::vector<ssize_t> inputs = {};
+			for (ssize_t i = -1; i < (ssize_t) cube->get_inputs().size(); ++i) {
+				inputs.push_back(i);
+			}
+
+			Spinner* ch = new Spinner(1, 16, 1);
+			ch->get_layout().width = MATCH_PARENT;
+
+			ch->set_on_change([&source](int index) {
+				source.channel = index - 1;
+			});
+
+			col->add_child(channel_text);
+			col->add_child(ch);
+		}
 		//Add
 		box->add_child(col);
 	}
