@@ -126,6 +126,8 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 	//Channels
 	for (unsigned int i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = cube->engine.get_channel(i);
+		ChannelSource& source = cube->channels.at(i);
+
 		VBox* col = new VBox();
 		col->get_layout().padding_left = 1;
 		col->get_layout().padding_right = 1;
@@ -166,7 +168,20 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 
 			col->add_child(engine_text);
 			col->add_child(engine);
+		}
+		//Octave
+		{
+			Label* octave_text = new Label("Octave");
+			octave_text->style.font_size = 10;
+			octave_text->style.font_color = BLACK;
+			octave_text->get_layout().margin_top = 10;
 
+			Spinner* octave = new Spinner(-4, 4, 0);
+			octave->get_layout().width = MATCH_PARENT;
+			octave->set_on_change(PROPERTY_BIND(int, source, source.octave));
+
+			col->add_child(octave_text);
+			col->add_child(octave);
 		}
 		//Volume
 		{
@@ -213,7 +228,6 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 				return std::to_string(b);
 			});
 
-			ChannelSource& source = cube->channels.at(i);
 			input->set_on_change([&source](ssize_t index) {
 				source.input = index;
 			});
@@ -241,7 +255,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 
 	LabeledControl<Spinner>* bpm = new LabeledControl<Spinner>("BPM", new Spinner(10, 480, 120), false);
 	bpm->label->style.font_color = WHITE;
-	bpm->control->get_layout().height = MATCH_PARENT;
+	bpm->get_layout().height = MATCH_PARENT;
 	bpm->control->get_layout().width = 100;
 	bpm->control->set_on_change(FUNC_PROPERTY_BIND(int, e, e.metronome.set_bpm));
 	footer->add_child(bpm);
