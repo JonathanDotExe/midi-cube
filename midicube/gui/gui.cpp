@@ -112,6 +112,16 @@ Node* MainMenuView::init(Frame* frame) {
 	return parent;
 }
 
+template <typename T>
+void style_button(T t) {
+	t->style.border_color = BLANK;
+	t->style.border_thickness = 0;
+	t->style.fill_color = YELLOW;
+	t->style.hover_color = ORANGE;
+	t->text_style.font_size = 10;
+	t->get_layout().width = MATCH_PARENT;
+}
+
 //SoundEngineMenuView
 SoundEngineMenuView::SoundEngineMenuView(MidiCube* cube) {
 	this->cube = cube;
@@ -159,12 +169,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 				channel.set_engine(index);
 			});
 
-			engine->style.border_color = BLANK;
-			engine->style.border_thickness = 0;
-			engine->style.fill_color = YELLOW;
-			engine->style.hover_color = ORANGE;
-			engine->text_style.font_size = 10;
-			engine->get_layout().width = MATCH_PARENT;
+			style_button(engine);
 
 			col->add_child(engine_text);
 			col->add_child(engine);
@@ -191,28 +196,28 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			looper_text->get_layout().margin_top = 10;
 
 			LabeledControl<CheckBox>* looper = new LabeledControl<CheckBox>("On");
+			looper->get_layout().margin_top = 2;
 			looper->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().preset.on));
 
 			LabeledControl<CheckBox>* looper_play = new LabeledControl<CheckBox>("Play");
+			looper_play->get_layout().margin_top = 2;
 			looper_play->control->checked = true;
 			looper_play->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().play));
 
 			LabeledControl<CheckBox>* looper_record = new LabeledControl<CheckBox>("Record");
+			looper_record->get_layout().margin_top = 2;
 			looper_record->control->checked = true;
 			looper_record->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().record));
 
 			LabeledControl<Spinner>* looper_bars = new LabeledControl<Spinner>("Bars", new Spinner(1, 16, 4));
+			looper_bars->get_layout().margin_top = 2;
 			looper_bars->get_layout().width = MATCH_PARENT;
 			looper_bars->control->get_layout().width = MATCH_PARENT;
 			looper_bars->control->set_on_change(PROPERTY_BIND(int, channel, channel.get_looper().preset.bars));
 
 			Button* looper_reset = new Button("Reset");
-			looper_reset->style.border_color = BLANK;
-			looper_reset->style.border_thickness = 0;
-			looper_reset->style.fill_color = YELLOW;
-			looper_reset->style.hover_color = ORANGE;
-			looper_reset->text_style.font_size = 10;
-			looper_reset->get_layout().width = MATCH_PARENT;
+			looper_reset->get_layout().margin_top = 2;
+			style_button(looper_reset);
 			looper_reset->set_on_click([&channel]() {
 				channel.get_looper().reset = true;
 			});
@@ -252,6 +257,23 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			col->add_child(vol_text);
 			col->add_child(volume);
 			col->add_child(vol_val);
+		}
+		//Mute/Active
+		{
+			LabeledControl<CheckBox>* active = new LabeledControl<CheckBox>("Active");
+			active->get_layout().margin_top = 5;
+			active->control->checked = true;
+			active->control->set_on_change(PROPERTY_BIND(bool, channel, channel.active));
+
+			Button* solo = new Button("Solo");
+			solo->get_layout().margin_top = 2;
+			style_button(solo);
+			solo->set_on_click([&e, i]() {
+				e.solo(i);
+			});
+
+			col->add_child(active);
+			col->add_child(solo);
 		}
 		//Input
 		{
@@ -300,7 +322,6 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 	bpm->control->get_layout().width = 100;
 	bpm->control->set_on_change(FUNC_PROPERTY_BIND(int, e, e.metronome.set_bpm));
 	footer->add_child(bpm);
-	//Label* bpm_text = new Label("BPM");
 
 	LabeledControl<CheckBox>* metronome = new LabeledControl<CheckBox>("Metronome");
 	metronome->label->style.font_color = WHITE;
