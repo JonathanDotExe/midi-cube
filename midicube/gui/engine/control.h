@@ -184,7 +184,7 @@ public:
 	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
 
 	virtual Vector get_content_size() {
-		return {10, 10};
+		return {14, 14};
 	}
 
 	virtual ~CheckBox();

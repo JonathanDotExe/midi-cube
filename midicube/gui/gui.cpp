@@ -194,15 +194,35 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			looper->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().preset.on));
 
 			LabeledControl<CheckBox>* looper_play = new LabeledControl<CheckBox>("Play");
+			looper_play->control->checked = true;
 			looper_play->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().play));
 
 			LabeledControl<CheckBox>* looper_record = new LabeledControl<CheckBox>("Record");
+			looper_record->control->checked = true;
 			looper_record->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().record));
+
+			LabeledControl<Spinner>* looper_bars = new LabeledControl<Spinner>("Bars", new Spinner(1, 16, 4));
+			looper_bars->get_layout().width = MATCH_PARENT;
+			looper_bars->control->get_layout().width = MATCH_PARENT;
+			looper_bars->control->set_on_change(PROPERTY_BIND(int, channel, channel.get_looper().preset.bars));
+
+			Button* looper_reset = new Button("Reset");
+			looper_reset->style.border_color = BLANK;
+			looper_reset->style.border_thickness = 0;
+			looper_reset->style.fill_color = YELLOW;
+			looper_reset->style.hover_color = ORANGE;
+			looper_reset->text_style.font_size = 10;
+			looper_reset->get_layout().width = MATCH_PARENT;
+			looper_reset->set_on_click([&channel]() {
+				channel.get_looper().reset = true;
+			});
 
 			col->add_child(looper_text);
 			col->add_child(looper);
 			col->add_child(looper_play);
 			col->add_child(looper_record);
+			col->add_child(looper_bars);
+			col->add_child(looper_reset);
 		}
 		//Volume
 		{
