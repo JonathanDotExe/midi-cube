@@ -16,6 +16,8 @@
 #include <sstream>
 #include <iostream>
 
+#define PROPERTY_BIND(type, obj, expr) [&obj](type v) {expr = v;}
+#define FUNC_PROPERTY_BIND(type, obj, func) [&obj](type v) {func(v);}
 
 std::unordered_map<DeviceType, Texture2D> device_textures;
 
@@ -119,6 +121,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 	VBox* container = new VBox();
 	container->style.fill_color = DARKGRAY;
 	HBox* box = new HBox();
+	SoundEngineDevice& e = cube->engine;
 
 	//Channels
 	for (unsigned int i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
@@ -147,7 +150,6 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 				engines.push_back(i);
 			}
 
-			SoundEngineDevice& e = cube->engine;
 			ComboBox<ssize_t>* engine = new ComboBox<ssize_t>(engines, [&e](ssize_t b) {
 				return b < 0 ? "None" : e.get_sound_engines().at(b)->get_name();
 			});
@@ -241,11 +243,13 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 	bpm->label->style.font_color = WHITE;
 	bpm->control->get_layout().height = MATCH_PARENT;
 	bpm->control->get_layout().width = 100;
+	bpm->control->set_on_change(FUNC_PROPERTY_BIND(int, e, e.metronome.set_bpm));
 	footer->add_child(bpm);
 	//Label* bpm_text = new Label("BPM");
 
 	LabeledControl<CheckBox>* metronome = new LabeledControl<CheckBox>("Metronome");
 	metronome->label->style.font_color = WHITE;
+	metronome->control->set_on_change(PROPERTY_BIND(bool, e, e.play_metronome));
 	footer->add_child(metronome);
 
 	container->add_child(box);
