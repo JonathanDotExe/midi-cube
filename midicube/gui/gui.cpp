@@ -183,6 +183,27 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			col->add_child(octave_text);
 			col->add_child(octave);
 		}
+		//Looper
+		{
+			Label* looper_text = new Label("Looper");
+			looper_text->style.font_size = 10;
+			looper_text->style.font_color = BLACK;
+			looper_text->get_layout().margin_top = 10;
+
+			LabeledControl<CheckBox>* looper = new LabeledControl<CheckBox>("On");
+			looper->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().preset.on));
+
+			LabeledControl<CheckBox>* looper_play = new LabeledControl<CheckBox>("Play");
+			looper_play->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().play));
+
+			LabeledControl<CheckBox>* looper_record = new LabeledControl<CheckBox>("Record");
+			looper_record->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().record));
+
+			col->add_child(looper_text);
+			col->add_child(looper);
+			col->add_child(looper_play);
+			col->add_child(looper_record);
+		}
 		//Volume
 		{
 			Label* vol_text = new Label("Volume");

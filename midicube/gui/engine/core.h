@@ -230,7 +230,7 @@ public:
 
 struct TextStyle {
 	std::string font = "";
-	int font_size = 12;
+	int font_size = 10;
 	Color font_color = BLACK;
 	HorizontalAlignment text_halignment = HorizontalAlignment::CENTER;
 	VerticalAlignment text_valignment = VerticalAlignment::CENTER;
