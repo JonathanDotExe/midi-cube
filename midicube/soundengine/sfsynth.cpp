@@ -13,7 +13,7 @@ SoundFontSynth::SoundFontSynth() {
 
 	synth = new_fluid_synth(settings);
 
-	fluid_synth_sfload(synth, "./data/soundfonts/epiano.sf2", 0);
+	fluid_synth_sfload(synth, "./data/soundfonts/keys.sf2", 1);
 }
 
 void SoundFontSynth::midi_message(MidiMessage& msg, SampleInfo& info) {
