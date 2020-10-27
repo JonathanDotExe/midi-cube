@@ -18,15 +18,15 @@ OrganDrawbar::OrganDrawbar(int value) {
 
 	style.border_color = BLACK;
 	style.border_thickness = 1;
-	style.border_radius = 1;
-	style.fill_color =  RAYWHITE;
-	style.hover_color = LIGHTGRAY;
+	style.border_radius = 0;
+	style.fill_color =  BLACK;
+	style.hover_color = BLACK;
 
 	button_style.border_color = BLACK;
 	button_style.border_thickness = 1;
-	button_style.border_radius = 0.3f;
-	button_style.fill_color = LIGHTGRAY;
-	button_style.hover_color = GRAY;
+	button_style.border_radius = 0.1f;
+	button_style.fill_color = WHITE;
+	button_style.hover_color = WHITE;
 }
 
 void OrganDrawbar::draw(int parentX, int parentY, NodeEnv env) {
@@ -40,19 +40,20 @@ void OrganDrawbar::set_on_change(std::function<void (double)> on_change) {
 }
 
 void OrganDrawbar::on_mouse_drag(int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
+	//TODO use organ constants
 	if (button == MouseButtonType::LEFT) {
 		double change = (double) y_motion/height;
-		double old_prog = progress;
-		progress -= change;
-		if (progress < 0) {
-			progress = 0;
+		int old_val = value;
+		value -= change;
+		if (value < 0) {
+			value = 0;
 		}
-		else if (progress > 1) {
-			progress = 1;
+		else if (value > 8) {
+			value = 8;
 		}
-		if (progress != old_prog) {
+		if ((int) value != old_val) {
 			if (on_change) {
-				on_change(scale.value(progress));
+				on_change((int) value);
 			}
 			frame->request_redraw();
 		}
