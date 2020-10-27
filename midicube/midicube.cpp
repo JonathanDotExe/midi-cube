@@ -12,6 +12,7 @@
 #include "soundengine/sampler.h"
 #include "soundengine/vocoder.h"
 #include "soundengine/synthesizer.h"
+#include "soundengine/sfsynth.h"
 
 static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, void* user_data) {
 	((MidiCube*) user_data)->process(channels, info);
@@ -53,6 +54,7 @@ void MidiCube::init() {
 	engine.add_sound_engine(new TemplateSoundEngineBank<Sampler>());
 	engine.add_sound_engine(new TemplateSoundEngineBank<Vocoder>());
 	engine.add_sound_engine(new TemplateSoundEngineBank<Synthesizer>());
+	engine.add_sound_engine(new TemplateSoundEngineBank<SoundFontSynth>());
 	//Init audio
 	audio_handler.init();
 }
