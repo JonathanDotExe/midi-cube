@@ -39,7 +39,7 @@ void OrganDrawbar::set_on_change(std::function<void (double)> on_change) {
 	this->on_change = on_change;
 }
 
-void OrganDrawbar::on_mouse_drag(int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
+void OrganDrawbar::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
 	//TODO use organ constants
 	if (button == MouseButtonType::LEFT) {
 		double change = (double) y_motion/height;

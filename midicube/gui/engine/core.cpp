@@ -32,6 +32,15 @@ void Node::update_position(int x, int y) {
 	this->y = y;
 }
 
+Vector Node::calc_position(Node* node, int x, int y) {
+	if (node == this) {
+		return {x + node->get_x(), y + node->get_y()};
+	}
+	else {
+		return {-1, -1};
+	}
+}
+
 Vector Node::calc_size(int parent_width, int parent_height, bool fit) {
 	Vector content = get_content_size();
 	int width = 0;
@@ -127,6 +136,20 @@ Vector Parent::get_content_size() {
 	return size;
 }
 
+Vector Parent::calc_position(Node* node, int x, int y) {
+	if (node == this) {
+		return {x + node->get_x(), y + node->get_y()};
+	}
+	else {
+		for (Node* child : children) {
+			if (child == node) {
+				return child->calc_position(node, x, y);
+			}
+		}
+		return {-1, -1};
+	}
+}
+
 void Parent::update_layout(int parent_width, int parent_height) {
 	Node::update_layout(parent_width, parent_height);
 	for (Node* node : children) {
@@ -183,14 +206,15 @@ void Frame::run (ViewController* view) {
 				request_redraw();
 			}
 			if (focused) {
+
 				if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-					focused->on_mouse_drag(mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::LEFT, {focused, hovered});
+					focused->on_mouse_drag(mouse_pos.x - focused_x, mouse_pos.y - focused_y, mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::LEFT, {focused, hovered});
 				}
 				if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
-					focused->on_mouse_drag(mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::MIDDLE, {focused, hovered});
+					focused->on_mouse_drag(mouse_pos.x - focused_x, mouse_pos.y - focused_y, mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::MIDDLE, {focused, hovered});
 				}
 				if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
-					focused->on_mouse_drag(mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::RIGHT, {focused, hovered});
+					focused->on_mouse_drag(mouse_pos.x - focused_x, mouse_pos.y - focused_y, mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::RIGHT, {focused, hovered});
 				}
 			}
 			last_mouse_x = mouse_pos.x;
@@ -199,6 +223,9 @@ void Frame::run (ViewController* view) {
 		if (root->collides(mouse_pos.x, mouse_pos.y)) {
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				focused = root->traverse_focus(mouse_pos.x, mouse_pos.y);
+				Vector focused_pos = root->calc_position(focused);
+				focused_x = focused_pos.x;
+				focused_y = focused_pos.y;
 				root->on_mouse_pressed(mouse_pos.x, mouse_pos.y, MouseButtonType::LEFT, {focused, hovered});
 			}
 			if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON)) {
@@ -224,6 +251,11 @@ void Frame::run (ViewController* view) {
 			root->update_position(0, 0);
 			request_redraw();
 			relayout = false;
+
+			hovered = nullptr;
+			focused = nullptr;
+			focused_x = -1;
+			focused_y = -1;
 		}
 		//Render
 		BeginDrawing();

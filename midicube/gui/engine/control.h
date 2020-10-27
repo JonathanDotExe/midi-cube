@@ -252,7 +252,7 @@ public:
 
 	FOCUS_TRAVERSABLE
 
-	virtual void on_mouse_drag(int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
 
 	virtual Vector get_content_size() {
 		return {30, 100};

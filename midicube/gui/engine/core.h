@@ -84,6 +84,8 @@ public:
 
 	virtual void set_frame(Frame* frame);
 
+	virtual Vector calc_position(Node* node, int x = 0, int y = 0);
+
 	virtual Vector calc_size(int parent_width, int parent_height, bool fit);
 
 	virtual Vector get_content_size() {
@@ -96,7 +98,7 @@ public:
 
 	}
 
-	virtual void on_mouse_drag(int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
 
 	}
 
@@ -154,6 +156,8 @@ public:
 
 	virtual Vector get_content_size();
 
+	virtual Vector calc_position(Node* node, int x = 0, int y = 0);
+
 	virtual void update_layout(int parent_width, int parent_height);
 
 	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env);
@@ -191,6 +195,9 @@ private:
 	std::string title;
 	int width;
 	int height;
+
+	int focused_x = -1;
+	int focused_y = -1;
 
 	Node* focused = nullptr;
 	Node* hovered = nullptr;
