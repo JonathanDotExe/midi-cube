@@ -155,10 +155,10 @@ void Slider::set_on_change(std::function<void (double)> on_change) {
 }
 
 void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
+	std::cout << y << std::endl;
 	if (button == MouseButtonType::LEFT) {
-		double change = (double) y_motion/height;
 		double old_prog = progress;
-		progress -= change;
+		progress = 1 - (double) y/height;
 		if (progress < 0) {
 			progress = 0;
 		}

@@ -142,8 +142,9 @@ Vector Parent::calc_position(Node* node, int x, int y) {
 	}
 	else {
 		for (Node* child : children) {
-			if (child == node) {
-				return child->calc_position(node, x, y);
+			Vector pos = child->calc_position(node, x, y);
+			if (pos.x >= 0 && pos.y >= 0) {
+				return pos;
 			}
 		}
 		return {-1, -1};
@@ -206,7 +207,6 @@ void Frame::run (ViewController* view) {
 				request_redraw();
 			}
 			if (focused) {
-
 				if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
 					focused->on_mouse_drag(mouse_pos.x - focused_x, mouse_pos.y - focused_y, mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::LEFT, {focused, hovered});
 				}
@@ -247,15 +247,11 @@ void Frame::run (ViewController* view) {
 		}
 		//Relayout
 		if (relayout) {
+			std::cout << "Relayout" << std::endl;
 			root->update_layout(width, height);
 			root->update_position(0, 0);
 			request_redraw();
 			relayout = false;
-
-			hovered = nullptr;
-			focused = nullptr;
-			focused_x = -1;
-			focused_y = -1;
 		}
 		//Render
 		BeginDrawing();
