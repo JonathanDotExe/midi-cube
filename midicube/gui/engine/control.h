@@ -236,6 +236,8 @@ class Slider : public StyleableNode {
 private:
 	std::function<void (double)> on_change;
 
+	void move_slider(int y);
+
 public:
 	BoxStyle style;
 	BoxStyle button_style;
@@ -253,6 +255,8 @@ public:
 	FOCUS_TRAVERSABLE
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
+
+	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env);
 
 	virtual Vector get_content_size() {
 		return {30, 100};

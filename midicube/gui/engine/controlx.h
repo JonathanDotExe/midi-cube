@@ -18,10 +18,12 @@ class OrganDrawbar : public StyleableNode {
 private:
 	std::function<void (int)> on_change;
 
+	void move_drawbar(int y);
+
 public:
 	BoxStyle style;
 	BoxStyle button_style;
-	double value;
+	int value;
 
 	OrganDrawbar(int value);
 
@@ -30,6 +32,8 @@ public:
 	virtual void set_on_change(std::function<void (double)> on_change);
 
 	FOCUS_TRAVERSABLE
+
+	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env);
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
 

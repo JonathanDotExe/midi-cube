@@ -154,25 +154,35 @@ void Slider::set_on_change(std::function<void (double)> on_change) {
 	this->on_change = on_change;
 }
 
-void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
-	std::cout << y << std::endl;
-	if (button == MouseButtonType::LEFT) {
-		double old_prog = progress;
-		progress = 1 - (double) y/height;
-		if (progress < 0) {
-			progress = 0;
+void Slider::move_slider(int y) {
+	double old_prog = progress;
+	progress = 1 - (double) y/height;
+	if (progress < 0) {
+		progress = 0;
+	}
+	else if (progress > 1) {
+		progress = 1;
+	}
+	if (progress != old_prog) {
+		if (on_change) {
+			on_change(scale.value(progress));
 		}
-		else if (progress > 1) {
-			progress = 1;
-		}
-		if (progress != old_prog) {
-			if (on_change) {
-				on_change(scale.value(progress));
-			}
-			frame->request_redraw();
-		}
+		frame->request_redraw();
 	}
 }
+
+void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
+	if (button == MouseButtonType::LEFT) {
+		move_slider(y);
+	}
+}
+
+void Slider::on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env) {
+	if (button == MouseButtonType::LEFT) {
+		move_slider(y - this->y);
+	}
+}
+
 
 Slider::~Slider() {
 

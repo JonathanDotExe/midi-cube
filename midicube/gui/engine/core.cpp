@@ -247,7 +247,6 @@ void Frame::run (ViewController* view) {
 		}
 		//Relayout
 		if (relayout) {
-			std::cout << "Relayout" << std::endl;
 			root->update_layout(width, height);
 			root->update_position(0, 0);
 			request_redraw();
