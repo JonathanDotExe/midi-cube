@@ -14,6 +14,7 @@
 #include "sampler.h"
 #include "vocoder.h"
 #include "synthesizer.h"
+#include "sfsynth.h"
 
 extern void fill_sound_engine_device(SoundEngineDevice* device) {
 	device->add_sound_engine(new TemplateSoundEngineBank<FMSynth>());
@@ -22,6 +23,7 @@ extern void fill_sound_engine_device(SoundEngineDevice* device) {
 	device->add_sound_engine(new TemplateSoundEngineBank<Sampler>());
 	device->add_sound_engine(new TemplateSoundEngineBank<Vocoder>());
 	device->add_sound_engine(new TemplateSoundEngineBank<Synthesizer>());
+	device->add_sound_engine(new TemplateSoundEngineBank<SoundFontSynth>());
 }
 
 
