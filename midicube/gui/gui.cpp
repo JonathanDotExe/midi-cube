@@ -6,6 +6,7 @@
  */
 
 #include "gui.h"
+#include "engine/controlx.h"
 #include <raylib.h>
 #define RAYGUI_IMPLEMENTATION
 #define RAYGUI_SUPPORT_ICONS
@@ -356,356 +357,71 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 	return container;
 }
 
-/*
-//DevicesMenuView
-DevicesMenuView::DevicesMenuView() {
-	binding_drag = {};
-	device_drag = {};
+B3OrganMenuView::B3OrganMenuView(B3OrganData* data, MidiCube* cube) {
+	this->data = data;
+	this->cube = cube;
 }
 
-View* DevicesMenuView::draw() {
-	View* view = this;
-	GUIModel& model = *get_model();
-	//Draw devices
-	for (auto device : model.midi_cube->get_devices()) {
-		Position* pos = model.get_position(device.first);
-		Texture2D tex = device_textures[device.second->type()];
-		//Texture
-		DrawTexture(tex, pos->x, pos->y, WHITE);
-		//Name
-		DrawText(device.first.c_str(), pos->x, pos->y + tex.height + 1, 4, BLACK);
+Node* B3OrganMenuView::init(Frame* frame) {
+	VBox* container = new VBox();
+	container->style.fill_color = DARKBROWN;
+
+	//Title
+	Label* title = new Label("B3 Organ");
+	title->style.font_size = 20;
+	title->style.font_color = YELLOW;
+	title->get_layout().halignment = HorizontalAlignment::CENTER;
+	container->add_child(title);
+
+	//Classic organ controls
+	HBox* controls = new HBox();
+	controls->get_layout().height = WRAP_CONTENT;
+	//Drawbars
+	HBox* drawbars = new HBox();
+	std::array<std::string, ORGAN_DRAWBAR_COUNT> drawbar_names = {"16'", "5 1/3'", "8'", "4'", "2 2/3'", "2'", "1 3/5'", "1'"};
+	for (size_t i = 0; i < data->preset.drawbars.size(); ++i) {
+		VBox* col = new VBox();
+		col->get_layout().width = WRAP_CONTENT;
+		col->get_layout().height = WRAP_CONTENT;
+		//Title
+		Label* name = new Label(drawbar_names.at(i));
+		name->style.font_size = 10;
+		name->style.font_color = YELLOW;
+		name->get_layout().halignment = HorizontalAlignment::CENTER;
+		//Drawbar
+		OrganDrawbar* drawbar = new OrganDrawbar(data->preset.drawbars[i]);
+		Color color = WHITE;
+		if (i <= 1) {
+			color = RED;
+		}
+		else if (i == 4 || i == 6 || i == 7) {
+			color = BLACK;
+		}
+		drawbar->button_style.fill_color = color;
+		drawbar->button_style.hover_color = color;
+
+		col->add_child(name);
+		col->add_child(drawbar);
+
+		drawbars->add_child(col);
 	}
-	//Bindings
-	for (DeviceBinding binding : model.midi_cube->get_bindings()) {
-		Position* pos1 = model.get_position(binding.input);
-		AudioDevice* device1 = model.midi_cube->get_devices()[binding.input];
-		Texture2D tex1 = device_textures[device1->type()];
+	container->add_child(drawbars);
 
-		Position* pos2= model.get_position(binding.output);
-		AudioDevice* device2 = model.midi_cube->get_devices()[binding.output];
-		Texture2D tex2 = device_textures[device2->type()];
-
-		//Lines
-		Vector2 start;
-		Vector2 end;
-
-		start.x = pos1->x + tex1.width/2;
-		start.y = pos1->y + tex1.height/2 + binding.input_channel * 2 - 16;
-
-		end.x = pos2->x + tex2.width/2;
-		end.y = pos2->y + tex2.height/2 + binding.output_channel * 2 - 16;
-
-		DrawLineEx(start, end, 2.0f, RED);
-
-		//Channels
-		Vector2 text_pos;
-		text_pos.x = (start.x + end.x) / 2;
-		text_pos.y = (start.y + end.y) / 2 - 20;
-		std::ostringstream text;
-		text << "Channel " << binding.input_channel << " - Channel " << binding.output_channel;
-		DrawText(text.str().c_str(), text_pos.x, text_pos.y, 4, BLACK);
-	}
-	//Move devices
-	Vector2 mouse_pos = GetMousePosition();
-	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-		if (!binding_drag.dialog && !drag_binding) {
-			if (device_drag.dragging) {
-				Position& pos = *model.device_positions[device_drag.device];
-				Texture2D tex = device_textures[model.midi_cube->get_devices()[device_drag.device]->type()];
-				pos.x += mouse_pos.x - device_drag.last_x;
-				pos.y += mouse_pos.y - device_drag.last_y;
-				pos.x = std::min(std::max(pos.x, 0), SCREEN_WIDTH - tex.width);
-				pos.y = std::min(std::max(pos.y, 0), SCREEN_HEIGHT - tex.height);
-
-				if (device_drag.dragging && GetTime() > press_time + 1 && device_drag.start_x == mouse_pos.x && device_drag.start_y == mouse_pos.y) {
-					drag_binding = true;
-				}
-			}
-			else {
-				press_time = GetTime();
-				//Find position
-				for (auto p : model.device_positions) {
-					Position& pos = *p.second;
-					Texture2D tex = device_textures[model.midi_cube->get_devices()[p.first]->type()];
-					if (mouse_pos.x >= pos.x && mouse_pos.x <= pos.x + tex.width && mouse_pos.y >= pos.y && mouse_pos.y <= pos.y + tex.height) {
-						//Clicked
-						device_drag.dragging = true;
-						device_drag.device = p.first;
-						break;
-					}
-				}
-				device_drag.start_x = mouse_pos.x;
-				device_drag.start_y = mouse_pos.y;
-			}
-			device_drag.last_x = mouse_pos.x;
-			device_drag.last_y = mouse_pos.y;
-		}
-	}
-	else {
-		//Edit device
-		if (device_drag.dragging && device_drag.start_x == mouse_pos.x && device_drag.start_y == mouse_pos.y) {
-			view = create_view_for_device(model.midi_cube->get_devices().at(device_drag.device));
-			if (!view) {
-				view = this;
-			}
-		}
-		device_drag.dragging = false;
-	}
-	//Bind devices
-	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
-		drag_binding = true;
-	}
-	drag_binding = drag_binding && (IsMouseButtonDown(MOUSE_RIGHT_BUTTON) || IsMouseButtonDown(MOUSE_LEFT_BUTTON));
-	if (drag_binding) {
-		if (binding_drag.dragging) {
-			//Draw
-			Position* pos = model.get_position(binding_drag.input_device);
-			AudioDevice* device = model.midi_cube->get_devices()[binding_drag.input_device];
-			Texture2D tex = device_textures[device->type()];
-
-			Vector2 start;
-
-			start.x = pos->x + tex.width/2;
-			start.y = pos->y + tex.height/2;
-
-			DrawLineEx(start, mouse_pos, 2.0f, BLUE);
-		}
-		else {
-			//Find position
-			for (auto p : model.device_positions) {
-				Position& pos = *p.second;
-				Texture2D tex = device_textures[model.midi_cube->get_devices()[p.first]->type()];
-				if (mouse_pos.x >= pos.x && mouse_pos.x <= pos.x + tex.width && mouse_pos.y >= pos.y && mouse_pos.y <= pos.y + tex.height) {
-					//Clicked
-					binding_drag.dragging = true;
-					binding_drag.input_device = p.first;
-					break;
-				}
-			}
-		}
-	}
-	else {
-		if (binding_drag.dragging) {
-			//Find position
-			for (auto p : model.device_positions) {
-				Position& pos = *p.second;
-				Texture2D tex = device_textures[model.midi_cube->get_devices()[p.first]->type()];
-				if (p.first != binding_drag.input_device && mouse_pos.x >= pos.x && mouse_pos.x <= pos.x + tex.width && mouse_pos.y >= pos.y && mouse_pos.y <= pos.y + tex.height) {
-					//Clicked
-					binding_drag.dialog = true;
-					binding_drag.output_device = p.first;
-					binding_drag.input_channel = -1;
-					binding_drag.output_channel = -1;
-					binding_drag.start_note = 0;
-					binding_drag.end_note = 127;
-					binding_drag.octave = 0;
-					binding_drag.transfer_cc = true;
-					binding_drag.transfer_channel_aftertouch = true;
-					binding_drag.transfer_other = true;
-					binding_drag.transfer_pitch_bend = true;
-					binding_drag.transfer_prog_change = true;
-
-					binding_drag.input_channel_editmode = false;
-					binding_drag.output_channel_editmode = false;
-					binding_drag.start_note_editmode = false;
-					binding_drag.end_note_editmode = false;
-					binding_drag.octave_editmode = false;
-					break;
-				}
-			}
-			binding_drag.dragging = false;
-		}
-	}
-
-	//Show channel dialog
-	if (binding_drag.dialog) {
-		const int input_width = 300;
-		const int input_height = 40;
-		const int check_height = 20;
-		const int text_height = 16;
-		const int box_width = input_width  + 10;
-		const int box_height = 6 * input_height + 5 + 5 * text_height + (check_height + 5) * 3 + 10;
-		//Background
-		DrawRectangle(SCREEN_WIDTH/2 - box_width/2, SCREEN_HEIGHT/2 - box_height/2, box_width, box_height, GRAY);
-		//Components
-		int pos_y = SCREEN_HEIGHT/2 - box_height/2 + 5;
-		DrawText("Input Channel: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
-		pos_y += text_height;
-		Rectangle rect;
-		rect.x = SCREEN_WIDTH/2 - input_width/2;
-		rect.y = pos_y;
-		rect.width = input_width;
-		rect.height = input_height;
-		if (GuiSpinner(rect, "Input Channel: ", &binding_drag.input_channel, -1, 15, binding_drag.input_channel_editmode)) {
-			binding_drag.input_channel_editmode = !binding_drag.input_channel_editmode;
-		}
-		pos_y += input_height;
-
-		DrawText("Output Channel: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
-		pos_y += text_height;
-		rect.y = pos_y;
-		if (GuiSpinner(rect, "Output Channel: ", &binding_drag.output_channel, -1, 15, binding_drag.output_channel_editmode))  {
-			binding_drag.output_channel_editmode = !binding_drag.output_channel_editmode;
-		}
-		pos_y += input_height;
-
-		DrawText("Start Note: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
-		pos_y += text_height;
-		rect.y = pos_y;
-		if (GuiSpinner(rect, "Start Note: ", &binding_drag.start_note, 0, 127, binding_drag.start_note_editmode)) {
-			binding_drag.start_note_editmode = !binding_drag.start_note_editmode;
-		}
-		pos_y += input_height;
-
-		DrawText("End Note: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
-		pos_y += text_height;
-		rect.y = pos_y;
-		if (GuiSpinner(rect, "End Note: ", &binding_drag.end_note, 0, 127, binding_drag.end_note_editmode)) {
-			binding_drag.end_note_editmode = !binding_drag.end_note_editmode;
-		}
-		pos_y += input_height;
-
-		DrawText("Octave: ", SCREEN_WIDTH/2 - input_width/2, pos_y + 2, 4, BLACK);
-		pos_y += text_height;
-		rect.y = pos_y;
-		if (GuiSpinner(rect, "Octave: ", &binding_drag.octave, -4, 4, binding_drag.octave_editmode)) {
-			binding_drag.octave_editmode = !binding_drag.octave_editmode;
-		}
-		pos_y += input_height + 5;
-
-		rect.height = check_height;
-		rect.width = check_height;
-		rect.y = pos_y;
-		binding_drag.transfer_cc = GuiCheckBox(rect, "CC", binding_drag.transfer_cc);
-
-		rect.x = SCREEN_WIDTH/2;
-		binding_drag.transfer_prog_change = GuiCheckBox(rect, "Prog.", binding_drag.transfer_prog_change);
-		pos_y += check_height + 5;
-
-		rect.x = SCREEN_WIDTH/2 - input_width/2;
-		rect.y = pos_y;
-		binding_drag.transfer_pitch_bend = GuiCheckBox(rect, "Pitch Bend", binding_drag.transfer_pitch_bend);
-
-		rect.x = SCREEN_WIDTH/2;
-		binding_drag.transfer_channel_aftertouch = GuiCheckBox(rect, "Channel Aftertouch", binding_drag.transfer_channel_aftertouch);
-		pos_y += check_height + 5;
-
-		rect.x = SCREEN_WIDTH/2 - input_width/2;
-		rect.y = pos_y;
-		binding_drag.transfer_other = GuiCheckBox(rect, "SYSEX", binding_drag.transfer_other);
-		pos_y += check_height + 5;
-
-		rect.height = input_height;
-		rect.width = input_width;
-		rect.y = pos_y;
-		if (GuiButton(rect, "Create Binding")) {
-			binding_drag.dialog = false;
-			DeviceBinding binding;
-			binding.input = binding_drag.input_device;
-			binding.input_channel = binding_drag.input_channel;
-			binding.output = binding_drag.output_device;
-			binding.output_channel = binding_drag.output_channel;
-			binding.octave = binding_drag.octave;
-
-			binding.start_note = binding_drag.start_note;
-			binding.end_note = binding_drag.end_note;
-			binding.transfer_cc = binding_drag.transfer_cc;
-			binding.transfer_channel_aftertouch = binding_drag.transfer_channel_aftertouch;
-			binding.transfer_other = binding_drag.transfer_other;
-			binding.transfer_pitch_bend = binding_drag.transfer_pitch_bend;
-			binding.transfer_prog_change = binding_drag.transfer_prog_change;
-
-			model.midi_cube->add_binding(binding);
-		}
-	}
-	draw_return_button(&view);
-
-	return view;
+	return container;
 }
 
-SoundEngineDeviceMenuView::SoundEngineDeviceMenuView(SoundEngineDevice* device) {
-	this->device = device;
-	//Options
-	std::ostringstream optionstr;
-	std::vector<SoundEngineBank*> engines = device->get_sound_engines();
-	optionstr << "None";
-	for (SoundEngineBank* engine : engines) {
-		optionstr << ";" << engine->get_name();
+
+ViewController* create_view_for_engine(std::string name, SoundEngine*engine, MidiCube* cube) {
+	if (name == "B3 Organ") {
+		return new B3OrganMenuView(&dynamic_cast<B3Organ*>(engine)->data, cube);	//TODO cleaner check
 	}
-	options = optionstr.str();
-}
-
-View* SoundEngineDeviceMenuView::draw() {
-	View* view = this;
-	std::vector<SoundEngineBank*> engines = device->get_sound_engines();
-	//Engines
-	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-		unsigned int ch = SOUND_ENGINE_MIDI_CHANNELS - 1 - i;
-		SoundEngineChannel& channel = device->get_channel(ch);
-		int selected = channel.get_engine() + 1;
-		int old = selected;
-		float y = 5 + ch * 25;
-		//Text
-		std::ostringstream text;
-		text << "Channel " << ch;
-		DrawText(text.str().c_str(), 5, y + 6, 4, BLACK);
-		//ComboBox
-		selected = GuiComboBox((Rectangle){100, y, 250, 20}, options.c_str(), selected);
-		if (old != selected) {
-			channel.set_engine(selected - 1);
-		}
-		//Edit
-		if (GuiButton((Rectangle){360, y, 20, 20}, GuiIconText(RICON_PENCIL, "")) && selected > 0) {
-			view = create_view_for_engine(engines.at(selected - 1)->get_name(), channel.get_engine(engines, ch)); //TODO Thread safety for data
-			if (!view) {
-				view = this;
-			}
-		}
-		//Volume Slider
-		channel.volume = GuiSlider((Rectangle){420, y, 200, 20}, "Vol", TextFormat("%1.2f", channel.volume.load()), channel.volume, 0, 1);
-
-		//Active and solo
-		channel.active = GuiCheckBox((Rectangle){650, y, 20, 20}, "A", channel.active);
-		if (GuiButton((Rectangle){690, y, 20, 20}, "S")) {
-			device->solo(ch);
-		}
-
-		//Looper
-		channel.get_looper().preset.on = GuiCheckBox((Rectangle){730, y, 20, 20}, "Looper", channel.get_looper().preset.on);
-		if (GuiButton((Rectangle){810, y, 50, 20}, "Clear")) {
-			channel.get_looper().reset = true;
-		}
-		//Bars
-		int bars = channel.get_looper().preset.bars;
-		GuiSpinner((Rectangle){870, y, 80, 20}, "", &bars, 1, 16, false);
-		channel.get_looper().preset.bars = bars;
-		//Play and Record
-		channel.get_looper().play = GuiCheckBox((Rectangle){950, y, 20, 20}, "P", channel.get_looper().play);
-		channel.get_looper().record = GuiCheckBox((Rectangle){985, y, 20, 20}, "R", channel.get_looper().record);
-	}
-
-	//Metronome
-	//Play
-	device->play_metronome = GuiCheckBox((Rectangle){10, SCREEN_HEIGHT - 35, 20, 20}, "Metronome", device->play_metronome);
-	//BPM
-	int bpm = device->metronome.get_bpm();
-	if (GuiSpinner((Rectangle){150, SCREEN_HEIGHT - 40, 150, 30}, "BPM", &bpm, 10, 1920, bpm_editmode)) {
-		bpm_editmode = !bpm_editmode;
-	}
-	device->metronome.set_bpm(bpm);
-
-	draw_return_button(&view);
-
-	return view;
-}
-
-View* create_view_for_device(AudioDevice* device) {
-	if (device->get_identifier() == "Sound Engine") { //TODO cleaner check
-		return new SoundEngineDeviceMenuView(dynamic_cast<SoundEngineDevice*>(device));
-	}
+	/*else if (name == "Synthesizer") {
+		return new SynthesizerEngineMenuView(&dynamic_cast<Synthesizer*>(engine)->data);	//TODO cleaner check
+	}*/
 	return nullptr;
 }
 
+/*
 //B3OrganEngineView
 void B3OrganEngineMenuView::draw_drawbar (int x, int y, int width, int height, size_t index) {
 	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT>& drawbars = data->preset.drawbars;

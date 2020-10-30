@@ -58,6 +58,20 @@ public:
 
 };
 
+class B3OrganMenuView : public ViewController {
+
+private:
+	B3OrganData* data;
+	MidiCube* cube;
+
+public:
+
+	B3OrganMenuView(B3OrganData* data, MidiCube* cube);
+
+	Node* init(Frame* frame);
+
+};
+
 /*
 struct DeviceDragInfo {
 	int last_x;
