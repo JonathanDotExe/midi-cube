@@ -72,6 +72,8 @@ public:
 
 };
 
+ViewController* create_view_for_engine(std::string engine_name, SoundEngine* engine, MidiCube* cube);
+
 /*
 struct DeviceDragInfo {
 	int last_x;
