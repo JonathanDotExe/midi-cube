@@ -191,6 +191,8 @@ class Frame {
 private:
 
 	ViewController* view;
+	ViewController* next_view;
+
 	Node* root;
 	std::string title;
 	int width;
@@ -215,6 +217,11 @@ public:
 	void run (ViewController* view);
 
 	void change_view(ViewController* view);
+
+	void request_view(ViewController* view) {
+		delete next_view;
+		next_view = view;
+	}
 
 	void request_relayout() {
 		relayout = true;

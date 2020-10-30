@@ -187,6 +187,7 @@ Frame::Frame(std::string title, int width, int height) {
 	this->width = width;
 	this->height = height;
 	view = nullptr;
+	next_view = nullptr;
 	root = nullptr;
 }
 
@@ -260,6 +261,10 @@ void Frame::run (ViewController* view) {
 				redraw = false;
 			}
 		EndDrawing();
+		//Next View
+		if (next_view) {
+			change_view(next_view);
+		}
 	}
 	//Cleanup
 	CloseWindow();
@@ -276,11 +281,16 @@ void Frame::change_view(ViewController* view) {
 		root->update_position(0, 0);
 		request_redraw();
 	}
+	if (next_view != view) {
+		delete next_view;
+	}
+	next_view = nullptr;
 }
 
 Frame::~Frame() {
 	delete this->view;
 	delete this->root;
+	delete this->next_view;
 }
 
 

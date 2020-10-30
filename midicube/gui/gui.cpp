@@ -106,7 +106,7 @@ Node* MainMenuView::init(Frame* frame) {
 
 	MidiCube* cube = this->cube;
 	button->set_on_click([frame, cube]() {
-		frame->change_view(new SoundEngineMenuView(cube));
+		frame->request_view(new SoundEngineMenuView(cube));
 	});
 	parent->add_child(button);
 
@@ -180,12 +180,12 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			Button* edit = new Button("Edit");
 			edit->get_layout().margin_top = 2;
 			style_button(edit);
-			edit->set_on_click([&e, i, &channel, &frame, this]() {
+			edit->set_on_click([&e, i, &channel, frame, this]() {
 				SoundEngine* eng = channel.get_engine(e.get_sound_engines(), i);
 				if (eng) {
 					ViewController* view = create_view_for_engine(e.get_sound_engines().at(channel.get_engine())->get_name(), eng, cube);
 					if (view) {
-						frame->change_view(view);
+						frame->request_view(view);
 					}
 				}
 			});
