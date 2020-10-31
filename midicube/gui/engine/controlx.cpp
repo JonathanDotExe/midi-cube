@@ -11,10 +11,8 @@
 //OrganDrawbar
 OrganDrawbar::OrganDrawbar(int value) {
 	this->value = value;
-	get_layout().padding_left = 2;
-	get_layout().padding_right = 2;
-	get_layout().padding_top = 2;
-	get_layout().padding_bottom = 2;
+	get_layout().padding_left = 5;
+	get_layout().padding_right = 5;
 
 	style.border_color = BLACK;
 	style.border_thickness = 1;

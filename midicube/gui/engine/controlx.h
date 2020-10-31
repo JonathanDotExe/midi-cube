@@ -38,7 +38,7 @@ public:
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
 
 	virtual Vector get_content_size() {
-		return {40, 150};
+		return {20, 150};
 	}
 
 	virtual ~OrganDrawbar();

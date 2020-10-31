@@ -400,6 +400,10 @@ Node* B3OrganMenuView::init(Frame* frame) {
 		VBox* col = new VBox();
 		col->get_layout().width = WRAP_CONTENT;
 		col->get_layout().height = WRAP_CONTENT;
+		col->get_layout().margin_top = 5;
+		col->get_layout().margin_bottom = 5;
+		col->get_layout().margin_left = 5;
+		col->get_layout().margin_right = 5;
 		//Title
 		Label* name = new Label(drawbar_names.at(i));
 		name->style.font_size = 10;
@@ -414,8 +418,15 @@ Node* B3OrganMenuView::init(Frame* frame) {
 		else if (i == 4 || i == 6 || i == 7) {
 			color = BLACK;
 		}
+		drawbar->get_layout().height = 200;
+		drawbar->get_layout().width = 30;
 		drawbar->button_style.fill_color = color;
 		drawbar->button_style.hover_color = color;
+		drawbar->style.fill_color = LIGHTGRAY;
+		drawbar->style.hover_color = LIGHTGRAY;
+		drawbar->style.border_thickness = 0;
+		drawbar->style.border_color = BLANK;
+
 
 		col->add_child(name);
 		col->add_child(drawbar);
