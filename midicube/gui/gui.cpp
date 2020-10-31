@@ -395,7 +395,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	controls->get_layout().height = WRAP_CONTENT;
 	//Drawbars
 	HBox* drawbars = new HBox();
-	std::array<std::string, ORGAN_DRAWBAR_COUNT> drawbar_names = {"16'", "5 1/3'", "8'", "4'", "2 2/3'", "2'", "1 3/5'", "1'"};
+	std::array<std::string, ORGAN_DRAWBAR_COUNT> drawbar_names = {"16'", "5 1/3'", "8'", "4'", "2 2/3'", "2'", "1 3/5'", "1 1/3'", "1'"};
 	for (size_t i = 0; i < data->preset.drawbars.size(); ++i) {
 		VBox* col = new VBox();
 		col->get_layout().width = WRAP_CONTENT;

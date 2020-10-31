@@ -41,8 +41,10 @@ void OrganDrawbar::set_on_change(std::function<void (double)> on_change) {
 
 void OrganDrawbar::move_drawbar(int y) {
 	//TODO use organ constants
+	std::cout << "Move" << std::endl;
+
 	int old_val = value;
-	value = y/height;
+	value = 8 * y/height;
 	if (value < 0) {
 		value = 0;
 	}
@@ -50,8 +52,9 @@ void OrganDrawbar::move_drawbar(int y) {
 		value = 8;
 	}
 	if ((int) value != old_val) {
+		std::cout << value << std::endl;
 		if (on_change) {
-			on_change((int) value);
+			on_change(value);
 		}
 		frame->request_redraw();
 	}
