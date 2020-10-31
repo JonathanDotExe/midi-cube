@@ -65,7 +65,7 @@ Vector VBox::get_content_size() {
 	for (Node* node : get_children()) {
 		Vector size = node->calc_size(0, 0, true);
 		curr_y += node->get_layout().margin_top;
-		curr_y += node->get_layout().y_weight ? 0 : size.y;
+		curr_y += size.y;
 		curr_y += node->get_layout().margin_bottom;
 
 		if (curr_x < size.x) {
