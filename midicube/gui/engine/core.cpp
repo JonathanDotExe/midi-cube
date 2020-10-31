@@ -200,27 +200,7 @@ void Frame::run (ViewController* view) {
 	while (!WindowShouldClose()) {
 		//Events
 		Vector2 mouse_pos = GetMousePosition();
-		//Selected
-		if ((int) mouse_pos.x != last_mouse_x || (int) mouse_pos.y != last_mouse_y) {
-			Node* old_hovered = hovered;
-			hovered = root->traverse_focus(mouse_pos.x, mouse_pos.y);
-			if (old_hovered != hovered) {
-				request_redraw();
-			}
-			if (focused) {
-				if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-					focused->on_mouse_drag(mouse_pos.x - focused_x, mouse_pos.y - focused_y, mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::LEFT, {focused, hovered});
-				}
-				if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
-					focused->on_mouse_drag(mouse_pos.x - focused_x, mouse_pos.y - focused_y, mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::MIDDLE, {focused, hovered});
-				}
-				if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
-					focused->on_mouse_drag(mouse_pos.x - focused_x, mouse_pos.y - focused_y, mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::RIGHT, {focused, hovered});
-				}
-			}
-			last_mouse_x = mouse_pos.x;
-			last_mouse_y = mouse_pos.y;
-		}
+		//Click event
 		if (root->collides(mouse_pos.x, mouse_pos.y)) {
 			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				focused = root->traverse_focus(mouse_pos.x, mouse_pos.y);
@@ -245,6 +225,27 @@ void Frame::run (ViewController* view) {
 			if (IsMouseButtonReleased(MOUSE_RIGHT_BUTTON)) {
 				root->on_mouse_released(mouse_pos.x, mouse_pos.y, MouseButtonType::MIDDLE, {focused, hovered});
 			}
+		}
+		//Selected
+		if ((int) mouse_pos.x != last_mouse_x || (int) mouse_pos.y != last_mouse_y) {
+			Node* old_hovered = hovered;
+			hovered = root->traverse_focus(mouse_pos.x, mouse_pos.y);
+			if (old_hovered != hovered) {
+				request_redraw();
+			}
+			if (focused) {
+				if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+					focused->on_mouse_drag(mouse_pos.x - focused_x, mouse_pos.y - focused_y, mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::LEFT, {focused, hovered});
+				}
+				if (IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
+					focused->on_mouse_drag(mouse_pos.x - focused_x, mouse_pos.y - focused_y, mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::MIDDLE, {focused, hovered});
+				}
+				if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+					focused->on_mouse_drag(mouse_pos.x - focused_x, mouse_pos.y - focused_y, mouse_pos.x - last_mouse_x, mouse_pos.y - last_mouse_y, MouseButtonType::RIGHT, {focused, hovered});
+				}
+			}
+			last_mouse_x = mouse_pos.x;
+			last_mouse_y = mouse_pos.y;
 		}
 		//Relayout
 		if (relayout) {

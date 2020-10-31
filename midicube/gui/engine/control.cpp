@@ -156,7 +156,7 @@ void Slider::set_on_change(std::function<void (double)> on_change) {
 
 void Slider::move_slider(int y) {
 	double old_prog = progress;
-	progress = 1 - (double) y/height;
+	progress = 1 - (double) (y - button_height/2)/(height - layout.padding_top - layout.padding_bottom - button_height);
 	if (progress < 0) {
 		progress = 0;
 	}
