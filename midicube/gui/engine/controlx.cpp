@@ -33,7 +33,7 @@ void OrganDrawbar::draw(int parentX, int parentY, NodeEnv env) {
 	render_box(parentX + x, parentY + y + height * val/9, width, height/9, button_style, env.hovered == this);
 }
 
-void OrganDrawbar::set_on_change(std::function<void (double)> on_change) {
+void OrganDrawbar::set_on_change(std::function<void (bool)> on_change) {
 	this->on_change = on_change;
 }
 
@@ -70,3 +70,64 @@ void OrganDrawbar::on_mouse_drag(int x, int y, int x_motion, int y_motion, Mouse
 OrganDrawbar::~OrganDrawbar() {
 
 }
+
+//OrganSwitch
+OrganSwitch::OrganSwitch(bool value) {
+	this->value = value;
+	text_style.font_size = 8;
+	on_style.fill_color = WHITE;
+	on_style.hover_color = WHITE;
+	off_style.fill_color = LIGHTGRAY;
+	off_style.hover_color = LIGHTGRAY;
+
+	get_layout().padding_top = 2;
+	get_layout().padding_bottom = 2;
+	get_layout().padding_left = 2;
+	get_layout().padding_right = 2;
+}
+
+void OrganSwitch::draw(int parentX, int parentY, NodeEnv env) {
+	if (value) {
+		render_box(parentX + x, parentY + y, width, height/2, on_style, env.hovered == this);
+		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, on_text, text_style);
+		render_box(parentX + x, parentY + y + height/2, width, height/2, off_style, env.hovered == this);
+		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top + height/2, off_text, text_style);
+	}
+	else {
+		render_box(parentX + x, parentY + y, width, height/2, off_style, env.hovered == this);
+		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, on_text, text_style);
+		render_box(parentX + x, parentY + y + height/2, width, height/2, on_style, env.hovered == this);
+		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top + height/2, off_text, text_style);
+
+	}
+}
+
+void OrganSwitch::set_on_change(std::function<void (bool)> on_change) {
+	this->on_change = on_change;
+}
+
+void OrganSwitch::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
+	if (env.focused == this && button == MouseButtonType::LEFT) {
+		value = !value;
+		if (on_change) {
+			on_change(value);
+		}
+		frame->request_redraw();
+	}
+}
+
+Vector OrganSwitch::get_content_size() {
+	Vector top_size = top_positioner.size();
+	Vector bottom_size = bottom_positioner.size();
+	return {std::max(top_size.x, bottom_size.x), top_size.y + bottom_size.y + layout.padding_top + layout.padding_bottom};
+}
+
+void OrganSwitch::update_style() {
+	top_positioner.recalc(width - layout.padding_top - layout.padding_bottom, height/2 - layout.padding_top - layout.padding_bottom, on_text, text_style);
+	bottom_positioner.recalc(width - layout.padding_top - layout.padding_bottom, height/2 - layout.padding_top - layout.padding_bottom, off_text, text_style);
+}
+
+OrganSwitch::~OrganSwitch() {
+
+}
+

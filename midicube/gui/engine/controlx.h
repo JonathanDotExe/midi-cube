@@ -29,7 +29,7 @@ public:
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
-	virtual void set_on_change(std::function<void (double)> on_change);
+	virtual void set_on_change(std::function<void (bool)> on_change);
 
 	FOCUS_TRAVERSABLE
 
@@ -42,6 +42,39 @@ public:
 	}
 
 	virtual ~OrganDrawbar();
+
+};
+
+class OrganSwitch : public StyleableNode {
+
+private:
+	std::function<void (bool)> on_change;
+	std::string on_text;
+	std::string off_text;
+	TextPositioner top_positioner;
+	TextPositioner bottom_positioner;
+
+public:
+	BoxStyle on_style;
+	BoxStyle off_style;
+	TextStyle text_style;
+	bool value;
+
+	OrganSwitch(bool value);
+
+	virtual void draw(int parentX, int parentY, NodeEnv env);
+
+	virtual void set_on_change(std::function<void (bool)> on_change);
+
+	FOCUS_TRAVERSABLE
+
+	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
+
+	virtual Vector get_content_size();
+
+	virtual void update_style();
+
+	virtual ~OrganSwitch();
 
 };
 

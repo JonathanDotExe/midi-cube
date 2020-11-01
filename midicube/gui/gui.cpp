@@ -433,7 +433,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 		drawbar->style.border_color = BLANK;
 
 		B3OrganPreset& preset = data->preset;
-		drawbar->set_on_change([&preset, value, i](int val) {
+		drawbar->set_on_change([&preset,  value, i](int val) {
 			preset.drawbars[i] = val;
 			value->update_text(std::to_string(val));
 		});
