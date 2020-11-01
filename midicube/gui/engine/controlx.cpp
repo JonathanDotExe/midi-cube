@@ -72,12 +72,12 @@ OrganDrawbar::~OrganDrawbar() {
 }
 
 //OrganSwitch
-OrganSwitch::OrganSwitch(bool value, std::string on_text, std::string off_test) {
+OrganSwitch::OrganSwitch(bool value, std::string on_text, std::string off_text) {
 	this->value = value;
 	this->on_text = on_text;
 	this->off_text = off_text;
 
-	text_style.font_size = 8;
+	text_style.font_size = 10;
 	on_style.fill_color = WHITE;
 	on_style.hover_color = WHITE;
 	off_style.fill_color = LIGHTGRAY;
@@ -87,22 +87,22 @@ OrganSwitch::OrganSwitch(bool value, std::string on_text, std::string off_test) 
 	get_layout().padding_bottom = 2;
 	get_layout().padding_left = 2;
 	get_layout().padding_right = 2;
+
+	update_style();
 }
 
 void OrganSwitch::draw(int parentX, int parentY, NodeEnv env) {
-	std::cout << "Switch" << std::endl;
-
 	if (value) {
 		render_box(parentX + x, parentY + y, width, height/2, on_style, env.hovered == this);
 		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, on_text, text_style);
 		render_box(parentX + x, parentY + y + height/2, width, height/2, off_style, env.hovered == this);
-		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top + height/2, off_text, text_style);
+		bottom_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top + height/2, off_text, text_style);
 	}
 	else {
 		render_box(parentX + x, parentY + y, width, height/2, off_style, env.hovered == this);
 		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, on_text, text_style);
 		render_box(parentX + x, parentY + y + height/2, width, height/2, on_style, env.hovered == this);
-		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top + height/2, off_text, text_style);
+		bottom_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top + height/2, off_text, text_style);
 	}
 }
 

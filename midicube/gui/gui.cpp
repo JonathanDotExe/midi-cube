@@ -395,6 +395,8 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	controls->get_layout().height = WRAP_CONTENT;
 	//Switches
 	VBox* switches = new VBox();
+	switches->get_layout().width = WRAP_CONTENT;
+	switches->get_layout().padding_right = 50;
 	//Rotary
 	LabeledControl<OrganSwitch>* rotary_switch = new LabeledControl<OrganSwitch>("Rotary", new OrganSwitch(data->preset.rotary));
 	rotary_switch->label->style.font_color = WHITE;

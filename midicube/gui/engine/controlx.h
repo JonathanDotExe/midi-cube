@@ -60,7 +60,7 @@ public:
 	TextStyle text_style;
 	bool value;
 
-	OrganSwitch(bool value, std::string on_text = "ON", std::string off_test = "OFF");
+	OrganSwitch(bool value, std::string on_text = "ON", std::string off_text = "OFF");
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
