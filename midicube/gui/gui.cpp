@@ -393,6 +393,16 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	//Classic organ controls
 	HBox* controls = new HBox();
 	controls->get_layout().height = WRAP_CONTENT;
+	//Switches
+	VBox* switches = new VBox();
+	//Rotary
+	LabeledControl<OrganSwitch>* rotary_switch = new LabeledControl<OrganSwitch>("Rotary", new OrganSwitch(data->preset.rotary));
+	rotary_switch->label->style.font_color = WHITE;
+	B3OrganPreset& preset = data->preset;
+	rotary_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.rotary));
+
+	switches->add_child(rotary_switch);
+	controls->add_child(switches);
 	//Drawbars
 	HBox* drawbars = new HBox();
 	std::array<std::string, ORGAN_DRAWBAR_COUNT> drawbar_names = {"16'", "5 1/3'", "8'", "4'", "2 2/3'", "2'", "1 3/5'", "1 1/3'", "1'"};
@@ -444,7 +454,9 @@ Node* B3OrganMenuView::init(Frame* frame) {
 
 		drawbars->add_child(col);
 	}
-	container->add_child(drawbars);
+	controls->add_child(drawbars);
+
+	container->add_child(controls);
 
 	return container;
 }

@@ -72,8 +72,11 @@ OrganDrawbar::~OrganDrawbar() {
 }
 
 //OrganSwitch
-OrganSwitch::OrganSwitch(bool value) {
+OrganSwitch::OrganSwitch(bool value, std::string on_text, std::string off_test) {
 	this->value = value;
+	this->on_text = on_text;
+	this->off_text = off_text;
+
 	text_style.font_size = 8;
 	on_style.fill_color = WHITE;
 	on_style.hover_color = WHITE;
@@ -87,6 +90,8 @@ OrganSwitch::OrganSwitch(bool value) {
 }
 
 void OrganSwitch::draw(int parentX, int parentY, NodeEnv env) {
+	std::cout << "Switch" << std::endl;
+
 	if (value) {
 		render_box(parentX + x, parentY + y, width, height/2, on_style, env.hovered == this);
 		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, on_text, text_style);
@@ -98,7 +103,6 @@ void OrganSwitch::draw(int parentX, int parentY, NodeEnv env) {
 		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, on_text, text_style);
 		render_box(parentX + x, parentY + y + height/2, width, height/2, on_style, env.hovered == this);
 		top_positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top + height/2, off_text, text_style);
-
 	}
 }
 
