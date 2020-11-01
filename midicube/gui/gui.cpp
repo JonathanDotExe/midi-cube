@@ -404,11 +404,16 @@ Node* B3OrganMenuView::init(Frame* frame) {
 		col->get_layout().margin_bottom = 5;
 		col->get_layout().margin_left = 5;
 		col->get_layout().margin_right = 5;
-		//Title
+		//Name
 		Label* name = new Label(drawbar_names.at(i));
 		name->style.font_size = 10;
 		name->style.font_color = YELLOW;
 		name->get_layout().halignment = HorizontalAlignment::CENTER;
+		//Value
+		Label* value = new Label(std::to_string(data->preset.drawbars[i]));
+		value->style.font_size = 10;
+		value->style.font_color = WHITE;
+		value->get_layout().halignment = HorizontalAlignment::CENTER;
 		//Drawbar
 		OrganDrawbar* drawbar = new OrganDrawbar(data->preset.drawbars[i]);
 		Color color = WHITE;
@@ -427,9 +432,15 @@ Node* B3OrganMenuView::init(Frame* frame) {
 		drawbar->style.border_thickness = 0;
 		drawbar->style.border_color = BLANK;
 
+		B3OrganPreset& preset = data->preset;
+		drawbar->set_on_change([&preset, value, i](int val) {
+			preset.drawbars[i] = val;
+			value->update_text(std::to_string(val));
+		});
 
 		col->add_child(name);
 		col->add_child(drawbar);
+		col->add_child(value);
 
 		drawbars->add_child(col);
 	}
