@@ -402,8 +402,37 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	rotary_switch->label->style.font_color = WHITE;
 	B3OrganPreset& preset = data->preset;
 	rotary_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.rotary));
-
 	switches->add_child(rotary_switch);
+	//Rotary Speed
+	LabeledControl<OrganSwitch>* rotary_speed_switch = new LabeledControl<OrganSwitch>("Rotary Speed", new OrganSwitch(data->preset.rotary_fast, "FST", "SLW"));
+	rotary_speed_switch->label->style.font_color = WHITE;
+	rotary_speed_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.rotary_fast));
+	switches->add_child(rotary_speed_switch);
+
+	//Percussion
+	LabeledControl<OrganSwitch>* percussion_switch = new LabeledControl<OrganSwitch>("Percussion", new OrganSwitch(data->preset.percussion));
+	percussion_switch->label->style.font_color = WHITE;
+	percussion_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion));
+	switches->add_child(percussion_switch);
+
+	//Percussion Harmonic
+	LabeledControl<OrganSwitch>* percussion_harmonic_switch = new LabeledControl<OrganSwitch>("Percussion Harmonic", new OrganSwitch(data->preset.percussion_third_harmonic, "3rd", "2nd"));
+	percussion_harmonic_switch->label->style.font_color = WHITE;
+	percussion_harmonic_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion_third_harmonic));
+	switches->add_child(percussion_harmonic_switch);
+
+	//Percussion Volume
+	LabeledControl<OrganSwitch>* percussion_volume_switch = new LabeledControl<OrganSwitch>("Percussion Volume", new OrganSwitch(data->preset.percussion_soft, "SFT", "HRD"));
+	percussion_volume_switch->label->style.font_color = WHITE;
+	percussion_volume_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion_soft));
+	switches->add_child(percussion_volume_switch);
+
+	//Percussion Decay
+	LabeledControl<OrganSwitch>* percussion_decay_switch = new LabeledControl<OrganSwitch>("Percussion Decay", new OrganSwitch(data->preset.percussion_fast_decay, "FST", "SLW"));
+	percussion_decay_switch->label->style.font_color = WHITE;
+	percussion_decay_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion_fast_decay));
+	switches->add_child(percussion_decay_switch);
+
 	controls->add_child(switches);
 	//Drawbars
 	HBox* drawbars = new HBox();
