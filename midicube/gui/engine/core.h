@@ -71,6 +71,7 @@ protected:
 	int y = 0;
 	int width = 0;
 	int height = 0;
+	bool visible = true;
 	NodeLayout layout;
 	Frame* frame;
 
@@ -93,6 +94,12 @@ public:
 	}
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
+
+	virtual void set_visible(bool visible);
+
+	virtual bool is_visible() {
+		return visible;
+	}
 
 	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env) {
 

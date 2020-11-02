@@ -27,6 +27,13 @@ void Node::update_layout(int parent_width, int parent_height) {
 	height = size.y;
 }
 
+void Node::set_visible(bool visible) {
+	this->visible = visible;
+	if (frame) {
+		frame->request_relayout();
+	}
+}
+
 void Node::update_position(int x, int y) {
 	this->x = x;
 	this->y = y;
@@ -45,29 +52,31 @@ Vector Node::calc_size(int parent_width, int parent_height, bool fit) {
 	Vector content = get_content_size();
 	int width = 0;
 	int height = 0;
-	//Width
-	//Wrap content/fit
-	if (layout.width == WRAP_CONTENT || (layout.width == MATCH_PARENT && fit)) {
-		width = content.x + layout.padding_right + layout.padding_left;
-	}
-	//Match parent
-	else if (layout.width == MATCH_PARENT && !fit) {
-		width = parent_width - layout.margin_left - layout.margin_right;
-	}
-	else {
-		width = layout.width;
-	}
-	//Height
-	//Wrap content/fit
-	if (layout.height == WRAP_CONTENT || (layout.height == MATCH_PARENT && fit)) {
-		height =  content.y + layout.padding_top + layout.padding_bottom;
-	}
-	//Match parent
-	else if (layout.height == MATCH_PARENT && !fit) {
-		height = parent_height - layout.margin_top - layout.margin_bottom;
-	}
-	else {
-		height = layout.height;
+	if (visible) {
+		//Width
+		//Wrap content/fit
+		if (layout.width == WRAP_CONTENT || (layout.width == MATCH_PARENT && fit)) {
+			width = content.x + layout.padding_right + layout.padding_left;
+		}
+		//Match parent
+		else if (layout.width == MATCH_PARENT && !fit) {
+			width = parent_width - layout.margin_left - layout.margin_right;
+		}
+		else {
+			width = layout.width;
+		}
+		//Height
+		//Wrap content/fit
+		if (layout.height == WRAP_CONTENT || (layout.height == MATCH_PARENT && fit)) {
+			height =  content.y + layout.padding_top + layout.padding_bottom;
+		}
+		//Match parent
+		else if (layout.height == MATCH_PARENT && !fit) {
+			height = parent_height - layout.margin_top - layout.margin_bottom;
+		}
+		else {
+			height = layout.height;
+		}
 	}
 	return {width, height};
 }
@@ -94,7 +103,9 @@ void Parent::set_frame(Frame* frame) {
 
 void Parent::draw(int parentX, int parentY, NodeEnv env) {
 	for (Node* node : children) {
-		node->draw(parentX + x, parentY + y, env);
+		if (node->is_visible()) {
+			node->draw(parentX + x, parentY + y, env);
+		}
 	}
 }
 
@@ -258,7 +269,9 @@ void Frame::run (ViewController* view) {
 		BeginDrawing();
 			if (redraw) {
 				ClearBackground(RAYWHITE);
-				root->draw(0, 0, {focused, hovered});
+				if (root->is_visible()) {
+					root->draw(0, 0, {focused, hovered});
+				}
 				redraw = false;
 			}
 		EndDrawing();
