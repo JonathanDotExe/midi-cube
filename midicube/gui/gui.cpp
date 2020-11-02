@@ -526,6 +526,12 @@ Node* B3OrganMenuView::init(Frame* frame) {
 		value->style.font_size = 10;
 		value->style.font_color = WHITE;
 		value->get_layout().halignment = HorizontalAlignment::CENTER;
+		hide_midi.push_back(value);
+		//MIDI
+		std::atomic<unsigned int>& dr_cc = data->preset.drawbar_ccs[i];
+		Spinner* drawbar_cc = new Spinner(0, 127, dr_cc);
+		drawbar_cc->set_on_change(PROPERTY_BIND(int, dr_cc, dr_cc));
+		show_midi.push_back(drawbar_cc);
 		//Drawbar
 		OrganDrawbar* drawbar = new OrganDrawbar(data->preset.drawbars[i]);
 		Color color = WHITE;
@@ -546,7 +552,6 @@ Node* B3OrganMenuView::init(Frame* frame) {
 
 		B3OrganPreset& preset = data->preset;
 		drawbar->set_on_change([&preset,  value, i](int val) {
-			std::cout << val << std::endl;
 			preset.drawbars[i] = val;
 			value->update_text(std::to_string(val));
 		});
@@ -554,6 +559,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 		col->add_child(name);
 		col->add_child(drawbar);
 		col->add_child(value);
+		col->add_child(drawbar_cc);
 
 		drawbars->add_child(col);
 	}
