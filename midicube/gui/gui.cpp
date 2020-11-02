@@ -504,6 +504,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	controls->add_child(switches);
 	//Drawbars
 	HBox* drawbars = new HBox();
+	drawbars->get_layout().x_weight = 2;
 	std::array<std::string, ORGAN_DRAWBAR_COUNT> drawbar_names = {"16'", "5 1/3'", "8'", "4'", "2 2/3'", "2'", "1 3/5'", "1 1/3'", "1'"};
 	for (size_t i = 0; i < data->preset.drawbars.size(); ++i) {
 		VBox* col = new VBox();
@@ -560,6 +561,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 
 		drawbars->add_child(col);
 	}
+	controls->add_child(drawbars);
 
 	//Amplifier
 	HBox* amplifier = new HBox();
@@ -602,10 +604,8 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	distortion_box->add_child(overdrive_val);
 	distortion_box->add_child(overdrive_cc);
 	amplifier->add_child(distortion_box);
-
 	controls->add_child(amplifier);
 
-	controls->add_child(drawbars);
 	container->add_child(controls);
 
 	//Footer
