@@ -382,6 +382,14 @@ B3OrganMenuView::B3OrganMenuView(B3OrganData* data, MidiCube* cube) {
 static void style_organ_switch(LabeledControl<OrganSwitch>* sw) {
 	sw->label->style.font_color = WHITE;
 	sw->control->get_layout().width = 25;
+	sw->control->get_layout().height = 20;
+	sw->get_layout().margin_bottom = 5;
+}
+
+static void style_organ_midi_cc(LabeledControl<Spinner>* sw) {
+	sw->label->style.font_color = WHITE;
+	sw->control->get_layout().width = 35;
+	sw->control->get_layout().height = 20;
 	sw->get_layout().margin_bottom = 5;
 }
 
@@ -390,6 +398,9 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	container->style.fill_color = DARKBROWN;
 
 	B3OrganPreset& preset = data->preset;
+
+	std::vector<Node*> show_midi;
+	std::vector<Node*> hide_midi;
 
 	//Title
 	Label* title = new Label("B3 Organ");
@@ -405,40 +416,93 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	VBox* switches = new VBox();
 	switches->get_layout().width = WRAP_CONTENT;
 	switches->get_layout().padding_right = 50;
-	//Rotary
-	LabeledControl<OrganSwitch>* rotary_switch = new LabeledControl<OrganSwitch>("Rotary", new OrganSwitch(preset.rotary));
-	style_organ_switch(rotary_switch);
-	rotary_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.rotary));
-	switches->add_child(rotary_switch);
-	//Rotary Speed
-	LabeledControl<OrganSwitch>* rotary_speed_switch = new LabeledControl<OrganSwitch>("Rotary Speed", new OrganSwitch(data->preset.rotary_fast, "FST", "SLW"));
-	style_organ_switch(rotary_speed_switch);
-	rotary_speed_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.rotary_fast));
-	switches->add_child(rotary_speed_switch);
 
-	//Percussion
-	LabeledControl<OrganSwitch>* percussion_switch = new LabeledControl<OrganSwitch>("Percussion", new OrganSwitch(data->preset.percussion));
-	style_organ_switch(percussion_switch);
-	percussion_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion));
-	switches->add_child(percussion_switch);
+	{
+		//Rotary
+		LabeledControl<OrganSwitch>* rotary_switch = new LabeledControl<OrganSwitch>("Rotary", new OrganSwitch(preset.rotary));
+		style_organ_switch(rotary_switch);
+		rotary_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.rotary));
+		switches->add_child(rotary_switch);
+		hide_midi.push_back(rotary_switch);
+		//Rotary Speed
+		LabeledControl<OrganSwitch>* rotary_speed_switch = new LabeledControl<OrganSwitch>("Rotary Speed", new OrganSwitch(data->preset.rotary_fast, "FST", "SLW"));
+		style_organ_switch(rotary_speed_switch);
+		rotary_speed_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.rotary_fast));
+		switches->add_child(rotary_speed_switch);
+		hide_midi.push_back(rotary_speed_switch);
 
-	//Percussion Harmonic
-	LabeledControl<OrganSwitch>* percussion_harmonic_switch = new LabeledControl<OrganSwitch>("Percussion Harmonic", new OrganSwitch(data->preset.percussion_third_harmonic, "3rd", "2nd"));
-	style_organ_switch(percussion_harmonic_switch);
-	percussion_harmonic_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion_third_harmonic));
-	switches->add_child(percussion_harmonic_switch);
+		//Percussion
+		LabeledControl<OrganSwitch>* percussion_switch = new LabeledControl<OrganSwitch>("Percussion", new OrganSwitch(data->preset.percussion));
+		style_organ_switch(percussion_switch);
+		percussion_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion));
+		switches->add_child(percussion_switch);
+		hide_midi.push_back(percussion_switch);
 
-	//Percussion Volume
-	LabeledControl<OrganSwitch>* percussion_volume_switch = new LabeledControl<OrganSwitch>("Percussion Volume", new OrganSwitch(data->preset.percussion_soft, "SFT", "HRD"));
-	style_organ_switch(percussion_volume_switch);
-	percussion_volume_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion_soft));
-	switches->add_child(percussion_volume_switch);
+		//Percussion Harmonic
+		LabeledControl<OrganSwitch>* percussion_harmonic_switch = new LabeledControl<OrganSwitch>("Percussion Harmonic", new OrganSwitch(data->preset.percussion_third_harmonic, "3rd", "2nd"));
+		style_organ_switch(percussion_harmonic_switch);
+		percussion_harmonic_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion_third_harmonic));
+		switches->add_child(percussion_harmonic_switch);
+		hide_midi.push_back(percussion_harmonic_switch);
 
-	//Percussion Decay
-	LabeledControl<OrganSwitch>* percussion_decay_switch = new LabeledControl<OrganSwitch>("Percussion Decay", new OrganSwitch(data->preset.percussion_fast_decay, "FST", "SLW"));
-	style_organ_switch(percussion_decay_switch);
-	percussion_decay_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion_fast_decay));
-	switches->add_child(percussion_decay_switch);
+		//Percussion Volume
+		LabeledControl<OrganSwitch>* percussion_volume_switch = new LabeledControl<OrganSwitch>("Percussion Volume", new OrganSwitch(data->preset.percussion_soft, "SFT", "HRD"));
+		style_organ_switch(percussion_volume_switch);
+		percussion_volume_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion_soft));
+		switches->add_child(percussion_volume_switch);
+		hide_midi.push_back(percussion_volume_switch);
+
+		//Percussion Decay
+		LabeledControl<OrganSwitch>* percussion_decay_switch = new LabeledControl<OrganSwitch>("Percussion Decay", new OrganSwitch(data->preset.percussion_fast_decay, "FST", "SLW"));
+		style_organ_switch(percussion_decay_switch);
+		percussion_decay_switch->control->set_on_change(PROPERTY_BIND(bool, preset, preset.percussion_fast_decay));
+		switches->add_child(percussion_decay_switch);
+		hide_midi.push_back(percussion_decay_switch);
+	}
+
+	{
+		//Rotary
+		LabeledControl<Spinner>* rotary_switch = new LabeledControl<Spinner>("Rotary", new Spinner(0, 127, preset.rotary_cc));
+		style_organ_midi_cc(rotary_switch);
+		rotary_switch->control->set_on_change(PROPERTY_BIND(int, preset, preset.rotary_cc));
+		switches->add_child(rotary_switch);
+		show_midi.push_back(rotary_switch);
+
+		//Rotary Speed
+		LabeledControl<Spinner>* rotary_speed_switch = new LabeledControl<Spinner>("Rotary Speed", new Spinner(0, 127, data->preset.rotary_speed_cc));
+		style_organ_midi_cc(rotary_speed_switch);
+		rotary_speed_switch->control->set_on_change(PROPERTY_BIND(int, preset, preset.rotary_speed_cc));
+		switches->add_child(rotary_speed_switch);
+		show_midi.push_back(rotary_speed_switch);
+
+		//Percussion
+		LabeledControl<Spinner>* percussion_switch = new LabeledControl<Spinner>("Percussion", new Spinner(0, 127, data->preset.percussion_cc));
+		style_organ_midi_cc(percussion_switch);
+		percussion_switch->control->set_on_change(PROPERTY_BIND(int, preset, preset.percussion_cc));
+		switches->add_child(percussion_switch);
+		show_midi.push_back(percussion_switch);
+
+		//Percussion Harmonic
+		LabeledControl<Spinner>* percussion_harmonic_switch = new LabeledControl<Spinner>("Percussion Harmonic", new Spinner(0, 127, data->preset.percussion_third_harmonic_cc));
+		style_organ_midi_cc(percussion_harmonic_switch);
+		percussion_harmonic_switch->control->set_on_change(PROPERTY_BIND(int, preset, preset.percussion_third_harmonic_cc));
+		switches->add_child(percussion_harmonic_switch);
+		show_midi.push_back(percussion_harmonic_switch);
+
+		//Percussion Volume
+		LabeledControl<Spinner>* percussion_volume_switch = new LabeledControl<Spinner>("Percussion Volume", new Spinner(0, 127, data->preset.percussion_soft_cc));
+		style_organ_midi_cc(percussion_volume_switch);
+		percussion_volume_switch->control->set_on_change(PROPERTY_BIND(int, preset, preset.percussion_soft_cc));
+		switches->add_child(percussion_volume_switch);
+		show_midi.push_back(percussion_volume_switch);
+
+		//Percussion Decay
+		LabeledControl<Spinner>* percussion_decay_switch = new LabeledControl<Spinner>("Percussion Decay", new Spinner(0, 127, data->preset.percussion_fast_decay_cc));
+		style_organ_midi_cc(percussion_decay_switch);
+		percussion_decay_switch->control->set_on_change(PROPERTY_BIND(int, preset, preset.percussion_fast_decay_cc));
+		switches->add_child(percussion_decay_switch);
+		show_midi.push_back(percussion_decay_switch);
+	}
 
 	controls->add_child(switches);
 	//Drawbars
@@ -494,8 +558,16 @@ Node* B3OrganMenuView::init(Frame* frame) {
 		drawbars->add_child(col);
 	}
 	controls->add_child(drawbars);
-
 	container->add_child(controls);
+
+	//Hide
+	for (Node* node : show_midi) {
+		node->set_visible(false);
+	}
+	//Show
+	for (Node* node : hide_midi) {
+		node->set_visible(true);
+	}
 
 	return container;
 }
