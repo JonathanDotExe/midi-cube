@@ -414,9 +414,6 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	controls->get_layout().height = WRAP_CONTENT;
 	//Switches
 	VBox* switches = new VBox();
-	switches->get_layout().width = WRAP_CONTENT;
-	switches->get_layout().padding_right = 50;
-
 	{
 		//Rotary
 		LabeledControl<OrganSwitch>* rotary_switch = new LabeledControl<OrganSwitch>("Rotary", new OrganSwitch(preset.rotary));
@@ -563,6 +560,51 @@ Node* B3OrganMenuView::init(Frame* frame) {
 
 		drawbars->add_child(col);
 	}
+
+	//Amplifier
+	HBox* amplifier = new HBox();
+	VBox* distortion_box = new VBox();
+	distortion_box->get_layout().width = WRAP_CONTENT;
+	distortion_box->get_layout().height = WRAP_CONTENT;
+
+	Label* vol_text = new Label("Overdrive");
+	vol_text->style.font_size = 10;
+	vol_text->style.font_color = BLACK;
+	vol_text->get_layout().halignment = HorizontalAlignment::CENTER;
+	vol_text->get_layout().margin_top = 10;
+
+	Slider* overdrive = new Slider(preset.overdrive, {0, {}, 1});
+	overdrive->style.border_color = BLANK;
+	overdrive->style.border_thickness = 0;
+	overdrive->button_style.border_color = BLANK;
+	overdrive->button_style.border_thickness = 0;
+	overdrive->button_style.fill_color = BLACK;
+	overdrive->button_style.hover_color = DARKGRAY;
+	overdrive->get_layout().halignment = HorizontalAlignment::CENTER;
+
+	Label* overdrive_val = new Label(std::to_string(preset.overdrive));
+	overdrive_val->style.font_size = 8;
+	overdrive_val->get_layout().width = MATCH_PARENT;
+	overdrive_val->get_layout().halignment = HorizontalAlignment::CENTER;
+	hide_midi.push_back(overdrive_val);
+
+	Spinner* overdrive_cc = new Spinner(0, 127, preset.overdrive_cc);
+	overdrive_cc->set_on_change(PROPERTY_BIND(int, preset, preset.overdrive_cc));
+	show_midi.push_back(overdrive_cc);
+
+	overdrive->set_on_change([&preset, overdrive_val](double val) {
+		preset.overdrive = val;
+		overdrive_val->update_text(std::to_string(val));
+	});
+
+	distortion_box->add_child(vol_text);
+	distortion_box->add_child(overdrive);
+	distortion_box->add_child(overdrive_val);
+	distortion_box->add_child(overdrive_cc);
+	amplifier->add_child(distortion_box);
+
+	controls->add_child(amplifier);
+
 	controls->add_child(drawbars);
 	container->add_child(controls);
 
