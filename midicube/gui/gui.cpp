@@ -475,6 +475,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 
 		B3OrganPreset& preset = data->preset;
 		drawbar->set_on_change([&preset,  value, i](int val) {
+			std::cout << val << std::endl;
 			preset.drawbars[i] = val;
 			value->update_text(std::to_string(val));
 		});

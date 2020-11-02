@@ -33,7 +33,7 @@ void OrganDrawbar::draw(int parentX, int parentY, NodeEnv env) {
 	render_box(parentX + x, parentY + y + height * val/9, width, height/9, button_style, env.hovered == this);
 }
 
-void OrganDrawbar::set_on_change(std::function<void (bool)> on_change) {
+void OrganDrawbar::set_on_change(std::function<void (int)> on_change) {
 	this->on_change = on_change;
 }
 
@@ -47,7 +47,7 @@ void OrganDrawbar::move_drawbar(int y) {
 	else if (value > 8) {
 		value = 8;
 	}
-	if ((int) value != old_val) {
+	if (value != old_val) {
 		if (on_change) {
 			on_change(value);
 		}

@@ -29,7 +29,7 @@ public:
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
-	virtual void set_on_change(std::function<void (bool)> on_change);
+	virtual void set_on_change(std::function<void (int)> on_change);
 
 	FOCUS_TRAVERSABLE
 
