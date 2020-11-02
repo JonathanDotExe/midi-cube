@@ -560,6 +560,22 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	controls->add_child(drawbars);
 	container->add_child(controls);
 
+	//Footer
+	HBox* footer = new HBox();
+	LabeledControl<CheckBox>* edit_midi = new LabeledControl<CheckBox>("Edit MIDI");
+	edit_midi->label->style.font_color = WHITE;
+	edit_midi->control->set_on_change([show_midi, hide_midi](bool midi) {
+		for (Node* node : show_midi) {
+			node->set_visible(midi);
+		}
+		for (Node* node : hide_midi) {
+			node->set_visible(!midi);
+		}
+	});
+
+	footer->add_child(edit_midi);
+	container->add_child(edit_midi);
+
 	//Hide
 	for (Node* node : show_midi) {
 		node->set_visible(false);
