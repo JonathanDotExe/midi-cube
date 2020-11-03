@@ -609,9 +609,11 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	std::vector<DistortionType> values{DistortionType::DIGITAL, DistortionType::ANALOG_1, DistortionType::ANALOG_2};
 	std::vector<std::string> names{"Digital", "Analog 1", "Analog 2"};
 
-	ComboBox<ssize_t>* distortion_type = new ComboBox<ssize_t>(types, [&names](ssize_t b) {
+	ComboBox<ssize_t>* distortion_type = new ComboBox<ssize_t>(types, [names](ssize_t b) {
 		return names.at(b);
 	});
+	distortion_type->get_layout().margin_left = 10;
+	distortion_type->get_layout().width = 60;
 	distortion_type->set_on_change([&preset, &values](ssize_t index) {
 		preset.distortion_type = values.at(index);
 	});
