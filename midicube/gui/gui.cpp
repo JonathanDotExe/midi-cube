@@ -569,6 +569,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	distortion_box->get_layout().width = WRAP_CONTENT;
 	distortion_box->get_layout().height = WRAP_CONTENT;
 
+	//Overdrive
 	Label* vol_text = new Label("Overdrive");
 	vol_text->style.font_size = 10;
 	vol_text->style.font_color = BLACK;
@@ -603,7 +604,22 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	distortion_box->add_child(overdrive);
 	distortion_box->add_child(overdrive_val);
 	distortion_box->add_child(overdrive_cc);
+	//DistortionType
+	std::vector<ssize_t> types{0, 1, 2};
+	std::vector<DistortionType> values{DistortionType::DIGITAL, DistortionType::ANALOG_1, DistortionType::ANALOG_2};
+	std::vector<std::string> names{"Digital", "Analog 1", "Analog 2"};
+
+	ComboBox<ssize_t>* distortion_type = new ComboBox<ssize_t>(types, [names](ssize_t b) {
+		return names.at(b);
+	});
+	distortion_type->get_layout().margin_left = 10;
+	distortion_type->get_layout().width = 60;
+	distortion_type->set_on_change([&preset, &values](ssize_t index) {
+		preset.distortion_type = values.at(index);
+	});
+
 	amplifier->add_child(distortion_box);
+	amplifier->add_child(distortion_type);
 	controls->add_child(amplifier);
 
 	container->add_child(controls);
