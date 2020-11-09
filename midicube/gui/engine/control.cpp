@@ -232,6 +232,26 @@ void Spinner::set_on_change(std::function<void(int)> on_change) {
 	this->on_change = on_change;
 }
 
+void Spinner::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
+	int old = value;
+	value += x_motion;
+	if (value < min) {
+		value = min;
+	}
+
+	if (value > max) {
+		value = max;
+	}
+
+	if (old != value) {
+		text = std::to_string(value);
+		frame->request_relayout();
+		if (on_change) {
+			on_change(value);
+		}
+	}
+}
+
 void Spinner::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
 	x -= this->x;
 	y -= this->y;

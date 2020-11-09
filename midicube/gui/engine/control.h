@@ -296,6 +296,8 @@ public:
 
 	FOCUS_TRAVERSABLE
 
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
+
 	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
 
 	virtual void update_style();
