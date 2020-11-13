@@ -287,3 +287,29 @@ Spinner::~Spinner() {
 
 }
 
+//DragBox
+DragBox::DragBox(double value, FixedScale scale) {
+	progress = 0;
+}
+
+void DragBox::draw(int parentX, int parentY, NodeEnv env) {
+	render_box(parentX + x, parentY + y, width, height, style, env.hovered == this);
+	positioner.draw(parentX + x, parentY + y, text, text_style);
+}
+
+void DragBox::set_on_change(std::function<void (double)> on_change) {
+	this->on_change = on_change;
+}
+
+void DragBox::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
+
+}
+
+void DragBox::update_style() {
+
+}
+
+DragBox::~DragBox() {
+
+}
+

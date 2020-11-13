@@ -306,4 +306,39 @@ public:
 
 };
 
+class DragBox : public StyleableNode {
+
+private:
+	std::function<void (double)> on_change;
+	std::string text;
+	TextPositioner positioner;
+
+public:
+	BoxStyle style;
+	TextStyle text_style;
+	double progress;
+	int precision = 2;
+	FixedScale scale{0, {}, 1};
+	double step = 1.0/127;
+
+	DragBox(double value, FixedScale scale);
+
+	virtual void draw(int parentX, int parentY, NodeEnv env);
+
+	virtual void set_on_change(std::function<void (double)> on_change);
+
+	FOCUS_TRAVERSABLE
+
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
+
+	virtual void update_style();
+
+	virtual Vector get_content_size() {
+		return positioner.size();
+	}
+
+	virtual ~DragBox();
+
+};
+
 #endif /* MIDICUBE_GUI_ENGINE_CONTROL_H_ */

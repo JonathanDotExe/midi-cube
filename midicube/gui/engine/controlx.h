@@ -78,41 +78,5 @@ public:
 
 };
 
-class SynthKnob : public StyleableNode {
-
-private:
-	std::function<void (double)> on_change;
-	TextPositioner positioner;
-
-public:
-	Color knob_color;
-	Color line_color;
-	TextStyle style;
-	double progress;
-	int precision = 2;
-	FixedScale scale{0, {}, 1};
-	int knob_radius = 15;
-	int x_off = 0;
-	int y_off = 0;
-
-	SynthKnob(double value, FixedScale scale);
-
-	virtual void draw(int parentX, int parentY, NodeEnv env);
-
-	virtual void set_on_change(std::function<void (double)> on_change);
-
-	FOCUS_TRAVERSABLE
-
-	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
-
-	virtual Vector get_content_size() {
-		Vector size = positioner.size();
-		return {std::max(2 * knob_radius, size.x), 2 * knob_radius + size.y + 2};
-	}
-
-	virtual ~SynthKnob();
-
-};
-
 
 #endif /* MIDICUBE_GUI_ENGINE_CONTROLX_H_ */
