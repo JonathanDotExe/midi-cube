@@ -6,6 +6,7 @@
  */
 
 #include "control.h"
+#include <cmath>
 
 //Label
 Label::Label(std::string text) : StyleableNode() {
@@ -302,6 +303,7 @@ void DragBox::set_on_change(std::function<void (double)> on_change) {
 }
 
 void DragBox::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
+	double dir = sqrt((double) x_motion * x_motion + y_motion * y_motion) * step;
 
 }
 
