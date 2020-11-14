@@ -668,6 +668,14 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	HBox* footer = new HBox();
 	footer->get_layout().margin_top = 10;
 	footer->get_layout().height = WRAP_CONTENT;
+	//Home
+	Button* home_button = new Button("Home");
+	home_button->set_on_click([this, frame]() {
+		frame->request_view(new SoundEngineMenuView(cube));
+	});
+	footer->add_child(home_button);
+
+	//Edit MIDI
 	LabeledControl<CheckBox>* edit_midi = new LabeledControl<CheckBox>("Edit MIDI");
 	edit_midi->label->style.font_color = WHITE;
 	edit_midi->control->set_on_change([show_midi, hide_midi](bool midi) {
