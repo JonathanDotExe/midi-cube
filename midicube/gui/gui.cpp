@@ -624,6 +624,36 @@ Node* B3OrganMenuView::init(Frame* frame) {
 
 	container->add_child(controls);
 
+	//Physical modeling controls
+	HBox* pm_params = new HBox();
+	VBox* col1 = new VBox();
+	//Harmonic foldback volume
+	LabeledControl<DragBox>* foldback_vol = new LabeledControl<DragBox>("Harmonic Foldback Volume", new DragBox(preset.harmonic_foldback_volume, {0, {}, 1}));
+	foldback_vol->label->style.font_color = WHITE;
+	foldback_vol->control->set_on_change(PROPERTY_BIND(double, preset, preset.harmonic_foldback_volume));
+	col1->add_child(foldback_vol);
+
+	//Rotary gain
+	LabeledControl<DragBox>* rotary_gain = new LabeledControl<DragBox>("Rotary Gain", new DragBox(preset.rotary_gain, {0, {}, 2}));
+	rotary_gain->label->style.font_color = WHITE;
+	rotary_gain->control->set_on_change(PROPERTY_BIND(double, preset, preset.rotary_gain));
+	col1->add_child(rotary_gain);
+
+	//Rotary type
+	LabeledControl<OrganSwitch>* rotary_type = new LabeledControl<OrganSwitch>("Rotary Type", new OrganSwitch(preset.rotary_type, "1", "2"));
+	rotary_type->label->style.font_color = WHITE;
+	rotary_type->control->set_on_change(PROPERTY_BIND(double, preset, preset.rotary_type));
+	col1->add_child(rotary_type);
+
+	//Rotary stereo mix
+	LabeledControl<DragBox>* rotary_stereo_mix = new LabeledControl<DragBox>("Rotary Stereo Mix", new DragBox(preset.rotary_stereo_mix, {0, {}, 1}));
+	rotary_stereo_mix->label->style.font_color = WHITE;
+	rotary_stereo_mix->control->set_on_change(PROPERTY_BIND(double, preset, preset.rotary_stereo_mix));
+	col1->add_child(rotary_stereo_mix);
+
+	pm_params->add_child(col1);
+	container->add_child(pm_params);
+
 	//Footer
 	HBox* footer = new HBox();
 	LabeledControl<CheckBox>* edit_midi = new LabeledControl<CheckBox>("Edit MIDI");
