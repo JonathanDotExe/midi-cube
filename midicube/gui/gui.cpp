@@ -634,6 +634,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 
 	//Physical modeling controls
 	HBox* pm_params = new HBox();
+	pm_params->get_layout().height = WRAP_CONTENT;
 	VBox* col1 = new VBox();
 	//Harmonic foldback volume
 	LabeledControl<DragBox>* foldback_vol = new LabeledControl<DragBox>("Harmonic Foldback Volume", new DragBox(preset.harmonic_foldback_volume, {0, {}, 1}));
@@ -665,6 +666,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 
 	//Footer
 	HBox* footer = new HBox();
+	footer->get_layout().margin_top = 10;
 	footer->get_layout().height = WRAP_CONTENT;
 	LabeledControl<CheckBox>* edit_midi = new LabeledControl<CheckBox>("Edit MIDI");
 	edit_midi->label->style.font_color = WHITE;
@@ -678,7 +680,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	});
 
 	footer->add_child(edit_midi);
-	container->add_child(edit_midi);
+	container->add_child(footer);
 
 	//Hide
 	for (Node* node : show_midi) {
