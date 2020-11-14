@@ -6,6 +6,9 @@
  */
 
 #include "control.h"
+#include <cmath>
+#include <iomanip>
+#include <sstream>
 
 //Label
 Label::Label(std::string text) : StyleableNode() {
@@ -289,7 +292,20 @@ Spinner::~Spinner() {
 
 //DragBox
 DragBox::DragBox(double value, FixedScale scale) {
-	progress = 0;
+	this->scale = scale;
+	progress = this->scale.progress(value);
+	get_layout().padding_left = 2;
+	get_layout().padding_right = 2;
+	get_layout().padding_top = 2;
+	get_layout().padding_bottom = 2;
+
+	style.border_color = BLACK;
+	style.border_thickness = 1;
+	style.border_radius = 0.2f;
+	style.fill_color =  RAYWHITE;
+	style.hover_color = LIGHTGRAY;
+
+	update_style();
 }
 
 void DragBox::draw(int parentX, int parentY, NodeEnv env) {
@@ -302,11 +318,30 @@ void DragBox::set_on_change(std::function<void (double)> on_change) {
 }
 
 void DragBox::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
-
+	long int old = round(scale.value(progress) * pow(10, precision));
+	progress += y_motion * step;
+	if (progress < 0) {
+		progress = 0;
+	}
+	else if (progress > 1) {
+		progress = 1;
+	}
+	long int new_val = round(scale.value(progress) * pow(10, precision));
+	if (old != new_val) {
+		if (on_change) {
+			on_change(new_val/pow(10.0, precision));
+		}
+		frame->request_relayout();
+	}
 }
 
 void DragBox::update_style() {
+	std::stringstream str;
+	str << std::fixed << std::setprecision(precision);
+	str << scale.value(progress);
+	text = str.str();
 
+	positioner.recalc(width, height, text, text_style);
 }
 
 DragBox::~DragBox() {
