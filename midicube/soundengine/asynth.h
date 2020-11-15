@@ -18,7 +18,8 @@
 struct OscilatorEntity {
 	double volume = 0;
 	ADSREnvelope env{0.0, 0, 1, 0.0};
-	AnalogOscilatorData osc;
+	AnalogOscilatorData osc{AnalogWaveForm::SAW_DOWN, true};
+	AnalogOscilatorBankData bank;
 };
 
 struct ModEnvelopeEntity {
@@ -41,7 +42,7 @@ struct AnalogSynthPreset {
 class AnalogSynth : public BaseSoundEngine {
 
 private:
-
+	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT, 8> oscilators;
 
 public:
 	AnalogSynthPreset preset;

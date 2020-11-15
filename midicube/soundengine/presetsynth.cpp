@@ -37,9 +37,9 @@ FMSynth::FMSynth() {
 	vibrato = 0;
 	filter.set_cutoff(1200);
 
-	osc.data.analog = true;
+	/*osc.data.analog = true;
 	osc.data.waveform = AnalogWaveForm::SAW_DOWN;
-	osc.unison_amount = 3;
+	osc.unison_amount = 3;*/
 
 	phase = 0;
 	fm_phase = 0;

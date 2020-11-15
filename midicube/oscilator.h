@@ -40,27 +40,29 @@ public:
 	~AnalogOscilator();
 };
 
+struct AnalogOscilatorBankData {
+	double unison_detune = 0.1;
+	size_t unison_amount = 0;
+};
+
 template<std::size_t N, std::size_t U>
 class AnalogOscilatorBank {
 private:
 	std::array<std::array<AnalogOscilator, U>, N> oscilators;
 public:
-	AnalogOscilatorData data;
-	double unison_detune = 0.1;
-	size_t unison_amount = 0;
 
 	AnalogOscilatorBank() {
 
 	}
 
-	double signal(double freq, double time_step, size_t index, bool modulator = false) {
+	double signal(double freq, double time_step, size_t index, AnalogOscilatorData data, AnalogOscilatorBankData bdata, bool modulator = false) {
 		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
 		double signal = 0;
-		double detune = note_to_freq_transpose(unison_detune);
-		double ndetune = note_to_freq_transpose(-unison_detune);
+		double detune = note_to_freq_transpose(bdata.unison_detune);
+		double ndetune = note_to_freq_transpose(-bdata.unison_detune);
 		double det = detune;
 		double ndet = 1;
-		for (size_t i = 0; i <= unison_amount && i < osc.size(); ++i) {
+		for (size_t i = 0; i <= bdata.unison_amount && i < osc.size(); ++i) {
 			double d = 1;
 			if (i % 2 == 0) {
 				d = ndet;
@@ -72,7 +74,7 @@ public:
 			}
 			signal += osc[i].signal(freq * d, time_step, data, modulator);
 		}
-		return signal / (unison_amount + 1);
+		return signal / (bdata.unison_amount + 1);
 	}
 
 	void randomize(size_t index) {
