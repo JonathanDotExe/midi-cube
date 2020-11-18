@@ -16,7 +16,12 @@
 #define ANALOG_MOD_ENV_COUNT 8
 #define ANALOG_LFO_COUNT 8
 
+const FixedScale SYNC_SCALE = {0, {}, 1};
+const FixedScale PULSE_WIDTH_SCALE = {0, {}, 0.5};
+const FixedScale UNISON_DETUNE_SCALE = {0, {}, 1};
+
 struct PropertyModulation {
+	double value = 0;
 	size_t mod_env = 0;
 	double mod_amount = 0;
 	size_t lfo = 0;
@@ -30,12 +35,10 @@ struct OscilatorEntity {
 	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
 	bool analog = false;
 	bool sync = false;
-	double pulse_width_scale = 0.5;
-	double sync_scale = 1;
-	AnalogOscilatorBankData bank;
-	PropertyModulation sync_mod;
-	PropertyModulation pulse_width_mod;
-	PropertyModulation unison_detune_mod;
+	size_t unison_amount = 0;
+	PropertyModulation sync_mul = {0.1};
+	PropertyModulation pulse_width = {1};
+	PropertyModulation unison_detune = {0.1};
 };
 
 struct ModEnvelopeEntity {
@@ -50,14 +53,10 @@ struct LFOEntity {
 };
 
 struct AnalogSynthPreset {
-	std::array<OscilatorEntity, ANALOG_LFO_COUNT> lfos;
-	std::array<OscilatorEntity, ANALOG_MOD_ENV_COUNT> mod_envs;
+	std::array<LFOEntity, ANALOG_LFO_COUNT> lfos;
+	std::array<ModEnvelopeEntity, ANALOG_MOD_ENV_COUNT> mod_envs;
 	std::array<OscilatorEntity, ANALOG_OSCILATOR_COUNT> oscilators;
 };
-
-const FixedScale SYNC_SCALE = {0, {}, 1};
-const FixedScale PULSE_WIDTH_SCALE = {0, {}, 0.5};
-const FixedScale UNISON_DETUNE_SCALE = {0, {}, 1};
 
 class AnalogSynth : public BaseSoundEngine {
 

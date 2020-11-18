@@ -10,14 +10,18 @@
 AnalogSynth::AnalogSynth() {
 	preset.oscilators.at(0).volume = 1;
 	preset.oscilators.at(0).env = {0.0005, 0, 1, 0.003};
-	preset.oscilators.at(0).bank.unison_amount = 2;
+	preset.oscilators.at(0).unison_amount = 2;
 }
 
-static double apply_modulation(double prog, FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, double velocity) {
-
+static double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, double velocity) {
+	double prog = mod.value;
+	prog += env_val.at(mod.mod_env) * mod.mod_amount + lfo_val.at(mod.lfo) * mod.lfo_amount + velocity * mod.velocity_amount;
+	prog = std::min(std::max(prog, 0.0), 1.0);
+	return scale.value(prog);
 }
 
 void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	double velocity = note.velocity/127.0;
 	//Mod Envs
 	std::array<double, ANALOG_MOD_ENV_COUNT> env_val;
 	for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
@@ -41,10 +45,13 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 		OscilatorEntity& osc = preset.oscilators[i];
 		if (osc.volume) {
 			AnalogOscilatorData data = {osc.waveform, osc.analog, osc.sync};
+			AnalogOscilatorBankData bdata = {0.1, osc.unison_amount};
 			//Apply modulation
+			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val, lfo_val, velocity);
+			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, env_val, lfo_val, velocity);
+			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, env_val, lfo_val, velocity);
 
-
-			sample += oscilators.signal(note.freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, data, osc.bank, false) * osc.volume;
+			sample += oscilators.signal(note.freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, data, bdata, false) * osc.volume;
 		}
 	}
 
