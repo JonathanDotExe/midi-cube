@@ -24,24 +24,26 @@ static double apply_modulation(const FixedScale& scale, PropertyModulation& mod,
 }
 
 void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	//Mod Envs
 	std::array<double, ANALOG_MOD_ENV_COUNT> env_val;
+	std::array<double, ANALOG_LFO_COUNT> lfo_val;
+	//Mod Envs
 	for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
 		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
-		if (mod_env.volume) {
-			env_val.at(i) = mod_env.env.amplitude(info.time, note, env) * mod_env.volume;
+		if (mod_env.active) {
+			double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, note.velocity);
+			env_val.at(i) = mod_env.env.amplitude(info.time, note, env) * volume;
 		}
 		else {
 			env_val.at(i) = 0;
 		}
 	}
 	//LFOs
-	std::array<double, ANALOG_LFO_COUNT> lfo_val;
 	for (size_t i = 0; i < preset.lfos.size(); ++i) {
 		LFOEntity& lfo = preset.lfos[i];
-		if (lfo.volume) {
+		if (lfo.active) {
+			double volume = apply_modulation(VOLUME_SCALE, lfo.volume, env_val, lfo_val, note.velocity);
 			AnalogOscilatorData d = {lfo.waveform};
-			lfo_val.at(i) = lfos.at(i).signal(lfo.freq, info.time_step, d, false) * lfo.volume;
+			lfo_val.at(i) = lfos.at(i).signal(lfo.freq, info.time_step, d, false) * volume;
 		}
 		else {
 			lfo_val.at(i) = 0;

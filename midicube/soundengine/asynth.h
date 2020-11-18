@@ -44,12 +44,14 @@ struct OscilatorEntity {
 };
 
 struct ModEnvelopeEntity {
-	double volume = 0;
+	bool active = false;
+	PropertyModulation volume = {1};
 	ADSREnvelope env{0.0, 0, 1, 0.0};
 };
 
 struct LFOEntity {
-	double volume = 0;
+	bool active = false;
+	PropertyModulation volume = {1};
 	double freq = 1;
 	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
 };
