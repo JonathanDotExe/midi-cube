@@ -27,7 +27,11 @@ struct PropertyModulation {
 struct OscilatorEntity {
 	double volume = 0;
 	ADSREnvelope env{0.0, 0, 1, 0.0};
-	AnalogOscilatorData osc{AnalogWaveForm::SAW_DOWN, true};
+	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
+	bool analog = false;
+	bool sync = false;
+	double pulse_width_scale = 0.5;
+	double sync_scale = 1;
 	AnalogOscilatorBankData bank;
 	PropertyModulation sync_mod;
 	PropertyModulation pulse_width_mod;

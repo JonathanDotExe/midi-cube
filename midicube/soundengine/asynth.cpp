@@ -13,6 +13,10 @@ AnalogSynth::AnalogSynth() {
 	preset.oscilators.at(0).bank.unison_amount = 2;
 }
 
+static double apply_modulation(double prog, FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, double velocity) {
+
+}
+
 void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Mod Envs
 	std::array<double, ANALOG_MOD_ENV_COUNT> env_val;
@@ -36,11 +40,11 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	for (size_t i = 0; i < preset.oscilators.size(); ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
 		if (osc.volume) {
-			AnalogOscilatorData data = osc.osc;
+			AnalogOscilatorData data = {osc.waveform, osc.analog, osc.sync};
 			//Apply modulation
 
 
-			sample += oscilators.signal(note.freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, osc.osc, osc.bank, false) * osc.volume;
+			sample += oscilators.signal(note.freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, data, osc.bank, false) * osc.volume;
 		}
 	}
 
