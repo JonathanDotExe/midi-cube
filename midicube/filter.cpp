@@ -14,6 +14,11 @@ double cutoff_to_rc(double cutoff) {
 	return 1.0/(2 * M_PI * cutoff);
 }
 
+//Filter
+double Filter::apply (FilterData& data, double sample, double time_step) {
+	return 0;
+}
+
 //LowPassFilter
 RCLowPassFilter::RCLowPassFilter(double cutoff) {
 	this->cutoff = cutoff;
