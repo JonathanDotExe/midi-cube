@@ -27,7 +27,7 @@ struct ModEnvelopeEntity {
 	ADSREnvelope env{0.0, 0, 1, 0.0};
 };
 
-struct LFOEnvelopeEntity {
+struct LFOEntity {
 	double volume = 0;
 	double freq = 1;
 	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
@@ -43,6 +43,7 @@ class AnalogSynth : public BaseSoundEngine {
 
 private:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT, 8> oscilators;
+	std::array<AnalogOscilator, ANALOG_LFO_COUNT> lfos;
 
 public:
 	AnalogSynthPreset preset;
