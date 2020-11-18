@@ -382,7 +382,15 @@ B3OrganMenuView::B3OrganMenuView(B3OrganData* data, MidiCube* cube) {
 static void style_organ_switch(LabeledControl<OrganSwitch>* sw) {
 	sw->label->style.font_color = WHITE;
 	sw->control->get_layout().width = 25;
-	sw->control->get_layout().height = 20;
+	sw->control->get_layout().height = 30;
+	sw->get_layout().margin_bottom = 5;
+}
+
+static void style_organ_drag_box(LabeledControl<DragBox>* sw) {
+	sw->label->style.font_color = WHITE;
+	sw->control->step = 0.005;
+	sw->control->get_layout().width = 25;
+	sw->control->get_layout().height = 30;
 	sw->get_layout().margin_bottom = 5;
 }
 
@@ -624,8 +632,50 @@ Node* B3OrganMenuView::init(Frame* frame) {
 
 	container->add_child(controls);
 
+	//Physical modeling controls
+	HBox* pm_params = new HBox();
+	pm_params->get_layout().height = WRAP_CONTENT;
+	VBox* col1 = new VBox();
+	//Harmonic foldback volume
+	LabeledControl<DragBox>* foldback_vol = new LabeledControl<DragBox>("Harmonic Foldback Volume", new DragBox(preset.harmonic_foldback_volume, {0, {}, 1}));
+	style_organ_drag_box(foldback_vol);
+	foldback_vol->control->set_on_change(PROPERTY_BIND(double, preset, preset.harmonic_foldback_volume));
+	col1->add_child(foldback_vol);
+
+	//Rotary gain
+	LabeledControl<DragBox>* rotary_gain = new LabeledControl<DragBox>("Rotary Gain", new DragBox(preset.rotary_gain, {0, {}, 2}));
+	style_organ_drag_box(rotary_gain);
+	rotary_gain->control->set_on_change(PROPERTY_BIND(double, preset, preset.rotary_gain));
+	col1->add_child(rotary_gain);
+
+	//Rotary type
+	LabeledControl<OrganSwitch>* rotary_type = new LabeledControl<OrganSwitch>("Rotary Type", new OrganSwitch(preset.rotary_type, "1", "2"));
+	style_organ_switch(rotary_type);
+	rotary_type->label->style.font_color = WHITE;
+	rotary_type->control->set_on_change(PROPERTY_BIND(double, preset, preset.rotary_type));
+	col1->add_child(rotary_type);
+
+	//Rotary stereo mix
+	LabeledControl<DragBox>* rotary_stereo_mix = new LabeledControl<DragBox>("Rotary Stereo Mix", new DragBox(preset.rotary_stereo_mix, {0, {}, 1}));
+	style_organ_drag_box(rotary_stereo_mix);
+	rotary_stereo_mix->control->set_on_change(PROPERTY_BIND(double, preset, preset.rotary_stereo_mix));
+	col1->add_child(rotary_stereo_mix);
+
+	pm_params->add_child(col1);
+	container->add_child(pm_params);
+
 	//Footer
 	HBox* footer = new HBox();
+	footer->get_layout().margin_top = 10;
+	footer->get_layout().height = WRAP_CONTENT;
+	//Home
+	Button* home_button = new Button("Home");
+	home_button->set_on_click([this, frame]() {
+		frame->request_view(new SoundEngineMenuView(cube));
+	});
+	footer->add_child(home_button);
+
+	//Edit MIDI
 	LabeledControl<CheckBox>* edit_midi = new LabeledControl<CheckBox>("Edit MIDI");
 	edit_midi->label->style.font_color = WHITE;
 	edit_midi->control->set_on_change([show_midi, hide_midi](bool midi) {
@@ -638,7 +688,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	});
 
 	footer->add_child(edit_midi);
-	container->add_child(edit_midi);
+	container->add_child(footer);
 
 	//Hide
 	for (Node* node : show_midi) {
