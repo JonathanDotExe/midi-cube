@@ -36,6 +36,10 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	for (size_t i = 0; i < preset.oscilators.size(); ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
 		if (osc.volume) {
+			AnalogOscilatorData data = osc.osc;
+			//Apply modulation
+
+
 			sample += oscilators.signal(note.freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, osc.osc, osc.bank, false) * osc.volume;
 		}
 	}
