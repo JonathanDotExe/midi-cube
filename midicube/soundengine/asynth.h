@@ -16,6 +16,7 @@
 #define ANALOG_MOD_ENV_COUNT 8
 #define ANALOG_LFO_COUNT 8
 
+const FixedScale VOLUME_SCALE = {0, {}, 1};
 const FixedScale SYNC_SCALE = {0, {}, 1};
 const FixedScale PULSE_WIDTH_SCALE = {0, {}, 0.5};
 const FixedScale UNISON_DETUNE_SCALE = {0, {}, 1};
@@ -30,12 +31,13 @@ struct PropertyModulation {
 };
 
 struct OscilatorEntity {
-	double volume = 0;
+	bool active = false;
 	ADSREnvelope env{0.0, 0, 1, 0.0};
 	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
 	bool analog = false;
 	bool sync = false;
 	size_t unison_amount = 0;
+	PropertyModulation volume = {1};
 	PropertyModulation sync_mul = {0.1};
 	PropertyModulation pulse_width = {1};
 	PropertyModulation unison_detune = {0.1};

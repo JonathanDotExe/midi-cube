@@ -9,8 +9,10 @@
 
 AnalogSynth::AnalogSynth() {
 	OscilatorEntity& osc = preset.oscilators.at(0);
-	osc.volume = 1;
-	osc.env = {0.0005, 0, 1, 0.003};
+	osc.active = true;
+	osc.volume.value = 0;
+	osc.volume.velocity_amount = 1;
+	osc.env = {0.2, 0, 1, 0.5};
 	osc.unison_amount = 2;
 }
 
@@ -49,15 +51,16 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	double sample = 0;
 	for (size_t i = 0; i < preset.oscilators.size(); ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
-		if (osc.volume) {
+		if (osc.active) {
 			AnalogOscilatorData data = {osc.waveform, osc.analog, osc.sync};
 			AnalogOscilatorBankData bdata = {0.1, osc.unison_amount};
 			//Apply modulation
+			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val, lfo_val, note.velocity) * osc.env.amplitude(info.time, note, env);
 			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val, lfo_val, note.velocity);
 			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, env_val, lfo_val, note.velocity);
 			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, env_val, lfo_val, note.velocity);
 
-			sample += oscilators.signal(note.freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, data, bdata, false) * osc.volume;
+			sample += oscilators.signal(note.freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, data, bdata, false) * volume;
 		}
 	}
 
@@ -79,7 +82,7 @@ bool AnalogSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardE
 	bool finished = true;
 	for (size_t i = 0; i < preset.oscilators.size() && finished; ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
-		if (osc.volume) {
+		if (osc.active) {
 			finished = osc.env.is_finished(info.time, note, env);
 		}
 	}
