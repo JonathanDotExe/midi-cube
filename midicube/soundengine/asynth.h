@@ -10,6 +10,7 @@
 
 #include "soundengine.h"
 #include "../oscilator.h"
+#include "../filter.h"
 #include "../util.h"
 
 #define ANALOG_OSCILATOR_COUNT 8
@@ -20,6 +21,7 @@ const FixedScale VOLUME_SCALE = {0, {}, 1};
 const FixedScale SYNC_SCALE = {0, {}, 1};
 const FixedScale PULSE_WIDTH_SCALE = {0, {}, 0.5};
 const FixedScale UNISON_DETUNE_SCALE = {0, {}, 1};
+const FixedScale FILTER_CUTOFF_SCALE(14, {{0.2, 200}, {0.3, 400}, {0.4, 800}, {0.7, 2500}, {0.8, 5000}, {0.9, 10000}}, 21000);
 
 struct PropertyModulation {
 	double value = 0;
@@ -41,6 +43,10 @@ struct OscilatorEntity {
 	PropertyModulation sync_mul = {0.1};
 	PropertyModulation pulse_width = {1};
 	PropertyModulation unison_detune = {0.1};
+
+	bool filter = false;
+	FilterType filter_type = FilterType::LP_12;
+	PropertyModulation filter_cutoff = {1};
 };
 
 struct ModEnvelopeEntity {
@@ -66,6 +72,7 @@ class AnalogSynth : public BaseSoundEngine {
 
 private:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT, 8> oscilators;
+	std::array<Filter, SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT> filters;
 	std::array<AnalogOscilator, ANALOG_LFO_COUNT> lfos;
 
 public:

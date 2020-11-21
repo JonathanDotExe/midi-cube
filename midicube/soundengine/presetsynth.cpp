@@ -35,7 +35,7 @@ FMSynth::FMSynth() {
 	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
 	vibrato = 0;
-	filter.set_cutoff(1200);
+	//filter.set_cutoff(1200);
 
 	/*osc.data.analog = true;
 	osc.data.waveform = AnalogWaveForm::SAW_DOWN;
@@ -83,9 +83,6 @@ bool FMSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvir
 void FMSynth::control_change(unsigned int control, unsigned int value) {
 	if (control == 1) {
 		vibrato = value/127.0;
-	}
-	if (control == 74) {
-		filter.set_cutoff(21000/(128.0 - value));
 	}
 }
 

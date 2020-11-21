@@ -30,7 +30,7 @@ class Filter {
 private:
 	std::array<FilterCache, 4> cache;
 public:
-	double apply (FilterData& data, double sample, double time_step) = 0;
+	double apply (FilterData& data, double sample, double time_step);
 
 };
 

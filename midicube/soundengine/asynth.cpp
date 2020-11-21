@@ -8,12 +8,21 @@
 
 
 AnalogSynth::AnalogSynth() {
+	ModEnvelopeEntity& mod_env = preset.mod_envs.at(0);
+	mod_env.active = true;
+	mod_env.env = {1.2, 0, 1, 0.7};
+
 	OscilatorEntity& osc = preset.oscilators.at(0);
 	osc.active = true;
 	osc.volume.value = 0;
 	osc.volume.velocity_amount = 1;
 	osc.env = {0.2, 0, 1, 0.5};
-	osc.unison_amount = 2;
+	osc.unison_detune.value = 0.05;
+	osc.unison_amount = 4;
+	osc.filter = true;
+	osc.filter_cutoff.value = 0.1;
+	osc.filter_cutoff.mod_env = 0;
+	osc.filter_cutoff.mod_amount = 0.5;
 }
 
 static double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, double velocity) {
@@ -62,7 +71,15 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, env_val, lfo_val, note.velocity);
 			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, env_val, lfo_val, note.velocity);
 
-			sample += oscilators.signal(note.freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, data, bdata, false) * volume;
+			double signal =  oscilators.signal(note.freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, data, bdata, false);
+			//Filter
+			if (osc.filter) {
+				FilterData filter{osc.filter_type};
+				filter.cutoff = apply_modulation(FILTER_CUTOFF_SCALE, osc.filter_cutoff, env_val, lfo_val, note.velocity);
+				signal = filters.at(note_index + i * SOUND_ENGINE_POLYPHONY).apply(filter, signal, info.time_step);
+			}
+
+			sample += signal * volume;
 		}
 	}
 

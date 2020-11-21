@@ -8,6 +8,7 @@
 #include "vocoder.h"
 #include <algorithm>
 
+/*
 VocoderData::VocoderData() {
 	double step = (double) (VOCODER_HIGH_BAND - VOCODER_LOW_BAND)/(carrier_filters.size());
 	for (size_t i = 0; i < carrier_filters.size(); ++i) {
@@ -105,4 +106,4 @@ std::string get_engine_name<Vocoder>() {
 
 void __fix_link_vocoder_name__ () {
 	get_engine_name<Vocoder>();
-}
+}*/

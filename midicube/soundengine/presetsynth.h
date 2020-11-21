@@ -24,7 +24,6 @@ private:
 	double phase;
 	double fm_phase;
 	ADSREnvelope env{0.0, 0, 1, 0.0};
-	MultiChannelFilter<LowPassFilter<2>> filter;
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 8> osc;
 public:
 

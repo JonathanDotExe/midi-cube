@@ -45,7 +45,6 @@ static double rc_highpass(FilterCache& c, double cutoff, double sample, double t
 
 //Filter
 double Filter::apply (FilterData& data, double sample, double time_step) {
-	size_t rep = 4;
 	switch (data.type) {
 	case FilterType::HP_12:
 		for (size_t i = 0; i < 2; ++i) {
@@ -68,5 +67,5 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 		}
 		break;
 	}
-	return 0;
+	return sample;
 }
