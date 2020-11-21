@@ -20,9 +20,10 @@ AnalogSynth::AnalogSynth() {
 	osc.unison_detune.value = 0.05;
 	osc.unison_amount = 4;
 	osc.filter = true;
-	osc.filter_cutoff.value = 0.1;
+	osc.filter_type = FilterType::LP_24;
+	osc.filter_cutoff.value = 0.02;
 	osc.filter_cutoff.mod_env = 0;
-	osc.filter_cutoff.mod_amount = 0.5;
+	osc.filter_cutoff.mod_amount = 0.3;
 }
 
 static double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, double velocity) {

@@ -21,7 +21,7 @@ const FixedScale VOLUME_SCALE = {0, {}, 1};
 const FixedScale SYNC_SCALE = {0, {}, 1};
 const FixedScale PULSE_WIDTH_SCALE = {0, {}, 0.5};
 const FixedScale UNISON_DETUNE_SCALE = {0, {}, 1};
-const FixedScale FILTER_CUTOFF_SCALE(14, {{0.2, 200}, {0.3, 400}, {0.4, 800}, {0.7, 2500}, {0.8, 5000}, {0.9, 10000}}, 21000);
+const FixedScale FILTER_CUTOFF_SCALE(0, {}, 1);
 
 struct PropertyModulation {
 	double value = 0;

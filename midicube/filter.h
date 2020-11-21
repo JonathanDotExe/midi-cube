@@ -17,7 +17,7 @@ enum class FilterType {
 
 struct FilterData {
 	FilterType type;
-	double cutoff = 21000;
+	double cutoff = 1;
 };
 
 struct FilterCache {
@@ -28,7 +28,10 @@ struct FilterCache {
 
 class Filter {
 private:
-	std::array<FilterCache, 4> cache;
+	double pole1 = 0;
+	double pole2 = 0;
+	double pole3 = 0;
+	double pole4 = 0;
 public:
 	double apply (FilterData& data, double sample, double time_step);
 

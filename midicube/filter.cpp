@@ -14,57 +14,29 @@ double cutoff_to_rc(double cutoff) {
 	return 1.0/(2 * M_PI * cutoff);
 }
 
-static double rc_lowpass(FilterCache& c, double cutoff, double sample, double time_step) {
-	double rc = cutoff_to_rc(cutoff);
-	double filtered = 0;
-	double a = time_step / (rc + time_step);
-
-	filtered = a * sample + (1 - a) * c.last_filtered;
-
-	c.last_filtered = filtered;
-	return filtered;
-}
-
-static double rc_highpass(FilterCache& c, double cutoff, double sample, double time_step) {
-	double filtered = 0;
-	double rc = cutoff_to_rc(cutoff);
-	double a = rc / (rc + time_step);
-
-	if (c.started) {
-		filtered = a * c.last_filtered + a * (sample - c.last);
-	}
-	else {
-		filtered = sample;
-		c.started = true;
-	}
-
-	c.last = sample;
-	c.last_filtered = filtered;
-	return filtered;
-}
+/**
+ * To convert frequency into filter cutoff use time_step/(rc+time_step)
+ */
 
 //Filter
 double Filter::apply (FilterData& data, double sample, double time_step) {
+	//Update buffers
+	pole1 += data.cutoff * (sample - pole1);
+	pole2 += data.cutoff * (pole1 - pole2);
+	pole3 += data.cutoff * (pole2 - pole3);
+	pole4 += data.cutoff * (pole3 - pole4);
 	switch (data.type) {
-	case FilterType::HP_12:
-		for (size_t i = 0; i < 2; ++i) {
-			sample = rc_highpass(cache.at(i), data.cutoff, sample, time_step);
-		}
-		break;
-	case FilterType::HP_24:
-		for (size_t i = 0; i < 4; ++i) {
-			sample = rc_highpass(cache.at(i), data.cutoff, sample, time_step);
-		}
-		break;
 	case FilterType::LP_12:
-		for (size_t i = 0; i < 2; ++i) {
-			sample = rc_lowpass(cache.at(i), data.cutoff, sample, time_step);
-		}
+		sample = pole2;
 		break;
 	case FilterType::LP_24:
-		for (size_t i = 0; i < 4; ++i) {
-			sample = rc_lowpass(cache.at(i), data.cutoff, sample, time_step);
-		}
+		sample = pole4;
+		break;
+	case FilterType::HP_12:
+		sample = sample - pole2;
+		break;
+	case FilterType::HP_24:
+		sample = sample - pole4;
 		break;
 	}
 	return sample;
