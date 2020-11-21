@@ -14,99 +14,48 @@ double cutoff_to_rc(double cutoff) {
 	return 1.0/(2 * M_PI * cutoff);
 }
 
-//Filter
-double Filter::apply (FilterData& data, double sample, double time_step) {
-	return 0;
-}
-
-//LowPassFilter
-RCLowPassFilter::RCLowPassFilter(double cutoff) {
-	this->cutoff = cutoff;
-	this->last = 0;
-	this->rc = cutoff_to_rc(cutoff);
-}
-
-double RCLowPassFilter::apply (double sample, double time_step) {
+static double rc_lowpass(FilterCache& c, double cutoff, double sample, double time_step) {
+	double rc = cutoff_to_rc(cutoff);
 	double filtered = 0;
 	double a = time_step / (rc + time_step);
 
-	filtered = a * sample + (1 - a) * last;
+	filtered = a * sample + (1 - a) * c.last_filtered;
 
-	last = filtered;
+	c.last_filtered = filtered;
 	return filtered;
 }
 
-void RCLowPassFilter::set_cutoff(double cutoff) {
-	this->cutoff = cutoff;
-	this->rc = cutoff_to_rc(cutoff);
-}
-
-double RCLowPassFilter::get_cutoff() {
-	return cutoff;
-}
-
-//HighPassFilter
-RCHighPassFilter::RCHighPassFilter(double cutoff) {
-	this->cutoff = cutoff;
-	this->last_filtered = 0;
-	this->last = 0;
-	this->rc = cutoff_to_rc(cutoff);
-	this->started = false;
-}
-
-double RCHighPassFilter::apply (double sample, double time_step) {
+static double rc_highpass(FilterCache& c, double cutoff, double sample, double time_step) {
 	double filtered = 0;
+	double rc = cutoff_to_rc(cutoff);
 	double a = rc / (rc + time_step);
 
-	if (started) {
-		filtered = a * last_filtered + a * (sample - last);
+	if (c.started) {
+		filtered = a * c.last_filtered + a * (sample - c.last);
 	}
 	else {
 		filtered = sample;
-		started = true;
+		c.started = true;
 	}
 
-	last = sample;
-	last_filtered = filtered;
+	c.last = sample;
+	c.last_filtered = filtered;
 	return filtered;
 }
 
-void RCHighPassFilter::set_cutoff(double cutoff) {
-	this->cutoff = cutoff;
-	this->rc = cutoff_to_rc(cutoff);
-}
+//Filter
+double Filter::apply (FilterData& data, double sample, double time_step) {
+	size_t rep = 4;
+	switch (data.type) {
+	case FilterType::HP_12:
+		rep = 2;
+	case FilterType::HP_24:
 
-double RCHighPassFilter::get_cutoff() {
-	return cutoff;
-}
-
-//BandPassFilter
-RCBandPassFilter::RCBandPassFilter(double cutoff, double bandwidth) {
-	set_cutoff(cutoff);
-	set_bandwidth(bandwidth);
-}
-
-double RCBandPassFilter::apply (double sample, double time_step) {
-	double filtered = lowpass.apply(highpass.apply(sample, time_step), time_step);
-	return filtered;
-}
-
-void RCBandPassFilter::set_cutoff(double cutoff) {
-	double bandwidth = get_bandwidth();
-	lowpass.set_cutoff(cutoff + bandwidth/2);
-	highpass.set_cutoff(cutoff - bandwidth/2);
-}
-
-double RCBandPassFilter::get_cutoff() {
-	return (lowpass.get_cutoff() + highpass.get_cutoff())/2.0;
-}
-
-void RCBandPassFilter::set_bandwidth(double bandwidth) {
-	double cutoff = get_cutoff();
-	lowpass.set_cutoff(cutoff + bandwidth/2);
-	highpass.set_cutoff(cutoff - bandwidth/2);
-}
-
-double RCBandPassFilter::get_bandwidth() {
-	return lowpass.get_cutoff() - highpass.get_cutoff();
+		break;
+	case FilterType::LP_12:
+		rep = 2;
+	case FilterType::LP_24:
+		break;
+	}
+	return 0;
 }
