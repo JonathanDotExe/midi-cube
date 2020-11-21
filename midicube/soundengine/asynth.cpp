@@ -5,28 +5,29 @@
  *      Author: jojo
  */
 #include "asynth.h"
+#include <cmath>
 
 
 AnalogSynth::AnalogSynth() {
 	ModEnvelopeEntity& mod_env = preset.mod_envs.at(0);
 	mod_env.active = true;
-	mod_env.env = {0, 0.2, 0, 0.003};
+	mod_env.env = {0, 0.1, 0, 0.003};
 
 	OscilatorEntity& osc = preset.oscilators.at(0);
 	osc.active = true;
-	osc.env = {0.0005, 0.3, 0, 0.003};
+	osc.env = {0.0005, 0.35, 0, 0.06};
 	osc.filter = true;
 	osc.filter_type = FilterType::LP_24;
-	osc.filter_cutoff.value = 0.5;
+	osc.filter_cutoff.value = 0.05;
 	osc.filter_cutoff.mod_env = 0;
-	osc.filter_cutoff.mod_amount = 0.1;
-	osc.filter_resonance.value = 0;
+	osc.filter_cutoff.mod_amount = 0.15;
+	osc.filter_resonance.value = 0.8;
 }
 
 static double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, double velocity) {
 	double prog = mod.value;
 	prog += env_val.at(mod.mod_env) * mod.mod_amount + lfo_val.at(mod.lfo) * mod.lfo_amount + velocity * mod.velocity_amount;
-	prog = std::min(std::max(prog, 0.0), 1.0);
+	prog = fmin(fmax(prog, 0.0), 1.0);
 	return scale.value(prog);
 }
 
