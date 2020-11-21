@@ -48,13 +48,24 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 	size_t rep = 4;
 	switch (data.type) {
 	case FilterType::HP_12:
-		rep = 2;
+		for (size_t i = 0; i < 2; ++i) {
+			sample = rc_highpass(cache.at(i), data.cutoff, sample, time_step);
+		}
+		break;
 	case FilterType::HP_24:
-
+		for (size_t i = 0; i < 4; ++i) {
+			sample = rc_highpass(cache.at(i), data.cutoff, sample, time_step);
+		}
 		break;
 	case FilterType::LP_12:
-		rep = 2;
+		for (size_t i = 0; i < 2; ++i) {
+			sample = rc_lowpass(cache.at(i), data.cutoff, sample, time_step);
+		}
+		break;
 	case FilterType::LP_24:
+		for (size_t i = 0; i < 4; ++i) {
+			sample = rc_lowpass(cache.at(i), data.cutoff, sample, time_step);
+		}
 		break;
 	}
 	return 0;
