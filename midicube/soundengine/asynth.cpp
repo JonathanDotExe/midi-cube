@@ -34,6 +34,7 @@ static double apply_modulation(const FixedScale& scale, PropertyModulation& mod,
 void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	std::array<double, ANALOG_MOD_ENV_COUNT> env_val = {};
 	std::array<double, ANALOG_LFO_COUNT> lfo_val = {};
+	double freq = note.freq * env.pitch_bend;
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
 		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
@@ -64,7 +65,7 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, env_val, lfo_val, note.velocity);
 			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, env_val, lfo_val, note.velocity);
 
-			double signal =  oscilators.signal(note.freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, data, bdata, false);
+			double signal =  oscilators.signal(freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, data, bdata, false);
 			//Filter
 			if (osc.filter) {
 				FilterData filter{osc.filter_type};
