@@ -18,6 +18,7 @@ enum class FilterType {
 struct FilterData {
 	FilterType type;
 	double cutoff = 1;
+	double resonance = 0;
 };
 
 struct FilterCache {

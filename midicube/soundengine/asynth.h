@@ -22,6 +22,7 @@ const FixedScale SYNC_SCALE = {0, {}, 1};
 const FixedScale PULSE_WIDTH_SCALE = {0, {}, 0.5};
 const FixedScale UNISON_DETUNE_SCALE = {0, {}, 1};
 const FixedScale FILTER_CUTOFF_SCALE(0, {}, 1);
+const FixedScale FILTER_RESONANCE_SCALE(0, {}, 1);
 
 struct PropertyModulation {
 	double value = 0;
@@ -47,6 +48,7 @@ struct OscilatorEntity {
 	bool filter = false;
 	FilterType filter_type = FilterType::LP_12;
 	PropertyModulation filter_cutoff = {1};
+	PropertyModulation filter_resonance = {0};
 };
 
 struct ModEnvelopeEntity {

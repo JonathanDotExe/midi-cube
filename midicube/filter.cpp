@@ -7,6 +7,7 @@
 
 
 #include <cmath>
+#include <iostream>
 #include "filter.h"
 
 
@@ -20,24 +21,22 @@ double cutoff_to_rc(double cutoff) {
 
 //Filter
 double Filter::apply (FilterData& data, double sample, double time_step) {
+	double cutoff = fmin(data.cutoff, 0.9999999999);
+	double feedback = data.resonance + data.resonance/(1 - cutoff);
 	//Update buffers
-	pole1 += data.cutoff * (sample - pole1);
+	pole1 += data.cutoff * (sample - pole1 + feedback * (pole1 - pole2));
 	pole2 += data.cutoff * (pole1 - pole2);
 	pole3 += data.cutoff * (pole2 - pole3);
 	pole4 += data.cutoff * (pole3 - pole4);
 	switch (data.type) {
 	case FilterType::LP_12:
-		sample = pole2;
-		break;
+		return pole2;
 	case FilterType::LP_24:
-		sample = pole4;
-		break;
+		return pole4;
 	case FilterType::HP_12:
-		sample = sample - pole2;
-		break;
+		return sample - pole2;
 	case FilterType::HP_24:
-		sample = sample - pole4;
-		break;
+		return sample - pole4;
 	}
 	return sample;
 }
