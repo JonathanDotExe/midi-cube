@@ -16,6 +16,7 @@
 #define ANALOG_OSCILATOR_COUNT 8
 #define ANALOG_MOD_ENV_COUNT 8
 #define ANALOG_LFO_COUNT 8
+#define ANALOG_CONTROL_COUNT 128
 
 const FixedScale VOLUME_SCALE = {0, {}, 1};
 const FixedScale SYNC_SCALE = {0, {}, 1};
@@ -31,13 +32,15 @@ struct PropertyModulation {
 	size_t lfo = 0;
 	double lfo_amount = 0;
 	double velocity_amount = 0;
+	size_t cc = 1;
+	double cc_amount = 0;
 };
 
 struct OscilatorEntity {
 	bool active = false;
 	ADSREnvelope env{0.0, 0, 1, 0.0};
 	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
-	bool analog = false;
+	bool analog = true;
 	bool sync = false;
 	size_t unison_amount = 0;
 	PropertyModulation volume = {1};
@@ -76,6 +79,7 @@ private:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT, 8> oscilators;
 	std::array<Filter, SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT> filters;
 	std::array<AnalogOscilator, ANALOG_LFO_COUNT> lfos;
+	std::array<double, ANALOG_CONTROL_COUNT> controls;
 
 public:
 	AnalogSynthPreset preset;
