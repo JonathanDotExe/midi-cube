@@ -24,6 +24,7 @@ const FixedScale PULSE_WIDTH_SCALE = {0, {}, 0.5};
 const FixedScale UNISON_DETUNE_SCALE = {0, {}, 1};
 const FixedScale FILTER_CUTOFF_SCALE(0, {}, 1);
 const FixedScale FILTER_RESONANCE_SCALE(0, {}, 1);
+const FixedScale PITCH_SCALE(-2, {}, 2);
 
 struct PropertyModulation {
 	double value = 0;
@@ -48,6 +49,8 @@ struct OscilatorEntity {
 	PropertyModulation pulse_width = {1};
 	PropertyModulation unison_detune = {0.1};
 	int semi = 0;
+	double transpose = 2;
+	PropertyModulation pitch = {0.5};
 
 	bool filter = false;
 	FilterType filter_type = FilterType::LP_12;

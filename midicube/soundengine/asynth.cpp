@@ -31,7 +31,7 @@ AnalogSynth::AnalogSynth() {
 	osc.env = {0.0005, 0, 1, 0.003};*/
 
 	//Poly Sweep
-	OscilatorEntity& osc1 = preset.oscilators.at(0);
+	/*OscilatorEntity& osc1 = preset.oscilators.at(0);
 	osc1.unison_amount = 3;
 	osc1.unison_detune.value = 0.05;
 	osc1.active = true;
@@ -62,7 +62,21 @@ AnalogSynth::AnalogSynth() {
 	osc3.filter = true;
 	osc3.filter_type = FilterType::LP_24;
 	osc3.filter_cutoff.value = 0.0;
-	osc3.filter_cutoff.cc_amount = 1;
+	osc3.filter_cutoff.cc_amount = 1;*/
+
+	//Spooky Sine
+	LFOEntity& lfo = preset.lfos.at(0);
+	lfo.active = true;
+	lfo.freq = 6;
+	lfo.volume.value = 0;
+	lfo.volume.cc_amount = 1;
+
+	OscilatorEntity& osc = preset.oscilators.at(0);
+	osc.waveform = AnalogWaveForm::SINE;
+	osc.active = true;
+	osc.env = {0.0005, 0, 1, 0.003};
+	osc.pitch.lfo = 0;
+	osc.pitch.lfo_amount = 0.125;
 }
 
 static double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, std::array<double, ANALOG_CONTROL_COUNT>& controls, double velocity) {
@@ -99,10 +113,11 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 		if (osc.active) {
 			//Frequency
 			double freq = note.freq;
-			if (osc.semi) {
-				freq = note_to_freq(note.note + osc.semi);
+			double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val, lfo_val, controls, note.velocity);
+			if (osc.semi || pitch) {
+				freq = note_to_freq(note.note + osc.semi + pitch);
 			}
-			freq *= env.pitch_bend;
+			freq *= env.pitch_bend * osc.transpose;
 
 			AnalogOscilatorData data = {osc.waveform, osc.analog, osc.sync};
 			AnalogOscilatorBankData bdata = {0.1, osc.unison_amount};
