@@ -47,6 +47,7 @@ struct OscilatorEntity {
 	PropertyModulation sync_mul = {0.1};
 	PropertyModulation pulse_width = {1};
 	PropertyModulation unison_detune = {0.1};
+	int semi = 0;
 
 	bool filter = false;
 	FilterType filter_type = FilterType::LP_12;
