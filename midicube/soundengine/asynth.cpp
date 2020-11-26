@@ -25,10 +25,10 @@ AnalogSynth::AnalogSynth() {
 	osc.filter_resonance.value = 0.8;*/
 
 	//Unison Saw
-	/*OscilatorEntity& osc = preset.oscilators.at(0);
+	OscilatorEntity& osc = preset.oscilators.at(0);
 	osc.unison_amount = 2;
 	osc.active = true;
-	osc.env = {0.0005, 0, 1, 0.003};*/
+	osc.env = {0.0005, 0, 1, 0.003};
 
 	//Poly Sweep
 	/*OscilatorEntity& osc1 = preset.oscilators.at(0);
@@ -65,7 +65,7 @@ AnalogSynth::AnalogSynth() {
 	osc3.filter_cutoff.cc_amount = 1;*/
 
 	//Spooky Sine
-	LFOEntity& lfo = preset.lfos.at(0);
+	/*LFOEntity& lfo = preset.lfos.at(0);
 	lfo.active = true;
 	lfo.freq = 6;
 	lfo.volume.value = 0;
@@ -76,7 +76,7 @@ AnalogSynth::AnalogSynth() {
 	osc.active = true;
 	osc.env = {0.0005, 0, 1, 0.003};
 	osc.pitch.lfo = 0;
-	osc.pitch.lfo_amount = 0.125;
+	osc.pitch.lfo_amount = 0.125;*/
 }
 
 static double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, std::array<double, ANALOG_CONTROL_COUNT>& controls, double velocity) {

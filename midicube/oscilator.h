@@ -26,6 +26,11 @@ struct AnalogOscilatorData {
 	double sync_mul = 1;
 };
 
+struct AnalogOscilatorSignal {
+	double carrier = 0;
+	double modulator = 0;
+};
+
 class AnalogOscilator {
 private:
 	double rotation = 0;
@@ -34,7 +39,7 @@ private:
 	double last_phase = 0;
 public:
 	AnalogOscilator();
-	double signal(double freq, double time_step, AnalogOscilatorData& data, bool modulator = false);
+	AnalogOscilatorSignal signal(double freq, double time_step, AnalogOscilatorData& data);
 	void randomize();
 	void reset();
 	~AnalogOscilator();
@@ -55,9 +60,9 @@ public:
 
 	}
 
-	double signal(double freq, double time_step, size_t index, AnalogOscilatorData data, AnalogOscilatorBankData bdata, bool modulator = false) {
+	double signal(double freq, double time_step, size_t index, AnalogOscilatorData data, AnalogOscilatorBankData bdata) {
 		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
-		double signal = 0;
+		AnalogOscilatorSignal signal;
 		double detune = note_to_freq_transpose(bdata.unison_detune);
 		double ndetune = note_to_freq_transpose(-bdata.unison_detune);
 		double det = detune;
@@ -72,7 +77,9 @@ public:
 				d = det;
 				det *= detune;
 			}
-			signal += osc[i].signal(freq * d, time_step, data, modulator);
+			AnalogOscilatorSignal sig = osc[i].signal(freq * d, time_step, data);
+			signal.carrier += sig.carrier;
+			signal.modulator += signal.modulator;
 		}
 		return signal / (bdata.unison_amount + 1);
 	}
