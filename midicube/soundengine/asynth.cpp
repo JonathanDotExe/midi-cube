@@ -77,6 +77,10 @@ AnalogSynth::AnalogSynth() {
 	osc.env = {0.0005, 0, 1, 0.003};
 	osc.pitch.lfo = 0;
 	osc.pitch.lfo_amount = 0.125;
+	osc.panning.value = 0;
+	osc.panning.cc = 2;
+	osc.panning.cc_amount = 1;
+
 }
 
 static double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, std::array<double, ANALOG_CONTROL_COUNT>& controls, double velocity) {
@@ -110,7 +114,8 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 		}
 	}
 	//Synthesize
-	double sample = 0;
+	double lsample = 0;
+	double rsample = 0;
 	for (size_t i = 0; i < preset.oscilators.size(); ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
 		if (osc.active) {
@@ -138,14 +143,22 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 				filter.resonance = apply_modulation(FILTER_RESONANCE_SCALE, osc.filter_resonance, env_val, lfo_val, controls, note.velocity);
 				signal = filters.at(note_index + i * SOUND_ENGINE_POLYPHONY).apply(filter, signal, info.time_step);
 			}
-
-			sample += signal * volume;
+			signal *= volume;
+			//Pan
+			double panning = apply_modulation(PANNING_SCALE, osc.panning, env_val, lfo_val, controls, note.velocity);
+			lsample += signal * (2 - panning);
+			rsample += signal * (1 + panning);
 		}
 	}
 
 	//Play
 	for (size_t i = 0; i < channels.size(); ++i) {
-		channels[i] += sample;
+		if (i%2 == 0) {
+			channels[i] += lsample;
+		}
+		else {
+			channels[i] += rsample;
+		}
 	}
 }
 

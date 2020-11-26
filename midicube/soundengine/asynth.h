@@ -25,6 +25,7 @@ const FixedScale UNISON_DETUNE_SCALE = {0, {}, 1};
 const FixedScale FILTER_CUTOFF_SCALE(0, {}, 1);
 const FixedScale FILTER_RESONANCE_SCALE(0, {}, 1);
 const FixedScale PITCH_SCALE(-2, {}, 2);
+const FixedScale PANNING_SCALE(-1, {}, 1);
 
 struct PropertyModulation {
 	double value = 0;
@@ -48,6 +49,7 @@ struct OscilatorEntity {
 	PropertyModulation sync_mul = {0.1};
 	PropertyModulation pulse_width = {1};
 	PropertyModulation unison_detune = {0.1};
+	PropertyModulation panning = {0.5};
 	int semi = 0;
 	double transpose = 2;
 	PropertyModulation pitch = {0.5};
