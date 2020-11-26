@@ -68,7 +68,7 @@ struct LFOEntity {
 	bool active = false;
 	PropertyModulation volume = {1};
 	double freq = 1;
-	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
+	AnalogWaveForm waveform = AnalogWaveForm::SINE;
 };
 
 struct AnalogSynthPreset {

@@ -60,7 +60,7 @@ public:
 
 	}
 
-	double signal(double freq, double time_step, size_t index, AnalogOscilatorData data, AnalogOscilatorBankData bdata) {
+	AnalogOscilatorSignal signal(double freq, double time_step, size_t index, AnalogOscilatorData data, AnalogOscilatorBankData bdata) {
 		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
 		AnalogOscilatorSignal signal;
 		double detune = note_to_freq_transpose(bdata.unison_detune);
@@ -81,7 +81,9 @@ public:
 			signal.carrier += sig.carrier;
 			signal.modulator += signal.modulator;
 		}
-		return signal / (bdata.unison_amount + 1);
+		signal.carrier /= (bdata.unison_amount + 1);
+		signal.modulator /= (bdata.unison_amount + 1);
+		return signal;
 	}
 
 	void randomize(size_t index) {
