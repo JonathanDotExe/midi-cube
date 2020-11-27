@@ -25,11 +25,11 @@ AnalogSynth::AnalogSynth() {
 	osc.filter_resonance.value = 0.8;*/
 
 	//Unison Saw
-	OscilatorEntity& osc = preset.oscilators.at(0);
+	/*OscilatorEntity& osc = preset.oscilators.at(0);
 	osc.reset = true;
 	osc.unison_amount = 2;
 	osc.active = true;
-	osc.env = {0.0005, 0, 1, 0.003};
+	osc.env = {0.0005, 0, 1, 0.003};*/
 
 	//Poly Sweep
 	/*OscilatorEntity& osc1 = preset.oscilators.at(0);
@@ -66,7 +66,7 @@ AnalogSynth::AnalogSynth() {
 	osc3.filter_cutoff.cc_amount = 1;*/
 
 	//Spooky Sine
-	/*LFOEntity& lfo = preset.lfos.at(0);
+	LFOEntity& lfo = preset.lfos.at(0);
 	lfo.active = true;
 	lfo.freq = 6;
 	lfo.volume.value = 0;
@@ -80,7 +80,7 @@ AnalogSynth::AnalogSynth() {
 	osc.pitch.lfo_amount = 0.125;
 	osc.panning.value = 0;
 	osc.panning.cc = 2;
-	osc.panning.cc_amount = 1;*/
+	osc.panning.cc_amount = 1;
 
 	//Lush Lead
 	/*LFOEntity& lfo = preset.lfos.at(0);
@@ -108,26 +108,13 @@ static double apply_modulation(const FixedScale& scale, PropertyModulation& mod,
 }
 
 void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	std::array<double, ANALOG_MOD_ENV_COUNT> env_val = {};
-	std::array<double, ANALOG_LFO_COUNT> lfo_val = {};
-	std::array<double, ANALOG_LFO_COUNT> lfo_mod = {};
+	env_val = {};
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
 		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
 		if (mod_env.active) {
 			double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, controls, note.velocity);
 			env_val.at(i) = mod_env.env.amplitude(info.time, note, env) * volume;
-		}
-	}
-	//LFOs
-	for (size_t i = 0; i < preset.lfos.size(); ++i) {
-		LFOEntity& lfo = preset.lfos[i];
-		if (lfo.active) {
-			double volume = apply_modulation(VOLUME_SCALE, lfo.volume, env_val, lfo_val, controls, note.velocity);
-			AnalogOscilatorData d = {lfo.waveform};
-			AnalogOscilatorSignal sig = lfos.at(i).signal(lfo.freq, info.time_step, d);
-			lfo_val.at(i) = sig.carrier * volume;
-			lfo_mod.at(i) = sig.modulator * volume;
 		}
 	}
 	//Synthesize
@@ -199,7 +186,19 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 }
 
 void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
-
+	//Move LFOs
+	lfo_val = {};
+	lfo_mod = {};
+	for (size_t i = 0; i < preset.lfos.size(); ++i) {
+		LFOEntity& lfo = preset.lfos[i];
+		if (lfo.active) {
+			double volume = apply_modulation(VOLUME_SCALE, lfo.volume, env_val, lfo_val, controls, 0);
+			AnalogOscilatorData d = {lfo.waveform};
+			AnalogOscilatorSignal sig = lfos.at(i).signal(lfo.freq, info.time_step, d);
+			lfo_val.at(i) = sig.carrier * volume;
+			lfo_mod.at(i) = sig.modulator * volume;
+		}
+	}
 }
 
 void AnalogSynth::control_change(unsigned int control, unsigned int value) {

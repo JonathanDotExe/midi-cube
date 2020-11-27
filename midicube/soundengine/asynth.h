@@ -88,7 +88,10 @@ class AnalogSynth : public BaseSoundEngine {
 private:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT, 8> oscilators;
 	std::array<Filter, SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT> filters;
+	std::array<double, ANALOG_MOD_ENV_COUNT> env_val = {};
 	std::array<AnalogOscilator, ANALOG_LFO_COUNT> lfos;
+	std::array<double, ANALOG_LFO_COUNT> lfo_val = {};
+	std::array<double, ANALOG_LFO_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
 
 public:
