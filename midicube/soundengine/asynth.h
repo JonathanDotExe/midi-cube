@@ -46,6 +46,7 @@ struct OscilatorEntity {
 	bool sync = false;
 	bool reset = false;
 	bool randomize = false;
+
 	size_t unison_amount = 0;
 	PropertyModulation volume = {1};
 	PropertyModulation sync_mul = {0.1};
@@ -55,6 +56,9 @@ struct OscilatorEntity {
 	int semi = 0;
 	double transpose = 1;
 	PropertyModulation pitch = {0.5};
+
+	bool mono = false;
+	double portamendo = 0;
 
 	bool filter = false;
 	FilterType filter_type = FilterType::LP_12;
@@ -93,6 +97,7 @@ private:
 	std::array<double, ANALOG_LFO_COUNT> lfo_val = {};
 	std::array<double, ANALOG_LFO_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
+	PortamendoBuffer note_port{0, 0};
 
 public:
 	AnalogSynthPreset preset;
