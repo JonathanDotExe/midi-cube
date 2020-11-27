@@ -25,10 +25,10 @@ AnalogSynth::AnalogSynth() {
 	osc.filter_resonance.value = 0.8;*/
 
 	//Unison Saw
-	/*OscilatorEntity& osc = preset.oscilators.at(0);
+	OscilatorEntity& osc = preset.oscilators.at(0);
 	osc.unison_amount = 2;
 	osc.active = true;
-	osc.env = {0.0005, 0, 1, 0.003};*/
+	osc.env = {0.0005, 0, 1, 0.003};
 
 	//Poly Sweep
 	/*OscilatorEntity& osc1 = preset.oscilators.at(0);
@@ -82,7 +82,7 @@ AnalogSynth::AnalogSynth() {
 	osc.panning.cc_amount = 1;*/
 
 	//Lush Lead
-	LFOEntity& lfo = preset.lfos.at(0);
+	/*LFOEntity& lfo = preset.lfos.at(0);
 	lfo.active = true;
 	lfo.freq = 0.5;
 
@@ -96,7 +96,7 @@ AnalogSynth::AnalogSynth() {
 	osc.filter_resonance.value = 0.0;
 	osc.filter_kb_track = 1;
 	osc.panning.value = 0;
-	osc.panning.lfo_amount = 1;
+	osc.panning.lfo_amount = 1;*/
 }
 
 static double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, std::array<double, ANALOG_CONTROL_COUNT>& controls, double velocity) {
