@@ -11,10 +11,6 @@
 #include "filter.h"
 
 
-double cutoff_to_rc(double cutoff) {
-	return 1.0/(2 * M_PI * cutoff);
-}
-
 /**
  * To convert frequency into filter cutoff use time_step/(rc+time_step)
  */

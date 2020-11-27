@@ -93,7 +93,8 @@ AnalogSynth::AnalogSynth() {
 	osc.filter = true;
 	osc.filter_type = FilterType::LP_24;
 	osc.filter_cutoff.value = 0.2;
-	osc.filter_resonance.value = 0.3;
+	osc.filter_resonance.value = 0.0;
+	osc.filter_kb_track = 1;
 	osc.panning.value = 0;
 	osc.panning.lfo_amount = 1;
 }
@@ -156,6 +157,13 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 				FilterData filter{osc.filter_type};
 				filter.cutoff = apply_modulation(FILTER_CUTOFF_SCALE, osc.filter_cutoff, env_val, lfo_val, controls, note.velocity);
 				filter.resonance = apply_modulation(FILTER_RESONANCE_SCALE, osc.filter_resonance, env_val, lfo_val, controls, note.velocity);
+
+				if (osc.filter_kb_track && filter.cutoff != 1) {
+					double cutoff = factor_to_cutoff(filter.cutoff, info.time_step);
+					cutoff *= 1 + ((double) note.note - 36)/12.0 * osc.filter_kb_track;
+					filter.cutoff = cutoff_to_factor(cutoff, info.time_step);
+				}
+
 				signal = filters.at(note_index + i * SOUND_ENGINE_POLYPHONY).apply(filter, signal, info.time_step);
 			}
 			signal *= volume;

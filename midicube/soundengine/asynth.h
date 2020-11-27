@@ -58,6 +58,8 @@ struct OscilatorEntity {
 	FilterType filter_type = FilterType::LP_12;
 	PropertyModulation filter_cutoff = {1};
 	PropertyModulation filter_resonance = {0};
+	double filter_kb_track = 0;
+	unsigned int filter_kb_track_note = 36;
 };
 
 struct ModEnvelopeEntity {
