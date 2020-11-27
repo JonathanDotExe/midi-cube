@@ -44,6 +44,8 @@ struct OscilatorEntity {
 	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
 	bool analog = true;
 	bool sync = false;
+	bool reset = false;
+	bool randomize = false;
 	size_t unison_amount = 0;
 	PropertyModulation volume = {1};
 	PropertyModulation sync_mul = {0.1};

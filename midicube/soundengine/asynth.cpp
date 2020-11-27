@@ -26,6 +26,7 @@ AnalogSynth::AnalogSynth() {
 
 	//Unison Saw
 	OscilatorEntity& osc = preset.oscilators.at(0);
+	osc.reset = true;
 	osc.unison_amount = 2;
 	osc.active = true;
 	osc.env = {0.0005, 0, 1, 0.003};
@@ -151,7 +152,19 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, env_val, lfo_val, controls, note.velocity);
 			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, env_val, lfo_val, controls, note.velocity);
 
-			double signal = oscilators.signal(freq, info.time_step, note_index + i * SOUND_ENGINE_POLYPHONY, data, bdata).carrier;
+			//Signal
+			size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
+			//Only on note start
+			if (note.start_time + info.time_step > info.time) {
+				if (osc.reset) {
+					oscilators.reset(index);
+				}
+				else if (osc.randomize) {
+					oscilators.randomize(index);
+				}
+			}
+
+			double signal = oscilators.signal(freq, info.time_step, index, data, bdata).carrier;
 			//Filter
 			if (osc.filter) {
 				FilterData filter{osc.filter_type};
