@@ -201,7 +201,7 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 		KeyboardEnvironment e = env;
 		e.pitch_bend *= note_to_freq_transpose(pitch - status.latest_note->note);
 
-		process_note(channels, info, *status.latest_note, e, status.latest_note_index);
+		process_note(channels, info, *status.latest_note, e, 0);
 	}
 	//Move LFOs
 	//TODO move before notes
