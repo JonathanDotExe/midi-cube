@@ -57,9 +57,6 @@ struct OscilatorEntity {
 	double transpose = 1;
 	PropertyModulation pitch = {0.5};
 
-	bool mono = false;
-	double portamendo = 0;
-
 	bool filter = false;
 	FilterType filter_type = FilterType::LP_12;
 	PropertyModulation filter_cutoff = {1};
@@ -85,6 +82,9 @@ struct AnalogSynthPreset {
 	std::array<LFOEntity, ANALOG_LFO_COUNT> lfos;
 	std::array<ModEnvelopeEntity, ANALOG_MOD_ENV_COUNT> mod_envs;
 	std::array<OscilatorEntity, ANALOG_OSCILATOR_COUNT> oscilators;
+
+	bool mono = false;
+	double portamendo = 0;
 };
 
 class AnalogSynth : public BaseSoundEngine {
@@ -97,7 +97,11 @@ private:
 	std::array<double, ANALOG_LFO_COUNT> lfo_val = {};
 	std::array<double, ANALOG_LFO_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
+
+	bool first_port = true;
 	PortamendoBuffer note_port{0, 0};
+
+	inline void process_note(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
 public:
 	AnalogSynthPreset preset;

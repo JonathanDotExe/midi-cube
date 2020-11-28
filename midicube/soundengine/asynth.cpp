@@ -66,6 +66,9 @@ AnalogSynth::AnalogSynth() {
 	osc3.filter_cutoff.cc_amount = 1;*/
 
 	//Spooky Sine
+	preset.mono = true;
+	preset.portamendo = 0.1;
+
 	LFOEntity& lfo = preset.lfos.at(0);
 	lfo.active = true;
 	lfo.freq = 6;
@@ -75,12 +78,9 @@ AnalogSynth::AnalogSynth() {
 	OscilatorEntity& osc = preset.oscilators.at(0);
 	osc.waveform = AnalogWaveForm::SINE;
 	osc.active = true;
-	osc.env = {0.0005, 0, 1, 0.003};
+	osc.env = {0.005, 0, 1, 0.005};
 	osc.pitch.lfo = 0;
 	osc.pitch.lfo_amount = 0.125;
-	osc.panning.value = 0;
-	osc.panning.cc = 2;
-	osc.panning.cc_amount = 1;
 
 	//Lush Lead
 	/*LFOEntity& lfo = preset.lfos.at(0);
@@ -107,7 +107,7 @@ static double apply_modulation(const FixedScale& scale, PropertyModulation& mod,
 	return scale.value(prog);
 }
 
-void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	env_val = {};
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
@@ -185,8 +185,26 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	}
 }
 
+void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	if (!preset.mono) {
+		process_note(channels, info, note, env, note_index);
+	}
+}
+
 void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
+	//Mono
+	if (preset.mono && status.latest_note) {
+		//Update portamendo
+		note_port.set(status.latest_note->note, info.time, first_port ? 0 : preset.portamendo);
+		first_port = false;
+		double pitch = note_port.get(info.time);
+		KeyboardEnvironment e = env;
+		e.pitch_bend *= note_to_freq_transpose(pitch - status.latest_note->note);
+
+		process_note(channels, info, *status.latest_note, e, status.latest_note_index);
+	}
 	//Move LFOs
+	//TODO move before notes
 	lfo_val = {};
 	lfo_mod = {};
 	for (size_t i = 0; i < preset.lfos.size(); ++i) {
