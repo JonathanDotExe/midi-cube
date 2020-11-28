@@ -10,6 +10,7 @@
 #include <iostream>
 #include <cmath>
 
+/*
 //PresetSynth
 FMSynth::FMSynth() {
 	/*detune = note_to_freq_transpose(0.1);
@@ -30,7 +31,7 @@ FMSynth::FMSynth() {
 
 	osc2 = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SQUARE));
 	osc2->set_volume(1);
-	osc2->set_unison(0);*/
+	osc2->set_unison(0);
 
 	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
@@ -39,7 +40,7 @@ FMSynth::FMSynth() {
 
 	/*osc.data.analog = true;
 	osc.data.waveform = AnalogWaveForm::SAW_DOWN;
-	osc.unison_amount = 3;*/
+	osc.unison_amount = 3;
 
 	phase = 0;
 	fm_phase = 0;
@@ -63,7 +64,7 @@ void FMSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	double mod = sine_wave(fm_phase, 1) * vibrato;
 	double mul = (freq + mod)/freq;
 
-	sample = sine_wave(phase * mul, 1);*/
+	sample = sine_wave(phase * mul, 1);
 
 	sample = sine_wave(info.time, freq + sine_wave(info.time, fm_freq) * vibrato);
 
@@ -76,7 +77,7 @@ void FMSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 	//filter.apply(channels, info.time_step);
 };
 
-bool FMSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+bool FMSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	return this->env.is_finished(info.time, note, env);
 }
 
@@ -98,5 +99,5 @@ void __fix_link_preset_synth_name__ () {
 
 FMSynth::~FMSynth() {
 
-}
+}*/
 

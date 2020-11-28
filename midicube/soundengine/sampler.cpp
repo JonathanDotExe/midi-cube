@@ -51,23 +51,18 @@ double SampleSound::get_sample(unsigned int channel, SampleInfo& info, Triggered
 	}
 	sample = region1->sample.isample(channel, time * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
 			region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate) * (prog);
-	sample *= envelope.amplitude(info.time, note, env);
 	return sample;
-}
-
-bool SampleSound::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
-	return this->envelope.is_finished(info.time, note, env);
 }
 
 void SampleSound::push_sample(SampleRegion* region) {
 	samples.push_back(region);
 }
 
-ADSREnvelope SampleSound::get_envelope() {
+ADSREnvelopeData SampleSound::get_envelope() {
 	return envelope;
 }
 
-void SampleSound::set_envelope(ADSREnvelope env) {
+void SampleSound::set_envelope(ADSREnvelopeData env) {
 	this->envelope = env;
 }
 
@@ -103,13 +98,15 @@ Sampler::Sampler() {
 }
 
 void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	ADSREnvelopeData e = this->sample->get_envelope();
+	double vol = envs.at(note_index).amplitude(e, info.time_step, note.pressed, sustain);
 	for (size_t channel = 0; channel < channels.size(); ++channel) {
 		channels[channel] += this->sample->get_sample(channel, info, note, env) * note.velocity;
 	}
 }
 
-bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
-	return this->sample->note_finished(info, note, env);
+bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	return envs.at(note_index).is_finished();
 }
 
 std::string Sampler::get_name() {
@@ -131,7 +128,7 @@ extern SampleSound* load_sound(std::string folder) {
 		std::string json_text ((std::istreambuf_iterator<char>(def_file)), std::istreambuf_iterator<char>());
 		auto j = json::parse(json_text);
 		//Envelope
-		ADSREnvelope env;
+		ADSREnvelopeData env;
 		env.attack = j.at("attack").get<double>();
 		env.decay = j.at("decay").get<double>();
 		env.sustain = j.at("sustain").get<double>();

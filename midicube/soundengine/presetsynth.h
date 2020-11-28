@@ -15,6 +15,7 @@
 #define SYNTH_VIBRATO_RATE 6
 #define SYNTH_VIBRATO_DETUNE 0.25
 
+/*
 class FMSynth : public BaseSoundEngine {
 
 private:
@@ -35,11 +36,11 @@ public:
 
 	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
 	~FMSynth();
 
-};
+};*/
 
 
 #endif /* MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_ */

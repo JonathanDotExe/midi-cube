@@ -223,7 +223,7 @@ void AnalogSynth::control_change(unsigned int control, unsigned int value) {
 	controls.at(control) = value/127.0;
 }
 
-bool AnalogSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+bool AnalogSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.oscilators.size() && finished; ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];

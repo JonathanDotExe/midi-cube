@@ -45,7 +45,7 @@ enum ADSREnvelopePhase {
 class ADSREnvelope {
 
 public:
-	ADSREnvelopePhase phase = ATTACK;
+	ADSREnvelopePhase phase = RELEASE;
 	double volume = 0;
 
 	double amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain);
