@@ -13,7 +13,7 @@
 /*
 //PresetSynth
 FMSynth::FMSynth() {
-	/*detune = note_to_freq_transpose(0.1);
+	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
 	vibrato = 0;
 	filter.set_cutoff(6300);
@@ -38,7 +38,7 @@ FMSynth::FMSynth() {
 	vibrato = 0;
 	//filter.set_cutoff(1200);
 
-	/*osc.data.analog = true;
+	osc.data.analog = true;
 	osc.data.waveform = AnalogWaveForm::SAW_DOWN;
 	osc.unison_amount = 3;
 
@@ -50,7 +50,7 @@ void FMSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	double sample = 0.0;
 	double freq = note.freq * env.pitch_bend;
 	double fm_freq = note.freq * env.pitch_bend;
-	/*sample = osc.signal(freq, info.time_step, note_index);
+	sample = osc.signal(freq, info.time_step, note_index);
 
 	if (vibrato) {
 		note.phase_shift += info.time_step * (note_to_freq_transpose(SYNTH_VIBRATO_DETUNE * sine_wave(info.time, SYNTH_VIBRATO_RATE) * vibrato) - 1);

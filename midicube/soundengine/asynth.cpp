@@ -114,7 +114,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
 		if (mod_env.active) {
 			double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, controls, note.velocity);
-			env_val.at(i) = mod_env.env.amplitude(info.time, note, env) * volume;
+			env_val.at(i) = mod_envs.at(note_index + i * SOUND_ENGINE_POLYPHONY).amplitude(mod_env.env, info.time_step, note.pressed, sustain) * volume;
 		}
 	}
 	//Synthesize
@@ -133,16 +133,10 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 
 			AnalogOscilatorData data = {osc.waveform, osc.analog, osc.sync};
 			AnalogOscilatorBankData bdata = {0.1, osc.unison_amount};
-			//Apply modulation
-			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val, lfo_val, controls, note.velocity) * osc.env.amplitude(info.time, note, env);
-			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val, lfo_val, controls, note.velocity);
-			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, env_val, lfo_val, controls, note.velocity);
-			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, env_val, lfo_val, controls, note.velocity);
-
-			//Signal
 			size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
 			//Only on note start
 			if (note.start_time + info.time_step > info.time) {
+				amp_envs.at(index).reset();
 				if (osc.reset) {
 					oscilators.reset(index);
 				}
@@ -150,7 +144,13 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 					oscilators.randomize(index);
 				}
 			}
+			//Apply modulation
+			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val, lfo_val, controls, note.velocity) * amp_envs.at(index).amplitude(osc.env, info.time_step, note.pressed, sustain);
+			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val, lfo_val, controls, note.velocity);
+			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, env_val, lfo_val, controls, note.velocity);
+			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, env_val, lfo_val, controls, note.velocity);
 
+			//Signal
 			double signal = oscilators.signal(freq, info.time_step, index, data, bdata).carrier;
 			//Filter
 			if (osc.filter) {
@@ -227,8 +227,9 @@ bool AnalogSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardE
 	bool finished = true;
 	for (size_t i = 0; i < preset.oscilators.size() && finished; ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
+		size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
 		if (osc.active) {
-			finished = osc.env.is_finished(info.time, note, env);
+			finished = amp_envs.at(index).is_finished();
 		}
 	}
 	return finished;

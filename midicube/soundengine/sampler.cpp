@@ -101,7 +101,7 @@ void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	ADSREnvelopeData e = this->sample->get_envelope();
 	double vol = envs.at(note_index).amplitude(e, info.time_step, note.pressed, sustain);
 	for (size_t channel = 0; channel < channels.size(); ++channel) {
-		channels[channel] += this->sample->get_sample(channel, info, note, env) * note.velocity;
+		channels[channel] += this->sample->get_sample(channel, info, note, env) * note.velocity * vol;
 	}
 }
 
