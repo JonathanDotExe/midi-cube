@@ -100,13 +100,13 @@ void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channe
 	//Notes
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (note.note[i].valid) {
-			note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
-			process_note_sample(channels, info, note.note[i], environment, i);
 			if (note_finished(info, note.note[i], environment, i)) {
 				note.note[i].valid = false;
 			}
 			else {
 				++status.pressed_notes; //TODO might cause problems in the future
+				note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
+				process_note_sample(channels, info, note.note[i], environment, i);
 				if (!status.latest_note || status.latest_note->start_time < note.note[i].start_time) {
 					status.latest_note = &note.note[i];
 					status.latest_note_index = i;

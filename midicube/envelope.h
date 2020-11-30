@@ -39,19 +39,19 @@ struct ADSREnvelopeData {
 };
 
 enum ADSREnvelopePhase {
-	ATTACK, DECAY, SUSTAIN, RELEASE
+	ATTACK, DECAY, SUSTAIN, RELEASE, FINISHED
 };
 
 class ADSREnvelope {
 
 public:
-	ADSREnvelopePhase phase = RELEASE;
+	ADSREnvelopePhase phase = FINISHED;
 	double volume = 0;
 
 	double amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain);
 
 	bool is_finished() {
-		return phase == RELEASE && volume == 0;
+		return phase == FINISHED;
 	}
 
 	void reset () {
