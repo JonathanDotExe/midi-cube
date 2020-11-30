@@ -113,6 +113,11 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 	for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
 		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
 		if (mod_env.active) {
+			size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
+			if (note.start_time + info.time_step > info.time) {
+				mod_envs.at(index).reset();
+			}
+
 			double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, controls, note.velocity);
 			env_val.at(i) = mod_envs.at(note_index + i * SOUND_ENGINE_POLYPHONY).amplitude(mod_env.env, info.time_step, note.pressed, sustain) * volume;
 		}
