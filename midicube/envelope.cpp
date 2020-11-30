@@ -34,12 +34,17 @@ double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pr
 		break;
 	case RELEASE:
 		if (!sustain) {
-			volume -= time_step/data.release * sustain;
-			 if (volume <= 0) {
-				 volume = 0;
-				 phase = FINISHED;
-			 }
+			if (data.release != 0 && data.sustain != 0) {
+				volume -= time_step/data.release * data.sustain;
+			}
+			else {
+				volume = 0;
+			}
 		}
+		 if (volume <= 0) {
+			 volume = 0;
+			 phase = FINISHED;
+		 }
 		break;
 	case FINISHED:
 		break;

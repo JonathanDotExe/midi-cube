@@ -145,8 +145,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 				}
 			}
 			//Apply modulation
-			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val, lfo_val, controls, note.velocity) * amp_envs.at(index).amplitude(osc.env, info.time_step, note.pressed, sustain);
-			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val, lfo_val, controls, note.velocity);
+			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val, lfo_val, controls, note.velocity) * amp_envs.at(index).amplitude(osc.env, info.time_step, note.pressed, env.sustain);			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val, lfo_val, controls, note.velocity);
 			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, env_val, lfo_val, controls, note.velocity);
 			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, env_val, lfo_val, controls, note.velocity);
 
@@ -224,7 +223,7 @@ void AnalogSynth::control_change(unsigned int control, unsigned int value) {
 }
 
 bool AnalogSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	bool finished = true;
+	bool finished = !note.pressed;
 	for (size_t i = 0; i < preset.oscilators.size() && finished; ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
 		size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;

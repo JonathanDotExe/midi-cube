@@ -99,14 +99,14 @@ Sampler::Sampler() {
 
 void Sampler::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	ADSREnvelopeData e = this->sample->get_envelope();
-	double vol = envs.at(note_index).amplitude(e, info.time_step, note.pressed, sustain);
+	double vol = envs.at(note_index).amplitude(e, info.time_step, note.pressed, env.sustain);
 	for (size_t channel = 0; channel < channels.size(); ++channel) {
 		channels[channel] += this->sample->get_sample(channel, info, note, env) * note.velocity * vol;
 	}
 }
 
 bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return envs.at(note_index).is_finished();
+	return !note.pressed && envs.at(note_index).is_finished();
 }
 
 std::string Sampler::get_name() {
