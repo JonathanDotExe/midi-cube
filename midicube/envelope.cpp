@@ -12,7 +12,8 @@
 //ADSREnvelope
 double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
 	//Goto release phase
-	if (!pressed && phase != FINISHED) {
+	if (!pressed && phase < RELEASE) {
+		last_vol = volume;
 		phase = RELEASE;
 	}
 	switch (phase) {
@@ -20,6 +21,7 @@ double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pr
 		volume += time_step/data.attack;
 		if (volume >= 1) {
 			volume = 1;
+			last_vol = volume;
 			phase = DECAY;
 		}
 		break;
@@ -27,6 +29,7 @@ double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pr
 		volume -= time_step/data.decay * (1 - data.sustain);
 		if (volume <= data.sustain) {
 			volume = data.sustain;
+			last_vol = volume;
 			phase = SUSTAIN;
 		}
 		break;
@@ -34,8 +37,8 @@ double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pr
 		break;
 	case RELEASE:
 		if (!sustain) {
-			if (data.release != 0 && data.sustain != 0) {
-				volume -= time_step/data.release * data.sustain;
+			if (data.release != 0) {
+				volume -= time_step/data.release * last_vol;
 			}
 			else {
 				volume = 0;
@@ -43,6 +46,7 @@ double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pr
 		}
 		 if (volume <= 0) {
 			 volume = 0;
+			 last_vol = volume;
 			 phase = FINISHED;
 		 }
 		break;
