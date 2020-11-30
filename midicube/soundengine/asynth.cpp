@@ -114,7 +114,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
 		if (mod_env.active) {
 			size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
-			if (note.start_time + info.time_step > info.time) {
+			if  (mod_envs.at(index).is_finished()) {
 				mod_envs.at(index).reset();
 			}
 
@@ -140,7 +140,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 			AnalogOscilatorBankData bdata = {0.1, osc.unison_amount};
 			size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
 			//Only on note start
-			if (note.start_time + info.time_step > info.time) {
+			if  (amp_envs.at(index).is_finished()) {
 				amp_envs.at(index).reset();
 				if (osc.reset) {
 					oscilators.reset(index);
@@ -149,6 +149,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 					oscilators.randomize(index);
 				}
 			}
+
 			//Apply modulation
 			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val, lfo_val, controls, note.velocity) * amp_envs.at(index).amplitude(osc.env, info.time_step, note.pressed, env.sustain);			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val, lfo_val, controls, note.velocity);
 			//std::cout << amp_envs.at(index).phase << " " << amp_envs.at(index).volume << std::endl;
