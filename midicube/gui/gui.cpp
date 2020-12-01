@@ -166,6 +166,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			ComboBox<ssize_t>* engine = new ComboBox<ssize_t>(engines, [&e](ssize_t b) {
 				return b < 0 ? "None" : e.get_sound_engines().at(b)->get_name();
 			});
+			engine->set_value(channel.get_engine());
 			engine->set_on_change([&channel](ssize_t index) {
 				channel.set_engine(index);
 			});

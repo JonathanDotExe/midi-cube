@@ -90,6 +90,20 @@ public:
 
 	void set_on_change(std::function<void(T)> on_change);
 
+	void set_index (size_t index) {
+		values.at(index);
+		this->index = index;
+		text = to_string(values.at(index));
+		if (frame) {
+			frame->request_relayout();
+		}
+	}
+
+	inline void set_value (T t) {
+		size_t index = std::find(values.begin(), values.end(), t) - values.begin();
+		set_index(index);
+	}
+
 	virtual Vector get_content_size() {
 		return positioner.size();
 	}

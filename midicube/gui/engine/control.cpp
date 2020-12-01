@@ -319,7 +319,6 @@ void DragBox::set_on_change(std::function<void (double)> on_change) {
 }
 
 void DragBox::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
-	double dir = sqrt((double) x_motion * x_motion + y_motion * y_motion) * step;
 	long int old = round(scale.value(progress) * pow(10, precision));
 	progress += y_motion * step;
 	if (progress < 0) {
