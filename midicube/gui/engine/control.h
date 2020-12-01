@@ -13,6 +13,7 @@
 #include "container.h"
 #include "../../util.h"
 #include <cmath>
+#include <algorithm>
 
 class Label : public StyleableNode {
 

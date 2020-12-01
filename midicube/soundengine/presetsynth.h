@@ -41,7 +41,7 @@ public:
 
 	~PresetSynth();
 
-};
+};*/
 
 
 #endif /* MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_ */
