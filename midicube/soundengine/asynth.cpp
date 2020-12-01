@@ -109,17 +109,19 @@ static double apply_modulation(const FixedScale& scale, PropertyModulation& mod,
 
 void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	env_val = {};
+	//Reset amps
+	bool reset_amps = amp_finished(info, note, env, note_index); //TODO maybe use press note event
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
 		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
 		if (mod_env.active) {
 			size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
-			if  (mod_envs.at(index).is_finished()) {
+			if  (reset_amps) {
 				mod_envs.at(index).reset();
 			}
 
 			double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, controls, note.velocity);
-			env_val.at(i) = mod_envs.at(note_index + i * SOUND_ENGINE_POLYPHONY).amplitude(mod_env.env, info.time_step, note.pressed, sustain) * volume;
+			env_val.at(i) = mod_envs.at(note_index + i * SOUND_ENGINE_POLYPHONY).amplitude(mod_env.env, info.time_step, note.pressed, env.sustain) * volume;
 		}
 	}
 	//Synthesize
@@ -140,7 +142,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 			AnalogOscilatorBankData bdata = {0.1, osc.unison_amount};
 			size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
 			//Only on note start
-			if  (amp_envs.at(index).is_finished()) {
+			if  (reset_amps) {
 				amp_envs.at(index).reset();
 				if (osc.reset) {
 					oscilators.reset(index);
@@ -230,7 +232,11 @@ void AnalogSynth::control_change(unsigned int control, unsigned int value) {
 }
 
 bool AnalogSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	bool finished = !note.pressed;
+	return !note.pressed && amp_finished(info, note, env, note_index);
+}
+
+bool AnalogSynth::amp_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	bool finished = true;
 	for (size_t i = 0; i < preset.oscilators.size() && finished; ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
 		size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
