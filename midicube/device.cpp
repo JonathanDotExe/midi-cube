@@ -38,8 +38,8 @@ PortInputDevice::PortInputDevice(MidiInput* input, std::string identifier) : Aud
 	this->identifier = identifier;
 }
 
-void PortInputDevice::set_midi_callback(void (*recieve) (double, MidiMessage&, void*), void* user_data) {
-	this->input->set_callback(recieve, user_data);
+void PortInputDevice::set_midi_callback(std::function<void(double, MidiMessage&)> callback) {
+	this->input->set_callback(callback);
 }
 
 std::string PortInputDevice::get_identifier() {

@@ -16,7 +16,7 @@
 #define SYNTH_VIBRATO_DETUNE 0.25
 
 /*
-class FMSynth : public BaseSoundEngine {
+class PresetSynth : public BaseSoundEngine {
 
 private:
 	double detune;
@@ -25,10 +25,11 @@ private:
 	double phase;
 	double fm_phase;
 	ADSREnvelope env{0.0, 0, 1, 0.0};
+	MultiChannelFilter<LowPassFilter<2>> filter;
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 8> osc;
 public:
 
-	FMSynth();
+	PresetSynth();
 
 	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
@@ -36,9 +37,9 @@ public:
 
 	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
-	~FMSynth();
+	~PresetSynth();
 
 };*/
 

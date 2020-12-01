@@ -11,6 +11,7 @@
 #include <rtmidi/RtMidi.h>
 #include <vector>
 #include <exception>
+#include <functional>
 
 class MidiException: public std::exception {
 
@@ -208,8 +209,7 @@ protected:
 class MidiInput : public MidiHandler {
 
 private:
-	void (*callback)(double deltatime, MidiMessage&, void*) = nullptr;
-	void* user_data = nullptr;
+	std::function<void(double, MidiMessage&)> callback = nullptr;
 	RtMidiIn *midiin = nullptr;
 
 public:
@@ -220,7 +220,7 @@ public:
 
 	void call_callback(double deltatime, std::vector<unsigned char>* msg);
 
-	void set_callback(void (*callback)(double deltatime, MidiMessage&, void*), void*);
+	void set_callback(std::function<void(double, MidiMessage&)>);
 
 	void open(unsigned int port);
 

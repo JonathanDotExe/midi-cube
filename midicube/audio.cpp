@@ -109,7 +109,7 @@ int AudioHandler::process(jack_nframes_t nframes) {
 		buffer1[i] = sample_buf[0];
 		buffer2[i] = sample_buf[1];
 
-		time += time_step;
+		time = time + time_step;
 		++sample_time;
 	}
 	return 0;
@@ -128,6 +128,11 @@ void AudioHandler::set_sample_callback(void (* get_sample) (std::array<double, O
 }
 
 SampleInfo AudioHandler::sample_info() {
-	return {time, time_step, sample_rate, sample_time};
+	SampleInfo info;
+	info.time = time;
+	info.time_step = time_step;
+	info.sample_rate = sample_rate;
+	info.sample_time = sample_time;
+	return info;
 }
 

@@ -34,7 +34,7 @@ public:
 	/**
 	 * For MIDI inputs
 	 */
-	virtual void set_midi_callback(void (*recieve) (double, MidiMessage&, void*), void*) {
+	virtual void set_midi_callback(std::function<void(double, MidiMessage&)> callback) {
 
 	}
 
@@ -82,7 +82,7 @@ public:
 
 	PortInputDevice(MidiInput* input, std::string identifier);
 
-	void set_midi_callback(void (*recieve) (double, MidiMessage&, void*), void*);
+	void set_midi_callback(std::function<void(double, MidiMessage&)> callback);
 
 	void call_listeners (MidiMessage& msg);
 
