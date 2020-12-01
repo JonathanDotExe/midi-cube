@@ -43,6 +43,13 @@ void MidiCube::init() {
 	}
 	//Sound Engines
 	fill_sound_engine_device(&engine);
+	//Default settings
+	Arpeggiator& arp = engine.get_channel(1).arpeggiator();
+	arp.on = true;
+	arp.preset.octaves = 3;
+	arp.preset.pattern = ArpeggiatorPattern::UP;
+	arp.preset.value = 1;
+	arp.metronome.set_bpm(440);
 	//Init audio
 	audio_handler.init();
 }

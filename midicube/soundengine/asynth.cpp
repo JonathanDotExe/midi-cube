@@ -69,7 +69,7 @@ AnalogSynth::AnalogSynth() {
 	osc3.filter_cutoff.cc_amount = 1;*/
 
 	//Spooky Sine
-	preset.mono = true;
+	/*preset.mono = true;
 	preset.legato = true;
 	preset.portamendo = 0.1;
 
@@ -84,7 +84,7 @@ AnalogSynth::AnalogSynth() {
 	osc.active = true;
 	osc.env = {0.0005, 0, 1, 0.003};
 	osc.pitch.lfo = 0;
-	osc.pitch.lfo_amount = 0.125;
+	osc.pitch.lfo_amount = 0.125;*/
 
 	//Lush Lead
 	/*LFOEntity& lfo = preset.lfos.at(0);
@@ -102,6 +102,23 @@ AnalogSynth::AnalogSynth() {
 	osc.filter_kb_track = 1;
 	osc.panning.value = 0;
 	osc.panning.lfo_amount = 1;*/
+
+	//Pulse Bass
+	ModEnvelopeEntity& mod_env = preset.mod_envs.at(0);
+	mod_env.active = true;
+	mod_env.env = {0, 0.1, 0, 0.1};
+
+	OscilatorEntity& osc = preset.oscilators.at(0);
+	osc.active = true;
+	osc.waveform = AnalogWaveForm::SQUARE;
+	osc.pulse_width.value = 0.66;
+	osc.env = {0.0005, 0.4, 0, 0.003};
+	osc.filter = true;
+	osc.filter_type = FilterType::LP_24;
+	osc.filter_cutoff.value = 0.05;
+	osc.filter_cutoff.mod_env = 0;
+	osc.filter_cutoff.mod_amount = 0.2;
+	osc.filter_resonance.value = 0.5;
 }
 
 static double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, std::array<double, ANALOG_CONTROL_COUNT>& controls, double velocity) {
