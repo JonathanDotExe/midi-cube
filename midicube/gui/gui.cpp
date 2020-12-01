@@ -200,7 +200,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			octave_text->style.font_color = BLACK;
 			octave_text->get_layout().margin_top = 10;
 
-			Spinner* octave = new Spinner(-4, 4, 0);
+			Spinner* octave = new Spinner(-4, 4, source.octave);
 			octave->get_layout().width = MATCH_PARENT;
 			octave->set_on_change(PROPERTY_BIND(int, source, source.octave));
 
@@ -215,20 +215,21 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			looper_text->get_layout().margin_top = 10;
 
 			LabeledControl<CheckBox>* looper = new LabeledControl<CheckBox>("On");
+			looper->control->checked = channel.get_looper().preset.on;
 			looper->get_layout().margin_top = 2;
 			looper->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().preset.on));
 
 			LabeledControl<CheckBox>* looper_play = new LabeledControl<CheckBox>("Play");
 			looper_play->get_layout().margin_top = 2;
-			looper_play->control->checked = true;
+			looper_play->control->checked = channel.get_looper().play;
 			looper_play->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().play));
 
 			LabeledControl<CheckBox>* looper_record = new LabeledControl<CheckBox>("Record");
 			looper_record->get_layout().margin_top = 2;
-			looper_record->control->checked = true;
+			looper_record->control->checked = channel.get_looper().record;
 			looper_record->control->set_on_change(PROPERTY_BIND(bool, channel, channel.get_looper().record));
 
-			LabeledControl<Spinner>* looper_bars = new LabeledControl<Spinner>("Bars", new Spinner(1, 16, 4));
+			LabeledControl<Spinner>* looper_bars = new LabeledControl<Spinner>("Bars", new Spinner(1, 16, channel.get_looper().preset.bars));
 			looper_bars->get_layout().margin_top = 2;
 			looper_bars->get_layout().width = MATCH_PARENT;
 			looper_bars->control->get_layout().width = MATCH_PARENT;
@@ -256,6 +257,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			vol_text->get_layout().margin_top = 10;
 
 			Slider* volume = new Slider(channel.volume, {0, {}, 1});
+			volume->set_value(channel.volume);
 			volume->style.border_color = BLANK;
 			volume->style.border_thickness = 0;
 			volume->button_style.border_color = BLANK;
@@ -281,7 +283,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		{
 			LabeledControl<CheckBox>* active = new LabeledControl<CheckBox>("Active");
 			active->get_layout().margin_top = 5;
-			active->control->checked = true;
+			active->control->checked = channel.active;
 			active->control->set_on_change(PROPERTY_BIND(bool, channel, channel.active));
 
 			Button* solo = new Button("Solo");
@@ -309,6 +311,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			ComboBox<ssize_t>* input = new ComboBox<ssize_t>(inputs, [](ssize_t b) {
 				return std::to_string(b);
 			});
+			input->set_value(source.input);
 
 			input->set_on_change([&source](ssize_t index) {
 				source.input = index;
@@ -331,12 +334,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			channel_text->style.font_color = BLACK;
 			channel_text->get_layout().margin_top = 10;
 
-			std::vector<ssize_t> inputs = {};
-			for (ssize_t i = -1; i < (ssize_t) cube->get_inputs().size(); ++i) {
-				inputs.push_back(i);
-			}
-
-			Spinner* ch = new Spinner(1, 16, 1);
+			Spinner* ch = new Spinner(1, 16, source.channel + 1);
 			ch->get_layout().width = MATCH_PARENT;
 
 			ch->set_on_change([&source](int index) {
@@ -357,7 +355,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 	footer->get_layout().padding_left = 5;
 	footer->get_layout().padding_right = 5;
 
-	LabeledControl<Spinner>* bpm = new LabeledControl<Spinner>("BPM", new Spinner(10, 480, 120), false);
+	LabeledControl<Spinner>* bpm = new LabeledControl<Spinner>("BPM", new Spinner(10, 480, e.metronome.get_bpm()), false);
 	bpm->label->style.font_color = WHITE;
 	bpm->get_layout().height = MATCH_PARENT;
 	bpm->control->get_layout().width = 100;
@@ -365,6 +363,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 	footer->add_child(bpm);
 
 	LabeledControl<CheckBox>* metronome = new LabeledControl<CheckBox>("Metronome");
+	metronome->control->checked = e.play_metronome;
 	metronome->label->style.font_color = WHITE;
 	metronome->control->set_on_change(PROPERTY_BIND(bool, e, e.play_metronome));
 	footer->add_child(metronome);

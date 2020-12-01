@@ -12,6 +12,7 @@
 #include "util.h"
 #include "container.h"
 #include "../../util.h"
+#include <cmath>
 
 class Label : public StyleableNode {
 
@@ -261,6 +262,17 @@ public:
 	int button_height = 10;
 
 	Slider(double value, FixedScale scale);
+
+	void set_value(double value) {
+		set_progress(scale.progress(value));
+	}
+
+	void set_progress(double prog) {
+		this->progress = fmax(fmin(prog, 1), 0);
+		if (frame) {
+			frame->request_redraw();
+		}
+	}
 
 	virtual void draw(int parentX, int parentY, NodeEnv env);
 
