@@ -344,6 +344,40 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 			col->add_child(channel_text);
 			col->add_child(ch);
 		}
+		//Start note
+		{
+			Label* start_note_text = new Label("Start Note");
+			start_note_text->style.font_size = 10;
+			start_note_text->style.font_color = BLACK;
+			start_note_text->get_layout().margin_top = 10;
+
+			Spinner* ch = new Spinner(0, 127, source.start_note);
+			ch->get_layout().width = MATCH_PARENT;
+
+			ch->set_on_change([&source](int note) {
+				source.start_note = note;
+			});
+
+			col->add_child(start_note_text);
+			col->add_child(ch);
+		}
+		//End note
+		{
+			Label* end_note_text = new Label("End Note");
+			end_note_text->style.font_size = 10;
+			end_note_text->style.font_color = BLACK;
+			end_note_text->get_layout().margin_top = 10;
+
+			Spinner* ch = new Spinner(0, 127, source.end_note);
+			ch->get_layout().width = MATCH_PARENT;
+
+			ch->set_on_change([&source](int note) {
+				source.end_note = note;
+			});
+
+			col->add_child(end_note_text);
+			col->add_child(ch);
+		}
 		//Add
 		box->add_child(col);
 	}
