@@ -84,6 +84,7 @@ struct AnalogSynthPreset {
 	std::array<OscilatorEntity, ANALOG_OSCILATOR_COUNT> oscilators;
 
 	bool mono = false;
+	bool legato = false;
 	double portamendo = 0;
 };
 
@@ -101,6 +102,7 @@ private:
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
 
 	bool first_port = true;
+	unsigned int last_note = 0;
 	PortamendoBuffer note_port{0, 0};
 
 	inline void process_note(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);

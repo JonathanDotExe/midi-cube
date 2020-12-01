@@ -7,6 +7,9 @@
 #include "asynth.h"
 #include <cmath>
 
+#define OSC_INDEX(note_index,i) (note_index + i * SOUND_ENGINE_POLYPHONY)
+#define ENV_INDEX(note_index,i) (note_index + i * SOUND_ENGINE_POLYPHONY)
+
 
 AnalogSynth::AnalogSynth() {
 	//Squashy Synth Basss
@@ -67,6 +70,7 @@ AnalogSynth::AnalogSynth() {
 
 	//Spooky Sine
 	preset.mono = true;
+	preset.legato = true;
 	preset.portamendo = 0.1;
 
 	LFOEntity& lfo = preset.lfos.at(0);
@@ -78,7 +82,7 @@ AnalogSynth::AnalogSynth() {
 	OscilatorEntity& osc = preset.oscilators.at(0);
 	osc.waveform = AnalogWaveForm::SINE;
 	osc.active = true;
-	osc.env = {0.005, 0, 1, 0.005};
+	osc.env = {0.5, 0, 1, 1};
 	osc.pitch.lfo = 0;
 	osc.pitch.lfo_amount = 0.125;
 
@@ -115,7 +119,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 	for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
 		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
 		if (mod_env.active) {
-			size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
+			size_t index = ENV_INDEX(note_index, i);
 			if  (reset_amps) {
 				mod_envs.at(index).reset();
 			}
@@ -140,7 +144,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 
 			AnalogOscilatorData data = {osc.waveform, osc.analog, osc.sync};
 			AnalogOscilatorBankData bdata = {0.1, osc.unison_amount};
-			size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
+			size_t index = OSC_INDEX(note_index, i);
 			//Only on note start
 			if  (reset_amps) {
 				amp_envs.at(index).reset();
@@ -202,8 +206,25 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 	//Mono
 	if (preset.mono && status.latest_note) {
+		unsigned int note = status.latest_note->note;
 		//Update portamendo
-		note_port.set(status.latest_note->note, info.time, first_port ? 0 : preset.portamendo);
+		if (note != last_note) {
+			//Reset envs to attack
+			if (!preset.legato) {
+				//Mod envs
+				for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
+					size_t index = ENV_INDEX(0, i);	//Updating every amp might be a bug source
+					mod_envs.at(index).phase = ATTACK;
+				}
+				//Amp envs
+				for (size_t i = 0; i < preset.oscilators.size(); ++i) {
+					size_t index = OSC_INDEX(0, i);
+					amp_envs.at(index).phase = ATTACK;
+				}
+			}
+			note_port.set(note, info.time, first_port ? 0 : preset.portamendo);
+		}
+		last_note = note;
 		first_port = false;
 		double pitch = note_port.get(info.time);
 		KeyboardEnvironment e = env;
@@ -239,7 +260,7 @@ bool AnalogSynth::amp_finished(SampleInfo& info, TriggeredNote& note, KeyboardEn
 	bool finished = true;
 	for (size_t i = 0; i < preset.oscilators.size() && finished; ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
-		size_t index = note_index + i * SOUND_ENGINE_POLYPHONY;
+		size_t index = OSC_INDEX(note_index, i);
 		if (osc.active) {
 			finished = amp_envs.at(index).is_finished();
 		}
