@@ -10,9 +10,10 @@
 #include <iostream>
 #include <cmath>
 
+/*
 //PresetSynth
 PresetSynth::PresetSynth() {
-	/*detune = note_to_freq_transpose(0.1);
+	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
 	vibrato = 0;
 	filter.set_cutoff(6300);
@@ -30,12 +31,12 @@ PresetSynth::PresetSynth() {
 
 	osc2 = new OscilatorSlot(new AnalogOscilator(AnalogWaveForm::SQUARE));
 	osc2->set_volume(1);
-	osc2->set_unison(0);*/
+	osc2->set_unison(0);
 
 	detune = note_to_freq_transpose(0.1);
 	ndetune = note_to_freq_transpose(-0.1);
 	vibrato = 0;
-	filter.set_cutoff(1200);
+	//filter.set_cutoff(1200);
 
 	osc.data.analog = true;
 	osc.data.waveform = AnalogWaveForm::SAW_DOWN;
@@ -49,7 +50,7 @@ void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	double sample = 0.0;
 	double freq = note.freq * env.pitch_bend;
 	double fm_freq = note.freq * env.pitch_bend;
-	/*sample = osc.signal(freq, info.time_step, note_index);
+	sample = osc.signal(freq, info.time_step, note_index);
 
 	if (vibrato) {
 		note.phase_shift += info.time_step * (note_to_freq_transpose(SYNTH_VIBRATO_DETUNE * sine_wave(info.time, SYNTH_VIBRATO_RATE) * vibrato) - 1);
@@ -63,7 +64,7 @@ void PresetSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	double mod = sine_wave(fm_phase, 1) * vibrato;
 	double mul = (freq + mod)/freq;
 
-	sample = sine_wave(phase * mul, 1);*/
+	sample = sine_wave(phase * mul, 1);
 
 	sample = sine_wave(info.time, freq + sine_wave(info.time, fm_freq) * vibrato);
 
@@ -84,9 +85,6 @@ void PresetSynth::control_change(unsigned int control, unsigned int value) {
 	if (control == 1) {
 		vibrato = value/127.0;
 	}
-	if (control == 74) {
-		filter.set_cutoff(21000/(128.0 - value));
-	}
 }
 
 
@@ -101,5 +99,5 @@ void __fix_link_preset_synth_name__ () {
 
 PresetSynth::~PresetSynth() {
 
-}
+}*/
 

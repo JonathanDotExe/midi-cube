@@ -16,7 +16,7 @@
 class FMOperator {
 public:
 	double volume;
-	ADSREnvelope env{0.0, 0, 1, 0.0};
+	ADSREnvelopeData env{0.0, 0, 1, 0.0};
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 8> osc;
 
 };
@@ -35,7 +35,7 @@ public:
 
 	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
 	~FMSynth();
 

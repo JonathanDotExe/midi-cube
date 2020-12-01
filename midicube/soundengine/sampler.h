@@ -39,7 +39,7 @@ struct SampleRegion {
 class SampleSound {
 private:
 	std::vector<SampleRegion*> samples;
-	ADSREnvelope envelope;
+	ADSREnvelopeData envelope;
 
 public:
 
@@ -47,13 +47,11 @@ public:
 
 	double get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
-
 	void push_sample(SampleRegion* region);
 
-	ADSREnvelope get_envelope();
+	ADSREnvelopeData get_envelope();
 
-	void set_envelope(ADSREnvelope env);
+	void set_envelope(ADSREnvelopeData env);
 
 	~SampleSound();
 
@@ -77,6 +75,7 @@ class Sampler : public BaseSoundEngine {
 
 private:
 	SampleSound* sample;
+	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY> envs;
 
 public:
 
@@ -84,7 +83,7 @@ public:
 
 	void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
 	std::string get_name();
 

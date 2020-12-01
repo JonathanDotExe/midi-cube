@@ -104,7 +104,7 @@ public:
 
 	};
 
-	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
 	};
 
@@ -220,7 +220,8 @@ private:
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	std::vector<SoundEngineBank*> sound_engines;
 
-	ADSREnvelope metronome_env{0.0005, 0.02, 0, 0};
+	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
+	ADSREnvelope metronome_env;
 
 public:
 	Metronome metronome;

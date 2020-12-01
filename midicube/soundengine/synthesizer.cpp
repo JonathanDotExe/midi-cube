@@ -4,7 +4,7 @@
  *  Created on: 15 Jul 2020
  *      Author: jojo
  */
-
+/*
 #include "synthesizer.h"
 #include <cmath>
 #include <algorithm>
@@ -1014,4 +1014,4 @@ std::string get_engine_name<Synthesizer>() {
 
 void __fix_link_synthesizer_name__ () {
 	get_engine_name<Synthesizer>();
-}
+}*/

@@ -10,87 +10,62 @@
 #include <iostream>
 
 //ADSREnvelope
-double ADSREnvelope::amplitude(double time, bool pressed, double note_start_time, double note_release_time, bool sustain, double sustain_time, double sustain_release_time) {
-	double release_time = fmax(note_release_time, sustain_release_time);
-	if (pressed || (sustain && sustain_time <= note_release_time)) {
-		//Attack
-		if (time <= note_start_time + attack) {
-			return (time - note_start_time)/attack;
+double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
+	//Goto release phase
+	if (!pressed && phase < RELEASE) {
+		last_vol = volume;
+		phase = RELEASE;
+	}
+	switch (phase) {
+	case ATTACK:
+		if (data.attack != 0) {
+			volume += time_step/data.attack;
 		}
-		//Decay
-		else if (time <= note_start_time + attack + decay) {
-			return 1 - (time - note_start_time - attack)/decay * (1 - this->sustain);
-		}
-		//Sustain
 		else {
-			return this->sustain;
+			volume = 1;
 		}
-	}
-	else if (time - release_time > release) {
-		return 0;
-	}
-	else {
-		double last_vol = this->sustain;
-		double held_time = release_time - note_start_time;
-		if (held_time <= attack) {
-			last_vol = held_time/attack;
+		if (volume >= 1) {
+			volume = 1;
+			last_vol = volume;
+			phase = DECAY;
 		}
-		else if (held_time < attack + decay) {
-			last_vol = 1 - (held_time - attack)/decay * (1 - this->sustain);
+		break;
+	case DECAY:
+		if (data.decay != 0) {
+			volume -= time_step/data.decay * (1 - data.sustain);
 		}
-		return last_vol - (time - release_time)/release * last_vol;
-	}
-
-	return 0;
-
-/*
- * 	double release_time = fmax(note.release_time, env.sustain_release_time);
-	if (note.pressed || (env.sustain && env.sustain_time <= note.release_time)) {
-		//Attack
-		if (time <= note.start_time + attack) {
-			return (time - note.start_time)/attack;
-		}
-		//Decay
-		else if (time <= note.start_time + attack + decay) {
-			return 1 - (time - note.start_time - attack)/decay * (1 - sustain);
-		}
-		//Sustain
 		else {
-			return sustain;
+			volume = data.sustain;
 		}
-	}
-	else if (time - release_time > release) {
-		return 0;
-	}
-	else {
-		double last_vol = sustain;
-		double held_time = release_time - note.start_time;
-		if (held_time <= attack) {
-			last_vol = held_time/attack;
+
+		if (volume <= data.sustain) {
+			volume = data.sustain;
+			last_vol = volume;
+			phase = SUSTAIN;
 		}
-		else if (held_time < attack + decay) {
-			last_vol = 1 - (held_time - attack)/decay * (1 - sustain);
+		break;
+	case SUSTAIN:
+		break;
+	case RELEASE:
+		if (!sustain) {
+			if (data.release != 0) {
+				volume -= time_step/data.release * last_vol;
+			}
+			else {
+				volume = 0;
+			}
 		}
-		return last_vol - (time - release_time)/release * last_vol;
+		 if (volume <= 0) {
+			 volume = 0;
+			 last_vol = volume;
+			 phase = FINISHED;
+		 }
+		break;
+	case FINISHED:
+		break;
 	}
-
-	return 0;
- */
+	return volume;
 }
-
-double ADSREnvelope::is_finished(double time, bool pressed, double note_start_time, double note_release_time, bool sustain, double sustain_time, double sustain_release_time) {
-	double release_time = fmax(note_release_time, sustain_release_time);
-	return !pressed && (!sustain || sustain_time > note_release_time) && time - release_time > release;
-}
-
-double ADSREnvelope::amplitude(double time, TriggeredNote& note, KeyboardEnvironment& env) {
-	return amplitude(time, note.pressed, note.start_time, note.release_time, env.sustain, env.sustain_time, env.sustain_release_time);
-}
-
-double ADSREnvelope::is_finished(double time, TriggeredNote& note, KeyboardEnvironment& env) {
-	return is_finished(time, note.pressed, note.start_time, note.release_time, env.sustain, env.sustain_time, env.sustain_release_time);
-}
-
 
 //EnvelopeFollower
 EnvelopeFollower::EnvelopeFollower(double step_time) {

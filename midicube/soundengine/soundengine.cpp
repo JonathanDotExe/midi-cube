@@ -87,11 +87,11 @@ void BaseSoundEngine::midi_message(MidiMessage& message, SampleInfo& info) {
 	}
 }
 
-inline void BaseSoundEngine::press_note(SampleInfo& info, unsigned int note, double velocity) {
+void BaseSoundEngine::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	this->note.press_note(info, note, velocity);
 }
 
-inline void BaseSoundEngine::release_note(SampleInfo& info, unsigned int note) {
+void BaseSoundEngine::release_note(SampleInfo& info, unsigned int note) {
 	this->note.release_note(info, note);
 }
 
@@ -100,12 +100,11 @@ void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channe
 	//Notes
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
 		if (note.note[i].valid) {
-			if (note_finished(info, note.note[i], environment)) {
+			if (note_finished(info, note.note[i], environment, i)) {
 				note.note[i].valid = false;
-				note_not_pressed(info, note.note[i], i);
 			}
 			else {
-				++status.pressed_notes;
+				++status.pressed_notes; //TODO might cause problems in the future
 				note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
 				process_note_sample(channels, info, note.note[i], environment, i);
 				if (!status.latest_note || status.latest_note->start_time < note.note[i].start_time) {
@@ -328,8 +327,10 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 	}
 	//Metronome
 	if (play_metronome) {
-		double start =(double) metronome.last_beat(info.sample_time, info.sample_rate, 1)/info.sample_rate;
-		double vol = metronome_env.amplitude(info.time, true, start, 0);
+		if (metronome.is_beat(info.sample_time, info.sample_rate, 1)) {
+			metronome_env.reset();
+		}
+		double vol = metronome_env.amplitude(metronome_env_data, info.time_step, true, false);
 		if (vol) {
 			double sample = sine_wave(info.time, 3520) * vol;
 			for (size_t i = 0; i < channels.size(); ++i) {

@@ -69,10 +69,15 @@ static bool draw_switch (int x, int y, int width, int height, bool value, std::s
 	return value;
 }
 
+/*
 static void scaled_slider(Rectangle pos, std::string text, double& value, const FixedScale& scale, std::string format = "1.2f%") {
 	value = scale.value(GuiSlider(pos, text.c_str(), TextFormat(format.c_str(), value), scale.progress(value), 0, 1));
+<<<<<<< HEAD
 }
 */
+=======
+}*/
+>>>>>>> refs/remotes/origin/master
 
 //MainMenuView
 MainMenuView::MainMenuView(MidiCube* cube) {
@@ -954,7 +959,7 @@ View* B3OrganEngineMenuView::draw() {
 	draw_return_button(&view);
 	return view;
 }
-
+/*
 SynthesizerEngineMenuView::SynthesizerEngineMenuView(SynthesizerData* data) {
 	this->data = data;
 }
@@ -1411,18 +1416,19 @@ float ComponentSlotDialog::width() {
 
 float ComponentSlotDialog::height() {
 	return 20 + (slot->get_component() ? (edit_binding ? 190 : (slot->bindings.size() * 20 + 65)) : 205);
-}
+}*/
 
 View* create_view_for_engine(std::string name, SoundEngine*engine) {
 	if (name == "B3 Organ") {
 		return new B3OrganEngineMenuView(&dynamic_cast<B3Organ*>(engine)->data);	//TODO cleaner check
 	}
-	else if (name == "Synthesizer") {
+	/*else if (name == "Synthesizer") {
 		return new SynthesizerEngineMenuView(&dynamic_cast<Synthesizer*>(engine)->data);	//TODO cleaner check
-	}
+	}*/
 	return nullptr;
 }
 
+/*
 Dialog* create_dialog_for_component(std::string name, SynthComponent* data) {
 	if (name == "Oscilator") {
 		return new OscilatorDialog(dynamic_cast<OscilatorComponent*>(data));	//TODO cleaner check

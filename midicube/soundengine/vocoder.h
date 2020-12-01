@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_SOUNDENGINE_VOCODER_H_
 #define MIDICUBE_SOUNDENGINE_VOCODER_H_
 
+/*
 #include "../filter.h"
 #include "soundengine.h"
 
@@ -63,6 +64,6 @@ public:
 	void control_change(unsigned int control, unsigned int value);
 
 	~Vocoder();
-};
+};*/
 
 #endif /* MIDICUBE_SOUNDENGINE_VOCODER_H_ */
