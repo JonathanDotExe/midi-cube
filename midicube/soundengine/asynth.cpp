@@ -82,7 +82,7 @@ AnalogSynth::AnalogSynth() {
 	OscilatorEntity& osc = preset.oscilators.at(0);
 	osc.waveform = AnalogWaveForm::SINE;
 	osc.active = true;
-	osc.env = {0.5, 0, 1, 1};
+	osc.env = {0.0005, 0, 1, 0.003};
 	osc.pitch.lfo = 0;
 	osc.pitch.lfo_amount = 0.125;
 
@@ -253,6 +253,10 @@ void AnalogSynth::control_change(unsigned int control, unsigned int value) {
 }
 
 bool AnalogSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	//Mono notes
+	if (preset.mono) {	//TODO not very easy to read/side effects
+		note_index = 0;
+	}
 	return !note.pressed && amp_finished(info, note, env, note_index);
 }
 
