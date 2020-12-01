@@ -5,9 +5,11 @@
  *      Author: jojo
  */
 
+
 #ifndef MIDICUBE_SOUNDENGINE_SYNTHESIZER_H_
 #define MIDICUBE_SOUNDENGINE_SYNTHESIZER_H_
 
+/*
 #include <type_traits>
 #include <atomic>
 #include <algorithm>
@@ -389,7 +391,7 @@ public:
 	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
 	virtual ~Synthesizer();
-};
+};*/
 
 
 #endif /* MIDICUBE_SOUNDENGINE_SYNTHESIZER_H_ */

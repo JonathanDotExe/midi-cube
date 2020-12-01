@@ -31,16 +31,35 @@ struct KeyboardEnvironment {
 	double pitch_bend = 1;
 };
 
-struct ADSREnvelope {
+struct ADSREnvelopeData {
 	double attack;
 	double decay;
 	double sustain;
 	double release;
+};
 
-	double amplitude(double time, bool pressed, double note_start_time, double note_release_time, bool sustain = false, double sustain_time = 0, double sustain_release_time = 0);
-	double amplitude(double time, TriggeredNote& note, KeyboardEnvironment& env);
-	double is_finished(double time, bool pressed, double note_start_time, double note_release_time, bool sustain = false, double sustain_time = 0, double sustain_release_time = 0);
-	double is_finished(double time, TriggeredNote& note, KeyboardEnvironment& env);
+enum ADSREnvelopePhase {
+	ATTACK, DECAY, SUSTAIN, RELEASE, FINISHED
+};
+
+class ADSREnvelope {
+
+public:
+	ADSREnvelopePhase phase = FINISHED;
+	double last_vol = 0;
+	double volume = 0;
+
+	double amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain);
+
+	bool is_finished() {
+		return phase == FINISHED;
+	}
+
+	void reset () {
+		phase = ATTACK;
+		volume = 0;
+		last_vol = 0;
+	}
 };
 
 class EnvelopeFollower {

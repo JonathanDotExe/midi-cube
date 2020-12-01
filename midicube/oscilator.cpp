@@ -26,7 +26,7 @@ static double polyblep(double phase, double step) {
 	return 0;
 }
 
-double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data, bool modulator) {
+AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data) {
 	//Move
 	double last_rotation = rotation;
 	double step = freq * time_step;
@@ -55,53 +55,52 @@ double AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorDat
 		}
 	}
 	//Compute wave
-	double signal = 0;
+	AnalogOscilatorSignal signal = {0, 0};
 	switch(data.waveform) {
 	case AnalogWaveForm::SINE:
 		//Modulator
-		if (modulator) {
-			//TODO sync polyblep
-			signal = (-cosine_wave(rotation, 1) + cosine_wave(last_rotation, 1))/(time_step * 2 * M_PI);
-		}
-		else {
-			signal = sine_wave(rotation, 1);
-			if (data.analog && data.sync && data.sync_mul != 1) {
-				signal -= polyblep(sync_phase, sync_step) * (sine_wave(last_phase, 1) + 1) / 2;
-			}
+		signal.modulator = (-cosine_wave(rotation, 1) + cosine_wave(last_rotation, 1))/(time_step * 2 * M_PI);
+		signal.carrier = sine_wave(rotation, 1);
+		if (data.analog && data.sync && data.sync_mul != 1) {
+			signal.carrier -= polyblep(sync_phase, sync_step) * (sine_wave(last_phase, 1) + 1) / 2;
 		}
 		break;
 	case AnalogWaveForm::SAW_DOWN:
-		signal = saw_wave_down(rotation, 1);
+		signal.carrier = saw_wave_down(rotation, 1);
 		if (data.analog) {
-			signal += polyblep(phase, step);
+			signal.carrier += polyblep(phase, step);
 			if (data.sync && data.sync_mul != 1) {
-				signal += polyblep(sync_phase, sync_step) * (1 - (saw_wave_down(last_phase, 1) + 1) / 2);
+				signal.carrier += polyblep(sync_phase, sync_step) * (1 - (saw_wave_down(last_phase, 1) + 1) / 2);
 			}
 		}
+		signal.modulator = signal.carrier;
 		break;
 	case AnalogWaveForm::SAW_UP:
-		signal = saw_wave_up(rotation, 1);
+		signal.carrier = saw_wave_up(rotation, 1);
 		if (data.analog) {
-			signal -= polyblep(phase, step);
+			signal.carrier -= polyblep(phase, step);
 			if (data.sync && data.sync_mul != 1) {
-				signal += polyblep(sync_phase, sync_step) * (saw_wave_up(last_phase, 1) + 1) / 2;
+				signal.carrier += polyblep(sync_phase, sync_step) * (saw_wave_up(last_phase, 1) + 1) / 2;
 			}
 		}
+		signal.modulator = signal.carrier;
 		break;
 	case AnalogWaveForm::SQUARE:
-		signal = square_wave(rotation, 1, pulse_width);
+		signal.carrier = square_wave(rotation, 1, pulse_width);
 		if (data.analog) {
-			signal += polyblep(phase, step);
+			signal.carrier += polyblep(phase, step);
 			double protation = rotation + pulse_width;
-			signal -= polyblep(protation - (long int) protation, step);
+			signal.carrier -= polyblep(protation - (long int) protation, step);
 
 			if (data.sync && data.sync_mul != 1) {
-				signal += polyblep(sync_phase, sync_step) *  (1 - (square_wave(rotation, 1, pulse_width) + 1) / 2);
+				signal.carrier += polyblep(sync_phase, sync_step) *  (1 - (square_wave(rotation, 1, pulse_width) + 1) / 2);
 			}
 		}
+		signal.modulator = signal.carrier;
 		break;
 	case AnalogWaveForm::NOISE:
-		signal = noise_wave(rotation, 1);
+		signal.carrier = noise_wave(rotation, 1);
+		signal.modulator = signal.carrier;
 		break;
 	}
 	return signal;

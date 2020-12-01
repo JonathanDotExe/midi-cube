@@ -10,231 +10,49 @@
 #include <array>
 #include <type_traits>
 #include "audio.h"
+#include <cmath>
+
+inline double cutoff_to_rc(double cutoff) {
+	return 1.0/(2 * M_PI * cutoff);
+}
+
+inline double rc_to_cutoff_factor(double rc, double time_step) {
+	return time_step/(rc+time_step);
+}
+
+inline double cutoff_to_factor(double cutoff, double time_step) {
+	return rc_to_cutoff_factor(cutoff_to_rc(cutoff), time_step);
+}
+
+inline double factor_to_cutoff(double cutoff, double time_step) {
+	return 1/(2*M_PI*(time_step/cutoff-time_step));
+}
+
+enum class FilterType {
+	LP_12, LP_24, HP_12, HP_24
+};
+
+struct FilterData {
+	FilterType type;
+	double cutoff = 1;
+	double resonance = 0;
+};
+
+struct FilterCache {
+	double last_filtered = 0;
+	double last = 0;
+	bool started = false;
+};
 
 class Filter {
-
-public:
-
-	virtual double apply (double sample, double time_step) = 0;
-
-	virtual void set_cutoff(double cutoff) = 0;
-
-	virtual double get_cutoff() = 0;
-
-	virtual ~Filter() {
-
-	}
-
-};
-
-class RCLowPassFilter : public Filter {
-
 private:
-
-	double last;
-	double cutoff;
-	double rc;
-
+	double pole1 = 0;
+	double pole2 = 0;
+	double pole3 = 0;
+	double pole4 = 0;
 public:
-
-	RCLowPassFilter(double cutoff = 21000);
-
-	double apply (double sample, double time_step);
-
-	void set_cutoff(double cutoff);
-
-	double get_cutoff();
-
-	~RCLowPassFilter() {
-
-	}
-};
-
-class RCHighPassFilter : public Filter {
-
-private:
-
-	double last_filtered;
-	double last;
-	double cutoff;
-	double rc;
-	bool started;
-
-public:
-
-	RCHighPassFilter(double cutoff = 21000);
-
-	double apply (double sample, double time_step);
-
-	void set_cutoff(double cutoff);
-
-	double get_cutoff();
-
-	~RCHighPassFilter() {
-
-	}
-};
-
-class RCBandPassFilter : public Filter {
-
-private:
-
-	RCLowPassFilter lowpass;
-	RCHighPassFilter highpass;
-
-public:
-
-	RCBandPassFilter(double cutoff = 10500, double bandwidth = 10500);
-
-	double apply (double sample, double time_step);
-
-	void set_cutoff(double cutoff);
-
-	double get_cutoff();
-
-	void set_bandwidth(double cutoff);
-
-	double get_bandwidth();
-
-	~RCBandPassFilter() {
-
-	}
-};
-
-template<std::size_t POLES>
-class LowPassFilter {
-private:
-	std::array<RCLowPassFilter, POLES> filters;		//TODO better implementation than array of rc low pass filters. Sound at cutoff will become more quiet the higher the amount of poles is
-
-public:
-
-	double apply (double sample, double time_step) {
-		for (size_t i = 0; i < filters.size(); ++i) {
-			sample = filters[i].apply(sample, time_step);
-		}
-		return sample;
-	}
-
-	void set_cutoff(double cutoff) {
-		for (size_t i = 0; i < filters.size(); ++i) {
-			filters[i].set_cutoff(cutoff);
-		}
-	}
-
-	double get_cutoff() {
-		return filters.at(0).get_cutoff();
-	}
+	double apply (FilterData& data, double sample, double time_step);
 
 };
-
-template<std::size_t POLES>
-class HighPassFilter {
-private:
-	std::array<RCHighPassFilter, POLES> filters;		//TODO better implementation than array of rc high pass filters. Sound at cutoff will become more quiet the higher the amount of poles is
-
-public:
-
-	double apply (double sample, double time_step) {
-		for (size_t i = 0; i < filters.size(); ++i) {
-			sample = filters[i].apply(sample, time_step);
-		}
-		return sample;
-	}
-
-	void set_cutoff(double cutoff) {
-		for (size_t i = 0; i < filters.size(); ++i) {
-			filters[i].set_cutoff(cutoff);
-		}
-	}
-
-	double get_cutoff() {
-		return filters.at(0).get_cutoff();
-	}
-
-};
-
-template<std::size_t POLES>
-class BandPassFilter {
-private:
-	std::array<RCBandPassFilter, POLES> filters;		//TODO better implementation than array of rc band pass filters. Sound at cutoff will become more quiet the higher the amount of poles is
-
-public:
-
-	double apply (double sample, double time_step) {
-		for (size_t i = 0; i < filters.size(); ++i) {
-			sample = filters[i].apply(sample, time_step);
-		}
-		return sample;
-	}
-
-	void set_cutoff(double cutoff) {
-		for (size_t i = 0; i < filters.size(); ++i) {
-			filters[i].set_cutoff(cutoff);
-		}
-	}
-
-	double get_cutoff() {
-		return filters.at(0).get_cutoff();
-	}
-
-	void set_bandwidth(double bandwidth) {
-		for (size_t i = 0; i < filters.size(); ++i) {
-			filters[i].set_bandwidth(bandwidth);
-		}
-	}
-
-	double get_bandwidth() {
-		return filters.at(0).get_bandwidth();
-	}
-
-};
-
-
-
-template<typename T, typename = std::enable_if<std::is_base_of<Filter, T>::value>>
-class MultiChannelFilter {
-protected:
-	std::array<T, OUTPUT_CHANNELS> channels;
-
-public:
-
-	void apply (std::array<double, OUTPUT_CHANNELS>& channels, double time_step) {
-		for (std::size_t i = 0; i < this->channels.size(); ++i) {
-			channels[i] = this->channels[i].apply(channels[i], time_step);
-		}
-	}
-
-	std::array<T, OUTPUT_CHANNELS>& get_channels () {
-		return channels;
-	}
-
-	void set_cutoff(double cutoff) {
-		for (std::size_t i = 0; i < this->channels.size(); ++i) {
-			this->channels[i].set_cutoff(cutoff);
-		}
-	}
-
-	double get_cutoff() {
-		return channels.at(0).get_cutoff();
-	}
-
-};
-
-class MultiChannelBandPassFilter : public MultiChannelFilter<RCBandPassFilter> {
-
-public:
-
-	void set_bandwidth(double bandwidth) {
-		for (std::size_t i = 0; i < this->channels.size(); ++i) {
-			this->channels[i].set_bandwidth(bandwidth);
-		}
-	}
-
-	double get_bandwidth() {
-		return channels.at(0).get_bandwidth();
-	}
-
-};
-
 
 #endif /* MIDICUBE_FILTER_H_ */

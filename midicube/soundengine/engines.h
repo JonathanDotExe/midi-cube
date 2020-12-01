@@ -10,20 +10,16 @@
 
 #include "organ.h"
 #include "drums.h"
-#include "presetsynth.h"
 #include "sampler.h"
-#include "vocoder.h"
-#include "synthesizer.h"
 #include "sfsynth.h"
+#include "asynth.h"
 
 extern void fill_sound_engine_device(SoundEngineDevice* device) {
-	device->add_sound_engine(new TemplateSoundEngineBank<FMSynth>());
+	device->add_sound_engine(new TemplateSoundEngineBank<SoundFontSynth>());
 	device->add_sound_engine(new TemplateSoundEngineBank<B3Organ>());
+	device->add_sound_engine(new TemplateSoundEngineBank<AnalogSynth>());
 	device->add_sound_engine(new TemplateSoundEngineBank<SampleDrums>());
 	device->add_sound_engine(new TemplateSoundEngineBank<Sampler>());
-	device->add_sound_engine(new TemplateSoundEngineBank<Vocoder>());
-	device->add_sound_engine(new TemplateSoundEngineBank<Synthesizer>());
-	device->add_sound_engine(new TemplateSoundEngineBank<SoundFontSynth>());
 }
 
 

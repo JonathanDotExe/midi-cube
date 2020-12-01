@@ -15,6 +15,7 @@
 #define SYNTH_VIBRATO_RATE 6
 #define SYNTH_VIBRATO_DETUNE 0.25
 
+/*
 class FMSynth : public BaseSoundEngine {
 
 private:
@@ -24,7 +25,6 @@ private:
 	double phase;
 	double fm_phase;
 	ADSREnvelope env{0.0, 0, 1, 0.0};
-	MultiChannelFilter<LowPassFilter<2>> filter;
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY, 8> osc;
 public:
 
@@ -36,11 +36,11 @@ public:
 
 	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
 	~FMSynth();
 
-};
+};*/
 
 
 #endif /* MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_ */

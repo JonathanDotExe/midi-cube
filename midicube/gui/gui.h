@@ -11,7 +11,6 @@
 #include "model.h"
 #include "../util.h"
 #include "../soundengine/organ.h"
-#include "../soundengine/synthesizer.h"
 #include "../soundengine/soundengine.h"
 #include <type_traits>
 
@@ -179,6 +178,7 @@ public:
 
 };
 
+/*
 class SynthesizerEngineMenuView : public View {
 private:
 	SynthesizerData* data;
@@ -286,10 +286,10 @@ public:
 	bool draw(float x, float y);
 	float width();
 	float height();
-};
+};*/
 
 View* create_view_for_engine(std::string engine_name, SoundEngine* engine);
 
-Dialog* create_dialog_for_component(std::string component_name, SynthComponent* data);
+/*Dialog* create_dialog_for_component(std::string component_name, SynthComponent* data);*/
 
 #endif /* MIDICUBE_GUI_GUI_H_ */

@@ -33,7 +33,7 @@ void SampleDrums::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 	}
 }
 
-bool SampleDrums::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+bool SampleDrums::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
 		return info.time - note.start_time > (double) drumkit->notes[note.note].duration();
 	}
