@@ -10,7 +10,7 @@
 
 AnalogSynth::AnalogSynth() {
 	//Squashy Synth Basss
-	ModEnvelopeEntity& mod_env = preset.mod_envs.at(0);
+	/*ModEnvelopeEntity& mod_env = preset.mod_envs.at(0);
 	mod_env.active = true;
 	mod_env.env = {0, 0.1, 0, 0.003};
 
@@ -22,7 +22,7 @@ AnalogSynth::AnalogSynth() {
 	osc.filter_cutoff.value = 0.05;
 	osc.filter_cutoff.mod_env = 0;
 	osc.filter_cutoff.mod_amount = 0.15;
-	osc.filter_resonance.value = 0.8;
+	osc.filter_resonance.value = 0.8;*/
 
 	//Unison Saw
 	/*OscilatorEntity& osc = preset.oscilators.at(0);
@@ -66,7 +66,7 @@ AnalogSynth::AnalogSynth() {
 	osc3.filter_cutoff.cc_amount = 1;*/
 
 	//Spooky Sine
-	/*preset.mono = true;
+	preset.mono = true;
 	preset.portamendo = 0.1;
 
 	LFOEntity& lfo = preset.lfos.at(0);
@@ -80,7 +80,7 @@ AnalogSynth::AnalogSynth() {
 	osc.active = true;
 	osc.env = {0.005, 0, 1, 0.005};
 	osc.pitch.lfo = 0;
-	osc.pitch.lfo_amount = 0.125;*/
+	osc.pitch.lfo_amount = 0.125;
 
 	//Lush Lead
 	/*LFOEntity& lfo = preset.lfos.at(0);

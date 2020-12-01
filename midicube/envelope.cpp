@@ -18,7 +18,12 @@ double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pr
 	}
 	switch (phase) {
 	case ATTACK:
-		volume += time_step/data.attack;
+		if (data.attack != 0) {
+			volume += time_step/data.attack;
+		}
+		else {
+			volume = 1;
+		}
 		if (volume >= 1) {
 			volume = 1;
 			last_vol = volume;
@@ -26,7 +31,13 @@ double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pr
 		}
 		break;
 	case DECAY:
-		volume -= time_step/data.decay * (1 - data.sustain);
+		if (data.decay != 0) {
+			volume -= time_step/data.decay * (1 - data.sustain);
+		}
+		else {
+			volume = data.sustain;
+		}
+
 		if (volume <= data.sustain) {
 			volume = data.sustain;
 			last_vol = volume;
