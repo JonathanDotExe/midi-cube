@@ -33,6 +33,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 	{
 		preset.delay_mix = 0.5;
 		preset.delay_feedback = 0.3;
+		preset.delay_time = 0.3;
 
 		OscilatorEntity& osc = preset.oscilators.at(0);
 		osc.reset = true;
@@ -290,8 +291,8 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 		double ldsample = ldelay.process();
 		double rdsample = rdelay.process();
 
-		ldelay.add_sample(ldsample * preset.delay_feedback, preset.delay_time * info.sample_rate);
-		rdelay.add_sample(rdsample, preset.delay_feedback * info.sample_rate);
+		ldelay.add_sample(ldsample * preset.delay_feedback, preset.delay_time * info.sample_rate - 1);
+		rdelay.add_sample(rdsample * preset.delay_feedback, preset.delay_time * info.sample_rate - 1);
 		//Play delay
 		lsample *= 1 - (fmax(0, preset.delay_mix - 0.5) * 2);
 		rsample *= 1 - (fmax(0, preset.delay_mix - 0.5) * 2);
