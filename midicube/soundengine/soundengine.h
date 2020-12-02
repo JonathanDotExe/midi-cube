@@ -151,7 +151,8 @@ struct ArpeggiatorPreset {
 	ArpeggiatorPattern pattern;
 	std::vector<unsigned int> data;
 	unsigned int octaves = 1;
-	int value;
+	int value = 1;
+	bool hold = false;
 };
 
 class Arpeggiator {

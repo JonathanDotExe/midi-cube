@@ -240,7 +240,6 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 	if (arp.on) {
 		arp.apply(info,
 		[&engine](SampleInfo& i, unsigned int note, double velocity) {
-			std::cout << note << std::endl;
 			engine.press_note(i, note, velocity);
 		},
 		[&engine](SampleInfo& i, unsigned int note) {

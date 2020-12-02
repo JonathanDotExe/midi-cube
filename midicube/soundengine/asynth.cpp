@@ -133,6 +133,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 	}
 		break;
 	case DELAY_CHORDS:
+	{
 		preset.delay_mix = 0.5;
 		preset.delay_feedback = 0.3;
 		preset.delay_time = 0.3;
@@ -153,6 +154,26 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc.filter_cutoff.value = 0.002;
 		osc.filter_cutoff.mod_amount = 0.5;
 		osc.filter_resonance.value = 0.4;
+	}
+		break;
+	case STRONG_PAD:
+	{
+		LFOEntity& lfo = preset.lfos.at(0);
+		lfo.active = true;
+		lfo.freq = 0.8;
+
+		OscilatorEntity& osc = preset.oscilators.at(0);
+		osc.waveform = AnalogWaveForm::SAW_DOWN;
+		osc.active = true;
+		osc.unison_amount = 3;
+		osc.unison_detune.value = 0.05;
+		osc.env = {0.2, 0, 1, 0.4};
+
+		osc.filter = true;
+		osc.filter_cutoff.value = cutoff_to_factor(1200, 1.0/44100);	//TODO sample rate hardcoded
+		osc.filter_cutoff.lfo = 0;
+		osc.filter_cutoff.lfo_amount = 0.01;
+	}
 		break;
 	}
 }
