@@ -31,6 +31,9 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		break;
 	case UNISON_SAWS:
 	{
+		preset.delay_mix = 0.5;
+		preset.delay_feedback = 0.3;
+
 		OscilatorEntity& osc = preset.oscilators.at(0);
 		osc.reset = true;
 		osc.unison_amount = 2;
@@ -266,6 +269,44 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 		e.pitch_bend *= note_to_freq_transpose(pitch - status.latest_note->note);
 
 		process_note(channels, info, *status.latest_note, e, 0);
+	}
+	//Delay lines
+	if (preset.delay_mix) {
+		//Get samples
+		double lsample = 0;
+		double rsample = 0;
+		for (size_t i = 0; i < channels.size(); ++i) {
+			if (i%2 == 0) {
+				lsample += channels[i];
+			}
+			else {
+				rsample += channels[i];
+			}
+		}
+		//Apply delay
+		ldelay.add_isample(lsample, preset.delay_time * info.sample_rate);
+		rdelay.add_isample(rsample, preset.delay_time * info.sample_rate);
+
+		double ldsample = ldelay.process();
+		double rdsample = rdelay.process();
+
+		ldelay.add_sample(ldsample * preset.delay_feedback, preset.delay_time * info.sample_rate);
+		rdelay.add_sample(rdsample, preset.delay_feedback * info.sample_rate);
+		//Play delay
+		lsample *= 1 - (fmax(0, preset.delay_mix - 0.5) * 2);
+		rsample *= 1 - (fmax(0, preset.delay_mix - 0.5) * 2);
+
+		lsample += ldsample * fmin(0.5, preset.delay_mix) * 2;
+		rsample += rdsample * fmin(0.5, preset.delay_mix) * 2;
+
+		for (size_t i = 0; i < channels.size(); ++i) {
+			if (i%2 == 0) {
+				channels[i] += lsample;
+			}
+			else {
+				channels[i] += rsample;
+			}
+		}
 	}
 	//Move LFOs
 	//TODO move before notes
