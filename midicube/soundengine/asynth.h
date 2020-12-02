@@ -86,6 +86,11 @@ struct AnalogSynthPreset {
 	bool mono = false;
 	bool legato = false;
 	double portamendo = 0;
+
+	//Delay effect
+	double delay_time = 0;
+	double delay_feedback = 0;
+	double delay_mix = 0;
 };
 
 class AnalogSynth : public BaseSoundEngine {
@@ -104,6 +109,8 @@ private:
 	bool first_port = true;
 	unsigned int last_note = 0;
 	PortamendoBuffer note_port{0, 0};
+	DelayBuffer ldelay;
+	DelayBuffer rdelay;
 
 	inline void process_note(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
@@ -125,6 +132,19 @@ public:
 	~AnalogSynth();
 
 };
+
+enum SynthFactoryPreset {
+	SQUASHY_BASS,
+	UNISON_SAWS,
+	POLY_SWEEP,
+	SPOOKY_SINE,
+	LUSH_LEAD,
+	PULSE_BASS,
+	DELAY_CHORDS,
+	STRONG_PAD
+};
+
+void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset);
 
 
 #endif /* MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_ */
