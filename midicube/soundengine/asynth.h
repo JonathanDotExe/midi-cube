@@ -139,7 +139,8 @@ enum SynthFactoryPreset {
 	POLY_SWEEP,
 	SPOOKY_SINE,
 	LUSH_LEAD,
-	PULSE_BASS
+	PULSE_BASS,
+	DELAY_CHORDS
 };
 
 void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset);

@@ -31,10 +31,6 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		break;
 	case UNISON_SAWS:
 	{
-		preset.delay_mix = 0.5;
-		preset.delay_feedback = 0.3;
-		preset.delay_time = 0.3;
-
 		OscilatorEntity& osc = preset.oscilators.at(0);
 		osc.reset = true;
 		osc.unison_amount = 2;
@@ -135,6 +131,28 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc.filter_cutoff.mod_amount = 0.2;
 		osc.filter_resonance.value = 0.5;
 	}
+		break;
+	case DELAY_CHORDS:
+		preset.delay_mix = 0.5;
+		preset.delay_feedback = 0.3;
+		preset.delay_time = 0.3;
+
+		ModEnvelopeEntity& env = preset.mod_envs.at(0);
+		env.active = true;
+		env.env = {0, 0.2, 0, 0.05};
+
+		OscilatorEntity& osc = preset.oscilators.at(0);
+		osc.active = true;
+		osc.unison_amount = 1;
+		osc.unison_detune.value = 0.06;
+		osc.env = {0.01, 0, 1, 0.1};
+
+		osc.filter = true;
+		osc.filter_type = FilterType::LP_24;
+		osc.filter_kb_track = 1;
+		osc.filter_cutoff.value = 0.002;
+		osc.filter_cutoff.mod_amount = 0.5;
+		osc.filter_resonance.value = 0.4;
 		break;
 	}
 }

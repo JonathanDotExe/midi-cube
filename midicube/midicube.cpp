@@ -45,7 +45,7 @@ void MidiCube::init() {
 	fill_sound_engine_device(&engine);
 	//Synth presets
 	SoundEngineBank* bank = engine.get_sound_engines().at(2);
-	apply_preset(UNISON_SAWS, static_cast<AnalogSynth&>(bank->channel(0)).preset);
+	apply_preset(DELAY_CHORDS, static_cast<AnalogSynth&>(bank->channel(0)).preset);
 	//Default settings
 	Arpeggiator& arp = engine.get_channel(1).arpeggiator();
 	arp.on = true;
