@@ -126,5 +126,16 @@ public:
 
 };
 
+enum SynthFactoryPreset {
+	SQUASHY_BASS,
+	UNISON_SAWS,
+	POLY_SWEEP,
+	SPOOKY_SINE,
+	LUSH_LEAD,
+	PULSE_BASS
+};
+
+void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset);
+
 
 #endif /* MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_ */
