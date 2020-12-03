@@ -14,16 +14,16 @@
 #include "../envelope.h"
 #include "../filter.h"
 
-#define VOCODER_BAND_COUNT 40
+#define VOCODER_BAND_COUNT 15
 #define VOCODER_LOW_BAND 120
-#define VOCODER_HIGH_BAND 440
+#define VOCODER_HIGH_BAND 160
 
 struct VocoderPreset {
 	bool on = false;
 	double vocoder_amp = 1;
-	double voice_amp = 0;
+	double voice_amp = 0.4;
 	double carrier_amp = 0;
-	double gate = 0.00;
+	double gate = 0;
 };
 
 struct VocoderBand {

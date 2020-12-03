@@ -33,3 +33,4 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 * Very helpful blog post about PolyBLEP - oscilators for anti-alising by Martin Finke (I wrote my polyblep function based on his) (http://www.martin-finke.de/blog/articles/audio-plugins-018-polyblep-oscillator/)
 * Artivle about soft clipping distortion by Eric Tarr (https://www.hackaudio.com/digital-signal-processing/distortion-effects/soft-clipping/)
 * Very helpful tutorial on implementing resonant filters by Martin Finke (http://www.martin-finke.de/blog/articles/audio-plugins-013-filter/)
+* http://www.dma.ufg.ac.at/app/link/Grundlagen%3AAudio/module/8086?step=all

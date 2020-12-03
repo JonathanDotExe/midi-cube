@@ -165,6 +165,14 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc.filter_cutoff.lfo_amount = 0.01;
 	}
 		break;
+	case CLEAN_SAW:
+	{
+		OscilatorEntity& osc = preset.oscilators.at(0);
+		osc.waveform = AnalogWaveForm::SAW_DOWN;
+		osc.active = true;
+		osc.env = {0.0005, 0, 1, 0.003};
+	}
+		break;
 	}
 }
 

@@ -141,7 +141,8 @@ enum SynthFactoryPreset {
 	LUSH_LEAD,
 	PULSE_BASS,
 	DELAY_CHORDS,
-	STRONG_PAD
+	STRONG_PAD,
+	CLEAN_SAW
 };
 
 void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset);
