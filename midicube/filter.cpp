@@ -33,6 +33,10 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 		return sample - pole2;
 	case FilterType::HP_24:
 		return sample - pole4;
+	case FilterType::LP_12:
+		return pole1 - pole2;
+	case FilterType::LP_24:
+		return pole1 - pole4;
 	}
 	return sample;
 }
