@@ -49,6 +49,7 @@ void MidiCube::init() {
 	apply_preset(PULSE_BASS, static_cast<AnalogSynth&>(bank->channel(1)).preset);
 	apply_preset(STRONG_PAD, static_cast<AnalogSynth&>(bank->channel(2)).preset);
 	apply_preset(DELAY_CHORDS, static_cast<AnalogSynth&>(bank->channel(3)).preset);
+	apply_preset(POLY_SWEEP, static_cast<AnalogSynth&>(bank->channel(4)).preset);
 	//Default setting
 	Arpeggiator& arp = engine.get_channel(1).arpeggiator();
 	arp.on = true;
