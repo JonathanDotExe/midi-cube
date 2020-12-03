@@ -249,6 +249,8 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 	if (active) {
 		engine.process_sample(ch, info);
 	}
+	//Vocoder
+	vocoder.apply(ch[0], ch[1], info.input_sample, vocoder_preset, info);
 	//Looper
 	looper.apply(ch, metronome, info);
 	//Playback

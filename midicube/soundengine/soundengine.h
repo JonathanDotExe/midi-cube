@@ -15,6 +15,7 @@
 #include "../synthesis.h"
 #include "../metronome.h"
 #include "../looper.h"
+#include "../effect/vocoder.h"
 #include <string>
 #include <array>
 #include <functional>
@@ -185,9 +186,11 @@ class SoundEngineChannel {
 private:
 	Arpeggiator arp;
 	Looper looper;
+	VocoderEffect vocoder;
 	std::atomic<ssize_t> engine_index{0};
 
 public:
+	VocoderPreset vocoder_preset;
 	std::atomic<double> volume{0.3};
 	std::atomic<bool> active{true};
 
