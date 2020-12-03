@@ -17,6 +17,44 @@ VocoderEffect::VocoderEffect() {
 	}
 }
 
-double VocoderEffect::apply(double lsample, double rsample, VocoderPreset& preset) {
+void VocoderEffect::apply(double& lsample, double& rsample, double modulator, VocoderPreset& preset, SampleInfo& info) {
+	if (preset.on) {
+		//Calc mix
+		double total_mix = preset.carrier_amp + preset.vocoder_amp + preset.voice_amp;
+		double carrier_mix = 0;
+		double vocoder_mix = 0;
+		double modulator_mix = 0;
+		if (total_mix) {
+			carrier_mix = preset.carrier_amp/total_mix;
+			vocoder_mix = preset.vocoder_amp/total_mix;
+			modulator_mix = preset.voice_amp/total_mix;
+		}
+		//Gate
+		modulator_env.apply(modulator, info.time, info.time_step);
+		if (modulator_env.volume() < preset.gate) {
+			modulator = 0;
+		}
+		//Vocode
+		double lvocoded = 0;
+		double rvocoded = 0;
+		if (modulator && (lsample || rsample)) {
+			for (size_t i = 0; i < bands.size(); ++i) {
+				VocoderBand& band = bands.at(i);
+				//Modulator amp
+				band.env.apply(band.mfilter.apply(band.filter_data, modulator, info.time_step), info.time, info.time_step);
+				double vol = band.env.volume();
 
+				//Vocode carrier
+				lvocoded += band.lfilter.apply(band.filter_data, lsample, info.time_step) * vol;
+				rvocoded += band.rfilter.apply(band.filter_data, lsample, info.time_step) * vol;
+			}
+		}
+		//Mix
+		lsample *= carrier_mix;
+		rsample *= carrier_mix;
+		lsample += lvocoded * vocoder_mix;
+		rsample += rvocoded * vocoder_mix;
+		lsample += modulator * modulator_mix;
+		rsample += modulator * modulator_mix;
+	}
 }

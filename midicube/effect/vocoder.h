@@ -19,6 +19,7 @@
 #define VOCODER_HIGH_BAND 440
 
 struct VocoderPreset {
+	bool on = false;
 	double vocoder_amp = 1;
 	double voice_amp = 0;
 	double carrier_amp = 0;
@@ -30,8 +31,7 @@ struct VocoderBand {
 	Filter lfilter;
 	Filter rfilter;
 	Filter mfilter;
-	EnvelopeFollower lenv;
-	EnvelopeFollower renv;
+	EnvelopeFollower env;
 };
 
 class VocoderEffect {
@@ -41,7 +41,7 @@ private:
 public:
 	VocoderEffect();
 
-	double apply(double lsample, double rsample, VocoderPreset& preset);
+	void apply(double& lsample, double& rsample, double modulator, VocoderPreset& preset, SampleInfo& info);
 
 };
 
