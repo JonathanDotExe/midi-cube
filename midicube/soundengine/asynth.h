@@ -148,7 +148,8 @@ enum SynthFactoryPreset {
 	DELAY_CHORDS,
 	STRONG_PAD,
 	CLEAN_SAW,
-	FM_BASS
+	FM_BASS,
+	FM_E_PIANO
 };
 
 void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset);
