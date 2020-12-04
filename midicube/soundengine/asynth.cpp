@@ -173,6 +173,23 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc.env = {0.0005, 0, 1, 0.003};
 	}
 		break;
+	case FM_BASS:
+	{
+		OscilatorEntity& osc1 = preset.oscilators.at(0);
+		osc1.transpose = 0.7;
+		osc1.waveform = AnalogWaveForm::SINE;
+		osc1.active = true;
+		osc1.audible = false;
+		osc1.env = {0, 0.2, 0, 0.003};
+
+		OscilatorEntity& osc2 = preset.oscilators.at(1);
+		osc2.waveform = AnalogWaveForm::SINE;
+		osc2.active = true;
+		osc2.fm_amount = 10;
+		osc2.modulator = 0;
+		osc2.env = {0.0005, 0.5, 0.0, 0.003};
+	}
+		break;
 	}
 }
 
@@ -212,6 +229,9 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 		if (osc.active) {
 			//Frequency
 			double freq = note.freq;
+			if (osc.fm_amount) {
+				freq += modulators.at(OSC_INDEX(note_index, osc.modulator)) * osc.fm_amount;
+			}
 			double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val, lfo_mod, controls, note.velocity);
 			if (osc.semi || pitch) {
 				freq = note_to_freq(note.note + osc.semi + pitch);
@@ -233,32 +253,36 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 			}
 
 			//Apply modulation
-			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val, lfo_val, controls, note.velocity) * amp_envs.at(index).amplitude(osc.env, info.time_step, note.pressed, env.sustain);			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val, lfo_val, controls, note.velocity);
-			//std::cout << amp_envs.at(index).phase << " " << amp_envs.at(index).volume << std::endl;
+			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val, lfo_val, controls, note.velocity) * amp_envs.at(index).amplitude(osc.env, info.time_step, note.pressed, env.sustain);
+			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val, lfo_val, controls, note.velocity);
 			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, env_val, lfo_val, controls, note.velocity);
 			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, env_val, lfo_val, controls, note.velocity);
 
 			//Signal
-			double signal = oscilators.signal(freq, info.time_step, index, data, bdata).carrier;
-			//Filter
-			if (osc.filter) {
-				FilterData filter{osc.filter_type};
-				filter.cutoff = apply_modulation(FILTER_CUTOFF_SCALE, osc.filter_cutoff, env_val, lfo_val, controls, note.velocity);
-				filter.resonance = apply_modulation(FILTER_RESONANCE_SCALE, osc.filter_resonance, env_val, lfo_val, controls, note.velocity);
+			AnalogOscilatorSignal sig = oscilators.signal(freq, info.time_step, index, data, bdata);
+			double signal = sig.carrier;
+			modulators.at(index) = sig.modulator * volume;
+			if (osc.audible) {
+				//Filter
+				if (osc.filter) {
+					FilterData filter{osc.filter_type};
+					filter.cutoff = apply_modulation(FILTER_CUTOFF_SCALE, osc.filter_cutoff, env_val, lfo_val, controls, note.velocity);
+					filter.resonance = apply_modulation(FILTER_RESONANCE_SCALE, osc.filter_resonance, env_val, lfo_val, controls, note.velocity);
 
-				if (osc.filter_kb_track && filter.cutoff != 1) {
-					double cutoff = factor_to_cutoff(filter.cutoff, info.time_step);
-					cutoff *= 1 + ((double) note.note - 36)/12.0 * osc.filter_kb_track;
-					filter.cutoff = cutoff_to_factor(cutoff, info.time_step);
+					if (osc.filter_kb_track && filter.cutoff != 1) {
+						double cutoff = factor_to_cutoff(filter.cutoff, info.time_step);
+						cutoff *= 1 + ((double) note.note - 36)/12.0 * osc.filter_kb_track;
+						filter.cutoff = cutoff_to_factor(cutoff, info.time_step);
+					}
+
+					signal = filters.at(note_index + i * SOUND_ENGINE_POLYPHONY).apply(filter, signal, info.time_step);
 				}
-
-				signal = filters.at(note_index + i * SOUND_ENGINE_POLYPHONY).apply(filter, signal, info.time_step);
+				signal *= volume;
+				//Pan
+				double panning = apply_modulation(PANNING_SCALE, osc.panning, env_val, lfo_val, controls, note.velocity);
+				lsample += signal * (2 - panning);
+				rsample += signal * (1 + panning);
 			}
-			signal *= volume;
-			//Pan
-			double panning = apply_modulation(PANNING_SCALE, osc.panning, env_val, lfo_val, controls, note.velocity);
-			lsample += signal * (2 - panning);
-			rsample += signal * (1 + panning);
 		}
 	}
 
