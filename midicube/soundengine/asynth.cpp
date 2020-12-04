@@ -196,33 +196,33 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc1.waveform = AnalogWaveForm::SINE;
 		osc1.active = true;
 		osc1.audible = false;
-		osc1.env = {0.1, 0.3, 0.6, 0.2};
+		osc1.env = {0.0005, 0.6, 0.6, 0.2};
 
 		OscilatorEntity& osc2 = preset.oscilators.at(1);
 		osc2.waveform = AnalogWaveForm::SINE;
 		osc2.volume.value = 0.2;
-		osc2.volume.velocity_amount = 0.4;
+		osc2.volume.velocity_amount = 0.3;
 		osc2.active = true;
 		osc2.fm_amount = 0.8;
 		osc2.modulator = 0;
-		osc2.env = {0.0005, 1.7, 0.0, 0.1};
+		osc2.env = {0.0005, 1.8, 0.0, 0.1};
 
 		OscilatorEntity& osc3 = preset.oscilators.at(2);
 		osc3.waveform = AnalogWaveForm::SINE;
 		osc3.volume.value = 0.0;
 		osc3.volume.velocity_amount = 1;
-		osc3.transpose = 16;
+		osc3.transpose = 10;
 		osc3.active = true;
 		osc3.audible = false;
-		osc3.env = {0.0005, 0.2, 0.3, 0.2};
+		osc3.env = {0.0005, 0.2, 0.4, 0.2};
 
 		OscilatorEntity& osc4 = preset.oscilators.at(3);
 		osc4.waveform = AnalogWaveForm::SINE;
-		osc4.volume.value = 0.4;
+		osc4.volume.value = 0.5;
 		osc4.active = true;
 		osc4.fm_amount = 1.5;
 		osc4.modulator = 2;
-		osc4.env = {0.0005, 1.0, 0.0, 0.1};
+		osc4.env = {0.0005, 1.7, 0.0, 0.1};
 	}
 		break;
 	}
