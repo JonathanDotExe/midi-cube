@@ -40,6 +40,7 @@ struct PropertyModulation {
 
 struct OscilatorEntity {
 	bool active = false;
+	bool audible = true;
 	ADSREnvelopeData env{0.0, 0, 1, 0.0};
 	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
 	bool analog = true;
@@ -63,6 +64,9 @@ struct OscilatorEntity {
 	PropertyModulation filter_resonance = {0};
 	double filter_kb_track = 0;
 	unsigned int filter_kb_track_note = 36;
+
+	double fm_amount = 0;
+	size_t modulator = 0;
 };
 
 struct ModEnvelopeEntity {
@@ -97,6 +101,7 @@ class AnalogSynth : public BaseSoundEngine {
 
 private:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT, 8> oscilators;
+	std::array<double, SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT> modulators;
 	std::array<Filter, SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT> filters;
 	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT> amp_envs;
 	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY * ANALOG_MOD_ENV_COUNT> mod_envs;
