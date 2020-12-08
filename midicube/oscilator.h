@@ -79,7 +79,7 @@ public:
 			}
 			AnalogOscilatorSignal sig = osc[i].signal(freq * d, time_step, data);
 			signal.carrier += sig.carrier;
-			signal.modulator += signal.modulator;
+			signal.modulator += sig.modulator;
 		}
 		signal.carrier /= (bdata.unison_amount + 1);
 		signal.modulator /= (bdata.unison_amount + 1);
