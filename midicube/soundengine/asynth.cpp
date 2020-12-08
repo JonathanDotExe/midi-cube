@@ -185,8 +185,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		OscilatorEntity& osc2 = preset.oscilators.at(1);
 		osc2.waveform = AnalogWaveForm::SINE;
 		osc2.active = true;
-		osc2.fm_amount = 10;
-		osc2.modulator = 0;
+		osc2.fm.push_back({10, 0});
 		osc2.env = {0.0005, 0.5, 0.0, 0.003};
 	}
 		break;
@@ -203,8 +202,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc2.volume.value = 0.2;
 		osc2.volume.velocity_amount = 0.3;
 		osc2.active = true;
-		osc2.fm_amount = 0.8;
-		osc2.modulator = 0;
+		osc2.fm.push_back({0.8, 0});
 		osc2.env = {0.0005, 1.8, 0.0, 0.1};
 
 		OscilatorEntity& osc3 = preset.oscilators.at(2);
@@ -220,8 +218,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc4.waveform = AnalogWaveForm::SINE;
 		osc4.volume.value = 0.5;
 		osc4.active = true;
-		osc4.fm_amount = 1.5;
-		osc4.modulator = 2;
+		osc4.fm.push_back({1.5, 2});
 		osc4.env = {0.0005, 1.7, 0.0, 0.1};
 	}
 		break;
@@ -264,8 +261,12 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 		if (osc.active) {
 			//Frequency
 			double freq = note.freq;
-			if (osc.fm_amount) {
-				freq += modulators.at(OSC_INDEX(note_index, osc.modulator)) * osc.fm_amount;
+			size_t fm_count = osc.fm.size();
+			for (size_t i = 0; i < fm_count; ++i) {
+				FrequencyModulatotion& fm = osc.fm[i];
+				if (fm.fm_amount) {
+					freq += modulators.at(OSC_INDEX(note_index, fm.modulator)) * fm.fm_amount;
+				}
 			}
 			double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val, lfo_mod, controls, note.velocity);
 			if (osc.semi || pitch) {

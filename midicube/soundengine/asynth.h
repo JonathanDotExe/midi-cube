@@ -38,6 +38,11 @@ struct PropertyModulation {
 	double cc_amount = 0;
 };
 
+struct FrequencyModulatotion {
+	double fm_amount = 0;
+	size_t modulator = 0;
+};
+
 struct OscilatorEntity {
 	bool active = false;
 	bool audible = true;
@@ -65,8 +70,7 @@ struct OscilatorEntity {
 	double filter_kb_track = 0;
 	unsigned int filter_kb_track_note = 36;
 
-	double fm_amount = 0;
-	size_t modulator = 0;
+	std::vector<FrequencyModulatotion> fm;
 };
 
 struct ModEnvelopeEntity {
