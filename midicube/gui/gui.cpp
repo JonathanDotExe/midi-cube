@@ -602,7 +602,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	});
 	distortion_type->get_layout().margin_left = 10;
 	distortion_type->get_layout().width = 60;
-	distortion_type->set_on_change([&preset, &values](ssize_t index) {
+	distortion_type->set_on_change([&preset, values](ssize_t index) {
 		preset.distortion_type = values.at(index);
 	});
 
