@@ -59,7 +59,7 @@ struct OscilatorEntity {
 	PropertyModulation pulse_width = {1};
 	PropertyModulation unison_detune = {0.1};
 	PropertyModulation panning = {0.5};
-	int semi = 0;
+	double semi = 0;
 	double transpose = 1;
 	PropertyModulation pitch = {0.5};
 
@@ -153,7 +153,9 @@ enum SynthFactoryPreset {
 	STRONG_PAD,
 	CLEAN_SAW,
 	FM_BASS,
-	FM_E_PIANO
+	FM_E_PIANO,
+	BRASS_PAD,
+	FM_KALIMBA
 };
 
 void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset);

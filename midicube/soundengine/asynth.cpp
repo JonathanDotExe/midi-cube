@@ -217,6 +217,55 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc4.env = {0.0005, 1.7, 0.0, 0.1};
 	}
 		break;
+	case BRASS_PAD:
+	{
+		ModEnvelopeEntity& mod_env = preset.mod_envs.at(0);
+		mod_env.active = true;
+		mod_env.env = {0.06, 0.5, 0, 0.05};
+
+		ModEnvelopeEntity& mod_env1 = preset.mod_envs.at(1);
+		mod_env1.active = true;
+		mod_env1.env = {0.06, 0.7, 0, 0.05};
+
+		ModEnvelopeEntity& mod_env2 = preset.mod_envs.at(2);
+		mod_env2.active = true;
+		mod_env2.env = {0.06, 0.4, 0, 0.05};
+
+		OscilatorEntity& osc = preset.oscilators.at(0);
+		osc.volume.value = 0.3;
+		osc.active = true;
+		osc.env = {0.0005, 0, 1, 0.1};
+		osc.filter = true;
+		osc.filter_type = FilterType::LP_12;
+		osc.filter_cutoff.value = 0.1;
+		osc.filter_cutoff.mod_env = 0;
+		osc.filter_cutoff.mod_amount = 0.3;
+
+		OscilatorEntity& osc1 = preset.oscilators.at(1);
+		osc1.volume.value = 0.3;
+		osc1.active = true;
+		osc1.semi = 0.05;
+		osc1.panning.value = 0;
+		osc1.env = {0.0005, 0, 1, 0.1};
+		osc1.filter = true;
+		osc1.filter_type = FilterType::LP_12;
+		osc1.filter_cutoff.value = 0.07;
+		osc1.filter_cutoff.mod_env = 1;
+		osc1.filter_cutoff.mod_amount = 0.3;
+
+		OscilatorEntity& osc2 = preset.oscilators.at(2);
+		osc2.volume.value = 0.3;
+		osc2.active = true;
+		osc2.semi = -0.05;
+		osc2.panning.value = 1;
+		osc2.env = {0.0005, 0, 1, 0.1};
+		osc2.filter = true;
+		osc2.filter_type = FilterType::LP_12;
+		osc2.filter_cutoff.value = 0.12;
+		osc2.filter_cutoff.mod_env = 2;
+		osc2.filter_cutoff.mod_amount = 0.3;
+	}
+		break;
 	}
 }
 
