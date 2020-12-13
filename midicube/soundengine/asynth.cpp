@@ -41,27 +41,27 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 	case POLY_SWEEP:
 	{
 		OscilatorEntity& osc1 = preset.oscilators.at(0);
-		osc1.volume.value = 0.5;
+		osc1.volume.value = 0.4;
 		osc1.unison_amount = 7;
 		osc1.unison_detune.value = 0.05;
 		osc1.active = true;
-		osc1.env = {0.0005, 0, 1, 0.003};
+		osc1.env = {0.0005, 0, 1, 0.1};
 		osc1.filter = true;
 		osc1.filter_type = FilterType::LP_24;
-		osc1.filter_cutoff.value = 0.0;
-		osc1.filter_cutoff.cc_amount = 1;
+		osc1.filter_cutoff.value = 0.1;
+		osc1.filter_cutoff.cc_amount = 0.9;
 
 		OscilatorEntity& osc2 = preset.oscilators.at(1);
-		osc2.volume.value = 0.5;
+		osc2.volume.value = 0.4;
 		osc2.unison_amount = 3;
 		osc2.unison_detune.value = 0.05;
 		osc2.semi = 12;
 		osc2.active = true;
-		osc2.env = {0.0005, 0, 1, 0.003};
+		osc2.env = {0.0005, 0, 1, 0.1};
 		osc2.filter = true;
 		osc2.filter_type = FilterType::LP_24;
-		osc2.filter_cutoff.value = 0.0;
-		osc2.filter_cutoff.cc_amount = 1;
+		osc2.filter_cutoff.value = 0.1;
+		osc2.filter_cutoff.cc_amount = 0.9;
 	}
 		break;
 	case SPOOKY_SINE:
