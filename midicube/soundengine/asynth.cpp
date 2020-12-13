@@ -266,6 +266,26 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc2.filter_cutoff.mod_amount = 0.3;
 	}
 		break;
+	case FM_KALIMBA:
+	{
+		OscilatorEntity& osc1 = preset.oscilators.at(0);
+		osc1.waveform = AnalogWaveForm::SINE;
+		osc1.semi = 28;
+		osc1.active = true;
+		osc1.audible = false;
+		osc1.env = {0.0005, 0.12, 0.0, 0.03};
+
+		OscilatorEntity& osc2 = preset.oscilators.at(1);
+		osc2.waveform = AnalogWaveForm::SINE;
+		osc2.active = true;
+		osc2.fm.push_back({0.4, 0});
+		osc2.env = {0.0005, 0.8, 0.0, 0.1};
+
+		preset.delay_mix = 0.25;
+		preset.delay_feedback = 0.3;
+		preset.delay_time = 0.4;
+	}
+		break;
 	}
 }
 
