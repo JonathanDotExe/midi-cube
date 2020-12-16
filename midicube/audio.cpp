@@ -22,18 +22,29 @@ void AudioHandler::init() {
 		throw AudioException("No audio devices detected");
 	}
 
+	//Set up options
+	RtAudio::StreamOptions options;
+	options.flags = options.flags || RTAUDIO_SCHEDULE_REALTIME;
+	options.priority = 90;
+
 	//Set up output
 	RtAudio::StreamParameters params;
 	params.deviceId = audio.getDefaultOutputDevice();
 	params.nChannels = 2;
 	params.firstChannel = 0;
 
+	//Set up input
+	RtAudio::StreamParameters input_params;
+	input_params.deviceId = audio.getDefaultInputDevice();
+	input_params.nChannels = 1;
+	input_params.firstChannel = 0;
+
 	sample_rate = 44100;
 	time_step = 1.0/sample_rate;
 	buffer_size = 256;
 
 	try {
-		audio.openStream(&params, nullptr, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
+		audio.openStream(&params, &input_params, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
 		audio.startStream();
 	}
 	catch (RtAudioError& e) {
@@ -46,7 +57,7 @@ int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned 
 	//Compute each sample
 	//TODO Use time
 	for (size_t i = 0; i < buffer_size; ++i) {
-		info = {time, time_step, sample_rate, sample_time, 0}; //TODO input
+		info = {time, time_step, sample_rate, sample_time, *input_buffer++}; //TODO input
 
 		sample_buf = {0, 0};
 		get_sample(sample_buf, info, user_data);
