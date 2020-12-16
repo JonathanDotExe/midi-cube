@@ -9,9 +9,9 @@
 #define MIDICUBE_AUDIO_H_
 
 #include <exception>
-#include <jack/jack.h>
 #include <atomic>
 #include <array>
+#include <rtaudio/RtAudio.h>
 
 #define OUTPUT_CHANNELS 2
 
@@ -41,10 +41,7 @@ struct SampleInfo {
 class AudioHandler {
 
 private:
-	jack_client_t* client = NULL;
-	jack_port_t* output_port_1 = nullptr;
-	jack_port_t* output_port_2 = nullptr;
-	jack_port_t* input_port;
+	RtAudio audio;
 	void* user_data = nullptr;
 	void (* get_sample) (std::array<double, OUTPUT_CHANNELS>&, SampleInfo&, void*) = nullptr;
 	/**
@@ -67,9 +64,7 @@ public:
 
 	void close();
 
-	int process(jack_nframes_t nframes);
-
-	void sample_rate_callback(jack_nframes_t nframes);
+	int process(double* output_buffer, double* input_buffer, int buffer_size, double time);
 
 	SampleInfo sample_info();
 
