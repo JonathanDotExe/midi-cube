@@ -47,6 +47,7 @@ private:
 	/**
 	 * Only for use in the jack audio thread
 	 */
+	unsigned int buffer_size = 256;
 	double time{0.0};
 	double time_step{0.0};
 	unsigned int sample_rate{0};
@@ -64,7 +65,7 @@ public:
 
 	void close();
 
-	int process(double* output_buffer, double* input_buffer, int buffer_size, double time);
+	int process(double* output_buffer, double* input_buffer, unsigned int buffer_size, double time);
 
 	SampleInfo sample_info();
 
