@@ -10,7 +10,7 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 * A web interface or a desktop client that allows uploading new sounds
 
 ## Used libraries
-* JACK Audio Connection Kit API licensed under LGPL (https://jackaudio.org/api/ https://www.gnu.org/licenses/lgpl-3.0.html)
+* RtAudio licensed under the RtAudio License which is pretty similar to the MIT License (https://github.com/thestk/rtaudio https://github.com/thestk/rtaudio/blob/master/LICENSE)
 * RtMidi licensed under the RtMidi license which is pretty similar to the MIT license (https://github.com/thestk/rtmidi https://github.com/thestk/rtmidi/blob/master/LICENSE)
 * libsndfile licensed under LGPL (https://github.com/erikd/libsndfile/commits/master https://github.com/erikd/libsndfile/blob/master/COPYING)
 * raylib licensed under zlib/libpng license (https://github.com/raysan5/raylib https://github.com/raysan5/raylib/blob/master/LICENSE)
