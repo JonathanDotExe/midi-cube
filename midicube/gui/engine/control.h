@@ -133,10 +133,10 @@ ComboBox<T>::ComboBox(std::vector<T> values, std::function<std::string(T)> to_st
 	get_layout().padding_top = 5;
 	get_layout().padding_bottom = 5;
 
-	style.border_color = BLACK;
+	style.border_color = sf::Color::Black;
 	style.border_thickness = 2;
 	style.border_radius = 0.2f;
-	style.fill_color = LIGHTGRAY;
+	style.fill_color = sf::Color(200, 200, 200);
 
 	text = to_string(values.at(index));
 }

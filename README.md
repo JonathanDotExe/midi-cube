@@ -1,6 +1,6 @@
 # midi-cube
 
-A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices with a touch display (Raspberry Pi) and Computers.
+A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices with a touch display (Raspberry Pi) and Computers.
 
 ## Planned features:
 * Serveral integrated virtual instruments like a B3 organ, an E-Piano-synthesizer, a sampler, drumkits, a subtractive/additive/FM-synthesizer, etc.

@@ -11,8 +11,8 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include <raylib.h>
 #include <iostream>
+#include <SFML/Graphics.hpp>
 
 #define FOCUS_TRAVERSABLE virtual Node* traverse_focus(int x, int y) { return this; }
 
@@ -252,21 +252,21 @@ public:
 struct TextStyle {
 	std::string font = "";
 	int font_size = 10;
-	Color font_color = BLACK;
+	sf::Color font_color = sf::Color::Black;
 	HorizontalAlignment text_halignment = HorizontalAlignment::CENTER;
 	VerticalAlignment text_valignment = VerticalAlignment::CENTER;
 };
 
 struct BoxStyle {
-	Color fill_color = RAYWHITE;
-	Color border_color = BLANK;
-	Color hover_color = RAYWHITE;
+	sf::Color fill_color = sf::Color::White;
+	sf::Color border_color = sf::Color::Transparent;
+	sf::Color hover_color = sf::Color::White;
 	float border_radius = 0;
 	int border_thickness = 0;
 };
 
 struct BackgroundStyle {
-	Color fill_color = BLANK;
+	sf::Color fill_color = sf::Color::Transparent;
 };
 
 class StyleableNode : public Node {

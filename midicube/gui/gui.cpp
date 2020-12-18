@@ -7,10 +7,6 @@
 
 #include "gui.h"
 #include "engine/controlx.h"
-#include <raylib.h>
-#define RAYGUI_IMPLEMENTATION
-#define RAYGUI_SUPPORT_ICONS
-#include <raygui.h>
 #include <exception>
 #include <unordered_map>
 #include <algorithm>
@@ -27,12 +23,12 @@ MainMenuView::MainMenuView(MidiCube* cube) {
 
 Node* MainMenuView::init(Frame* frame) {
 	VBox* parent = new VBox();
-	parent->style.fill_color = DARKGRAY;
+	parent->style.fill_color = sf::Color(50, 50, 50);
 
 	//Title
 	Label* title = new Label("MIDICube");
 	title->style.font_size = 72;
-	title->style.font_color = WHITE;
+	title->style.font_color = sf::Color::White;
 	title->get_layout().halignment = HorizontalAlignment::CENTER;
 	parent->add_child(title);
 
@@ -45,9 +41,9 @@ Node* MainMenuView::init(Frame* frame) {
 	button->get_layout().padding_top = 10;
 	button->get_layout().padding_left = 10;
 	button->get_layout().padding_right = 10;
-	button->style.fill_color = GREEN;
-	button->style.hover_color = DARKGREEN;
-	button->style.border_color = BLANK;
+	button->style.fill_color = sf::Color::Green;
+	button->style.hover_color = sf::Color(0, 128, 0);
+	button->style.border_color = sf::Color::Transparent;
 	button->style.border_thickness = 0;
 
 	MidiCube* cube = this->cube;
@@ -61,10 +57,10 @@ Node* MainMenuView::init(Frame* frame) {
 
 template <typename T>
 void style_button(T t) {
-	t->style.border_color = BLANK;
+	t->style.border_color = sf::Color::Transparent;
 	t->style.border_thickness = 0;
-	t->style.fill_color = YELLOW;
-	t->style.hover_color = ORANGE;
+	t->style.fill_color = sf::Color::Yellow;
+	t->style.hover_color = sf::Color(255, 128, 0);
 	t->text_style.font_size = 10;
 	t->get_layout().width = MATCH_PARENT;
 }
@@ -76,7 +72,7 @@ SoundEngineMenuView::SoundEngineMenuView(MidiCube* cube) {
 
 Node* SoundEngineMenuView::init(Frame* frame) {
 	VBox* container = new VBox();
-	container->style.fill_color = DARKGRAY;
+	container->style.fill_color = sf::Color(50, 50, 50);
 	HBox* box = new HBox();
 	SoundEngineDevice& e = cube->engine;
 
@@ -93,7 +89,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		{
 			Label* title = new Label("Ch. " + std::to_string(i + 1));
 			title->style.font_size = 20;
-			title->style.font_color = YELLOW;
+			title->style.font_color = sf::Color::Yellow;
 			title->get_layout().halignment = HorizontalAlignment::CENTER;
 			col->add_child(title);
 		}
@@ -101,7 +97,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		{
 			Label* engine_text = new Label("Engine");
 			engine_text->style.font_size = 10;
-			engine_text->style.font_color = BLACK;
+			engine_text->style.font_color = sf::Color::Black;
 			engine_text->get_layout().margin_top = 10;
 
 			std::vector<ssize_t> engines = {};
@@ -143,7 +139,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		{
 			Label* octave_text = new Label("Octave");
 			octave_text->style.font_size = 10;
-			octave_text->style.font_color = BLACK;
+			octave_text->style.font_color = sf::Color::Black;
 			octave_text->get_layout().margin_top = 10;
 
 			Spinner* octave = new Spinner(-4, 4, source.octave);
@@ -157,7 +153,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		{
 			Label* looper_text = new Label("Looper");
 			looper_text->style.font_size = 10;
-			looper_text->style.font_color = BLACK;
+			looper_text->style.font_color = sf::Color::Black;
 			looper_text->get_layout().margin_top = 10;
 
 			LabeledControl<CheckBox>* looper = new LabeledControl<CheckBox>("On");
@@ -199,17 +195,17 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		{
 			Label* vol_text = new Label("Volume");
 			vol_text->style.font_size = 10;
-			vol_text->style.font_color = BLACK;
+			vol_text->style.font_color = sf::Color::Black;
 			vol_text->get_layout().margin_top = 10;
 
 			Slider* volume = new Slider(channel.volume, {0, {}, 1});
 			volume->set_value(channel.volume);
-			volume->style.border_color = BLANK;
+			volume->style.border_color = sf::Color::Transparent;
 			volume->style.border_thickness = 0;
-			volume->button_style.border_color = BLANK;
+			volume->button_style.border_color = sf::Color::Transparent;
 			volume->button_style.border_thickness = 0;
-			volume->button_style.fill_color = GREEN;
-			volume->button_style.hover_color = DARKGREEN;
+			volume->button_style.fill_color = sf::Color::Green;
+			volume->button_style.hover_color = sf::Color(0, 128, 0);
 			volume->get_layout().halignment = HorizontalAlignment::CENTER;
 
 			Label* vol_val = new Label(std::to_string(channel.volume));
@@ -246,7 +242,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		{
 			Label* engine_text = new Label("Input");
 			engine_text->style.font_size = 10;
-			engine_text->style.font_color = BLACK;
+			engine_text->style.font_color = sf::Color::Black;
 			engine_text->get_layout().margin_top = 10;
 
 			std::vector<ssize_t> inputs = {};
@@ -263,10 +259,10 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 				source.input = index;
 			});
 
-			input->style.border_color = BLACK;
+			input->style.border_color = sf::Color::Black;
 			input->style.border_thickness = 1;
-			input->style.fill_color = WHITE;
-			input->style.hover_color = LIGHTGRAY;
+			input->style.fill_color = sf::Color::White;
+			input->style.hover_color = sf::Color(200, 200, 200);
 			input->text_style.font_size = 10;
 			input->get_layout().width = MATCH_PARENT;
 
@@ -277,7 +273,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		{
 			Label* channel_text = new Label("Channel");
 			channel_text->style.font_size = 10;
-			channel_text->style.font_color = BLACK;
+			channel_text->style.font_color = sf::Color::Black;
 			channel_text->get_layout().margin_top = 10;
 
 			Spinner* ch = new Spinner(1, 16, source.channel + 1);
@@ -294,7 +290,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		{
 			Label* start_note_text = new Label("Start Note");
 			start_note_text->style.font_size = 10;
-			start_note_text->style.font_color = BLACK;
+			start_note_text->style.font_color = sf::Color::Black;
 			start_note_text->get_layout().margin_top = 10;
 
 			Spinner* ch = new Spinner(0, 127, source.start_note);
@@ -311,7 +307,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 		{
 			Label* end_note_text = new Label("End Note");
 			end_note_text->style.font_size = 10;
-			end_note_text->style.font_color = BLACK;
+			end_note_text->style.font_color = sf::Color::Black;
 			end_note_text->get_layout().margin_top = 10;
 
 			Spinner* ch = new Spinner(0, 127, source.end_note);
@@ -336,7 +332,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 	footer->get_layout().padding_right = 5;
 
 	LabeledControl<Spinner>* bpm = new LabeledControl<Spinner>("BPM", new Spinner(10, 480, e.metronome.get_bpm()), false);
-	bpm->label->style.font_color = WHITE;
+	bpm->label->style.font_color = sf::Color::White;
 	bpm->get_layout().height = MATCH_PARENT;
 	bpm->control->get_layout().width = 100;
 	bpm->control->set_on_change(FUNC_PROPERTY_BIND(int, e, e.metronome.set_bpm));
@@ -344,7 +340,7 @@ Node* SoundEngineMenuView::init(Frame* frame) {
 
 	LabeledControl<CheckBox>* metronome = new LabeledControl<CheckBox>("Metronome");
 	metronome->control->checked = e.play_metronome;
-	metronome->label->style.font_color = WHITE;
+	metronome->label->style.font_color = sf::Color::White;
 	metronome->control->set_on_change(PROPERTY_BIND(bool, e, e.play_metronome));
 	footer->add_child(metronome);
 
@@ -360,14 +356,14 @@ B3OrganMenuView::B3OrganMenuView(B3OrganData* data, MidiCube* cube) {
 }
 
 static void style_organ_switch(LabeledControl<OrganSwitch>* sw) {
-	sw->label->style.font_color = WHITE;
+	sw->label->style.font_color = sf::Color::White;
 	sw->control->get_layout().width = 25;
 	sw->control->get_layout().height = 30;
 	sw->get_layout().margin_bottom = 5;
 }
 
 static void style_organ_drag_box(LabeledControl<DragBox>* sw) {
-	sw->label->style.font_color = WHITE;
+	sw->label->style.font_color = sf::Color::White;
 	sw->control->step = 0.005;
 	sw->control->get_layout().width = 25;
 	sw->control->get_layout().height = 30;
@@ -375,7 +371,7 @@ static void style_organ_drag_box(LabeledControl<DragBox>* sw) {
 }
 
 static void style_organ_midi_cc(LabeledControl<Spinner>* sw) {
-	sw->label->style.font_color = WHITE;
+	sw->label->style.font_color = sf::Color::White;
 	sw->control->get_layout().width = 35;
 	sw->control->get_layout().height = 20;
 	sw->get_layout().margin_bottom = 5;
@@ -383,7 +379,7 @@ static void style_organ_midi_cc(LabeledControl<Spinner>* sw) {
 
 Node* B3OrganMenuView::init(Frame* frame) {
 	VBox* container = new VBox();
-	container->style.fill_color = DARKBROWN;
+	container->style.fill_color = sf::Color(112, 67, 0);
 
 	B3OrganPreset& preset = data->preset;
 
@@ -393,7 +389,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	//Title
 	Label* title = new Label("B3 Organ");
 	title->style.font_size = 20;
-	title->style.font_color = YELLOW;
+	title->style.font_color = sf::Color::Yellow;
 	title->get_layout().halignment = HorizontalAlignment::CENTER;
 	container->add_child(title);
 
@@ -505,12 +501,12 @@ Node* B3OrganMenuView::init(Frame* frame) {
 		//Name
 		Label* name = new Label(drawbar_names.at(i));
 		name->style.font_size = 10;
-		name->style.font_color = YELLOW;
+		name->style.font_color = sf::Color::Yellow;
 		name->get_layout().halignment = HorizontalAlignment::CENTER;
 		//Value
 		Label* value = new Label(std::to_string(data->preset.drawbars[i]));
 		value->style.font_size = 10;
-		value->style.font_color = WHITE;
+		value->style.font_color = sf::Color::White;
 		value->get_layout().halignment = HorizontalAlignment::CENTER;
 		hide_midi.push_back(value);
 		//MIDI
@@ -520,21 +516,21 @@ Node* B3OrganMenuView::init(Frame* frame) {
 		show_midi.push_back(drawbar_cc);
 		//Drawbar
 		OrganDrawbar* drawbar = new OrganDrawbar(data->preset.drawbars[i]);
-		Color color = WHITE;
+		sf::Color color = sf::Color::White;
 		if (i <= 1) {
-			color = RED;
+			color = sf::Color::Red;
 		}
 		else if (i == 4 || i == 6 || i == 7) {
-			color = BLACK;
+			color = sf::Color::Black;
 		}
 		drawbar->get_layout().height = 200;
 		drawbar->get_layout().width = 30;
 		drawbar->button_style.fill_color = color;
 		drawbar->button_style.hover_color = color;
-		drawbar->style.fill_color = LIGHTGRAY;
-		drawbar->style.hover_color = LIGHTGRAY;
+		drawbar->style.fill_color = sf::Color(200, 200, 200);
+		drawbar->style.hover_color = sf::Color(200, 200, 200);
 		drawbar->style.border_thickness = 0;
-		drawbar->style.border_color = BLANK;
+		drawbar->style.border_color = sf::Color::Transparent;
 
 		B3OrganPreset& preset = data->preset;
 		drawbar->set_on_change([&preset,  value, i](int val) {
@@ -560,17 +556,17 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	//Overdrive
 	Label* vol_text = new Label("Overdrive");
 	vol_text->style.font_size = 10;
-	vol_text->style.font_color = BLACK;
+	vol_text->style.font_color = sf::Color::Black;
 	vol_text->get_layout().halignment = HorizontalAlignment::CENTER;
 	vol_text->get_layout().margin_top = 10;
 
 	Slider* overdrive = new Slider(preset.overdrive, {0, {}, 1});
-	overdrive->style.border_color = BLANK;
+	overdrive->style.border_color = sf::Color::Transparent;
 	overdrive->style.border_thickness = 0;
-	overdrive->button_style.border_color = BLANK;
+	overdrive->button_style.border_color = sf::Color::Transparent;
 	overdrive->button_style.border_thickness = 0;
-	overdrive->button_style.fill_color = BLACK;
-	overdrive->button_style.hover_color = DARKGRAY;
+	overdrive->button_style.fill_color = sf::Color::Black;
+	overdrive->button_style.hover_color = sf::Color(50, 50, 50);
 	overdrive->get_layout().halignment = HorizontalAlignment::CENTER;
 
 	Label* overdrive_val = new Label(std::to_string(preset.overdrive));
@@ -631,7 +627,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 	//Rotary type
 	LabeledControl<OrganSwitch>* rotary_type = new LabeledControl<OrganSwitch>("Rotary Type", new OrganSwitch(preset.rotary_type, "1", "2"));
 	style_organ_switch(rotary_type);
-	rotary_type->label->style.font_color = WHITE;
+	rotary_type->label->style.font_color = sf::Color::White;
 	rotary_type->control->set_on_change(PROPERTY_BIND(double, preset, preset.rotary_type));
 	col1->add_child(rotary_type);
 
@@ -657,7 +653,7 @@ Node* B3OrganMenuView::init(Frame* frame) {
 
 	//Edit MIDI
 	LabeledControl<CheckBox>* edit_midi = new LabeledControl<CheckBox>("Edit MIDI");
-	edit_midi->label->style.font_color = WHITE;
+	edit_midi->label->style.font_color = sf::Color::White;
 	edit_midi->control->set_on_change([show_midi, hide_midi](bool midi) {
 		for (Node* node : show_midi) {
 			node->set_visible(midi);
