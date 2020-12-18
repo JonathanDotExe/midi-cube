@@ -10,15 +10,13 @@
 
 #include "core.h"
 #include "util.h"
-#include "container.h"
 #include "../../util.h"
 #include <cmath>
 #include <algorithm>
 
-class Label : public StyleableNode {
+class Label : public Node {
 
 private:
-	TextPositioner positioner;
 	std::string text;
 
 public:
@@ -26,21 +24,15 @@ public:
 
 	Label(std::string text);
 
-	virtual Vector get_content_size() {
-		return positioner.size();
-	}
-
-	virtual void draw(int parentX, int parentY, NodeEnv env);
+	virtual void draw(sf::Window window, NodeEnv env);
 
 	virtual void update_text(std::string text);
-
-	virtual void update_style();
 
 	virtual ~Label();
 
 };
 
-class Button : public StyleableNode {
+class Button : public Node {
 
 private:
 	TextPositioner positioner;
@@ -53,29 +45,20 @@ public:
 
 	Button(std::string text);
 
-	virtual void draw(int parentX, int parentY, NodeEnv env);
+	virtual void draw(sf::Window window, NodeEnv env);
 
 	void set_on_click(std::function<void()> on_click);
-
-	virtual Vector get_content_size() {
-		return positioner.size();
-	}
 
 	FOCUS_TRAVERSABLE
 
 	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
 
-	virtual void update_style();
-
-	virtual ~Button();
-
 };
 
 template <typename T>
-class ComboBox : public StyleableNode {
+class ComboBox : public Node {
 
 private:
-	TextPositioner positioner;
 	std::vector<T> values;
 	std::function<std::string(T)> to_string = nullptr;
 	std::function<void(T)> on_change = nullptr;
@@ -104,10 +87,6 @@ public:
 	inline void set_value (T t) {
 		size_t index = std::find(values.begin(), values.end(), t) - values.begin();
 		set_index(index);
-	}
-
-	virtual Vector get_content_size() {
-		return positioner.size();
 	}
 
 	FOCUS_TRAVERSABLE
@@ -179,7 +158,7 @@ ComboBox<T>::~ComboBox() {
 
 }
 
-class CheckBox : public StyleableNode {
+class CheckBox : public Node {
 
 private:
 	std::function<void (bool)> on_change;
@@ -191,7 +170,7 @@ public:
 
 	CheckBox();
 
-	virtual void draw(int parentX, int parentY, NodeEnv env);
+	virtual void draw(sf::Window window, NodeEnv env);
 
 	virtual void set_on_change(std::function<void (bool)> on_change);
 
@@ -199,55 +178,11 @@ public:
 
 	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
 
-	virtual Vector get_content_size() {
-		return {14, 14};
-	}
-
 	virtual ~CheckBox();
 
 };
 
-template <typename T>
-class LabeledControl : public HBox {
-public:
-	T* control;
-	Label* label;
-
-	LabeledControl(std::string text, T* control = new T(), bool after = true) {
-		layout.width = WRAP_CONTENT;
-		layout.height = WRAP_CONTENT;
-
-		this->control = control;
-		control->get_layout().valignment = VerticalAlignment::CENTER;
-		control->get_layout().margin_left = 2;
-		control->get_layout().margin_right = 2;
-		label = new Label(text);
-		label->get_layout().valignment = VerticalAlignment::CENTER;
-
-		if (after) {
-			add_child(control);
-			add_child(label);
-		}
-		else {
-			add_child(label);
-			add_child(control);
-		}
-	}
-
-	virtual ~LabeledControl() {
-
-	}
-	const T& get_checkbox() const {
-		return *control;
-	}
-
-	const Label& get_label() const {
-		return *label;
-	}
-
-};
-
-class Slider : public StyleableNode {
+class Slider : public Node {
 
 private:
 	std::function<void (double)> on_change;
@@ -275,7 +210,7 @@ public:
 		}
 	}
 
-	virtual void draw(int parentX, int parentY, NodeEnv env);
+	virtual void draw(sf::Window window, NodeEnv env);
 
 	virtual void set_on_change(std::function<void (double)> on_change);
 
@@ -285,15 +220,11 @@ public:
 
 	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env);
 
-	virtual Vector get_content_size() {
-		return {30, 100};
-	}
-
 	virtual ~Slider();
 
 };
 
-class Spinner : public StyleableNode {
+class Spinner : public Node {
 
 private:
 	TextPositioner positioner;
@@ -311,15 +242,9 @@ public:
 
 	Spinner(int min, int max, int value);
 
-	virtual void draw(int parentX, int parentY, NodeEnv env);
+	virtual void draw(sf::Window window, NodeEnv env);
 
 	void set_on_change(std::function<void(int)> on_change);
-
-	virtual Vector get_content_size() {
-		Vector size = positioner.size();
-		size.x += button_width * 2;
-		return size;
-	}
 
 	FOCUS_TRAVERSABLE
 
@@ -327,18 +252,15 @@ public:
 
 	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
 
-	virtual void update_style();
-
 	virtual ~Spinner();
 
 };
 
-class DragBox : public StyleableNode {
+class DragBox : public Node {
 
 private:
 	std::function<void (double)> on_change;
 	std::string text;
-	TextPositioner positioner;
 
 public:
 	BoxStyle style;
@@ -350,19 +272,13 @@ public:
 
 	DragBox(double value, FixedScale scale);
 
-	virtual void draw(int parentX, int parentY, NodeEnv env);
+	virtual void draw(sf::Window window, NodeEnv env);
 
 	virtual void set_on_change(std::function<void (double)> on_change);
 
 	FOCUS_TRAVERSABLE
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
-
-	virtual void update_style();
-
-	virtual Vector get_content_size() {
-		return positioner.size();
-	}
 
 	virtual ~DragBox();
 
