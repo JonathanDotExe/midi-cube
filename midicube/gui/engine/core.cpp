@@ -27,9 +27,17 @@ Frame::Frame(int width, int height, std::string title) {
 	this->width = width;
 	this->height = height;
 	this->title = title;
+	this->view = nullptr;
 }
 
-void Frame::run() {
+void Frame::run(ViewController* v) {
+	//Init view
+	this->view = v;
+	for (Control* control : view->create(*this)) {
+		control->frame = this;
+		controls.push_back(control);
+	}
+	//Main loop
 	sf::RenderWindow window(sf::VideoMode(width, height), title);
 
 	while (window.isOpen()) {
@@ -40,13 +48,19 @@ void Frame::run() {
 			}
 		}
 		window.clear();
-		//TODO render
+		//Render
+		for (Control* control : controls) {
+			control->draw(window);
+		}
 		window.display();
 	}
 }
 
 Frame::~Frame() {
-
+	delete view;
+	for (Control* control : controls) {
+		delete control;
+	}
 }
 
 

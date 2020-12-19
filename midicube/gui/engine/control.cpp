@@ -6,6 +6,7 @@
  */
 
 #include "control.h"
+#include <iostream>
 
 //Button
 void Button::update_position(int x, int y, int width, int height) {
@@ -14,7 +15,7 @@ void Button::update_position(int x, int y, int width, int height) {
 	rect.setSize(sf::Vector2<float>(width, height));
 }
 
-void Button::draw(sf::RenderWindow window) {
+void Button::draw(sf::RenderWindow& window) {
 	window.draw(rect);
 }
 

@@ -26,7 +26,7 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw(sf::RenderWindow window) = 0;
+	virtual void draw(sf::RenderWindow& window) = 0;
 
 	virtual ~Control() {
 
@@ -52,9 +52,12 @@ private:
 	int width;
 	int height;
 	std::string title;
+	ViewController* view;
+	std::vector<Control*> controls;
 public:
 	Frame(int width, int height, std::string title);
-	void run();
+
+	void run(ViewController* v);
 
 	~Frame();
 

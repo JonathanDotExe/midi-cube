@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "midicube/gui/engine/core.h"
+#include "midicube/gui/view/SoundEngineView.h"
 #include "midicube/midicube.h"
 
 using namespace std;
@@ -20,7 +21,7 @@ int main(int argc, char **argv) {
 		//View
 		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation");
 		//Run frame
-		frame.run();
+		frame.run(new SoundEngineView());
 	}
 	catch (AudioException& e) {
 		cerr << e.what() << endl;
