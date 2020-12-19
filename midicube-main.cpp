@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "midicube/gui/gui.h"
+#include "midicube/gui/engine/core.h"
 #include "midicube/midicube.h"
 
 using namespace std;
@@ -18,10 +18,9 @@ int main(int argc, char **argv) {
 		ptr.cube = new MidiCube();
 		ptr.cube->init();
 		//View
-		ViewController* view = new MainMenuView(ptr.cube);
-		Frame frame("MIDICube - universal MIDI and synthesis workstation", 1024, 600);
+		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation");
 		//Run frame
-		frame.run(view);
+		frame.run();
 	}
 	catch (AudioException& e) {
 		cerr << e.what() << endl;
