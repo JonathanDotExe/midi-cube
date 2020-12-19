@@ -39,7 +39,7 @@ class ViewController {
 
 	}
 
-	std::vector<Control> create(Frame& frame) = 0;
+	virtual std::vector<Control> create(Frame& frame) = 0;
 
 	~ViewController() {
 
