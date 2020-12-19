@@ -10,6 +10,18 @@
 
 #include "core.h"
 
+//Control
+Control::Control(int x = 0, int y = 0, int width = 0, int height = 0) {
+	update_position(x, y, width, height);
+}
+
+void Control::update_position(int x, int y, int width, int height) {
+	this->x = x;
+	this->y = y;
+	this->width = width;
+	this->height = height;
+}
+
 //Frame
 Frame::Frame(int width, int height, std::string title) {
 	this->width = width;
