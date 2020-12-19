@@ -40,7 +40,7 @@ private:
 	std::function<void()> on_click = nullptr;
 
 public:
-	BoxStyle style;
+	sf::RectangleShape rect;
 	TextStyle text_style;
 
 	Button(std::string text);

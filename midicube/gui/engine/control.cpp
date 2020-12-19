@@ -12,24 +12,16 @@
 #include <sstream>
 
 //Label
-Label::Label(std::string text) : StyleableNode() {
+Label::Label(std::string text) : Node() {
 	this->text = text;
-	get_layout().width = WRAP_CONTENT;
-	get_layout().height = WRAP_CONTENT;
-	update_style();
 }
 
-void Label::draw(int parentX, int parentY, NodeEnv env) {
-	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, style);
+void Label::draw(sf::Window window, NodeEnv env) {
+	//TODO
 }
 
 void Label::update_text(std::string text) {
 	this->text = text;
-	frame->request_relayout();
-}
-
-void Label::update_style() {
-	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, style);
 }
 
 Label::~Label() {
@@ -37,23 +29,15 @@ Label::~Label() {
 }
 
 //Button
-Button::Button(std::string text) : StyleableNode() {
+Button::Button(std::string text) : Node() {
 	this->text = text;
 
-	get_layout().width = WRAP_CONTENT;
-	get_layout().height = WRAP_CONTENT;
-	get_layout().padding_left = 5;
-	get_layout().padding_right = 5;
-	get_layout().padding_top = 5;
-	get_layout().padding_bottom = 5;
-
-	style.border_color = BLACK;
-	style.border_thickness = 2;
-	style.border_radius = 0.2f;
-	style.fill_color = LIGHTGRAY;
+	rect.setFillColor(sf::Color::White);
+	rect.setOutlineColor(sf::Color::Black);
+	rect.setOutlineThickness(2);
 }
 
-void Button::draw(int parentX, int parentY, NodeEnv env) {
+void Button::draw(sf::Window window, NodeEnv env) {
 	render_box(parentX + x, parentY + y, width, height, style, env.hovered == this);
 	//Text
 	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, text_style);
