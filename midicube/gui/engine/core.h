@@ -26,12 +26,24 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw (sf::RenderWindow window) = 0;
+	virtual void draw(sf::RenderWindow window) = 0;
 
 	virtual ~Control() {
 
 	}
 
+};
+
+class ViewController {
+	ViewController() {
+
+	}
+
+	std::vector<Control> create(Frame& frame) = 0;
+
+	~ViewController() {
+
+	}
 };
 
 class Frame {
