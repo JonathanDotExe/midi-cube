@@ -5,9 +5,6 @@
  *      Author: jojo
  */
 
-#ifndef MIDICUBE_GUI_ENGINE_CORE_CPP_
-#define MIDICUBE_GUI_ENGINE_CORE_CPP_
-
 #include "core.h"
 
 //Control
@@ -111,7 +108,3 @@ Frame::~Frame() {
 	}
 }
 
-
-
-
-#endif /* MIDICUBE_GUI_ENGINE_CORE_CPP_ */

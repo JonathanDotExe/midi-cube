@@ -18,6 +18,9 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * JSON library by nlohman licensed under MIT license (https://github.com/nlohmann/json https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
 * FluidSynth API for playing soundfonts licensed under LGPL-2.1 (https://github.com/FluidSynth/fluidsynth https://github.com/FluidSynth/fluidsynth/blob/master/LICENSE)
 
+##Used Assets
+* Liberation font licensed onder the Open Font License (https://github.com/liberationfonts/liberation-fonts/tree/2.1.1 https://github.com/liberationfonts/liberation-fonts/blob/master/LICENSE)
+
 ## Used ressources
 * Format of .wav files from the german Wikipedia (https://de.wikipedia.org/wiki/RIFF_WAVE)
 * Article about the Hammond-Organ from the german Wikiedia (https://de.wikipedia.org/wiki/Hammondorgel)

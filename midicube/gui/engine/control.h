@@ -17,9 +17,15 @@ private:
 
 public:
 	sf::RectangleShape rect;
+	sf::Text text;
 
-	Button(int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
+	Button(std::string text, sf::Font& font, int text_size, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
+		this->text.setFont(font);
+		this->text.setString(text);
+		this->text.setCharacterSize(text_size);
+		this->text.setFillColor(sf::Color::Black);
 		rect.setFillColor(sf::Color(220, 220, 220));
+
 		update_position(x, y, width, height);
 	}
 

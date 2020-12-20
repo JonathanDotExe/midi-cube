@@ -10,6 +10,7 @@
 
 #include "../engine/core.h"
 #include "../engine/control.h"
+#include "resources.h"
 
 class SoundEngineView : public ViewController {
 public:

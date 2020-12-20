@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "midicube/gui/engine/core.h"
 #include "midicube/gui/view/SoundEngineView.h"
 #include "midicube/midicube.h"
 
@@ -18,6 +17,7 @@ int main(int argc, char **argv) {
 	try {
 		ptr.cube = new MidiCube();
 		ptr.cube->init();
+		load_resources();
 		//View
 		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation");
 		//Run frame

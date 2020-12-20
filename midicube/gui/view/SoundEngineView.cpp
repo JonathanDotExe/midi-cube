@@ -15,7 +15,7 @@ SoundEngineView::SoundEngineView() : ViewController() {
 
 std::vector<Control*> SoundEngineView::create(Frame& frame) {
 	std::vector<Control*> controls;
-	Button* demo_button = new Button(frame.get_width()/2 - 50, frame.get_height()/2 - 10, 100, 20);
+	Button* demo_button = new Button("Text", main_font, 18, frame.get_width()/2 - 80, frame.get_height()/2 - 15, 160, 30);
 	demo_button->set_on_click([]() {
 		std::cout << "Click" << std::endl;
 	});
