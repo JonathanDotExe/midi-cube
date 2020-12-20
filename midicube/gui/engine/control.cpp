@@ -19,4 +19,10 @@ void Button::draw(sf::RenderWindow& window) {
 	window.draw(rect);
 }
 
+void Button::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+	if (on_click) {
+		on_click();
+	}
+}
+
 

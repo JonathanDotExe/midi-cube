@@ -9,9 +9,11 @@
 #define MIDICUBE_GUI_ENGINE_CONTROL_H_
 
 #include "core.h"
+#include <functional>
 
 class Button : public Control {
 private:
+	std::function<void(void)> on_click = nullptr;
 
 public:
 	sf::RectangleShape rect;
@@ -25,8 +27,14 @@ public:
 
 	virtual void draw(sf::RenderWindow& window);
 
+	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+
 	virtual ~Button() {
 
+	}
+
+	void set_on_click(const std::function<void(void)> &onClick = nullptr) {
+		on_click = onClick;
 	}
 };
 
