@@ -28,6 +28,20 @@ public:
 
 	virtual void draw(sf::RenderWindow& window) = 0;
 
+	bool collides (int x, int y);
+
+	virtual void on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
+
+	}
+
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, sf::Mouse::Button button) {
+
+	}
+
+	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button) {
+
+	}
+
 	virtual ~Control() {
 
 	}

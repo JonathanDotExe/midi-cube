@@ -22,6 +22,10 @@ void Control::update_position(int x, int y, int width, int height) {
 	this->height = height;
 }
 
+bool Control::collides (int x, int y) {
+	return this->x <= x && this->x + this->width > x && this->y <= y && this->y + this->height > y;
+}
+
 //Frame
 Frame::Frame(int width, int height, std::string title) {
 	this->width = width;
@@ -41,14 +45,33 @@ void Frame::run(ViewController* v) {
 	sf::RenderWindow window(sf::VideoMode(width, height), title);
 
 	while (window.isOpen()) {
+		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::Closed) {
+			switch (event.type) {
+			case sf::Event::Closed:
 				window.close();
+				break;
+			case sf::Event::MouseButtonPressed:
+				for (Control* control : controls) {
+					if (control->collides(event.mouseButton.x, event.mouseButton.y)) {
+						control->on_mouse_pressed(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
+					}
+				}
+				break;
+			case sf::Event::MouseButtonReleased:
+				for (Control* control : controls) {
+					if (control->collides(event.mouseButton.x, event.mouseButton.y)) {
+						control->on_mouse_released(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
+					}
+				}
+				break;
+			default:
+				break;
 			}
 		}
-		window.clear();
 		//Render
+		window.clear();
 		for (Control* control : controls) {
 			control->draw(window);
 		}
