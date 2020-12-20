@@ -45,6 +45,7 @@ void Frame::run(ViewController* v) {
 	}
 	//Main loop
 	sf::RenderWindow window(sf::VideoMode(width, height), title);
+	window.setFramerateLimit(30);
 
 	while (window.isOpen()) {
 		//Events
