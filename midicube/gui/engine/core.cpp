@@ -32,6 +32,8 @@ Frame::Frame(int width, int height, std::string title) {
 	this->height = height;
 	this->title = title;
 	this->view = nullptr;
+
+	this->selected = nullptr;
 }
 
 void Frame::run(ViewController* v) {
@@ -53,13 +55,35 @@ void Frame::run(ViewController* v) {
 				window.close();
 				break;
 			case sf::Event::MouseButtonPressed:
+			{
+				bool left = event.mouseButton.button == sf::Mouse::Left;
+				if (left) {
+					mouse_pressed = true;
+					last_mouse_x = event.mouseButton.x;
+					last_mouse_y = event.mouseButton.y;
+				}
 				for (Control* control : controls) {
 					if (control->collides(event.mouseButton.x, event.mouseButton.y)) {
 						control->on_mouse_pressed(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
+						if (left) {
+							selected = control;
+						}
 					}
+				}
+			}
+				break;
+			case sf::Event::MouseMoved:
+				if (mouse_pressed && selected) {
+					int x_motion = event.mouseMove.x - last_mouse_x;
+					int y_motion = event.mouseMove.y - last_mouse_y;
+
+					selected->on_mouse_drag(event.mouseMove.x, event.mouseMove.y, x_motion, y_motion);
 				}
 				break;
 			case sf::Event::MouseButtonReleased:
+				if (event.mouseButton.button == sf::Mouse::Left) {
+					mouse_pressed = false;
+				}
 				for (Control* control : controls) {
 					if (control->collides(event.mouseButton.x, event.mouseButton.y)) {
 						control->on_mouse_released(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);

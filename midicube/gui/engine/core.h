@@ -34,7 +34,7 @@ public:
 
 	}
 
-	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, sf::Mouse::Button button) {
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 
 	}
 
@@ -68,6 +68,11 @@ private:
 	std::string title;
 	ViewController* view;
 	std::vector<Control*> controls;
+
+	bool mouse_pressed = false;
+	int last_mouse_x = 0;
+	int last_mouse_y = 0;
+	Control* selected;
 public:
 	Frame(int width, int height, std::string title);
 
