@@ -148,8 +148,8 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		}
 
 		//Compress
-		if (status.pressed_notes) {
-			double v = calc_vol(status.pressed_notes, 0.75)/status.pressed_notes;
+		if (status.pressed_notes && data.preset.multi_note_gain != 1) {
+			double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
 			bass_sample *= v;
 			horn_sample *= v;
 		}
@@ -189,8 +189,8 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
 		}
 		//Compress
-		if (status.pressed_notes) {
-			double v = calc_vol(status.pressed_notes, 0.75)/status.pressed_notes;
+		if (status.pressed_notes && data.preset.multi_note_gain != 1) {
+			double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
 			vol *= v;
 			sample *= v;
 		}

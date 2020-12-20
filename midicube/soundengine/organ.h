@@ -48,6 +48,8 @@ struct B3OrganPreset {
 	std::atomic<double> overdrive{0};
 	std::atomic<unsigned int> overdrive_cc{35};
 
+	std::atomic<double> multi_note_gain{0.75};
+
 	std::atomic<bool> rotary{false};
 	std::atomic<bool> rotary_fast{true};
 	std::atomic<unsigned int> rotary_cc{22};
@@ -136,6 +138,7 @@ private:
 	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_frequencies;
 	size_t cutoff_tonewheel = 0;
 	double foldback_freq = 0;
+
 
 public:
 	B3OrganData data;
