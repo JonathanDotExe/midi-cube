@@ -13,3 +13,15 @@ void center_text(sf::Text& text, int x, int y, int width, int height) {
 	text.setPosition(x + width/2, y + height/2);
 }
 
+void center_text_left(sf::Text& text, int x, int y, int width, int height) {
+	sf::FloatRect bounds = text.getLocalBounds();
+	text.setOrigin(0, bounds.top + bounds.height/2);
+	text.setPosition(x, y + height/2);
+}
+
+void center_text_right(sf::Text& text, int x, int y, int width, int height) {
+	sf::FloatRect bounds = text.getLocalBounds();
+	text.setOrigin(0, bounds.top + bounds.height/2);
+	text.setPosition(width - bounds.width, y + height/2);
+}
+
