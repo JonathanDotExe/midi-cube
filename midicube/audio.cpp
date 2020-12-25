@@ -52,12 +52,12 @@ void AudioHandler::init() {
 	}
 };
 
-int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned int buffer_size, double time) {
+int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned int buffer_size, double t) {
 	SampleInfo info;
 	//Compute each sample
-	//TODO Use time
+	//TODO Use rtaudio time
 	for (size_t i = 0; i < buffer_size; ++i) {
-		info = {time, time_step, sample_rate, sample_time, *input_buffer++}; //TODO input
+		info = {time, time_step, sample_rate, sample_time, *input_buffer++};
 
 		sample_buf = {0, 0};
 		get_sample(sample_buf, info, user_data);
@@ -66,7 +66,7 @@ int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned 
 		*output_buffer++ = sample_buf[0];
 		*output_buffer++ = sample_buf[1];
 
-		time = time + time_step;
+		this->time += time_step;
 		++sample_time;
 	}
 	return 0;

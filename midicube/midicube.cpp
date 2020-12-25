@@ -14,7 +14,6 @@ static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleIn
 
 MidiCube::MidiCube() {
 	audio_handler.set_sample_callback(&process_func, this);
-	engine.handler = &audio_handler;
 }
 
 void MidiCube::init() {
@@ -77,6 +76,7 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 
 void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 	MessageType t = message.get_message_type();
+	SampleInfo info = audio_handler.sample_info();
 	for (size_t i = 0; i < channels.size(); ++i) {
 		ChannelSource& s = channels[i];
 		if (s.input == static_cast<ssize_t>(input) && s.channel == message.get_channel()) {
@@ -112,7 +112,7 @@ void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 			//Apply binding
 			if (pass) {
 				msg.set_channel(i);
-				engine.send(msg);
+				engine.send(msg, info);
 			}
 		}
 	}

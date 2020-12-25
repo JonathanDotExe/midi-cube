@@ -11,7 +11,6 @@
 #include "../midi.h"
 #include "../envelope.h"
 #include "../audio.h"
-#include "../device.h"
 #include "../synthesis.h"
 #include "../metronome.h"
 #include "../looper.h"
@@ -217,7 +216,7 @@ public:
 
 };
 
-class SoundEngineDevice : public AudioDevice {
+class SoundEngineDevice {
 
 private:
 	std::string identifier;
@@ -230,7 +229,6 @@ private:
 public:
 	Metronome metronome;
 	std::atomic<bool> play_metronome{false};
-	AudioHandler* handler = nullptr; //TODO remove this reference and pass time through send() to be thread-safe
 
 	SoundEngineDevice(std::string identifier);
 
@@ -246,11 +244,7 @@ public:
 		return true;
 	}
 
-	DeviceType type() {
-		return DeviceType::SOUND_ENGINE;
-	};
-
-	void send(MidiMessage& message);
+	void send(MidiMessage& message, SampleInfo& info);
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 

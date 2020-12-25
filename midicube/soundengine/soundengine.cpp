@@ -353,8 +353,7 @@ SoundEngineChannel& SoundEngineDevice::get_channel(unsigned int channel) {
 	return channels.at(channel);
 }
 
-void SoundEngineDevice::send(MidiMessage &message) {
-	SampleInfo info =  handler->sample_info();
+void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	SoundEngineChannel& ch = this->channels.at(message.get_channel());
 	SoundEngine* engine = ch.get_engine(sound_engines, message.get_channel());
 	if (engine) {

@@ -9,7 +9,6 @@
 #define MIDICUBE_MIDICUBE_H_
 
 #include "audio.h"
-#include "device.h"
 #include "soundengine/soundengine.h"
 
 
