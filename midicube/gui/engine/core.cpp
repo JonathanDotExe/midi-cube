@@ -77,6 +77,8 @@ void Frame::run(ViewController* v) {
 					int y_motion = event.mouseMove.y - last_mouse_y;
 
 					selected->on_mouse_drag(event.mouseMove.x, event.mouseMove.y, x_motion, y_motion);
+					last_mouse_x = event.mouseMove.x;
+					last_mouse_y = event.mouseMove.y;
 				}
 				break;
 			case sf::Event::MouseButtonReleased:
