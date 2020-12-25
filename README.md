@@ -17,6 +17,7 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 * raygui licensed under zlib/libpng license (https://github.com/raysan5/raygui https://github.com/raysan5/raygui/blob/master/LICENSE)
 * JSON library by nlohman licensed under MIT license (https://github.com/nlohmann/json https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
 * FluidSynth API for playing soundfonts licensed under LGPL-2.1 (https://github.com/FluidSynth/fluidsynth https://github.com/FluidSynth/fluidsynth/blob/master/LICENSE)
+* Boost licensed under the Boost Software License (https://github.com/boostorg/boost https://github.com/boostorg/boost/blob/master/LICENSE_1_0.txt)
 
 ## Used ressources
 * Format of .wav files from the german Wikipedia (https://de.wikipedia.org/wiki/RIFF_WAVE)
