@@ -97,7 +97,7 @@ void Frame::run(ViewController* v) {
 			}
 		}
 		//Render
-		window.clear();
+		window.clear(sf::Color(80, 80, 80));
 		for (Control* control : controls) {
 			control->draw(window, selected == control);
 		}

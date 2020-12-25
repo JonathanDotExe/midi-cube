@@ -32,13 +32,12 @@ void Button::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 void Slider::update_position(int x, int y, int width, int height) {
 	Control::update_position(x, y, width, height);
 	//Slider
-	slider_rect.setOrigin(width/2, 0);
-	slider_rect.setPosition(x + width/2, y);
+	slider_rect.setPosition(x + width/2 - width * slider_width / 2, y);
 	slider_rect.setSize(sf::Vector2<float>(width * slider_width, height));
 	//Button
 	double range = height * (1 - button_height);
-	slider_rect.setPosition(x, y + range * (1 - progress));
-	slider_rect.setSize(sf::Vector2<float>(width, height * button_height));
+	button_rect.setPosition(x, y + range * (1 - progress));
+	button_rect.setSize(sf::Vector2<float>(width, height * button_height));
 
 	//Context box and text
 	center_text_top(text, x, y + height + 5, width, height);

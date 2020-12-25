@@ -62,7 +62,7 @@ public:
 	sf::RectangleShape context_rect;
 	sf::Text text;
 
-	Slider(double value, double min, double max, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, double slider_width = 0.5, double button_height = 1/11.0) : Control (x, y, width, height) {
+	Slider(double value, double min, double max, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, double slider_width = 0.7, double button_height = 0.15) : Control (x, y, width, height) {
 		this->min = min;
 		this->max = max;
 		this->progress = (value - min)/(max - min);
@@ -70,8 +70,8 @@ public:
 		this->slider_width = slider_width;
 		this->button_height = button_height;
 
-		this->slider_rect.setFillColor(sf::Color::White);
-		this->button_rect.setFillColor(sf::Color(50, 50, 50));
+		this->slider_rect.setFillColor(sf::Color(220, 220, 220));
+		this->button_rect.setFillColor(sf::Color::White);
 
 		this->text.setFont(font);
 		this->text.setFillColor(sf::Color::Black);
