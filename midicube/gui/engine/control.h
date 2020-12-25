@@ -109,7 +109,7 @@ private:
 public:
 	sf::RectangleShape rect;
 	sf::Text text;
-	double drag_mul = 0.01;
+	double drag_mul = 0.0025;
 
 	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
 		this->min = min;
@@ -129,7 +129,7 @@ public:
 		Control::update_position(x, y, width, height);
 		rect.setPosition(x, y);
 		rect.setSize(sf::Vector2<float>(width, height));
-		T value = progress/(max - min) + min;
+		T value = progress * (max - min) + min;
 		text.setString(std::to_string(value));
 		center_text(text, x, y, width, height);
 	}
@@ -140,8 +140,8 @@ public:
 	}
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
-		T old_val = progress/(max - min) + min;
-		progress -= drag_mul * x_motion;
+		T old_val = progress * (max - min) + min;
+		progress += drag_mul * x_motion;
 
 		if (progress < 0) {
 			progress = 0;
@@ -150,7 +150,7 @@ public:
 			progress = 1;
 		}
 
-		if (old_val != (progress/(max - min) + min)) {
+		if (old_val != (progress * (max - min) + min)) {
 			update_position(this->x, this->y, width, height);
 		}
 	}
