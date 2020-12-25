@@ -25,3 +25,9 @@ void center_text_right(sf::Text& text, int x, int y, int width, int height) {
 	text.setPosition(width - bounds.width, y + height/2);
 }
 
+void center_text_top(sf::Text& text, int x, int y, int width, int height) {
+	sf::FloatRect bounds = text.getLocalBounds();
+	text.setOrigin(bounds.left + bounds.width/2, 0);
+	text.setPosition(x + width/2, y);
+}
+

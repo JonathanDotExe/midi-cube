@@ -10,6 +10,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#define SELECTABLE virtual bool selectable() const { return true; };
+
 class Frame;
 
 class Control {
@@ -26,9 +28,13 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw(sf::RenderWindow& window) = 0;
+	virtual void draw(sf::RenderWindow& window, bool selected) = 0;
 
 	bool collides (int x, int y);
+
+	virtual bool selectable() const {
+		return false;
+	}
 
 	virtual void on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
 

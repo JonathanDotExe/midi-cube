@@ -61,11 +61,12 @@ void Frame::run(ViewController* v) {
 					last_mouse_y = event.mouseButton.y;
 				}
 				for (Control* control : controls) {
-					if (control->collides(event.mouseButton.x, event.mouseButton.y)) {
+					if (control->selectable() && control->collides(event.mouseButton.x, event.mouseButton.y)) {
 						control->on_mouse_pressed(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
 						if (left) {
 							selected = control;
 						}
+						break;
 					}
 				}
 			}
@@ -83,8 +84,9 @@ void Frame::run(ViewController* v) {
 					mouse_pressed = false;
 				}
 				for (Control* control : controls) {
-					if (control->collides(event.mouseButton.x, event.mouseButton.y)) {
+					if (control->selectable() && control->collides(event.mouseButton.x, event.mouseButton.y)) {
 						control->on_mouse_released(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
+						break;
 					}
 				}
 				break;
@@ -95,7 +97,7 @@ void Frame::run(ViewController* v) {
 		//Render
 		window.clear();
 		for (Control* control : controls) {
-			control->draw(window);
+			control->draw(window, selected == control);
 		}
 		window.display();
 	}

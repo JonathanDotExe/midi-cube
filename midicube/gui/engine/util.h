@@ -16,5 +16,7 @@ void center_text_left(sf::Text& text, int x, int y, int width, int height);
 
 void center_text_right(sf::Text& text, int x, int y, int width, int height);
 
+void center_text_top(sf::Text& text, int x, int y, int width, int height);
+
 
 #endif /* MIDICUBE_GUI_ENGINE_UTIL_H_ */
