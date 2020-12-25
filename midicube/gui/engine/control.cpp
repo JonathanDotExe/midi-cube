@@ -6,7 +6,6 @@
  */
 
 #include "control.h"
-#include "util.h"
 #include <iostream>
 
 //Button

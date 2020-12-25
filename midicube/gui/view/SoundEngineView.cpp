@@ -27,6 +27,13 @@ std::vector<Control*> SoundEngineView::create(Frame& frame) {
 	Slider* slider = new Slider(0.3, 0, 1, main_font, 10, 10, 40, 200);
 	controls.push_back(slider);
 
+	//DragBox
+	DragBox<int>* int_box = new DragBox<int>(5, 0, 12, main_font, 18, 80, 10, 60, 40);
+	controls.push_back(int_box);
+
+	DragBox<double>* double_box = new DragBox<double>(2, 0, 10, main_font, 18, 150, 10, 80, 40);
+	controls.push_back(double_box);
+
 	return controls;
 }
 
