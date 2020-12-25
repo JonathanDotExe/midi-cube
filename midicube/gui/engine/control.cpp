@@ -32,7 +32,7 @@ void Button::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 void Slider::update_position(int x, int y, int width, int height) {
 	Control::update_position(x, y, width, height);
 	//Slider
-	//slider_rect.setOrigin(width/2, 0);
+	slider_rect.setOrigin(width/2, 0);
 	slider_rect.setPosition(x + width/2, y);
 	slider_rect.setSize(sf::Vector2<float>(width * slider_width, height));
 	//Button
@@ -68,7 +68,7 @@ void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 	}
 
 	if (old_prog != progress) {
-		update_position(x, y, width, height);
+		update_position(this->x, this->y, width, height);
 	}
 }
 
