@@ -40,10 +40,14 @@ void Slider::update_position(int x, int y, int width, int height) {
 	button_rect.setSize(sf::Vector2<float>(width, height * button_height));
 
 	//Context box and text
+	double value = (max - min) * progress + min;
+	text.setString(std::to_string(value));
+
 	center_text_top(text, x, y + height + 5, width, height);
 	context_rect.setOrigin(text.getOrigin());
 	context_rect.setPosition(text.getPosition());
-	context_rect.setSize(sf::Vector2<float>(text.getLocalBounds().width, text.getLocalBounds().height));
+	sf::FloatRect bounds = text.getLocalBounds();
+	context_rect.setSize(sf::Vector2<float>(bounds.left + bounds.width + 2, bounds.top + bounds.height + 2));
 }
 
 void Slider::draw(sf::RenderWindow& window, bool selected) {
@@ -52,7 +56,7 @@ void Slider::draw(sf::RenderWindow& window, bool selected) {
 	if (selected) {
 		window.draw(context_rect);
 		window.draw(text);
-	}
+ 	}
 }
 
 void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {

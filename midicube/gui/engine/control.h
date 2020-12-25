@@ -70,11 +70,12 @@ public:
 		this->slider_width = slider_width;
 		this->button_height = button_height;
 
-		this->slider_rect.setFillColor(sf::Color(220, 220, 220));
-		this->button_rect.setFillColor(sf::Color::White);
+		this->slider_rect.setFillColor(sf::Color(50, 50, 50));
+		this->button_rect.setFillColor(sf::Color(220, 220, 220));
 
 		this->text.setFont(font);
 		this->text.setFillColor(sf::Color::Black);
+		this->text.setCharacterSize(12);
 
 		this->context_rect.setFillColor(sf::Color::White);
 		this->context_rect.setOutlineColor(sf::Color::Black);
