@@ -74,4 +74,27 @@ void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 	}
 }
 
+void CheckBox::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	rect.setPosition(x, y);
+	rect.setSize(sf::Vector2<float>(width, height));
+	inner_rect.setPosition(x + 4, y + 4);
+	inner_rect.setSize(sf::Vector2<float>(width - 8, height - 8));
 
+	center_text_left(text, x + width + 2, y, height);
+}
+
+void CheckBox::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(rect);
+	if (checked) {
+		window.draw(inner_rect);
+	}
+	window.draw(text);
+}
+
+void CheckBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+	if (button == sf::Mouse::Left) {
+		checked = !checked;
+		//TODO request redraw
+	}
+}

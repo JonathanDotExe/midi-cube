@@ -179,7 +179,9 @@ public:
 		this->text.setString(text);
 		this->text.setCharacterSize(text_size);
 		this->text.setFillColor(sf::Color::Black);
+
 		rect.setFillColor(sf::Color(220, 220, 220));
+		inner_rect.setFillColor(sf::Color(50, 50, 50));
 
 		update_position(x, y, width, height);
 	}
