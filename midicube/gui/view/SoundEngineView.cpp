@@ -27,11 +27,25 @@ std::vector<Control*> SoundEngineView::create(Frame& frame) {
 	int pane_width = (frame.get_width() - 15) / cols;
 	int pane_height = (frame.get_height() - 50 - 5) / rows;
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		//Background pane
 		int x = 10 + pane_width * (i % cols);
 		int y = 10 + pane_height * (i / cols);
 		Pane* pane = new Pane(sf::Color(120, 120, 120), x, y, pane_width - 5, pane_height - 5);
 
 		controls.push_back(pane);
+
+		//Title
+		Label* title = new Label("Channel " + std::to_string(i + 1), main_font, 18, x + 5, y + 5);
+		controls.push_back(title);
+
+		//Engine
+		Button* engine = new Button("Engine", main_font, 12, x + 5, y + 30, pane_width - 15, 30);
+		engine->rect.setFillColor(sf::Color(0, 180, 255));
+		controls.push_back(engine);
+
+		//Volume
+		Slider* volume = new Slider(0.3, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);
+		controls.push_back(volume);
 	}
 
 	/*//Pane
