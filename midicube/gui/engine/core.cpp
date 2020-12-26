@@ -17,6 +17,10 @@ void Control::update_position(int x, int y, int width, int height) {
 	this->y = y;
 	this->width = width;
 	this->height = height;
+
+	if (frame) {
+		frame->request_redraw();
+	}
 }
 
 bool Control::collides (int x, int y) {
@@ -69,6 +73,7 @@ void Frame::run(ViewController* v) {
 						break;
 					}
 				}
+				request_redraw();
 			}
 				break;
 			case sf::Event::MouseMoved:
@@ -92,15 +97,19 @@ void Frame::run(ViewController* v) {
 						break;
 					}
 				}
+				request_redraw();
 				break;
 			default:
 				break;
 			}
 		}
 		//Render
-		window.clear(sf::Color(80, 80, 80));
-		for (Control* control : controls) {
-			control->draw(window, selected == control);
+		if (redraw) {
+			window.clear(sf::Color(80, 80, 80));
+			for (Control* control : controls) {
+				control->draw(window, selected == control);
+			}
+			redraw = false;
 		}
 		window.display();
 	}

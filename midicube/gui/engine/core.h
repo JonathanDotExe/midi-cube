@@ -76,6 +76,7 @@ private:
 	std::vector<Control*> controls;
 
 	bool mouse_pressed = false;
+	bool redraw = true;
 	int last_mouse_x = 0;
 	int last_mouse_y = 0;
 	Control* selected;
@@ -92,6 +93,10 @@ public:
 
 	int get_width() const {
 		return width;
+	}
+
+	void request_redraw() {
+		redraw = true;
 	}
 };
 

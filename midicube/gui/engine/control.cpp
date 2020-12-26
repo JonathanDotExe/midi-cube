@@ -115,6 +115,6 @@ void CheckBox::draw(sf::RenderWindow& window, bool selected) {
 void CheckBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	if (button == sf::Mouse::Left) {
 		checked = !checked;
-		//TODO request redraw
+		frame->request_redraw();
 	}
 }
