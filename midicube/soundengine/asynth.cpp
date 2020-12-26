@@ -6,6 +6,7 @@
  */
 #include "asynth.h"
 #include <cmath>
+#include <iostream>
 
 #define OSC_INDEX(note_index,i) (note_index + i * SOUND_ENGINE_POLYPHONY)
 #define ENV_INDEX(note_index,i) (note_index + i * SOUND_ENGINE_POLYPHONY)
@@ -32,7 +33,6 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 	case UNISON_SAWS:
 	{
 		OscilatorEntity& osc = preset.oscilators.at(0);
-		osc.reset = true;
 		osc.unison_amount = 2;
 		osc.active = true;
 		osc.env = {0.0005, 0, 1, 0.003};
@@ -380,7 +380,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 				signal *= volume;
 				//Pan
 				double panning = apply_modulation(PANNING_SCALE, osc.panning, env_val, lfo_val, controls, note.velocity);
-				lsample += signal * (2 - panning);
+				lsample += signal * (1 - panning);
 				rsample += signal * (1 + panning);
 			}
 		}
@@ -432,6 +432,7 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 
 		process_note(channels, info, *status.latest_note, e, 0);
 	}
+
 	//Delay lines
 	if (preset.delay_mix) {
 		//Get samples
