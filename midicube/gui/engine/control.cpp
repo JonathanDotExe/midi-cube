@@ -17,6 +17,17 @@ void Label::draw(sf::RenderWindow& window, bool selected) {
 	window.draw(text);
 }
 
+//Pane
+void Pane::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	rect.setPosition(x, y);
+	rect.setSize(sf::Vector2<float>(width, height));
+}
+
+void Pane::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(rect);
+}
+
 //Button
 void Button::update_position(int x, int y, int width, int height) {
 	Control::update_position(x, y, width, height);

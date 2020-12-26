@@ -29,9 +29,28 @@ public:
 
 	virtual void draw(sf::RenderWindow& window, bool selected);
 
-	SELECTABLE
-
 	virtual ~Label() {
+
+	}
+
+};
+
+class Pane : public Control {
+
+public:
+	sf::RectangleShape rect;
+
+	Pane(sf::Color color, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
+		rect.setFillColor(color);
+
+		update_position(x, y, width, height);
+	}
+
+	virtual void update_position(int x, int y, int width, int height);
+
+	virtual void draw(sf::RenderWindow& window, bool selected);
+
+	virtual ~Pane() {
 
 	}
 
