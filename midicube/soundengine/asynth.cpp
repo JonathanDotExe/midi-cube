@@ -380,8 +380,8 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 				signal *= volume;
 				//Pan
 				double panning = apply_modulation(PANNING_SCALE, osc.panning, env_val, lfo_val, controls, note.velocity);
-				lsample += signal * (1 - panning);
-				rsample += signal * (1 + panning);
+				lsample += signal * (1 - fmax(0, panning));
+				rsample += signal * (1 - fmax(0, -panning));
 			}
 		}
 	}
