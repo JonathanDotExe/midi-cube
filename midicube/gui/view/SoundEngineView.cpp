@@ -16,6 +16,11 @@ SoundEngineView::SoundEngineView() : ViewController() {
 std::vector<Control*> SoundEngineView::create(Frame& frame) {
 	std::vector<Control*> controls;
 
+	//Label
+	Label* label = new Label("Demo", main_font, 24, 10, 300, 0, 0);
+	label->text.setFillColor(sf::Color::White);
+	controls.push_back(label);
+
 	//Button
 	Button* demo_button = new Button("Text", main_font, 12, frame.get_width()/2 - 80, frame.get_height()/2 - 15, 160, 30);
 	demo_button->set_on_click([]() {

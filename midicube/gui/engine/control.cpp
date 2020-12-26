@@ -8,6 +8,15 @@
 #include "control.h"
 #include <iostream>
 
+//Label
+void Label::update_position(int x, int y, int width, int height) {
+	text.setPosition(x, y);
+}
+
+void Label::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(text);
+}
+
 //Button
 void Button::update_position(int x, int y, int width, int height) {
 	Control::update_position(x, y, width, height);
