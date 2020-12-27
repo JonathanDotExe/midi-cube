@@ -73,5 +73,4 @@ public:
 	double progress(double value) const;
 };
 
-
 #endif /* MIDICUBE_UTIL_H_ */

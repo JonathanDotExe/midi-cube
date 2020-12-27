@@ -28,7 +28,7 @@ bool Control::collides (int x, int y) {
 }
 
 //Frame
-Frame::Frame(int width, int height, std::string title) {
+Frame::Frame(int width, int height, std::string title) : tasks(64) {
 	this->width = width;
 	this->height = height;
 	this->title = title;
@@ -49,6 +49,12 @@ void Frame::run(ViewController* v) {
 	window.setFramerateLimit(30);
 
 	while (window.isOpen()) {
+		//Perform tasks
+		std::function<void ()>* task;
+		while (tasks.pop(task)) {
+			(*task)();
+			delete task;
+		}
 		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -115,10 +121,19 @@ void Frame::run(ViewController* v) {
 	}
 }
 
+void Frame::run_task(std::function<void ()> task) {
+	tasks.push(new std::function<void ()>(task));
+}
+
 Frame::~Frame() {
 	delete view;
 	for (Control* control : controls) {
 		delete control;
+	}
+	//TODO memory leak possible maybe?
+	std::function<void ()>* task;
+	while (tasks.pop(task)) {
+		delete task;
 	}
 }
 

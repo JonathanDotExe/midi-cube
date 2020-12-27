@@ -9,6 +9,9 @@
 #define MIDICUBE_GUI_ENGINE_CORE_H_
 
 #include <SFML/Graphics.hpp>
+#include <boost/lockfree/queue.hpp>
+#include <functional>
+#include "../../util.h"
 
 #define SELECTABLE virtual bool selectable() const { return true; };
 
@@ -80,10 +83,18 @@ private:
 	int last_mouse_x = 0;
 	int last_mouse_y = 0;
 	Control* selected;
+
+	boost::lockfree::queue<std::function<void ()>*> tasks;
 public:
 	Frame(int width, int height, std::string title);
 
 	void run(ViewController* v);
+
+	void run_task(std::function<void ()> task);
+
+	void request_redraw() {
+		redraw = true;
+	}
 
 	~Frame();
 
@@ -95,9 +106,6 @@ public:
 		return width;
 	}
 
-	void request_redraw() {
-		redraw = true;
-	}
 };
 
 
