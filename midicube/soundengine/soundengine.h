@@ -179,7 +179,10 @@ public:
 
 };
 
-
+enum SoundEngineChannelProperty {
+	pChannelActive,
+	pChannelVolume
+};
 
 class SoundEngineChannel {
 private:
@@ -189,6 +192,7 @@ private:
 	std::atomic<ssize_t> engine_index{0};
 
 public:
+
 	VocoderPreset vocoder_preset;
 	std::atomic<double> volume{0.3};
 	std::atomic<bool> active{true};
