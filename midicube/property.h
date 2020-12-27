@@ -9,13 +9,28 @@
 #define MIDICUBE_GUI_ENGINE_PROPERTY_H_
 
 #include <cstddef>
+#include <functional>
 
 union PropertyValue {
 	int ival;
 	double dval;
 };
 
+class PropertyHolder;
+
+struct PropertyChange {
+	PropertyHolder* holder;
+	size_t property;
+	PropertyValue value;
+};
+
+/**
+ * Functions are intended to be called from the UI thread
+ */
 class PropertyHolder {
+
+public:
+	std::function<void(PropertyChange)> listener;
 
 	virtual void set(size_t prop, PropertyValue value) = 0;
 

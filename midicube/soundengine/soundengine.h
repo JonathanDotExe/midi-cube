@@ -15,6 +15,7 @@
 #include "../metronome.h"
 #include "../looper.h"
 #include "../effect/vocoder.h"
+#include "../property.h"
 #include <string>
 #include <array>
 #include <functional>
