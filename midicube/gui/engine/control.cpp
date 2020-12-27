@@ -7,6 +7,7 @@
 
 #include "control.h"
 #include <iostream>
+#include <cmath>
 
 //Label
 void Label::update_position(int x, int y, int width, int height) {
@@ -94,6 +95,12 @@ void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 	}
 }
 
+void Slider::bound_property_change(PropertyValue val) {
+	progress = fmin(fmax((val.dval - min)/(max - min), 0), 1);
+	update_position(this->x, this->y, width, height);
+}
+
+//CheckBox
 void CheckBox::update_position(int x, int y, int width, int height) {
 	Control::update_position(x, y, width, height);
 	rect.setPosition(x, y);
@@ -117,4 +124,9 @@ void CheckBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 		checked = !checked;
 		frame->request_redraw();
 	}
+}
+
+void CheckBox::bound_property_change(PropertyValue val) {
+	checked = val.bval;
+	frame->request_redraw();
 }

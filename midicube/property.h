@@ -11,10 +11,26 @@
 #include <cstddef>
 #include <functional>
 
+template<typename T>
+struct PropertyType {};
+
 union PropertyValue {
 	int ival;
 	double dval;
 	bool bval;
+
+	int get(PropertyType<int> t) {
+		return ival;
+	}
+
+	double get(PropertyType<double> t) {
+		return dval;
+	}
+
+	bool get(PropertyType<bool> t) {
+		return bval;
+	}
+
 };
 
 class PropertyHolder;

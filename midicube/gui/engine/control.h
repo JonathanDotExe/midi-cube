@@ -91,7 +91,7 @@ public:
 	}
 };
 
-class Slider : public Control {
+class Slider : public BindableControl {
 
 private:
 	double progress;
@@ -107,7 +107,7 @@ public:
 	sf::RectangleShape context_rect;
 	sf::Text text;
 
-	Slider(double value, double min, double max, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, double slider_width = 0.7, double button_height = 0.15) : Control (x, y, width, height) {
+	Slider(double value, double min, double max, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, double slider_width = 0.7, double button_height = 0.15) : BindableControl (x, y, width, height) {
 		this->min = min;
 		this->max = max;
 		this->progress = (value - min)/(max - min);
@@ -140,10 +140,12 @@ public:
 
 	}
 
+protected:
+	virtual void bound_property_change(PropertyValue val);
 };
 
 template <typename T>
-class DragBox : public Control {
+class DragBox : public BindableControl {
 
 private:
 	double progress;
@@ -155,7 +157,7 @@ public:
 	sf::Text text;
 	double drag_mul = 0.0025;
 
-	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
+	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
 		this->min = min;
 		this->max = max;
 		this->progress = (value - min)/(max - min);
@@ -205,9 +207,15 @@ public:
 
 	}
 
+protected:
+	virtual void bound_property_change(PropertyValue val) {
+		progress = fmin(fmax((val.get(PropertyType<T>{}) - min)/(max - min), 0), 1);
+		update_position(this->x, this->y, width, height);
+	}
+
 };
 
-class CheckBox : public Control {
+class CheckBox : public BindableControl {
 private:
 	bool checked = false;
 
@@ -216,7 +224,7 @@ public:
 	sf::RectangleShape inner_rect;
 	sf::Text text;
 
-	CheckBox(bool checked, std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
+	CheckBox(bool checked, std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
 		this->checked = checked;
 
 		this->text.setFont(font);
@@ -241,6 +249,9 @@ public:
 	virtual ~CheckBox() {
 
 	}
+
+protected:
+	virtual void bound_property_change(PropertyValue val);
 
 };
 
