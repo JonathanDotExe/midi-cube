@@ -6,6 +6,8 @@
  */
 
 #include "sfsynth.h"
+#include <filesystem>
+#include <boost/filesystem.hpp>
 
 SoundFontSynth::SoundFontSynth() {
 	settings = new_fluid_settings();
@@ -13,9 +15,11 @@ SoundFontSynth::SoundFontSynth() {
 
 	synth = new_fluid_synth(settings);
 
-	fluid_synth_sfload(synth, "./data/soundfonts/keys.sf2", 1);
+	for (const auto& f : boost::filesystem::directory_iterator("./data/soundfonts")) {
+		fluid_synth_sfload(synth, f.path().c_str(), 1);
+	}
 	fluid_synth_cc(synth, 0, 7, 127); //Set volume
-	//TODO use only one synth
+	//TODO use only one synth instance
 }
 
 void SoundFontSynth::midi_message(MidiMessage& msg, SampleInfo& info) {

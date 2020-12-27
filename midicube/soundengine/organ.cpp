@@ -111,6 +111,14 @@ static double apply_distortion(double sample, double overdrive, DistortionType t
 	return sample;
 }
 
+static double calc_vol (size_t keys, double comp_factor) {
+	double vol = 1;
+	for (size_t i = 2; i <= keys; ++i) {
+		vol += comp_factor * 1.0/(i - 1);
+	}
+	return vol;
+}
+
 void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
 	//Play organ sound
 	if (data.preset.rotary) {
@@ -137,6 +145,13 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 				horn_vol += data.tonewheels[i].curr_vol + data.tonewheels[i].dynamic_vol;
 			}
 			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
+		}
+
+		//Compress
+		if (status.pressed_notes && data.preset.multi_note_gain != 1) {
+			double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
+			bass_sample *= v;
+			horn_sample *= v;
 		}
 
 		//Gain
@@ -172,6 +187,12 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		for (size_t i = 0; i < data.tonewheels.size(); ++i) {
 			vol += data.tonewheels[i].curr_vol + data.tonewheels[i].dynamic_vol;
 			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
+		}
+		//Compress
+		if (status.pressed_notes && data.preset.multi_note_gain != 1) {
+			double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
+			vol *= v;
+			sample *= v;
 		}
 		//Overdrive
 		if (data.preset.overdrive) {

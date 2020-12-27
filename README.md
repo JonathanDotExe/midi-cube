@@ -17,6 +17,7 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * raygui licensed under zlib/libpng license (https://github.com/raysan5/raygui https://github.com/raysan5/raygui/blob/master/LICENSE)
 * JSON library by nlohman licensed under MIT license (https://github.com/nlohmann/json https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
 * FluidSynth API for playing soundfonts licensed under LGPL-2.1 (https://github.com/FluidSynth/fluidsynth https://github.com/FluidSynth/fluidsynth/blob/master/LICENSE)
+* Boost licensed under the Boost Software License (https://github.com/boostorg/boost https://github.com/boostorg/boost/blob/master/LICENSE_1_0.txt)
 
 ##Used Assets
 * Liberation font licensed onder the Open Font License (https://github.com/liberationfonts/liberation-fonts/tree/2.1.1 https://github.com/liberationfonts/liberation-fonts/blob/master/LICENSE)
@@ -37,3 +38,4 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * Artivle about soft clipping distortion by Eric Tarr (https://www.hackaudio.com/digital-signal-processing/distortion-effects/soft-clipping/)
 * Very helpful tutorial on implementing resonant filters by Martin Finke (http://www.martin-finke.de/blog/articles/audio-plugins-013-filter/)
 * http://www.dma.ufg.ac.at/app/link/Grundlagen%3AAudio/module/8086?step=all
+* https://electricdruid.net/technical-aspects-of-the-hammond-organ/
