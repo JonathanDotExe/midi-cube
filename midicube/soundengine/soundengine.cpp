@@ -276,6 +276,30 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngin
 	}
 }
 
+PropertyValue SoundEngineChannel::get(size_t prop) {
+	PropertyValue value = {0};
+	switch (prop) {
+	case SoundEngineChannelProperty::pChannelActive:
+		value.bval = active;
+		break;
+	case SoundEngineChannelProperty::pChannelVolume:
+		value.dval = volume;
+		break;
+	}
+	return value;
+}
+
+void SoundEngineChannel::set(size_t prop, PropertyValue value) {
+	switch (prop) {
+	case SoundEngineChannelProperty::pChannelActive:
+		active = value.bval;
+		break;
+	case SoundEngineChannelProperty::pChannelVolume:
+		volume = value.dval;
+		break;
+	}
+}
+
 /**
  * May only be called from GUI thread after GUI has started
  */
@@ -378,3 +402,4 @@ SoundEngineDevice::~SoundEngineDevice() {
 	}
 	sound_engines.clear();
 }
+

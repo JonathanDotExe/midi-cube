@@ -185,7 +185,7 @@ enum SoundEngineChannelProperty {
 	pChannelVolume
 };
 
-class SoundEngineChannel {
+class SoundEngineChannel : PropertyHolder {
 private:
 	Arpeggiator arp;
 	Looper looper;
@@ -203,6 +203,10 @@ public:
 	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine);
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome, SoundEngine& engine);
+
+	PropertyValue get(size_t prop);
+
+	void set(size_t prop, PropertyValue value);
 
 	SoundEngine* get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel);
 

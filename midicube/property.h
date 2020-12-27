@@ -14,6 +14,7 @@
 union PropertyValue {
 	int ival;
 	double dval;
+	bool bval;
 };
 
 class PropertyHolder;
