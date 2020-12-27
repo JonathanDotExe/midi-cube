@@ -10,7 +10,7 @@
 #include <iostream>
 #include "../../soundengine/soundengine.h"
 
-SoundEngineView::SoundEngineView() : ViewController() {
+SoundEngineView::SoundEngineView(MidiCube& c) : ViewController(), cube(c) {
 
 }
 
@@ -48,7 +48,7 @@ std::vector<Control*> SoundEngineView::create(Frame& frame) {
 		controls.push_back(volume);
 	}
 
-	frame.run_task([]() {
+	cube.run_task([]() {
 		std::cout << "Callback" << std::endl;
 	});
 

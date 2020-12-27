@@ -11,10 +11,14 @@
 #include "../engine/core.h"
 #include "../engine/control.h"
 #include "resources.h"
+#include "../../midicube.h"
 
 class SoundEngineView : public ViewController {
+private:
+	MidiCube& cube;
+
 public:
-	SoundEngineView();
+	SoundEngineView(MidiCube& cube);
 
 	virtual std::vector<Control*> create(Frame& frame);
 

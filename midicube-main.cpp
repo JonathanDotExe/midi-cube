@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 		//View
 		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation");
 		//Run frame
-		frame.run(new SoundEngineView());
+		frame.run(new SoundEngineView(*ptr.cube));
 	}
 	catch (AudioException& e) {
 		cerr << e.what() << endl;
