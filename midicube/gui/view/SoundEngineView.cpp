@@ -48,10 +48,6 @@ std::vector<Control*> SoundEngineView::create(Frame& frame) {
 		controls.push_back(volume);
 	}
 
-	cube.run_task([]() {
-		std::cout << "Callback" << std::endl;
-	});
-
 	/*//Pane
 	Pane* pane = new Pane(sf::Color(220, 220, 220), 0, 250, 300, 300);
 	controls.push_back(pane);
