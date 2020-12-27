@@ -12,7 +12,7 @@ static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleIn
 	((MidiCube*) user_data)->process(channels, info);
 }
 
-MidiCube::MidiCube() {
+MidiCube::MidiCube() : tasks(64){
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -67,6 +67,13 @@ void MidiCube::init() {
 }
 
 void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+	//Tasks
+	std::function<void ()>* task;
+	while (tasks.pop(task)) {
+		(*task)();
+		delete task;	//TODO make own garbage collector task
+	}
+	//Process
 	engine.process_sample(channels, info);
 }
 
@@ -117,10 +124,21 @@ void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 		}
 	}
 }
+
+void MidiCube::run_task(std::function<void ()> task) {
+	tasks.push(new std::function<void ()>(task));
+}
+
+
 MidiCube::~MidiCube() {
 	audio_handler.close();
 	for (MidiCubeInput in : inputs) {
 		delete in.in;
 	}
 	inputs.clear();
+	//TODO memory leak possible maybe?
+	std::function<void ()>* task;
+	while (tasks.pop(task)) {
+		delete task;
+	}
 }
