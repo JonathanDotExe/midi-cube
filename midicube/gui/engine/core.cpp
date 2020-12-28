@@ -57,6 +57,8 @@ void Frame::run(ViewController* v) {
 			(*task)();
 			delete task;
 		}
+		//Poll property changes
+
 		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {

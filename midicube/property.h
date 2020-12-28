@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <boost/lockfree/queue.hpp>
 
 template<typename T>
 struct PropertyType {};
@@ -47,7 +48,8 @@ struct PropertyChange {
 class PropertyHolder {
 
 public:
-	std::function<void(PropertyChange)> listener;
+
+	boost::lockfree::queue<PropertyChange>* changes = nullptr;
 
 	virtual void set(size_t prop, PropertyValue value) = 0;
 
@@ -56,8 +58,17 @@ public:
 	virtual ~PropertyHolder() {
 
 	}
-};
 
+protected:
+
+	inline void submit_change(size_t prop, PropertyValue value);
+
+	inline void submit_change(size_t prop, int value);
+
+	inline void submit_change(size_t prop, double value);
+
+	inline void submit_change(size_t prop, bool value);
+};
 
 
 #endif /* MIDICUBE_GUI_ENGINE_PROPERTY_H_ */
