@@ -40,11 +40,15 @@ Scene SoundEngineView::create(Frame& frame) {
 		controls.push_back(pane);
 
 		//Title
-		Label* title = new Label("Channel " + std::to_string(i + 1), main_font, 18, x + 5, y + 5);
+		Label* title = new Label("Channel " + std::to_string(i + 1), main_font, 16, x + 5, y + 5);
 		controls.push_back(title);
 
+		//Active
+		CheckBox* active = new CheckBox(false, "", main_font, 12, x + pane_width - 30, y + 5, 20, 20);
+		active->bind(&channel, SoundEngineChannelProperty::pChannelActive);
+		controls.push_back(active);
 		//Engine
-		Button* engine = new Button("Engine", main_font, 12, x + 5, y + 30, pane_width - 15, 30);
+		Button* engine = new Button("Engine", main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
 		engine->rect.setFillColor(sf::Color(0, 180, 255));
 		controls.push_back(engine);
 
