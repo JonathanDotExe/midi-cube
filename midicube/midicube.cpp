@@ -67,6 +67,11 @@ void MidiCube::init() {
 }
 
 void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+	//Changes
+	PropertyChange change;
+	while (changes.pop(change)) {
+		change.holder->set(change.property, change.value);
+	}
 	//Tasks
 	std::function<void ()>* task;
 	while (tasks.pop(task)) {
@@ -129,6 +134,9 @@ void MidiCube::run_task(std::function<void ()> task) {
 	tasks.push(new std::function<void ()>(task));
 }
 
+void MidiCube::perform_change(PropertyChange change) {
+	changes.push(change);
+}
 
 MidiCube::~MidiCube() {
 	audio_handler.close();

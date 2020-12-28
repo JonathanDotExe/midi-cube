@@ -35,6 +35,7 @@ class MidiCube {
 private:
 	AudioHandler audio_handler;
 	std::vector<MidiCubeInput> inputs;
+	boost::lockfree::queue<PropertyChange> changes;
 	boost::lockfree::queue<std::function<void ()>*> tasks;
 public:
 	std::array<ChannelSource, SOUND_ENGINE_MIDI_CHANNELS> channels;
@@ -44,6 +45,7 @@ public:
 	void init();
 	inline void process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 	void run_task(std::function<void ()> task);
+	void perform_change(PropertyChange change);
 	std::vector<MidiCubeInput> get_inputs();
 	void midi_callback(MidiMessage& message, size_t input);
 	~MidiCube();
