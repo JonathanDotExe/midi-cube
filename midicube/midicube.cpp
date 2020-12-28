@@ -12,7 +12,7 @@ static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleIn
 	((MidiCube*) user_data)->process(channels, info);
 }
 
-MidiCube::MidiCube() : tasks(64){
+MidiCube::MidiCube() : changes(128), tasks(64) {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 

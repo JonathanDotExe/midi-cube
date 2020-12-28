@@ -91,6 +91,8 @@ void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 	}
 
 	if (old_prog != progress) {
+		double value = (max - min) * progress + min;
+		send_change(value);
 		update_position(this->x, this->y, width, height);
 	}
 }
@@ -122,6 +124,7 @@ void CheckBox::draw(sf::RenderWindow& window, bool selected) {
 void CheckBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	if (button == sf::Mouse::Left) {
 		checked = !checked;
+		send_change(checked);
 		frame->request_redraw();
 	}
 }

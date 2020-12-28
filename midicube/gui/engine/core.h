@@ -13,6 +13,7 @@
 #include <functional>
 #include "../../util.h"
 #include "../../property.h"
+#include "../../midicube.h"
 
 #define SELECTABLE virtual bool selectable() const { return true; };
 
@@ -62,38 +63,6 @@ public:
 
 };
 
-class BindableControl : public Control{
-
-protected:
-
-	virtual void bound_property_change(PropertyValue val) = 0;
-
-public:
-	PropertyHolder* holder = nullptr;
-	size_t property = 0;
-
-	BindableControl(int x = 0, int y = 0, int width = 0, int height = 0) : Control(x, y, width, height) {
-
-	}
-
-	void bind(PropertyHolder* holder, size_t property) {
-		this->holder = holder;
-		this->property = property;
-	}
-
-	virtual void property_change(PropertyChange change) {
-		Control::property_change(change);
-		if (change.holder == holder && change.property == property) {
-			bound_property_change(change.value);
-		}
-	}
-
-	virtual ~BindableControl() {
-
-	}
-
-};
-
 struct Scene {
 	std::vector<Control*> controls;
 	std::vector<PropertyHolder*> prop_holders;
@@ -133,8 +102,10 @@ private:
 
 	boost::lockfree::queue<PropertyChange> changes;
 	boost::lockfree::queue<std::function<void ()>*> tasks;
+
 public:
-	Frame(int width, int height, std::string title);
+	MidiCube& cube;
+	Frame(MidiCube& cube, int width, int height, std::string title);
 
 	void run(ViewController* v);
 
@@ -158,7 +129,68 @@ public:
 
 };
 
+class BindableControl : public Control{
 
+protected:
+
+	virtual void bound_property_change(PropertyValue val) = 0;
+
+public:
+	PropertyHolder* holder = nullptr;
+	size_t property = 0;
+
+	BindableControl(int x = 0, int y = 0, int width = 0, int height = 0) : Control(x, y, width, height) {
+
+	}
+
+	void bind(PropertyHolder* holder, size_t property) {
+		this->holder = holder;
+		this->property = property;
+	}
+
+	virtual void property_change(PropertyChange change) {
+		Control::property_change(change);
+		if (change.holder == holder && change.property == property) {
+			bound_property_change(change.value);
+		}
+	}
+
+	virtual ~BindableControl() {
+
+	}
+
+protected:
+
+	inline void send_change(PropertyValue value);
+
+	inline void send_change(int value);
+
+	inline void send_change(double value);
+
+	inline void send_change(bool value);
+};
+
+void BindableControl::send_change(PropertyValue value) {
+	frame->cube.perform_change({holder, property, value});
+}
+
+void BindableControl::send_change(int value) {
+	PropertyValue val;
+	val.ival = value;
+	send_change(val);
+}
+
+void BindableControl::send_change(double value) {
+	PropertyValue val;
+	val.dval = value;
+	send_change(val);
+}
+
+void BindableControl::send_change(bool value) {
+	PropertyValue val;
+	val.bval = value;
+	send_change(val);
+}
 
 
 #endif /* MIDICUBE_GUI_ENGINE_CORE_H_ */

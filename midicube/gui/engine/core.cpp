@@ -29,7 +29,7 @@ bool Control::collides (int x, int y) {
 }
 
 //Frame
-Frame::Frame(int width, int height, std::string title) : changes(512), tasks(64) {
+Frame::Frame(MidiCube& c, int width, int height, std::string title) : changes(512), tasks(64), cube(c) {
 	this->width = width;
 	this->height = height;
 	this->title = title;

@@ -197,6 +197,8 @@ public:
 		}
 
 		if (old_val != (progress * (max - min) + min)) {
+			T value = progress * (max - min) + min;
+			send_change(value);
 			update_position(this->x, this->y, width, height);
 		}
 	}
