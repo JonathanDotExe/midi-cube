@@ -235,35 +235,37 @@ SoundEngineChannel::SoundEngineChannel() {
 	engine_index = -1;
 }
 
-void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome, SoundEngine& engine) {
-	std::array<double, OUTPUT_CHANNELS> ch = {};
+void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome, SoundEngine* engine) {
 	//Properties
 	if (update_request) {
 		submit_change(SoundEngineChannelProperty::pChannelActive, active);
 		submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
 		update_request = false;
 	}
-	//Arpeggiator
-	if (arp.on) {
-		arp.apply(info,
-		[&engine](SampleInfo& i, unsigned int note, double velocity) {
-			engine.press_note(i, note, velocity);
-		},
-		[&engine](SampleInfo& i, unsigned int note) {
-			engine.release_note(i, note);
-		});
-	}
-	//Process
-	if (active) {
-		engine.process_sample(ch, info);
-	}
-	//Vocoder
-	vocoder.apply(ch[0], ch[1], info.input_sample, vocoder_preset, info);
-	//Looper
-	looper.apply(ch, metronome, info);
-	//Playback
-	for (size_t i = 0; i < channels.size(); ++i) {
-		channels[i] += (ch[i] * volume);
+	if (engine) {
+		std::array<double, OUTPUT_CHANNELS> ch = {};
+		//Arpeggiator
+		if (arp.on) {
+			arp.apply(info,
+			[engine](SampleInfo& i, unsigned int note, double velocity) {
+				engine->press_note(i, note, velocity);
+			},
+			[engine](SampleInfo& i, unsigned int note) {
+				engine->release_note(i, note);
+			});
+		}
+		//Process
+		if (active) {
+			engine->process_sample(ch, info);
+		}
+		//Vocoder
+		vocoder.apply(ch[0], ch[1], info.input_sample, vocoder_preset, info);
+		//Looper
+		looper.apply(ch, metronome, info);
+		//Playback
+		for (size_t i = 0; i < channels.size(); ++i) {
+			channels[i] += (ch[i] * volume);
+		}
 	}
 }
 
@@ -354,9 +356,7 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
 		SoundEngine* engine = ch.get_engine(sound_engines, i);
-		if (engine) {
-			ch.process_sample(channels, info, metronome, *engine);
-		}
+		ch.process_sample(channels, info, metronome, engine);
 	}
 	//Metronome
 	if (play_metronome) {

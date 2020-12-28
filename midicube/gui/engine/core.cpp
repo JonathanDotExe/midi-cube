@@ -6,6 +6,7 @@
  */
 
 #include "core.h"
+#include <iostream>
 
 //Control
 Control::Control(int x, int y, int width, int height) {
