@@ -29,7 +29,7 @@ bool Control::collides (int x, int y) {
 }
 
 //Frame
-Frame::Frame(MidiCube& c, int width, int height, std::string title) : changes(512), tasks(64), cube(c) {
+Frame::Frame(MidiCube& c, int width, int height, std::string title) : changes(512), cube(c) {
 	this->width = width;
 	this->height = height;
 	this->title = title;
@@ -58,12 +58,6 @@ void Frame::run(ViewController* v) {
 	window.setFramerateLimit(30);
 
 	while (window.isOpen()) {
-		//Perform tasks
-		std::function<void ()>* task;
-		while (tasks.pop(task)) {
-			(*task)();
-			delete task;
-		}
 		//Poll property changes
 		PropertyChange change;
 		while (changes.pop(change)) {
@@ -143,11 +137,6 @@ void Frame::property_change(PropertyChange change) {
 	}
 	view->property_change(change);
 }
-
-void Frame::run_task(std::function<void ()> task) {
-	tasks.push(new std::function<void ()>(task));
-}
-
 Frame::~Frame() {
 	delete view;
 	for (Control* control : controls) {
@@ -155,11 +144,6 @@ Frame::~Frame() {
 	}
 	for (PropertyHolder* holder : prop_holders) {
 		holder->changes = nullptr;
-	}
-	//TODO memory leak possible maybe?
-	std::function<void ()>* task;
-	while (tasks.pop(task)) {
-		delete task;
 	}
 }
 

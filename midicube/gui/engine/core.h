@@ -101,15 +101,12 @@ private:
 	Control* selected;
 
 	boost::lockfree::queue<PropertyChange> changes;
-	boost::lockfree::queue<std::function<void ()>*> tasks;
 
 public:
 	MidiCube& cube;
 	Frame(MidiCube& cube, int width, int height, std::string title);
 
 	void run(ViewController* v);
-
-	void run_task(std::function<void ()> task);
 
 	virtual void property_change(PropertyChange change);
 
