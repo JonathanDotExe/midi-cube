@@ -131,6 +131,7 @@ private:
 	int last_mouse_y = 0;
 	Control* selected;
 
+	boost::lockfree::queue<PropertyChange> changes;
 	boost::lockfree::queue<std::function<void ()>*> tasks;
 public:
 	Frame(int width, int height, std::string title);

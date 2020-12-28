@@ -28,7 +28,7 @@ bool Control::collides (int x, int y) {
 }
 
 //Frame
-Frame::Frame(int width, int height, std::string title) : tasks(64) {
+Frame::Frame(int width, int height, std::string title) : changes(512), tasks(64) {
 	this->width = width;
 	this->height = height;
 	this->title = title;
@@ -40,12 +40,17 @@ Frame::Frame(int width, int height, std::string title) : tasks(64) {
 void Frame::run(ViewController* v) {
 	//Init view
 	this->view = v;
+	//Controls
 	Scene scene = view->create(*this);
 	for (Control* control : scene.controls) {
 		control->frame = this;
 		controls.push_back(control);
 	}
+	//Prop holders
 	prop_holders = scene.prop_holders;
+	for (PropertyHolder* holder : prop_holders) {
+		holder->changes = &changes;
+	}
 	//Main loop
 	sf::RenderWindow window(sf::VideoMode(width, height), title);
 	window.setFramerateLimit(30);
@@ -58,7 +63,12 @@ void Frame::run(ViewController* v) {
 			delete task;
 		}
 		//Poll property changes
-
+		PropertyChange change;
+		while (changes.pop(change)) {
+			for (Control* control : controls) {
+				control->property_change(change);
+			}
+		}
 		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -140,6 +150,9 @@ Frame::~Frame() {
 	delete view;
 	for (Control* control : controls) {
 		delete control;
+	}
+	for (PropertyHolder* holder : prop_holders) {
+		holder->changes = nullptr;
 	}
 	//TODO memory leak possible maybe?
 	std::function<void ()>* task;
