@@ -14,8 +14,9 @@ SoundEngineView::SoundEngineView(MidiCube& c) : ViewController(), cube(c) {
 
 }
 
-std::vector<Control*> SoundEngineView::create(Frame& frame) {
+Scene SoundEngineView::create(Frame& frame) {
 	std::vector<Control*> controls;
+	std::vector<PropertyHolder*> holders;
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -78,7 +79,7 @@ std::vector<Control*> SoundEngineView::create(Frame& frame) {
 	CheckBox* check_box = new CheckBox(true, "Demo Checkbox", main_font, 12, 250, 10, 30, 30);
 	controls.push_back(check_box);*/
 
-	return controls;
+	return {controls, holders};
 }
 
 SoundEngineView::~SoundEngineView() {

@@ -40,10 +40,12 @@ Frame::Frame(int width, int height, std::string title) : tasks(64) {
 void Frame::run(ViewController* v) {
 	//Init view
 	this->view = v;
-	for (Control* control : view->create(*this)) {
+	Scene scene = view->create(*this);
+	for (Control* control : scene.controls) {
 		control->frame = this;
 		controls.push_back(control);
 	}
+	prop_holders = scene.prop_holders;
 	//Main loop
 	sf::RenderWindow window(sf::VideoMode(width, height), title);
 	window.setFramerateLimit(30);
@@ -119,6 +121,13 @@ void Frame::run(ViewController* v) {
 		}
 		window.display();
 	}
+}
+
+void Frame::property_change(PropertyChange change) {
+	for (Control* control : controls) {
+		control->property_change(change);
+	}
+	view->property_change(change);
 }
 
 void Frame::run_task(std::function<void ()> task) {

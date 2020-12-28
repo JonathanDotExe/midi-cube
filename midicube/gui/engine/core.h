@@ -94,13 +94,22 @@ public:
 
 };
 
+struct Scene {
+	std::vector<Control*> controls;
+	std::vector<PropertyHolder*> prop_holders;
+};
+
 class ViewController {
 public:
 	ViewController() {
 
 	}
 
-	virtual std::vector<Control*> create(Frame& frame) = 0;
+	virtual Scene create(Frame& frame) = 0;
+
+	virtual void property_change(PropertyChange change) {
+
+	}
 
 	virtual ~ViewController() {
 
@@ -114,6 +123,7 @@ private:
 	std::string title;
 	ViewController* view;
 	std::vector<Control*> controls;
+	std::vector<PropertyHolder*> prop_holders;
 
 	bool mouse_pressed = false;
 	bool redraw = true;
@@ -129,11 +139,13 @@ public:
 
 	void run_task(std::function<void ()> task);
 
+	virtual void property_change(PropertyChange change);
+
 	void request_redraw() {
 		redraw = true;
 	}
 
-	~Frame();
+	virtual ~Frame();
 
 	int get_height() const {
 		return height;

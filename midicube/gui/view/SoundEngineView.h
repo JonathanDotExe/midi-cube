@@ -20,7 +20,7 @@ private:
 public:
 	SoundEngineView(MidiCube& cube);
 
-	virtual std::vector<Control*> create(Frame& frame);
+	virtual Scene create(Frame& frame);
 
 	virtual ~SoundEngineView();
 };
