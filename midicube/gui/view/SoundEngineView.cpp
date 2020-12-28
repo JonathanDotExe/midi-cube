@@ -22,12 +22,16 @@ Scene SoundEngineView::create(Frame& frame) {
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
 
+	SoundEngineDevice& sound_engine = cube.engine;
+
 	//Channels
 	int rows = 2;
 	int cols = SOUND_ENGINE_MIDI_CHANNELS / rows;
 	int pane_width = (frame.get_width() - 15) / cols;
 	int pane_height = (frame.get_height() - 50 - 5) / rows;
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		SoundEngineChannel& channel = sound_engine.get_channel(i);
+		holders.push_back(&channel);
 		//Background pane
 		int x = 10 + pane_width * (i % cols);
 		int y = 10 + pane_height * (i / cols);
@@ -45,7 +49,8 @@ Scene SoundEngineView::create(Frame& frame) {
 		controls.push_back(engine);
 
 		//Volume
-		Slider* volume = new Slider(0.3, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);
+		Slider* volume = new Slider(0, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);
+		volume->bind(&channel, SoundEngineChannelProperty::pChannelVolume);
 		controls.push_back(volume);
 	}
 

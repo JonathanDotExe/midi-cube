@@ -185,7 +185,7 @@ enum SoundEngineChannelProperty {
 	pChannelVolume
 };
 
-class SoundEngineChannel : PropertyHolder {
+class SoundEngineChannel : public PropertyHolder {
 private:
 	Arpeggiator arp;
 	Looper looper;
