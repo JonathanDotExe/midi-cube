@@ -50,6 +50,7 @@ void Frame::run(ViewController* v) {
 	prop_holders = scene.prop_holders;
 	for (PropertyHolder* holder : prop_holders) {
 		holder->changes = &changes;
+		holder->request_update();
 	}
 	//Main loop
 	sf::RenderWindow window(sf::VideoMode(width, height), title);

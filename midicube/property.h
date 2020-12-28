@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <atomic>
 #include <boost/lockfree/queue.hpp>
 
 template<typename T>
@@ -51,6 +52,10 @@ public:
 
 	boost::lockfree::queue<PropertyChange>* changes = nullptr;
 
+	void request_update() {
+		update_request = true;
+	}
+
 	virtual void set(size_t prop, PropertyValue value) = 0;
 
 	virtual PropertyValue get(size_t prop) = 0;
@@ -60,6 +65,7 @@ public:
 	}
 
 protected:
+	std::atomic<bool> update_request;
 
 	inline void submit_change(size_t prop, PropertyValue value);
 
@@ -69,6 +75,30 @@ protected:
 
 	inline void submit_change(size_t prop, bool value);
 };
+
+void PropertyHolder::submit_change(size_t prop, PropertyValue value) {
+	if (changes) {
+		changes->push({this, prop, value});
+	}
+}
+
+void PropertyHolder::submit_change(size_t prop, int value) {
+	PropertyValue val;
+	val.ival = value;
+	submit_change(prop, val);
+}
+
+void PropertyHolder::submit_change(size_t prop, double value) {
+	PropertyValue val;
+	val.dval = value;
+	submit_change(prop, val);
+}
+
+void PropertyHolder::submit_change(size_t prop, bool value) {
+	PropertyValue val;
+	val.bval = value;
+	submit_change(prop, val);
+}
 
 
 #endif /* MIDICUBE_GUI_ENGINE_PROPERTY_H_ */

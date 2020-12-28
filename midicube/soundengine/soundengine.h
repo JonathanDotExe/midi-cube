@@ -195,8 +195,8 @@ private:
 public:
 
 	VocoderPreset vocoder_preset;
-	std::atomic<double> volume{0.3};
-	std::atomic<bool> active{true};
+	double volume{0.3};
+	bool active{true};
 
 	SoundEngineChannel();
 

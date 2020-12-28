@@ -237,6 +237,13 @@ SoundEngineChannel::SoundEngineChannel() {
 
 void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome, SoundEngine& engine) {
 	std::array<double, OUTPUT_CHANNELS> ch = {};
+	//Properties
+	if (update_request) {
+		submit_change(SoundEngineChannelProperty::pChannelActive, active);
+		submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
+		update_request = false;
+	}
+	//Arpeggiator
 	if (arp.on) {
 		arp.apply(info,
 		[&engine](SampleInfo& i, unsigned int note, double velocity) {
@@ -246,6 +253,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 			engine.release_note(i, note);
 		});
 	}
+	//Process
 	if (active) {
 		engine.process_sample(ch, info);
 	}
