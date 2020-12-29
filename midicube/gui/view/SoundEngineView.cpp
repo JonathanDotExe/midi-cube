@@ -8,7 +8,6 @@
 #include "SoundEngineView.h"
 
 #include <iostream>
-#include "../../soundengine/soundengine.h"
 
 SoundEngineView::SoundEngineView(MidiCube& c) : ViewController(), cube(c) {
 
@@ -23,6 +22,10 @@ Scene SoundEngineView::create(Frame& frame) {
 	controls.push_back(bg);
 
 	SoundEngineDevice& sound_engine = cube.engine;
+	//Sound engines
+	for (SoundEngineBank* engine : sound_engine.get_sound_engines()) {
+		engine_names.push_back(engine->get_name());
+	}
 
 	//Channels
 	int rows = 2;
@@ -51,6 +54,7 @@ Scene SoundEngineView::create(Frame& frame) {
 		Button* engine = new Button("Engine", main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
 		engine->rect.setFillColor(sf::Color(0, 180, 255));
 		controls.push_back(engine);
+		engine_buttons[i] = engine;
 
 		//Volume
 		Slider* volume = new Slider(0, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);
@@ -58,40 +62,21 @@ Scene SoundEngineView::create(Frame& frame) {
 		controls.push_back(volume);
 	}
 
-	/*//Pane
-	Pane* pane = new Pane(sf::Color(220, 220, 220), 0, 250, 300, 300);
-	controls.push_back(pane);
-
-	//Label
-	Label* label = new Label("Demo", main_font, 24, 10, 300, 0, 0);
-	controls.push_back(label);
-
-	//Button
-	Button* demo_button = new Button("Text", main_font, 12, frame.get_width()/2 - 80, frame.get_height()/2 - 15, 160, 30);
-	demo_button->set_on_click([]() {
-		std::cout << "Click" << std::endl;
-	});
-	controls.push_back(demo_button);
-
-	//Slider
-	Slider* slider = new Slider(0.3, 0, 1, main_font, 10, 10, 40, 200);
-	controls.push_back(slider);
-
-	//DragBox
-	DragBox<int>* int_box = new DragBox<int>(5, 0, 12, main_font, 18, 80, 10, 60, 40);
-	controls.push_back(int_box);
-
-	DragBox<double>* double_box = new DragBox<double>(2, 0, 12, main_font, 18, 150, 10, 80, 40);
-	controls.push_back(double_box);
-
-	//Check Box
-	CheckBox* check_box = new CheckBox(true, "Demo Checkbox", main_font, 12, 250, 10, 30, 30);
-	controls.push_back(check_box);*/
-
 	return {controls, holders};
+}
+
+
+void SoundEngineView::property_change(PropertyChange change) {
+	if (change.property == SoundEngineChannelProperty::pChannelSoundEngine) {
+		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+			SoundEngineChannel& channel = cube.engine.get_channel(i);
+			if (&channel == change.holder) {
+				engine_buttons[i]->update_text(change.value.ival < 0 ? "None" : engine_names[change.value.ival]);
+			}
+		}
+	}
 }
 
 SoundEngineView::~SoundEngineView() {
 
 }
-

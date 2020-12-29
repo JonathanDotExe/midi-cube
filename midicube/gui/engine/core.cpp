@@ -61,6 +61,7 @@ void Frame::run(ViewController* v) {
 		//Poll property changes
 		PropertyChange change;
 		while (changes.pop(change)) {
+			view->property_change(change);
 			for (Control* control : controls) {
 				control->property_change(change);
 			}

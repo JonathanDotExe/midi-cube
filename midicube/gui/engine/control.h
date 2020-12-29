@@ -80,6 +80,8 @@ public:
 
 	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
 
+	void update_text(std::string text);
+
 	SELECTABLE
 
 	virtual ~Button() {

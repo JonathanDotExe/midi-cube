@@ -182,7 +182,8 @@ public:
 
 enum SoundEngineChannelProperty {
 	pChannelActive,
-	pChannelVolume
+	pChannelVolume,
+	pChannelSoundEngine
 };
 
 class SoundEngineChannel : public PropertyHolder {
@@ -190,7 +191,7 @@ private:
 	Arpeggiator arp;
 	Looper looper;
 	VocoderEffect vocoder;
-	std::atomic<ssize_t> engine_index{0};
+	ssize_t engine_index{0};
 
 public:
 

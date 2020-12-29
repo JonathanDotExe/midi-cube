@@ -240,6 +240,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 	if (update_request) {
 		submit_change(SoundEngineChannelProperty::pChannelActive, active);
 		submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
+		submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) engine_index);
 		update_request = false;
 	}
 	if (engine) {
@@ -288,24 +289,30 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngin
 
 PropertyValue SoundEngineChannel::get(size_t prop) {
 	PropertyValue value = {0};
-	switch (prop) {
+	switch ((SoundEngineChannelProperty) prop) {
 	case SoundEngineChannelProperty::pChannelActive:
 		value.bval = active;
 		break;
 	case SoundEngineChannelProperty::pChannelVolume:
 		value.dval = volume;
 		break;
+	case SoundEngineChannelProperty::pChannelSoundEngine:
+		value.ival = engine_index;
+		break;
 	}
 	return value;
 }
 
 void SoundEngineChannel::set(size_t prop, PropertyValue value) {
-	switch (prop) {
+	switch ((SoundEngineChannelProperty) prop) {
 	case SoundEngineChannelProperty::pChannelActive:
 		active = value.bval;
 		break;
 	case SoundEngineChannelProperty::pChannelVolume:
 		volume = value.dval;
+		break;
+	case SoundEngineChannelProperty::pChannelSoundEngine:
+		engine_index = value.ival;
 		break;
 	}
 }

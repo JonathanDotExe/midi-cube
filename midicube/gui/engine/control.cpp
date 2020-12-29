@@ -48,6 +48,11 @@ void Button::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	}
 }
 
+void Button::update_text(std::string text) {
+	this->text.setString(text);
+	update_position(x, y, width, height);
+}
+
 //Slider
 void Slider::update_position(int x, int y, int width, int height) {
 	Control::update_position(x, y, width, height);
