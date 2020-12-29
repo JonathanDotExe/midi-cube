@@ -62,6 +62,18 @@ void MidiCube::init() {
 	arp.preset.pattern = ArpeggiatorPattern::UP;
 	arp.preset.value = 1;
 	arp.metronome.set_bpm(440);
+
+	//Default engines
+	engine.channels[0].active = true;
+	engine.channels[0].set_engine(0);
+
+	engine.channels[9].active = true;
+	engine.channels[9].set_engine(3);
+
+	for (size_t i = 0; i < engine.channels.size(); ++i) {
+		engine.channels[i].source.channel = i;
+		engine.channels[i].source.input = 1;
+	}
 	//Init audio
 	audio_handler.init();
 }

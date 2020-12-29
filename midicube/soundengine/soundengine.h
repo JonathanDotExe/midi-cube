@@ -217,7 +217,7 @@ private:
 public:
 	VocoderPreset vocoder_preset;
 	double volume{0.3};
-	bool active{true};
+	bool active{false};
 	ChannelSource source;
 	Arpeggiator arp;
 	Looper looper;
