@@ -24,7 +24,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	controls.push_back(bg);
 
 	//Title
-	Label* title = new Label("Channel " + std::to_string(channel_index), main_font, 18, 5, 5);
+	Label* title = new Label("Channel " + std::to_string(channel_index + 1), main_font, 18, 5, 5);
 	controls.push_back(title);
 
 

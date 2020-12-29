@@ -39,23 +39,12 @@ Frame::Frame(MidiCube& c, int width, int height, std::string title) : changes(51
 }
 
 void Frame::run(ViewController* v) {
-	//Init view
-	this->view = v;
-	//Controls
-	Scene scene = view->create(*this);
-	for (Control* control : scene.controls) {
-		control->frame = this;
-		controls.push_back(control);
-	}
-	//Prop holders
-	prop_holders = scene.prop_holders;
-	for (PropertyHolder* holder : prop_holders) {
-		holder->changes = &changes;
-		holder->request_update();
-	}
 	//Main loop
 	sf::RenderWindow window(sf::VideoMode(width, height), title);
 	window.setFramerateLimit(30);
+
+	//View
+	switch_view(v);
 
 	while (window.isOpen()) {
 		//Poll property changes
@@ -129,6 +118,11 @@ void Frame::run(ViewController* v) {
 			redraw = false;
 		}
 		window.display();
+		//Change view
+		if (next_view) {
+			switch_view(next_view);
+			next_view = nullptr;
+		}
 	}
 }
 
@@ -138,6 +132,30 @@ void Frame::property_change(PropertyChange change) {
 	}
 	view->property_change(change);
 }
+
+void Frame::switch_view(ViewController* view) {
+	//Init view
+	delete this->view;
+	this->view = view;
+	//Controls
+	Scene scene = view->create(*this);
+	for (Control* control : controls) {
+		delete control;
+	}
+	controls.clear();
+	for (Control* control : scene.controls) {
+		control->frame = this;
+		controls.push_back(control);
+	}
+	//Prop holders
+	prop_holders = scene.prop_holders;
+	for (PropertyHolder* holder : prop_holders) {
+		holder->changes = &changes;
+		holder->request_update();
+	}
+	request_redraw();
+}
+
 Frame::~Frame() {
 	delete view;
 	for (Control* control : controls) {

@@ -6,6 +6,7 @@
  */
 
 #include "SoundEngineView.h"
+#include "SoundEngineChannelView.h"
 
 #include <iostream>
 
@@ -56,6 +57,9 @@ Scene SoundEngineView::create(Frame& frame) {
 		engine->rect.setFillColor(sf::Color(0, 180, 255));
 		controls.push_back(engine);
 		engine_buttons[i] = engine;
+		engine->set_on_click([&channel, i, &frame]() {
+			frame.change_view(new SoundEngineChannelView(channel, i));
+		});
 
 		//Volume
 		Slider* volume = new Slider(0, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);

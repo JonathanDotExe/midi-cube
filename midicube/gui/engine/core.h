@@ -95,10 +95,12 @@ private:
 	std::vector<PropertyHolder*> prop_holders;
 
 	bool mouse_pressed = false;
-	bool redraw = true;
 	int last_mouse_x = 0;
 	int last_mouse_y = 0;
 	Control* selected;
+
+	bool redraw = true;
+	ViewController* next_view = nullptr;
 
 	boost::lockfree::queue<PropertyChange> changes;
 
@@ -114,6 +116,11 @@ public:
 		redraw = true;
 	}
 
+	void change_view(ViewController* view) {
+		delete next_view;
+		next_view = view;
+	}
+
 	virtual ~Frame();
 
 	int get_height() const {
@@ -123,6 +130,9 @@ public:
 	int get_width() const {
 		return width;
 	}
+
+private:
+	void switch_view(ViewController* view);
 
 };
 
