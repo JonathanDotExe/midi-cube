@@ -180,6 +180,19 @@ public:
 
 };
 
+struct ChannelSource {
+	ssize_t input = -1;
+	unsigned int channel;
+	unsigned int start_note = 0;
+	unsigned int end_note = 127;
+	int octave = 0;
+	bool transfer_channel_aftertouch = true;
+	bool transfer_pitch_bend = true;
+	bool transfer_cc = true;
+	bool transfer_prog_change = true;
+	bool transfer_other = true;
+};
+
 enum SoundEngineChannelProperty {
 	pChannelActive,
 	pChannelVolume,
@@ -188,16 +201,16 @@ enum SoundEngineChannelProperty {
 
 class SoundEngineChannel : public PropertyHolder {
 private:
-	Arpeggiator arp;
-	Looper looper;
-	VocoderEffect vocoder;
 	ssize_t engine_index{0};
 
 public:
-
 	VocoderPreset vocoder_preset;
 	double volume{0.3};
 	bool active{true};
+	ChannelSource source;
+	Arpeggiator arp;
+	Looper looper;
+	VocoderEffect vocoder;
 
 	SoundEngineChannel();
 
@@ -218,10 +231,6 @@ public:
 
 	ssize_t get_engine();
 
-	Arpeggiator& arpeggiator();
-
-	Looper& get_looper();
-
 	~SoundEngineChannel();
 
 };
@@ -229,8 +238,6 @@ public:
 class SoundEngineDevice {
 
 private:
-	std::string identifier;
-	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	std::vector<SoundEngineBank*> sound_engines;
 
 	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
@@ -239,20 +246,13 @@ private:
 public:
 	Metronome metronome;
 	std::atomic<bool> play_metronome{false};
+	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 
-	SoundEngineDevice(std::string identifier);
-
-	std::string get_identifier();
+	SoundEngineDevice();
 
 	std::vector<SoundEngineBank*> get_sound_engines();
 
 	void add_sound_engine(SoundEngineBank* engine);
-
-	SoundEngineChannel& get_channel(unsigned int channel);
-
-	bool is_audio_input() {
-		return true;
-	}
 
 	void send(MidiMessage& message, SampleInfo& info);
 

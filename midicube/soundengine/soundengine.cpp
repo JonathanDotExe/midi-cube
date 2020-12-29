@@ -328,14 +328,6 @@ ssize_t SoundEngineChannel::get_engine() {
 	return engine_index;
 }
 
-Arpeggiator& SoundEngineChannel::arpeggiator() {
-	return arp;
-}
-
-Looper& SoundEngineChannel::get_looper() {
-	return looper;
-}
-
 SoundEngine* SoundEngineChannel::get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel) {
 	if (engine_index >= 0 && engine_index < (ssize_t) engines.size()) {
 		return &engines[engine_index]->channel(channel);
@@ -349,13 +341,8 @@ SoundEngineChannel::~SoundEngineChannel() {
 
 
 //SoundEngineDevice
-SoundEngineDevice::SoundEngineDevice(std::string identifier) {
-	this->identifier = identifier;
+SoundEngineDevice::SoundEngineDevice() {
 	metronome.init(0);
-}
-
-std::string SoundEngineDevice::get_identifier() {
-	return identifier;
 }
 
 void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
@@ -386,10 +373,6 @@ std::vector<SoundEngineBank*> SoundEngineDevice::get_sound_engines() {
 
 void SoundEngineDevice::add_sound_engine(SoundEngineBank* engine) {
 	sound_engines.push_back(engine);
-}
-
-SoundEngineChannel& SoundEngineDevice::get_channel(unsigned int channel) {
-	return channels.at(channel);
 }
 
 void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {

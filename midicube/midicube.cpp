@@ -56,7 +56,7 @@ void MidiCube::init() {
 	//Default setting
 	SoundEngineBank* bank2 = engine.get_sound_engines().at(2);
 	static_cast<BaseSoundEngine&>(bank2->channel(1)).sustain = false;
-	Arpeggiator& arp = engine.get_channel(1).arpeggiator();
+	Arpeggiator& arp = engine.channels[1].arp;
 	arp.on = true;
 	arp.preset.octaves = 3;
 	arp.preset.pattern = ArpeggiatorPattern::UP;
@@ -83,8 +83,8 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 	MessageType t = message.get_message_type();
 	SampleInfo info = audio_handler.sample_info();
-	for (size_t i = 0; i < channels.size(); ++i) {
-		ChannelSource& s = channels[i];
+	for (size_t i = 0; i < engine.channels.size(); ++i) {
+		ChannelSource& s = engine.channels[i].source;
 		if (s.input == static_cast<ssize_t>(input) && s.channel == message.get_channel()) {
 			bool pass = true;
 			MidiMessage msg = message;

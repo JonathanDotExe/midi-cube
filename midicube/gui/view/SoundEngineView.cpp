@@ -33,7 +33,7 @@ Scene SoundEngineView::create(Frame& frame) {
 	int pane_width = (frame.get_width() - 15) / cols;
 	int pane_height = (frame.get_height() - 50 - 5) / rows;
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-		SoundEngineChannel& channel = sound_engine.get_channel(i);
+		SoundEngineChannel& channel = sound_engine.channels[i];
 		holders.push_back(&channel);
 		//Background pane
 		int x = 10 + pane_width * (i % cols);
@@ -69,7 +69,7 @@ Scene SoundEngineView::create(Frame& frame) {
 void SoundEngineView::property_change(PropertyChange change) {
 	if (change.property == SoundEngineChannelProperty::pChannelSoundEngine) {
 		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-			SoundEngineChannel& channel = cube.engine.get_channel(i);
+			SoundEngineChannel& channel = cube.engine.channels[i];
 			if (&channel == change.holder) {
 				engine_buttons[i]->update_text(change.value.ival < 0 ? "None" : engine_names[change.value.ival]);
 			}
