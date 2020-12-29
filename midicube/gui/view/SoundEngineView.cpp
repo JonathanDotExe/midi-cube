@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-SoundEngineView::SoundEngineView(MidiCube& c) : ViewController(), cube(c) {
+SoundEngineView::SoundEngineView() : ViewController() {
 
 }
 
@@ -21,7 +21,8 @@ Scene SoundEngineView::create(Frame& frame) {
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
 
-	SoundEngineDevice& sound_engine = cube.engine;
+	this->engine = &frame.cube.engine;
+	SoundEngineDevice& sound_engine = frame.cube.engine;
 	//Sound engines
 	for (SoundEngineBank* engine : sound_engine.get_sound_engines()) {
 		engine_names.push_back(engine->get_name());
@@ -69,7 +70,7 @@ Scene SoundEngineView::create(Frame& frame) {
 void SoundEngineView::property_change(PropertyChange change) {
 	if (change.property == SoundEngineChannelProperty::pChannelSoundEngine) {
 		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-			SoundEngineChannel& channel = cube.engine.channels[i];
+			SoundEngineChannel& channel = engine->channels[i];
 			if (&channel == change.holder) {
 				engine_buttons[i]->update_text(change.value.ival < 0 ? "None" : engine_names[change.value.ival]);
 			}
