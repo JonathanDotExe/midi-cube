@@ -182,7 +182,7 @@ public:
 
 struct ChannelSource {
 	ssize_t input = -1;
-	unsigned int channel;
+	unsigned int channel = 0;
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
 	int octave = 0;
@@ -196,7 +196,18 @@ struct ChannelSource {
 enum SoundEngineChannelProperty {
 	pChannelActive,
 	pChannelVolume,
-	pChannelSoundEngine
+	pChannelSoundEngine,
+
+	pChannelInputDevice,
+	pChannelInputChannel,
+	pChannelStartNote,
+	pChannelEndNote,
+	pChannelOctave,
+	pChannelTransferChannelAftertouch,
+	pChannelTransferPitchBend,
+	pChannelTransferCC,
+	pChannelTransferProgChange,
+	pChannelTransferOther
 };
 
 class SoundEngineChannel : public PropertyHolder {

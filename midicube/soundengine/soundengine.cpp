@@ -241,6 +241,18 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 		submit_change(SoundEngineChannelProperty::pChannelActive, active);
 		submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
 		submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) engine_index);
+
+		submit_change(SoundEngineChannelProperty::pChannelInputDevice, (int) source.input);
+		submit_change(SoundEngineChannelProperty::pChannelInputChannel, (int) source.channel);
+		submit_change(SoundEngineChannelProperty::pChannelStartNote, (int) source.start_note);
+		submit_change(SoundEngineChannelProperty::pChannelEndNote, (int) source.end_note);
+		submit_change(SoundEngineChannelProperty::pChannelOctave, source.octave);
+		submit_change(SoundEngineChannelProperty::pChannelTransferChannelAftertouch, source.transfer_channel_aftertouch);
+		submit_change(SoundEngineChannelProperty::pChannelTransferPitchBend, source.transfer_pitch_bend);
+		submit_change(SoundEngineChannelProperty::pChannelTransferCC, source.transfer_cc);
+		submit_change(SoundEngineChannelProperty::pChannelTransferProgChange, source.transfer_prog_change);
+		submit_change(SoundEngineChannelProperty::pChannelTransferOther, source.transfer_other);
+
 		update_request = false;
 	}
 	if (engine) {
@@ -299,6 +311,36 @@ PropertyValue SoundEngineChannel::get(size_t prop) {
 	case SoundEngineChannelProperty::pChannelSoundEngine:
 		value.ival = engine_index;
 		break;
+	case SoundEngineChannelProperty::pChannelInputDevice:
+		value.ival = source.input;
+		break;
+	case SoundEngineChannelProperty::pChannelInputChannel:
+		value.ival = source.channel;
+		break;
+	case SoundEngineChannelProperty::pChannelStartNote:
+		value.ival = source.start_note;
+		break;
+	case SoundEngineChannelProperty::pChannelEndNote:
+		value.ival = source.end_note;
+		break;
+	case SoundEngineChannelProperty::pChannelOctave:
+		value.ival = source.octave;
+		break;
+	case SoundEngineChannelProperty::pChannelTransferChannelAftertouch:
+		value.bval = source.transfer_channel_aftertouch;
+		break;
+	case SoundEngineChannelProperty::pChannelTransferPitchBend:
+		value.bval = source.transfer_pitch_bend;
+		break;
+	case SoundEngineChannelProperty::pChannelTransferCC:
+		value.bval = source.transfer_cc;
+		break;
+	case SoundEngineChannelProperty::pChannelTransferProgChange:
+		value.bval = source.transfer_prog_change;
+		break;
+	case SoundEngineChannelProperty::pChannelTransferOther:
+		value.bval = source.transfer_other;
+		break;
 	}
 	return value;
 }
@@ -313,6 +355,36 @@ void SoundEngineChannel::set(size_t prop, PropertyValue value) {
 		break;
 	case SoundEngineChannelProperty::pChannelSoundEngine:
 		engine_index = value.ival;
+		break;
+	case SoundEngineChannelProperty::pChannelInputDevice:
+		source.input= value.ival;
+		break;
+	case SoundEngineChannelProperty::pChannelInputChannel:
+		source.channel = value.ival;
+		break;
+	case SoundEngineChannelProperty::pChannelStartNote:
+		source.start_note = value.ival;
+		break;
+	case SoundEngineChannelProperty::pChannelEndNote:
+		source.end_note = value.ival;
+		break;
+	case SoundEngineChannelProperty::pChannelOctave:
+		source.octave = value.ival;
+		break;
+	case SoundEngineChannelProperty::pChannelTransferChannelAftertouch:
+		source.transfer_channel_aftertouch = value.bval;
+		break;
+	case SoundEngineChannelProperty::pChannelTransferPitchBend:
+		source.transfer_pitch_bend = value.bval;
+		break;
+	case SoundEngineChannelProperty::pChannelTransferCC:
+		source.transfer_cc = value.bval;
+		break;
+	case SoundEngineChannelProperty::pChannelTransferProgChange:
+		source.transfer_prog_change = value.bval;
+		break;
+	case SoundEngineChannelProperty::pChannelTransferOther:
+		source.transfer_other = value.bval;
 		break;
 	}
 }
