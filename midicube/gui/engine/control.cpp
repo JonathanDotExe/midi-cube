@@ -138,3 +138,32 @@ void CheckBox::bound_property_change(PropertyValue val) {
 	checked = val.bval;
 	frame->request_redraw();
 }
+
+//ComboBox
+void ComboBox::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	rect.setPosition(x, y);
+	rect.setSize(sf::Vector2<float>(width, height));
+	text.setString(values.at(index));
+	center_text(text, x, y, width, height);
+}
+
+void ComboBox::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(rect);
+	window.draw(text);
+}
+
+void ComboBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+	index++;
+	if (index >= values.size()) {
+		index = 0;
+	}
+	send_change(index + start_val);
+	update_position(this->x, this->y, width, height);
+}
+
+void ComboBox::bound_property_change(PropertyValue val) {
+	index = val.ival - start_val;
+	update_position(this->x, this->y, width, height);
+}
+

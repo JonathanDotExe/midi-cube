@@ -259,6 +259,45 @@ protected:
 
 };
 
+class ComboBox : public BindableControl {
+private:
+	int start_val = 0;
+	int index = 0;
+	std::vector<std::string> values;
+
+public:
+	sf::RectangleShape rect;
+	sf::Text text;
+
+	ComboBox(int value, std::vector<std::string> values, sf::Font& font, int text_size = 12, int start_val = 0, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
+		this->start_val = start_val;
+		this->index = value - start_val;
+		this->values = values;
+
+		this->text.setFont(font);
+		this->text.setCharacterSize(text_size);
+		this->text.setFillColor(sf::Color::Black);
+		rect.setFillColor(sf::Color(220, 220, 220));
+
+		update_position(x, y, width, height);
+	}
+
+	virtual void update_position(int x, int y, int width, int height);
+
+	virtual void draw(sf::RenderWindow& window, bool selected);
+
+	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+
+	SELECTABLE
+
+	virtual ~ComboBox() {
+
+	}
+
+protected:
+	virtual void bound_property_change(PropertyValue val);
+};
+
 
 
 #endif /* MIDICUBE_GUI_ENGINE_CONTROL_H_ */
