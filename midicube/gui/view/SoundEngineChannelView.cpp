@@ -47,6 +47,8 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	engine->bind(&channel, SoundEngineChannelProperty::pChannelSoundEngine);
 	controls.push_back(engine);
 
+	Button* edit_engine = new Button("Edit", main_font, 18, 10, 130, 300, 60);
+	controls.push_back(edit_engine);
 	//Col 2
 	//Volume
 	{
@@ -104,6 +106,31 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		tmp_y += 60;
 		octave->bind(&channel, SoundEngineChannelProperty::pChannelOctave);
 		controls.push_back(octave);
+	}
+	//Start Note
+	{
+		tmp_y += 5;
+		Label* start_note_label = new Label("Start Note", main_font, 18, 470, tmp_y);
+		tmp_y += 30;
+		controls.push_back(start_note_label);
+
+		DragBox<int>* start_note = new DragBox<int>(0, 0, 127, main_font, 18, 470, tmp_y, 150, 60);
+		tmp_y += 60;
+		start_note->bind(&channel, SoundEngineChannelProperty::pChannelStartNote);
+		controls.push_back(start_note);
+	}
+
+	//End Note
+	{
+		tmp_y += 5;
+		Label* end_note_label = new Label("End Note", main_font, 18, 470, tmp_y);
+		tmp_y += 30;
+		controls.push_back(end_note_label);
+
+		DragBox<int>* end_note = new DragBox<int>(0, 0, 127, main_font, 18, 470, tmp_y, 150, 60);
+		tmp_y += 60;
+		end_note->bind(&channel, SoundEngineChannelProperty::pChannelEndNote);
+		controls.push_back(end_note);
 	}
 
 	//Col 4

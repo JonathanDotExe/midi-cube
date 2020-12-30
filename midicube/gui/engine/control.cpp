@@ -115,7 +115,7 @@ void CheckBox::update_position(int x, int y, int width, int height) {
 	inner_rect.setPosition(x + 4, y + 4);
 	inner_rect.setSize(sf::Vector2<float>(width - 8, height - 8));
 
-	center_text_left(text, x + width + 2, y, height);
+	center_text_left(text, x + width + 5, y, height);
 }
 
 void CheckBox::draw(sf::RenderWindow& window, bool selected) {
