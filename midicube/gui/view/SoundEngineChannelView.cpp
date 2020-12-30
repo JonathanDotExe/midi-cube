@@ -8,6 +8,7 @@
 #include "SoundEngineChannelView.h"
 #include "resources.h"
 #include "SoundEngineView.h"
+#include "ArpeggiatorView.h"
 
 SoundEngineChannelView::SoundEngineChannelView(SoundEngineChannel& ch, int channel_index) : channel(ch) {
 	this->channel_index = channel_index;
@@ -49,6 +50,12 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 	Button* edit_engine = new Button("Edit", main_font, 18, 10, 130, 300, 60);
 	controls.push_back(edit_engine);
+
+	Button* arpeggiator = new Button("Arpeggiator", main_font, 18, 10, 195, 300, 60);
+	arpeggiator->set_on_click([&frame, this]() {
+		frame.change_view(new ArpeggiatorView(channel, channel_index));
+	});
+	controls.push_back(arpeggiator);
 
 	CheckBox* active = new CheckBox(true, "Active", main_font, 18, 10, frame.get_height() - 95, 40, 40);
 	active->bind(&channel, SoundEngineChannelProperty::pChannelActive);
