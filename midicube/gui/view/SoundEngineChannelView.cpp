@@ -49,6 +49,10 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 	Button* edit_engine = new Button("Edit", main_font, 18, 10, 130, 300, 60);
 	controls.push_back(edit_engine);
+
+	CheckBox* active = new CheckBox(true, "Active", main_font, 18, 10, frame.get_height() - 95, 40, 40);
+	active->bind(&channel, SoundEngineChannelProperty::pChannelActive);
+	controls.push_back(active);
 	//Col 2
 	//Volume
 	{
@@ -64,7 +68,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		Label* pan_label = new Label("Pan.", main_font, 24, 400, 10);
 		controls.push_back(pan_label);
 
-		Slider* pan = new Slider(0, 0, 1, main_font, 400, 45, 60, 400, 0.7, 0.1);
+		Slider* pan = new Slider(0, -1, 1, main_font, 400, 45, 60, 400, 0.7, 0.1);
 		//pan->bind(&channel, SoundEngineChannelProperty::pChannelVolume); TODO implement channel pan
 		controls.push_back(pan);
 	}
