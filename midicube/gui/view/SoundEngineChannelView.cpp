@@ -67,6 +67,35 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		controls.push_back(pan);
 	}
 
+	//Col 3
+	//Source
+	{
+		Label* source_label = new Label("Source", main_font, 18, 350, 15);
+		controls.push_back(source_label);
+
+		DragBox<int>* source = new DragBox<int>(0, -1, 15, main_font, 18, 350, 45, 100, 40);
+		source->bind(&channel, SoundEngineChannelProperty::pChannelInputDevice);
+		controls.push_back(source);
+	}
+	//Channel
+	{
+		Label* channel_label = new Label("Channel", main_font, 18, 350, 90);
+		controls.push_back(channel_label);
+
+		DragBox<int>* input_channel = new DragBox<int>(0, 0, 15, main_font, 18, 350, 120, 100, 40);
+		input_channel->bind(&channel, SoundEngineChannelProperty::pChannelInputChannel);
+		controls.push_back(input_channel);
+	}
+	//Octave
+	{
+		Label* octave_label = new Label("Octave", main_font, 18, 350, 165);
+		controls.push_back(octave_label);
+
+		DragBox<int>* octave = new DragBox<int>(0, -3, 3, main_font, 18, 350, 195, 100, 40);
+		octave->bind(&channel, SoundEngineChannelProperty::pChannelOctave);
+		controls.push_back(octave);
+	}
+
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->set_on_click([&frame]() {

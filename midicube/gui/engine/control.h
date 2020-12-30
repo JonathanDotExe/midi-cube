@@ -213,7 +213,8 @@ public:
 
 protected:
 	virtual void bound_property_change(PropertyValue val) {
-		progress = fmin(fmax((val.get(PropertyType<T>{}) - min)/(max - min), 0), 1);
+		T v = val.get(PropertyType<T>{});
+		progress = fmin(fmax((double) (v - min)/(max - min), 0), 1);
 		update_position(this->x, this->y, width, height);
 	}
 
