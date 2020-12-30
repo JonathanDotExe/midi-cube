@@ -40,11 +40,33 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	Label* title = new Label("Channel " + std::to_string(channel_index + 1), main_font, 24, 10, 10);
 	controls.push_back(title);
 
+	//Col 1
 	//Engine
-	ComboBox* engine = new ComboBox(0, engine_names, main_font, 18, -1, 10, 40, 200, 40);
+	ComboBox* engine = new ComboBox(0, engine_names, main_font, 18, -1, 10, 45, 200, 40);
 	engine->rect.setFillColor(sf::Color(0, 180, 255));
 	engine->bind(&channel, SoundEngineChannelProperty::pChannelSoundEngine);
 	controls.push_back(engine);
+
+	//Col 2
+	//Volume
+	{
+		Label* vol_label = new Label("Vol.", main_font, 24, 230, 10);
+		controls.push_back(vol_label);
+
+		Slider* volume = new Slider(0, 0, 1, main_font, 230, 45, 40, 300, 0.7, 0.1);
+		volume->bind(&channel, SoundEngineChannelProperty::pChannelVolume);
+		controls.push_back(volume);
+	}
+	//Panning
+	{
+		Label* pan_label = new Label("Pan.", main_font, 24, 290, 10);
+		controls.push_back(pan_label);
+
+		Slider* pan = new Slider(0, 0, 1, main_font, 290, 45, 40, 300, 0.7, 0.1);
+		//pan->bind(&channel, SoundEngineChannelProperty::pChannelVolume); TODO implement channel pan
+		controls.push_back(pan);
+	}
+
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->set_on_click([&frame]() {
