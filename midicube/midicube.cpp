@@ -103,8 +103,10 @@ void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 			switch (t) {
 			case MessageType::NOTE_OFF:
 			case MessageType::NOTE_ON:
+				pass = s.start_velocity <= message.get_velocity() && s.end_velocity >= message.get_velocity();
+				/* no break */
 			case MessageType::POLYPHONIC_AFTERTOUCH:
-				pass = s.start_note <= message.get_note() && s.end_note >= message.get_note();
+				pass = pass && s.start_note <= message.get_note() && s.end_note >= message.get_note();
 				if (s.octave) {
 					msg.set_note(msg.get_note() + s.octave * 12);
 				}

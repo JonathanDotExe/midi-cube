@@ -185,6 +185,8 @@ struct ChannelSource {
 	unsigned int channel = 0;
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
+	unsigned int start_velocity = 0;
+	unsigned int end_velocity = 127;
 	int octave = 0;
 	bool transfer_channel_aftertouch = true;
 	bool transfer_pitch_bend = true;
