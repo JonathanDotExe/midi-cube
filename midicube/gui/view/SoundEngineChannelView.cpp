@@ -20,6 +20,8 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<PropertyHolder*> holders;
 
+	holders.push_back(&channel);
+
 	//Sound engines
 	std::vector<std::string> engine_names;
 	engine_names.push_back("None");
@@ -35,11 +37,11 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	controls.push_back(pane);
 
 	//Title
-	Label* title = new Label("Channel " + std::to_string(channel_index + 1), main_font, 18, 10, 10);
+	Label* title = new Label("Channel " + std::to_string(channel_index + 1), main_font, 24, 10, 10);
 	controls.push_back(title);
 
 	//Engine
-	ComboBox* engine = new ComboBox(0, engine_names, main_font, 12, -1, 10, 40, 200, 40);
+	ComboBox* engine = new ComboBox(0, engine_names, main_font, 18, -1, 10, 40, 200, 40);
 	engine->rect.setFillColor(sf::Color(0, 180, 255));
 	engine->bind(&channel, SoundEngineChannelProperty::pChannelSoundEngine);
 	controls.push_back(engine);

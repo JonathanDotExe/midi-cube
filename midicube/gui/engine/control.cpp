@@ -155,7 +155,7 @@ void ComboBox::draw(sf::RenderWindow& window, bool selected) {
 
 void ComboBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	index++;
-	if (index >= values.size()) {
+	if (index >= (int) values.size()) {
 		index = 0;
 	}
 	send_change(index + start_val);
