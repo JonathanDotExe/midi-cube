@@ -205,6 +205,8 @@ enum SoundEngineChannelProperty {
 	pChannelInputChannel,
 	pChannelStartNote,
 	pChannelEndNote,
+	pChannelStartVelocity,
+	pChannelEndVelocity,
 	pChannelOctave,
 	pChannelTransferChannelAftertouch,
 	pChannelTransferPitchBend,

@@ -247,6 +247,8 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 		submit_change(SoundEngineChannelProperty::pChannelInputChannel, (int) source.channel);
 		submit_change(SoundEngineChannelProperty::pChannelStartNote, (int) source.start_note);
 		submit_change(SoundEngineChannelProperty::pChannelEndNote, (int) source.end_note);
+		submit_change(SoundEngineChannelProperty::pChannelStartVelocity, (int) source.start_velocity);
+		submit_change(SoundEngineChannelProperty::pChannelEndVelocity, (int) source.end_velocity);
 		submit_change(SoundEngineChannelProperty::pChannelOctave, source.octave);
 		submit_change(SoundEngineChannelProperty::pChannelTransferChannelAftertouch, source.transfer_channel_aftertouch);
 		submit_change(SoundEngineChannelProperty::pChannelTransferPitchBend, source.transfer_pitch_bend);
@@ -328,6 +330,12 @@ PropertyValue SoundEngineChannel::get(size_t prop) {
 	case SoundEngineChannelProperty::pChannelEndNote:
 		value.ival = source.end_note;
 		break;
+	case SoundEngineChannelProperty::pChannelStartVelocity:
+		value.ival = source.start_velocity;
+		break;
+	case SoundEngineChannelProperty::pChannelEndVelocity:
+		value.ival = source.end_velocity;
+		break;
 	case SoundEngineChannelProperty::pChannelOctave:
 		value.ival = source.octave;
 		break;
@@ -375,6 +383,12 @@ void SoundEngineChannel::set(size_t prop, PropertyValue value) {
 		break;
 	case SoundEngineChannelProperty::pChannelEndNote:
 		source.end_note = value.ival;
+		break;
+	case SoundEngineChannelProperty::pChannelStartVelocity:
+		source.start_velocity = value.ival;
+		break;
+	case SoundEngineChannelProperty::pChannelEndVelocity:
+		source.end_velocity = value.ival;
 		break;
 	case SoundEngineChannelProperty::pChannelOctave:
 		source.octave = value.ival;

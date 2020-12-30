@@ -111,6 +111,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		octave->bind(&channel, SoundEngineChannelProperty::pChannelOctave);
 		controls.push_back(octave);
 	}
+	int zone_y = tmp_y;
 	//Start Note
 	{
 		tmp_y += 5;
@@ -183,6 +184,33 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		pitch->bind(&channel, SoundEngineChannelProperty::pChannelTransferOther);
 		tmp_y += 40;
 		controls.push_back(pitch);
+	}
+
+	tmp_y = zone_y;
+	//Start Note
+	{
+		tmp_y += 5;
+		Label* start_velocity_label = new Label("Start Velocity", main_font, 18, 630, tmp_y);
+		tmp_y += 30;
+		controls.push_back(start_velocity_label);
+
+		DragBox<int>* start_velocity = new DragBox<int>(0, 0, 127, main_font, 18, 630, tmp_y, 150, 60);
+		tmp_y += 60;
+		start_velocity->bind(&channel, SoundEngineChannelProperty::pChannelStartVelocity);
+		controls.push_back(start_velocity);
+	}
+
+	//End Note
+	{
+		tmp_y += 5;
+		Label* end_velocity_label = new Label("End Velocity", main_font, 18, 630, tmp_y);
+		tmp_y += 30;
+		controls.push_back(end_velocity_label);
+
+		DragBox<int>* end_velocity = new DragBox<int>(0, 0, 127, main_font, 18, 630, tmp_y, 150, 60);
+		tmp_y += 60;
+		end_velocity->bind(&channel, SoundEngineChannelProperty::pChannelEndVelocity);
+		controls.push_back(end_velocity);
 	}
 
 	//Back Button
