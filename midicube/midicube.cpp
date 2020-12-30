@@ -59,7 +59,7 @@ void MidiCube::init() {
 	Arpeggiator& arp = engine.channels[1].arp;
 	arp.on = true;
 	arp.preset.octaves = 3;
-	arp.preset.pattern = ArpeggiatorPattern::UP;
+	arp.preset.pattern = ArpeggiatorPattern::ARP_UP;
 	arp.preset.value = 1;
 	arp.metronome.set_bpm(440);
 

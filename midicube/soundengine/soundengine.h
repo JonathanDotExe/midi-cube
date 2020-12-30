@@ -144,8 +144,8 @@ public:
 	}
 };
 
-enum class ArpeggiatorPattern {
-	UP, DOWN, RANDOM, UP_DOWN, UP_CUSTOM, DOWN_CUSTOM
+enum ArpeggiatorPattern {
+	ARP_UP, ARP_DOWN, ARP_RANDOM, ARP_UP_DOWN, ARP_UP_CUSTOM, ARP_DOWN_CUSTOM
 };
 
 struct ArpeggiatorPreset {
@@ -212,7 +212,14 @@ enum SoundEngineChannelProperty {
 	pChannelTransferPitchBend,
 	pChannelTransferCC,
 	pChannelTransferProgChange,
-	pChannelTransferOther
+	pChannelTransferOther,
+
+	pArpeggiatorOn,
+	pArpeggiatorPattern,
+	pArpeggiatorOctaves,
+	pArpeggiatorStep,
+	pArpeggiatorHold,
+	pArpeggiatorBPM
 };
 
 class SoundEngineChannel : public PropertyHolder {

@@ -151,7 +151,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 		long int highest_index = -1;
 
 		switch (preset.pattern) {
-		case ArpeggiatorPattern::UP:
+		case ArpeggiatorPattern::ARP_UP:
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
 				if (this->note.note[i].pressed) {
 					if (this->note.note[i].note < lowest_note) {
@@ -175,7 +175,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 				next_index = lowest_index;
 			}
 			break;
-		case ArpeggiatorPattern::DOWN:
+		case ArpeggiatorPattern::ARP_DOWN:
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
 				if (this->note.note[i].pressed) {
 					if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note) {
@@ -200,15 +200,15 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 				next_index = highest_index;
 			}
 			break;
-		case ArpeggiatorPattern::UP_DOWN:
+		case ArpeggiatorPattern::ARP_UP_DOWN:
 			//TODO
 			break;
-		case ArpeggiatorPattern::RANDOM:
+		case ArpeggiatorPattern::ARP_RANDOM:
 			//TODO
 			break;
-		case ArpeggiatorPattern::UP_CUSTOM:
+		case ArpeggiatorPattern::ARP_UP_CUSTOM:
 			break;
-		case ArpeggiatorPattern::DOWN_CUSTOM:
+		case ArpeggiatorPattern::ARP_DOWN_CUSTOM:
 			break;
 		}
 		//Press note
@@ -255,6 +255,13 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 		submit_change(SoundEngineChannelProperty::pChannelTransferCC, source.transfer_cc);
 		submit_change(SoundEngineChannelProperty::pChannelTransferProgChange, source.transfer_prog_change);
 		submit_change(SoundEngineChannelProperty::pChannelTransferOther, source.transfer_other);
+
+		submit_change(SoundEngineChannelProperty::pArpeggiatorOn, arp.on);
+		submit_change(SoundEngineChannelProperty::pArpeggiatorPattern, arp.preset.pattern);
+		submit_change(SoundEngineChannelProperty::pArpeggiatorOctaves, (int) arp.preset.octaves);
+		submit_change(SoundEngineChannelProperty::pArpeggiatorStep, arp.preset.value);
+		submit_change(SoundEngineChannelProperty::pArpeggiatorHold, arp.preset.hold);
+		submit_change(SoundEngineChannelProperty::pArpeggiatorBPM, (int) arp.metronome.get_bpm());
 
 		update_request = false;
 	}
@@ -354,6 +361,24 @@ PropertyValue SoundEngineChannel::get(size_t prop) {
 	case SoundEngineChannelProperty::pChannelTransferOther:
 		value.bval = source.transfer_other;
 		break;
+	case SoundEngineChannelProperty::pArpeggiatorOn:
+		value.bval = arp.on;
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorPattern:
+		value.ival = arp.preset.pattern;
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorOctaves:
+		value.ival = arp.preset.octaves;
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorStep:
+		value.ival = arp.preset.value;
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorHold:
+		value.bval = arp.preset.hold;
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorBPM:
+		value.ival = arp.metronome.get_bpm();
+		break;
 	}
 	return value;
 }
@@ -407,6 +432,24 @@ void SoundEngineChannel::set(size_t prop, PropertyValue value) {
 		break;
 	case SoundEngineChannelProperty::pChannelTransferOther:
 		source.transfer_other = value.bval;
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorOn:
+		arp.on = value.bval;
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorPattern:
+		arp.preset.pattern = static_cast<ArpeggiatorPattern>(value.ival);
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorOctaves:
+		arp.preset.octaves = value.ival;
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorStep:
+		arp.preset.value = value.ival;
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorHold:
+		arp.preset.hold = value.bval;
+		break;
+	case SoundEngineChannelProperty::pArpeggiatorBPM:
+		arp.metronome.set_bpm(value.ival);
 		break;
 	}
 }
@@ -494,4 +537,3 @@ SoundEngineDevice::~SoundEngineDevice() {
 	}
 	sound_engines.clear();
 }
-
