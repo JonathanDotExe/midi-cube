@@ -240,6 +240,7 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 	if (update_request) {
 		submit_change(SoundEngineChannelProperty::pChannelActive, active);
 		submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
+		submit_change(SoundEngineChannelProperty::pChannelPanning, panning);
 		submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) engine_index);
 
 		submit_change(SoundEngineChannelProperty::pChannelInputDevice, (int) source.input);
@@ -277,7 +278,8 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 		looper.apply(ch, metronome, info);
 		//Playback
 		for (size_t i = 0; i < channels.size(); ++i) {
-			channels[i] += (ch[i] * volume);
+			double mul = i % 2 == 0 ? (1 - fmax(0, panning)) : (1 - fmax(0, -panning));
+			channels[i] += (ch[i] * volume * mul);
 		}
 	}
 }
@@ -307,6 +309,9 @@ PropertyValue SoundEngineChannel::get(size_t prop) {
 		break;
 	case SoundEngineChannelProperty::pChannelVolume:
 		value.dval = volume;
+		break;
+	case SoundEngineChannelProperty::pChannelPanning:
+		value.dval = panning;
 		break;
 	case SoundEngineChannelProperty::pChannelSoundEngine:
 		value.ival = engine_index;
@@ -352,6 +357,9 @@ void SoundEngineChannel::set(size_t prop, PropertyValue value) {
 		break;
 	case SoundEngineChannelProperty::pChannelVolume:
 		volume = value.dval;
+		break;
+	case SoundEngineChannelProperty::pChannelPanning:
+		panning = value.dval;
 		break;
 	case SoundEngineChannelProperty::pChannelSoundEngine:
 		engine_index = value.ival;

@@ -69,7 +69,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		controls.push_back(pan_label);
 
 		Slider* pan = new Slider(0, -1, 1, main_font, 400, 45, 60, 400, 0.7, 0.1);
-		//pan->bind(&channel, SoundEngineChannelProperty::pChannelVolume); TODO implement channel pan
+		pan->bind(&channel, SoundEngineChannelProperty::pChannelPanning);
 		controls.push_back(pan);
 	}
 

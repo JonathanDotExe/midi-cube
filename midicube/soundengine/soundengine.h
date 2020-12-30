@@ -196,6 +196,7 @@ struct ChannelSource {
 enum SoundEngineChannelProperty {
 	pChannelActive,
 	pChannelVolume,
+	pChannelPanning,
 	pChannelSoundEngine,
 
 	pChannelInputDevice,
@@ -218,6 +219,7 @@ public:
 	VocoderPreset vocoder_preset;
 	double volume{0.3};
 	bool active{false};
+	double panning = 0;
 	ChannelSource source;
 	Arpeggiator arp;
 	Looper looper;
