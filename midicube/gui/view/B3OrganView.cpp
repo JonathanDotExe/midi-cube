@@ -9,7 +9,7 @@
 #include "resources.h"
 #include "SoundEngineChannelView.h"
 
-B3OrganView::B3OrganView(SoundEngineChannel& ch, int channel_index) : channel(ch) {
+B3OrganView::B3OrganView(B3Organ& o, SoundEngineChannel& ch, int channel_index) : organ(o), channel(ch) {
 	this->channel_index = channel_index;
 }
 

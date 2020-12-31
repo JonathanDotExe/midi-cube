@@ -283,6 +283,10 @@ public:
 		update_position(x, y, width, height);
 	}
 
+	int get_value() {
+		return index + start_val;
+	}
+
 	virtual void update_position(int x, int y, int width, int height);
 
 	virtual void draw(sf::RenderWindow& window, bool selected);

@@ -10,13 +10,15 @@
 
 #include "../engine/core.h"
 #include "../engine/control.h"
+#include "../../soundengine/organ.h"
 
 class B3OrganView : public ViewController {
 private:
+	B3Organ& organ;
 	SoundEngineChannel& channel;
 	int channel_index;
 public:
-	B3OrganView(SoundEngineChannel& channel, int channel_index);
+	B3OrganView(B3Organ& organ, SoundEngineChannel& channel, int channel_index);
 	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);
 	virtual ~B3OrganView();

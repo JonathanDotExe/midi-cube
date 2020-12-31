@@ -224,7 +224,7 @@ enum SoundEngineChannelProperty {
 
 class SoundEngineChannel : public PropertyHolder {
 private:
-	ssize_t engine_index{0};
+	std::atomic<ssize_t> engine_index{0};
 
 public:
 	VocoderPreset vocoder_preset;

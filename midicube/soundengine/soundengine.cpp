@@ -454,9 +454,6 @@ void SoundEngineChannel::set(size_t prop, PropertyValue value) {
 	}
 }
 
-/**
- * May only be called from GUI thread after GUI has started
- */
 void SoundEngineChannel::set_engine(ssize_t engine_index) {
 	this->engine_index = engine_index;
 }
@@ -466,6 +463,7 @@ ssize_t SoundEngineChannel::get_engine() {
 }
 
 SoundEngine* SoundEngineChannel::get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel) {
+	ssize_t engine_index = this->engine_index;
 	if (engine_index >= 0 && engine_index < (ssize_t) engines.size()) {
 		return &engines[engine_index]->channel(channel);
 	}

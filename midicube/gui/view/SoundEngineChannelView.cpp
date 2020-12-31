@@ -9,6 +9,8 @@
 #include "resources.h"
 #include "SoundEngineView.h"
 #include "ArpeggiatorView.h"
+#include "B3OrganView.h"
+#include "../../soundengine/organ.h"
 
 SoundEngineChannelView::SoundEngineChannelView(SoundEngineChannel& ch, int channel_index) : channel(ch) {
 	this->channel_index = channel_index;
@@ -48,9 +50,23 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	engine->bind(&channel, SoundEngineChannelProperty::pChannelSoundEngine);
 	controls.push_back(engine);
 
+	//Edit
 	Button* edit_engine = new Button("Edit", main_font, 18, 10, 130, 300, 60);
+	edit_engine->set_on_click([this, &frame]() {
+		//TODO not optimal solution
+		ssize_t engine_index = channel.get_engine();
+		if (engine_index >= 0) {
+			std::string name = frame.cube.engine.get_sound_engines().at(engine_index)->get_name();
+			SoundEngine& en = frame.cube.engine.get_sound_engines().at(engine_index)->channel(channel_index);
+			ViewController* view = create_view_for_engine(name, en, channel, channel_index);
+			if (view) {
+				frame.change_view(view);
+			}
+		}
+	});
 	controls.push_back(edit_engine);
 
+	//Arpeggiator
 	Button* arpeggiator = new Button("Arpeggiator", main_font, 18, 10, 195, 300, 60);
 	arpeggiator->set_on_click([&frame, this]() {
 		frame.change_view(new ArpeggiatorView(channel, channel_index));
@@ -230,7 +246,13 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	return {controls, holders};
 }
 
-
 SoundEngineChannelView::~SoundEngineChannelView() {
 
+}
+
+ViewController* create_view_for_engine(std::string name, SoundEngine& engine, SoundEngineChannel& channel, int channel_index) {
+	if (get_engine_name<B3Organ>() == name) {
+		return new B3OrganView(dynamic_cast<B3Organ&>(engine), channel, channel_index);
+	}
+	return nullptr;
 }
