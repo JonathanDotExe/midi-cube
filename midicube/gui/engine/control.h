@@ -315,9 +315,10 @@ private:
 public:
 	sf::RectangleShape slider_rect;
 	sf::RectangleShape button_rect;
+	sf::Text title_text;
 	sf::Text text;
 
-	Drawbar(int value, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : BindableControl (x, y, width, height) {
+	Drawbar(int value, sf::Font& font, std::string title, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : BindableControl (x, y, width, height) {
 		this->progress = (double) value/MAX;
 
 		this->slider_width = slider_width;
@@ -330,9 +331,14 @@ public:
 		this->button_rect.setOutlineColor(sf::Color::Black);
 		this->button_rect.setOutlineThickness(2);
 
+		this->title_text.setFont(font);
+		this->title_text.setFillColor(sf::Color::Black);
+		this->title_text.setCharacterSize(24);
+		this->title_text.setString(title);
+
 		this->text.setFont(font);
 		this->text.setFillColor(sf::Color::Black);
-		this->text.setCharacterSize(18);
+		this->text.setCharacterSize(24);
 
 		update_position(x, y, width, height);
 	}
@@ -352,12 +358,16 @@ public:
 		//Value Text
 		text.setString(std::to_string(value));
 		center_text_top(text, x, y + height + 5, width, height);
+
+		//Title Text
+		center_text_top(title_text, x, y - 40, width, 40);
 	}
 
 	virtual void draw(sf::RenderWindow& window, bool selected) {
 		window.draw(slider_rect);
 		window.draw(button_rect);
 		window.draw(text);
+		window.draw(title_text);
 	}
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
