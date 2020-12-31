@@ -23,8 +23,28 @@ Scene B3OrganView::create(Frame &frame) {
 	holders.push_back(&channel);
 
 	//Background
-	Pane* bg = new Pane(sf::Color(0x70, 0x43, 0), 0, 0, frame.get_width(), frame.get_height());
+	Pane* bg = new Pane(sf::Color(0x8d, 0x56, 0x04), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
+
+	//Drawbars
+	int tmp_x = 200;
+	std::vector<sf::Color> colors = {
+			sf::Color(150, 0, 0),
+			sf::Color(150, 0, 0),
+			sf::Color::White,
+			sf::Color::White,
+			sf::Color::Black,
+			sf::Color::White,
+			sf::Color::Black,
+			sf::Color::Black,
+			sf::Color::White
+	};
+
+	for (size_t i = 0; i < colors.size(); ++i) {
+		Drawbar<ORGAN_DRAWBAR_MAX>* drawbar = new Drawbar<ORGAN_DRAWBAR_MAX>(0, main_font, tmp_x, 40, 60, 300, colors[i]);
+		controls.push_back(drawbar);
+		tmp_x += 80;
+	}
 
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);

@@ -178,7 +178,9 @@ protected:
 };
 
 void BindableControl::send_change(PropertyValue value) {
-	frame->cube.perform_change({holder, property, value});
+	if (holder) {
+		frame->cube.perform_change({holder, property, value});
+	}
 }
 
 void BindableControl::send_change(int value) {

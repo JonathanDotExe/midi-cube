@@ -327,6 +327,8 @@ public:
 		this->slider_rect.setOutlineColor(sf::Color::White);
 		this->slider_rect.setOutlineThickness(2);
 		this->button_rect.setFillColor(button_color);
+		this->button_rect.setOutlineColor(sf::Color::Black);
+		this->button_rect.setOutlineThickness(2);
 
 		this->text.setFont(font);
 		this->text.setFillColor(sf::Color::Black);
@@ -338,11 +340,11 @@ public:
 	virtual void update_position(int x, int y, int width, int height) {
 		Control::update_position(x, y, width, height);
 		int value = MAX * progress;
-		double real_prog = value/MAX;
+		double real_prog = (double) value/MAX;
 		//Slider
 		double range = height - button_height;
 		slider_rect.setPosition(x + width/2 - width * slider_width / 2, y);
-		slider_rect.setSize(sf::Vector2<float>(width * slider_width, real_prog * range));
+		slider_rect.setSize(sf::Vector2<float>(width * slider_width, real_prog * range - 2));
 		//Button
 		button_rect.setPosition(x, y + real_prog * range);
 		button_rect.setSize(sf::Vector2<float>(width, button_height));
@@ -360,7 +362,7 @@ public:
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 		int old_val = MAX * progress;
-		progress -= (double)y_motion/height;
+		progress += (double)y_motion/height;
 
 		if (progress < 0) {
 			progress = 0;
