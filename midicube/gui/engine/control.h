@@ -303,6 +303,91 @@ protected:
 	virtual void bound_property_change(PropertyValue val);
 };
 
+template<int MAX>
+class Drawbar : public BindableControl {
+
+private:
+	double progress;
+
+	double slider_width;
+	int button_height;
+
+public:
+	sf::RectangleShape slider_rect;
+	sf::RectangleShape button_rect;
+	sf::Text text;
+
+	Drawbar(int value, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : BindableControl (x, y, width, height) {
+		this->progress = (double) value/MAX;
+
+		this->slider_width = slider_width;
+		this->button_height = button_height;
+
+		this->slider_rect.setFillColor(sf::Color::Black);
+		this->slider_rect.setOutlineColor(sf::Color::White);
+		this->slider_rect.setOutlineThickness(2);
+		this->button_rect.setFillColor(button_color);
+
+		this->text.setFont(font);
+		this->text.setFillColor(sf::Color::Black);
+		this->text.setCharacterSize(18);
+
+		update_position(x, y, width, height);
+	}
+
+	virtual void update_position(int x, int y, int width, int height) {
+		Control::update_position(x, y, width, height);
+		int value = MAX * progress;
+		double real_prog = value/MAX;
+		//Slider
+		double range = height - button_height;
+		slider_rect.setPosition(x + width/2 - width * slider_width / 2, y);
+		slider_rect.setSize(sf::Vector2<float>(width * slider_width, real_prog * range));
+		//Button
+		button_rect.setPosition(x, y + real_prog * range);
+		button_rect.setSize(sf::Vector2<float>(width, button_height));
+
+		//Value Text
+		text.setString(std::to_string(value));
+		center_text_top(text, x, y + height + 5, width, height);
+	}
+
+	virtual void draw(sf::RenderWindow& window, bool selected) {
+		window.draw(slider_rect);
+		window.draw(button_rect);
+		window.draw(text);
+	}
+
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
+		int old_val = MAX * progress;
+		progress -= (double)y_motion/height;
+
+		if (progress < 0) {
+			progress = 0;
+		}
+		else if (progress > 1) {
+			progress = 1;
+		}
+
+		int value = MAX * progress;
+		if (old_val != value) {
+			send_change(value);
+			update_position(this->x, this->y, width, height);
+		}
+	}
+
+	SELECTABLE
+
+	virtual ~Drawbar() {
+
+	}
+
+protected:
+	virtual void bound_property_change(PropertyValue val) {
+		progress = (double) val.ival / MAX;
+		update_position(x, y, width, height);
+	}
+};
 
 
 #endif /* MIDICUBE_GUI_ENGINE_CONTROL_H_ */
