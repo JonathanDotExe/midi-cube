@@ -11,6 +11,7 @@
 
 #include "soundengine.h"
 #include "../synthesis.h"
+#include "../property.h"
 
 #define ORGAN_DRAWBAR_COUNT 9
 #define ORGAN_DRAWBAR_MAX 8
@@ -34,47 +35,105 @@
 #define BASS_RADIUS 0.15
 #define SOUND_SPEED 343.2
 
+
+
 enum class DistortionType {
 	DIGITAL, ANALOG_1, ANALOG_2
 };
 
+enum B3OrganProperty {
+	pB3Drawbar1,
+	pB3Drawbar2,
+	pB3Drawbar3,
+	pB3Drawbar4,
+	pB3Drawbar5,
+	pB3Drawbar6,
+	pB3Drawbar7,
+	pB3Drawbar8,
+	pB3Drawbar9,
+
+	pB3DrawbarCC1,
+	pB3DrawbarCC2,
+	pB3DrawbarCC3,
+	pB3DrawbarCC4,
+	pB3DrawbarCC5,
+	pB3DrawbarCC6,
+	pB3DrawbarCC7,
+	pB3DrawbarCC8,
+	pB3DrawbarCC9,
+
+	pB3HarmonicFoldbackVolume,
+
+	pB3DistortionType,
+	pB3NormalizeOverdrive,
+	pB3Overdrive,
+	pB3OverdriveCC,
+
+	pB3MultiNoteGain,
+
+	pB3Rotary,
+	pB3RotarySpeed,
+	pB3RotaryCC,
+	pB3RotarySpeedCC,
+
+	pB3RotaryStereoMix,
+	pB3RotaryGain,
+	pB3RotaryType,
+	pB3RotaryDelay,
+
+	pB3Percussion,
+	pB3PercussionThirdHarmonic,
+	pB3PercussionSoft,
+	pB3PercussionFastDecay,
+
+	pB3PercussionSoftVolume,
+	pB3PercussionHardVolume,
+	pB3PercussionFastDecayTime,
+	pB3PercussionSlowDecayTime,
+
+	pB3PercussionCC,
+	pB3PercussionThirdHarmonicCC,
+	pB3PercussionSoftCC,
+	pB3PercussionFastDecayCC,
+};
+
 struct B3OrganPreset {
-	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbars;
-	std::array<std::atomic<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
-	std::atomic<double> harmonic_foldback_volume{1.0};
+	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbars;
+	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
+	double harmonic_foldback_volume{1.0};
 
-	std::atomic<DistortionType> distortion_type{DistortionType::ANALOG_1};
-	std::atomic<bool> normalize_overdrive{false};
-	std::atomic<double> overdrive{0};
-	std::atomic<unsigned int> overdrive_cc{35};
+	DistortionType distortion_type{DistortionType::ANALOG_1};
+	bool normalize_overdrive{false};
+	double overdrive{0};
+	unsigned int overdrive_cc{35};
 
-	std::atomic<double> multi_note_gain{0.75};
+	double multi_note_gain{0.75};
 
-	std::atomic<bool> rotary{false};
-	std::atomic<bool> rotary_fast{true};
-	std::atomic<unsigned int> rotary_cc{22};
-	std::atomic<unsigned int> rotary_speed_cc{23};
+	bool rotary{false};
+	bool rotary_fast{true};
+	unsigned int rotary_cc{22};
+	unsigned int rotary_speed_cc{23};
 
-	std::atomic<double> rotary_stereo_mix{0.5};
-	std::atomic<double> rotary_gain{1.5};
-	std::atomic<bool> rotary_type{false};
-	std::atomic<double> rotary_delay{0.0005};
+	double rotary_stereo_mix{0.5};
+	double rotary_gain{1.5};
+	bool rotary_type{false};
+	double rotary_delay{0.0005};
 
 
-	std::atomic<bool> percussion{false};
-	std::atomic<bool> percussion_third_harmonic{true};
-	std::atomic<bool> percussion_soft{true};
-	std::atomic<bool> percussion_fast_decay{true};
+	bool percussion{false};
+	bool percussion_third_harmonic{true};
+	bool percussion_soft{true};
+	bool percussion_fast_decay{true};
 
-	std::atomic<double> percussion_soft_volume{0.5};
-	std::atomic<double> percussion_hard_volume{1.0};
-	std::atomic<double> percussion_fast_decay_time{0.2};
-	std::atomic<double> percussion_slow_decay_time{1.0};
+	double percussion_soft_volume{0.5};
+	double percussion_hard_volume{1.0};
+	double percussion_fast_decay_time{0.2};
+	double percussion_slow_decay_time{1.0};
 
-	std::atomic<unsigned int> percussion_cc{24};
-	std::atomic<unsigned int> percussion_third_harmonic_cc{25};
-	std::atomic<unsigned int> percussion_soft_cc{26};
-	std::atomic<unsigned int> percussion_fast_decay_cc{27};
+	unsigned int percussion_cc{24};
+	unsigned int percussion_third_harmonic_cc{25};
+	unsigned int percussion_soft_cc{26};
+	unsigned int percussion_fast_decay_cc{27};
 
 	B3OrganPreset () {
 		for (size_t i = 0; i < drawbars.size(); ++i) {
