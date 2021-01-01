@@ -401,5 +401,61 @@ protected:
 	}
 };
 
+class OrganSwitch : public BindableControl {
+private:
+	bool checked = false;
+
+public:
+	sf::RectangleShape activated_rect;
+	sf::RectangleShape deactivated_rect;
+	sf::Text text;
+	sf::Text on_text;
+	sf::Text off_text;
+
+	OrganSwitch(bool checked, std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0, std::string on_text="On", std::string off_text="Off", int switch_text_size = 12) : BindableControl (x, y, width, height) {
+		this->checked = checked;
+
+		this->text.setFont(font);
+		this->text.setString(text);
+		this->text.setCharacterSize(text_size);
+		this->text.setFillColor(sf::Color::Black);
+
+		activated_rect.setFillColor(sf::Color::White);
+		activated_rect.setOutlineColor(sf::Color::Black);
+		activated_rect.setOutlineThickness(2);
+		deactivated_rect.setFillColor(sf::Color(180, 180, 140));
+		deactivated_rect.setOutlineColor(sf::Color::Black);
+		deactivated_rect.setOutlineThickness(2);
+
+		this->on_text.setFont(font);
+		this->on_text.setString(on_text);
+		this->on_text.setCharacterSize(switch_text_size);
+		this->on_text.setFillColor(sf::Color::Black);
+
+		this->off_text.setFont(font);
+		this->off_text.setString(off_text);
+		this->off_text.setCharacterSize(switch_text_size);
+		this->off_text.setFillColor(sf::Color::Black);
+
+		update_position(x, y, width, height);
+	}
+
+	virtual void update_position(int x, int y, int width, int height);
+
+	virtual void draw(sf::RenderWindow& window, bool selected);
+
+	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+
+	SELECTABLE
+
+	virtual ~OrganSwitch() {
+
+	}
+
+protected:
+	virtual void bound_property_change(PropertyValue val);
+
+};
+
 
 #endif /* MIDICUBE_GUI_ENGINE_CONTROL_H_ */

@@ -167,3 +167,43 @@ void ComboBox::bound_property_change(PropertyValue val) {
 	update_position(this->x, this->y, width, height);
 }
 
+//OrganSwitch
+void OrganSwitch::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	int lower = height/2;
+	int upper = height - lower;
+	if (checked) {
+		activated_rect.setPosition(x, y);
+		activated_rect.setSize(sf::Vector2<float>(width, upper));
+
+		deactivated_rect.setPosition(x, y + upper);
+		deactivated_rect.setSize(sf::Vector2<float>(width, lower));
+	}
+
+	center_text(on_text, x, y, width, upper);
+	center_text(off_text, x, y + upper, width, lower);
+
+	center_text_left(text, x + width + 5, y, height);
+}
+
+void OrganSwitch::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(activated_rect);
+	window.draw(activated_rect);
+	window.draw(on_text);
+	window.draw(off_text);
+	window.draw(text);
+}
+
+void OrganSwitch::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+	if (button == sf::Mouse::Left) {
+		checked = !checked;
+		send_change(checked);
+		frame->request_redraw();
+	}
+}
+
+void OrganSwitch::bound_property_change(PropertyValue val) {
+	checked = val.bval;
+	frame->request_redraw();
+}
+
