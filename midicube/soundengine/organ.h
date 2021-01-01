@@ -188,7 +188,7 @@ public:
 	}
 };
 
-class B3Organ : public BaseSoundEngine, PropertyHolder {
+class B3Organ : public BaseSoundEngine, public PropertyHolder {
 
 private:
 	//Static values

@@ -20,7 +20,7 @@ void B3OrganView::property_change(PropertyChange change) {
 Scene B3OrganView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<PropertyHolder*> holders;
-	holders.push_back(&channel);
+	holders.push_back(&organ);
 
 	//Background
 	Pane* bg = new Pane(sf::Color(0x53, 0x32, 0x00), 0, 0, frame.get_width(), frame.get_height());
@@ -55,6 +55,7 @@ Scene B3OrganView::create(Frame &frame) {
 		Drawbar<ORGAN_DRAWBAR_MAX>* drawbar = new Drawbar<ORGAN_DRAWBAR_MAX>(0, main_font, titles[i], tmp_x, 60, 60, 300, colors[i]);
 		drawbar->text.setFillColor(sf::Color::White);
 		drawbar->title_text.setFillColor(sf::Color::Yellow);
+		drawbar->bind(&organ, B3OrganProperty::pB3Drawbar1 + i);
 		controls.push_back(drawbar);
 		tmp_x += 70;
 	}

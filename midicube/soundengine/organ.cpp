@@ -339,34 +339,42 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	for (size_t i = 0; i < data.preset.drawbar_ccs.size(); ++i) {
 		if (data.preset.drawbar_ccs[i] == control) {
 			data.preset.drawbars[i] = round((double) value/127 * ORGAN_DRAWBAR_MAX);
+			submit_change(B3OrganProperty::pB3Drawbar1 + i, (int) data.preset.drawbars[i]);
 		}
 	}
 	//Rotary
 	if (control == data.preset.rotary_cc) {
 		data.preset.rotary = value > 0;
+		submit_change(B3OrganProperty::pB3Rotary, data.preset.rotary);
 	}
 	if (control == data.preset.rotary_speed_cc) {
 		data.preset.rotary_fast = value > 0;
+		submit_change(B3OrganProperty::pB3RotarySpeed, data.preset.rotary_fast);
 	}
 	//Overdrive
 	if (control == data.preset.overdrive_cc) {
 		data.preset.overdrive = value/127.0;
+		submit_change(B3OrganProperty::pB3Overdrive, data.preset.overdrive);
 	}
 	//Percussion
 	if (control == data.preset.percussion_cc) {
 		data.preset.percussion = value > 0;
+		submit_change(B3OrganProperty::pB3Percussion, data.preset.percussion);
 	}
 	//Percussion Third Harmonic
 	if (control == data.preset.percussion_third_harmonic_cc) {
 		data.preset.percussion_third_harmonic = value > 0;
+		submit_change(B3OrganProperty::pB3PercussionThirdHarmonic, data.preset.percussion_third_harmonic);
 	}
 	//Percussion Fast Decay
 	if (control == data.preset.percussion_fast_decay_cc) {
 		data.preset.percussion_fast_decay = value > 0;
+		submit_change(B3OrganProperty::pB3PercussionFastDecay, data.preset.percussion_fast_decay);
 	}
 	//Percussion Soft
 	if (control == data.preset.percussion_soft_cc) {
 		data.preset.percussion_soft = value > 0;
+		submit_change(B3OrganProperty::pB3PercussionSoft, data.preset.percussion_soft);
 	}
 }
 
@@ -569,7 +577,7 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 		data.preset.harmonic_foldback_volume = val.dval;
 		break;
 	case B3OrganProperty::pB3DistortionType:
-		data.preset.distortion_type = val.ival;
+		data.preset.distortion_type = static_cast<DistortionType>(val.ival);
 		break;
 	case B3OrganProperty::pB3NormalizeOverdrive:
 		data.preset.normalize_overdrive = val.bval;
