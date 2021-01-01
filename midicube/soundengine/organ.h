@@ -37,8 +37,8 @@
 
 
 
-enum class DistortionType {
-	DIGITAL, ANALOG_1, ANALOG_2
+enum DistortionType {
+	DIGITAL_DISTORTION, ANALOG_DISTORTION_1, ANALOG_DISTORTION_2
 };
 
 enum B3OrganProperty {
@@ -102,7 +102,7 @@ struct B3OrganPreset {
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	double harmonic_foldback_volume{1.0};
 
-	DistortionType distortion_type{DistortionType::ANALOG_1};
+	DistortionType distortion_type{DistortionType::ANALOG_DISTORTION_1};
 	bool normalize_overdrive{false};
 	double overdrive{0};
 	unsigned int overdrive_cc{35};
@@ -188,7 +188,7 @@ public:
 	}
 };
 
-class B3Organ : public BaseSoundEngine {
+class B3Organ : public BaseSoundEngine, PropertyHolder {
 
 private:
 	//Static values
@@ -209,6 +209,10 @@ public:
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
 	void control_change(unsigned int control, unsigned int value);
+
+	PropertyValue get(size_t prop);
+
+	void set(size_t prop, PropertyValue value);
 
 };
 
