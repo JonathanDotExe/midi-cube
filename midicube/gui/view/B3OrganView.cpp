@@ -26,8 +26,33 @@ Scene B3OrganView::create(Frame &frame) {
 	Pane* bg = new Pane(sf::Color(0x53, 0x32, 0x00), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
 
+	//Col 1
+	int tmp_y = 20;
+	{
+		OrganSwitch* rotary = new OrganSwitch(false, "Rotary Speaker", main_font, 18, 10, tmp_y, 80, 60);
+		rotary->bind(&organ, B3OrganProperty::pB3Rotary);
+		controls.push_back(rotary);
+
+		tmp_y += 70;
+	}
+	{
+		OrganSwitch* rotary_speed = new OrganSwitch(false, "Rotary Speed", main_font, 18, 10, tmp_y, 80, 60, "Fast", "Slow");
+		rotary_speed->bind(&organ, B3OrganProperty::pB3RotarySpeed);
+		controls.push_back(rotary_speed);
+
+		tmp_y += 70;
+	}
+	{
+		OrganSwitch* rotary_type = new OrganSwitch(false, "Rotary Type", main_font, 18, 10, tmp_y, 80, 60);
+		rotary_type->bind(&organ, B3OrganProperty::pB3RotaryType);
+		controls.push_back(rotary_type);
+
+		tmp_y += 70;
+	}
+
+	//Col 2
 	//Drawbars
-	int tmp_x = 200;
+	int tmp_x = 230;
 	std::vector<sf::Color> colors = {
 			sf::Color(150, 0, 0),
 			sf::Color(150, 0, 0),

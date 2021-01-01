@@ -179,6 +179,13 @@ void OrganSwitch::update_position(int x, int y, int width, int height) {
 		deactivated_rect.setPosition(x, y + upper);
 		deactivated_rect.setSize(sf::Vector2<float>(width, lower));
 	}
+	else {
+		deactivated_rect.setPosition(x, y);
+		deactivated_rect.setSize(sf::Vector2<float>(width, upper));
+
+		activated_rect.setPosition(x, y + upper);
+		activated_rect.setSize(sf::Vector2<float>(width, lower));
+	}
 
 	center_text(on_text, x, y, width, upper);
 	center_text(off_text, x, y + upper, width, lower);
@@ -188,7 +195,7 @@ void OrganSwitch::update_position(int x, int y, int width, int height) {
 
 void OrganSwitch::draw(sf::RenderWindow& window, bool selected) {
 	window.draw(activated_rect);
-	window.draw(activated_rect);
+	window.draw(deactivated_rect);
 	window.draw(on_text);
 	window.draw(off_text);
 	window.draw(text);
@@ -198,12 +205,12 @@ void OrganSwitch::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	if (button == sf::Mouse::Left) {
 		checked = !checked;
 		send_change(checked);
-		frame->request_redraw();
+		update_position(this->x, this->y, width, height);
 	}
 }
 
 void OrganSwitch::bound_property_change(PropertyValue val) {
 	checked = val.bval;
-	frame->request_redraw();
+	update_position(x, y, width, height);
 }
 
