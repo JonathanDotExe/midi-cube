@@ -150,6 +150,45 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_x += 70;
 	}
 
+	//Col 3
+	tmp_y = 20;
+	//Percussion
+	{
+		OrganSwitch* percussion = new OrganSwitch(false, "Percussion", main_font, 18, tmp_x, tmp_y, 80, 60);
+		percussion->text.setFillColor(sf::Color::White);
+		percussion->bind(&organ, B3OrganProperty::pB3Percussion);
+		controls.push_back(percussion);
+
+		tmp_y += 70;
+	}
+	//Percussion Decay
+	{
+		OrganSwitch* percussion_decay = new OrganSwitch(false, "Perc. Decay", main_font, 18, tmp_x, tmp_y, 80, 60, "Fast", "Slow");
+		percussion_decay->text.setFillColor(sf::Color::White);
+		percussion_decay->bind(&organ, B3OrganProperty::pB3PercussionFastDecay);
+		controls.push_back(percussion_decay);
+
+		tmp_y += 70;
+	}
+	//Percussion
+	{
+		OrganSwitch* percussion_volume = new OrganSwitch(false, "Perc. Volume", main_font, 18, tmp_x, tmp_y, 80, 60, "Soft", "Hard");
+		percussion_volume->text.setFillColor(sf::Color::White);
+		percussion_volume->bind(&organ, B3OrganProperty::pB3PercussionSoft);
+		controls.push_back(percussion_volume);
+
+		tmp_y += 70;
+	}
+	//Percussion
+	{
+		OrganSwitch* percussion_harmonic = new OrganSwitch(false, "Perc. Harmonic", main_font, 18, tmp_x, tmp_y, 80, 60, "3rd", "2nd");
+		percussion_harmonic->text.setFillColor(sf::Color::White);
+		percussion_harmonic->bind(&organ, B3OrganProperty::pB3PercussionThirdHarmonic);
+		controls.push_back(percussion_harmonic);
+
+		tmp_y += 70;
+	}
+
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
