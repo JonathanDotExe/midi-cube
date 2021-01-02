@@ -39,3 +39,5 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * Very helpful tutorial on implementing resonant filters by Martin Finke (http://www.martin-finke.de/blog/articles/audio-plugins-013-filter/)
 * http://www.dma.ufg.ac.at/app/link/Grundlagen%3AAudio/module/8086?step=all
 * https://electricdruid.net/technical-aspects-of-the-hammond-organ/
+* https://www.hackaudio.com/digital-signal-processing/distortion-effects/bit-crushing/
+* https://de.wikipedia.org/wiki/Bitcrusher

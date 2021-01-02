@@ -25,6 +25,7 @@ protected:
 	int y = 0;
 	int width = 0;
 	int height = 0;
+	bool visible = true;
 
 public:
 	Frame* frame = nullptr;
@@ -61,6 +62,9 @@ public:
 
 	}
 
+	bool is_visible() const;
+
+	void set_visible(bool visible = true);
 };
 
 struct Scene {

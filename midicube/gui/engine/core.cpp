@@ -28,6 +28,17 @@ bool Control::collides (int x, int y) {
 	return this->x <= x && this->x + this->width > x && this->y <= y && this->y + this->height > y;
 }
 
+bool Control::is_visible() const {
+	return visible;
+}
+
+void Control::set_visible(bool visible) {
+	this->visible = visible;
+	if (frame) {
+		frame->request_redraw();
+	}
+}
+
 //Frame
 Frame::Frame(MidiCube& c, int width, int height, std::string title) : changes(512), cube(c) {
 	this->width = width;
@@ -71,7 +82,7 @@ void Frame::run(ViewController* v) {
 					last_mouse_y = event.mouseButton.y;
 				}
 				for (Control* control : controls) {
-					if (control->selectable() && control->collides(event.mouseButton.x, event.mouseButton.y)) {
+					if (control->is_visible() && control->selectable() && control->collides(event.mouseButton.x, event.mouseButton.y)) {
 						control->on_mouse_pressed(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
 						if (left) {
 							selected = control;
@@ -98,7 +109,7 @@ void Frame::run(ViewController* v) {
 					selected = nullptr;
 				}
 				for (Control* control : controls) {
-					if (control->selectable() && control->collides(event.mouseButton.x, event.mouseButton.y)) {
+					if (control->is_visible() && control->selectable() && control->collides(event.mouseButton.x, event.mouseButton.y)) {
 						control->on_mouse_released(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
 						break;
 					}
@@ -113,7 +124,9 @@ void Frame::run(ViewController* v) {
 		if (redraw) {
 			window.clear(sf::Color(80, 80, 80));
 			for (Control* control : controls) {
-				control->draw(window, selected == control);
+				if (control->is_visible()) {
+					control->draw(window, selected == control);
+				}
 			}
 			redraw = false;
 		}
