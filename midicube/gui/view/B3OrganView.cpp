@@ -28,22 +28,54 @@ Scene B3OrganView::create(Frame &frame) {
 
 	//Col 1
 	int tmp_y = 20;
+	//Rotary
 	{
 		OrganSwitch* rotary = new OrganSwitch(false, "Rotary Speaker", main_font, 18, 10, tmp_y, 80, 60);
+		rotary->text.setFillColor(sf::Color::White);
 		rotary->bind(&organ, B3OrganProperty::pB3Rotary);
 		controls.push_back(rotary);
 
 		tmp_y += 70;
 	}
+	//Rotary Speed
 	{
 		OrganSwitch* rotary_speed = new OrganSwitch(false, "Rotary Speed", main_font, 18, 10, tmp_y, 80, 60, "Fast", "Slow");
+		rotary_speed->text.setFillColor(sf::Color::White);
 		rotary_speed->bind(&organ, B3OrganProperty::pB3RotarySpeed);
 		controls.push_back(rotary_speed);
 
+		tmp_y += 80;
+	}
+	//Distortion Type
+	{
+		ComboBox* distortion_type = new ComboBox(0, {"Digital", "Analog 1", "Analog 2"}, main_font, 18, 0, 10, tmp_y, 80, 60);
+		distortion_type->bind(&organ, B3OrganProperty::pB3DistortionType);
+		controls.push_back(distortion_type);
+
+		Label* distortion_type_label = new Label("Distortion Type", main_font, 16, 95, tmp_y + 20);
+		distortion_type_label->text.setFillColor(sf::Color::White);
+		controls.push_back(distortion_type_label);
+
 		tmp_y += 70;
 	}
+
+	//Distortion Amount
 	{
-		OrganSwitch* rotary_type = new OrganSwitch(false, "Rotary Type", main_font, 18, 10, tmp_y, 80, 60);
+		DragBox<double>* overdrive = new DragBox<double>(0, 0, 1, main_font, 18, 10, tmp_y, 80, 60);
+		overdrive->bind(&organ, B3OrganProperty::pB3Overdrive);
+		controls.push_back(overdrive);
+
+		Label* overdrive_label = new Label("Overdrive", main_font, 16, 95, tmp_y + 20);
+		overdrive_label->text.setFillColor(sf::Color::White);
+		controls.push_back(overdrive_label);
+
+		tmp_y += 70;
+	}
+
+	//Rotary Type
+	{
+		OrganSwitch* rotary_type = new OrganSwitch(false, "Rotary Type", main_font, 18, 10, tmp_y, 80, 60, "1", "2");
+		rotary_type->text.setFillColor(sf::Color::White);
 		rotary_type->bind(&organ, B3OrganProperty::pB3RotaryType);
 		controls.push_back(rotary_type);
 
