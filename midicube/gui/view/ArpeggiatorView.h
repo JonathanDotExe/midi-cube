@@ -1,0 +1,26 @@
+/*
+ * ArpeggiatorView.h
+ *
+ *  Created on: Dec 29, 2020
+ *      Author: jojo
+ */
+
+#ifndef MIDICUBE_GUI_VIEW_ARPEGGIATORVIEW_H_
+#define MIDICUBE_GUI_VIEW_ARPEGGIATORVIEW_H_
+
+#include "../engine/core.h"
+#include "../engine/control.h"
+
+class ArpeggiatorView: public ViewController {
+private:
+	SoundEngineChannel& channel;
+	int channel_index;
+
+public:
+	ArpeggiatorView(SoundEngineChannel& channel, int channel_index);
+	virtual void property_change(PropertyChange change);
+	virtual Scene create(Frame &frame);
+	virtual ~ArpeggiatorView();
+};
+
+#endif /* MIDICUBE_GUI_VIEW_ARPEGGIATORVIEW_H_ */

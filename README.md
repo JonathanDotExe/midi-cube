@@ -1,6 +1,6 @@
 # midi-cube
 
-A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices with a touch display (Raspberry Pi) and Computers.
+A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices with a touch display (Raspberry Pi) and Computers.
 
 ## Planned features:
 * Serveral integrated virtual instruments like a B3 organ, an E-Piano-synthesizer, a sampler, drumkits, a subtractive/additive/FM-synthesizer, etc.
@@ -19,6 +19,9 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 * FluidSynth API for playing soundfonts licensed under LGPL-2.1 (https://github.com/FluidSynth/fluidsynth https://github.com/FluidSynth/fluidsynth/blob/master/LICENSE)
 * Boost licensed under the Boost Software License (https://github.com/boostorg/boost https://github.com/boostorg/boost/blob/master/LICENSE_1_0.txt)
 
+##Used Assets
+* Liberation font licensed onder the Open Font License (https://github.com/liberationfonts/liberation-fonts/tree/2.1.1 https://github.com/liberationfonts/liberation-fonts/blob/master/LICENSE)
+
 ## Used ressources
 * Format of .wav files from the german Wikipedia (https://de.wikipedia.org/wiki/RIFF_WAVE)
 * Article about the Hammond-Organ from the german Wikiedia (https://de.wikipedia.org/wiki/Hammondorgel)
@@ -36,3 +39,5 @@ A MIDI-Workstation written in C++. Inendend to both work on Single-Chip-Devices 
 * Very helpful tutorial on implementing resonant filters by Martin Finke (http://www.martin-finke.de/blog/articles/audio-plugins-013-filter/)
 * http://www.dma.ufg.ac.at/app/link/Grundlagen%3AAudio/module/8086?step=all
 * https://electricdruid.net/technical-aspects-of-the-hammond-organ/
+* https://www.hackaudio.com/digital-signal-processing/distortion-effects/bit-crushing/
+* https://de.wikipedia.org/wiki/Bitcrusher

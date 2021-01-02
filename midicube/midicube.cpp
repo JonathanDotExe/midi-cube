@@ -12,7 +12,7 @@ static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleIn
 	((MidiCube*) user_data)->process(channels, info);
 }
 
-MidiCube::MidiCube() {
+MidiCube::MidiCube() : changes(128) {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -56,17 +56,38 @@ void MidiCube::init() {
 	//Default setting
 	SoundEngineBank* bank2 = engine.get_sound_engines().at(2);
 	static_cast<BaseSoundEngine&>(bank2->channel(1)).sustain = false;
-	Arpeggiator& arp = engine.get_channel(1).arpeggiator();
+	Arpeggiator& arp = engine.channels[1].arp;
 	arp.on = true;
 	arp.preset.octaves = 3;
-	arp.preset.pattern = ArpeggiatorPattern::UP;
+	arp.preset.pattern = ArpeggiatorPattern::ARP_UP;
 	arp.preset.value = 1;
 	arp.metronome.set_bpm(440);
+
+	//Default engines
+	engine.channels[0].active = true;
+	engine.channels[0].set_engine(0);
+
+	engine.channels[9].active = true;
+	engine.channels[9].set_engine(3);
+
+	engine.channels[10].bitcrusher_preset.on = true;
+	engine.channels[10].bitcrusher_preset.bits = 8;
+
+	for (size_t i = 0; i < engine.channels.size(); ++i) {
+		engine.channels[i].source.channel = i;
+		engine.channels[i].source.input = 1;
+	}
 	//Init audio
 	audio_handler.init();
 }
 
 void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+	//Changes
+	PropertyChange change;
+	while (changes.pop(change)) {
+		change.holder->set(change.property, change.value);
+	}
+	//Process
 	engine.process_sample(channels, info);
 }
 
@@ -77,16 +98,18 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 	MessageType t = message.get_message_type();
 	SampleInfo info = audio_handler.sample_info();
-	for (size_t i = 0; i < channels.size(); ++i) {
-		ChannelSource& s = channels[i];
+	for (size_t i = 0; i < engine.channels.size(); ++i) {
+		ChannelSource& s = engine.channels[i].source;
 		if (s.input == static_cast<ssize_t>(input) && s.channel == message.get_channel()) {
 			bool pass = true;
 			MidiMessage msg = message;
 			switch (t) {
-			case MessageType::NOTE_OFF:
 			case MessageType::NOTE_ON:
+				pass = s.start_velocity <= message.get_velocity() && s.end_velocity >= message.get_velocity();
+				/* no break */
+			case MessageType::NOTE_OFF:
 			case MessageType::POLYPHONIC_AFTERTOUCH:
-				pass = s.start_note <= message.get_note() && s.end_note >= message.get_note();
+				pass = pass && s.start_note <= message.get_note() && s.end_note >= message.get_note();
 				if (s.octave) {
 					msg.set_note(msg.get_note() + s.octave * 12);
 				}
@@ -117,6 +140,11 @@ void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 		}
 	}
 }
+
+void MidiCube::perform_change(PropertyChange change) {
+	changes.push(change);
+}
+
 MidiCube::~MidiCube() {
 	audio_handler.close();
 	for (MidiCubeInput in : inputs) {

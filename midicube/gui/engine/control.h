@@ -1,7 +1,7 @@
 /*
  * control.h
  *
- *  Created on: 10 Oct 2020
+ *  Created on: Dec 19, 2020
  *      Author: jojo
  */
 
@@ -10,362 +10,446 @@
 
 #include "core.h"
 #include "util.h"
-#include "container.h"
-#include "../../util.h"
-#include <cmath>
-#include <algorithm>
+#include <functional>
 
-class Label : public StyleableNode {
-
-private:
-	TextPositioner positioner;
-	std::string text;
-
+class Label : public Control {
 public:
-	TextStyle style;
+	sf::Text text;
 
-	Label(std::string text);
+	Label(std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
+		this->text.setFont(font);
+		this->text.setString(text);
+		this->text.setCharacterSize(text_size);
+		this->text.setFillColor(sf::Color::Black);
 
-	virtual Vector get_content_size() {
-		return positioner.size();
+		update_position(x, y, width, height);
 	}
 
-	virtual void draw(int parentX, int parentY, NodeEnv env);
+	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void update_text(std::string text);
+	virtual void draw(sf::RenderWindow& window, bool selected);
 
-	virtual void update_style();
+	virtual ~Label() {
 
-	virtual ~Label();
+	}
 
 };
 
-class Button : public StyleableNode {
-
-private:
-	TextPositioner positioner;
-	std::string text;
-	std::function<void()> on_click = nullptr;
+class Pane : public Control {
 
 public:
-	BoxStyle style;
-	TextStyle text_style;
+	sf::RectangleShape rect;
 
-	Button(std::string text);
+	Pane(sf::Color color, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
+		rect.setFillColor(color);
 
-	virtual void draw(int parentX, int parentY, NodeEnv env);
-
-	void set_on_click(std::function<void()> on_click);
-
-	virtual Vector get_content_size() {
-		return positioner.size();
+		update_position(x, y, width, height);
 	}
 
-	FOCUS_TRAVERSABLE
+	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
+	virtual void draw(sf::RenderWindow& window, bool selected);
 
-	virtual void update_style();
+	virtual ~Pane() {
 
-	virtual ~Button();
+	}
 
+};
+
+class Button : public Control {
+private:
+	std::function<void(void)> on_click = nullptr;
+
+public:
+	sf::RectangleShape rect;
+	sf::Text text;
+
+	Button(std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
+		this->text.setFont(font);
+		this->text.setString(text);
+		this->text.setCharacterSize(text_size);
+		this->text.setFillColor(sf::Color::Black);
+		rect.setFillColor(sf::Color(220, 220, 220));
+
+		update_position(x, y, width, height);
+	}
+
+	virtual void update_position(int x, int y, int width, int height);
+
+	virtual void draw(sf::RenderWindow& window, bool selected);
+
+	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+
+	void update_text(std::string text);
+
+	SELECTABLE
+
+	virtual ~Button() {
+
+	}
+
+	void set_on_click(const std::function<void(void)> &onClick = nullptr) {
+		on_click = onClick;
+	}
+};
+
+class Slider : public BindableControl {
+
+private:
+	double progress;
+	double min;
+	double max;
+
+	double slider_width;
+	double button_height;
+
+public:
+	sf::RectangleShape slider_rect;
+	sf::RectangleShape button_rect;
+	sf::RectangleShape context_rect;
+	sf::Text text;
+
+	Slider(double value, double min, double max, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, double slider_width = 0.7, double button_height = 0.15) : BindableControl (x, y, width, height) {
+		this->min = min;
+		this->max = max;
+		this->progress = (value - min)/(max - min);
+
+		this->slider_width = slider_width;
+		this->button_height = button_height;
+
+		this->slider_rect.setFillColor(sf::Color(50, 50, 50));
+		this->button_rect.setFillColor(sf::Color(220, 220, 220));
+
+		this->text.setFont(font);
+		this->text.setFillColor(sf::Color::Black);
+		this->text.setCharacterSize(12);
+
+		this->context_rect.setFillColor(sf::Color::White);
+		this->context_rect.setOutlineColor(sf::Color::Black);
+
+		update_position(x, y, width, height);
+	}
+
+	virtual void update_position(int x, int y, int width, int height);
+
+	virtual void draw(sf::RenderWindow& window, bool selected);
+
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion);
+
+	SELECTABLE
+
+	virtual ~Slider() {
+
+	}
+
+protected:
+	virtual void bound_property_change(PropertyValue val);
 };
 
 template <typename T>
-class ComboBox : public StyleableNode {
+class DragBox : public BindableControl {
 
 private:
-	TextPositioner positioner;
-	std::vector<T> values;
-	std::function<std::string(T)> to_string = nullptr;
-	std::function<void(T)> on_change = nullptr;
-	size_t index = 0;
-	std::string text;
+	double progress;
+	T min;
+	T max;
 
 public:
-	BoxStyle style;
-	TextStyle text_style;
+	sf::RectangleShape rect;
+	sf::Text text;
+	double drag_mul = 0.0025;
 
-	ComboBox(std::vector<T> values, std::function<std::string(T)> to_string);
+	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
+		this->min = min;
+		this->max = max;
+		this->progress = (value - min)/(max - min);
 
-	virtual void draw(int parentX, int parentY, NodeEnv env);
+		this->rect.setFillColor(sf::Color(220, 220, 220));
 
-	void set_on_change(std::function<void(T)> on_change);
+		this->text.setFont(font);
+		this->text.setFillColor(sf::Color::Black);
+		this->text.setCharacterSize(text_size);
 
-	void set_index (size_t index) {
-		values.at(index);
-		this->index = index;
-		text = to_string(values.at(index));
-		if (frame) {
-			frame->request_relayout();
+		update_position(x, y, width, height);
+	}
+
+	virtual void update_position(int x, int y, int width, int height) {
+		Control::update_position(x, y, width, height);
+		rect.setPosition(x, y);
+		rect.setSize(sf::Vector2<float>(width, height));
+		T value = progress * (max - min) + min;
+		text.setString(std::to_string(value));
+		center_text(text, x, y, width, height);
+	}
+
+	virtual void draw(sf::RenderWindow& window, bool selected) {
+		window.draw(rect);
+		window.draw(text);
+	}
+
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
+		T old_val = progress * (max - min) + min;
+		progress += drag_mul * x_motion;
+
+		if (progress < 0) {
+			progress = 0;
+		}
+		else if (progress > 1) {
+			progress = 1;
+		}
+
+		if (old_val != (progress * (max - min) + min)) {
+			T value = progress * (max - min) + min;
+			send_change(value);
+			update_position(this->x, this->y, width, height);
 		}
 	}
 
-	inline void set_value (T t) {
-		size_t index = std::find(values.begin(), values.end(), t) - values.begin();
-		set_index(index);
+	SELECTABLE
+
+	virtual ~DragBox() {
+
 	}
 
-	virtual Vector get_content_size() {
-		return positioner.size();
+protected:
+	virtual void bound_property_change(PropertyValue val) {
+		T v = val.get(PropertyType<T>{});
+		progress = fmin(fmax((double) (v - min)/(max - min), 0), 1);
+		update_position(this->x, this->y, width, height);
 	}
-
-	FOCUS_TRAVERSABLE
-
-	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
-
-	virtual void update_style();
-
-	virtual ~ComboBox();
 
 };
 
-//ComboBox
-template<typename T>
-ComboBox<T>::ComboBox(std::vector<T> values, std::function<std::string(T)> to_string) : StyleableNode() {
-	this->values = values;
-	this->to_string = to_string;
-
-	get_layout().width = WRAP_CONTENT;
-	get_layout().height = WRAP_CONTENT;
-	get_layout().padding_left = 5;
-	get_layout().padding_right = 5;
-	get_layout().padding_top = 5;
-	get_layout().padding_bottom = 5;
-
-	style.border_color = BLACK;
-	style.border_thickness = 2;
-	style.border_radius = 0.2f;
-	style.fill_color = LIGHTGRAY;
-
-	text = to_string(values.at(index));
-}
-
-template<typename T>
-void ComboBox<T>::draw(int parentX, int parentY, NodeEnv env) {
-	render_box(parentX + x, parentY + y, width, height, style, env.hovered == this);
-	//Text
-	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, text_style);
-}
-
-template<typename T>
-void ComboBox<T>::set_on_change(std::function<void(T)> on_change) {
-	this->on_change = on_change;
-}
-
-template<typename T>
-void ComboBox<T>::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
-	if (env.focused == this && button == MouseButtonType::LEFT) {
-		index++;
-		if (index >= values.size()) {
-			index = 0;
-		}
-		text = to_string(values.at(index));
-		frame->request_relayout();
-		//Actions
-		if (on_change) {
-			on_change(values.at(index));
-		}
-	}
-}
-
-template<typename T>
-void ComboBox<T>::update_style() {
-	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, text_style);
-}
-
-template<typename T>
-ComboBox<T>::~ComboBox() {
-
-}
-
-class CheckBox : public StyleableNode {
-
+class CheckBox : public BindableControl {
 private:
-	std::function<void (bool)> on_change;
-
-public:
-	BoxStyle style;
-	BoxStyle inner_style;
 	bool checked = false;
 
-	CheckBox();
-
-	virtual void draw(int parentX, int parentY, NodeEnv env);
-
-	virtual void set_on_change(std::function<void (bool)> on_change);
-
-	FOCUS_TRAVERSABLE
-
-	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
-
-	virtual Vector get_content_size() {
-		return {14, 14};
-	}
-
-	virtual ~CheckBox();
-
-};
-
-template <typename T>
-class LabeledControl : public HBox {
 public:
-	T* control;
-	Label* label;
+	sf::RectangleShape rect;
+	sf::RectangleShape inner_rect;
+	sf::Text text;
 
-	LabeledControl(std::string text, T* control = new T(), bool after = true) {
-		layout.width = WRAP_CONTENT;
-		layout.height = WRAP_CONTENT;
+	CheckBox(bool checked, std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
+		this->checked = checked;
 
-		this->control = control;
-		control->get_layout().valignment = VerticalAlignment::CENTER;
-		control->get_layout().margin_left = 2;
-		control->get_layout().margin_right = 2;
-		label = new Label(text);
-		label->get_layout().valignment = VerticalAlignment::CENTER;
+		this->text.setFont(font);
+		this->text.setString(text);
+		this->text.setCharacterSize(text_size);
+		this->text.setFillColor(sf::Color::Black);
 
-		if (after) {
-			add_child(control);
-			add_child(label);
-		}
-		else {
-			add_child(label);
-			add_child(control);
-		}
+		rect.setFillColor(sf::Color(220, 220, 220));
+		inner_rect.setFillColor(sf::Color(50, 50, 50));
+
+		update_position(x, y, width, height);
 	}
 
-	virtual ~LabeledControl() {
+	virtual void update_position(int x, int y, int width, int height);
+
+	virtual void draw(sf::RenderWindow& window, bool selected);
+
+	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+
+	SELECTABLE
+
+	virtual ~CheckBox() {
 
 	}
-	const T& get_checkbox() const {
-		return *control;
-	}
 
-	const Label& get_label() const {
-		return *label;
-	}
+protected:
+	virtual void bound_property_change(PropertyValue val);
 
 };
 
-class Slider : public StyleableNode {
+class ComboBox : public BindableControl {
+private:
+	int start_val = 0;
+	int index = 0;
+	std::vector<std::string> values;
+
+public:
+	sf::RectangleShape rect;
+	sf::Text text;
+
+	ComboBox(int value, std::vector<std::string> values, sf::Font& font, int text_size = 12, int start_val = 0, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
+		this->start_val = start_val;
+		this->index = value - start_val;
+		this->values = values;
+
+		this->text.setFont(font);
+		this->text.setCharacterSize(text_size);
+		this->text.setFillColor(sf::Color::Black);
+		rect.setFillColor(sf::Color(220, 220, 220));
+
+		update_position(x, y, width, height);
+	}
+
+	int get_value() {
+		return index + start_val;
+	}
+
+	virtual void update_position(int x, int y, int width, int height);
+
+	virtual void draw(sf::RenderWindow& window, bool selected);
+
+	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+
+	SELECTABLE
+
+	virtual ~ComboBox() {
+
+	}
+
+protected:
+	virtual void bound_property_change(PropertyValue val);
+};
+
+template<int MAX>
+class Drawbar : public BindableControl {
 
 private:
-	std::function<void (double)> on_change;
-
-	void move_slider(int y);
-
-public:
-	BoxStyle style;
-	BoxStyle button_style;
 	double progress;
-	FixedScale scale{0, {}, 1};
-	int inner_width = 10;
-	int button_height = 10;
 
-	Slider(double value, FixedScale scale);
+	double slider_width;
+	int button_height;
 
-	void set_value(double value) {
-		set_progress(scale.progress(value));
+public:
+	sf::RectangleShape slider_rect;
+	sf::RectangleShape button_rect;
+	sf::Text title_text;
+	sf::Text text;
+
+	Drawbar(int value, sf::Font& font, std::string title, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : BindableControl (x, y, width, height) {
+		this->progress = (double) value/MAX;
+
+		this->slider_width = slider_width;
+		this->button_height = button_height;
+
+		this->slider_rect.setFillColor(sf::Color::Black);
+		this->slider_rect.setOutlineColor(sf::Color::White);
+		this->slider_rect.setOutlineThickness(2);
+		this->button_rect.setFillColor(button_color);
+		this->button_rect.setOutlineColor(sf::Color::Black);
+		this->button_rect.setOutlineThickness(2);
+
+		this->title_text.setFont(font);
+		this->title_text.setFillColor(sf::Color::Black);
+		this->title_text.setCharacterSize(24);
+		this->title_text.setString(title);
+
+		this->text.setFont(font);
+		this->text.setFillColor(sf::Color::Black);
+		this->text.setCharacterSize(24);
+
+		update_position(x, y, width, height);
 	}
 
-	void set_progress(double prog) {
-		this->progress = fmax(fmin(prog, 1), 0);
-		if (frame) {
-			frame->request_redraw();
+	virtual void update_position(int x, int y, int width, int height) {
+		Control::update_position(x, y, width, height);
+		int value = MAX * progress;
+		double real_prog = (double) value/MAX;
+		//Slider
+		double range = height - button_height;
+		slider_rect.setPosition(x + width/2 - width * slider_width / 2, y);
+		slider_rect.setSize(sf::Vector2<float>(width * slider_width, real_prog * range - 2));
+		//Button
+		button_rect.setPosition(x, y + real_prog * range);
+		button_rect.setSize(sf::Vector2<float>(width, button_height));
+
+		//Value Text
+		text.setString(std::to_string(value));
+		center_text_top(text, x, y + height + 5, width, height);
+
+		//Title Text
+		center_text_top(title_text, x, y - 40, width, 40);
+	}
+
+	virtual void draw(sf::RenderWindow& window, bool selected) {
+		window.draw(slider_rect);
+		window.draw(button_rect);
+		window.draw(text);
+		window.draw(title_text);
+	}
+
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
+		int old_val = MAX * progress;
+		progress += (double)y_motion/height;
+
+		if (progress < 0) {
+			progress = 0;
+		}
+		else if (progress > 1) {
+			progress = 1;
+		}
+
+		int value = MAX * progress;
+		if (old_val != value) {
+			send_change(value);
+			update_position(this->x, this->y, width, height);
 		}
 	}
 
-	virtual void draw(int parentX, int parentY, NodeEnv env);
+	SELECTABLE
 
-	virtual void set_on_change(std::function<void (double)> on_change);
+	virtual ~Drawbar() {
 
-	FOCUS_TRAVERSABLE
-
-	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
-
-	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env);
-
-	virtual Vector get_content_size() {
-		return {30, 100};
 	}
 
-	virtual ~Slider();
-
+protected:
+	virtual void bound_property_change(PropertyValue val) {
+		progress = (double) val.ival / MAX;
+		update_position(x, y, width, height);
+	}
 };
 
-class Spinner : public StyleableNode {
-
+class OrganSwitch : public BindableControl {
 private:
-	TextPositioner positioner;
-	int min;
-	int max;
-	int value;
-	std::string text;
-	std::function<void(int)> on_change = nullptr;
+	bool checked = false;
 
 public:
-	BoxStyle style;
-	BoxStyle button_style;
-	TextStyle text_style;
-	int button_width = 10;
+	sf::RectangleShape activated_rect;
+	sf::RectangleShape deactivated_rect;
+	sf::Text on_text;
+	sf::Text off_text;
 
-	Spinner(int min, int max, int value);
+	OrganSwitch(bool checked, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, std::string on_text="On", std::string off_text="Off", int switch_text_size = 12) : BindableControl (x, y, width, height) {
+		this->checked = checked;
 
-	virtual void draw(int parentX, int parentY, NodeEnv env);
+		activated_rect.setFillColor(sf::Color::White);
+		activated_rect.setOutlineColor(sf::Color::Black);
+		activated_rect.setOutlineThickness(2);
+		deactivated_rect.setFillColor(sf::Color(180, 180, 140));
+		deactivated_rect.setOutlineColor(sf::Color::Black);
+		deactivated_rect.setOutlineThickness(2);
 
-	void set_on_change(std::function<void(int)> on_change);
+		this->on_text.setFont(font);
+		this->on_text.setString(on_text);
+		this->on_text.setCharacterSize(switch_text_size);
+		this->on_text.setFillColor(sf::Color::Black);
 
-	virtual Vector get_content_size() {
-		Vector size = positioner.size();
-		size.x += button_width * 2;
-		return size;
+		this->off_text.setFont(font);
+		this->off_text.setString(off_text);
+		this->off_text.setCharacterSize(switch_text_size);
+		this->off_text.setFillColor(sf::Color::Black);
+
+		update_position(x, y, width, height);
 	}
 
-	FOCUS_TRAVERSABLE
+	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
+	virtual void draw(sf::RenderWindow& window, bool selected);
 
-	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
+	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
 
-	virtual void update_style();
+	SELECTABLE
 
-	virtual ~Spinner();
+	virtual ~OrganSwitch() {
+
+	}
+
+protected:
+	virtual void bound_property_change(PropertyValue val);
 
 };
 
-class DragBox : public StyleableNode {
-
-private:
-	std::function<void (double)> on_change;
-	std::string text;
-	TextPositioner positioner;
-
-public:
-	BoxStyle style;
-	TextStyle text_style;
-	double progress;
-	int precision = 2;
-	FixedScale scale{0, {}, 1};
-	double step = 1.0/127;
-
-	DragBox(double value, FixedScale scale);
-
-	virtual void draw(int parentX, int parentY, NodeEnv env);
-
-	virtual void set_on_change(std::function<void (double)> on_change);
-
-	FOCUS_TRAVERSABLE
-
-	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env);
-
-	virtual void update_style();
-
-	virtual Vector get_content_size() {
-		return positioner.size();
-	}
-
-	virtual ~DragBox();
-
-};
 
 #endif /* MIDICUBE_GUI_ENGINE_CONTROL_H_ */

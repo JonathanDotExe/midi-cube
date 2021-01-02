@@ -1,27 +1,22 @@
 /*
  * util.h
  *
- *  Created on: 10 Oct 2020
+ *  Created on: Dec 20, 2020
  *      Author: jojo
  */
 
 #ifndef MIDICUBE_GUI_ENGINE_UTIL_H_
 #define MIDICUBE_GUI_ENGINE_UTIL_H_
 
-#include "core.h"
+#include <SFML/Graphics.hpp>
 
-class TextPositioner {
-private:
-	int x_off = 0;
-	int y_off = 0;
-	int width = 0;
-	int height = 0;
-public:
-	void draw(int x, int y, std::string text, TextStyle& style);
-	void recalc(int width, int height, std::string text, TextStyle& style);
-	Vector size();
-};
+void center_text(sf::Text& text, int x, int y, int width, int height);
 
-extern void render_box(int x, int y, int width, int height, BoxStyle& style, bool hover = false);
+void center_text_left(sf::Text& text, int x, int y, int height);
+
+void center_text_right(sf::Text& text, int x, int y, int width, int height);
+
+void center_text_top(sf::Text& text, int x, int y, int width, int height);
+
 
 #endif /* MIDICUBE_GUI_ENGINE_UTIL_H_ */

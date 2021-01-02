@@ -1,351 +1,213 @@
 /*
  * control.cpp
  *
- *  Created on: 10 Oct 2020
+ *  Created on: Dec 19, 2020
  *      Author: jojo
  */
 
 #include "control.h"
+#include <iostream>
 #include <cmath>
-#include <cmath>
-#include <iomanip>
-#include <sstream>
 
 //Label
-Label::Label(std::string text) : StyleableNode() {
-	this->text = text;
-	get_layout().width = WRAP_CONTENT;
-	get_layout().height = WRAP_CONTENT;
-	update_style();
+void Label::update_position(int x, int y, int width, int height) {
+	text.setPosition(x, y);
 }
 
-void Label::draw(int parentX, int parentY, NodeEnv env) {
-	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, style);
+void Label::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(text);
 }
 
-void Label::update_text(std::string text) {
-	this->text = text;
-	frame->request_relayout();
+//Pane
+void Pane::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	rect.setPosition(x, y);
+	rect.setSize(sf::Vector2<float>(width, height));
 }
 
-void Label::update_style() {
-	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, style);
-}
-
-Label::~Label() {
-
+void Pane::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(rect);
 }
 
 //Button
-Button::Button(std::string text) : StyleableNode() {
-	this->text = text;
-
-	get_layout().width = WRAP_CONTENT;
-	get_layout().height = WRAP_CONTENT;
-	get_layout().padding_left = 5;
-	get_layout().padding_right = 5;
-	get_layout().padding_top = 5;
-	get_layout().padding_bottom = 5;
-
-	style.border_color = BLACK;
-	style.border_thickness = 2;
-	style.border_radius = 0.2f;
-	style.fill_color = LIGHTGRAY;
+void Button::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	rect.setPosition(x, y);
+	rect.setSize(sf::Vector2<float>(width, height));
+	center_text(text, x, y, width, height);
 }
 
-void Button::draw(int parentX, int parentY, NodeEnv env) {
-	render_box(parentX + x, parentY + y, width, height, style, env.hovered == this);
-	//Text
-	positioner.draw(parentX + x + layout.padding_left, parentY + y + layout.padding_top, text, text_style);
+void Button::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(rect);
+	window.draw(text);
 }
 
-void Button::set_on_click(std::function<void()> on_click) {
-	this->on_click = on_click;
-}
-
-void Button::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
-	if (env.focused == this && button == MouseButtonType::LEFT) {
-		//Actions
-		if (on_click) {
-			on_click();
-		}
+void Button::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+	if (on_click) {
+		on_click();
 	}
 }
 
-void Button::update_style() {
-	positioner.recalc(width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, text, text_style);
-}
-
-Button::~Button() {
-
-}
-
-//CheckBox
-CheckBox::CheckBox() {
-	get_layout().width = WRAP_CONTENT;
-	get_layout().height = WRAP_CONTENT;
-	get_layout().padding_left = 2;
-	get_layout().padding_right = 2;
-	get_layout().padding_top = 2;
-	get_layout().padding_bottom = 2;
-
-	style.border_color = BLACK;
-	style.border_thickness = 1;
-	style.border_radius = 0;
-	style.fill_color = RAYWHITE;
-	style.hover_color = LIGHTGRAY;
-
-	inner_style.fill_color = {50, 50, 110, 255};
-	inner_style.hover_color = BLACK;
-	inner_style.border_radius = 0;
-};
-
-void CheckBox::draw(int parentX, int parentY, NodeEnv env) {
-	render_box(parentX + x, parentY + y, width, height, style, env.hovered == this);
-	if (checked) {
-		render_box(parentX + x + layout.padding_left, parentY + y + layout.padding_top, width - layout.padding_left - layout.padding_right, height - layout.padding_top - layout.padding_bottom, inner_style, env.hovered == this);
-	}
-}
-
-void CheckBox::set_on_change(std::function<void (bool)> on_change) {
-	this->on_change = on_change;
-}
-
-void CheckBox::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
-	if (env.focused == this && button == MouseButtonType::LEFT) {
-		checked = !checked;
-		frame->request_redraw();
-		//Actions
-		if (on_change) {
-			on_change(checked);
-		}
-	}
-}
-
-CheckBox::~CheckBox() {
-
+void Button::update_text(std::string text) {
+	this->text.setString(text);
+	update_position(x, y, width, height);
 }
 
 //Slider
-Slider::Slider(double value, FixedScale scale) {
-	this->scale = scale;
-	progress = this->scale.progress(value);
-	get_layout().padding_left = 2;
-	get_layout().padding_right = 2;
-	get_layout().padding_top = 2;
-	get_layout().padding_bottom = 2;
+void Slider::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	//Slider
+	slider_rect.setPosition(x + width/2 - width * slider_width / 2, y);
+	slider_rect.setSize(sf::Vector2<float>(width * slider_width, height));
+	//Button
+	double range = height * (1 - button_height);
+	button_rect.setPosition(x, y + range * (1 - progress));
+	button_rect.setSize(sf::Vector2<float>(width, height * button_height));
 
-	style.border_color = BLACK;
-	style.border_thickness = 1;
-	style.border_radius = 1;
-	style.fill_color =  RAYWHITE;
-	style.hover_color = LIGHTGRAY;
+	//Context box and text
+	double value = (max - min) * progress + min;
+	text.setString(std::to_string(value));
 
-	button_style.border_color = BLACK;
-	button_style.border_thickness = 1;
-	button_style.border_radius = 0.3f;
-	button_style.fill_color = LIGHTGRAY;
-	button_style.hover_color = GRAY;
+	center_text_top(text, x, y + height + 5, width, height);
+	context_rect.setOrigin(text.getOrigin());
+	context_rect.setPosition(text.getPosition());
+	sf::FloatRect bounds = text.getLocalBounds();
+	context_rect.setSize(sf::Vector2<float>(bounds.left + bounds.width + 2, bounds.top + bounds.height + 2));
 }
 
-void Slider::draw(int parentX, int parentY, NodeEnv env) {
-	render_box(parentX + x + (width - inner_width)/2 , parentY + y, inner_width, height, style, env.hovered == this);
-	int button_height = height - layout.padding_top - layout.padding_bottom - this->button_height;
-	render_box(parentX + x, parentY + y + layout.padding_top + button_height * (1 - progress), width, this->button_height, button_style, env.hovered == this);
+void Slider::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(slider_rect);
+	window.draw(button_rect);
+	if (selected) {
+		window.draw(context_rect);
+		window.draw(text);
+ 	}
 }
 
-void Slider::set_on_change(std::function<void (double)> on_change) {
-	this->on_change = on_change;
-}
-
-void Slider::move_slider(int y) {
+void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 	double old_prog = progress;
-	progress = 1 - (double) (y - button_height/2)/(height - layout.padding_top - layout.padding_bottom - button_height);
+	progress -= (double)y_motion/height;
+
 	if (progress < 0) {
 		progress = 0;
 	}
 	else if (progress > 1) {
 		progress = 1;
 	}
-	if (progress != old_prog) {
-		if (on_change) {
-			on_change(scale.value(progress));
-		}
+
+	if (old_prog != progress) {
+		double value = (max - min) * progress + min;
+		send_change(value);
+		update_position(this->x, this->y, width, height);
+	}
+}
+
+void Slider::bound_property_change(PropertyValue val) {
+	progress = fmin(fmax((val.dval - min)/(max - min), 0), 1);
+	update_position(this->x, this->y, width, height);
+}
+
+//CheckBox
+void CheckBox::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	rect.setPosition(x, y);
+	rect.setSize(sf::Vector2<float>(width, height));
+	inner_rect.setPosition(x + 4, y + 4);
+	inner_rect.setSize(sf::Vector2<float>(width - 8, height - 8));
+
+	center_text_left(text, x + width + 5, y, height);
+}
+
+void CheckBox::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(rect);
+	if (checked) {
+		window.draw(inner_rect);
+	}
+	window.draw(text);
+}
+
+void CheckBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+	if (button == sf::Mouse::Left) {
+		checked = !checked;
+		send_change(checked);
 		frame->request_redraw();
 	}
 }
 
-void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
-	if (button == MouseButtonType::LEFT) {
-		move_slider(y);
+void CheckBox::bound_property_change(PropertyValue val) {
+	checked = val.bval;
+	frame->request_redraw();
+}
+
+//ComboBox
+void ComboBox::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	rect.setPosition(x, y);
+	rect.setSize(sf::Vector2<float>(width, height));
+	text.setString(values.at(index));
+	center_text(text, x, y, width, height);
+}
+
+void ComboBox::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(rect);
+	window.draw(text);
+}
+
+void ComboBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+	index++;
+	if (index >= (int) values.size()) {
+		index = 0;
+	}
+	send_change(index + start_val);
+	update_position(this->x, this->y, width, height);
+}
+
+void ComboBox::bound_property_change(PropertyValue val) {
+	index = val.ival - start_val;
+	update_position(this->x, this->y, width, height);
+}
+
+//OrganSwitch
+void OrganSwitch::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	int lower = height/2;
+	int upper = height - lower;
+	if (checked) {
+		activated_rect.setPosition(x, y);
+		activated_rect.setSize(sf::Vector2<float>(width, upper));
+
+		deactivated_rect.setPosition(x, y + upper);
+		deactivated_rect.setSize(sf::Vector2<float>(width, lower));
+	}
+	else {
+		deactivated_rect.setPosition(x, y);
+		deactivated_rect.setSize(sf::Vector2<float>(width, upper));
+
+		activated_rect.setPosition(x, y + upper);
+		activated_rect.setSize(sf::Vector2<float>(width, lower));
+	}
+
+	center_text(on_text, x, y, width, upper);
+	center_text(off_text, x, y + upper, width, lower);
+}
+
+void OrganSwitch::draw(sf::RenderWindow& window, bool selected) {
+	window.draw(activated_rect);
+	window.draw(deactivated_rect);
+	window.draw(on_text);
+	window.draw(off_text);
+}
+
+void OrganSwitch::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+	if (button == sf::Mouse::Left) {
+		checked = !checked;
+		send_change(checked);
+		update_position(this->x, this->y, width, height);
 	}
 }
 
-void Slider::on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env) {
-	if (button == MouseButtonType::LEFT) {
-		move_slider(y - this->y);
-	}
-}
-
-
-Slider::~Slider() {
-
-}
-
-//Spinner
-Spinner::Spinner(int min, int max, int value) {
-	this->min = min;
-	this->max = max;
-	this->value = value;
-	text = std::to_string(value);
-
-	style.border_color = BLACK;
-	style.border_thickness = 1;
-	style.border_radius = 0;
-	style.fill_color =  RAYWHITE;
-	style.hover_color = LIGHTGRAY;
-
-	button_style.border_color = BLACK;
-	button_style.border_thickness = 1;
-	button_style.border_radius = 0.5f;
-	button_style.fill_color = LIGHTGRAY;
-	button_style.hover_color = GRAY;
-
-	text_style.font_size = 10;
-	text_style.text_valignment = VerticalAlignment::CENTER;
-	text_style.text_halignment = HorizontalAlignment::CENTER;
-
-	layout.padding_top = 2;
-	layout.padding_bottom = 2;
-	layout.padding_left = 2;
-	layout.padding_right = 2;
-	update_style();
-}
-
-void Spinner::draw(int parentX, int parentY, NodeEnv env) {
-	//Left Button
-	render_box(parentX + x, parentY + y, button_width, height, button_style, env.hovered == this);
-	//Center
-	render_box(parentX + x + button_width, parentY + y, width - 2 * button_width, height, style, env.hovered == this);
-	positioner.draw(parentX + x + layout.padding_left + button_width, parentY + y + layout.padding_top, text, text_style);
-	//Right Button
-	render_box(parentX + x + width - button_width, parentY + y, button_width, height, button_style, env.hovered == this);
-}
-
-void Spinner::set_on_change(std::function<void(int)> on_change) {
-	this->on_change = on_change;
-}
-
-void Spinner::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
-	int old = value;
-	value += x_motion;
-	if (value < min) {
-		value = min;
-	}
-
-	if (value > max) {
-		value = max;
-	}
-
-	if (old != value) {
-		text = std::to_string(value);
-		frame->request_relayout();
-		if (on_change) {
-			on_change(value);
-		}
-	}
-}
-
-void Spinner::on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
-	x -= this->x;
-	y -= this->y;
-	int old = value;
-	//Left Button
-	if (x >= 0 && x < button_width) {
-		value--;
-		if (value < min) {
-			value = min;
-		}
-	}
-	//Right Button
-	else if (x >= width - button_width && x < width) {
-		value++;
-		if (value > max) {
-			value = max;
-		}
-	}
-	if (old != value) {
-		text = std::to_string(value);
-		frame->request_relayout();
-		if (on_change) {
-			on_change(value);
-		}
-	}
-}
-
-void Spinner::update_style() {
-	positioner.recalc(width - layout.padding_left - layout.padding_right - 2 * button_width, height - layout.padding_top - layout.padding_bottom, text, text_style);
-}
-
-Spinner::~Spinner() {
-
-}
-
-//DragBox
-DragBox::DragBox(double value, FixedScale scale) {
-	this->scale = scale;
-	progress = this->scale.progress(value);
-	get_layout().padding_left = 2;
-	get_layout().padding_right = 2;
-	get_layout().padding_top = 2;
-	get_layout().padding_bottom = 2;
-
-	style.border_color = BLACK;
-	style.border_thickness = 1;
-	style.border_radius = 0.2f;
-	style.fill_color =  RAYWHITE;
-	style.hover_color = LIGHTGRAY;
-
-	update_style();
-}
-
-void DragBox::draw(int parentX, int parentY, NodeEnv env) {
-	render_box(parentX + x, parentY + y, width, height, style, env.hovered == this);
-	positioner.draw(parentX + x, parentY + y, text, text_style);
-}
-
-void DragBox::set_on_change(std::function<void (double)> on_change) {
-	this->on_change = on_change;
-}
-
-void DragBox::on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
-	long int old = round(scale.value(progress) * pow(10, precision));
-	progress += y_motion * step;
-	if (progress < 0) {
-		progress = 0;
-	}
-	else if (progress > 1) {
-		progress = 1;
-	}
-	long int new_val = round(scale.value(progress) * pow(10, precision));
-	if (old != new_val) {
-		if (on_change) {
-			on_change(new_val/pow(10.0, precision));
-		}
-		frame->request_relayout();
-	}
-}
-
-void DragBox::update_style() {
-	std::stringstream str;
-	str << std::fixed << std::setprecision(precision);
-	str << scale.value(progress);
-	text = str.str();
-
-	positioner.recalc(width, height, text, text_style);
-}
-
-DragBox::~DragBox() {
-
+void OrganSwitch::bound_property_change(PropertyValue val) {
+	checked = val.bval;
+	update_position(x, y, width, height);
 }
 

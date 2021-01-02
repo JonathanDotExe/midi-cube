@@ -1,244 +1,131 @@
 /*
- * gui_engine.h
+ * core.h
  *
- *  Created on: Sep 29, 2020
+ *  Created on: Dec 19, 2020
  *      Author: jojo
  */
 
 #ifndef MIDICUBE_GUI_ENGINE_CORE_H_
 #define MIDICUBE_GUI_ENGINE_CORE_H_
 
-#include <vector>
-#include <string>
+#include <SFML/Graphics.hpp>
+#include <boost/lockfree/queue.hpp>
 #include <functional>
-#include <raylib.h>
-#include <iostream>
+#include "../../util.h"
+#include "../../property.h"
+#include "../../midicube.h"
 
-#define FOCUS_TRAVERSABLE virtual Node* traverse_focus(int x, int y) { return this; }
-
-enum class VerticalAlignment {
-	TOP, CENTER, BOTTOM
-};
-
-enum class HorizontalAlignment {
-	LEFT, CENTER, RIGHT
-};
-
-enum class MouseButtonType {
-	LEFT, RIGHT, MIDDLE
-};
-
-class Node;
-
-struct NodeEnv {
-	Node* focused;
-	Node* hovered;
-};
-
-struct Vector {
-	int x;
-	int y;
-};
-
-#define MATCH_PARENT -1
-#define WRAP_CONTENT -2
-
-struct NodeLayout {
-	int width = WRAP_CONTENT;
-	int height = WRAP_CONTENT;
-	VerticalAlignment valignment = VerticalAlignment::TOP;
-	HorizontalAlignment halignment = HorizontalAlignment::LEFT;
-
-	int padding_left = 0;
-	int padding_right = 0;
-	int padding_top = 0;
-	int padding_bottom = 0;
-
-	int margin_left = 0;
-	int margin_right = 0;
-	int margin_top = 0;
-	int margin_bottom = 0;
-
-	int x_weight = 1;
-	int y_weight = 1;
-};
+#define SELECTABLE virtual bool selectable() const { return true; };
 
 class Frame;
 
-class Node {
+class Control {
 protected:
 	int x = 0;
 	int y = 0;
 	int width = 0;
 	int height = 0;
 	bool visible = true;
-	NodeLayout layout;
-	Frame* frame;
 
 public:
+	Frame* frame = nullptr;
 
-	Node();
+	Control(int x = 0, int y = 0, int width = 0, int height = 0);
 
-	virtual void update_layout(int parent_width, int parent_height);
+	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void update_position(int x, int y);
-
-	virtual void set_frame(Frame* frame);
-
-	virtual Vector calc_position(Node* node, int x = 0, int y = 0);
-
-	virtual Vector calc_size(int parent_width, int parent_height, bool fit);
-
-	virtual Vector get_content_size() {
-		return {0, 0};
-	}
-
-	virtual void draw(int parentX, int parentY, NodeEnv env);
-
-	virtual void set_visible(bool visible);
-
-	virtual bool is_visible() {
-		return visible;
-	}
-
-	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env) {
-
-	}
-
-	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion, MouseButtonType button, NodeEnv env) {
-
-	}
-
-	virtual Node* traverse_focus(int x, int y) {
-		return nullptr;
-	}
-
-	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env) {
-
-	}
+	virtual void draw(sf::RenderWindow& window, bool selected) = 0;
 
 	bool collides (int x, int y);
 
-	virtual ~Node();
+	virtual void property_change(PropertyChange change) {
 
-	NodeLayout& get_layout() {
-		return layout;
 	}
 
-	virtual void set_layout(const NodeLayout &layout) {
-		this->layout = layout;	//TODO relayout
+	virtual bool selectable() const {
+		return false;
 	}
 
-	int get_height() const {
-		return height;
+	virtual void on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
+
 	}
 
-	int get_width() const {
-		return width;
+	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
+
 	}
 
-	int get_x() const {
-		return x;
+	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button) {
+
 	}
 
-	int get_y() const {
-		return y;
+	virtual ~Control() {
+
 	}
+
+	bool is_visible() const;
+
+	void set_visible(bool visible = true);
 };
 
-class Parent : public Node {
-
-private:
-	std::vector<Node*> children;
-
-public:
-
-	Parent();
-
-	virtual void draw(int parentX, int parentY, NodeEnv env);
-
-	virtual void set_frame(Frame* frame);
-
-	virtual void add_child(Node* child);
-
-	virtual Vector get_content_size();
-
-	virtual Vector calc_position(Node* node, int x = 0, int y = 0);
-
-	virtual void update_layout(int parent_width, int parent_height);
-
-	virtual void on_mouse_pressed(int x, int y, MouseButtonType button, NodeEnv env);
-
-	virtual Node* traverse_focus(int x, int y);
-
-	virtual void on_mouse_released(int x, int y, MouseButtonType button, NodeEnv env);
-
-	std::vector<Node*> get_children() {
-		return children;
-	}
-
-	virtual ~Parent();
-
+struct Scene {
+	std::vector<Control*> controls;
+	std::vector<PropertyHolder*> prop_holders;
 };
 
-class Frame;
-
-//View
 class ViewController {
 public:
-	virtual Node* init(Frame* frame) = 0;
+	ViewController() {
+
+	}
+
+	virtual Scene create(Frame& frame) = 0;
+
+	virtual void property_change(PropertyChange change) {
+
+	}
+
 	virtual ~ViewController() {
 
 	}
 };
 
-//Frame
 class Frame {
-
 private:
-
-	ViewController* view;
-	ViewController* next_view;
-
-	Node* root;
-	std::string title;
 	int width;
 	int height;
+	std::string title;
+	ViewController* view;
+	std::vector<Control*> controls;
+	std::vector<PropertyHolder*> prop_holders;
 
-	int focused_x = -1;
-	int focused_y = -1;
+	bool mouse_pressed = false;
+	int last_mouse_x = 0;
+	int last_mouse_y = 0;
+	Control* selected;
 
-	Node* focused = nullptr;
-	Node* hovered = nullptr;
+	bool redraw = true;
+	ViewController* next_view = nullptr;
 
-	int last_mouse_x = -1;
-	int last_mouse_y = -1;
-
-	bool redraw = false;
-	bool relayout = false;
+	boost::lockfree::queue<PropertyChange> changes;
 
 public:
+	MidiCube& cube;
+	Frame(MidiCube& cube, int width, int height, std::string title);
 
-	Frame(std::string title, int width, int height);
+	void run(ViewController* v);
 
-	void run (ViewController* view);
-
-	void change_view(ViewController* view);
-
-	void request_view(ViewController* view) {
-		delete next_view;
-		next_view = view;
-	}
-
-	void request_relayout() {
-		relayout = true;
-	}
+	virtual void property_change(PropertyChange change);
 
 	void request_redraw() {
 		redraw = true;
 	}
 
-	~Frame();
+	void change_view(ViewController* view) {
+		delete next_view;
+		next_view = view;
+	}
+
+	virtual ~Frame();
 
 	int get_height() const {
 		return height;
@@ -247,48 +134,76 @@ public:
 	int get_width() const {
 		return width;
 	}
+
+private:
+	void switch_view(ViewController* view);
+
 };
 
-struct TextStyle {
-	std::string font = "";
-	int font_size = 10;
-	Color font_color = BLACK;
-	HorizontalAlignment text_halignment = HorizontalAlignment::CENTER;
-	VerticalAlignment text_valignment = VerticalAlignment::CENTER;
-};
-
-struct BoxStyle {
-	Color fill_color = RAYWHITE;
-	Color border_color = BLANK;
-	Color hover_color = RAYWHITE;
-	float border_radius = 0;
-	int border_thickness = 0;
-};
-
-struct BackgroundStyle {
-	Color fill_color = BLANK;
-};
-
-class StyleableNode : public Node {
+class BindableControl : public Control{
 
 protected:
-	virtual void update_style() {
 
-	}
+	virtual void bound_property_change(PropertyValue val) = 0;
 
 public:
+	PropertyHolder* holder = nullptr;
+	size_t property = 0;
 
-	StyleableNode();
+	BindableControl(int x = 0, int y = 0, int width = 0, int height = 0) : Control(x, y, width, height) {
 
-	virtual void update_layout(int parent_width, int parent_height) {
-		update_style();		//TODO calling update_layout() twice is a kinda dirty fix
-		Node::update_layout(parent_width, parent_height);
-		update_style();
 	}
 
-	virtual ~StyleableNode();
+	void bind(PropertyHolder* holder, size_t property) {
+		this->holder = holder;
+		this->property = property;
+	}
 
+	virtual void property_change(PropertyChange change) {
+		Control::property_change(change);
+		if (change.holder == holder && change.property == property) {
+			bound_property_change(change.value);
+		}
+	}
+
+	virtual ~BindableControl() {
+
+	}
+
+protected:
+
+	inline void send_change(PropertyValue value);
+
+	inline void send_change(int value);
+
+	inline void send_change(double value);
+
+	inline void send_change(bool value);
 };
+
+void BindableControl::send_change(PropertyValue value) {
+	if (holder) {
+		frame->cube.perform_change({holder, property, value});
+	}
+}
+
+void BindableControl::send_change(int value) {
+	PropertyValue val;
+	val.ival = value;
+	send_change(val);
+}
+
+void BindableControl::send_change(double value) {
+	PropertyValue val;
+	val.dval = value;
+	send_change(val);
+}
+
+void BindableControl::send_change(bool value) {
+	PropertyValue val;
+	val.bval = value;
+	send_change(val);
+}
 
 
 #endif /* MIDICUBE_GUI_ENGINE_CORE_H_ */
