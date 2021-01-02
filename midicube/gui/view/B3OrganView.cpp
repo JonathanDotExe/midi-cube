@@ -48,11 +48,11 @@ Scene B3OrganView::create(Frame &frame) {
 	}
 	//Distortion Type
 	{
-		ComboBox* distortion_type = new ComboBox(0, {"Digital", "Analog 1", "Analog 2"}, main_font, 18, 0, 10, tmp_y, 80, 60);
+		ComboBox* distortion_type = new ComboBox(0, {"Digital", "Analog 1", "Analog 2"}, main_font, 16, 0, 10, tmp_y, 80, 60);
 		distortion_type->bind(&organ, B3OrganProperty::pB3DistortionType);
 		controls.push_back(distortion_type);
 
-		Label* distortion_type_label = new Label("Distortion Type", main_font, 16, 95, tmp_y + 20);
+		Label* distortion_type_label = new Label("Distortion Type", main_font, 18, 95, tmp_y + 20);
 		distortion_type_label->text.setFillColor(sf::Color::White);
 		controls.push_back(distortion_type_label);
 
@@ -61,15 +61,15 @@ Scene B3OrganView::create(Frame &frame) {
 
 	//Distortion Amount
 	{
-		DragBox<double>* overdrive = new DragBox<double>(0, 0, 1, main_font, 18, 10, tmp_y, 80, 60);
+		DragBox<double>* overdrive = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
 		overdrive->bind(&organ, B3OrganProperty::pB3Overdrive);
 		controls.push_back(overdrive);
 
-		Label* overdrive_label = new Label("Overdrive", main_font, 16, 95, tmp_y + 20);
+		Label* overdrive_label = new Label("Overdrive", main_font, 18, 95, tmp_y + 20);
 		overdrive_label->text.setFillColor(sf::Color::White);
 		controls.push_back(overdrive_label);
 
-		tmp_y += 70;
+		tmp_y += 80;
 	}
 
 	//Rotary Type
@@ -78,6 +78,39 @@ Scene B3OrganView::create(Frame &frame) {
 		rotary_type->text.setFillColor(sf::Color::White);
 		rotary_type->bind(&organ, B3OrganProperty::pB3RotaryType);
 		controls.push_back(rotary_type);
+
+		tmp_y += 70;
+	}
+	//Normalize overdrive
+	{
+		OrganSwitch* rotary_type = new OrganSwitch(false, "Normalize Overdrive", main_font, 18, 10, tmp_y, 80, 60);
+		rotary_type->text.setFillColor(sf::Color::White);
+		rotary_type->bind(&organ, B3OrganProperty::pB3RotaryType);
+		controls.push_back(rotary_type);
+
+		tmp_y += 70;
+	}
+	//Harmonic Foldback Volume
+	{
+		DragBox<double>* foldback = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
+		foldback->bind(&organ, B3OrganProperty::pB3HarmonicFoldbackVolume);
+		controls.push_back(foldback);
+
+		Label* foldback_label = new Label("Harm. Foldback Vol.", main_font, 18, 95, tmp_y + 20);
+		foldback_label->text.setFillColor(sf::Color::White);
+		controls.push_back(foldback_label);
+
+		tmp_y += 70;
+	}
+	//Multi Note Gain
+	{
+		DragBox<double>* gain = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
+		gain->bind(&organ, B3OrganProperty::pB3MultiNoteGain);
+		controls.push_back(gain);
+
+		Label* gain_label = new Label("Multi Note Gain", main_font, 18, 95, tmp_y + 20);
+		gain_label->text.setFillColor(sf::Color::White);
+		controls.push_back(gain_label);
 
 		tmp_y += 70;
 	}
