@@ -22,6 +22,9 @@ Scene B3OrganView::create(Frame &frame) {
 	std::vector<PropertyHolder*> holders;
 	holders.push_back(&organ);
 
+	std::vector<Control*> hide_midi = {};
+	std::vector<Control*> show_midi = {};
+
 	//Background
 	Pane* bg = new Pane(sf::Color(0x53, 0x32, 0x00), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
@@ -35,8 +38,14 @@ Scene B3OrganView::create(Frame &frame) {
 		controls.push_back(label);
 		tmp_y += 25;
 
+		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
+		midi->bind(&organ, B3OrganProperty::pB3RotaryCC);
+		controls.push_back(midi);
+		show_midi.push_back(midi);
+
 		OrganSwitch* rotary = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60);
 		rotary->bind(&organ, B3OrganProperty::pB3Rotary);
+		hide_midi.push_back(rotary);
 		controls.push_back(rotary);
 
 		tmp_y += 65;
@@ -254,8 +263,22 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 
+	//Edit MIDI Button
+	Button* edit_midi = new Button("Edit MIDI", main_font, 18, frame.get_width() - 170, frame.get_height() - 40, 100, 40);
+	edit_midi->rect.setFillColor(sf::Color::Yellow);
+	edit_midi->set_on_click([show_midi, hide_midi, this]() {
+		this->edit_midi = !this->edit_midi;
+		for (Control* control : show_midi) {
+			control->set_visible(this->edit_midi);
+		}
+		for (Control* control : hide_midi) {
+			control->set_visible(!this->edit_midi);
+		}
+	});
+	controls.push_back(edit_midi);
+
 	//Back Button
-	Button* back = new Button("Back", main_font, 18, frame.get_width() - 65, frame.get_height() - 40, 70, 40);
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
 	back->set_on_click([&frame, this]() {
 		frame.change_view(new SoundEngineChannelView(channel, channel_index));
