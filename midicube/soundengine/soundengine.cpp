@@ -283,6 +283,8 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 		}
 		//Vocoder
 		vocoder.apply(ch[0], ch[1], info.input_sample, vocoder_preset, info);
+		//Bit Crusher
+		bitcrusher.apply(ch[0], ch[1], bitcrusher_preset, info);
 		//Looper
 		looper.apply(ch, metronome, info);
 		//Playback

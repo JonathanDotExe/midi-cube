@@ -15,6 +15,7 @@
 #include "../metronome.h"
 #include "../looper.h"
 #include "../effect/vocoder.h"
+#include "../effect/bitcrusher.h"
 #include "../property.h"
 #include <string>
 #include <array>
@@ -227,14 +228,18 @@ private:
 	std::atomic<ssize_t> engine_index{0};
 
 public:
-	VocoderPreset vocoder_preset;
 	double volume{0.3};
 	bool active{false};
 	double panning = 0;
 	ChannelSource source;
 	Arpeggiator arp;
 	Looper looper;
+
+	//Effects
+	VocoderPreset vocoder_preset;
 	VocoderEffect vocoder;
+	BitCrusherPreset bitcrusher_preset;
+	BitCrusherEffect bitcrusher;
 
 	SoundEngineChannel();
 
