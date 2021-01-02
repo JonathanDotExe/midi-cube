@@ -408,17 +408,11 @@ private:
 public:
 	sf::RectangleShape activated_rect;
 	sf::RectangleShape deactivated_rect;
-	sf::Text text;
 	sf::Text on_text;
 	sf::Text off_text;
 
-	OrganSwitch(bool checked, std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0, std::string on_text="On", std::string off_text="Off", int switch_text_size = 12) : BindableControl (x, y, width, height) {
+	OrganSwitch(bool checked, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, std::string on_text="On", std::string off_text="Off", int switch_text_size = 12) : BindableControl (x, y, width, height) {
 		this->checked = checked;
-
-		this->text.setFont(font);
-		this->text.setString(text);
-		this->text.setCharacterSize(text_size);
-		this->text.setFillColor(sf::Color::Black);
 
 		activated_rect.setFillColor(sf::Color::White);
 		activated_rect.setOutlineColor(sf::Color::Black);

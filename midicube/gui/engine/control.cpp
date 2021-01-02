@@ -189,8 +189,6 @@ void OrganSwitch::update_position(int x, int y, int width, int height) {
 
 	center_text(on_text, x, y, width, upper);
 	center_text(off_text, x, y + upper, width, lower);
-
-	center_text_left(text, x + width + 5, y, height);
 }
 
 void OrganSwitch::draw(sf::RenderWindow& window, bool selected) {
@@ -198,7 +196,6 @@ void OrganSwitch::draw(sf::RenderWindow& window, bool selected) {
 	window.draw(deactivated_rect);
 	window.draw(on_text);
 	window.draw(off_text);
-	window.draw(text);
 }
 
 void OrganSwitch::on_mouse_released(int x, int y, sf::Mouse::Button button) {
