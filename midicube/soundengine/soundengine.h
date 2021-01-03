@@ -264,7 +264,12 @@ public:
 
 };
 
-class SoundEngineDevice {
+enum SoundEngineProperty {
+	pEngineMetronomeOn,
+	pEngineMetronomeBPM
+};
+
+class SoundEngineDevice : public PropertyHolder {
 
 private:
 	std::vector<SoundEngineBank*> sound_engines;
@@ -288,6 +293,10 @@ public:
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 
 	void solo (unsigned int channel);
+
+	PropertyValue get(size_t prop);
+
+	void set(size_t prop, PropertyValue value);
 
 	~SoundEngineDevice();
 

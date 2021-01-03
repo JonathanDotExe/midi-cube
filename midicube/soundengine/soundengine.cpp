@@ -483,6 +483,12 @@ SoundEngineDevice::SoundEngineDevice() {
 }
 
 void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
+	//Update properties
+	if (update_request) {
+		submit_change(SoundEngineProperty::pEngineMetronomeOn, play_metronome);
+		submit_change(SoundEngineProperty::pEngineMetronomeBPM, (int) metronome.get_bpm());
+		update_request = false;
+	}
 	//Channels
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
@@ -523,6 +529,30 @@ void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 void SoundEngineDevice::solo (unsigned int channel) {
 	for (size_t i = 0; i < channels.size(); ++i) {
 		channels[i].active = channel == i;
+	}
+}
+
+PropertyValue SoundEngineDevice::get(size_t prop) {
+	PropertyValue val;
+	switch ((SoundEngineProperty) prop) {
+	case SoundEngineProperty::pEngineMetronomeOn:
+		val.bval = play_metronome;
+		break;
+	case SoundEngineProperty::pEngineMetronomeBPM:
+		val.ival = metronome.get_bpm();
+		break;
+	}
+	return val;
+}
+
+void SoundEngineDevice::set(size_t prop, PropertyValue val) {
+	switch ((SoundEngineProperty) prop) {
+	case SoundEngineProperty::pEngineMetronomeOn:
+		play_metronome = val.bval;
+		break;
+	case SoundEngineProperty::pEngineMetronomeBPM:
+		 metronome.set_bpm(val.ival);
+		break;
 	}
 }
 
