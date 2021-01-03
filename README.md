@@ -13,7 +13,6 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * RtAudio licensed under the RtAudio License which is pretty similar to the MIT License (https://github.com/thestk/rtaudio https://github.com/thestk/rtaudio/blob/master/LICENSE)
 * RtMidi licensed under the RtMidi license which is pretty similar to the MIT license (https://github.com/thestk/rtmidi https://github.com/thestk/rtmidi/blob/master/LICENSE)
 * libsndfile licensed under LGPL (https://github.com/erikd/libsndfile/commits/master https://github.com/erikd/libsndfile/blob/master/COPYING)
-* JSON library by nlohman licensed under MIT license (https://github.com/nlohmann/json https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
 * FluidSynth API for playing soundfonts licensed under LGPL-2.1 (https://github.com/FluidSynth/fluidsynth https://github.com/FluidSynth/fluidsynth/blob/master/LICENSE)
 * Boost licensed under the Boost Software License (https://github.com/boostorg/boost https://github.com/boostorg/boost/blob/master/LICENSE_1_0.txt)
 * SFML licensed under the zlib/png license (https://github.com/SFML/SFML https://github.com/SFML/SFML/blob/master/license.md)
