@@ -47,26 +47,33 @@ SampleDrums::~SampleDrums() {
 
 extern SampleDrumKit* load_drumkit(std::string folder) {
 	//Load file
+	SampleDrumKit* drumkit = nullptr;
 	pt::ptree tree;
-	pt::read_json(folder + "/drumkit.json", tree);
-	//Parse
-	SampleDrumKit* drumkit = new SampleDrumKit();
 	try {
-		//Load sounds
-		for (auto r : tree.get_child("sounds")) {
-			unsigned int index = r.second.get<unsigned int>("note", 0);
-			drumkit->notes[index] = {};
-			std::string file = folder + "/" + r.second.get<std::string>("file");
-			if (!read_audio_file(drumkit->notes.at(index), file)) {
-				std::cerr << "Couldn't load drum sample " << file << std::endl;
-				throw std::runtime_error("Couldn't load drum sample " + file);
+		pt::read_json(folder + "/drumkit.json", tree);
+		//Parse
+
+		drumkit = new SampleDrumKit();
+		try {
+			//Load sounds
+			for (auto r : tree.get_child("sounds")) {
+				unsigned int index = r.second.get<unsigned int>("note", 0);
+				drumkit->notes[index] = {};
+				std::string file = folder + "/" + r.second.get<std::string>("file");
+				if (!read_audio_file(drumkit->notes.at(index), file)) {
+					std::cerr << "Couldn't load drum sample " << file << std::endl;
+					throw std::runtime_error("Couldn't load drum sample " + file);
+				}
 			}
 		}
+		catch (std::exception& e) {
+			delete drumkit;
+			drumkit = nullptr;
+			throw e;
+		}
 	}
-	catch (std::exception& e) {
-		delete drumkit;
-		drumkit = nullptr;
-		throw e;
+	catch (pt::json_parser_error& e) {
+		std::cerr << "Couldn't laod drumkit.json" << std::endl;
 	}
 	return drumkit;
 }

@@ -128,40 +128,46 @@ Sampler::~Sampler() {
 extern SampleSound* load_sound(std::string folder) {
 	//Load file
 	pt::ptree tree;
-	pt::read_json(folder + "/sound.json", tree);
-
-	//Envelope
-	ADSREnvelopeData env;
-	env.attack = tree.get<double>("attack", 0.0005);
-	env.decay = tree.get<double>("decay", 0.0);
-	env.sustain = tree.get<double>("sustain", 1);
-	env.release = tree.get<double>("release", 0.003);
-	//Parse
-	SampleSound* sound = new SampleSound();
-	sound->set_envelope(env);
+	SampleSound* sound = nullptr;
 	try {
-		//Load sounds
-		for (auto r : tree.get_child("regions")) {
-			SampleRegion* region = new SampleRegion();
-			try {
-				region->freq = note_to_freq(r.second.get<int>("note", 0));
-				std::string file = folder + "/" + r.second.get<std::string>("file");
-				if (!read_audio_file(region->sample, file)) {
-					throw std::runtime_error("Couldn't load sample file " + file);
+		pt::read_json(folder + "/sound.json", tree);
+
+		//Envelope
+		ADSREnvelopeData env;
+		env.attack = tree.get<double>("attack", 0.0005);
+		env.decay = tree.get<double>("decay", 0.0);
+		env.sustain = tree.get<double>("sustain", 1);
+		env.release = tree.get<double>("release", 0.003);
+		//Parse
+		sound = new SampleSound();
+		sound->set_envelope(env);
+		try {
+			//Load sounds
+			for (auto r : tree.get_child("regions")) {
+				SampleRegion* region = new SampleRegion();
+				try {
+					region->freq = note_to_freq(r.second.get<int>("note", 0));
+					std::string file = folder + "/" + r.second.get<std::string>("file");
+					if (!read_audio_file(region->sample, file)) {
+						throw std::runtime_error("Couldn't load sample file " + file);
+					}
 				}
+				catch (std::exception& e) {
+					delete region;
+					region = nullptr;
+					throw e;
+				}
+				sound->push_sample(region);
 			}
-			catch (std::exception& e) {
-				delete region;
-				region = nullptr;
-				throw e;
-			}
-			sound->push_sample(region);
+		}
+		catch (std::exception& e) {
+			delete sound;
+			sound = nullptr;
+			throw e;
 		}
 	}
-	catch (std::exception& e) {
-		delete sound;
-		sound = nullptr;
-		throw e;
+	catch (pt::json_parser_error& e) {
+		std::cerr << "Couldn't laod sound.json" << std::endl;
 	}
 	return sound;
 }
