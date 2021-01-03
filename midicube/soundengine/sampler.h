@@ -8,10 +8,10 @@
 #ifndef MIDICUBE_SOUNDENGINE_SAMPLER_H_
 #define MIDICUBE_SOUNDENGINE_SAMPLER_H_
 
+#include <unordered_map>
 #include "soundengine.h"
 #include "../audiofile.h"
 #include "../envelope.h"
-#include <nlohmann/json.hpp>
 
 struct SampleRegionConfig {
 	std::string filename;

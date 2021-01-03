@@ -8,10 +8,10 @@
 
 #include "drums.h"
 #include <fstream>
-#include <nlohmann/json.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
-using json = nlohmann::json;
-
+namespace pt = boost::property_tree;
 
 //SampleDrums
 SampleDrums::SampleDrums () {
@@ -47,42 +47,35 @@ SampleDrums::~SampleDrums() {
 
 extern SampleDrumKit* load_drumkit(std::string folder) {
 	//Load file
-	std::ifstream def_file;
-	def_file.open(folder + "/drumkit.json");
-	if (def_file.is_open()) {
-		//Parse json
-		std::string json_text ((std::istreambuf_iterator<char>(def_file)), std::istreambuf_iterator<char>());
-		auto j = json::parse(json_text);
+	SampleDrumKit* drumkit = nullptr;
+	pt::ptree tree;
+	try {
+		pt::read_json(folder + "/drumkit.json", tree);
 		//Parse
-		SampleDrumKit* drumkit = new SampleDrumKit();
+
+		drumkit = new SampleDrumKit();
 		try {
 			//Load sounds
-			for (auto r : j.at("sounds").get<std::vector<json>>()) {
-				unsigned int index = r.at("note").get<unsigned int>();
+			for (auto r : tree.get_child("sounds")) {
+				unsigned int index = r.second.get<unsigned int>("note", 0);
 				drumkit->notes[index] = {};
-				std::string file = folder + "/" + r.at("file").get<std::string>();
+				std::string file = folder + "/" + r.second.get<std::string>("file");
 				if (!read_audio_file(drumkit->notes.at(index), file)) {
 					std::cerr << "Couldn't load drum sample " << file << std::endl;
 					throw std::runtime_error("Couldn't load drum sample " + file);
 				}
 			}
 		}
-		catch (json::exception& e) {
-			delete drumkit;
-			drumkit = nullptr;
-			throw e;
-		}
 		catch (std::exception& e) {
 			delete drumkit;
 			drumkit = nullptr;
 			throw e;
 		}
-		return drumkit;
 	}
-	else {
-		std::cerr << "Couldn't load drumkit" << std::endl;
+	catch (pt::json_parser_error& e) {
+		std::cerr << "Couldn't laod drumkit.json" << std::endl;
 	}
-	return nullptr;
+	return drumkit;
 }
 
 template<>

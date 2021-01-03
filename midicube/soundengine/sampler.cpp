@@ -8,9 +8,10 @@
 #include "sampler.h"
 #include <iostream>
 #include <fstream>
-#include <nlohmann/json.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
-using json = nlohmann::json;
+namespace pt = boost::property_tree;
 
 
 //SampleSound
@@ -126,36 +127,30 @@ Sampler::~Sampler() {
 
 extern SampleSound* load_sound(std::string folder) {
 	//Load file
-	std::ifstream def_file;
-	def_file.open(folder + "/sound.json");
-	if (def_file.is_open()) {
-		//Parse json
-		std::string json_text ((std::istreambuf_iterator<char>(def_file)), std::istreambuf_iterator<char>());
-		auto j = json::parse(json_text);
+	pt::ptree tree;
+	SampleSound* sound = nullptr;
+	try {
+		pt::read_json(folder + "/sound.json", tree);
+
 		//Envelope
 		ADSREnvelopeData env;
-		env.attack = j.at("attack").get<double>();
-		env.decay = j.at("decay").get<double>();
-		env.sustain = j.at("sustain").get<double>();
-		env.release = j.at("release").get<double>();
+		env.attack = tree.get<double>("attack", 0.0005);
+		env.decay = tree.get<double>("decay", 0.0);
+		env.sustain = tree.get<double>("sustain", 1);
+		env.release = tree.get<double>("release", 0.003);
 		//Parse
-		SampleSound* sound = new SampleSound();
+		sound = new SampleSound();
 		sound->set_envelope(env);
 		try {
 			//Load sounds
-			for (auto r : j["regions"].get<std::vector<json>>()) {
+			for (auto r : tree.get_child("regions")) {
 				SampleRegion* region = new SampleRegion();
 				try {
-					region->freq = note_to_freq(r.at("note").get<int>());
-					std::string file = folder + "/" + r.at("file").get<std::string>();
+					region->freq = note_to_freq(r.second.get<int>("note", 0));
+					std::string file = folder + "/" + r.second.get<std::string>("file");
 					if (!read_audio_file(region->sample, file)) {
 						throw std::runtime_error("Couldn't load sample file " + file);
 					}
-				}
-				catch (json::exception& e) {
-					delete region;
-					region = nullptr;
-					throw e;
 				}
 				catch (std::exception& e) {
 					delete region;
@@ -165,22 +160,16 @@ extern SampleSound* load_sound(std::string folder) {
 				sound->push_sample(region);
 			}
 		}
-		catch (json::exception& e) {
-			delete sound;
-			sound = nullptr;
-			throw e;
-		}
 		catch (std::exception& e) {
 			delete sound;
 			sound = nullptr;
 			throw e;
 		}
-		return sound;
 	}
-	else {
-		std::cerr << "Couldn't load sample sound" << std::endl;
+	catch (pt::json_parser_error& e) {
+		std::cerr << "Couldn't laod sound.json" << std::endl;
 	}
-	return nullptr;
+	return sound;
 }
 
 template<>
