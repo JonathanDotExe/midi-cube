@@ -478,7 +478,7 @@ SoundEngineChannel::~SoundEngineChannel() {
 
 
 //SoundEngineDevice
-SoundEngineDevice::SoundEngineDevice() {
+SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	metronome.init(0);
 }
 

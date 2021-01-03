@@ -23,6 +23,7 @@ Scene SoundEngineView::create(Frame& frame) {
 	controls.push_back(bg);
 
 	this->engine = &frame.cube.engine;
+	holders.push_back(this->engine);
 	SoundEngineDevice& sound_engine = frame.cube.engine;
 	//Sound engines
 	for (SoundEngineBank* engine : sound_engine.get_sound_engines()) {
@@ -66,6 +67,16 @@ Scene SoundEngineView::create(Frame& frame) {
 		volume->bind(&channel, SoundEngineChannelProperty::pChannelVolume);
 		controls.push_back(volume);
 	}
+
+	//Metronome
+	CheckBox* metronome = new CheckBox(false, "Metronome", main_font, 18, 10, frame.get_height() - 45, 40, 40);
+	metronome->bind(this->engine, SoundEngineProperty::pEngineMetronomeOn);
+	controls.push_back(metronome);
+
+	DragBox<int>* bpm = new DragBox<int>(120, 10, 480, main_font, 18, 200, frame.get_height() - 45, 100, 40);
+	bpm->drag_mul = 0.00125;
+	bpm->bind(this->engine, SoundEngineProperty::pEngineMetronomeBPM);
+	controls.push_back(bpm);
 
 	return {controls, holders};
 }
