@@ -8,10 +8,10 @@
 
 #include "drums.h"
 #include <fstream>
-#include <nlohmann/json.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
-using json = nlohmann::json;
-
+namespace pt = boost::property_tree;
 
 //SampleDrums
 SampleDrums::SampleDrums () {
@@ -47,42 +47,28 @@ SampleDrums::~SampleDrums() {
 
 extern SampleDrumKit* load_drumkit(std::string folder) {
 	//Load file
-	std::ifstream def_file;
-	def_file.open(folder + "/drumkit.json");
-	if (def_file.is_open()) {
-		//Parse json
-		std::string json_text ((std::istreambuf_iterator<char>(def_file)), std::istreambuf_iterator<char>());
-		auto j = json::parse(json_text);
-		//Parse
-		SampleDrumKit* drumkit = new SampleDrumKit();
-		try {
-			//Load sounds
-			for (auto r : j.at("sounds").get<std::vector<json>>()) {
-				unsigned int index = r.at("note").get<unsigned int>();
-				drumkit->notes[index] = {};
-				std::string file = folder + "/" + r.at("file").get<std::string>();
-				if (!read_audio_file(drumkit->notes.at(index), file)) {
-					std::cerr << "Couldn't load drum sample " << file << std::endl;
-					throw std::runtime_error("Couldn't load drum sample " + file);
-				}
+	pt::ptree tree;
+	pt::read_json(folder + "/drumkit.json", tree);
+	//Parse
+	SampleDrumKit* drumkit = new SampleDrumKit();
+	try {
+		//Load sounds
+		for (auto r : tree.get_child("sounds")) {
+			unsigned int index = r.second.get<unsigned int>("note", 0);
+			drumkit->notes[index] = {};
+			std::string file = folder + "/" + r.second.get<std::string>("file");
+			if (!read_audio_file(drumkit->notes.at(index), file)) {
+				std::cerr << "Couldn't load drum sample " << file << std::endl;
+				throw std::runtime_error("Couldn't load drum sample " + file);
 			}
 		}
-		catch (json::exception& e) {
-			delete drumkit;
-			drumkit = nullptr;
-			throw e;
-		}
-		catch (std::exception& e) {
-			delete drumkit;
-			drumkit = nullptr;
-			throw e;
-		}
-		return drumkit;
 	}
-	else {
-		std::cerr << "Couldn't load drumkit" << std::endl;
+	catch (std::exception& e) {
+		delete drumkit;
+		drumkit = nullptr;
+		throw e;
 	}
-	return nullptr;
+	return drumkit;
 }
 
 template<>
