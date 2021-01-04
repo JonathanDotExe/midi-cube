@@ -6,7 +6,6 @@
  */
 
 #include "sfsynth.h"
-#include <filesystem>
 #include <boost/filesystem.hpp>
 
 SoundFontSynth::SoundFontSynth() {
