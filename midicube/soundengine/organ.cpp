@@ -63,7 +63,6 @@ B3Organ::B3Organ() {
 			}
 		}
 		tonewheel_frequencies[i] = 20 * teeth * gear_ratios[i % gear_ratios.size()];
-		std::cout << (ORGAN_LOWEST_TONEWHEEL_NOTE + i) << " " << tonewheel_frequencies[i] << std::endl;
 	}
 }
 
