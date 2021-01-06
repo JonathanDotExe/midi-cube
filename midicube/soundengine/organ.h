@@ -35,6 +35,9 @@
 #define BASS_RADIUS 0.15
 #define SOUND_SPEED 343.2
 
+#define MIN_SWELL 0.1
+#define SWELL_RANGE (1 - MIN_SWELL)
+
 
 
 enum DistortionType {
@@ -135,6 +138,8 @@ struct B3OrganPreset {
 	unsigned int percussion_soft_cc{26};
 	unsigned int percussion_fast_decay_cc{27};
 
+	unsigned int swell_cc{11};
+
 	B3OrganPreset () {
 		for (size_t i = 0; i < drawbars.size(); ++i) {
 			drawbars[i] = 8;
@@ -182,6 +187,8 @@ public:
 
 	bool reset_percussion = true;
 	double percussion_start = 0;
+
+	double swell = 1;
 
 	virtual SoundEngineData* copy() {
 		return new B3OrganData();	//TODO

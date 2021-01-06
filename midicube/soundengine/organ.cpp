@@ -207,6 +207,8 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		update_request = false;
 	}
 
+	double swell = this->data.swell * SWELL_RANGE + MIN_SWELL;
+
 	//Play organ sound
 	if (data.preset.rotary) {
 		double horn_sample = 0;
@@ -224,14 +226,14 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 				++bass_count;
 				bass_vol += data.tonewheels[i].curr_vol + data.tonewheels[i].dynamic_vol;
 			}
-			bass_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
+			bass_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend) * swell;
 		}
 		for (; i < data.tonewheels.size(); ++i) {
 			if (data.tonewheels[i].dynamic_vol + data.tonewheels[i].curr_vol) {
 				++horn_count;
 				horn_vol += data.tonewheels[i].curr_vol + data.tonewheels[i].dynamic_vol;
 			}
-			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
+			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend) * swell;
 		}
 
 		//Compress
@@ -271,9 +273,10 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		//Compute samples
 		double sample = 0;
 		double vol = 0;
+
 		for (size_t i = 0; i < data.tonewheels.size(); ++i) {
 			vol += data.tonewheels[i].curr_vol + data.tonewheels[i].dynamic_vol;
-			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
+			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend) * swell;
 		}
 		//Compress
 		if (status.pressed_notes && data.preset.multi_note_gain != 1) {
@@ -375,6 +378,10 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	if (control == data.preset.percussion_soft_cc) {
 		data.preset.percussion_soft = value > 0;
 		submit_change(B3OrganProperty::pB3PercussionSoft, data.preset.percussion_soft);
+	}
+	//Swell
+	if (control == data.preset.swell_cc) {
+		data.swell = value/127.0;
 	}
 }
 
