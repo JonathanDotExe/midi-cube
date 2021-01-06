@@ -161,7 +161,24 @@ Scene B3OrganView::create(Frame &frame) {
 
 		tmp_y += 65;
 	}
-	tmp_x -= 140;
+	tmp_x += 140;
+	tmp_y -= 65 + 25;
+	//Swell
+	{
+		Label* label = new Label("Swell", main_font, 18, tmp_x, tmp_y);
+		label->text.setFillColor(sf::Color::White);
+		controls.push_back(label);
+		show_midi.push_back(label);
+		tmp_y += 25;
+
+		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
+		midi->bind(&organ, B3OrganProperty::pB3SwellCC);
+		controls.push_back(midi);
+		show_midi.push_back(midi);
+		tmp_y += 65;
+	}
+
+	tmp_x -= 280;
 	tmp_y -= (65 + 25) * 2;
 	//Drawbars
 	std::vector<sf::Color> colors = {

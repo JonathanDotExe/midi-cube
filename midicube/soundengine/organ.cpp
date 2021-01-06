@@ -204,6 +204,8 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 				(int) data.preset.percussion_soft_cc);
 		submit_change(B3OrganProperty::pB3PercussionFastDecayCC,
 				(int) data.preset.percussion_fast_decay_cc);
+		submit_change(B3OrganProperty::pB3SwellCC,
+				(int) data.preset.swell_cc);
 		update_request = false;
 	}
 
@@ -520,6 +522,9 @@ PropertyValue B3Organ::get(size_t prop) {
 	case B3OrganProperty::pB3PercussionFastDecayCC:
 		val.ival = data.preset.percussion_fast_decay_cc;
 		break;
+	case B3OrganProperty::pB3SwellCC:
+		val.ival = data.preset.swell_cc;
+		break;
 	}
 	return val;
 }
@@ -657,6 +662,9 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 		break;
 	case B3OrganProperty::pB3PercussionFastDecayCC:
 		data.preset.percussion_fast_decay_cc = val.ival;
+		break;
+	case B3OrganProperty::pB3SwellCC:
+		data.preset.swell_cc = val.ival;
 		break;
 	}
 }

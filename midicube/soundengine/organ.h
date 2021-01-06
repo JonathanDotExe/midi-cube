@@ -98,6 +98,8 @@ enum B3OrganProperty {
 	pB3PercussionThirdHarmonicCC,
 	pB3PercussionSoftCC,
 	pB3PercussionFastDecayCC,
+
+	pB3SwellCC,
 };
 
 struct B3OrganPreset {
