@@ -27,8 +27,6 @@
 struct RotarySpeakerPreset {
 	bool on = false;
 	bool fast = false;
-	unsigned int on_cc{22};
-	unsigned int speed_cc{23};
 
 	double stereo_mix{0.5};
 	double gain{1.5};

@@ -11,6 +11,7 @@
 
 #include "soundengine.h"
 #include "../synthesis.h"
+#include "../effect/rotary_speaker.h"
 #include "../property.h"
 
 #define ORGAN_DRAWBAR_COUNT 9
@@ -98,7 +99,9 @@ struct B3OrganPreset {
 
 	double multi_note_gain{0.75};
 
-
+	RotarySpeakerPreset rotary;
+	unsigned int rotary_cc{22};
+	unsigned int rotary_speed_cc{23};
 
 	bool percussion{false};
 	bool percussion_third_harmonic{true};
@@ -150,6 +153,7 @@ public:
 class B3OrganData : public SoundEngineData{
 public:
 	B3OrganPreset preset;
+	RotarySpeakerEffect rotary_speaker;
 	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels;
 
 	bool reset_percussion = true;
