@@ -53,10 +53,6 @@ B3Organ::B3Organ() {
 	}
 }
 
-static inline double sound_delay(double rotation, double max_delay, unsigned int sample_rate) {
-	return (1 + rotation) * max_delay * 0.5 * sample_rate;
-}
-
 void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Organ sound
 	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
@@ -293,48 +289,6 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		//Play
 		for (size_t i = 0; i < channels.size() ; ++i) {
 			channels[i] += sample;
-		}
-	}
-
-	//Trigger percussion
-	if (status.pressed_notes == 0) {
-		data.reset_percussion = true;
-	}
-	else if (data.reset_percussion) {
-		data.reset_percussion = false;
-		data.percussion_start = info.time + info.time_step; //TODO first pressed frame no percussion can be heard
-	}
-
-	//Switch speaker speed
-	if (data.curr_rotary_fast != data.preset.rotary_fast) {
-		data.curr_rotary_fast = data.preset.rotary_fast;
-		if (data.curr_rotary_fast) {
-			data.horn_speed.set(ROTARY_HORN_FAST_FREQUENCY, info.time, ROTARY_HORN_FAST_RAMP);
-			data.bass_speed.set(ROTARY_BASS_FAST_FREQUENCY, info.time, ROTARY_BASS_FAST_RAMP);
-		}
-		else {
-			data.horn_speed.set(ROTARY_HORN_SLOW_FREQUENCY, info.time, ROTARY_HORN_SLOW_RAMP);
-			data.bass_speed.set(ROTARY_BASS_SLOW_FREQUENCY, info.time, ROTARY_BASS_SLOW_RAMP);
-		}
-	}
-
-	//Rotate speakers
-	data.horn_rotation += data.horn_speed.get(info.time) * info.time_step;
-	data.bass_rotation -= data.bass_speed.get(info.time) * info.time_step;
-
-	//Play delay
-	double horn_rot = sin(freq_to_radians(data.horn_rotation));
-	double bass_rot = sin(freq_to_radians(data.bass_rotation));
-
-	double left = (data.left_horn_del.process() * (0.5 + horn_rot * 0.5) + data.left_bass_del.process() * (0.5 + bass_rot * 0.5));
-	double right = (data.right_horn_del.process() * (0.5 - horn_rot * 0.5) + data.right_bass_del.process() * (0.5 - bass_rot * 0.5));
-
-	for (size_t i = 0; i < channels.size(); ++i) {
-		if (i % 2 == 0) {
-			channels[i] += left + right * data.preset.rotary_stereo_mix;
-		}
-		else {
-			channels[i] += right + left * data.preset.rotary_stereo_mix;
 		}
 	}
 }
