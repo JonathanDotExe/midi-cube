@@ -47,6 +47,7 @@ src = [
 	'midicube/gui/view/SoundEngineView.cpp',
 	
 	'midicube/effect/bitcrusher.cpp',
+	'midicube/effect/rotary_speaker.cpp',
 	'midicube/effect/vocoder.cpp'
 ]
 

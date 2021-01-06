@@ -19,22 +19,6 @@
 #define ORGAN_TONEWHEEL_AMOUNT 91
 #define ORGAN_LOWEST_TONEWHEEL_NOTE 24
 
-#define ROTARY_CUTOFF 800
-
-#define ROTARY_HORN_SLOW_FREQUENCY 0.83333333333333
-#define ROTARY_HORN_FAST_FREQUENCY 6.66666666666667
-#define ROTARY_BASS_SLOW_FREQUENCY 0.66666666666667
-#define ROTARY_BASS_FAST_FREQUENCY 5.66666666666667
-
-#define ROTARY_HORN_SLOW_RAMP 1.6
-#define ROTARY_HORN_FAST_RAMP 1.0
-#define ROTARY_BASS_SLOW_RAMP 5.5
-#define ROTARY_BASS_FAST_RAMP 5.5
-
-#define HORN_RADIUS 0.15
-#define BASS_RADIUS 0.15
-#define SOUND_SPEED 343.2
-
 #define MIN_SWELL 0.1
 #define SWELL_RANGE (1 - MIN_SWELL)
 
@@ -114,15 +98,6 @@ struct B3OrganPreset {
 
 	double multi_note_gain{0.75};
 
-	bool rotary{false};
-	bool rotary_fast{true};
-	unsigned int rotary_cc{22};
-	unsigned int rotary_speed_cc{23};
-
-	double rotary_stereo_mix{0.5};
-	double rotary_gain{1.5};
-	bool rotary_type{false};
-	double rotary_delay{0.0005};
 
 
 	bool percussion{false};
