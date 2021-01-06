@@ -35,21 +35,35 @@ double B3OrganTonewheel::process(SampleInfo& info, double freq) {
 	}
 }
 
-
 //B3Organ
 B3Organ::B3Organ() {
 	drawbar_harmonics = { 0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8 };
 	drawbar_notes = {-12, 7, 0, 12, 19, 24, 28, 31, 36};
-	foldback_freq = note_to_freq(ORGAN_FOLDBACK_NOTE);
+	std::vector<double> gear_ratios = {
+		0.817307692,
+		0.865853659,
+		0.917808219,
+		0.972222222,
+		1.030000000,
+		1.090909091,
+		1.156250000,
+		1.225000000,
+		1.297297297,
+		1.375000000,
+		1.456521739,
+		1.542857143
+	};
 
+	int teeth = 1;
 	for (size_t i = 0; i < tonewheel_frequencies.size(); ++i) {
-		tonewheel_frequencies[i] = note_to_freq(ORGAN_LOWEST_TONEWHEEL_NOTE + i);
-	}
-
-	for (cutoff_tonewheel = 0; cutoff_tonewheel < tonewheel_frequencies.size(); ++cutoff_tonewheel) {
-		if (tonewheel_frequencies[cutoff_tonewheel] > ROTARY_CUTOFF) {
-			break;
+		if (i % gear_ratios.size() == 0) {
+			teeth *= 2;
+			if (teeth > 192) {
+				teeth = 192;
+			}
 		}
+		tonewheel_frequencies[i] = 20 * teeth * gear_ratios[i % gear_ratios.size()];
+		std::cout << (ORGAN_LOWEST_TONEWHEEL_NOTE + i) << " " << tonewheel_frequencies[i] << std::endl;
 	}
 }
 

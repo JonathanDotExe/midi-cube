@@ -173,9 +173,6 @@ private:
 	std::array<double, ORGAN_DRAWBAR_COUNT> drawbar_harmonics;
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbar_notes;
 	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_frequencies;
-	size_t cutoff_tonewheel = 0;
-	double foldback_freq = 0;
-
 
 public:
 	B3OrganData data;
