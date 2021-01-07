@@ -34,6 +34,7 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * German articale about vocoders (https://www.amazona.de/was-ist-ein-vocoder-geschichte-funktionsweise-varianten/)
 * Very helpful blog post about PolyBLEP - oscilators for anti-alising by Martin Finke (I wrote my polyblep function based on his) (http://www.martin-finke.de/blog/articles/audio-plugins-018-polyblep-oscillator/)
 * Artivle about soft clipping distortion by Eric Tarr (https://www.hackaudio.com/digital-signal-processing/distortion-effects/soft-clipping/)
+* Paper about simulation a tube amplifier (https://ses.library.usyd.edu.au/bitstream/handle/2123/7624/DESC9115_DAS_Assign02_310106370.pdf;jsessionid=0318BB69B12E37D8810CEDFD50DB5A42?sequence=2)
 * Very helpful tutorial on implementing resonant filters by Martin Finke (http://www.martin-finke.de/blog/articles/audio-plugins-013-filter/)
 * http://www.dma.ufg.ac.at/app/link/Grundlagen%3AAudio/module/8086?step=all
 * https://electricdruid.net/technical-aspects-of-the-hammond-organ/

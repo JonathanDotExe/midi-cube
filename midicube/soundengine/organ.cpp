@@ -97,29 +97,6 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	}
 }
 
-static double apply_distortion(double sample, double overdrive, DistortionType type, double vol) {
-	switch (type) {
-	case DistortionType::DIGITAL_DISTORTION:
-	{
-		double clip = (1 - overdrive) * vol;
-		sample = fmax(fmin(sample, clip), -clip);
-		sample *= clip ? 1/clip : 0;
-	}
-		break;
-	case DistortionType::ANALOG_DISTORTION_1:
-	{
-		sample -= (sample * sample * sample) * overdrive * (vol ? 1/vol : 0);
-	}
-		break;
-	case DistortionType::ANALOG_DISTORTION_2:
-	{
-		sample = 2 / M_PI * atan(sample * overdrive * 10 * (vol ? 1/vol : 0)) * vol;
-	}
-	break;
-	}
-	return sample;
-}
-
 static double calc_vol (size_t keys, double comp_factor) {
 	double vol = 1;
 	for (size_t i = 2; i <= keys; ++i) {
