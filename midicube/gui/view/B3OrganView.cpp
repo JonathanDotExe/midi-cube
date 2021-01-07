@@ -156,7 +156,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<double>* rotary_gain = new DragBox<double>(0, 0, 2, main_font, 16, tmp_x, tmp_y, 80, 60);
-		rotary_gain->bind(&organ, B3OrganProperty::pB3RotaryGain);
+		rotary_gain->bind(&organ, B3OrganProperty::pB3AmpBoost);
 		controls.push_back(rotary_gain);
 
 		tmp_y += 65;

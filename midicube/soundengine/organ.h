@@ -12,6 +12,7 @@
 #include "soundengine.h"
 #include "../synthesis.h"
 #include "../effect/rotary_speaker.h"
+#include "../effect/amplifier_simulation.h"
 #include "../property.h"
 
 #define ORGAN_DRAWBAR_COUNT 9
@@ -23,11 +24,6 @@
 #define MIN_SWELL 0.1
 #define SWELL_RANGE (1 - MIN_SWELL)
 
-
-
-enum DistortionType {
-	DIGITAL_DISTORTION, ANALOG_DISTORTION_1, ANALOG_DISTORTION_2
-};
 
 enum B3OrganProperty {
 	pB3Drawbar1,
@@ -65,7 +61,7 @@ enum B3OrganProperty {
 	pB3RotarySpeedCC,
 
 	pB3RotaryStereoMix,
-	pB3RotaryGain,
+	pB3AmpBoost,
 	pB3RotaryType,
 	pB3RotaryDelay,
 
@@ -92,9 +88,7 @@ struct B3OrganPreset {
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	double harmonic_foldback_volume{1.0};
 
-	DistortionType distortion_type{DistortionType::ANALOG_DISTORTION_1};
-	bool normalize_overdrive{false};
-	double overdrive{0};
+	AmplifierSimulationPreset amplifier;
 	unsigned int overdrive_cc{35};
 
 	double multi_note_gain{0.75};
@@ -153,6 +147,7 @@ public:
 class B3OrganData : public SoundEngineData{
 public:
 	B3OrganPreset preset;
+	AmplifierSimulationEffect amplifier;
 	RotarySpeakerEffect rotary_speaker;
 	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels;
 

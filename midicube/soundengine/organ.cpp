@@ -147,10 +147,8 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		submit_change(B3OrganProperty::pB3HarmonicFoldbackVolume,
 				data.preset.harmonic_foldback_volume);
 		submit_change(B3OrganProperty::pB3DistortionType,
-				data.preset.distortion_type);
-		submit_change(B3OrganProperty::pB3NormalizeOverdrive,
-				data.preset.normalize_overdrive);
-		submit_change(B3OrganProperty::pB3Overdrive, data.preset.overdrive);
+				data.preset.amplifier.type);
+		submit_change(B3OrganProperty::pB3Overdrive, data.preset.amplifier.drive);
 		submit_change(B3OrganProperty::pB3OverdriveCC,
 				(int) data.preset.overdrive_cc);
 		submit_change(B3OrganProperty::pB3MultiNoteGain,
@@ -163,7 +161,7 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 				(int) data.preset.rotary_speed_cc);
 		submit_change(B3OrganProperty::pB3RotaryStereoMix,
 				data.preset.rotary.stereo_mix);
-		submit_change(B3OrganProperty::pB3RotaryGain, data.preset.rotary.gain);
+		submit_change(B3OrganProperty::pB3AmpBoost, data.preset.amplifier.boost);
 		submit_change(B3OrganProperty::pB3RotaryType, data.preset.rotary.type);
 		submit_change(B3OrganProperty::pB3RotaryDelay,
 				data.preset.rotary.max_delay);
@@ -212,14 +210,13 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		vol *= v;
 		sample *= v;
 	}
-	//Overdrive
-	if (data.preset.overdrive) {
-		sample = apply_distortion(sample, data.preset.overdrive, data.preset.distortion_type, data.preset.normalize_overdrive ? vol : 1);
-	}
 
-	//Rotary
+	//Amplifier
 	double lsample = sample;
 	double rsample = sample;
+	data.amplifier.apply(lsample, rsample, data.preset.amplifier, info);
+
+	//Rotary
 	data.rotary_speaker.apply(lsample, rsample, data.preset.rotary, info);
 
 	//Play
@@ -247,8 +244,8 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	}
 	//Overdrive
 	if (control == data.preset.overdrive_cc) {
-		data.preset.overdrive = value/127.0;
-		submit_change(B3OrganProperty::pB3Overdrive, data.preset.overdrive);
+		data.preset.amplifier.drive = value/127.0;
+		submit_change(B3OrganProperty::pB3Overdrive, data.preset.amplifier.drive);
 	}
 	//Percussion
 	if (control == data.preset.percussion_cc) {
@@ -337,13 +334,10 @@ PropertyValue B3Organ::get(size_t prop) {
 		val.dval = data.preset.harmonic_foldback_volume;
 		break;
 	case B3OrganProperty::pB3DistortionType:
-		val.ival = data.preset.distortion_type;
-		break;
-	case B3OrganProperty::pB3NormalizeOverdrive:
-		val.bval = data.preset.normalize_overdrive;
+		val.ival = data.preset.amplifier.type;
 		break;
 	case B3OrganProperty::pB3Overdrive:
-		val.dval = data.preset.overdrive;
+		val.dval = data.preset.amplifier.drive;
 		break;
 	case B3OrganProperty::pB3OverdriveCC:
 		val.dval = data.preset.overdrive_cc;
@@ -366,8 +360,8 @@ PropertyValue B3Organ::get(size_t prop) {
 	case B3OrganProperty::pB3RotaryStereoMix:
 		val.dval = data.preset.rotary.stereo_mix;
 		break;
-	case B3OrganProperty::pB3RotaryGain:
-		val.dval = data.preset.rotary.gain;
+	case B3OrganProperty::pB3AmpBoost:
+		val.dval = data.preset.amplifier.boost;
 		break;
 	case B3OrganProperty::pB3RotaryType:
 		val.bval = data.preset.rotary.type;
@@ -478,13 +472,10 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 		data.preset.harmonic_foldback_volume = val.dval;
 		break;
 	case B3OrganProperty::pB3DistortionType:
-		data.preset.distortion_type = static_cast<DistortionType>(val.ival);
-		break;
-	case B3OrganProperty::pB3NormalizeOverdrive:
-		data.preset.normalize_overdrive = val.bval;
+		data.preset.amplifier.type = static_cast<DistortionType>(val.ival);
 		break;
 	case B3OrganProperty::pB3Overdrive:
-		data.preset.overdrive = val.dval;
+		data.preset.amplifier.drive = val.dval;
 		break;
 	case B3OrganProperty::pB3OverdriveCC:
 		data.preset.overdrive_cc = val.dval;
@@ -507,8 +498,8 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 	case B3OrganProperty::pB3RotaryStereoMix:
 		data.preset.rotary.stereo_mix = val.dval;
 		break;
-	case B3OrganProperty::pB3RotaryGain:
-		data.preset.rotary.gain = val.dval;
+	case B3OrganProperty::pB3AmpBoost:
+		data.preset.amplifier.boost = val.dval;
 		break;
 	case B3OrganProperty::pB3RotaryType:
 		data.preset.rotary.type = val.bval;

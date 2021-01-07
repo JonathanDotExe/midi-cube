@@ -42,20 +42,23 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 }
 
 void AmplifierSimulationEffect::apply(double &lsample, double &rsample, AmplifierSimulationPreset &preset, SampleInfo &info) {
-	//Gain
-	double gain = preset.boost + 1;
-	lsample *= gain;
-	rsample *= gain;
+	if (preset.on) {
+		//Gain
+		double gain = preset.boost + 1;
+		lsample *= gain;
+		rsample *= gain;
 
-	//Distortion
-	lsample = apply_distortion(lsample, preset.drive, preset.type);
-	rsample = apply_distortion(lsample, preset.drive, preset.type);
+		//Distortion
+		lsample = apply_distortion(lsample, preset.drive, preset.type);
+		rsample = apply_distortion(lsample, preset.drive, preset.type);
 
-	//Low-pass
-	FilterData data;
-	data.cutoff = cutoff_to_factor(1000 + preset.tone * 20000, info.time_step);
-	lsample = lfilter.apply(data, lsample, info.time_step);
-	rsample = lfilter.apply(data, rsample, info.time_step);
+		//Low-pass
+		FilterData data;
+		data.type = FilterType::LP_12;
+		data.cutoff = cutoff_to_factor(1000 + preset.tone * 20000, info.time_step);
+		lsample = lfilter.apply(data, lsample, info.time_step);
+		rsample = lfilter.apply(data, rsample, info.time_step);
+	}
 }
 
 AmplifierSimulationEffect::~AmplifierSimulationEffect() {

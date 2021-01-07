@@ -20,8 +20,8 @@ struct AmplifierSimulationPreset {
 	bool on = false;
 	double boost = 0;
 	double drive = 0;
-	double tone = 0.5;
-	DistortionType type;
+	double tone = 0.6;
+	DistortionType type = TUBE_AMP_DISTORTION;
 };
 
 class AmplifierSimulationEffect {

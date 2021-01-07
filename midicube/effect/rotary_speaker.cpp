@@ -23,9 +23,6 @@ void RotarySpeakerEffect::apply(double &lsample, double &rsample, RotarySpeakerP
 		//Filter
 		double bass_sample = filter.apply(filter_data, sample, info.time_step);
 		double horn_sample = sample - bass_sample;
-		//Gain
-		bass_sample *= preset.gain;
-		horn_sample *= preset.gain;
 
 		//Horn
 		double horn_pitch_rot = preset.type ? sin(freq_to_radians(horn_rotation)) : cos(freq_to_radians(horn_rotation));
