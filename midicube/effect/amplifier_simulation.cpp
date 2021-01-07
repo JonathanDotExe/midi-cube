@@ -50,7 +50,7 @@ void AmplifierSimulationEffect::apply(double &lsample, double &rsample, Amplifie
 
 		//Distortion
 		lsample = apply_distortion(lsample, preset.drive, preset.type);
-		rsample = apply_distortion(lsample, preset.drive, preset.type);
+		rsample = apply_distortion(rsample, preset.drive, preset.type);
 
 		//Low-pass
 		FilterData data;
