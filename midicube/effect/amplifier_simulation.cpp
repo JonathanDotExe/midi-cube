@@ -15,7 +15,7 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 	switch (type) {
 	case DistortionType::TUBE_AMP_DISTORTION:
 	{
-		double a = sin((drive * 100.0 + 1)/101 * M_PI/2.0);
+		double a = sin((drive * 100.0 + 1)/101 * (M_PI/2.0));
 		double k = 2 * a/(1 - a);
 		sample = (1 + k) * sample / (1 + k * abs(sample));
 	}

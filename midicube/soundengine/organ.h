@@ -48,10 +48,12 @@ enum B3OrganProperty {
 
 	pB3HarmonicFoldbackVolume,
 
-	pB3DistortionType,
-	pB3NormalizeOverdrive,
-	pB3Overdrive,
-	pB3OverdriveCC,
+	pB3AmpOn,
+	pB3AmpDrive,
+	pB3AmpBoost,
+	pB3AmpTone,
+	pB3AmpDistortionType,
+	pB3AmpDriveCC,
 
 	pB3MultiNoteGain,
 
@@ -61,7 +63,6 @@ enum B3OrganProperty {
 	pB3RotarySpeedCC,
 
 	pB3RotaryStereoMix,
-	pB3AmpBoost,
 	pB3RotaryType,
 	pB3RotaryDelay,
 

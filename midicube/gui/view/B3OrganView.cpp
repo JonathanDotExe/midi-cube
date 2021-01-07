@@ -69,6 +69,55 @@ Scene B3OrganView::create(Frame &frame) {
 
 		tmp_y += 75;
 	}
+
+	//Amplifier
+	{
+		Label* label = new Label("Amplifier", main_font, 18, 10, tmp_y);
+		label->text.setFillColor(sf::Color::White);
+		controls.push_back(label);
+		tmp_y += 25;
+
+		OrganSwitch* rotary_type = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60);
+		rotary_type->bind(&organ, B3OrganProperty::pB3AmpOn);
+		controls.push_back(rotary_type);
+
+		tmp_y += 65;
+	}
+
+	//Amplifier Boost
+	{
+		Label* label = new Label("Amp Boost", main_font, 18, 10, tmp_y);
+		label->text.setFillColor(sf::Color::White);
+		controls.push_back(label);
+		tmp_y += 25;
+
+		DragBox<double>* boost = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
+		boost->bind(&organ, B3OrganProperty::pB3AmpBoost);
+		controls.push_back(boost);
+
+		tmp_y += 65;
+	}
+
+	//Distortion Amount
+	{
+		Label* overdrive_label = new Label("Amp Drive", main_font, 18, 10, tmp_y);
+		overdrive_label->text.setFillColor(sf::Color::White);
+		controls.push_back(overdrive_label);
+		tmp_y += 25;
+
+		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
+		midi->bind(&organ, B3OrganProperty::pB3AmpDriveCC);
+		controls.push_back(midi);
+		show_midi.push_back(midi);
+
+		DragBox<double>* overdrive = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
+		overdrive->bind(&organ, B3OrganProperty::pB3AmpDrive);
+		controls.push_back(overdrive);
+		hide_midi.push_back(overdrive);
+
+		tmp_y += 65;
+	}
+
 	//Distortion Type
 	{
 		Label* distortion_type_label = new Label("Distortion Type", main_font, 18, 10, tmp_y);
@@ -76,56 +125,9 @@ Scene B3OrganView::create(Frame &frame) {
 		controls.push_back(distortion_type_label);
 		tmp_y += 25;
 
-		ComboBox* distortion_type = new ComboBox(0, {"Digital", "Analog 1", "Analog 2"}, main_font, 16, 0, 10, tmp_y, 80, 60);
-		distortion_type->bind(&organ, B3OrganProperty::pB3DistortionType);
+		ComboBox* distortion_type = new ComboBox(0, {"Tube", "Digital", "Analog 1", "Analog 2"}, main_font, 16, 0, 10, tmp_y, 80, 60);
+		distortion_type->bind(&organ, B3OrganProperty::pB3AmpDistortionType);
 		controls.push_back(distortion_type);
-
-		tmp_y += 65;
-	}
-
-	//Distortion Amount
-	{
-		Label* overdrive_label = new Label("Overdrive", main_font, 18, 10, tmp_y);
-		overdrive_label->text.setFillColor(sf::Color::White);
-		controls.push_back(overdrive_label);
-		tmp_y += 25;
-
-		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3OverdriveCC);
-		controls.push_back(midi);
-		show_midi.push_back(midi);
-
-		DragBox<double>* overdrive = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
-		overdrive->bind(&organ, B3OrganProperty::pB3Overdrive);
-		controls.push_back(overdrive);
-		hide_midi.push_back(overdrive);
-
-		tmp_y += 75;
-	}
-
-	//Rotary Type
-	{
-		Label* label = new Label("Rotary Type", main_font, 18, 10, tmp_y);
-		label->text.setFillColor(sf::Color::White);
-		controls.push_back(label);
-		tmp_y += 25;
-
-		OrganSwitch* rotary_type = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60, "1", "2");
-		rotary_type->bind(&organ, B3OrganProperty::pB3RotaryType);
-		controls.push_back(rotary_type);
-
-		tmp_y += 65;
-	}
-	//Normalize overdrive
-	{
-		Label* label = new Label("Norm. Overdrive", main_font, 18, 10, tmp_y);
-		label->text.setFillColor(sf::Color::White);
-		controls.push_back(label);
-		tmp_y += 25;
-
-		OrganSwitch* rotary_type = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60);
-		rotary_type->bind(&organ, B3OrganProperty::pB3RotaryType);
-		controls.push_back(rotary_type);
 
 		tmp_y += 65;
 	}
@@ -133,6 +135,22 @@ Scene B3OrganView::create(Frame &frame) {
 	//Col 2
 	tmp_y -= 65 + 25;
 	int tmp_x = 180;
+	//Amp Tone
+	{
+		Label* label = new Label("Amp Tone", main_font, 18, tmp_x, tmp_y);
+		label->text.setFillColor(sf::Color::White);
+		controls.push_back(label);
+		tmp_y += 25;
+
+		DragBox<double>* rotary_stereo = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
+		rotary_stereo->bind(&organ, B3OrganProperty::pB3AmpTone);
+		controls.push_back(rotary_stereo);
+
+		tmp_y += 65;
+	}
+	tmp_y -= 65 + 25;
+	tmp_x += 140;
+
 	//Rotary Stereo Mix
 	{
 		Label* label = new Label("Rotary Stereo", main_font, 18, tmp_x, tmp_y);
@@ -148,19 +166,21 @@ Scene B3OrganView::create(Frame &frame) {
 	}
 	tmp_y -= 65 + 25;
 	tmp_x += 140;
-	//Rotary Gain
+
+	//Rotary Type
 	{
-		Label* label = new Label("Rotary Gain", main_font, 18, tmp_x, tmp_y);
+		Label* label = new Label("Rotary Type", main_font, 18, tmp_x, tmp_y);
 		label->text.setFillColor(sf::Color::White);
 		controls.push_back(label);
 		tmp_y += 25;
 
-		DragBox<double>* rotary_gain = new DragBox<double>(0, 0, 2, main_font, 16, tmp_x, tmp_y, 80, 60);
-		rotary_gain->bind(&organ, B3OrganProperty::pB3AmpBoost);
-		controls.push_back(rotary_gain);
+		OrganSwitch* rotary_type = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "1", "2");
+		rotary_type->bind(&organ, B3OrganProperty::pB3RotaryType);
+		controls.push_back(rotary_type);
 
 		tmp_y += 65;
 	}
+
 	tmp_x += 140;
 	tmp_y -= 65 + 25;
 	//Swell
@@ -178,7 +198,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 
-	tmp_x -= 280;
+	tmp_x -= 140 * 3;
 	tmp_y -= (65 + 25) * 2;
 	//Drawbars
 	std::vector<sf::Color> colors = {

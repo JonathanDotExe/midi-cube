@@ -146,10 +146,12 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 				(int) data.preset.drawbar_ccs[8]);
 		submit_change(B3OrganProperty::pB3HarmonicFoldbackVolume,
 				data.preset.harmonic_foldback_volume);
-		submit_change(B3OrganProperty::pB3DistortionType,
+		submit_change(B3OrganProperty::pB3AmpOn, data.preset.amplifier.on);
+		submit_change(B3OrganProperty::pB3AmpDistortionType,
 				data.preset.amplifier.type);
-		submit_change(B3OrganProperty::pB3Overdrive, data.preset.amplifier.drive);
-		submit_change(B3OrganProperty::pB3OverdriveCC,
+		submit_change(B3OrganProperty::pB3AmpDrive, data.preset.amplifier.drive);
+		submit_change(B3OrganProperty::pB3AmpTone, data.preset.amplifier.tone);
+		submit_change(B3OrganProperty::pB3AmpDriveCC,
 				(int) data.preset.overdrive_cc);
 		submit_change(B3OrganProperty::pB3MultiNoteGain,
 				data.preset.multi_note_gain);
@@ -245,7 +247,7 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	//Overdrive
 	if (control == data.preset.overdrive_cc) {
 		data.preset.amplifier.drive = value/127.0;
-		submit_change(B3OrganProperty::pB3Overdrive, data.preset.amplifier.drive);
+		submit_change(B3OrganProperty::pB3AmpDrive, data.preset.amplifier.drive);
 	}
 	//Percussion
 	if (control == data.preset.percussion_cc) {
@@ -333,13 +335,19 @@ PropertyValue B3Organ::get(size_t prop) {
 	case B3OrganProperty::pB3HarmonicFoldbackVolume:
 		val.dval = data.preset.harmonic_foldback_volume;
 		break;
-	case B3OrganProperty::pB3DistortionType:
+	case B3OrganProperty::pB3AmpOn:
+		val.bval = data.preset.amplifier.on;
+		break;
+	case B3OrganProperty::pB3AmpDistortionType:
 		val.ival = data.preset.amplifier.type;
 		break;
-	case B3OrganProperty::pB3Overdrive:
+	case B3OrganProperty::pB3AmpDrive:
 		val.dval = data.preset.amplifier.drive;
 		break;
-	case B3OrganProperty::pB3OverdriveCC:
+	case B3OrganProperty::pB3AmpTone:
+		val.dval = data.preset.amplifier.tone;
+		break;
+	case B3OrganProperty::pB3AmpDriveCC:
 		val.dval = data.preset.overdrive_cc;
 		break;
 	case B3OrganProperty::pB3MultiNoteGain:
@@ -471,13 +479,19 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 	case B3OrganProperty::pB3HarmonicFoldbackVolume:
 		data.preset.harmonic_foldback_volume = val.dval;
 		break;
-	case B3OrganProperty::pB3DistortionType:
+	case B3OrganProperty::pB3AmpOn:
+		data.preset.amplifier.on = val.bval;
+		break;
+	case B3OrganProperty::pB3AmpDistortionType:
 		data.preset.amplifier.type = static_cast<DistortionType>(val.ival);
 		break;
-	case B3OrganProperty::pB3Overdrive:
+	case B3OrganProperty::pB3AmpDrive:
 		data.preset.amplifier.drive = val.dval;
 		break;
-	case B3OrganProperty::pB3OverdriveCC:
+	case B3OrganProperty::pB3AmpTone:
+		data.preset.amplifier.tone = val.dval;
+		break;
+	case B3OrganProperty::pB3AmpDriveCC:
 		data.preset.overdrive_cc = val.dval;
 		break;
 	case B3OrganProperty::pB3MultiNoteGain:
