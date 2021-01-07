@@ -15,6 +15,11 @@ AmplifierSimulationEffect::AmplifierSimulationEffect() {
 static double apply_distortion(double sample, double drive, DistortionType type) {
 	switch (type) {
 	case DistortionType::TUBE_AMP_DISTORTION:
+	{
+		double a = sin((drive * 100.0 + 1)/101 * M_PI/2.0);
+		double k = 2 * a/(1 - a);
+		sample = (1 + k) * sample / (1 + k * abs(sample));
+	}
 		break;
 	case DistortionType::DIGITAL_DISTORTION:
 	{
@@ -39,7 +44,7 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 
 void AmplifierSimulationEffect::apply(double &lsample, double &rsample, AmplifierSimulationPreset &preset, SampleInfo &info) {
 	//Gain
-	double gain = preset.boost * 99 + 1;
+	double gain = preset.boost + 1;
 	lsample *= gain;
 	rsample *= gain;
 
