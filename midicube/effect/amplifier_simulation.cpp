@@ -11,7 +11,6 @@ AmplifierSimulationEffect::AmplifierSimulationEffect() {
 
 }
 
-
 static double apply_distortion(double sample, double drive, DistortionType type) {
 	switch (type) {
 	case DistortionType::TUBE_AMP_DISTORTION:
@@ -51,6 +50,12 @@ void AmplifierSimulationEffect::apply(double &lsample, double &rsample, Amplifie
 	//Distortion
 	lsample = apply_distortion(lsample, preset.drive, preset.type);
 	rsample = apply_distortion(lsample, preset.drive, preset.type);
+
+	//Low-pass
+	FilterData data;
+	data.cutoff = cutoff_to_factor(1000 + preset.tone * 20000, info.time_step);
+	lsample = lfilter.apply(data, lsample, info.time_step);
+	rsample = lfilter.apply(data, rsample, info.time_step);
 }
 
 AmplifierSimulationEffect::~AmplifierSimulationEffect() {

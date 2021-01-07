@@ -18,8 +18,8 @@ enum DistortionType {
 
 struct AmplifierSimulationPreset {
 	bool on = false;
-	double boost{1.0};
-	double drive;
+	double boost = 0;
+	double drive = 0;
 	double tone = 0.5;
 	DistortionType type;
 };
