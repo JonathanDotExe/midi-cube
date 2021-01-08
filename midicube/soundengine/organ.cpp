@@ -80,6 +80,10 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 		vol *= 1.0/ORGAN_DRAWBAR_COUNT * 2;
 		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12);
 
+		while (tonewheel < 0) {
+			tonewheel += 12;
+			vol *= data.preset.harmonic_foldback_volume;
+		}
 		while (tonewheel >= (int) data.tonewheels.size()) {
 			tonewheel -= 12;
 			vol *= data.preset.harmonic_foldback_volume;
@@ -195,6 +199,15 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 	}
 
 	double swell = this->data.swell * SWELL_RANGE + MIN_SWELL;
+
+	//Percussion
+	if (status.pressed_notes == 0) {
+		data.reset_percussion = true;
+	}
+	else if (data.reset_percussion) {
+		data.percussion_start = info.time + info.time_step;
+		data.reset_percussion = false;
+	}
 
 	//Play organ sound
 	//Compute samples
