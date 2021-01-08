@@ -72,6 +72,10 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 		int tonewheel = note.note + drawbar_notes.at(i) - ORGAN_LOWEST_TONEWHEEL_NOTE;
 		double volume = 1;
 
+		while (tonewheel < 0) {
+			tonewheel += 12;
+			volume *= data.preset.harmonic_foldback_volume;
+		}
 		while (tonewheel >= (int) data.tonewheels.size()) {
 			tonewheel -= 12;
 			volume *= data.preset.harmonic_foldback_volume;
