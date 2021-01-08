@@ -12,7 +12,6 @@ AmplifierSimulationEffect::AmplifierSimulationEffect() {
 }
 
 static double apply_distortion(double sample, double drive, DistortionType type) {
-	double os = sample + offset;
 	switch (type) {
 	/*case DistortionType::TUBE_AMP_DISTORTION:
 	{

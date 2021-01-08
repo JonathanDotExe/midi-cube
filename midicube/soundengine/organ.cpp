@@ -152,7 +152,7 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		submit_change(B3OrganProperty::pB3AmpDrive, data.preset.amplifier.drive);
 		submit_change(B3OrganProperty::pB3AmpTone, data.preset.amplifier.tone);
 		submit_change(B3OrganProperty::pB3AmpDriveCC,
-				(int) data.preset.overdrive_cc);
+				(int) data.preset.amp_drive_cc);
 		submit_change(B3OrganProperty::pB3MultiNoteGain,
 				data.preset.multi_note_gain);
 		submit_change(B3OrganProperty::pB3Rotary, data.preset.rotary.on);
@@ -244,10 +244,25 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 		data.preset.rotary.fast = value > 0;
 		submit_change(B3OrganProperty::pB3RotarySpeed, data.preset.rotary.fast);
 	}
-	//Overdrive
-	if (control == data.preset.overdrive_cc) {
+	//Amp
+	if (control == data.preset.amp_cc) {
+		data.preset.amplifier.on = value > 0;
+		submit_change(B3OrganProperty::pB3AmpOn, data.preset.amplifier.on);
+	}
+	//Boost
+	if (control == data.preset.amp_boost_cc) {
+		data.preset.amplifier.boost = value/127.0;
+		submit_change(B3OrganProperty::pB3AmpBoost, data.preset.amplifier.boost);
+	}
+	//Drive
+	if (control == data.preset.amp_drive_cc) {
 		data.preset.amplifier.drive = value/127.0;
 		submit_change(B3OrganProperty::pB3AmpDrive, data.preset.amplifier.drive);
+	}
+	//Tone
+	if (control == data.preset.amp_tone_cc) {
+		data.preset.amplifier.tone = value/127.0;
+		submit_change(B3OrganProperty::pB3AmpTone, data.preset.amplifier.tone);
 	}
 	//Percussion
 	if (control == data.preset.percussion_cc) {
@@ -348,7 +363,7 @@ PropertyValue B3Organ::get(size_t prop) {
 		val.dval = data.preset.amplifier.tone;
 		break;
 	case B3OrganProperty::pB3AmpDriveCC:
-		val.dval = data.preset.overdrive_cc;
+		val.dval = data.preset.amp_drive_cc;
 		break;
 	case B3OrganProperty::pB3MultiNoteGain:
 		val.dval = data.preset.multi_note_gain;
@@ -492,7 +507,7 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 		data.preset.amplifier.tone = val.dval;
 		break;
 	case B3OrganProperty::pB3AmpDriveCC:
-		data.preset.overdrive_cc = val.dval;
+		data.preset.amp_drive_cc = val.dval;
 		break;
 	case B3OrganProperty::pB3MultiNoteGain:
 		data.preset.multi_note_gain = val.dval;

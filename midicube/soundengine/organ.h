@@ -90,7 +90,10 @@ struct B3OrganPreset {
 	double harmonic_foldback_volume{1.0};
 
 	AmplifierSimulationPreset amplifier;
-	unsigned int overdrive_cc{35};
+	unsigned int amp_cc{28};
+	unsigned int amp_boost_cc{35};
+	unsigned int amp_drive_cc{36};
+	unsigned int amp_tone_cc{37};
 
 	double multi_note_gain{0.75};
 
