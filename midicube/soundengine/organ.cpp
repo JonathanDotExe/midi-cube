@@ -10,22 +10,11 @@
 #include <cmath>
 
 //B3OrganTonewheel
-bool B3OrganTonewheel::has_turned_since(double time) {
-	return time <= last_turn;
-}
-
 double B3OrganTonewheel::process(SampleInfo& info, double freq) {
-	double volume = curr_vol + dynamic_vol;
 	//Rotation
-	double old_rot = rotation;
+	double volume = this->volume;
 	rotation += freq * info.time_step;
-	if ((int) (old_rot/0.5) != (int)(rotation/0.5)) {
-		last_turn = info.time;
-		curr_vol = static_vol;
-	}
-	//Reset
-	static_vol = 0;
-	dynamic_vol = 0;
+	this->volume = 0;
 	//Signal
 	if (volume) {
 		return sin(freq_to_radians(rotation)) * volume;
@@ -81,7 +70,7 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 			volume *= data.preset.harmonic_foldback_volume;
 		}
 		if (tonewheel >= 0) {
-			data.tonewheels[tonewheel].static_vol += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / data.preset.drawbars.size() * volume;
+			data.tonewheels[tonewheel].volume += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / data.preset.drawbars.size() * volume;
 		}
 	}
 	//Percussion
@@ -96,7 +85,7 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 			vol *= data.preset.harmonic_foldback_volume;
 		}
 		if (tonewheel >= 0 /*&& data.tonewheels[tonewheel].has_turned_since(data.percussion_start)*/) {
-			data.tonewheels[tonewheel].static_vol += vol;
+			data.tonewheels[tonewheel].volume += vol;
 		}
 	}
 }
@@ -210,16 +199,12 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 	//Play organ sound
 	//Compute samples
 	double sample = 0;
-	double vol = 0;
-
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
-		vol += data.tonewheels[i].curr_vol + data.tonewheels[i].dynamic_vol;
 		sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend) * swell;
 	}
 	//Compress
 	if (status.pressed_notes && data.preset.multi_note_gain != 1) {
 		double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
-		vol *= v;
 		sample *= v;
 	}
 

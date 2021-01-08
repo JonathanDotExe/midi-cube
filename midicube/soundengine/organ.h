@@ -141,13 +141,8 @@ struct B3OrganPreset {
 class B3OrganTonewheel {
 private:
 	double rotation = 0;
-	double last_turn = 0;
 public:
-	double static_vol = 0;
-	double dynamic_vol = 0;
-	double curr_vol = 0;
-
-	bool has_turned_since(double time);
+	double volume = 0;
 	double process(SampleInfo& info, double freq);
 };
 
