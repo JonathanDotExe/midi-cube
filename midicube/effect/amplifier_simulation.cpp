@@ -15,7 +15,7 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 	switch (type) {
 	case DistortionType::TUBE_AMP_DISTORTION:
 	{
-		double a = sin((drive * 100.0 + 1)/101 * (M_PI/2.0));
+		double a = sin((drive * 100.0 + 1)/102 * (M_PI/2.0));
 		double k = 2 * a/(1 - a);
 		sample = (1 + k) * sample / (1 + k * abs(sample));
 	}
@@ -29,12 +29,12 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 		break;
 	case DistortionType::SOFT_CLIPPING_1:
 	{
-		sample -= (sample * sample * sample) * drive;
+		sample -= (sample * sample * sample) * drive * 1/3;
 	}
 		break;
 	case DistortionType::SOFT_CLIPPING_2:
 	{
-		sample = 2 / M_PI * atan(sample * drive * 10);
+		sample = 2 / M_PI * atan(sample * (1.5 + drive));
 	}
 		break;
 	}
@@ -55,7 +55,7 @@ void AmplifierSimulationEffect::apply(double &lsample, double &rsample, Amplifie
 		//Low-pass
 		FilterData data;
 		data.type = FilterType::LP_12;
-		data.cutoff = cutoff_to_factor(1000 + preset.tone * 20000, info.time_step);
+		data.cutoff = cutoff_to_factor(200 + preset.tone * 20000, info.time_step);
 		lsample = lfilter.apply(data, lsample, info.time_step);
 		rsample = lfilter.apply(data, rsample, info.time_step);
 	}

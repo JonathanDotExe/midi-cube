@@ -13,7 +13,7 @@
 #include "../synthesis.h"
 
 enum DistortionType {
-	TUBE_AMP_DISTORTION, SOFT_CLIPPING_1, SOFT_CLIPPING_2, DIGITAL_DISTORTION
+	TUBE_AMP_DISTORTION, DIGITAL_DISTORTION, SOFT_CLIPPING_1, SOFT_CLIPPING_2
 };
 
 struct AmplifierSimulationPreset {
