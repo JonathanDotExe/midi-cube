@@ -77,9 +77,15 @@ Scene B3OrganView::create(Frame &frame) {
 		controls.push_back(label);
 		tmp_y += 25;
 
-		OrganSwitch* rotary_type = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60);
-		rotary_type->bind(&organ, B3OrganProperty::pB3AmpOn);
-		controls.push_back(rotary_type);
+		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
+		midi->bind(&organ, B3OrganProperty::pB3AmpOnCC);
+		controls.push_back(midi);
+		show_midi.push_back(midi);
+
+		OrganSwitch* amplifier = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60);
+		amplifier->bind(&organ, B3OrganProperty::pB3AmpOn);
+		controls.push_back(amplifier);
+		hide_midi.push_back(amplifier);
 
 		tmp_y += 65;
 	}
@@ -91,9 +97,16 @@ Scene B3OrganView::create(Frame &frame) {
 		controls.push_back(label);
 		tmp_y += 25;
 
+		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
+		midi->bind(&organ, B3OrganProperty::pB3AmpBoostCC);
+		controls.push_back(midi);
+		show_midi.push_back(midi);
+
+
 		DragBox<double>* boost = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
 		boost->bind(&organ, B3OrganProperty::pB3AmpBoost);
 		controls.push_back(boost);
+		hide_midi.push_back(boost);
 
 		tmp_y += 65;
 	}
@@ -142,9 +155,16 @@ Scene B3OrganView::create(Frame &frame) {
 		controls.push_back(label);
 		tmp_y += 25;
 
-		DragBox<double>* rotary_stereo = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		rotary_stereo->bind(&organ, B3OrganProperty::pB3AmpTone);
-		controls.push_back(rotary_stereo);
+		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
+		midi->bind(&organ, B3OrganProperty::pB3AmpToneCC);
+		controls.push_back(midi);
+		show_midi.push_back(midi);
+
+
+		DragBox<double>* amp_tone = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
+		amp_tone->bind(&organ, B3OrganProperty::pB3AmpTone);
+		controls.push_back(amp_tone);
+		hide_midi.push_back(amp_tone);
 
 		tmp_y += 65;
 	}

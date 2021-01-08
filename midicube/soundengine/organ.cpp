@@ -151,8 +151,14 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 				data.preset.amplifier.type);
 		submit_change(B3OrganProperty::pB3AmpDrive, data.preset.amplifier.drive);
 		submit_change(B3OrganProperty::pB3AmpTone, data.preset.amplifier.tone);
+		submit_change(B3OrganProperty::pB3AmpOnCC,
+				(int) data.preset.amp_cc);
+		submit_change(B3OrganProperty::pB3AmpBoostCC,
+				(int) data.preset.amp_boost_cc);
 		submit_change(B3OrganProperty::pB3AmpDriveCC,
 				(int) data.preset.amp_drive_cc);
+		submit_change(B3OrganProperty::pB3AmpToneCC,
+				(int) data.preset.amp_tone_cc);
 		submit_change(B3OrganProperty::pB3MultiNoteGain,
 				data.preset.multi_note_gain);
 		submit_change(B3OrganProperty::pB3Rotary, data.preset.rotary.on);
@@ -362,8 +368,17 @@ PropertyValue B3Organ::get(size_t prop) {
 	case B3OrganProperty::pB3AmpTone:
 		val.dval = data.preset.amplifier.tone;
 		break;
+	case B3OrganProperty::pB3AmpOnCC:
+		val.ival = data.preset.amp_cc;
+		break;
+	case B3OrganProperty::pB3AmpBoostCC:
+		val.ival = data.preset.amp_boost_cc;
+		break;
 	case B3OrganProperty::pB3AmpDriveCC:
-		val.dval = data.preset.amp_drive_cc;
+		val.ival = data.preset.amp_drive_cc;
+		break;
+	case B3OrganProperty::pB3AmpToneCC:
+		val.ival = data.preset.amp_tone_cc;
 		break;
 	case B3OrganProperty::pB3MultiNoteGain:
 		val.dval = data.preset.multi_note_gain;
@@ -506,8 +521,17 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 	case B3OrganProperty::pB3AmpTone:
 		data.preset.amplifier.tone = val.dval;
 		break;
+	case B3OrganProperty::pB3AmpOnCC:
+		data.preset.amp_cc = val.ival;
+		break;
+	case B3OrganProperty::pB3AmpBoostCC:
+		data.preset.amp_boost_cc = val.ival;
+		break;
 	case B3OrganProperty::pB3AmpDriveCC:
-		data.preset.amp_drive_cc = val.dval;
+		data.preset.amp_drive_cc = val.ival;
+		break;
+	case B3OrganProperty::pB3AmpToneCC:
+		data.preset.amp_tone_cc = val.ival;
 		break;
 	case B3OrganProperty::pB3MultiNoteGain:
 		data.preset.multi_note_gain = val.dval;

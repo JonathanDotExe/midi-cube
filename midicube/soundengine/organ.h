@@ -53,7 +53,10 @@ enum B3OrganProperty {
 	pB3AmpBoost,
 	pB3AmpTone,
 	pB3AmpDistortionType,
+	pB3AmpOnCC,
+	pB3AmpBoostCC,
 	pB3AmpDriveCC,
+	pB3AmpToneCC,
 
 	pB3MultiNoteGain,
 
