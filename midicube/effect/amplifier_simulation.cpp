@@ -12,14 +12,15 @@ AmplifierSimulationEffect::AmplifierSimulationEffect() {
 }
 
 static double apply_distortion(double sample, double drive, DistortionType type) {
+	double os = sample + offset;
 	switch (type) {
-	case DistortionType::TUBE_AMP_DISTORTION:
+	/*case DistortionType::TUBE_AMP_DISTORTION:
 	{
 		double a = sin((drive * 100.0 + 1)/102 * (M_PI/2.0));
 		double k = 2 * a/(1 - a);
 		sample = (1 + k) * sample / (1 + k * abs(sample));
 	}
-		break;
+		break;*/
 	case DistortionType::DIGITAL_DISTORTION:
 	{
 		double clip = (1 - drive);
@@ -27,12 +28,12 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 		sample *= clip ? 1/clip : 0;
 	}
 		break;
-	case DistortionType::SOFT_CLIPPING_1:
+	case DistortionType::POLYNOMAL_DISTORTION:
 	{
 		sample -= (sample * sample * sample) * drive * 1/3;
 	}
 		break;
-	case DistortionType::SOFT_CLIPPING_2:
+	case DistortionType::ARCTAN_DISTORTION:
 	{
 		sample = 2 / M_PI * atan(sample * (1.5 + drive));
 	}

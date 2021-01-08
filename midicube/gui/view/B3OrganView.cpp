@@ -125,7 +125,7 @@ Scene B3OrganView::create(Frame &frame) {
 		controls.push_back(distortion_type_label);
 		tmp_y += 25;
 
-		ComboBox* distortion_type = new ComboBox(0, {"Tube", "Digital", "Analog 1", "Analog 2"}, main_font, 16, 0, 10, tmp_y, 80, 60);
+		ComboBox* distortion_type = new ComboBox(0, {"Digital", "Polynomal", "Arctan"}, main_font, 16, 0, 10, tmp_y, 80, 60);
 		distortion_type->bind(&organ, B3OrganProperty::pB3AmpDistortionType);
 		controls.push_back(distortion_type);
 

@@ -13,7 +13,7 @@
 #include "../synthesis.h"
 
 enum DistortionType {
-	TUBE_AMP_DISTORTION, DIGITAL_DISTORTION, SOFT_CLIPPING_1, SOFT_CLIPPING_2
+	DIGITAL_DISTORTION, POLYNOMAL_DISTORTION, ARCTAN_DISTORTION
 };
 
 struct AmplifierSimulationPreset {
@@ -21,7 +21,7 @@ struct AmplifierSimulationPreset {
 	double boost = 0;
 	double drive = 0;
 	double tone = 0.6;
-	DistortionType type = TUBE_AMP_DISTORTION;
+	DistortionType type = ARCTAN_DISTORTION;
 };
 
 class AmplifierSimulationEffect {
