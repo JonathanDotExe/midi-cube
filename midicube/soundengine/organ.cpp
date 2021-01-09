@@ -57,6 +57,7 @@ B3Organ::B3Organ() {
 
 void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Organ sound
+	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
 		int tonewheel = note.note + drawbar_notes.at(i) - ORGAN_LOWEST_TONEWHEEL_NOTE;
 		double volume = 1;
@@ -70,14 +71,14 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 			volume *= data.preset.harmonic_foldback_volume;
 		}
 		if (tonewheel >= 0) {
-			data.tonewheels[tonewheel].volume += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / data.preset.drawbars.size() * volume;
+			data.tonewheels[tonewheel].volume += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount  * volume;
 		}
 	}
 	//Percussion
 	double decay = data.preset.percussion_fast_decay ? data.preset.percussion_fast_decay_time : data.preset.percussion_slow_decay_time;
 	if (data.preset.percussion && info.time - data.percussion_start <= decay) {
 		double vol = (1 - (info.time - data.percussion_start)/decay) * (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
-		vol *= 1.0/ORGAN_DRAWBAR_COUNT * 2;
+		vol /= drawbar_amount;
 		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12);
 
 		while (tonewheel < 0) {

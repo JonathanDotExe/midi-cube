@@ -109,8 +109,8 @@ struct B3OrganPreset {
 	bool percussion_soft{true};
 	bool percussion_fast_decay{true};
 
-	double percussion_soft_volume{0.5};
-	double percussion_hard_volume{1.0};
+	double percussion_soft_volume{2};
+	double percussion_hard_volume{5};
 	double percussion_fast_decay_time{0.2};
 	double percussion_slow_decay_time{1.0};
 
