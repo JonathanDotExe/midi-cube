@@ -90,6 +90,7 @@ enum B3OrganProperty {
 	pB3PercussionSoftCC,
 	pB3PercussionFastDecayCC,
 
+	pB3VibratoMix,
 	pB3SwellCC,
 };
 

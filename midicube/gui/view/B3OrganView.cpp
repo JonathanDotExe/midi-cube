@@ -169,11 +169,27 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 	tmp_y -= 65 + 25;
-	tmp_x += 140;
+	tmp_x += 95;
+
+	//Vibrato Mix
+	{
+		Label* label = new Label("Vibrato Mix", main_font, 18, tmp_x, tmp_y);
+		label->text.setFillColor(sf::Color::White);
+		controls.push_back(label);
+		tmp_y += 25;
+
+		DragBox<double>* vibrato = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
+		vibrato->bind(&organ, B3OrganProperty::pB3VibratoMix);
+		controls.push_back(vibrato);
+
+		tmp_y += 65;
+	}
+	tmp_y -= 65 + 25;
+	tmp_x += 95;
 
 	//Rotary Stereo Mix
 	{
-		Label* label = new Label("Rotary Stereo", main_font, 18, tmp_x, tmp_y);
+		Label* label = new Label("Rot. Stereo", main_font, 18, tmp_x, tmp_y);
 		label->text.setFillColor(sf::Color::White);
 		controls.push_back(label);
 		tmp_y += 25;
@@ -185,7 +201,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 	tmp_y -= 65 + 25;
-	tmp_x += 140;
+	tmp_x += 95;
 
 	//Rotary Type
 	{
@@ -201,7 +217,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 
-	tmp_x += 140;
+	tmp_x += 95;
 	tmp_y -= 65 + 25;
 	//Swell
 	{
@@ -218,7 +234,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 
-	tmp_x -= 140 * 3;
+	tmp_x -= 95 * 4;
 	tmp_y -= (65 + 25) * 2;
 	//Drawbars
 	std::vector<sf::Color> colors = {
