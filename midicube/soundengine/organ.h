@@ -167,6 +167,7 @@ public:
 	bool reset_percussion = true;
 	double percussion_start = 0;
 	double scanner_phase = 0;
+	bool scanner_inverse = false;
 
 	double swell = 1;
 

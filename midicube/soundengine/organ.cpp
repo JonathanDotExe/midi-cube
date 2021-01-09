@@ -231,23 +231,32 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		size_t delays = data.delays.size();
 		//Get vibrato signal
 		double vibrato = 0;
-		size_t scanner_pos = (size_t) (data.scanner_phase * (delays - 1) * 2);
-		if (scanner_pos >= delays) {
-			scanner_pos = delays - (scanner_pos - delays + 1);
-		}
+		double scanner_pos = data.scanner_phase * (delays - 1);
+		size_t scanner_pos_1 = floor(scanner_pos);
+		size_t scanner_pos_2 = ceil(scanner_pos);
+		double prog = scanner_pos - scanner_pos_1;
+
 		for (size_t i = 0; i < delays; ++i) {
 			data.delays[i].add_isample(sample, (int) (0.0001 * info.sample_rate * (i + 1)));
-			if (i == scanner_pos) {
-				vibrato = data.delays[i].process();
+			if (i == scanner_pos_1) {
+				vibrato += data.delays[i].process() * (1 - prog);
+			}
+			else if (i == scanner_pos_2) {
+				vibrato += data.delays[i].process() * prog;
 			}
 			else {
 				data.delays[i].process();
 			}
 		}
 		//Move scanner
-		data.scanner_phase += info.time_step * ORGAN_VIBRATO_RATE;
-		while (data.scanner_phase >= 1) {
-			data.scanner_phase -= 1;
+		data.scanner_phase += (data.scanner_inverse ? (-1) : (1)) * info.time_step * ORGAN_VIBRATO_RATE * 2;
+		if (data.scanner_phase > 1) {
+			data.scanner_phase = 1 - fmod(data.scanner_phase, 1.0);
+			data.scanner_inverse = true;
+		}
+		else if (data.scanner_phase < 0) {
+			data.scanner_phase = fmod(-data.scanner_phase, 1.0);
+			data.scanner_inverse = false;
 		}
 		//Play back
 		switch (data.preset.chorus_vibrato_type) {
