@@ -11,6 +11,8 @@
 
 #include "soundengine.h"
 #include "../synthesis.h"
+#include "../effect/rotary_speaker.h"
+#include "../effect/amplifier_simulation.h"
 #include "../property.h"
 
 #define ORGAN_DRAWBAR_COUNT 9
@@ -19,27 +21,15 @@
 #define ORGAN_TONEWHEEL_AMOUNT 91
 #define ORGAN_LOWEST_TONEWHEEL_NOTE 24
 
-#define ROTARY_CUTOFF 800
+#define ORGAN_MAX_DOWN_DELAY 0.025
+#define ORGAN_MAX_UP_DELAY 0.025
 
-#define ROTARY_HORN_SLOW_FREQUENCY 0.83333333333333
-#define ROTARY_HORN_FAST_FREQUENCY 6.66666666666667
-#define ROTARY_BASS_SLOW_FREQUENCY 0.66666666666667
-#define ROTARY_BASS_FAST_FREQUENCY 5.66666666666667
+#define MIN_SWELL 0.1
+#define SWELL_RANGE (1 - MIN_SWELL)
 
-#define ROTARY_HORN_SLOW_RAMP 1.6
-#define ROTARY_HORN_FAST_RAMP 1.0
-#define ROTARY_BASS_SLOW_RAMP 5.5
-#define ROTARY_BASS_FAST_RAMP 5.5
+#define ORGAN_VIBRATO_RATE 7
+#define ORGAN_VIBRATO_DELAY_STAGES 9
 
-#define HORN_RADIUS 0.15
-#define BASS_RADIUS 0.15
-#define SOUND_SPEED 343.2
-
-
-
-enum DistortionType {
-	DIGITAL_DISTORTION, ANALOG_DISTORTION_1, ANALOG_DISTORTION_2
-};
 
 enum B3OrganProperty {
 	pB3Drawbar1,
@@ -64,10 +54,15 @@ enum B3OrganProperty {
 
 	pB3HarmonicFoldbackVolume,
 
-	pB3DistortionType,
-	pB3NormalizeOverdrive,
-	pB3Overdrive,
-	pB3OverdriveCC,
+	pB3AmpOn,
+	pB3AmpDrive,
+	pB3AmpBoost,
+	pB3AmpTone,
+	pB3AmpDistortionType,
+	pB3AmpOnCC,
+	pB3AmpBoostCC,
+	pB3AmpDriveCC,
+	pB3AmpToneCC,
 
 	pB3MultiNoteGain,
 
@@ -77,7 +72,6 @@ enum B3OrganProperty {
 	pB3RotarySpeedCC,
 
 	pB3RotaryStereoMix,
-	pB3RotaryGain,
 	pB3RotaryType,
 	pB3RotaryDelay,
 
@@ -95,6 +89,14 @@ enum B3OrganProperty {
 	pB3PercussionThirdHarmonicCC,
 	pB3PercussionSoftCC,
 	pB3PercussionFastDecayCC,
+
+	pB3VibratoMix,
+	pB3VibratoMixCC,
+	pB3SwellCC,
+};
+
+enum OrganChorusVibratoType {
+	B3_NONE, B3_CHORUS_1, B3_CHORUS_2, B3_CHORUS_3, B3_VIBRATO_1, B3_VIBRATO_2, B3_VIBRATO_3
 };
 
 struct B3OrganPreset {
@@ -102,31 +104,25 @@ struct B3OrganPreset {
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	double harmonic_foldback_volume{1.0};
 
-	DistortionType distortion_type{DistortionType::ANALOG_DISTORTION_1};
-	bool normalize_overdrive{false};
-	double overdrive{0};
-	unsigned int overdrive_cc{35};
+	AmplifierSimulationPreset amplifier;
+	unsigned int amp_cc{28};
+	unsigned int amp_boost_cc{35};
+	unsigned int amp_drive_cc{36};
+	unsigned int amp_tone_cc{37};
 
 	double multi_note_gain{0.75};
 
-	bool rotary{false};
-	bool rotary_fast{true};
+	RotarySpeakerPreset rotary;
 	unsigned int rotary_cc{22};
 	unsigned int rotary_speed_cc{23};
-
-	double rotary_stereo_mix{0.5};
-	double rotary_gain{1.5};
-	bool rotary_type{false};
-	double rotary_delay{0.0005};
-
 
 	bool percussion{false};
 	bool percussion_third_harmonic{true};
 	bool percussion_soft{true};
 	bool percussion_fast_decay{true};
 
-	double percussion_soft_volume{0.5};
-	double percussion_hard_volume{1.0};
+	double percussion_soft_volume{1};
+	double percussion_hard_volume{5};
 	double percussion_fast_decay_time{0.2};
 	double percussion_slow_decay_time{1.0};
 
@@ -134,6 +130,10 @@ struct B3OrganPreset {
 	unsigned int percussion_third_harmonic_cc{25};
 	unsigned int percussion_soft_cc{26};
 	unsigned int percussion_fast_decay_cc{27};
+
+	double vibrato_mix = 0;
+	unsigned int vibrato_mix_cc{38};
+	unsigned int swell_cc{11};
 
 	B3OrganPreset () {
 		for (size_t i = 0; i < drawbars.size(); ++i) {
@@ -153,35 +153,26 @@ struct B3OrganPreset {
 };
 
 class B3OrganTonewheel {
-private:
-	double rotation = 0;
-	double last_turn = 0;
 public:
-	double static_vol = 0;
-	double dynamic_vol = 0;
-	double curr_vol = 0;
-
-	bool has_turned_since(double time);
+	double rotation = 0;
+	double volume = 0;
 	double process(SampleInfo& info, double freq);
 };
 
 class B3OrganData : public SoundEngineData{
 public:
 	B3OrganPreset preset;
+	AmplifierSimulationEffect amplifier;
+	RotarySpeakerEffect rotary_speaker;
 	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels;
-
-	DelayBuffer left_horn_del;
-	DelayBuffer right_horn_del;
-	DelayBuffer left_bass_del;
-	DelayBuffer right_bass_del;
-	bool curr_rotary_fast = 0;
-	PortamendoBuffer horn_speed{ROTARY_HORN_SLOW_FREQUENCY, ROTARY_HORN_SLOW_RAMP};
-	PortamendoBuffer bass_speed{ROTARY_BASS_SLOW_FREQUENCY, ROTARY_BASS_SLOW_RAMP};
-	double horn_rotation = 0;
-	double bass_rotation = 0;
+	std::array<DelayBuffer, ORGAN_VIBRATO_DELAY_STAGES> delays;
 
 	bool reset_percussion = true;
 	double percussion_start = 0;
+	double scanner_phase = 0;
+	bool scanner_inverse = false;
+
+	double swell = 1;
 
 	virtual SoundEngineData* copy() {
 		return new B3OrganData();	//TODO
@@ -192,12 +183,12 @@ class B3Organ : public BaseSoundEngine, public PropertyHolder {
 
 private:
 	//Static values
-	std::array<double, ORGAN_DRAWBAR_COUNT> drawbar_harmonics;
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbar_notes;
 	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_frequencies;
-	size_t cutoff_tonewheel = 0;
-	double foldback_freq = 0;
+	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_press_delay;
+	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_release_delay;
 
+	void trigger_tonewheel(int tonewheel, double vol, SampleInfo& info, TriggeredNote& note);
 
 public:
 	B3OrganData data;
@@ -209,6 +200,8 @@ public:
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
 	void control_change(unsigned int control, unsigned int value);
+
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
 	PropertyValue get(size_t prop);
 

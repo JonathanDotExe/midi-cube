@@ -10,22 +10,11 @@
 #include <cmath>
 
 //B3OrganTonewheel
-bool B3OrganTonewheel::has_turned_since(double time) {
-	return time <= last_turn;
-}
-
 double B3OrganTonewheel::process(SampleInfo& info, double freq) {
-	double volume = curr_vol + dynamic_vol;
 	//Rotation
-	double old_rot = rotation;
+	double volume = this->volume;
 	rotation += freq * info.time_step;
-	if ((int) (old_rot/0.5) != (int)(rotation/0.5)) {
-		last_turn = info.time;
-		curr_vol = static_vol;
-	}
-	//Reset
-	static_vol = 0;
-	dynamic_vol = 0;
+	this->volume = 0;
 	//Signal
 	if (volume) {
 		return sin(freq_to_radians(rotation)) * volume;
@@ -35,80 +24,75 @@ double B3OrganTonewheel::process(SampleInfo& info, double freq) {
 	}
 }
 
-
 //B3Organ
 B3Organ::B3Organ() {
-	drawbar_harmonics = { 0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8 };
 	drawbar_notes = {-12, 7, 0, 12, 19, 24, 28, 31, 36};
-	foldback_freq = note_to_freq(ORGAN_FOLDBACK_NOTE);
+	std::vector<double> gear_ratios = {
+		0.817307692,
+		0.865853659,
+		0.917808219,
+		0.972222222,
+		1.030000000,
+		1.090909091,
+		1.156250000,
+		1.225000000,
+		1.297297297,
+		1.375000000,
+		1.456521739,
+		1.542857143
+	};
 
+	//Frequencies
+	int teeth = 1;
 	for (size_t i = 0; i < tonewheel_frequencies.size(); ++i) {
-		tonewheel_frequencies[i] = note_to_freq(ORGAN_LOWEST_TONEWHEEL_NOTE + i);
-	}
-
-	for (cutoff_tonewheel = 0; cutoff_tonewheel < tonewheel_frequencies.size(); ++cutoff_tonewheel) {
-		if (tonewheel_frequencies[cutoff_tonewheel] > ROTARY_CUTOFF) {
-			break;
+		if (i % gear_ratios.size() == 0) {
+			teeth *= 2;
+			if (teeth > 192) {
+				teeth = 192;
+			}
 		}
+		tonewheel_frequencies[i] = 20 * teeth * gear_ratios[i % gear_ratios.size()];
+	}
+	//Press/Release delays
+	srand(888800000);
+	for (size_t i = 0; i < tonewheel_press_delay.size(); ++i) {
+		tonewheel_press_delay[i] = (double) rand()/RAND_MAX * ORGAN_MAX_DOWN_DELAY;
+	}
+	for (size_t i = 0; i < tonewheel_release_delay.size(); ++i) {
+		tonewheel_release_delay[i] = (double) rand()/RAND_MAX * ORGAN_MAX_UP_DELAY;
 	}
 }
 
-static inline double sound_delay(double rotation, double max_delay, unsigned int sample_rate) {
-	return (1 + rotation) * max_delay * 0.5 * sample_rate;
+void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, TriggeredNote& note) {
+	while (tonewheel < 0) {
+		tonewheel += 12;
+		volume *= data.preset.harmonic_foldback_volume;
+	}
+	while (tonewheel >= (int) data.tonewheels.size()) {
+		tonewheel -= 12;
+		volume *= data.preset.harmonic_foldback_volume;
+	}
+	if (tonewheel >= 0 && info.time >= note.start_time + tonewheel_press_delay[tonewheel] && (note.pressed || info.time <= note.release_time + tonewheel_release_delay[tonewheel])) {
+		data.tonewheels[tonewheel].volume += volume;
+	}
 }
 
 void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Organ sound
+	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
 		int tonewheel = note.note + drawbar_notes.at(i) - ORGAN_LOWEST_TONEWHEEL_NOTE;
-		double volume = 1;
-
-		while (tonewheel >= (int) data.tonewheels.size()) {
-			tonewheel -= 12;
-			volume *= data.preset.harmonic_foldback_volume;
-		}
-		if (tonewheel >= 0) {
-			data.tonewheels[tonewheel].static_vol += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / data.preset.drawbars.size() * volume;
-		}
+		trigger_tonewheel(tonewheel, data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount, info, note);
 	}
 	//Percussion
 	double decay = data.preset.percussion_fast_decay ? data.preset.percussion_fast_decay_time : data.preset.percussion_slow_decay_time;
 	if (data.preset.percussion && info.time - data.percussion_start <= decay) {
 		double vol = (1 - (info.time - data.percussion_start)/decay) * (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
-		vol *= 1.0/ORGAN_DRAWBAR_COUNT * 2;
+		vol /= drawbar_amount;
 		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12);
 
-		while (tonewheel >= (int) data.tonewheels.size()) {
-			tonewheel -= 12;
-			vol *= data.preset.harmonic_foldback_volume;
-		}
-		if (tonewheel >= 0 /*&& data.tonewheels[tonewheel].has_turned_since(data.percussion_start)*/) {
-			data.tonewheels[tonewheel].static_vol += vol;
-		}
+		trigger_tonewheel(tonewheel, vol, info, note);
 	}
-}
-
-static double apply_distortion(double sample, double overdrive, DistortionType type, double vol) {
-	switch (type) {
-	case DistortionType::DIGITAL_DISTORTION:
-	{
-		double clip = (1 - overdrive) * vol;
-		sample = fmax(fmin(sample, clip), -clip);
-		sample *= clip ? 1/clip : 0;
-	}
-		break;
-	case DistortionType::ANALOG_DISTORTION_1:
-	{
-		sample -= (sample * sample * sample) * overdrive * (vol ? 1/vol : 0);
-	}
-		break;
-	case DistortionType::ANALOG_DISTORTION_2:
-	{
-		sample = 2 / M_PI * atan(sample * overdrive * 10 * (vol ? 1/vol : 0)) * vol;
-	}
-	break;
-	}
-	return sample;
 }
 
 static double calc_vol (size_t keys, double comp_factor) {
@@ -118,6 +102,10 @@ static double calc_vol (size_t keys, double comp_factor) {
 	}
 	return vol;
 }
+
+bool B3Organ::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	return !note.pressed && info.time > ORGAN_MAX_UP_DELAY;
+};
 
 void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
 	//Update properties
@@ -160,27 +148,33 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 				(int) data.preset.drawbar_ccs[8]);
 		submit_change(B3OrganProperty::pB3HarmonicFoldbackVolume,
 				data.preset.harmonic_foldback_volume);
-		submit_change(B3OrganProperty::pB3DistortionType,
-				data.preset.distortion_type);
-		submit_change(B3OrganProperty::pB3NormalizeOverdrive,
-				data.preset.normalize_overdrive);
-		submit_change(B3OrganProperty::pB3Overdrive, data.preset.overdrive);
-		submit_change(B3OrganProperty::pB3OverdriveCC,
-				(int) data.preset.overdrive_cc);
+		submit_change(B3OrganProperty::pB3AmpOn, data.preset.amplifier.on);
+		submit_change(B3OrganProperty::pB3AmpDistortionType,
+				data.preset.amplifier.type);
+		submit_change(B3OrganProperty::pB3AmpDrive, data.preset.amplifier.drive);
+		submit_change(B3OrganProperty::pB3AmpTone, data.preset.amplifier.tone);
+		submit_change(B3OrganProperty::pB3AmpOnCC,
+				(int) data.preset.amp_cc);
+		submit_change(B3OrganProperty::pB3AmpBoostCC,
+				(int) data.preset.amp_boost_cc);
+		submit_change(B3OrganProperty::pB3AmpDriveCC,
+				(int) data.preset.amp_drive_cc);
+		submit_change(B3OrganProperty::pB3AmpToneCC,
+				(int) data.preset.amp_tone_cc);
 		submit_change(B3OrganProperty::pB3MultiNoteGain,
 				data.preset.multi_note_gain);
-		submit_change(B3OrganProperty::pB3Rotary, data.preset.rotary);
-		submit_change(B3OrganProperty::pB3RotarySpeed, data.preset.rotary_fast);
+		submit_change(B3OrganProperty::pB3Rotary, data.preset.rotary.on);
+		submit_change(B3OrganProperty::pB3RotarySpeed, data.preset.rotary.fast);
 		submit_change(B3OrganProperty::pB3RotaryCC,
 				(int) data.preset.rotary_cc);
 		submit_change(B3OrganProperty::pB3RotarySpeedCC,
 				(int) data.preset.rotary_speed_cc);
 		submit_change(B3OrganProperty::pB3RotaryStereoMix,
-				data.preset.rotary_stereo_mix);
-		submit_change(B3OrganProperty::pB3RotaryGain, data.preset.rotary_gain);
-		submit_change(B3OrganProperty::pB3RotaryType, data.preset.rotary_type);
+				data.preset.rotary.stereo_mix);
+		submit_change(B3OrganProperty::pB3AmpBoost, data.preset.amplifier.boost);
+		submit_change(B3OrganProperty::pB3RotaryType, data.preset.rotary.type);
 		submit_change(B3OrganProperty::pB3RotaryDelay,
-				data.preset.rotary_delay);
+				data.preset.rotary.max_delay);
 		submit_change(B3OrganProperty::pB3Percussion, data.preset.percussion);
 		submit_change(B3OrganProperty::pB3PercussionThirdHarmonic,
 				data.preset.percussion_third_harmonic);
@@ -204,133 +198,85 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 				(int) data.preset.percussion_soft_cc);
 		submit_change(B3OrganProperty::pB3PercussionFastDecayCC,
 				(int) data.preset.percussion_fast_decay_cc);
+		submit_change(B3OrganProperty::pB3VibratoMix,
+				data.preset.vibrato_mix);
+		submit_change(B3OrganProperty::pB3VibratoMixCC,
+				(int) data.preset.vibrato_mix_cc);
+		submit_change(B3OrganProperty::pB3SwellCC,
+				(int) data.preset.swell_cc);
 		update_request = false;
 	}
 
-	//Play organ sound
-	if (data.preset.rotary) {
-		double horn_sample = 0;
-		double bass_sample = 0;
+	double swell = this->data.swell * SWELL_RANGE + MIN_SWELL;
 
-		double horn_vol = 0;
-		double bass_vol = 0;
-
-		//Compute samples
-		size_t i = 0;
-		double horn_count = 0;
-		double bass_count = 0;
-		for (; i < cutoff_tonewheel && i < data.tonewheels.size(); ++i) {
-			if (data.tonewheels[i].dynamic_vol + data.tonewheels[i].curr_vol) {
-				++bass_count;
-				bass_vol += data.tonewheels[i].curr_vol + data.tonewheels[i].dynamic_vol;
-			}
-			bass_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
-		}
-		for (; i < data.tonewheels.size(); ++i) {
-			if (data.tonewheels[i].dynamic_vol + data.tonewheels[i].curr_vol) {
-				++horn_count;
-				horn_vol += data.tonewheels[i].curr_vol + data.tonewheels[i].dynamic_vol;
-			}
-			horn_sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
-		}
-
-		//Compress
-		if (status.pressed_notes && data.preset.multi_note_gain != 1) {
-			double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
-			bass_sample *= v;
-			horn_sample *= v;
-		}
-
-		//Gain
-		bass_sample *= data.preset.rotary_gain;
-		horn_sample *= data.preset.rotary_gain;
-
-		//Overdrive
-		double total_count = bass_count + horn_count;
-		if (data.preset.overdrive && total_count) {
-			bass_sample = apply_distortion(bass_sample, data.preset.overdrive, data.preset.distortion_type, data.preset.normalize_overdrive ? bass_vol : bass_count/total_count);
-			horn_sample = apply_distortion(horn_sample, data.preset.overdrive, data.preset.distortion_type, data.preset.normalize_overdrive ? horn_vol : horn_count/total_count);
-		}
-
-		//Horn
-		double horn_pitch_rot = data.preset.rotary_type ? sin(freq_to_radians(data.horn_rotation)) :  cos(freq_to_radians(data.horn_rotation));
-		double lhorn_delay = sound_delay(horn_pitch_rot, data.preset.rotary_delay, info.sample_rate);
-		double rhorn_delay = sound_delay(-horn_pitch_rot, data.preset.rotary_delay, info.sample_rate);
-		//Bass
-		double bass_pitch_rot = data.preset.rotary_type ? sin(freq_to_radians(data.bass_rotation)) : cos(freq_to_radians(data.bass_rotation));
-		double lbass_delay = sound_delay(bass_pitch_rot, data.preset.rotary_delay, info.sample_rate);
-		double rbass_delay = sound_delay(-bass_pitch_rot, data.preset.rotary_delay, info.sample_rate);
-
-		//Process
-		data.left_horn_del.add_isample(horn_sample, lhorn_delay);
-		data.left_bass_del.add_isample(bass_sample, lbass_delay);
-		data.right_horn_del.add_isample(horn_sample, rhorn_delay);
-		data.right_bass_del.add_isample(bass_sample, rbass_delay);
-	}
-	else {
-		//Compute samples
-		double sample = 0;
-		double vol = 0;
-		for (size_t i = 0; i < data.tonewheels.size(); ++i) {
-			vol += data.tonewheels[i].curr_vol + data.tonewheels[i].dynamic_vol;
-			sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend);
-		}
-		//Compress
-		if (status.pressed_notes && data.preset.multi_note_gain != 1) {
-			double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
-			vol *= v;
-			sample *= v;
-		}
-		//Overdrive
-		if (data.preset.overdrive) {
-			sample = apply_distortion(sample, data.preset.overdrive, data.preset.distortion_type, data.preset.normalize_overdrive ? vol : 1);
-		}
-		//Play
-		for (size_t i = 0; i < channels.size() ; ++i) {
-			channels[i] += sample;
-		}
-	}
-
-	//Trigger percussion
+	//Percussion
 	if (status.pressed_notes == 0) {
 		data.reset_percussion = true;
 	}
 	else if (data.reset_percussion) {
+		data.percussion_start = info.time + info.time_step;
 		data.reset_percussion = false;
-		data.percussion_start = info.time + info.time_step; //TODO first pressed frame no percussion can be heard
 	}
 
-	//Switch speaker speed
-	if (data.curr_rotary_fast != data.preset.rotary_fast) {
-		data.curr_rotary_fast = data.preset.rotary_fast;
-		if (data.curr_rotary_fast) {
-			data.horn_speed.set(ROTARY_HORN_FAST_FREQUENCY, info.time, ROTARY_HORN_FAST_RAMP);
-			data.bass_speed.set(ROTARY_BASS_FAST_FREQUENCY, info.time, ROTARY_BASS_FAST_RAMP);
-		}
-		else {
-			data.horn_speed.set(ROTARY_HORN_SLOW_FREQUENCY, info.time, ROTARY_HORN_SLOW_RAMP);
-			data.bass_speed.set(ROTARY_BASS_SLOW_FREQUENCY, info.time, ROTARY_BASS_SLOW_RAMP);
-		}
+	//Play organ sound
+	//Compute samples
+	double sample = 0;
+	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
+		sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend) * swell;
+	}
+	//Compress
+	if (status.pressed_notes && data.preset.multi_note_gain != 1) {
+		double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
+		sample *= v;
 	}
 
-	//Rotate speakers
-	data.horn_rotation += data.horn_speed.get(info.time) * info.time_step;
-	data.bass_rotation -= data.bass_speed.get(info.time) * info.time_step;
+	//Chorus/Vibrato
+	if (data.preset.vibrato_mix) {
+		size_t delays = data.delays.size();
+		//Get vibrato signal
+		double vibrato = 0;
+		double scanner_pos = data.scanner_phase * (delays - 1);
+		size_t scanner_pos_1 = floor(scanner_pos);
+		size_t scanner_pos_2 = ceil(scanner_pos);
+		double prog = scanner_pos - scanner_pos_1;
 
-	//Play delay
-	double horn_rot = sin(freq_to_radians(data.horn_rotation));
-	double bass_rot = sin(freq_to_radians(data.bass_rotation));
-
-	double left = (data.left_horn_del.process() * (0.5 + horn_rot * 0.5) + data.left_bass_del.process() * (0.5 + bass_rot * 0.5));
-	double right = (data.right_horn_del.process() * (0.5 - horn_rot * 0.5) + data.right_bass_del.process() * (0.5 - bass_rot * 0.5));
-
-	for (size_t i = 0; i < channels.size(); ++i) {
-		if (i % 2 == 0) {
-			channels[i] += left + right * data.preset.rotary_stereo_mix;
+		for (size_t i = 0; i < delays; ++i) {
+			data.delays[i].add_isample(sample, (int) (0.0001 * info.sample_rate * (i + 1)));
+			if (i == scanner_pos_1) {
+				vibrato += data.delays[i].process() * (1 - prog);
+			}
+			else if (i == scanner_pos_2) {
+				vibrato += data.delays[i].process() * prog;
+			}
+			else {
+				data.delays[i].process();
+			}
 		}
-		else {
-			channels[i] += right + left * data.preset.rotary_stereo_mix;
+		//Move scanner
+		data.scanner_phase += (data.scanner_inverse ? (-1) : (1)) * info.time_step * ORGAN_VIBRATO_RATE * 2;
+		if (data.scanner_phase > 1) {
+			data.scanner_phase = 1 - fmod(data.scanner_phase, 1.0);
+			data.scanner_inverse = true;
 		}
+		else if (data.scanner_phase < 0) {
+			data.scanner_phase = fmod(-data.scanner_phase, 1.0);
+			data.scanner_inverse = false;
+		}
+		//Play back
+		sample = sample * (1 - fmax(0, data.preset.vibrato_mix - 0.5) * 2) + vibrato * (fmin(1, data.preset.vibrato_mix * 2));
+	}
+
+	//Amplifier
+	double lsample = sample;
+	double rsample = sample;
+	data.amplifier.apply(lsample, rsample, data.preset.amplifier, info);
+
+	//Rotary
+	data.rotary_speaker.apply(lsample, rsample, data.preset.rotary, info);
+
+	//Play
+	for (size_t i = 0; i < channels.size() ; ++i) {
+		channels[i] += i%2 == 0 ? lsample : rsample;
 	}
 }
 
@@ -344,17 +290,32 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	}
 	//Rotary
 	if (control == data.preset.rotary_cc) {
-		data.preset.rotary = value > 0;
-		submit_change(B3OrganProperty::pB3Rotary, data.preset.rotary);
+		data.preset.rotary.on = value > 0;
+		submit_change(B3OrganProperty::pB3Rotary, data.preset.rotary.on);
 	}
 	if (control == data.preset.rotary_speed_cc) {
-		data.preset.rotary_fast = value > 0;
-		submit_change(B3OrganProperty::pB3RotarySpeed, data.preset.rotary_fast);
+		data.preset.rotary.fast = value > 0;
+		submit_change(B3OrganProperty::pB3RotarySpeed, data.preset.rotary.fast);
 	}
-	//Overdrive
-	if (control == data.preset.overdrive_cc) {
-		data.preset.overdrive = value/127.0;
-		submit_change(B3OrganProperty::pB3Overdrive, data.preset.overdrive);
+	//Amp
+	if (control == data.preset.amp_cc) {
+		data.preset.amplifier.on = value > 0;
+		submit_change(B3OrganProperty::pB3AmpOn, data.preset.amplifier.on);
+	}
+	//Boost
+	if (control == data.preset.amp_boost_cc) {
+		data.preset.amplifier.boost = value/127.0;
+		submit_change(B3OrganProperty::pB3AmpBoost, data.preset.amplifier.boost);
+	}
+	//Drive
+	if (control == data.preset.amp_drive_cc) {
+		data.preset.amplifier.drive = value/127.0;
+		submit_change(B3OrganProperty::pB3AmpDrive, data.preset.amplifier.drive);
+	}
+	//Tone
+	if (control == data.preset.amp_tone_cc) {
+		data.preset.amplifier.tone = value/127.0;
+		submit_change(B3OrganProperty::pB3AmpTone, data.preset.amplifier.tone);
 	}
 	//Percussion
 	if (control == data.preset.percussion_cc) {
@@ -375,6 +336,15 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	if (control == data.preset.percussion_soft_cc) {
 		data.preset.percussion_soft = value > 0;
 		submit_change(B3OrganProperty::pB3PercussionSoft, data.preset.percussion_soft);
+	}
+	//Vibrato Mix
+	if (control == data.preset.vibrato_mix_cc) {
+		data.preset.vibrato_mix = value/127.0;
+		submit_change(B3OrganProperty::pB3VibratoMix, data.preset.vibrato_mix);
+	}
+	//Swell
+	if (control == data.preset.swell_cc) {
+		data.swell = value/127.0;
 	}
 }
 
@@ -438,26 +408,38 @@ PropertyValue B3Organ::get(size_t prop) {
 	case B3OrganProperty::pB3HarmonicFoldbackVolume:
 		val.dval = data.preset.harmonic_foldback_volume;
 		break;
-	case B3OrganProperty::pB3DistortionType:
-		val.ival = data.preset.distortion_type;
+	case B3OrganProperty::pB3AmpOn:
+		val.bval = data.preset.amplifier.on;
 		break;
-	case B3OrganProperty::pB3NormalizeOverdrive:
-		val.bval = data.preset.normalize_overdrive;
+	case B3OrganProperty::pB3AmpDistortionType:
+		val.ival = data.preset.amplifier.type;
 		break;
-	case B3OrganProperty::pB3Overdrive:
-		val.dval = data.preset.overdrive;
+	case B3OrganProperty::pB3AmpDrive:
+		val.dval = data.preset.amplifier.drive;
 		break;
-	case B3OrganProperty::pB3OverdriveCC:
-		val.dval = data.preset.overdrive_cc;
+	case B3OrganProperty::pB3AmpTone:
+		val.dval = data.preset.amplifier.tone;
+		break;
+	case B3OrganProperty::pB3AmpOnCC:
+		val.ival = data.preset.amp_cc;
+		break;
+	case B3OrganProperty::pB3AmpBoostCC:
+		val.ival = data.preset.amp_boost_cc;
+		break;
+	case B3OrganProperty::pB3AmpDriveCC:
+		val.ival = data.preset.amp_drive_cc;
+		break;
+	case B3OrganProperty::pB3AmpToneCC:
+		val.ival = data.preset.amp_tone_cc;
 		break;
 	case B3OrganProperty::pB3MultiNoteGain:
 		val.dval = data.preset.multi_note_gain;
 		break;
 	case B3OrganProperty::pB3Rotary:
-		val.bval = data.preset.rotary;
+		val.bval = data.preset.rotary.on;
 		break;
 	case B3OrganProperty::pB3RotarySpeed:
-		val.bval = data.preset.rotary_fast;
+		val.bval = data.preset.rotary.fast;
 		break;
 	case B3OrganProperty::pB3RotaryCC:
 		val.ival = data.preset.rotary_cc;
@@ -466,16 +448,16 @@ PropertyValue B3Organ::get(size_t prop) {
 		val.ival = data.preset.rotary_speed_cc;
 		break;
 	case B3OrganProperty::pB3RotaryStereoMix:
-		val.dval = data.preset.rotary_stereo_mix;
+		val.dval = data.preset.rotary.stereo_mix;
 		break;
-	case B3OrganProperty::pB3RotaryGain:
-		val.dval = data.preset.rotary_gain;
+	case B3OrganProperty::pB3AmpBoost:
+		val.dval = data.preset.amplifier.boost;
 		break;
 	case B3OrganProperty::pB3RotaryType:
-		val.bval = data.preset.rotary_type;
+		val.bval = data.preset.rotary.type;
 		break;
 	case B3OrganProperty::pB3RotaryDelay:
-		val.ival = data.preset.rotary_delay;
+		val.ival = data.preset.rotary.max_delay;
 		break;
 	case B3OrganProperty::pB3Percussion:
 		val.bval = data.preset.percussion;
@@ -512,6 +494,15 @@ PropertyValue B3Organ::get(size_t prop) {
 		break;
 	case B3OrganProperty::pB3PercussionFastDecayCC:
 		val.ival = data.preset.percussion_fast_decay_cc;
+		break;
+	case B3OrganProperty::pB3VibratoMix:
+		val.dval = data.preset.vibrato_mix;
+		break;
+	case B3OrganProperty::pB3VibratoMixCC:
+		val.ival = data.preset.vibrato_mix_cc;
+		break;
+	case B3OrganProperty::pB3SwellCC:
+		val.ival = data.preset.swell_cc;
 		break;
 	}
 	return val;
@@ -576,26 +567,38 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 	case B3OrganProperty::pB3HarmonicFoldbackVolume:
 		data.preset.harmonic_foldback_volume = val.dval;
 		break;
-	case B3OrganProperty::pB3DistortionType:
-		data.preset.distortion_type = static_cast<DistortionType>(val.ival);
+	case B3OrganProperty::pB3AmpOn:
+		data.preset.amplifier.on = val.bval;
 		break;
-	case B3OrganProperty::pB3NormalizeOverdrive:
-		data.preset.normalize_overdrive = val.bval;
+	case B3OrganProperty::pB3AmpDistortionType:
+		data.preset.amplifier.type = static_cast<DistortionType>(val.ival);
 		break;
-	case B3OrganProperty::pB3Overdrive:
-		data.preset.overdrive = val.dval;
+	case B3OrganProperty::pB3AmpDrive:
+		data.preset.amplifier.drive = val.dval;
 		break;
-	case B3OrganProperty::pB3OverdriveCC:
-		data.preset.overdrive_cc = val.dval;
+	case B3OrganProperty::pB3AmpTone:
+		data.preset.amplifier.tone = val.dval;
+		break;
+	case B3OrganProperty::pB3AmpOnCC:
+		data.preset.amp_cc = val.ival;
+		break;
+	case B3OrganProperty::pB3AmpBoostCC:
+		data.preset.amp_boost_cc = val.ival;
+		break;
+	case B3OrganProperty::pB3AmpDriveCC:
+		data.preset.amp_drive_cc = val.ival;
+		break;
+	case B3OrganProperty::pB3AmpToneCC:
+		data.preset.amp_tone_cc = val.ival;
 		break;
 	case B3OrganProperty::pB3MultiNoteGain:
 		data.preset.multi_note_gain = val.dval;
 		break;
 	case B3OrganProperty::pB3Rotary:
-		data.preset.rotary = val.bval;
+		data.preset.rotary.on = val.bval;
 		break;
 	case B3OrganProperty::pB3RotarySpeed:
-		data.preset.rotary_fast = val.bval;
+		data.preset.rotary.fast = val.bval;
 		break;
 	case B3OrganProperty::pB3RotaryCC:
 		data.preset.rotary_cc = val.ival;
@@ -604,16 +607,16 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 		data.preset.rotary_speed_cc = val.ival;
 		break;
 	case B3OrganProperty::pB3RotaryStereoMix:
-		data.preset.rotary_stereo_mix = val.dval;
+		data.preset.rotary.stereo_mix = val.dval;
 		break;
-	case B3OrganProperty::pB3RotaryGain:
-		data.preset.rotary_gain = val.dval;
+	case B3OrganProperty::pB3AmpBoost:
+		data.preset.amplifier.boost = val.dval;
 		break;
 	case B3OrganProperty::pB3RotaryType:
-		data.preset.rotary_type = val.bval;
+		data.preset.rotary.type = val.bval;
 		break;
 	case B3OrganProperty::pB3RotaryDelay:
-		data.preset.rotary_delay = val.ival;
+		data.preset.rotary.max_delay = val.ival;
 		break;
 	case B3OrganProperty::pB3Percussion:
 		data.preset.percussion = val.bval;
@@ -650,6 +653,15 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 		break;
 	case B3OrganProperty::pB3PercussionFastDecayCC:
 		data.preset.percussion_fast_decay_cc = val.ival;
+		break;
+	case B3OrganProperty::pB3VibratoMix:
+		data.preset.vibrato_mix = val.dval;
+		break;
+	case B3OrganProperty::pB3VibratoMixCC:
+		data.preset.vibrato_mix_cc = val.ival;
+		break;
+	case B3OrganProperty::pB3SwellCC:
+		data.preset.swell_cc = val.ival;
 		break;
 	}
 }

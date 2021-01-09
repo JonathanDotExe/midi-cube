@@ -38,12 +38,6 @@ struct FilterData {
 	double resonance = 0;
 };
 
-struct FilterCache {
-	double last_filtered = 0;
-	double last = 0;
-	bool started = false;
-};
-
 class Filter {
 private:
 	double pole1 = 0;

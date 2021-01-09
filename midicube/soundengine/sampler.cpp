@@ -167,7 +167,7 @@ extern SampleSound* load_sound(std::string folder) {
 		}
 	}
 	catch (pt::json_parser_error& e) {
-		std::cerr << "Couldn't laod sound.json" << std::endl;
+		std::cerr << "Couldn't load sound.json" << std::endl;
 	}
 	return sound;
 }
