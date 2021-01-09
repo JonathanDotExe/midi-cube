@@ -26,7 +26,6 @@ double B3OrganTonewheel::process(SampleInfo& info, double freq) {
 
 //B3Organ
 B3Organ::B3Organ() {
-	drawbar_harmonics = { 0.5, 0.5 * 3, 1, 2, 3, 4, 5, 6, 8 };
 	drawbar_notes = {-12, 7, 0, 12, 19, 24, 28, 31, 36};
 	std::vector<double> gear_ratios = {
 		0.817307692,
@@ -43,6 +42,7 @@ B3Organ::B3Organ() {
 		1.542857143
 	};
 
+	//Frequencies
 	int teeth = 1;
 	for (size_t i = 0; i < tonewheel_frequencies.size(); ++i) {
 		if (i % gear_ratios.size() == 0) {
@@ -53,6 +53,28 @@ B3Organ::B3Organ() {
 		}
 		tonewheel_frequencies[i] = 20 * teeth * gear_ratios[i % gear_ratios.size()];
 	}
+	//Press/Release delays
+	srand(888800000);
+	for (size_t i = 0; i < tonewheel_press_delay.size(); ++i) {
+		tonewheel_press_delay[i] = (double) rand()/RAND_MAX * ORGAN_MAX_DOWN_DELAY;
+	}
+	for (size_t i = 0; i < tonewheel_release_delay.size(); ++i) {
+		tonewheel_release_delay[i] = (double) rand()/RAND_MAX * ORGAN_MAX_UP_DELAY;
+	}
+}
+
+void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, TriggeredNote& note) {
+	while (tonewheel < 0) {
+		tonewheel += 12;
+		volume *= data.preset.harmonic_foldback_volume;
+	}
+	while (tonewheel >= (int) data.tonewheels.size()) {
+		tonewheel -= 12;
+		volume *= data.preset.harmonic_foldback_volume;
+	}
+	if (tonewheel >= 0 && info.time >= note.start_time + tonewheel_press_delay[tonewheel] && (note.pressed || info.time <= note.release_time + tonewheel_release_delay[tonewheel])) {
+		data.tonewheels[tonewheel].volume += volume;
+	}
 }
 
 void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
@@ -60,19 +82,7 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
 		int tonewheel = note.note + drawbar_notes.at(i) - ORGAN_LOWEST_TONEWHEEL_NOTE;
-		double volume = 1;
-
-		while (tonewheel < 0) {
-			tonewheel += 12;
-			volume *= data.preset.harmonic_foldback_volume;
-		}
-		while (tonewheel >= (int) data.tonewheels.size()) {
-			tonewheel -= 12;
-			volume *= data.preset.harmonic_foldback_volume;
-		}
-		if (tonewheel >= 0) {
-			data.tonewheels[tonewheel].volume += data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount  * volume;
-		}
+		trigger_tonewheel(tonewheel, data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount, info, note);
 	}
 	//Percussion
 	double decay = data.preset.percussion_fast_decay ? data.preset.percussion_fast_decay_time : data.preset.percussion_slow_decay_time;
@@ -81,17 +91,7 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 		vol /= drawbar_amount;
 		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12);
 
-		while (tonewheel < 0) {
-			tonewheel += 12;
-			vol *= data.preset.harmonic_foldback_volume;
-		}
-		while (tonewheel >= (int) data.tonewheels.size()) {
-			tonewheel -= 12;
-			vol *= data.preset.harmonic_foldback_volume;
-		}
-		if (tonewheel >= 0 /*&& data.tonewheels[tonewheel].has_turned_since(data.percussion_start)*/) {
-			data.tonewheels[tonewheel].volume += vol;
-		}
+		trigger_tonewheel(tonewheel, vol, info, note);
 	}
 }
 
@@ -102,6 +102,10 @@ static double calc_vol (size_t keys, double comp_factor) {
 	}
 	return vol;
 }
+
+bool B3Organ::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	return !note.pressed && info.time > ORGAN_MAX_UP_DELAY;
+};
 
 void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
 	//Update properties

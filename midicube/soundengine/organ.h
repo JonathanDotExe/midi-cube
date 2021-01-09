@@ -21,6 +21,9 @@
 #define ORGAN_TONEWHEEL_AMOUNT 91
 #define ORGAN_LOWEST_TONEWHEEL_NOTE 24
 
+#define ORGAN_MAX_DOWN_DELAY 0.025
+#define ORGAN_MAX_UP_DELAY 0.025
+
 #define MIN_SWELL 0.1
 #define SWELL_RANGE (1 - MIN_SWELL)
 
@@ -139,9 +142,8 @@ struct B3OrganPreset {
 };
 
 class B3OrganTonewheel {
-private:
-	double rotation = 0;
 public:
+	double rotation = 0;
 	double volume = 0;
 	double process(SampleInfo& info, double freq);
 };
@@ -167,9 +169,12 @@ class B3Organ : public BaseSoundEngine, public PropertyHolder {
 
 private:
 	//Static values
-	std::array<double, ORGAN_DRAWBAR_COUNT> drawbar_harmonics;
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbar_notes;
 	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_frequencies;
+	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_press_delay;
+	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_release_delay;
+
+	void trigger_tonewheel(int tonewheel, double vol, SampleInfo& info, TriggeredNote& note);
 
 public:
 	B3OrganData data;
@@ -181,6 +186,8 @@ public:
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
 	void control_change(unsigned int control, unsigned int value);
+
+	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
 	PropertyValue get(size_t prop);
 
