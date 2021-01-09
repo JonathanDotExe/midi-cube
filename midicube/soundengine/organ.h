@@ -91,6 +91,7 @@ enum B3OrganProperty {
 	pB3PercussionFastDecayCC,
 
 	pB3VibratoMix,
+	pB3VibratoMixCC,
 	pB3SwellCC,
 };
 
@@ -131,6 +132,7 @@ struct B3OrganPreset {
 	unsigned int percussion_fast_decay_cc{27};
 
 	double vibrato_mix = 0;
+	unsigned int vibrato_mix_cc{38};
 	unsigned int swell_cc{11};
 
 	B3OrganPreset () {

@@ -160,7 +160,6 @@ Scene B3OrganView::create(Frame &frame) {
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
-
 		DragBox<double>* amp_tone = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
 		amp_tone->bind(&organ, B3OrganProperty::pB3AmpTone);
 		controls.push_back(amp_tone);
@@ -169,7 +168,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 	tmp_y -= 65 + 25;
-	tmp_x += 95;
+	tmp_x += 100;
 
 	//Vibrato Mix
 	{
@@ -178,14 +177,20 @@ Scene B3OrganView::create(Frame &frame) {
 		controls.push_back(label);
 		tmp_y += 25;
 
+		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
+		midi->bind(&organ, B3OrganProperty::pB3VibratoMixCC);
+		controls.push_back(midi);
+		show_midi.push_back(midi);
+
 		DragBox<double>* vibrato = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
 		vibrato->bind(&organ, B3OrganProperty::pB3VibratoMix);
 		controls.push_back(vibrato);
+		hide_midi.push_back(vibrato);
 
 		tmp_y += 65;
 	}
 	tmp_y -= 65 + 25;
-	tmp_x += 95;
+	tmp_x += 100;
 
 	//Rotary Stereo Mix
 	{
@@ -201,7 +206,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 	tmp_y -= 65 + 25;
-	tmp_x += 95;
+	tmp_x += 100;
 
 	//Rotary Type
 	{
@@ -217,7 +222,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 
-	tmp_x += 95;
+	tmp_x += 100;
 	tmp_y -= 65 + 25;
 	//Swell
 	{
@@ -234,7 +239,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 
-	tmp_x -= 95 * 4;
+	tmp_x -= 100 * 4;
 	tmp_y -= (65 + 25) * 2;
 	//Drawbars
 	std::vector<sf::Color> colors = {

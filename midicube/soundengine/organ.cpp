@@ -200,6 +200,8 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 				(int) data.preset.percussion_fast_decay_cc);
 		submit_change(B3OrganProperty::pB3VibratoMix,
 				data.preset.vibrato_mix);
+		submit_change(B3OrganProperty::pB3VibratoMixCC,
+				(int) data.preset.vibrato_mix_cc);
 		submit_change(B3OrganProperty::pB3SwellCC,
 				(int) data.preset.swell_cc);
 		update_request = false;
@@ -261,7 +263,7 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 			data.scanner_inverse = false;
 		}
 		//Play back
-		sample = sample * (1 - data.preset.vibrato_mix) + vibrato * data.preset.vibrato_mix;
+		sample = sample * (1 - fmax(0, data.preset.vibrato_mix - 0.5) * 2) + vibrato * (fmin(1, data.preset.vibrato_mix * 2));
 	}
 
 	//Amplifier
@@ -334,6 +336,11 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	if (control == data.preset.percussion_soft_cc) {
 		data.preset.percussion_soft = value > 0;
 		submit_change(B3OrganProperty::pB3PercussionSoft, data.preset.percussion_soft);
+	}
+	//Vibrato Mix
+	if (control == data.preset.vibrato_mix_cc) {
+		data.preset.vibrato_mix = value/127.0;
+		submit_change(B3OrganProperty::pB3VibratoMix, data.preset.vibrato_mix);
 	}
 	//Swell
 	if (control == data.preset.swell_cc) {
@@ -491,6 +498,9 @@ PropertyValue B3Organ::get(size_t prop) {
 	case B3OrganProperty::pB3VibratoMix:
 		val.dval = data.preset.vibrato_mix;
 		break;
+	case B3OrganProperty::pB3VibratoMixCC:
+		val.ival = data.preset.vibrato_mix_cc;
+		break;
 	case B3OrganProperty::pB3SwellCC:
 		val.ival = data.preset.swell_cc;
 		break;
@@ -646,6 +656,9 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 		break;
 	case B3OrganProperty::pB3VibratoMix:
 		data.preset.vibrato_mix = val.dval;
+		break;
+	case B3OrganProperty::pB3VibratoMixCC:
+		data.preset.vibrato_mix_cc = val.ival;
 		break;
 	case B3OrganProperty::pB3SwellCC:
 		data.preset.swell_cc = val.ival;
