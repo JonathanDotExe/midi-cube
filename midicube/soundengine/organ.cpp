@@ -231,12 +231,12 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 		size_t delays = data.delays.size();
 		//Get vibrato signal
 		double vibrato = 0;
-		size_t scanner_pos = (size_t) (data.scanner_phase / delays);
+		size_t scanner_pos = (size_t) (data.scanner_phase * (delays - 1) * 2);
 		if (scanner_pos >= delays) {
 			scanner_pos = delays - (scanner_pos - delays + 1);
 		}
 		for (size_t i = 0; i < delays; ++i) {
-			data.delays[i].add_sample(sample, (int) (0.0001 * info.sample_rate * (i + 1)));
+			data.delays[i].add_isample(sample, (int) (0.0001 * info.sample_rate * (i + 1)));
 			if (i == scanner_pos) {
 				vibrato = data.delays[i].process();
 			}
@@ -244,7 +244,6 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 				data.delays[i].process();
 			}
 		}
-		std::cout << scanner_pos << std::endl;
 		//Move scanner
 		data.scanner_phase += info.time_step * ORGAN_VIBRATO_RATE;
 		while (data.scanner_phase >= 1) {
