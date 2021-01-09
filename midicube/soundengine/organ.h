@@ -129,7 +129,7 @@ struct B3OrganPreset {
 	unsigned int percussion_soft_cc{26};
 	unsigned int percussion_fast_decay_cc{27};
 
-	OrganChorusVibratoType chorus_vibrato_type = B3_VIBRATO_3;
+	double vibrato_mix = 0;
 	unsigned int swell_cc{11};
 
 	B3OrganPreset () {

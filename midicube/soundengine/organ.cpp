@@ -227,7 +227,7 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 	}
 
 	//Chorus/Vibrato
-	if (data.preset.chorus_vibrato_type) {
+	if (data.preset.vibrato_mix) {
 		size_t delays = data.delays.size();
 		//Get vibrato signal
 		double vibrato = 0;
@@ -259,24 +259,7 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 			data.scanner_inverse = false;
 		}
 		//Play back
-		switch (data.preset.chorus_vibrato_type) {
-		case OrganChorusVibratoType::B3_CHORUS_1:
-			sample = sample * 5/6 + vibrato + 1/6;
-			break;
-		case OrganChorusVibratoType::B3_CHORUS_2:
-			sample = sample * 4/6 + vibrato + 2/6;
-			break;
-		case OrganChorusVibratoType::B3_CHORUS_3:
-			sample = sample * 3/6 + vibrato + 3/6;
-			break;
-		case OrganChorusVibratoType::B3_VIBRATO_1:
-		case OrganChorusVibratoType::B3_VIBRATO_2:
-		case OrganChorusVibratoType::B3_VIBRATO_3:
-			sample = vibrato;
-			break;
-		case OrganChorusVibratoType::B3_NONE:
-			break;
-		}
+		sample = sample * (1 - data.preset.vibrato_mix) + vibrato * data.preset.vibrato_mix;
 	}
 
 	//Amplifier
