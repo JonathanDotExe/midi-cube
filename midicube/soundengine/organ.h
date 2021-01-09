@@ -27,6 +27,9 @@
 #define MIN_SWELL 0.1
 #define SWELL_RANGE (1 - MIN_SWELL)
 
+#define ORGAN_VIBRATO_RATE 7
+#define ORGAN_VIBRATO_DELAY_STAGES 9
+
 
 enum B3OrganProperty {
 	pB3Drawbar1,
@@ -90,6 +93,10 @@ enum B3OrganProperty {
 	pB3SwellCC,
 };
 
+enum OrganChorusVibratoType {
+	B3_NONE, B3_CHORUS_1, B3_CHORUS_2, B3_CHORUS_3, B3_VIBRATO_1, B3_VIBRATO_2, B3_VIBRATO_3
+};
+
 struct B3OrganPreset {
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbars;
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
@@ -122,6 +129,7 @@ struct B3OrganPreset {
 	unsigned int percussion_soft_cc{26};
 	unsigned int percussion_fast_decay_cc{27};
 
+	OrganChorusVibratoType chorus_vibrato_type = B3_VIBRATO_3;
 	unsigned int swell_cc{11};
 
 	B3OrganPreset () {
@@ -154,9 +162,11 @@ public:
 	AmplifierSimulationEffect amplifier;
 	RotarySpeakerEffect rotary_speaker;
 	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels;
+	std::array<DelayBuffer, ORGAN_VIBRATO_DELAY_STAGES> delays;
 
 	bool reset_percussion = true;
 	double percussion_start = 0;
+	double scanner_phase = 0;
 
 	double swell = 1;
 
