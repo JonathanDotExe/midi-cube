@@ -30,7 +30,7 @@ struct RotarySpeakerPreset {
 
 	double stereo_mix{0.5};
 	bool type{false};
-	double max_delay{0.0005};
+	double max_delay{0.001};
 
 	double horn_slow_frequency = 0.83333333333333;
 	double horn_fast_frequency = 6.66666666666667;
