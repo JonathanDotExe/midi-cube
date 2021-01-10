@@ -51,7 +51,7 @@ B3Organ::B3Organ() {
 				teeth = 192;
 			}
 		}
-		tonewheel_frequencies[i] = 20 * teeth * gear_ratios[i % gear_ratios.size()];
+		tonewheel_frequencies[i] = 20 * teeth * gear_ratios[(i + (teeth == 192 ? 5 : 0)) % gear_ratios.size()];
 	}
 	//Press/Release delays
 	srand(888800000);
