@@ -24,7 +24,7 @@ void AudioHandler::init() {
 
 	//Set up options
 	RtAudio::StreamOptions options;
-	options.flags = options.flags || RTAUDIO_SCHEDULE_REALTIME;
+	options.flags = options.flags | RTAUDIO_SCHEDULE_REALTIME;
 	options.priority = 90;
 
 	//Set up output

@@ -457,7 +457,7 @@ PropertyValue B3Organ::get(size_t prop) {
 		val.bval = data.preset.rotary.type;
 		break;
 	case B3OrganProperty::pB3RotaryDelay:
-		val.ival = data.preset.rotary.max_delay;
+		val.dval = data.preset.rotary.max_delay;
 		break;
 	case B3OrganProperty::pB3Percussion:
 		val.bval = data.preset.percussion;
@@ -616,7 +616,7 @@ void B3Organ::set(size_t prop, PropertyValue val) {
 		data.preset.rotary.type = val.bval;
 		break;
 	case B3OrganProperty::pB3RotaryDelay:
-		data.preset.rotary.max_delay = val.ival;
+		data.preset.rotary.max_delay = val.dval;
 		break;
 	case B3OrganProperty::pB3Percussion:
 		data.preset.percussion = val.bval;
