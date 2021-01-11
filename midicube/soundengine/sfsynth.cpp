@@ -50,10 +50,10 @@ void SoundFontSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channel
 	//Play
 	for (size_t i = 0; i < channels.size() ; ++i) {
 		if (i % 2 == 0) {
-			channels[i] += left;
+			channels[i] += left * 5;
 		}
 		else {
-			channels[i] += right;
+			channels[i] += right * 5;
 		}
 	}
 }
