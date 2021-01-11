@@ -520,3 +520,20 @@ std::string get_engine_name<AnalogSynth>() {
 	return "Analog Synthesizer";
 }
 
+//SynthPartPropertyHolder
+PropertyValue SynthPartPropertyHolder::get(size_t prop) {
+	PropertyValue val;
+	return val;
+}
+
+SynthPartPropertyHolder::SynthPartPropertyHolder(AnalogSynthPreset &p, size_t i) : preset(p), part(i) {
+
+}
+
+void SynthPartPropertyHolder::check_update() {
+
+}
+
+void SynthPartPropertyHolder::set(size_t prop, PropertyValue value) {
+
+}
