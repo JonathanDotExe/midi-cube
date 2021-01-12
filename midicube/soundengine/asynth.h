@@ -101,33 +101,18 @@ struct AnalogSynthPreset {
 	double delay_feedback = 0;
 	double delay_mix = 0;
 };
-/*
-	bool active = false;
-	bool audible = true;
-	ADSREnvelopeData env{0.0, 0, 1, 0.0};
-	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
-	bool analog = true;
-	bool sync = false;
-	bool reset = false;
-	bool randomize = false;
 
-	size_t unison_amount = 0;
-	PropertyModulation volume = {1};
-	PropertyModulation sync_mul = {0.1};
-	PropertyModulation pulse_width = {1};
-	PropertyModulation unison_detune = {0.1};
-	PropertyModulation panning = {0.5};
-	double semi = 0;
-	double transpose = 1;
-	PropertyModulation pitch = {0.5};
+enum SynthModulationProperty {
+	pModValue,
+	pModModEnv,
+	pModModEnvAmount,
+	pModLFO,
+	pModLFOAmount,
+	pModVelocityAmount,
+	pModCC,
+	pModCCAmount,
+};
 
-	bool filter = false;
-	FilterType filter_type = FilterType::LP_12;
-	PropertyModulation filter_cutoff = {1};
-	PropertyModulation filter_resonance = {0};
-	double filter_kb_track = 0;
-	unsigned int filter_kb_track_note = 36;
- */
 enum SynthPartProperty {
 	pSynthOscActive,
 	pSynthOscAudible,
@@ -144,63 +129,20 @@ enum SynthPartProperty {
 	pSynthOscUnisonAmount,
 
 	pSynthOscVolume,
-	pSynthOscVolumeModEnv,
-	pSynthOscVolumeModEnvAmount,
-	pSynthOscVolumeLFO,
-	pSynthOscVolumeLFOAmount,
-	pSynthOscVolumeVelocityAmount,
-	pSynthOscVolumeCC,
-	pSynthOscVolumeCCAmount,
-
 	pSynthOscSyncMul,
-	pSynthOscSyncMulModEnv,
-	pSynthOscSyncMulModEnvAmount,
-	pSynthOscSyncMulLFO,
-	pSynthOscSyncMulLFOAmount,
-	pSynthOscSyncMulVelocityAmount,
-	pSynthOscSyncMulCC,
-	pSynthOscSyncMulCCAmount,
-
 	pSynthOscPulseWidth,
-	pSynthOscPulseWidthModEnv,
-	pSynthOscPulseWidthModEnvAmount,
-	pSynthOscPulseWidthLFO,
-	pSynthOscPulseWidthLFOAmount,
-	pSynthOscPulseWidthVelocityAmount,
-	pSynthOscPulseWidthCC,
-	pSynthOscPulseWidthCCAmount,
-
 	pSynthOscUnisonDetune,
-	pSynthOscUnisonDetuneModEnv,
-	pSynthOscUnisonDetuneModEnvAmount,
-	pSynthOscUnisonDetuneLFO,
-	pSynthOscUnisonDetuneLFOAmount,
-	pSynthOscUnisonDetuneVelocityAmount,
-	pSynthOscUnisonDetuneCC,
-	pSynthOscUnisonDetuneCCAmount,
-
 	pSynthOscSemi,
 	pSynthOscTranspose,
-
 	pSynthOscPitch,
-	pSynthOscPitchModEnv,
-	pSynthOscPitchModEnvAmount,
-	pSynthOscPitchLFO,
-	pSynthOscPitchLFOAmount,
-	pSynthOscPitchVelocityAmount,
-	pSynthOscPitchCC,
-	pSynthOscPitchCCAmount,
+
+	pSynthOscFilter,
+	pSynthOscFilterType,
+	pSynthOscFilterCutoff,
+	pSynthOscFilterResonance,
+	pSynthOscFilterKBTrack,
+	pSynthOscFilterKBTrackNote,
 };
-/*
-	double value = 0;
-	size_t mod_env = 0;
-	double mod_amount = 0;
-	size_t lfo = 0;
-	double lfo_amount = 0;
-	double velocity_amount = 0;
-	size_t cc = 1;
-	double cc_amount = 0;
- */
 
 class SynthPartPropertyHolder : public PropertyHolder {
 private:
@@ -209,8 +151,8 @@ private:
 public:
 	SynthPartPropertyHolder(AnalogSynthPreset& p, size_t part);
 	void check_update();
-	PropertyValue get(size_t prop);
-	void set(size_t prop, PropertyValue value);
+	PropertyValue get(size_t prop, size_t sub_prop = 0);
+	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
 };
 
 class AnalogSynth : public BaseSoundEngine {

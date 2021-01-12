@@ -520,10 +520,104 @@ std::string get_engine_name<AnalogSynth>() {
 	return "Analog Synthesizer";
 }
 
-//SynthPartPropertyHolder
-PropertyValue SynthPartPropertyHolder::get(size_t prop) {
+PropertyValue get_mod_prop(PropertyModulation& mod, SynthModulationProperty prop) {
 	PropertyValue val;
+	switch (prop) {
+	case SynthModulationProperty::pModValue:
+		val.dval = mod.value;
+		break;
+	case SynthModulationProperty::pModModEnv:
+		val.ival = mod.mod_env;
+		break;
+	case SynthModulationProperty::pModModEnvAmount:
+		val.dval = mod.mod_amount;
+		break;
+	case SynthModulationProperty::pModLFO:
+		val.ival = mod.lfo;
+		break;
+	case SynthModulationProperty::pModLFOAmount:
+		val.dval = mod.lfo_amount;
+		break;
+	case SynthModulationProperty::pModVelocityAmount:
+		val.ival = mod.velocity_amount;
+		break;
+	case SynthModulationProperty::pModCC:
+		val.ival = mod.cc;
+		break;
+	case SynthModulationProperty::pModCCAmount:
+		val.dval = mod.cc_amount;
+		break;
+	}
 	return val;
+}
+
+//SynthPartPropertyHolder
+PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
+	PropertyValue val;
+	OscilatorEntity& osc = preset.oscilators[this->part];
+	switch ((SynthPartProperty) prop) {
+	case SynthPartProperty::pSynthOscActive:
+		val.bval = osc.active;
+		break;
+	case SynthPartProperty::pSynthOscAudible:
+		val.bval = osc.audible;
+		break;
+	case SynthPartProperty::pSynthOscAmpAttack:
+		val.dval = osc.env.attack;
+		break;
+	case SynthPartProperty::pSynthOscDecay:
+		val.dval = osc.env.decay;
+		break;
+	case SynthPartProperty::pSynthOscSustain:
+		val.dval = osc.env.sustain;
+		break;
+	case SynthPartProperty::pSynthOscRelease:
+		val.dval = osc.env.release;
+		break;
+	case SynthPartProperty::pSynthOscWaveForm:
+		break;
+	case SynthPartProperty::pSynthOscAnalog:
+		break;
+	case SynthPartProperty::pSynthOscSync:
+		break;
+	case SynthPartProperty::pSynthOscReset:
+		break;
+	case SynthPartProperty::pSynthOscRandomize:
+		break;
+	case SynthPartProperty::pSynthOscUnisonAmount:
+		break;
+	case SynthPartProperty::pSynthOscVolume:
+		break;
+	case SynthPartProperty::pSynthOscSyncMul:
+		break;
+	case SynthPartProperty::pSynthOscPulseWidth:
+		break;
+	case SynthPartProperty::pSynthOscUnisonDetune:
+		break;
+	case SynthPartProperty::pSynthOscSemi:
+		break;
+	case SynthPartProperty::pSynthOscTranspose:
+		break;
+	case SynthPartProperty::pSynthOscPitch:
+		break;
+	case SynthPartProperty::pSynthOscFilter:
+		break;
+	case SynthPartProperty::pSynthOscFilterType:
+		break;
+	case SynthPartProperty::pSynthOscFilterCutoff:
+		break;
+	case SynthPartProperty::pSynthOscFilterResonance:
+		break;
+	case SynthPartProperty::pSynthOscFilterKBTrack:
+		break;
+	case SynthPartProperty::pSynthOscFilterKBTrackNote:
+		break;
+	}
+	return val;
+}
+
+void SynthPartPropertyHolder::set(size_t prop, PropertyValue value, size_t sub_prop) {
+
 }
 
 SynthPartPropertyHolder::SynthPartPropertyHolder(AnalogSynthPreset &p, size_t i) : preset(p), part(i) {
@@ -531,9 +625,5 @@ SynthPartPropertyHolder::SynthPartPropertyHolder(AnalogSynthPreset &p, size_t i)
 }
 
 void SynthPartPropertyHolder::check_update() {
-
-}
-
-void SynthPartPropertyHolder::set(size_t prop, PropertyValue value) {
 
 }
