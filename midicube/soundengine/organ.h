@@ -21,8 +21,9 @@
 #define ORGAN_TONEWHEEL_AMOUNT 91
 #define ORGAN_LOWEST_TONEWHEEL_NOTE 24
 
-#define ORGAN_MAX_DOWN_DELAY 0.0125
-#define ORGAN_MAX_UP_DELAY 0.0125
+//TODO more accurate click (contact bounce) and anti-aliasing
+#define ORGAN_MAX_DOWN_DELAY 0.007
+#define ORGAN_MAX_UP_DELAY 0.007
 
 #define MIN_SWELL 0.1
 #define SWELL_RANGE (1 - MIN_SWELL)
