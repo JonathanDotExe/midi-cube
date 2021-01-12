@@ -286,6 +286,24 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		preset.delay_time = 0.4;
 	}
 		break;
+	case SYNTH_BRASS:
+	{
+		ModEnvelopeEntity &mod_env = preset.mod_envs.at(0);
+		mod_env.active = true;
+		mod_env.env = { 0.1, 0.5, 0, 0.05 };
+
+		OscilatorEntity &osc = preset.oscilators.at(0);
+		osc.unison_amount = 3;
+		osc.unison_detune.value = 0.05;
+		osc.active = true;
+		osc.env = { 0.0005, 0, 1, 0.003 };
+		osc.filter = true;
+		osc.filter_type = FilterType::LP_24;
+		osc.filter_cutoff.value = 0.2;
+		osc.filter_cutoff.mod_env = 0;
+		osc.filter_cutoff.mod_amount = 0.15;
+	}
+		break;
 	}
 }
 

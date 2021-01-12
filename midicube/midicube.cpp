@@ -53,6 +53,7 @@ void MidiCube::init() {
 	apply_preset(POLY_SWEEP, static_cast<AnalogSynth&>(bank->channel(6)).preset);
 	apply_preset(BRASS_PAD, static_cast<AnalogSynth&>(bank->channel(7)).preset);
 	apply_preset(FM_KALIMBA, static_cast<AnalogSynth&>(bank->channel(8)).preset);
+	apply_preset(SYNTH_BRASS, static_cast<AnalogSynth&>(bank->channel(10)).preset);
 	//Default setting
 	SoundEngineBank* bank2 = engine.get_sound_engines().at(2);
 	static_cast<BaseSoundEngine&>(bank2->channel(1)).sustain = false;
