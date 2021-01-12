@@ -41,6 +41,7 @@ struct PropertyChange {
 	PropertyHolder* holder;
 	size_t property;
 	PropertyValue value;
+	size_t sub_property = 0;
 };
 
 /**
@@ -56,9 +57,9 @@ public:
 		update_request = true;
 	}
 
-	virtual void set(size_t prop, PropertyValue value) = 0;
+	virtual void set(size_t prop, PropertyValue value, size_t sub_prop = 0) = 0;
 
-	virtual PropertyValue get(size_t prop) = 0;
+	virtual PropertyValue get(size_t prop, size_t sub_prop = 0) = 0;
 
 	virtual ~PropertyHolder() {
 
@@ -67,37 +68,37 @@ public:
 protected:
 	std::atomic<bool> update_request;
 
-	inline void submit_change(size_t prop, PropertyValue value);
+	inline void submit_change(size_t prop, PropertyValue value, size_t sub_prop = 0);
 
-	inline void submit_change(size_t prop, int value);
+	inline void submit_change(size_t prop, int value, size_t sub_prop = 0);
 
-	inline void submit_change(size_t prop, double value);
+	inline void submit_change(size_t prop, double value, size_t sub_prop = 0);
 
-	inline void submit_change(size_t prop, bool value);
+	inline void submit_change(size_t prop, bool value, size_t sub_prop = 0);
 };
 
-void PropertyHolder::submit_change(size_t prop, PropertyValue value) {
+void PropertyHolder::submit_change(size_t prop, PropertyValue value, size_t sub_prop) {
 	if (changes) {
-		changes->push({this, prop, value});
+		changes->push({this, prop, value, sub_prop});
 	}
 }
 
-void PropertyHolder::submit_change(size_t prop, int value) {
+void PropertyHolder::submit_change(size_t prop, int value, size_t sub_prop) {
 	PropertyValue val;
 	val.ival = value;
-	submit_change(prop, val);
+	submit_change(prop, val, sub_prop);
 }
 
-void PropertyHolder::submit_change(size_t prop, double value) {
+void PropertyHolder::submit_change(size_t prop, double value, size_t sub_prop) {
 	PropertyValue val;
 	val.dval = value;
-	submit_change(prop, val);
+	submit_change(prop, val, sub_prop);
 }
 
-void PropertyHolder::submit_change(size_t prop, bool value) {
+void PropertyHolder::submit_change(size_t prop, bool value, size_t sub_prop) {
 	PropertyValue val;
 	val.bval = value;
-	submit_change(prop, val);
+	submit_change(prop, val, sub_prop);
 }
 
 

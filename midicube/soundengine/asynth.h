@@ -179,15 +179,6 @@ enum SynthPartProperty {
 	pSynthOscUnisonDetuneCC,
 	pSynthOscUnisonDetuneCCAmount,
 
-	pSynthOscPulseWidth,
-	pSynthOscPulseWidthModEnv,
-	pSynthOscPulseWidthModEnvAmount,
-	pSynthOscPulseWidthLFO,
-	pSynthOscPulseWidthLFOAmount,
-	pSynthOscPulseWidthVelocityAmount,
-	pSynthOscPulseWidthCC,
-	pSynthOscPulseWidthCCAmount,
-
 	pSynthOscSemi,
 	pSynthOscTranspose,
 

@@ -348,7 +348,7 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 	}
 }
 
-PropertyValue B3Organ::get(size_t prop) {
+PropertyValue B3Organ::get(size_t prop, size_t sub_prop) {
 	PropertyValue val;
 	switch ((B3OrganProperty) prop) {
 	case B3OrganProperty::pB3Drawbar1:
@@ -508,7 +508,7 @@ PropertyValue B3Organ::get(size_t prop) {
 	return val;
 }
 
-void B3Organ::set(size_t prop, PropertyValue val) {
+void B3Organ::set(size_t prop, PropertyValue val, size_t sub_prop) {
 	switch ((B3OrganProperty) prop) {
 	case B3OrganProperty::pB3Drawbar1:
 		data.preset.drawbars[0] = val.ival;
