@@ -38,15 +38,20 @@ void VocoderEffect::apply(double& lsample, double& rsample, double modulator, Vo
 		double rvocoded = 0;
 		if (modulator && (lsample || rsample)) {
 			for (size_t i = 0; i < bands.size(); ++i) {
-				VocoderBand& band = bands.at(i);
+				VocoderBand& band = bands[i];
 				//Modulator amp
 				band.env.apply(band.mfilter.apply(band.filter_data, modulator, info.time_step), info.time, info.time_step);
 				double vol = band.env.volume();
 
 				//Vocode carrier
 				lvocoded += band.lfilter.apply(band.filter_data, lsample, info.time_step) * vol;
-				rvocoded += band.rfilter.apply(band.filter_data, lsample, info.time_step) * vol;
+				rvocoded += band.rfilter.apply(band.filter_data, rsample, info.time_step) * vol;
 			}
+		}
+		//Highpass
+		if (preset.mod_highpass) {
+			FilterData data = {FilterType::HP_24, cutoff_to_factor(preset.mod_highpass, info.time_step)};
+			modulator = mfilter.apply(data, modulator, info.time_step);
 		}
 		//Mix
 		lsample *= carrier_mix;
