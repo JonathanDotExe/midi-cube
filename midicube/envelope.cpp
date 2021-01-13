@@ -68,23 +68,17 @@ double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pr
 }
 
 //EnvelopeFollower
-EnvelopeFollower::EnvelopeFollower(double step_time) {
-	this->step_time = step_time;
-	port.set(0, 0, step_time);
+EnvelopeFollower::EnvelopeFollower() {
+
 }
 
-void EnvelopeFollower::apply(double signal, double time) {
-	double val = volume(time);
+void EnvelopeFollower::apply(double signal, double time_step) {
 	signal = fabs(signal);
-	port.set(signal, time, signal >= val ? 0 : step_time * (val - signal));
+	value = filter.apply(data, signal, time_step);
 }
 
-double EnvelopeFollower::volume(double time) {
-	return port.get(time);
-}
-
-void EnvelopeFollower::set_step_time(double step_time) {
-	this->step_time = step_time;
+double EnvelopeFollower::volume() {
+	return value;
 }
 
 

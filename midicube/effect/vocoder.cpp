@@ -29,9 +29,8 @@ void VocoderEffect::apply(double& lsample, double& rsample, double modulator, Vo
 			modulator_mix = preset.voice_amp/total_mix;
 		}
 		//Gate
-		modulator_env.apply(modulator, info.time);
-		std::cout << modulator_env.volume(info.time) << std::endl;
-		if (modulator_env.volume(info.time) < preset.gate) {
+		modulator_env.apply(modulator, info.time_step);
+		if (modulator_env.volume() < preset.gate) {
 			modulator = 0;
 		}
 		//Vocode
@@ -41,8 +40,8 @@ void VocoderEffect::apply(double& lsample, double& rsample, double modulator, Vo
 			for (size_t i = 0; i < bands.size(); ++i) {
 				VocoderBand& band = bands[i];
 				//Modulator amp
-				band.env.apply(band.mfilter.apply(band.filter_data, modulator, info.time_step), info.time);
-				double vol = band.env.volume(info.time);
+				band.env.apply(band.mfilter.apply(band.filter_data, modulator, info.time_step), info.time_step);
+				double vol = band.env.volume();
 
 				//Vocode carrier
 				lvocoded += band.lfilter.apply(band.filter_data, lsample, info.time_step) * vol;

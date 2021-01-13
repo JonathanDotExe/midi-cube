@@ -11,7 +11,7 @@
 #define ENVELOPE_FOLLOWER_BUFFER_SIZE 44100
 
 #include <array>
-#include "synthesis.h"
+#include "filter.h"
 
 struct TriggeredNote {
 	double start_time = 0;
@@ -65,13 +65,13 @@ public:
 
 class EnvelopeFollower {
 private:
-	PortamendoBuffer port{0, 0};
-	double step_time = 0.05;
+	Filter filter;
+	FilterData data{FilterType::LP_12, cutoff_to_factor(20, 1/44100.0), 0}; //FIXME
+	double value = 0;
 public:
-	EnvelopeFollower(double step_time = 0.05);
-	void apply(double signal, double time);
-	double volume(double time);
-	void set_step_time(double step_time);
+	EnvelopeFollower();
+	void apply(double signal, double time_step);
+	double volume();
 };
 
 
