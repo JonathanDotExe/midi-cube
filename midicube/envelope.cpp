@@ -70,32 +70,17 @@ double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pr
 //EnvelopeFollower
 EnvelopeFollower::EnvelopeFollower(double step_time) {
 	this->step_time = step_time;
+	port.set(0, 0, step_time);
 }
 
-void EnvelopeFollower::apply(double signal, double time, double time_step) {
-	buffer[index] = signal;
-	if (std::abs(signal) >= highest_signal) {
-		highest_signal = std::abs(signal);
-		highest_time = time;
-	}
-	else if (highest_time < time - step_time) {
-		highest_signal = -1;
-		//Look for new highest signal
-		size_t timespan = round(step_time / time_step);
-		for (size_t i = 0; i < timespan; ++i) {
-			size_t pos = (index - i)%buffer.size();
-			if (std::abs(buffer[pos]) >= highest_signal) {
-				highest_signal = std::abs(buffer[pos]);
-				highest_time = time - time_step * i;
-			}
-		}
-	}
-
-	index = (index + 1) % buffer.size();
+void EnvelopeFollower::apply(double signal, double time) {
+	double val = volume(time);
+	signal = fabs(signal);
+	port.set(signal, time, signal >= val ? 0 : step_time * (val - signal));
 }
 
-double EnvelopeFollower::volume() {
-	return highest_signal;
+double EnvelopeFollower::volume(double time) {
+	return port.get(time);
 }
 
 void EnvelopeFollower::set_step_time(double step_time) {

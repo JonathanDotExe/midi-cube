@@ -32,14 +32,14 @@ struct VocoderBand {
 	Filter lfilter;
 	Filter rfilter;
 	Filter mfilter;
-	EnvelopeFollower env;
+	EnvelopeFollower env{};
 };
 
 class VocoderEffect {
 private:
 	std::array<VocoderBand, VOCODER_BAND_COUNT> bands;
 	Filter mfilter;
-	EnvelopeFollower modulator_env;
+	EnvelopeFollower modulator_env{};
 public:
 	VocoderEffect();
 

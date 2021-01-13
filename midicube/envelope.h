@@ -11,6 +11,7 @@
 #define ENVELOPE_FOLLOWER_BUFFER_SIZE 44100
 
 #include <array>
+#include "synthesis.h"
 
 struct TriggeredNote {
 	double start_time = 0;
@@ -64,16 +65,12 @@ public:
 
 class EnvelopeFollower {
 private:
-	std::array<double, ENVELOPE_FOLLOWER_BUFFER_SIZE> buffer = {};
-	std::size_t index = 0;
-	double highest_signal = 0;
-	double highest_time = 0;
-
+	PortamendoBuffer port{0, 0};
 	double step_time = 0.05;
 public:
 	EnvelopeFollower(double step_time = 0.05);
-	void apply(double signal, double time, double  time_step);
-	double volume();
+	void apply(double signal, double time);
+	double volume(double time);
 	void set_step_time(double step_time);
 };
 

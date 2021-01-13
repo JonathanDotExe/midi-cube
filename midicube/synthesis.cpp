@@ -7,6 +7,7 @@
 
 #include "synthesis.h"
 #include <cmath>
+#include <iostream>
 
 
 extern double db_to_amp(double db) {
@@ -110,6 +111,7 @@ double PortamendoBuffer::get(double time) {
 
 void PortamendoBuffer::set(double value, double time, double slope_time) {
 	last_value = get(time);
+	std::cout << last_value << std::endl;
 	last_time = time;
 	this->value = value;
 	this->slope_time = slope_time;
