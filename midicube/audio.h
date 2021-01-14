@@ -61,7 +61,7 @@ public:
 
 	void set_sample_callback(void (* get_sample) (std::array<double, OUTPUT_CHANNELS>&, SampleInfo&, void*), void* user_data);
 
-	void init();
+	void init(int device = -1);
 
 	void close();
 
