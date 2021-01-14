@@ -29,6 +29,7 @@ void VocoderEffect::apply(double& lsample, double& rsample, double modulator, Vo
 			modulator_mix = preset.voice_amp/total_mix;
 		}
 		//Gate
+		modulator *= preset.mod_pre_amp;
 		modulator_env.apply(modulator, info.time_step);
 		if (modulator_env.volume() < preset.gate) {
 			modulator = 0;
@@ -69,7 +70,7 @@ void VocoderEffect::apply(double& lsample, double& rsample, double modulator, Vo
 		}
 		//Highpass
 		if (preset.mod_highpass) {
-			FilterData data = {FilterType::HP_24, cutoff_to_factor(preset.mod_highpass, info.time_step)};
+			FilterData data = {FilterType::HP_12, cutoff_to_factor(preset.mod_highpass, info.time_step)};
 			modulator = mfilter.apply(data, modulator, info.time_step);
 		}
 		//Mix

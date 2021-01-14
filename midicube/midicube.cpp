@@ -16,7 +16,7 @@ MidiCube::MidiCube() : changes(128) {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
-void MidiCube::init() {
+void MidiCube::init(int device) {
 	//MIDI Inputs
 	//Input-Devices
 	MidiInput input_dummy;
@@ -81,7 +81,7 @@ void MidiCube::init() {
 		engine.channels[i].source.input = 1;
 	}
 	//Init audio
-	audio_handler.init();
+	audio_handler.init(device);
 }
 
 void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
