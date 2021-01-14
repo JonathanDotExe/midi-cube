@@ -21,6 +21,11 @@ void AudioHandler::init(int device) {
 	if ((int) audio.getDeviceCount() <= std::max(device, 0)) {
 		throw AudioException("No audio devices detected");
 	}
+	//List devices
+	for (size_t i = 0; i < audio.getDeviceCount(); ++i) {
+		RtAudio::DeviceInfo info = audio.getDeviceInfo(i);
+		std::cout << i << ": " << info.name << " " << info.outputChannels << " outs " << info.inputChannels << " ins" << std::endl;
+	}
 
 	//Set up options
 	RtAudio::StreamOptions options;
