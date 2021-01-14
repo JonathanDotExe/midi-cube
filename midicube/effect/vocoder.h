@@ -20,6 +20,7 @@
 
 struct VocoderPreset {
 	bool on = false;
+	double mod_pre_amp = 3;
 	double vocoder_amp = 0.6;
 	double voice_amp = 0.4;
 	double carrier_amp = 0;
