@@ -9,7 +9,6 @@ deps = [
 	dependency('sfml-system'),
 	dependency('sfml-window'),
 	dependency('sfml-graphics'),
-	dependency('atomic'),
 	cxx.find_library('boost_system'),
 	cxx.find_library('boost_filesystem')
 ]
@@ -53,4 +52,4 @@ src = [
 	'midicube/effect/vocoder.cpp'
 ]
 
-executable('midi-cube', src, dependencies: deps)
+executable('midi-cube', src, dependencies: deps, link_args: '-latomic')
