@@ -9,6 +9,7 @@ deps = [
 	dependency('sfml-system'),
 	dependency('sfml-window'),
 	dependency('sfml-graphics'),
+	dependency('atomic'),
 	cxx.find_library('boost_system'),
 	cxx.find_library('boost_filesystem')
 ]

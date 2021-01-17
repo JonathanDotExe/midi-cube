@@ -66,7 +66,7 @@ void MidiCube::init(int device) {
 
 	//Default engines
 	engine.channels[0].active = true;
-	engine.channels[0].vocoder_preset.on = true;
+	//engine.channels[0].vocoder_preset.on = true;
 
 	engine.channels[0].set_engine(2);
 
