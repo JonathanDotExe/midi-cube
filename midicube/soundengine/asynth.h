@@ -48,7 +48,7 @@ struct OscilatorEntity {
 	bool active = false;
 	bool audible = true;
 	ADSREnvelopeData env{0.0, 0, 1, 0.0};
-	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
+	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN_WAVE;
 	bool analog = true;
 	bool sync = false;
 	bool reset = false;
@@ -84,7 +84,7 @@ struct LFOEntity {
 	bool active = false;
 	PropertyModulation volume = {1};
 	double freq = 1;
-	AnalogWaveForm waveform = AnalogWaveForm::SINE;
+	AnalogWaveForm waveform = AnalogWaveForm::SINE_WAVE;
 };
 
 struct AnalogSynthPreset {

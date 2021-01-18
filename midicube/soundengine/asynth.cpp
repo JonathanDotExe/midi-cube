@@ -77,7 +77,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		lfo.volume.cc_amount = 1;
 
 		OscilatorEntity& osc = preset.oscilators.at(0);
-		osc.waveform = AnalogWaveForm::SINE;
+		osc.waveform = AnalogWaveForm::SINE_WAVE;
 		osc.active = true;
 		osc.env = {0.0005, 0, 1, 0.003};
 		osc.pitch.lfo = 0;
@@ -91,7 +91,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		lfo.freq = 0.5;
 
 		OscilatorEntity& osc = preset.oscilators.at(0);
-		osc.waveform = AnalogWaveForm::SAW_DOWN;
+		osc.waveform = AnalogWaveForm::SAW_DOWN_WAVE;
 		osc.active = true;
 		osc.env = {0.0005, 0.35, 0.7, 0.003};
 		osc.filter = true;
@@ -111,7 +111,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 
 		OscilatorEntity& osc = preset.oscilators.at(0);
 		osc.active = true;
-		osc.waveform = AnalogWaveForm::SQUARE;
+		osc.waveform = AnalogWaveForm::SQUARE_WAVE;
 		osc.pulse_width.value = 0.66;
 		osc.env = {0.0005, 0.4, 0, 0.003};
 		osc.filter = true;
@@ -149,7 +149,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 	case STRONG_PAD:
 	{
 		OscilatorEntity& osc = preset.oscilators.at(0);
-		osc.waveform = AnalogWaveForm::SAW_DOWN;
+		osc.waveform = AnalogWaveForm::SAW_DOWN_WAVE;
 		osc.active = true;
 		osc.unison_amount = 3;
 		osc.unison_detune.value = 0.05;
@@ -163,7 +163,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 	case CLEAN_SAW:
 	{
 		OscilatorEntity& osc = preset.oscilators.at(0);
-		osc.waveform = AnalogWaveForm::SAW_DOWN;
+		osc.waveform = AnalogWaveForm::SAW_DOWN_WAVE;
 		osc.active = true;
 		osc.env = {0.0005, 0, 1, 0.003};
 	}
@@ -172,13 +172,13 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 	{
 		OscilatorEntity& osc1 = preset.oscilators.at(0);
 		osc1.transpose = 0.7;
-		osc1.waveform = AnalogWaveForm::SINE;
+		osc1.waveform = AnalogWaveForm::SINE_WAVE;
 		osc1.active = true;
 		osc1.audible = false;
 		osc1.env = {0, 0.2, 0, 0.003};
 
 		OscilatorEntity& osc2 = preset.oscilators.at(1);
-		osc2.waveform = AnalogWaveForm::SINE;
+		osc2.waveform = AnalogWaveForm::SINE_WAVE;
 		osc2.active = true;
 		osc2.fm.push_back({10, 0});
 		osc2.env = {0.0005, 0.5, 0.0, 0.003};
@@ -187,13 +187,13 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 	case FM_E_PIANO:
 	{
 		OscilatorEntity& osc1 = preset.oscilators.at(0);
-		osc1.waveform = AnalogWaveForm::SINE;
+		osc1.waveform = AnalogWaveForm::SINE_WAVE;
 		osc1.active = true;
 		osc1.audible = false;
 		osc1.env = {0.0005, 0.6, 0.6, 0.2};
 
 		OscilatorEntity& osc2 = preset.oscilators.at(1);
-		osc2.waveform = AnalogWaveForm::SINE;
+		osc2.waveform = AnalogWaveForm::SINE_WAVE;
 		osc2.volume.value = 0.2;
 		osc2.volume.velocity_amount = 0.3;
 		osc2.active = true;
@@ -201,7 +201,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc2.env = {0.0005, 1.8, 0.0, 0.1};
 
 		OscilatorEntity& osc3 = preset.oscilators.at(2);
-		osc3.waveform = AnalogWaveForm::SINE;
+		osc3.waveform = AnalogWaveForm::SINE_WAVE;
 		osc3.volume.value = 0.0;
 		osc3.volume.velocity_amount = 1;
 		osc3.transpose = 10;
@@ -210,7 +210,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc3.env = {0.0005, 0.2, 0.4, 0.2};
 
 		OscilatorEntity& osc4 = preset.oscilators.at(3);
-		osc4.waveform = AnalogWaveForm::SINE;
+		osc4.waveform = AnalogWaveForm::SINE_WAVE;
 		osc4.volume.value = 0.5;
 		osc4.active = true;
 		osc4.fm.push_back({1.5, 2});
@@ -269,14 +269,14 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 	case FM_KALIMBA:
 	{
 		OscilatorEntity& osc1 = preset.oscilators.at(0);
-		osc1.waveform = AnalogWaveForm::SINE;
+		osc1.waveform = AnalogWaveForm::SINE_WAVE;
 		osc1.semi = 28;
 		osc1.active = true;
 		osc1.audible = false;
 		osc1.env = {0.0005, 0.12, 0.0, 0.03};
 
 		OscilatorEntity& osc2 = preset.oscilators.at(1);
-		osc2.waveform = AnalogWaveForm::SINE;
+		osc2.waveform = AnalogWaveForm::SINE_WAVE;
 		osc2.active = true;
 		osc2.fm.push_back({0.4, 0});
 		osc2.env = {0.0005, 0.8, 0.0, 0.1};
@@ -686,7 +686,7 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val, size_t sub_pro
 		osc.env.release = val.dval;
 		break;
 	case SynthPartProperty::pSynthOscWaveForm:
-		osc.waveform = val.ival;
+		osc.waveform = (AnalogWaveForm) val.ival;
 		break;
 	case SynthPartProperty::pSynthOscAnalog:
 		osc.analog = val.bval;
@@ -707,13 +707,13 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val, size_t sub_pro
 		set_mod_prop(osc.volume, (SynthModulationProperty) sub_prop, val);
 		break;
 	case SynthPartProperty::pSynthOscSyncMul:
-		val = set_mod_prop(osc.sync_mul, (SynthModulationProperty) sub_prop, val);
+		set_mod_prop(osc.sync_mul, (SynthModulationProperty) sub_prop, val);
 		break;
 	case SynthPartProperty::pSynthOscPulseWidth:
-		val = set_mod_prop(osc.pulse_width, (SynthModulationProperty) sub_prop, val);
+		set_mod_prop(osc.pulse_width, (SynthModulationProperty) sub_prop, val);
 		break;
 	case SynthPartProperty::pSynthOscUnisonDetune:
-		val = set_mod_prop(osc.unison_detune, (SynthModulationProperty) sub_prop, val);
+		set_mod_prop(osc.unison_detune, (SynthModulationProperty) sub_prop, val);
 		break;
 	case SynthPartProperty::pSynthOscSemi:
 		osc.semi = val.dval;
@@ -722,19 +722,19 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val, size_t sub_pro
 		osc.transpose = val.dval;
 		break;
 	case SynthPartProperty::pSynthOscPitch:
-		val = set_mod_prop(osc.pitch, (SynthModulationProperty) sub_prop, val);
+		set_mod_prop(osc.pitch, (SynthModulationProperty) sub_prop, val);
 		break;
 	case SynthPartProperty::pSynthOscFilter:
 		osc.filter = val.bval;
 		break;
 	case SynthPartProperty::pSynthOscFilterType:
-		osc.filter_type = val.ival;
+		osc.filter_type = (FilterType) val.ival;
 		break;
 	case SynthPartProperty::pSynthOscFilterCutoff:
-		val = set_mod_prop(osc.filter_cutoff, (SynthModulationProperty) sub_prop, val);
+		set_mod_prop(osc.filter_cutoff, (SynthModulationProperty) sub_prop, val);
 		break;
 	case SynthPartProperty::pSynthOscFilterResonance:
-		val = set_mod_prop(osc.filter_resonance, (SynthModulationProperty) sub_prop, val);
+		set_mod_prop(osc.filter_resonance, (SynthModulationProperty) sub_prop, val);
 		break;
 	case SynthPartProperty::pSynthOscFilterKBTrack:
 		osc.filter_kb_track = val.dval;
