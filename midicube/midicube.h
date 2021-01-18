@@ -27,7 +27,7 @@ public:
 	SoundEngineDevice engine;
 
 	MidiCube();
-	void init(int device = -1);
+	void init(int out_device = -1, int in_device = -1);
 	inline void process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
 	void perform_change(PropertyChange change);
 	std::vector<MidiCubeInput> get_inputs();
