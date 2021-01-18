@@ -551,6 +551,35 @@ PropertyValue get_mod_prop(PropertyModulation& mod, SynthModulationProperty prop
 	return val;
 }
 
+void set_mod_prop(PropertyModulation& mod, SynthModulationProperty prop, PropertyValue val) {
+	switch (prop) {
+	case SynthModulationProperty::pModValue:
+		mod.value = val.dval;
+		break;
+	case SynthModulationProperty::pModModEnv:
+		mod.mod_env = val.ival;
+		break;
+	case SynthModulationProperty::pModModEnvAmount:
+		mod.mod_amount = val.dval;
+		break;
+	case SynthModulationProperty::pModLFO:
+		mod.lfo = val.ival;
+		break;
+	case SynthModulationProperty::pModLFOAmount:
+		mod.lfo_amount = val.dval;
+		break;
+	case SynthModulationProperty::pModVelocityAmount:
+		mod.velocity_amount = val.ival;
+		break;
+	case SynthModulationProperty::pModCC:
+		mod.cc = val.ival;
+		break;
+	case SynthModulationProperty::pModCCAmount:
+		mod.cc_amount = val.dval;
+		break;
+	}
+}
+
 //SynthPartPropertyHolder
 PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	PropertyValue val;
@@ -575,49 +604,145 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 		val.dval = osc.env.release;
 		break;
 	case SynthPartProperty::pSynthOscWaveForm:
+		val.ival = osc.waveform;
 		break;
 	case SynthPartProperty::pSynthOscAnalog:
+		val.bval = osc.analog;
 		break;
 	case SynthPartProperty::pSynthOscSync:
+		val.bval = osc.sync;
 		break;
 	case SynthPartProperty::pSynthOscReset:
+		val.bval = osc.reset;
 		break;
 	case SynthPartProperty::pSynthOscRandomize:
+		val.bval = osc.randomize;
 		break;
 	case SynthPartProperty::pSynthOscUnisonAmount:
+		val.ival = osc.unison_amount;
 		break;
 	case SynthPartProperty::pSynthOscVolume:
+		val = get_mod_prop(osc.volume, (SynthModulationProperty) sub_prop);
 		break;
 	case SynthPartProperty::pSynthOscSyncMul:
+		val = get_mod_prop(osc.sync_mul, (SynthModulationProperty) sub_prop);
 		break;
 	case SynthPartProperty::pSynthOscPulseWidth:
+		val = get_mod_prop(osc.pulse_width, (SynthModulationProperty) sub_prop);
 		break;
 	case SynthPartProperty::pSynthOscUnisonDetune:
+		val = get_mod_prop(osc.unison_detune, (SynthModulationProperty) sub_prop);
 		break;
 	case SynthPartProperty::pSynthOscSemi:
+		val.dval = osc.semi;
 		break;
 	case SynthPartProperty::pSynthOscTranspose:
+		val.dval = osc.transpose;
 		break;
 	case SynthPartProperty::pSynthOscPitch:
+		val = get_mod_prop(osc.pitch, (SynthModulationProperty) sub_prop);
 		break;
 	case SynthPartProperty::pSynthOscFilter:
+		val.bval = osc.filter;
 		break;
 	case SynthPartProperty::pSynthOscFilterType:
+		val.ival = osc.filter_type;
 		break;
 	case SynthPartProperty::pSynthOscFilterCutoff:
+		val = get_mod_prop(osc.filter_cutoff, (SynthModulationProperty) sub_prop);
 		break;
 	case SynthPartProperty::pSynthOscFilterResonance:
+		val = get_mod_prop(osc.filter_resonance, (SynthModulationProperty) sub_prop);
 		break;
 	case SynthPartProperty::pSynthOscFilterKBTrack:
+		val.dval = osc.filter_kb_track;
 		break;
 	case SynthPartProperty::pSynthOscFilterKBTrackNote:
+		val.ival = osc.filter_kb_track_note;
 		break;
 	}
 	return val;
 }
 
-void SynthPartPropertyHolder::set(size_t prop, PropertyValue value, size_t sub_prop) {
-
+void SynthPartPropertyHolder::set(size_t prop, PropertyValue val, size_t sub_prop) {
+	OscilatorEntity& osc = preset.oscilators[this->part];
+	switch ((SynthPartProperty) prop) {
+	case SynthPartProperty::pSynthOscActive:
+		osc.active = val.bval;
+		break;
+	case SynthPartProperty::pSynthOscAudible:
+		osc.audible = val.bval;
+		break;
+	case SynthPartProperty::pSynthOscAmpAttack:
+		osc.env.attack = val.dval;
+		break;
+	case SynthPartProperty::pSynthOscDecay:
+		osc.env.decay = val.dval;
+		break;
+	case SynthPartProperty::pSynthOscSustain:
+		osc.env.sustain = val.dval;
+		break;
+	case SynthPartProperty::pSynthOscRelease:
+		osc.env.release = val.dval;
+		break;
+	case SynthPartProperty::pSynthOscWaveForm:
+		osc.waveform = val.ival;
+		break;
+	case SynthPartProperty::pSynthOscAnalog:
+		osc.analog = val.bval;
+		break;
+	case SynthPartProperty::pSynthOscSync:
+		osc.sync = val.bval;
+		break;
+	case SynthPartProperty::pSynthOscReset:
+		osc.reset = val.bval;
+		break;
+	case SynthPartProperty::pSynthOscRandomize:
+		osc.randomize = val.bval;
+		break;
+	case SynthPartProperty::pSynthOscUnisonAmount:
+		osc.unison_amount = val.ival;
+		break;
+	case SynthPartProperty::pSynthOscVolume:
+		set_mod_prop(osc.volume, (SynthModulationProperty) sub_prop, val);
+		break;
+	case SynthPartProperty::pSynthOscSyncMul:
+		val = set_mod_prop(osc.sync_mul, (SynthModulationProperty) sub_prop, val);
+		break;
+	case SynthPartProperty::pSynthOscPulseWidth:
+		val = set_mod_prop(osc.pulse_width, (SynthModulationProperty) sub_prop, val);
+		break;
+	case SynthPartProperty::pSynthOscUnisonDetune:
+		val = set_mod_prop(osc.unison_detune, (SynthModulationProperty) sub_prop, val);
+		break;
+	case SynthPartProperty::pSynthOscSemi:
+		osc.semi = val.dval;
+		break;
+	case SynthPartProperty::pSynthOscTranspose:
+		osc.transpose = val.dval;
+		break;
+	case SynthPartProperty::pSynthOscPitch:
+		val = set_mod_prop(osc.pitch, (SynthModulationProperty) sub_prop, val);
+		break;
+	case SynthPartProperty::pSynthOscFilter:
+		osc.filter = val.bval;
+		break;
+	case SynthPartProperty::pSynthOscFilterType:
+		osc.filter_type = val.ival;
+		break;
+	case SynthPartProperty::pSynthOscFilterCutoff:
+		val = set_mod_prop(osc.filter_cutoff, (SynthModulationProperty) sub_prop, val);
+		break;
+	case SynthPartProperty::pSynthOscFilterResonance:
+		val = set_mod_prop(osc.filter_resonance, (SynthModulationProperty) sub_prop, val);
+		break;
+	case SynthPartProperty::pSynthOscFilterKBTrack:
+		osc.filter_kb_track = val.dval;
+		break;
+	case SynthPartProperty::pSynthOscFilterKBTrackNote:
+		osc.filter_kb_track_note = val.ival;
+		break;
+	}
 }
 
 SynthPartPropertyHolder::SynthPartPropertyHolder(AnalogSynthPreset &p, size_t i) : preset(p), part(i) {
