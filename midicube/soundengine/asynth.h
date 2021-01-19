@@ -14,9 +14,7 @@
 #include "../util.h"
 #include "../property.h"
 
-#define ANALOG_OSCILATOR_COUNT 8
-#define ANALOG_MOD_ENV_COUNT 8
-#define ANALOG_LFO_COUNT 8
+#define ANALOG_PART_COUNT 8
 #define ANALOG_CONTROL_COUNT 128
 
 const FixedScale VOLUME_SCALE = {0, {}, 1};
@@ -88,9 +86,9 @@ struct LFOEntity {
 };
 
 struct AnalogSynthPreset {
-	std::array<LFOEntity, ANALOG_LFO_COUNT> lfos;
-	std::array<ModEnvelopeEntity, ANALOG_MOD_ENV_COUNT> mod_envs;
-	std::array<OscilatorEntity, ANALOG_OSCILATOR_COUNT> oscilators;
+	std::array<LFOEntity, ANALOG_PART_COUNT> lfos;
+	std::array<ModEnvelopeEntity, ANALOG_PART_COUNT> mod_envs;
+	std::array<OscilatorEntity, ANALOG_PART_COUNT> oscilators;
 
 	bool mono = false;
 	bool legato = false;
@@ -145,29 +143,42 @@ enum SynthPartProperty {
 };
 
 class SynthPartPropertyHolder : public PropertyHolder {
-private:
-	AnalogSynthPreset& preset;
-	size_t part;
 public:
-	SynthPartPropertyHolder(AnalogSynthPreset& p, size_t part);
+	AnalogSynthPreset* preset;
+	size_t part;
+	SynthPartPropertyHolder(AnalogSynthPreset* p = nullptr, size_t part = 0);
 	void check_update();
 	PropertyValue get(size_t prop, size_t sub_prop = 0);
 	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
+
+protected:
+	inline void submit_change(size_t prop, PropertyModulation& mod) {
+		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModValue);
+		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModModEnv);
+		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModModEnvAmount);
+		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModLFO);
+		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModLFOAmount);
+		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModVelocityAmount);
+		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModCC);
+		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModCCAmount);
+	}
 };
 
 class AnalogSynth : public BaseSoundEngine {
 
 private:
-	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT, 8> oscilators;
-	std::array<double, SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT> modulators = {};
-	std::array<Filter, SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT> filters;
-	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY * ANALOG_OSCILATOR_COUNT> amp_envs;
-	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY * ANALOG_MOD_ENV_COUNT> mod_envs;
-	std::array<double, ANALOG_MOD_ENV_COUNT> env_val = {};
-	std::array<AnalogOscilator, ANALOG_LFO_COUNT> lfos;
-	std::array<double, ANALOG_LFO_COUNT> lfo_val = {};
-	std::array<double, ANALOG_LFO_COUNT> lfo_mod = {};
+	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT, 8> oscilators;
+	std::array<double, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> modulators = {};
+	std::array<Filter, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> filters;
+	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> amp_envs;
+	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> mod_envs;
+	std::array<double, ANALOG_PART_COUNT> env_val = {};
+	std::array<AnalogOscilator, ANALOG_PART_COUNT> lfos;
+	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
+	std::array<double, ANALOG_PART_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
+
+	std::array<SynthPartPropertyHolder, ANALOG_PART_COUNT> parts;
 
 	bool first_port = true;
 	unsigned int last_note = 0;

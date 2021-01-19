@@ -290,10 +290,13 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 }
 
 AnalogSynth::AnalogSynth() {
-
+	for (size_t i = 0; i < parts.size(); ++i) {
+		parts[i].preset = &preset;
+		parts[i].part = i;
+	}
 }
 
-static double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_MOD_ENV_COUNT>& env_val, std::array<double, ANALOG_LFO_COUNT>& lfo_val, std::array<double, ANALOG_CONTROL_COUNT>& controls, double velocity) {
+static inline double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_PART_COUNT>& env_val, std::array<double, ANALOG_PART_COUNT>& lfo_val, std::array<double, ANALOG_CONTROL_COUNT>& controls, double velocity) {
 	double prog = mod.value;
 	prog += env_val.at(mod.mod_env) * mod.mod_amount + lfo_val.at(mod.lfo) * mod.lfo_amount + controls.at(mod.cc) * mod.cc_amount + velocity * mod.velocity_amount;
 	prog = fmin(fmax(prog, 0.0), 1.0);
@@ -404,6 +407,10 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 }
 
 void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
+	//Update properties
+	for (size_t i = 0; i < parts.size(); ++i) {
+		parts[i].check_update();
+	}
 	//Mono
 	if (preset.mono && status.latest_note) {
 		unsigned int note = status.latest_note->note;
@@ -583,7 +590,7 @@ void set_mod_prop(PropertyModulation& mod, SynthModulationProperty prop, Propert
 //SynthPartPropertyHolder
 PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	PropertyValue val;
-	OscilatorEntity& osc = preset.oscilators[this->part];
+	OscilatorEntity& osc = preset->oscilators[this->part];
 	switch ((SynthPartProperty) prop) {
 	case SynthPartProperty::pSynthOscActive:
 		val.bval = osc.active;
@@ -665,7 +672,7 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 }
 
 void SynthPartPropertyHolder::set(size_t prop, PropertyValue val, size_t sub_prop) {
-	OscilatorEntity& osc = preset.oscilators[this->part];
+	OscilatorEntity& osc = preset->oscilators[this->part];
 	switch ((SynthPartProperty) prop) {
 	case SynthPartProperty::pSynthOscActive:
 		osc.active = val.bval;
@@ -745,10 +752,41 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val, size_t sub_pro
 	}
 }
 
-SynthPartPropertyHolder::SynthPartPropertyHolder(AnalogSynthPreset &p, size_t i) : preset(p), part(i) {
+SynthPartPropertyHolder::SynthPartPropertyHolder(AnalogSynthPreset *p, size_t i) : preset(p), part(i) {
 
 }
 
 void SynthPartPropertyHolder::check_update() {
+	if (update_request) {
+		OscilatorEntity& osc = preset->oscilators[this->part];
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscActive, osc.active);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscAudible, osc.audible);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscAmpAttack, osc.env.attack);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscDecay, osc.env.decay);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscSustain, osc.env.sustain);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscRelease, osc.env.release);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscWaveForm, osc.waveform);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscAnalog, osc.analog);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscSync, osc.sync);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscReset, osc.reset);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscRandomize, osc.randomize);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscUnisonAmount, (int) osc.unison_amount);
 
+		submit_change(SynthPartProperty::pSynthOscVolume, osc.volume);
+		submit_change(SynthPartProperty::pSynthOscSyncMul, osc.sync_mul);
+		submit_change(SynthPartProperty::pSynthOscPulseWidth, osc.pulse_width);
+		submit_change(SynthPartProperty::pSynthOscUnisonDetune, osc.unison_detune);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscSemi, osc.semi);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose, osc.transpose);
+		submit_change(SynthPartProperty::pSynthOscPitch, osc.pitch);
+
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilter, osc.filter);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterType, osc.filter_type);
+		submit_change(SynthPartProperty::pSynthOscFilterCutoff, osc.filter_cutoff);
+		submit_change(SynthPartProperty::pSynthOscFilterResonance, osc.filter_resonance);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose, osc.filter_kb_track);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose, (int) osc.filter_kb_track_note);
+
+		update_request = false;
+	}
 }
