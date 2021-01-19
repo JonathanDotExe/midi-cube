@@ -178,8 +178,6 @@ private:
 	std::array<double, ANALOG_PART_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
 
-	std::array<SynthPartPropertyHolder, ANALOG_PART_COUNT> parts;
-
 	bool first_port = true;
 	unsigned int last_note = 0;
 	PortamendoBuffer note_port{0, 0};
@@ -192,6 +190,7 @@ private:
 
 public:
 	AnalogSynthPreset preset;
+	std::array<SynthPartPropertyHolder, ANALOG_PART_COUNT> parts;
 
 	AnalogSynth();
 
