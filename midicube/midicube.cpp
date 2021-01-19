@@ -73,8 +73,8 @@ void MidiCube::init(int device) {
 	engine.channels[9].active = true;
 	engine.channels[9].set_engine(3);
 
-	engine.channels[10].bitcrusher_preset.on = true;
-	engine.channels[10].bitcrusher_preset.bits = 8;
+	//engine.channels[10].bitcrusher_preset.on = true;
+	//engine.channels[10].bitcrusher_preset.bits = 8;
 
 	for (size_t i = 0; i < engine.channels.size(); ++i) {
 		engine.channels[i].source.channel = i;
