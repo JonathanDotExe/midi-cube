@@ -16,7 +16,7 @@ MidiCube::MidiCube() : changes(128) {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
-void MidiCube::init(int device) {
+void MidiCube::init(int out_device, int in_device) {
 	//MIDI Inputs
 	//Input-Devices
 	MidiInput input_dummy;
@@ -44,7 +44,7 @@ void MidiCube::init(int device) {
 	fill_sound_engine_device(&engine);
 	//Synth presets
 	SoundEngineBank* bank = engine.get_sound_engines().at(2);
-	apply_preset(UNISON_SAWS, static_cast<AnalogSynth&>(bank->channel(0)).preset);
+	apply_preset(CLEAN_SAW, static_cast<AnalogSynth&>(bank->channel(0)).preset);
 	apply_preset(PULSE_BASS, static_cast<AnalogSynth&>(bank->channel(1)).preset);
 	apply_preset(STRONG_PAD, static_cast<AnalogSynth&>(bank->channel(2)).preset);
 	apply_preset(DELAY_CHORDS, static_cast<AnalogSynth&>(bank->channel(3)).preset);
@@ -81,7 +81,7 @@ void MidiCube::init(int device) {
 		engine.channels[i].source.input = 1;
 	}
 	//Init audio
-	audio_handler.init(device);
+	audio_handler.init(out_device, in_device);
 }
 
 void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
