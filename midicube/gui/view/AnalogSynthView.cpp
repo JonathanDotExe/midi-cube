@@ -8,6 +8,7 @@
 #include "AnalogSynthView.h"
 #include "resources.h"
 #include "SoundEngineChannelView.h"
+#include "AnalogSynthOscilatorView.h"
 
 AnalogSynthView::AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int channel_index) : synth(s), channel(c) {
 	this->channel_index = channel_index;
@@ -44,9 +45,12 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(title);
 
 		//Engine
-		Button* engine = new Button("Oscilator", main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
-		engine->rect.setFillColor(sf::Color(0, 180, 255));
-		controls.push_back(engine);
+		Button* osc = new Button("Oscilator", main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
+		osc->rect.setFillColor(sf::Color(0, 180, 255));
+		osc->set_on_click([&frame, this, i]{
+			frame.change_view(new AnalogSynthOscilatorView(synth, channel, channel_index, i));
+		});
+		controls.push_back(osc);
 	}
 
 	//Back Button
