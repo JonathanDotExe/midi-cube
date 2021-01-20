@@ -20,6 +20,7 @@ void AnalogSynthOscilatorView::property_change(PropertyChange change) {
 Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<PropertyHolder*> holders;
+	std::cout << part << std::endl;
 
 	SynthPartPropertyHolder* part = &synth.parts.at(this->part);
 	holders.push_back(part);
@@ -38,7 +39,8 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	//Waveform and active
 	{
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Noise"};
-		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, tmp_x , tmp_y, 100, 40);
+
+		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 100, 40);
 		waveform->bind(part, SynthPartProperty::pSynthOscWaveForm);
 		controls.push_back(waveform);
 	}
