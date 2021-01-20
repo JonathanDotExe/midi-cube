@@ -17,7 +17,6 @@ private:
 	AnalogSynth& synth;
 	SoundEngineChannel& channel;
 	int channel_index;
-	size_t part;
 public:
 	AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int channel_index);
 	virtual void property_change(PropertyChange change);

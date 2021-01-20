@@ -34,6 +34,21 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	int tmp_x = 10;
 	int tmp_y = 10;
 
+	//Col 1
+	//Waveform and active
+	{
+		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Noise"};
+		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, tmp_x , tmp_y, 100, 40);
+		waveform->bind(part, SynthPartProperty::pSynthOscWaveForm);
+		controls.push_back(waveform);
+	}
+	{
+		CheckBox* active = new CheckBox(false, "Active", main_font, 16, tmp_x + 110, tmp_y, 40, 40);
+		active->bind(part, SynthPartProperty::pSynthOscActive);
+		controls.push_back(active);
+		tmp_y += 45;
+	}
+
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
