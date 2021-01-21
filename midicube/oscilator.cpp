@@ -108,7 +108,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 			signal.carrier -= polyblep(protation - (long int) protation, step);
 		}
 		//Integrate
-		signal.carrier = last_val + signal.carrier * step * 4;
+		signal.carrier = last_val + signal.carrier * step * 2 * (signal.carrier > 0 ? 1/pulse_width : 1/(1 - pulse_width));
 		last_val = signal.carrier;
 		//TODO sync
 		signal.modulator = 0;
