@@ -89,7 +89,7 @@ void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels,
 	if (data.preset.percussion && info.time - data.percussion_start <= decay) {
 		double vol = (1 - (info.time - data.percussion_start)/decay) * (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 		vol /= drawbar_amount;
-		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12);
+		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12) - ORGAN_LOWEST_TONEWHEEL_NOTE;
 
 		trigger_tonewheel(tonewheel, vol, info, note);
 	}
