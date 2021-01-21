@@ -99,7 +99,18 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::TRIANGLE_WAVE:
-		signal.carrier = triangle_wave(rotation, 1);
+		//Square wave
+		signal.carrier = square_wave(rotation, 1, pulse_width);
+		//TODO center excalty around 0
+		if (data.analog) {
+			signal.carrier += polyblep(phase, step);
+			double protation = rotation + pulse_width;
+			signal.carrier -= polyblep(protation - (long int) protation, step);
+		}
+		//Integrate
+		signal.carrier = last_val + signal.carrier * step * 4;
+		last_val = signal.carrier;
+		//TODO sync
 		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::NOISE:
