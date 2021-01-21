@@ -49,6 +49,16 @@ extern double saw_wave_up(double time, double freq) {
 	return fmod(time, interval)/interval * 2 - 1;
 }
 
+extern double triangle_wave(double time, double freq) {
+	double interval = 0.5/freq;
+	if (time < 0.5) {
+		return fmod(time, interval)/interval * 2 - 1;
+	}
+	else {
+		return -fmod(time, interval)/interval * 2 + 1;
+	}
+}
+
 /**
  * The arguments are irrelevant here, they are just there if a function pointer to a generic wave function is needed
  */
