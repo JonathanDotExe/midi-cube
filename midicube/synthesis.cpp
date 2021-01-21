@@ -50,12 +50,12 @@ extern double saw_wave_up(double time, double freq) {
 }
 
 extern double triangle_wave(double time, double freq) {
-	double interval = 0.5/freq;
-	if (time < 0.5) {
-		return fmod(time, interval)/interval * 2 - 1;
+	double interval = 1/freq;
+	if (fmod(time, interval) < 0.5) {
+		return fmod(time, interval/2)/interval * 2 - 1;
 	}
 	else {
-		return -fmod(time, interval)/interval * 2 + 1;
+		return -fmod(time, interval/2)/interval * 2 + 1;
 	}
 }
 

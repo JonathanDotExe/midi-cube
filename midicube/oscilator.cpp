@@ -73,7 +73,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 				signal.carrier += polyblep(sync_phase, sync_step) * (1 - (saw_wave_down(last_phase, 1) + 1) / 2);
 			}
 		}
-		signal.modulator = signal.carrier;
+		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::SAW_UP:
 		signal.carrier = saw_wave_up(rotation, 1);
@@ -83,7 +83,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 				signal.carrier += polyblep(sync_phase, sync_step) * (saw_wave_up(last_phase, 1) + 1) / 2;
 			}
 		}
-		signal.modulator = signal.carrier;
+		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::SQUARE:
 		signal.carrier = square_wave(rotation, 1, pulse_width);
@@ -96,11 +96,15 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 				signal.carrier += polyblep(sync_phase, sync_step) *  (1 - (square_wave(rotation, 1, pulse_width) + 1) / 2);
 			}
 		}
-		signal.modulator = signal.carrier;
+		signal.modulator = 0;
+		break;
+	case AnalogWaveForm::TRIANGLE_WAVE:
+		signal.carrier = triangle_wave(rotation, 1);
+		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::NOISE:
 		signal.carrier = noise_wave(rotation, 1);
-		signal.modulator = signal.carrier;
+		signal.modulator = 0;
 		break;
 	}
 	return signal;

@@ -15,7 +15,7 @@
 #include <array>
 
 enum class AnalogWaveForm {
-	SINE, SAW_DOWN, SAW_UP, SQUARE, NOISE
+	SINE, SAW_DOWN, SAW_UP, SQUARE, TRIANGLE_WAVE, NOISE
 };
 
 struct AnalogOscilatorData {

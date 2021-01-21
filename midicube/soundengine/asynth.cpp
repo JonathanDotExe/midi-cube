@@ -304,6 +304,47 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc.filter_cutoff.mod_amount = 0.15;
 	}
 		break;
+	case BELL_LEAD:
+	{
+		OscilatorEntity& osc1 = preset.oscilators.at(0);
+		osc1.waveform = AnalogWaveForm::TRIANGLE_WAVE;
+		osc1.volume.value = 0.35;
+		osc1.unison_amount = 0;
+		osc1.unison_detune.value = 0.05;
+		osc1.active = true;
+		osc1.env = {0.0005, 0, 1, 0.07};
+
+		/*OscilatorEntity& osc2 = preset.oscilators.at(1);
+		osc2.waveform = AnalogWaveForm::TRIANGLE_WAVE;
+		osc2.volume.value = 0.35;
+		osc2.unison_amount = 2;
+		osc2.unison_detune.value = 0.05;
+		osc2.semi = 24;
+		osc2.active = true;
+		osc2.env = {0.0005, 0, 1, 0.07};
+
+		OscilatorEntity& osc3 = preset.oscilators.at(3);
+		osc3.waveform = AnalogWaveForm::SAW_DOWN;
+		osc3.volume.value = 0;
+		osc3.volume.cc = 30;
+		osc3.volume.cc_amount = 0.15;
+		osc3.unison_amount = 2;
+		osc3.unison_detune.value = 0.05;
+		osc3.active = true;
+		osc3.env = {0.0005, 0, 1, 0.07};
+
+		OscilatorEntity& osc4 = preset.oscilators.at(4);
+		osc4.waveform = AnalogWaveForm::SAW_DOWN;
+		osc4.volume.value = 0;
+		osc4.volume.cc = 30;
+		osc4.volume.cc_amount = 0.15;
+		osc4.unison_amount = 2;
+		osc4.unison_detune.value = 0.05;
+		osc4.semi = 12;
+		osc4.active = true;
+		osc4.env = {0.0005, 0, 1, 0.07};*/
+	}
+		break;
 	}
 }
 

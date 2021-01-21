@@ -156,7 +156,8 @@ enum SynthFactoryPreset {
 	FM_E_PIANO,
 	BRASS_PAD,
 	FM_KALIMBA,
-	SYNTH_BRASS
+	SYNTH_BRASS,
+	BELL_LEAD
 };
 
 void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset);
