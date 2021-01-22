@@ -17,8 +17,80 @@ AnalogSynthOscilatorView::AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineCh
 void AnalogSynthOscilatorView::property_change(PropertyChange change) {
 }
 
+static void property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source) {
+	//Value
+	{
+		Label* title = new Label(name, main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 60, 40);
+		value->bind(holder, prop, SynthModulationProperty::pModValue);
+		controls->push_back(value);
+	}
+	x += 70;
+	//Mod Env
+	{
+		Label* title = new Label("Env", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 60, 40);
+		amount->bind(holder, prop, SynthModulationProperty::pModModEnvAmount);
+		controls->push_back(amount);
+		show_amount->push_back(amount);
+
+		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, x, y + 15, 60, 40);
+		source->bind(holder, prop, SynthModulationProperty::pModModEnv);
+		controls->push_back(source);
+		show_amount->push_back(source);
+	}
+	x += 70;
+	//LFO
+	{
+		Label* title = new Label("LFO", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 60, 40);
+		amount->bind(holder, prop, SynthModulationProperty::pModLFOAmount);
+		controls->push_back(amount);
+		show_amount->push_back(amount);
+
+		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, x, y + 15, 60, 40);
+		source->bind(holder, prop, SynthModulationProperty::pModLFO);
+		controls->push_back(source);
+		show_amount->push_back(source);
+	}
+	x += 70;
+	//Vel
+	{
+		Label* title = new Label("Vel", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 60, 40);
+		amount->bind(holder, prop, SynthModulationProperty::pModVelocityAmount);
+		controls->push_back(amount);
+	}
+	x += 70;
+	//CC
+	{
+		Label* title = new Label("CC", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 60, 40);
+		amount->bind(holder, prop, SynthModulationProperty::pModCCAmount);
+		controls->push_back(amount);
+		show_amount->push_back(amount);
+
+		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_CONTROL_COUNT, main_font, 16, x, y + 15, 60, 40);
+		source->bind(holder, prop, SynthModulationProperty::pModCC);
+		controls->push_back(source);
+		show_amount->push_back(source);
+	}
+	x += 70;
+}
 Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	std::vector<Control*> controls;
+	std::vector<Control*> show_amount;
+	std::vector<Control*> show_source;
 	std::vector<PropertyHolder*> holders;
 	std::cout << part << std::endl;
 
@@ -74,6 +146,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		controls.push_back(audible);
 		tmp_y += 50;
 	}
+	//Volume
 
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
