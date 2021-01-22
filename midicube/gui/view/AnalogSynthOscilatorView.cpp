@@ -23,69 +23,69 @@ static void property_mod_controls(std::vector<Control*>* controls, int x, int y,
 		Label* title = new Label(name, main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 60, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
 		value->bind(holder, prop, SynthModulationProperty::pModValue);
 		controls->push_back(value);
 	}
-	x += 70;
+	x += 90;
 	//Mod Env
 	{
 		Label* title = new Label("Env", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 60, 40);
+		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->bind(holder, prop, SynthModulationProperty::pModModEnvAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 
-		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, x, y + 15, 60, 40);
+		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, x, y + 15, 80, 40);
 		source->bind(holder, prop, SynthModulationProperty::pModModEnv);
 		controls->push_back(source);
-		show_amount->push_back(source);
+		show_source->push_back(source);
 	}
-	x += 70;
+	x += 90;
 	//LFO
 	{
 		Label* title = new Label("LFO", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 60, 40);
+		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->bind(holder, prop, SynthModulationProperty::pModLFOAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 
-		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, x, y + 15, 60, 40);
+		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, x, y + 15, 80, 40);
 		source->bind(holder, prop, SynthModulationProperty::pModLFO);
 		controls->push_back(source);
-		show_amount->push_back(source);
+		show_source->push_back(source);
 	}
-	x += 70;
+	x += 90;
 	//Vel
 	{
 		Label* title = new Label("Vel", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 60, 40);
+		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->bind(holder, prop, SynthModulationProperty::pModVelocityAmount);
 		controls->push_back(amount);
 	}
-	x += 70;
+	x += 90;
 	//CC
 	{
 		Label* title = new Label("CC", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 60, 40);
+		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->bind(holder, prop, SynthModulationProperty::pModCCAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 
-		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_CONTROL_COUNT, main_font, 16, x, y + 15, 60, 40);
+		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_CONTROL_COUNT, main_font, 16, x, y + 15, 80, 40);
 		source->bind(holder, prop, SynthModulationProperty::pModCC);
 		controls->push_back(source);
-		show_amount->push_back(source);
+		show_source->push_back(source);
 	}
-	x += 70;
+	x += 90;
 }
 Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	std::vector<Control*> controls;
@@ -147,6 +147,21 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		tmp_y += 50;
 	}
 	//Volume
+	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscVolume, "Volume", &show_amount, &show_source);
+
+	//Edit Sources
+	Button* edit = new Button("Edit Sources", main_font, 18, frame.get_width() - 70 - 120, frame.get_height() - 40, 120, 40);
+	edit->rect.setFillColor(sf::Color::Yellow);
+	edit->set_on_click([&frame, show_amount, show_source, this]() {
+		edit_source = !edit_source;
+		for (Control* c : show_amount) {
+			c->set_visible(!edit_source);
+		}
+		for (Control* c : show_source) {
+			c->set_visible(edit_source);
+		}
+	});
+	controls.push_back(edit);
 
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
@@ -155,6 +170,13 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		frame.change_view(new AnalogSynthView(synth, channel, channel_index));
 	});
 	controls.push_back(back);
+
+	for (Control* c : show_amount) {
+		c->set_visible(!edit_source);
+	}
+	for (Control* c : show_source) {
+		c->set_visible(edit_source);
+	}
 
 	return {controls, holders};
 }

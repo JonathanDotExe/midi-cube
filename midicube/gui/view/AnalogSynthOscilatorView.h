@@ -18,6 +18,7 @@ private:
 	SoundEngineChannel& channel;
 	int channel_index;
 	size_t part;
+	bool edit_source = false;
 public:
 	AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineChannel& c, int channel_index, size_t part);
 	virtual ~AnalogSynthOscilatorView();
