@@ -40,3 +40,5 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * https://electricdruid.net/technical-aspects-of-the-hammond-organ/
 * https://www.hackaudio.com/digital-signal-processing/distortion-effects/bit-crushing/
 * https://de.wikipedia.org/wiki/Bitcrusher
+* https://asa.scitation.org/doi/pdf/10.1121/1.5003796
+* https://www.dsprelated.com/showarticle/938.php

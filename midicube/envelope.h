@@ -11,6 +11,7 @@
 #define ENVELOPE_FOLLOWER_BUFFER_SIZE 44100
 
 #include <array>
+#include "filter.h"
 
 struct TriggeredNote {
 	double start_time = 0;
@@ -64,17 +65,13 @@ public:
 
 class EnvelopeFollower {
 private:
-	std::array<double, ENVELOPE_FOLLOWER_BUFFER_SIZE> buffer = {};
-	std::size_t index = 0;
-	double highest_signal = 0;
-	double highest_time = 0;
-
-	double step_time = 0.05;
+	Filter filter;
+	FilterData data{FilterType::LP_12, cutoff_to_factor(20, 1/44100.0), 0}; //FIXME
+	double value = 0;
 public:
-	EnvelopeFollower(double step_time = 0.05);
-	void apply(double signal, double time, double  time_step);
+	EnvelopeFollower();
+	void apply(double signal, double time_step);
 	double volume();
-	void set_step_time(double step_time);
 };
 
 

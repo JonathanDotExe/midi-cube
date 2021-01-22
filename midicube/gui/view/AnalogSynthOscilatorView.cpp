@@ -38,7 +38,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	//Col 1
 	//Waveform and active
 	{
-		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Noise"};
+		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 100, 40);
 		waveform->bind(part, SynthPartProperty::pSynthOscWaveForm);

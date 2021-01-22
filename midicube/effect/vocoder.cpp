@@ -12,7 +12,7 @@ VocoderEffect::VocoderEffect() {
 	for (size_t i = 0; i < bands.size(); ++i) {
 		VocoderBand& band = bands.at(i);
 		band.filter_data.cutoff = cutoff_to_factor((VOCODER_HIGH_BAND - VOCODER_LOW_BAND)/VOCODER_BAND_COUNT * i + VOCODER_LOW_BAND, 1/44100.0); //TODO dependent on the sampel rate
-		band.filter_data.type = FilterType::BP_24;
+		band.filter_data.type = FilterType::LP_24;
 	}
 }
 
@@ -29,7 +29,8 @@ void VocoderEffect::apply(double& lsample, double& rsample, double modulator, Vo
 			modulator_mix = preset.voice_amp/total_mix;
 		}
 		//Gate
-		modulator_env.apply(modulator, info.time, info.time_step);
+		modulator *= preset.mod_pre_amp;
+		modulator_env.apply(modulator, info.time_step);
 		if (modulator_env.volume() < preset.gate) {
 			modulator = 0;
 		}
@@ -37,16 +38,40 @@ void VocoderEffect::apply(double& lsample, double& rsample, double modulator, Vo
 		double lvocoded = 0;
 		double rvocoded = 0;
 		if (modulator && (lsample || rsample)) {
-			for (size_t i = 0; i < bands.size(); ++i) {
-				VocoderBand& band = bands.at(i);
+			//Filters
+			std::array<double, VOCODER_BAND_COUNT> lfiltered;
+			std::array<double, VOCODER_BAND_COUNT> rfiltered;
+			std::array<double, VOCODER_BAND_COUNT> mfiltered;
+			lfiltered[0] = bands[0].lfilter.apply(bands[0].filter_data, lsample, info.time_step);
+			rfiltered[0] = bands[0].rfilter.apply(bands[0].filter_data, rsample, info.time_step);
+			mfiltered[0] = bands[0].rfilter.apply(bands[0].filter_data, modulator, info.time_step);
+			for (size_t i = 1; i < bands.size(); ++i) {
+				VocoderBand& band = bands[i];
+				//Filter
+				double lf = band.lfilter.apply(band.filter_data, lsample, info.time_step);
+				double rf = band.rfilter.apply(band.filter_data, rsample, info.time_step);
+				double m = band.rfilter.apply(band.filter_data, modulator, info.time_step);
+				lfiltered[i] = lf;
+				rfiltered[i] = rf;
+				mfiltered[i] = m;
+
+				lf -= lfiltered[i - 1];
+				rf -= rfiltered[i - 1];
+				m -= mfiltered[i - 1];
+
 				//Modulator amp
-				band.env.apply(band.mfilter.apply(band.filter_data, modulator, info.time_step), info.time, info.time_step);
+				band.env.apply(m, info.time_step);
 				double vol = band.env.volume();
 
 				//Vocode carrier
-				lvocoded += band.lfilter.apply(band.filter_data, lsample, info.time_step) * vol;
-				rvocoded += band.rfilter.apply(band.filter_data, lsample, info.time_step) * vol;
+				lvocoded += lfiltered[i] * vol;
+				rvocoded += rfiltered[i] * vol;
 			}
+		}
+		//Highpass
+		if (preset.mod_highpass) {
+			FilterData data = {FilterType::HP_12, cutoff_to_factor(preset.mod_highpass, info.time_step)};
+			modulator = mfilter.apply(data, modulator, info.time_step);
 		}
 		//Mix
 		lsample *= carrier_mix;

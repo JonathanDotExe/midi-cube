@@ -16,7 +16,7 @@ MidiCube::MidiCube() : changes(128) {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
-void MidiCube::init() {
+void MidiCube::init(int out_device, int in_device) {
 	//MIDI Inputs
 	//Input-Devices
 	MidiInput input_dummy;
@@ -44,7 +44,7 @@ void MidiCube::init() {
 	fill_sound_engine_device(&engine);
 	//Synth presets
 	SoundEngineBank* bank = engine.get_sound_engines().at(2);
-	apply_preset(UNISON_SAWS, static_cast<AnalogSynth&>(bank->channel(0)).preset);
+	apply_preset(CLEAN_SAW, static_cast<AnalogSynth&>(bank->channel(0)).preset);
 	apply_preset(PULSE_BASS, static_cast<AnalogSynth&>(bank->channel(1)).preset);
 	apply_preset(STRONG_PAD, static_cast<AnalogSynth&>(bank->channel(2)).preset);
 	apply_preset(DELAY_CHORDS, static_cast<AnalogSynth&>(bank->channel(3)).preset);
@@ -53,6 +53,8 @@ void MidiCube::init() {
 	apply_preset(POLY_SWEEP, static_cast<AnalogSynth&>(bank->channel(6)).preset);
 	apply_preset(BRASS_PAD, static_cast<AnalogSynth&>(bank->channel(7)).preset);
 	apply_preset(FM_KALIMBA, static_cast<AnalogSynth&>(bank->channel(8)).preset);
+	apply_preset(SYNTH_BRASS, static_cast<AnalogSynth&>(bank->channel(10)).preset);
+	apply_preset(BELL_LEAD, static_cast<AnalogSynth&>(bank->channel(11)).preset);
 	//Default setting
 	SoundEngineBank* bank2 = engine.get_sound_engines().at(2);
 	static_cast<BaseSoundEngine&>(bank2->channel(1)).sustain = false;
@@ -65,20 +67,22 @@ void MidiCube::init() {
 
 	//Default engines
 	engine.channels[0].active = true;
-	engine.channels[0].set_engine(0);
+	//engine.channels[0].vocoder_preset.on = true;
+
+	engine.channels[0].set_engine(2);
 
 	engine.channels[9].active = true;
 	engine.channels[9].set_engine(3);
 
-	engine.channels[10].bitcrusher_preset.on = true;
-	engine.channels[10].bitcrusher_preset.bits = 8;
+	//engine.channels[10].bitcrusher_preset.on = true;
+	//engine.channels[10].bitcrusher_preset.bits = 8;
 
 	for (size_t i = 0; i < engine.channels.size(); ++i) {
 		engine.channels[i].source.channel = i;
 		engine.channels[i].source.input = 1;
 	}
 	//Init audio
-	audio_handler.init();
+	audio_handler.init(out_device, in_device);
 }
 
 void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {

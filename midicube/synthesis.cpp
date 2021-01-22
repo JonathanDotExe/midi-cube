@@ -7,6 +7,7 @@
 
 #include "synthesis.h"
 #include <cmath>
+#include <iostream>
 
 
 extern double db_to_amp(double db) {
@@ -46,6 +47,16 @@ extern double saw_wave_down(double time, double freq) {
 extern double saw_wave_up(double time, double freq) {
 	double interval = 1.0/freq;
 	return fmod(time, interval)/interval * 2 - 1;
+}
+
+extern double triangle_wave(double time, double freq) {
+	double interval = 1/freq;
+	if (fmod(time, interval) < 0.5) {
+		return fmod(time, interval/2)/interval * 2 - 1;
+	}
+	else {
+		return -fmod(time, interval/2)/interval * 2 + 1;
+	}
 }
 
 /**
@@ -110,6 +121,7 @@ double PortamendoBuffer::get(double time) {
 
 void PortamendoBuffer::set(double value, double time, double slope_time) {
 	last_value = get(time);
+	std::cout << last_value << std::endl;
 	last_time = time;
 	this->value = value;
 	this->slope_time = slope_time;

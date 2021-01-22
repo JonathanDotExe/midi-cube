@@ -1,4 +1,4 @@
-project('midi-cube', 'cpp')
+project('midi-cube', 'cpp', default_options: ['cpp_std=c++17'])
 cxx = meson.get_compiler('cpp')
 
 deps = [
@@ -54,4 +54,4 @@ src = [
 	'midicube/effect/vocoder.cpp'
 ]
 
-executable('midi-cube', src, dependencies: deps)
+executable('midi-cube', src, dependencies: deps, link_args: '-latomic')

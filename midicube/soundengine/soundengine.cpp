@@ -296,19 +296,21 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 }
 
 void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine) {
-	if (arp.on) {
-		if (message.get_message_type() == MessageType::NOTE_ON) {
-			arp.note.press_note(info, message.get_note(), message.get_velocity()/127.0);
-		}
-		else if (message.get_message_type() == MessageType::NOTE_OFF) {
-			arp.note.release_note(info, message.get_note(), true);
+	if (active) {
+		if (arp.on) {
+			if (message.get_message_type() == MessageType::NOTE_ON) {
+				arp.note.press_note(info, message.get_note(), message.get_velocity()/127.0);
+			}
+			else if (message.get_message_type() == MessageType::NOTE_OFF) {
+				arp.note.release_note(info, message.get_note(), true);
+			}
+			else {
+				engine.midi_message(message, info);
+			}
 		}
 		else {
 			engine.midi_message(message, info);
 		}
-	}
-	else {
-		engine.midi_message(message, info);
 	}
 }
 

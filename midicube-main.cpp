@@ -13,10 +13,22 @@ struct MidiCubePtr {
 };
 
 int main(int argc, char **argv) {
+	//Parse args
+	int out_device = -1;
+	int in_device = -1;
+	if (argc > 1) {
+		out_device = atoi(argv[1]);
+		cout << out_device << endl;
+	}
+	if (argc > 2) {
+		in_device = atoi(argv[2]);
+		cout << in_device << endl;
+	}
+	//Create MIDICube
 	MidiCubePtr ptr;
 	try {
 		ptr.cube = new MidiCube();
-		ptr.cube->init();
+		ptr.cube->init(out_device, in_device);
 		load_resources();
 		//View
 		Frame frame(*ptr.cube, 1024, 600, "MIDICube - universal MIDI and synthesis workstation");

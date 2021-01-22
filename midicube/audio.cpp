@@ -17,9 +17,14 @@ int g_process(void* output_buffer, void* input_buffer, unsigned int buffer_size,
 	return handler->process((double*) output_buffer, (double*) input_buffer, buffer_size, time);
 }
 
-void AudioHandler::init() {
-	if (audio.getDeviceCount() <= 0) {
+void AudioHandler::init(int out_device, int in_device) {
+	if ((int) audio.getDeviceCount() <= std::max(std::max(out_device, in_device), 0)) {
 		throw AudioException("No audio devices detected");
+	}
+	//List devices
+	for (size_t i = 0; i < audio.getDeviceCount(); ++i) {
+		RtAudio::DeviceInfo info = audio.getDeviceInfo(i);
+		std::cout << i << ": " << info.name << " " << info.outputChannels << " outs " << info.inputChannels << " ins" << std::endl;
 	}
 
 	//Set up options
@@ -29,13 +34,13 @@ void AudioHandler::init() {
 
 	//Set up output
 	RtAudio::StreamParameters params;
-	params.deviceId = audio.getDefaultOutputDevice();
+	params.deviceId = out_device >= 0 ? out_device : audio.getDefaultOutputDevice();
 	params.nChannels = 2;
 	params.firstChannel = 0;
 
 	//Set up input
 	RtAudio::StreamParameters input_params;
-	input_params.deviceId = audio.getDefaultInputDevice();
+	input_params.deviceId = in_device >= 0 ? in_device : audio.getDefaultInputDevice();
 	input_params.nChannels = 1;
 	input_params.firstChannel = 0;
 
