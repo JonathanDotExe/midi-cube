@@ -102,6 +102,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		//Square wave
 		signal.carrier = square_wave(rotation, 1, pulse_width);
 		//TODO center excalty around 0
+		//TODO implement to be save against phase jumps (onle use sqare wave at blep points
 		if (data.analog) {
 			signal.carrier += polyblep(phase, step);
 			double protation = rotation + pulse_width;

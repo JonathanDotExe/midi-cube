@@ -40,15 +40,39 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	{
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
-		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 100, 40);
+		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
 		waveform->bind(part, SynthPartProperty::pSynthOscWaveForm);
 		controls.push_back(waveform);
 	}
 	{
-		CheckBox* active = new CheckBox(false, "Active", main_font, 16, tmp_x + 110, tmp_y, 40, 40);
+		CheckBox* active = new CheckBox(false, "Active", main_font, 16, tmp_x + 160, tmp_y, 40, 40);
 		active->bind(part, SynthPartProperty::pSynthOscActive);
 		controls.push_back(active);
-		tmp_y += 45;
+		tmp_y += 50;
+	}
+	//Reset and audible
+	{
+		CheckBox* reset = new CheckBox(false, "Reset", main_font, 16, tmp_x, tmp_y, 40, 40);
+		reset->bind(part, SynthPartProperty::pSynthOscReset);
+		controls.push_back(reset);
+	}
+	{
+		CheckBox* audible = new CheckBox(false, "Audible", main_font, 16, tmp_x + 160, tmp_y, 40, 40);
+		audible->bind(part, SynthPartProperty::pSynthOscAudible);
+		controls.push_back(audible);
+		tmp_y += 50;
+	}
+	//Randomize and sync
+	{
+		CheckBox* reset = new CheckBox(false, "Randomize", main_font, 16, tmp_x, tmp_y, 40, 40);
+		reset->bind(part, SynthPartProperty::pSynthOscRandomize);
+		controls.push_back(reset);
+	}
+	{
+		CheckBox* audible = new CheckBox(false, "Sync", main_font, 16, tmp_x + 160, tmp_y, 40, 40);
+		audible->bind(part, SynthPartProperty::pSynthOscSync);
+		controls.push_back(audible);
+		tmp_y += 50;
 	}
 
 	//Back Button
