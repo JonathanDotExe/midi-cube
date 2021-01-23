@@ -95,7 +95,7 @@ static void adsr_controls(std::vector<Control*>* controls, int x, int y, Propert
 		Label* title = new Label("Attack", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0.0005, 1, main_font, 16, x, y + 15, 80, 40);
 		value->bind(holder, prop);
 		controls->push_back(value);
 	}
@@ -125,7 +125,7 @@ static void adsr_controls(std::vector<Control*>* controls, int x, int y, Propert
 		Label* title = new Label("Release", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0.0005, 1, main_font, 16, x, y + 15, 80, 40);
 		value->bind(holder, prop + 3);
 		controls->push_back(value);
 	}
@@ -193,6 +193,10 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	}
 	//Volume
 	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscVolume, "Volume", &show_amount, &show_source);
+	tmp_y += 75;
+	//ADSR
+	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscAmpAttack);
+	tmp_y += 75;
 
 	//Edit Sources
 	Button* edit = new Button("Edit Sources", main_font, 18, frame.get_width() - 70 - 120, frame.get_height() - 40, 120, 40);
