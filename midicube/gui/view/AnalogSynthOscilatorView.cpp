@@ -95,7 +95,8 @@ static void adsr_controls(std::vector<Control*>* controls, int x, int y, Propert
 		Label* title = new Label("Attack", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0.0005, 1, main_font, 16, x, y + 15, 80, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0.0005, 5, main_font, 16, x, y + 15, 80, 40);
+		value->drag_mul /= 5;
 		value->bind(holder, prop);
 		controls->push_back(value);
 	}
@@ -105,7 +106,8 @@ static void adsr_controls(std::vector<Control*>* controls, int x, int y, Propert
 		Label* title = new Label("Decay", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0, 10, main_font, 16, x, y + 15, 80, 40);
+		value->drag_mul /= 10;
 		value->bind(holder, prop + 1);
 		controls->push_back(value);
 	}
@@ -125,7 +127,8 @@ static void adsr_controls(std::vector<Control*>* controls, int x, int y, Propert
 		Label* title = new Label("Release", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0.0005, 1, main_font, 16, x, y + 15, 80, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0.0005, 10, main_font, 16, x, y + 15, 80, 40);
+		value->drag_mul /= 10;
 		value->bind(holder, prop + 3);
 		controls->push_back(value);
 	}
