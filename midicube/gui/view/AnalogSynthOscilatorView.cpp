@@ -38,7 +38,7 @@ static void property_mod_controls(std::vector<Control*>* controls, int x, int y,
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 
-		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, x, y + 15, 80, 40);
+		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
 		source->bind(holder, prop, SynthModulationProperty::pModModEnv);
 		controls->push_back(source);
 		show_source->push_back(source);
@@ -54,7 +54,7 @@ static void property_mod_controls(std::vector<Control*>* controls, int x, int y,
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 
-		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, x, y + 15, 80, 40);
+		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
 		source->bind(holder, prop, SynthModulationProperty::pModLFO);
 		controls->push_back(source);
 		show_source->push_back(source);
@@ -80,7 +80,7 @@ static void property_mod_controls(std::vector<Control*>* controls, int x, int y,
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 
-		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_CONTROL_COUNT, main_font, 16, x, y + 15, 80, 40);
+		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_CONTROL_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
 		source->bind(holder, prop, SynthModulationProperty::pModCC);
 		controls->push_back(source);
 		show_source->push_back(source);
