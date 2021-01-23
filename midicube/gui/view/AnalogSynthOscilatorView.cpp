@@ -232,6 +232,23 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	}
 	tmp_x += 90;
 
+	//Col 2
+	tmp_x = 500;
+	tmp_y = 10;
+	//Pulse Width
+	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscPulseWidth, "Shape/PW", &show_amount, &show_source);
+	tmp_y += 75;
+	//Pitch
+	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscPitch, "Pitch", &show_amount, &show_source);
+	tmp_y += 75;
+	//Sync
+	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscSyncMul, "Sync", &show_amount, &show_source);
+	tmp_y += 75;
+	//Unison Detune
+	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscUnisonDetune, "Unison Det.", &show_amount, &show_source);
+	tmp_y += 75;
+
+
 	//Edit Sources
 	Button* edit = new Button("Edit Sources", main_font, 18, frame.get_width() - 70 - 120, frame.get_height() - 40, 120, 40);
 	edit->rect.setFillColor(sf::Color::Yellow);
