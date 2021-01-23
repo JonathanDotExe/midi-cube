@@ -605,7 +605,7 @@ PropertyValue get_mod_prop(PropertyModulation& mod, SynthModulationProperty prop
 		val.dval = mod.lfo_amount;
 		break;
 	case SynthModulationProperty::pModVelocityAmount:
-		val.ival = mod.velocity_amount;
+		val.dval = mod.velocity_amount;
 		break;
 	case SynthModulationProperty::pModCC:
 		val.ival = mod.cc;
@@ -635,7 +635,7 @@ void set_mod_prop(PropertyModulation& mod, SynthModulationProperty prop, Propert
 		mod.lfo_amount = val.dval;
 		break;
 	case SynthModulationProperty::pModVelocityAmount:
-		mod.velocity_amount = val.ival;
+		mod.velocity_amount = val.dval;
 		break;
 	case SynthModulationProperty::pModCC:
 		mod.cc = val.ival;
