@@ -201,6 +201,37 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscAmpAttack);
 	tmp_y += 75;
 
+	//Unison
+	{
+		Label* title = new Label("Unison", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<int>* value = new DragBox<int>(0, 0, 7, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->bind(part, SynthPartProperty::pSynthOscUnisonAmount);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+	//Semi
+	{
+		Label* title = new Label("Semi", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<int>* value = new DragBox<int>(0, -48, 48, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->bind(part, SynthPartProperty::pSynthOscSemi);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+	//Ratio
+	{
+		Label* title = new Label("Ratio", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 48, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->bind(part, SynthPartProperty::pSynthOscTranspose);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+
 	//Edit Sources
 	Button* edit = new Button("Edit Sources", main_font, 18, frame.get_width() - 70 - 120, frame.get_height() - 40, 120, 40);
 	edit->rect.setFillColor(sf::Color::Yellow);
