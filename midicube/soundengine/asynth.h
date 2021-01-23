@@ -29,7 +29,7 @@ const FixedScale PANNING_SCALE(-1, {}, 1);
 struct PropertyModulation {
 	double value = 0;
 	size_t mod_env = 0;
-	double mod_amount = 0;
+	double mod_env_amount = 0;
 	size_t lfo = 0;
 	double lfo_amount = 0;
 	double velocity_amount = 0;
@@ -154,13 +154,13 @@ public:
 protected:
 	inline void submit_change(size_t prop, PropertyModulation& mod) {
 		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModValue);
-		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModModEnv);
-		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModModEnvAmount);
-		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModLFO);
-		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModLFOAmount);
-		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModVelocityAmount);
-		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModCC);
-		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModCCAmount);
+		PropertyHolder::submit_change(prop, (int) mod.mod_env, SynthModulationProperty::pModModEnv);
+		PropertyHolder::submit_change(prop, mod.mod_env_amount, SynthModulationProperty::pModModEnvAmount);
+		PropertyHolder::submit_change(prop, (int) mod.lfo, SynthModulationProperty::pModLFO);
+		PropertyHolder::submit_change(prop, mod.lfo_amount, SynthModulationProperty::pModLFOAmount);
+		PropertyHolder::submit_change(prop, mod.velocity_amount, SynthModulationProperty::pModVelocityAmount);
+		PropertyHolder::submit_change(prop, (int) mod.cc, SynthModulationProperty::pModCC);
+		PropertyHolder::submit_change(prop, mod.cc_amount, SynthModulationProperty::pModCCAmount);
 	}
 };
 

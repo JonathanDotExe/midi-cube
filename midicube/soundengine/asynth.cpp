@@ -26,7 +26,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc.filter_type = FilterType::LP_24;
 		osc.filter_cutoff.value = 0.05;
 		osc.filter_cutoff.mod_env = 0;
-		osc.filter_cutoff.mod_amount = 0.15;
+		osc.filter_cutoff.mod_env_amount = 0.15;
 		osc.filter_resonance.value = 0.8;
 	}
 		break;
@@ -118,7 +118,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc.filter_type = FilterType::LP_24;
 		osc.filter_cutoff.value = 0.05;
 		osc.filter_cutoff.mod_env = 0;
-		osc.filter_cutoff.mod_amount = 0.2;
+		osc.filter_cutoff.mod_env_amount = 0.2;
 		osc.filter_resonance.value = 0.5;
 	}
 		break;
@@ -142,7 +142,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc.filter_type = FilterType::LP_24;
 		osc.filter_kb_track = 1;
 		osc.filter_cutoff.value = 0.002;
-		osc.filter_cutoff.mod_amount = 0.5;
+		osc.filter_cutoff.mod_env_amount = 0.5;
 		osc.filter_resonance.value = 0.4;
 	}
 		break;
@@ -239,7 +239,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc.filter_type = FilterType::LP_12;
 		osc.filter_cutoff.value = 0.1;
 		osc.filter_cutoff.mod_env = 0;
-		osc.filter_cutoff.mod_amount = 0.3;
+		osc.filter_cutoff.mod_env_amount = 0.3;
 
 		OscilatorEntity& osc1 = preset.oscilators.at(1);
 		osc1.volume.value = 0.3;
@@ -251,7 +251,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc1.filter_type = FilterType::LP_12;
 		osc1.filter_cutoff.value = 0.07;
 		osc1.filter_cutoff.mod_env = 1;
-		osc1.filter_cutoff.mod_amount = 0.3;
+		osc1.filter_cutoff.mod_env_amount = 0.3;
 
 		OscilatorEntity& osc2 = preset.oscilators.at(2);
 		osc2.volume.value = 0.3;
@@ -263,7 +263,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc2.filter_type = FilterType::LP_12;
 		osc2.filter_cutoff.value = 0.12;
 		osc2.filter_cutoff.mod_env = 2;
-		osc2.filter_cutoff.mod_amount = 0.3;
+		osc2.filter_cutoff.mod_env_amount = 0.3;
 	}
 		break;
 	case FM_KALIMBA:
@@ -301,7 +301,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		osc.filter_type = FilterType::LP_24;
 		osc.filter_cutoff.value = 0.2;
 		osc.filter_cutoff.mod_env = 0;
-		osc.filter_cutoff.mod_amount = 0.15;
+		osc.filter_cutoff.mod_env_amount = 0.15;
 	}
 		break;
 	case BELL_LEAD:
@@ -357,7 +357,7 @@ AnalogSynth::AnalogSynth() {
 
 static inline double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_PART_COUNT>& env_val, std::array<double, ANALOG_PART_COUNT>& lfo_val, std::array<double, ANALOG_CONTROL_COUNT>& controls, double velocity) {
 	double prog = mod.value;
-	prog += env_val.at(mod.mod_env) * mod.mod_amount + lfo_val.at(mod.lfo) * mod.lfo_amount + controls.at(mod.cc) * mod.cc_amount + velocity * mod.velocity_amount;
+	prog += env_val.at(mod.mod_env) * mod.mod_env_amount + lfo_val.at(mod.lfo) * mod.lfo_amount + controls.at(mod.cc) * mod.cc_amount + velocity * mod.velocity_amount;
 	prog = fmin(fmax(prog, 0.0), 1.0);
 	return scale.value(prog);
 }
@@ -596,7 +596,7 @@ PropertyValue get_mod_prop(PropertyModulation& mod, SynthModulationProperty prop
 		val.ival = mod.mod_env;
 		break;
 	case SynthModulationProperty::pModModEnvAmount:
-		val.dval = mod.mod_amount;
+		val.dval = mod.mod_env_amount;
 		break;
 	case SynthModulationProperty::pModLFO:
 		val.ival = mod.lfo;
@@ -626,7 +626,7 @@ void set_mod_prop(PropertyModulation& mod, SynthModulationProperty prop, Propert
 		mod.mod_env = val.ival;
 		break;
 	case SynthModulationProperty::pModModEnvAmount:
-		mod.mod_amount = val.dval;
+		mod.mod_env_amount = val.dval;
 		break;
 	case SynthModulationProperty::pModLFO:
 		mod.lfo = val.ival;
