@@ -87,6 +87,51 @@ static void property_mod_controls(std::vector<Control*>* controls, int x, int y,
 	}
 	x += 90;
 }
+
+
+static void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop) {
+	//Attack
+	{
+		Label* title = new Label("Attack", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		value->bind(holder, prop);
+		controls->push_back(value);
+	}
+	x += 90;
+	//Decay
+	{
+		Label* title = new Label("Decay", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		value->bind(holder, prop + 1);
+		controls->push_back(value);
+	}
+	x += 90;
+	//Sustain
+	{
+		Label* title = new Label("Sustain", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		value->bind(holder, prop + 2);
+		controls->push_back(value);
+	}
+	x += 90;
+	//Release
+	{
+		Label* title = new Label("Release", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		value->bind(holder, prop + 3);
+		controls->push_back(value);
+	}
+	x += 90;
+}
+
 Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<Control*> show_amount;
