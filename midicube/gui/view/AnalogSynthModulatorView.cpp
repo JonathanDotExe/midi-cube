@@ -5,20 +5,21 @@
  *      Author: jojo
  */
 
-#include "AnalogSynthModultatorView.h"
+#include "AnalogSynthModulatorView.h"
+#include "AnalogSynthOscilatorView.h"
 #include "AnalogSynthView.h"
 #include "resources.h"
 
-AnalogSynthModultatorView::AnalogSynthModultatorView(AnalogSynth &s,
+AnalogSynthModulatorView::AnalogSynthModulatorView(AnalogSynth &s,
 		SoundEngineChannel &c, int channel_index, size_t part) : synth(s), channel(c) {
 	this->channel_index = channel_index;
 	this->part = part;
 }
 
-void AnalogSynthModultatorView::property_change(PropertyChange change) {
+void AnalogSynthModulatorView::property_change(PropertyChange change) {
 }
 
-Scene AnalogSynthModultatorView::create(Frame &frame) {
+Scene AnalogSynthModulatorView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
@@ -37,7 +38,6 @@ Scene AnalogSynthModultatorView::create(Frame &frame) {
 
 	int tmp_x = 10;
 	int tmp_y = 10;
-
 
 
 	//Edit Sources
@@ -72,6 +72,6 @@ Scene AnalogSynthModultatorView::create(Frame &frame) {
 	return {controls, holders};
 }
 
-AnalogSynthModultatorView::~AnalogSynthModultatorView() {
+AnalogSynthModulatorView::~AnalogSynthModulatorView() {
 
 }

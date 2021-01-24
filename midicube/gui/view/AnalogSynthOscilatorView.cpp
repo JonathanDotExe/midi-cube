@@ -17,7 +17,7 @@ AnalogSynthOscilatorView::AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineCh
 void AnalogSynthOscilatorView::property_change(PropertyChange change) {
 }
 
-static void property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source) {
+void property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source) {
 	//Value
 	{
 		Label* title = new Label(name, main_font, 12, x, y);
