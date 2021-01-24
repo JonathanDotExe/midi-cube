@@ -114,7 +114,7 @@ enum SynthModulationProperty {
 enum SynthPartProperty {
 	pSynthOscActive,
 	pSynthOscAudible,
-	pSynthOscAmpAttack,
+	pSynthOscAttack,
 	pSynthOscDecay,
 	pSynthOscSustain,
 	pSynthOscRelease,
@@ -141,6 +141,18 @@ enum SynthPartProperty {
 	pSynthOscFilterResonance,
 	pSynthOscFilterKBTrack,
 	pSynthOscFilterKBTrackNote,
+
+	pSynthEnvActive,
+	pSynthEnvVolume,
+	pSynthEnvAttack,
+	pSynthEnvDecay,
+	pSynthEnvSustain,
+	pSynthEnvRelease,
+
+	pSynthLFOActive,
+	pSynthLFOVolume,
+	pSynthLFOFrequency,
+	pSynthLFOWaveForm,
 };
 
 class SynthPartPropertyHolder : public PropertyHolder {

@@ -650,6 +650,8 @@ void set_mod_prop(PropertyModulation& mod, SynthModulationProperty prop, Propert
 PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	PropertyValue val;
 	OscilatorEntity& osc = preset->oscilators[this->part];
+	ModEnvelopeEntity& env = preset->mod_envs[this->part];
+	LFOEntity& lfo = preset->lfos[this->part];
 	switch ((SynthPartProperty) prop) {
 	case SynthPartProperty::pSynthOscActive:
 		val.bval = osc.active;
@@ -657,7 +659,7 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	case SynthPartProperty::pSynthOscAudible:
 		val.bval = osc.audible;
 		break;
-	case SynthPartProperty::pSynthOscAmpAttack:
+	case SynthPartProperty::pSynthOscAttack:
 		val.dval = osc.env.attack;
 		break;
 	case SynthPartProperty::pSynthOscDecay:
@@ -729,12 +731,46 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	case SynthPartProperty::pSynthOscFilterKBTrackNote:
 		val.ival = osc.filter_kb_track_note;
 		break;
+
+	case SynthPartProperty::pSynthEnvActive:
+		val.bval = env.active;
+		break;
+	case SynthPartProperty::pSynthEnvAttack:
+		val.dval = env.env.attack;
+		break;
+	case SynthPartProperty::pSynthEnvDecay:
+		val.dval = env.env.decay;
+		break;
+	case SynthPartProperty::pSynthEnvSustain:
+		val.dval = env.env.sustain;
+		break;
+	case SynthPartProperty::pSynthEnvRelease:
+		val.dval = env.env.release;
+		break;
+	case SynthPartProperty::pSynthEnvVolume:
+		val = get_mod_prop(env.volume, (SynthModulationProperty) sub_prop);
+		break;
+
+	case SynthPartProperty::pSynthLFOActive:
+		val.bval = lfo.active;
+		break;
+	case SynthPartProperty::pSynthLFOFrequency:
+		val.dval = lfo.freq;
+		break;
+	case SynthPartProperty::pSynthLFOWaveForm:
+		val.ival = lfo.waveform;
+		break;
+	case SynthPartProperty::pSynthLFOVolume:
+		val = get_mod_prop(lfo.volume, (SynthModulationProperty) sub_prop);
+		break;
 	}
 	return val;
 }
 
 void SynthPartPropertyHolder::set(size_t prop, PropertyValue val, size_t sub_prop) {
 	OscilatorEntity& osc = preset->oscilators[this->part];
+	ModEnvelopeEntity& env = preset->mod_envs[this->part];
+	LFOEntity& lfo = preset->lfos[this->part];
 	switch ((SynthPartProperty) prop) {
 	case SynthPartProperty::pSynthOscActive:
 		osc.active = val.bval;
@@ -742,7 +778,7 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val, size_t sub_pro
 	case SynthPartProperty::pSynthOscAudible:
 		osc.audible = val.bval;
 		break;
-	case SynthPartProperty::pSynthOscAmpAttack:
+	case SynthPartProperty::pSynthOscAttack:
 		osc.env.attack = val.dval;
 		break;
 	case SynthPartProperty::pSynthOscDecay:
@@ -814,6 +850,38 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val, size_t sub_pro
 	case SynthPartProperty::pSynthOscFilterKBTrackNote:
 		osc.filter_kb_track_note = val.ival;
 		break;
+
+	case SynthPartProperty::pSynthEnvActive:
+		env.active = val.bval;
+		break;
+	case SynthPartProperty::pSynthEnvAttack:
+		env.env.attack = val.dval;
+		break;
+	case SynthPartProperty::pSynthEnvDecay:
+		env.env.decay = val.dval;
+		break;
+	case SynthPartProperty::pSynthEnvSustain:
+		env.env.sustain = val.dval;
+		break;
+	case SynthPartProperty::pSynthEnvRelease:
+		env.env.release = val.dval;
+		break;
+	case SynthPartProperty::pSynthEnvVolume:
+		set_mod_prop(env.volume, (SynthModulationProperty) sub_prop, val);
+		break;
+
+	case SynthPartProperty::pSynthLFOActive:
+		lfo.active = val.bval;
+		break;
+	case SynthPartProperty::pSynthLFOFrequency:
+		lfo.freq = val.dval;
+		break;
+	case SynthPartProperty::pSynthLFOWaveForm:
+		lfo.waveform = (AnalogWaveForm) val.ival;
+		break;
+	case SynthPartProperty::pSynthLFOVolume:
+		set_mod_prop(lfo.volume, (SynthModulationProperty) sub_prop, val);
+		break;
 	}
 }
 
@@ -824,9 +892,12 @@ SynthPartPropertyHolder::SynthPartPropertyHolder(AnalogSynthPreset *p, size_t i)
 void SynthPartPropertyHolder::check_update() {
 	if (update_request) {
 		OscilatorEntity& osc = preset->oscilators[this->part];
+		ModEnvelopeEntity& env = preset->mod_envs[this->part];
+		LFOEntity& lfo = preset->lfos[this->part];
+
 		PropertyHolder::submit_change(SynthPartProperty::pSynthOscActive, osc.active);
 		PropertyHolder::submit_change(SynthPartProperty::pSynthOscAudible, osc.audible);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscAmpAttack, osc.env.attack);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscAttack, osc.env.attack);
 		PropertyHolder::submit_change(SynthPartProperty::pSynthOscDecay, osc.env.decay);
 		PropertyHolder::submit_change(SynthPartProperty::pSynthOscSustain, osc.env.sustain);
 		PropertyHolder::submit_change(SynthPartProperty::pSynthOscRelease, osc.env.release);
@@ -852,6 +923,18 @@ void SynthPartPropertyHolder::check_update() {
 		submit_change(SynthPartProperty::pSynthOscFilterResonance, osc.filter_resonance);
 		PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose, osc.filter_kb_track);
 		PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose, (int) osc.filter_kb_track_note);
+
+		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvActive, env.active);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvAttack, env.env.attack);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvDecay, env.env.decay);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvSustain, env.env.sustain);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvRelease, env.env.release);
+		submit_change(SynthPartProperty::pSynthEnvVolume, env.volume);
+
+		PropertyHolder::submit_change(SynthPartProperty::pSynthLFOActive, lfo.active);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthLFOFrequency, lfo.freq);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthLFOWaveForm, (int) lfo.waveform);
+		submit_change(SynthPartProperty::pSynthEnvVolume, lfo.volume);
 
 		update_request = false;
 	}
