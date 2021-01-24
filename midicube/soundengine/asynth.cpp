@@ -921,8 +921,8 @@ void SynthPartPropertyHolder::check_update() {
 		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterType, osc.filter_type);
 		submit_change(SynthPartProperty::pSynthOscFilterCutoff, osc.filter_cutoff);
 		submit_change(SynthPartProperty::pSynthOscFilterResonance, osc.filter_resonance);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose, osc.filter_kb_track);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose, (int) osc.filter_kb_track_note);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterKBTrack, osc.filter_kb_track);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterKBTrackNote, (int) osc.filter_kb_track_note);
 
 		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvActive, env.active);
 		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvAttack, env.env.attack);
