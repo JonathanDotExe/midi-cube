@@ -699,6 +699,9 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	case SynthPartProperty::pSynthOscUnisonDetune:
 		val = get_mod_prop(osc.unison_detune, (SynthModulationProperty) sub_prop);
 		break;
+	case SynthPartProperty::pSynthOscPanning:
+		val = get_mod_prop(osc.panning, (SynthModulationProperty) sub_prop);
+		break;
 	case SynthPartProperty::pSynthOscSemi:
 		val.dval = osc.semi;
 		break;
@@ -781,6 +784,9 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val, size_t sub_pro
 	case SynthPartProperty::pSynthOscUnisonDetune:
 		set_mod_prop(osc.unison_detune, (SynthModulationProperty) sub_prop, val);
 		break;
+	case SynthPartProperty::pSynthOscPanning:
+		set_mod_prop(osc.panning, (SynthModulationProperty) sub_prop, val);
+		break;
 	case SynthPartProperty::pSynthOscSemi:
 		osc.semi = val.dval;
 		break;
@@ -835,6 +841,7 @@ void SynthPartPropertyHolder::check_update() {
 		submit_change(SynthPartProperty::pSynthOscSyncMul, osc.sync_mul);
 		submit_change(SynthPartProperty::pSynthOscPulseWidth, osc.pulse_width);
 		submit_change(SynthPartProperty::pSynthOscUnisonDetune, osc.unison_detune);
+		submit_change(SynthPartProperty::pSynthOscPanning, osc.panning);
 		PropertyHolder::submit_change(SynthPartProperty::pSynthOscSemi, osc.semi);
 		PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose, osc.transpose);
 		submit_change(SynthPartProperty::pSynthOscPitch, osc.pitch);

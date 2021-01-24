@@ -194,11 +194,14 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		controls.push_back(audible);
 		tmp_y += 50;
 	}
+	//ADSR
+	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscAmpAttack);
+	tmp_y += 75;
 	//Volume
 	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscVolume, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
-	//ADSR
-	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscAmpAttack);
+	//Panning
+	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscPanning, "Panning", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Unison

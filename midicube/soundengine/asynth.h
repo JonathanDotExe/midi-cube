@@ -130,6 +130,7 @@ enum SynthPartProperty {
 	pSynthOscSyncMul,
 	pSynthOscPulseWidth,
 	pSynthOscUnisonDetune,
+	pSynthOscPanning,
 	pSynthOscSemi,
 	pSynthOscTranspose,
 	pSynthOscPitch,
