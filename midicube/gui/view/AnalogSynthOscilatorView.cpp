@@ -89,7 +89,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 }
 
 
-static void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop) {
+void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop) {
 	//Attack
 	{
 		Label* title = new Label("Attack", main_font, 12, x, y);
