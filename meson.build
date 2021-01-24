@@ -41,6 +41,7 @@ src = [
 	'midicube/gui/engine/util.cpp',
 	
 	'midicube/gui/view/resources.cpp',
+	'midicube/gui/view/AnalogSynthModulatorView.cpp',
 	'midicube/gui/view/AnalogSynthOscilatorView.cpp',
 	'midicube/gui/view/AnalogSynthView.cpp',
 	'midicube/gui/view/ArpeggiatorView.cpp',
