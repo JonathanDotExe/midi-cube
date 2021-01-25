@@ -26,18 +26,6 @@ static double polyblep(double phase, double step) {
 	return 0;
 }
 
-static double triangle_polyblep(double phase, double step) {
-	if (phase < step) {
-		phase = -phase/step;
-		return 1 - (phase * phase + 2 * phase + 1);
-	}
-	else if (phase > (1 - step)) {
-		phase = (phase - 1)/step;
-		return 1 - (phase * phase + 2 * phase + 1);
-	}
-	return 0;
-}
-
 AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data) {
 	//Move
 	double last_rotation = rotation;
@@ -111,24 +99,9 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::TRIANGLE_WAVE:
-		//Square wave
 		signal.carrier = triangle_wave(rotation, 1); //TODO PWM
 		if (data.analog) {
-			signal.carrier += polyblep(phase, step) * step * 4;
-			//Sample start
-			if (phase < step) {
-				std::cout << "Phase 1 start: " << (phase - step + 1) << std::endl;
-				signal.carrier += polyblep(phase - step + 1, step) * step * 4;
-			}
-			double protation = rotation + 0.5;
-			double pphase = protation - (long int) protation;
-			signal.carrier -= polyblep(pphase, step) * step * 4;
-			//Sample start
-			if (pphase < step) {
-				std::cout << "Phase 2 start: " << (pphase - step + 1) << std::endl;
-				signal.carrier -= polyblep(pphase - step + 1, step) * step * 4;
-			}
-			std::cout << signal.carrier << "/" << phase << "/" << pphase << std::endl;
+			//TODO
 		}
 		//TODO sync
 		signal.modulator = 0;
