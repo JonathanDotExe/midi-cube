@@ -26,6 +26,18 @@ static double polyblep(double phase, double step) {
 	return 0;
 }
 
+static double triangle_polyblep(double phase, double step) {
+	if (phase < step) {
+		phase /= step;
+		return - phase * phase + 2 * phase - 1;
+	}
+	else if (phase > (1 - step)) {
+		phase = (phase - 1)/step;
+		return 1 - (phase * phase + 2 * phase + 1);
+	}
+	return 0;
+}
+
 AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data) {
 	//Move
 	double last_rotation = rotation;
@@ -102,9 +114,9 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		//Square wave
 		signal.carrier = triangle_wave(rotation, 1); //TODO PWM
 		if (data.analog) {
-			signal.carrier += polyblep(phase, step) * step * 4;
+			signal.carrier += triangle_polyblep(phase, step) * step * 4;
 			double protation = rotation + 0.5;
-			signal.carrier -= polyblep(protation - (long int) protation, step) * step * 4;
+			signal.carrier -= triangle_polyblep(protation - (long int) protation, step) * step * 4;
 			std::cout << signal.carrier << "/" << phase << "/" << (protation - (long int) protation) <<  std::endl;
 		}
 		//TODO sync
