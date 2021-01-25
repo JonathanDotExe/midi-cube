@@ -26,6 +26,18 @@ static double polyblep(double phase, double step) {
 	return 0;
 }
 
+static double integrated_polyblep(double phase, double step) {
+	if (phase < step) {
+		phase = phase * phase / step * 0.5;
+		return - phase * phase * phase / 3 + phase * phase - phase;
+	}
+	else if (phase > (1 - step)) {
+		phase = (phase - 1) * (phase - 1) / step * 0.5;
+		return phase * phase * phase / 3 + phase * phase + phase;
+	}
+	return 0;
+}
+
 AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, AnalogOscilatorData& data) {
 	//Move
 	double last_rotation = rotation;
@@ -102,6 +114,9 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		signal.carrier = triangle_wave(rotation, 1); //TODO PWM
 		if (data.analog) {
 			//TODO
+			signal.carrier += integrated_polyblep(phase, step) * 4 * step;
+			double protation = rotation + 0.5;
+			signal.carrier -= integrated_polyblep(protation - (long int) protation, step) * 4 * step;
 		}
 		//TODO sync
 		signal.modulator = 0;

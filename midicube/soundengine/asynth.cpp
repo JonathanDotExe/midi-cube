@@ -163,7 +163,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 	case CLEAN_SAW:
 	{
 		OscilatorEntity& osc = preset.oscilators.at(0);
-		osc.waveform = AnalogWaveForm::SAW_DOWN;
+		osc.waveform = AnalogWaveForm::TRIANGLE_WAVE;
 		osc.active = true;
 		osc.env = {0.0005, 0, 1, 0.003};
 	}
