@@ -117,7 +117,6 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 			signal.carrier += triangle_polyblep(phase, step) * step * 4;
 			double protation = rotation + 0.5;
 			signal.carrier -= triangle_polyblep(protation - (long int) protation, step) * step * 4;
-			std::cout << signal.carrier << "/" << phase << "/" << (protation - (long int) protation) <<  std::endl;
 		}
 		//TODO sync
 		signal.modulator = 0;
