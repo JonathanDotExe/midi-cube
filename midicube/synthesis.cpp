@@ -49,14 +49,14 @@ extern double saw_wave_up(double time, double freq) {
 	return fmod(time, interval)/interval * 2 - 1;
 }
 
-extern double triangle_wave(double time, double freq) {
+extern double triangle_wave(double time, double freq, double pulse_width) {
 	double interval = 1/freq;
 	double phase = fmod(time, interval);
-	if (phase < 0.5) {
-		return phase * 4 - 1;
+	if (phase < pulse_width) {
+		return phase * 2 * 1/pulse_width - 1;
 	}
 	else {
-		return -(phase - 0.5) * 4 + 1;
+		return -(phase - 0.5) * 2 * 1/(1 - pulse_width) + 1;
 	}
 }
 
