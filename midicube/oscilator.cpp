@@ -28,12 +28,12 @@ static double polyblep(double phase, double step) {
 
 static double integrated_polyblep(double phase, double step) {
 	if (phase < step) {
-		phase = phase * phase / step * 0.5;
-		return - phase * phase * phase / 3 + phase * phase - phase;
+		phase = phase / step - 1;
+		return - 1 / 3.0 * phase * phase * phase;
 	}
 	else if (phase > (1 - step)) {
-		phase = (phase - 1) * (phase - 1) / step * 0.5;
-		return phase * phase * phase / 3 + phase * phase + phase;
+		phase = (phase - 1) / step + 1;
+		return 1 / 3.0 * phase * phase * phase;
 	}
 	return 0;
 }
