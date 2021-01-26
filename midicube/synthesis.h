@@ -30,7 +30,7 @@ extern double saw_wave_down(double time, double freq);
 
 extern double saw_wave_up(double time, double freq);
 
-extern double triangle_wave(double time, double freq);
+extern double triangle_wave(double time, double freq, double pulse_width = 0.5);
 
 /**
  * The arguments are irrelevant here, they are just there if a function pointer to a generic wave function is needed

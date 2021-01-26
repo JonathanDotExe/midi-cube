@@ -309,7 +309,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset) {
 		OscilatorEntity& osc1 = preset.oscilators.at(0);
 		osc1.waveform = AnalogWaveForm::TRIANGLE_WAVE;
 		osc1.volume.value = 0.35;
-		osc1.unison_amount = 0;
+		osc1.unison_amount = 2;
 		osc1.unison_detune.value = 0.05;
 		osc1.active = true;
 		osc1.env = {0.0005, 0, 1, 0.07};
