@@ -100,6 +100,17 @@ struct AnalogSynthPreset {
 	double delay_mix = 0;
 };
 
+enum SynthProperty {
+	pSynthMono,
+	pSynthLegato,
+	pSynthPortamendo,
+
+	pSynthDelayTime,
+	pSynthDelayFeedback,
+	pSynthDelayMix
+};
+
+
 enum SynthModulationProperty {
 	pModValue,
 	pModModEnv,
@@ -177,7 +188,7 @@ protected:
 	}
 };
 
-class AnalogSynth : public BaseSoundEngine {
+class AnalogSynth : public BaseSoundEngine, public PropertyHolder {
 
 private:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT, 8> oscilators;
@@ -214,6 +225,8 @@ public:
 	void control_change(unsigned int control, unsigned int value);
 
 	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	
+	
 
 	~AnalogSynth();
 
