@@ -21,6 +21,7 @@ void AnalogSynthView::property_change(PropertyChange change) {
 Scene AnalogSynthView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<PropertyHolder*> holders;
+	holders.push_back(&synth);
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -59,6 +60,68 @@ Scene AnalogSynthView::create(Frame &frame) {
 		});
 		controls.push_back(mod);
 	}
+
+	//Synth global controls
+	//Mono
+	int tmp_x = 10;
+	int tmp_y = pane_height + 20;
+	{
+		CheckBox* mono = new CheckBox(false, "Mono", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
+		mono->bind(&synth, SynthProperty::pSynthMono);
+		controls.push_back(mono);
+	}
+	tmp_x += 120;
+	//Legato
+	{
+		CheckBox* legato = new CheckBox(false, "Legato", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
+		legato->bind(&synth, SynthProperty::pSynthLegato);
+		controls.push_back(legato);
+	}
+	tmp_x += 120;
+	//Portamendo
+	{
+		Label* title = new Label("Portamendo", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->bind(&synth, SynthProperty::pSynthPortamendo);
+		controls.push_back(value);
+	}
+	tmp_x = 10;
+	tmp_y += 75;
+
+	//Delay
+	//Delay Mix
+	{
+		Label* title = new Label("Delay Mix", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->bind(&synth, SynthProperty::pSynthDelayMix);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+	//Delay Time
+	{
+		Label* title = new Label("Delay Time", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->bind(&synth, SynthProperty::pSynthDelayTime);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+	//Delay Feedback
+	{
+		Label* title = new Label("Delay Feedback", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->bind(&synth, SynthProperty::pSynthDelayFeedback);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+
 
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
