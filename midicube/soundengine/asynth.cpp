@@ -577,6 +577,55 @@ bool AnalogSynth::amp_finished(SampleInfo& info, TriggeredNote& note, KeyboardEn
 	return finished;
 }
 
+
+void AnalogSynth::set(size_t prop, PropertyValue value, size_t sub_prop) {
+	switch((SynthProperty) prop) {
+	case SynthProperty::pSynthMono:
+		preset.mono = value.bval;
+		break;
+	case SynthProperty::pSynthLegato:
+		preset.legato = value.bval;
+		break;
+	case SynthProperty::pSynthPortamendo:
+		preset.portamendo = value.dval;
+		break;
+	case SynthProperty::pSynthDelayMix:
+		preset.delay_mix = value.dval;
+		break;
+	case SynthProperty::pSynthDelayTime:
+		preset.delay_time = value.dval;
+		break;
+	case SynthProperty::pSynthDelayFeedback:
+		preset.delay_feedback = value.dval;
+		break;
+	}
+}
+
+PropertyValue AnalogSynth::get(size_t prop, size_t sub_prop) {
+	PropertyValue value;
+	switch((SynthProperty) prop) {
+	case SynthProperty::pSynthMono:
+		value.bval = preset.mono;
+		break;
+	case SynthProperty::pSynthLegato:
+		value.bval = preset.legato;
+		break;
+	case SynthProperty::pSynthPortamendo:
+		value.dval = preset.portamendo;
+		break;
+	case SynthProperty::pSynthDelayMix:
+		value.dval = preset.delay_mix;
+		break;
+	case SynthProperty::pSynthDelayTime:
+		value.dval = preset.delay_time;
+		break;
+	case SynthProperty::pSynthDelayFeedback:
+		value.dval = preset.delay_feedback;
+		break;
+	}
+	return value;
+}
+
 AnalogSynth::~AnalogSynth() {
 
 }

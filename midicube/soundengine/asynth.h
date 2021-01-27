@@ -226,7 +226,9 @@ public:
 
 	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 	
+	void set(size_t prop, PropertyValue value, size_t sub_prop);
 	
+	PropertyValue get(size_t prop, size_t sub_prop);
 
 	~AnalogSynth();
 
