@@ -36,6 +36,7 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * Artivle about soft clipping distortion by Eric Tarr (https://www.hackaudio.com/digital-signal-processing/distortion-effects/soft-clipping/)
 * Paper about simulation a tube amplifier (https://ses.library.usyd.edu.au/bitstream/handle/2123/7624/DESC9115_DAS_Assign02_310106370.pdf;jsessionid=0318BB69B12E37D8810CEDFD50DB5A42?sequence=2)
 * Very helpful tutorial on implementing resonant filters by Martin Finke (http://www.martin-finke.de/blog/articles/audio-plugins-013-filter/)
+* Implementation of a PolyBLEP oscilator by Martin Finke (my PolyBLEP anti-aliasing is based on this) (https://github.com/martinfinke/PolyBLEP) 
 * http://www.dma.ufg.ac.at/app/link/Grundlagen%3AAudio/module/8086?step=all
 * https://electricdruid.net/technical-aspects-of-the-hammond-organ/
 * https://www.hackaudio.com/digital-signal-processing/distortion-effects/bit-crushing/

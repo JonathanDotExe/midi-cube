@@ -19,9 +19,21 @@ static double polyblep(double phase, double step) {
 		phase /= step;
 		return - phase * phase + 2 * phase - 1;
 	}
-	else if (phase > 1 - step) {
+	else if (phase > (1 - step)) {
 		phase = (phase - 1)/step;
 		return phase * phase + 2 * phase + 1;
+	}
+	return 0;
+}
+
+static double integrated_polyblep(double phase, double step) {
+	if (phase < step) {
+		phase = phase / step - 1;
+		return - 1 / 3.0 * phase * phase * phase;
+	}
+	else if (phase > (1 - step)) {
+		phase = (phase - 1) / step + 1;
+		return 1 / 3.0 * phase * phase * phase;
 	}
 	return 0;
 }
@@ -99,18 +111,23 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::TRIANGLE_WAVE:
-		//Square wave
-		signal.carrier = square_wave(rotation, 1, pulse_width);
-		//TODO center excalty around 0
-		//TODO implement to be save against phase jumps (onle use sqare wave at blep points
+		signal.carrier = triangle_wave(rotation, 1, pulse_width); //TODO PWM
 		if (data.analog) {
-			signal.carrier += polyblep(phase, step);
+			double mul1;
+			double mul2;
+			if (phase < pulse_width) {
+				mul1 = 1/pulse_width;
+				mul2 = 1/(1 - pulse_width);
+			}
+			else {
+				mul1 = 1/(1 - pulse_width);
+				mul2 = 1/pulse_width;
+			}
+			signal.carrier += integrated_polyblep(phase, step) * 2 * mul1 * step;
 			double protation = rotation + pulse_width;
-			signal.carrier -= polyblep(protation - (long int) protation, step);
+			double pphase = protation - (long int) protation;
+			signal.carrier -= integrated_polyblep(pphase, step) * 2 * mul2 * step;
 		}
-		//Integrate
-		signal.carrier = last_val + signal.carrier * step * 2 * (signal.carrier > 0 ? 1/pulse_width : 1/(1 - pulse_width));
-		last_val = signal.carrier;
 		//TODO sync
 		signal.modulator = 0;
 		break;
