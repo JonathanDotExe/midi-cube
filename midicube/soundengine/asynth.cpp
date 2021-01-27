@@ -467,6 +467,15 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 
 void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 	//Update properties
+	if (update_request) {
+		submit_change(SynthProperty::pSynthMono, preset.mono);
+		submit_change(SynthProperty::pSynthLegato, preset.legato);
+		submit_change(SynthProperty::pSynthPortamendo, preset.portamendo);
+		submit_change(SynthProperty::pSynthDelayMix, preset.delay_mix);
+		submit_change(SynthProperty::pSynthDelayTime, preset.delay_time);
+		submit_change(SynthProperty::pSynthDelayFeedback, preset.delay_feedback);
+		update_request = false;
+	}
 	for (size_t i = 0; i < parts.size(); ++i) {
 		parts[i].check_update();
 	}
