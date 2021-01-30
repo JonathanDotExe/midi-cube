@@ -105,6 +105,7 @@ private:
 
 	bool redraw = true;
 	ViewController* next_view = nullptr;
+	bool request_close = false;
 
 	boost::lockfree::queue<PropertyChange> changes;
 
@@ -120,10 +121,16 @@ public:
 		redraw = true;
 	}
 
+	void close() {
+		request_close = true;
+	}
+
 	void change_view(ViewController* view) {
 		delete next_view;
 		next_view = view;
 	}
+
+
 
 	virtual ~Frame();
 

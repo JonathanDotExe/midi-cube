@@ -78,6 +78,15 @@ Scene SoundEngineView::create(Frame& frame) {
 	bpm->bind(this->engine, SoundEngineProperty::pEngineMetronomeBPM);
 	controls.push_back(bpm);
 
+	//Exit Button
+	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
+	exit->set_on_click([&frame]() {
+		frame.close();
+	});
+	exit->rect.setFillColor(sf::Color::Yellow);
+	controls.push_back(exit);
+
+
 	return {controls, holders};
 }
 
