@@ -48,7 +48,7 @@ mkdir data/soundfonts
 #Make script and start
 nano start-midi-cube.sh
 
-./build/midi-cube [number-of-output-device] [number-of-input-device] > midicube_log.txt
+./build/midi-cube \[number-of-output-device\]  \[number-of-input-device\] > midicube_log.txt
 
 chmod +rwx start-midicube.sh
 startx ./start-midicube.sh
@@ -67,10 +67,14 @@ Type=idle
 
 ##Start MIDICube after login
 nano .profile
+
 ```
-cd /home/midicube/midi-cube
-startx ./start.sh
-shutdown 0
+if [ $(tty) = "/dev/tty1" ] ; then
+    cd /home/midicube/midi-cube
+    startx ./start.sh
+    shutdown 0
+fi
+
 ```
 
 ##Sources
