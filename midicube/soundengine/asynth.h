@@ -43,7 +43,6 @@ struct FrequencyModulatotion {
 };
 
 struct OscilatorEntity {
-	bool active = false;
 	bool audible = true;
 	ADSREnvelopeData env{0.0, 0, 1, 0.0};
 	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN_WAVE;
@@ -73,13 +72,11 @@ struct OscilatorEntity {
 };
 
 struct ModEnvelopeEntity {
-	bool active = false;
 	PropertyModulation volume = {1};
 	ADSREnvelopeData env{0.0, 0, 1, 0.0};
 };
 
 struct LFOEntity {
-	bool active = false;
 	PropertyModulation volume = {1};
 	double freq = 1;
 	AnalogWaveForm waveform = AnalogWaveForm::SINE_WAVE;
@@ -127,7 +124,6 @@ enum SynthModulationProperty {
 };
 
 enum SynthPartProperty {
-	pSynthOscActive,
 	pSynthOscAudible,
 	pSynthOscAttack,
 	pSynthOscDecay,
@@ -157,14 +153,12 @@ enum SynthPartProperty {
 	pSynthOscFilterKBTrack,
 	pSynthOscFilterKBTrackNote,
 
-	pSynthEnvActive,
 	pSynthEnvVolume,
 	pSynthEnvAttack,
 	pSynthEnvDecay,
 	pSynthEnvSustain,
 	pSynthEnvRelease,
 
-	pSynthLFOActive,
 	pSynthLFOVolume,
 	pSynthLFOFrequency,
 	pSynthLFOWaveForm,

@@ -46,13 +46,6 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 		controls.push_back(title);
 	}
 	tmp_y += 30;
-	//Active
-	{
-		CheckBox* reset = new CheckBox(false, "Active", main_font, 16, tmp_x, tmp_y, 40, 40);
-		reset->bind(part, SynthPartProperty::pSynthEnvActive);
-		controls.push_back(reset);
-	}
-	tmp_y += 50;
 	//Envelope
 	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthEnvAttack);
 	tmp_y += 75;
@@ -69,14 +62,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 		controls.push_back(title);
 	}
 	tmp_y += 30;
-	//Active
-	{
-		CheckBox* reset = new CheckBox(false, "Active", main_font, 16, tmp_x, tmp_y, 40, 40);
-		reset->bind(part, SynthPartProperty::pSynthLFOActive);
-		controls.push_back(reset);
-	}
-	tmp_y += 50;
-	//Freqency
+	//Frequency
 	{
 		Label* title = new Label("Frequency", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
