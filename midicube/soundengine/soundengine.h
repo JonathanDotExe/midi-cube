@@ -247,9 +247,9 @@ public:
 
 	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome, SoundEngine* engine);
 
-	PropertyValue get(size_t prop);
+	PropertyValue get(size_t prop, size_t sub_prop);
 
-	void set(size_t prop, PropertyValue value);
+	void set(size_t prop, PropertyValue value, size_t sub_prop);
 
 	SoundEngine* get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel);
 
@@ -294,9 +294,9 @@ public:
 
 	void solo (unsigned int channel);
 
-	PropertyValue get(size_t prop);
+	PropertyValue get(size_t prop, size_t sub_prop = 0);
 
-	void set(size_t prop, PropertyValue value);
+	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
 
 	~SoundEngineDevice();
 

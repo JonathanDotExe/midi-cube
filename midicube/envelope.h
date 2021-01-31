@@ -52,11 +52,11 @@ public:
 
 	double amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain);
 
-	bool is_finished() {
+	inline bool is_finished() {
 		return phase == FINISHED;
 	}
 
-	void reset () {
+	inline void reset () {
 		phase = ATTACK;
 		volume = 0;
 		last_vol = 0;

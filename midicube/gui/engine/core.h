@@ -105,6 +105,7 @@ private:
 
 	bool redraw = true;
 	ViewController* next_view = nullptr;
+	bool request_close = false;
 
 	boost::lockfree::queue<PropertyChange> changes;
 
@@ -120,10 +121,16 @@ public:
 		redraw = true;
 	}
 
+	void close() {
+		request_close = true;
+	}
+
 	void change_view(ViewController* view) {
 		delete next_view;
 		next_view = view;
 	}
+
+
 
 	virtual ~Frame();
 
@@ -149,19 +156,21 @@ protected:
 public:
 	PropertyHolder* holder = nullptr;
 	size_t property = 0;
+	size_t sub_property = 0;
 
 	BindableControl(int x = 0, int y = 0, int width = 0, int height = 0) : Control(x, y, width, height) {
 
 	}
 
-	void bind(PropertyHolder* holder, size_t property) {
+	void bind(PropertyHolder* holder, size_t property, size_t sub_property = 0) {
 		this->holder = holder;
 		this->property = property;
+		this->sub_property = sub_property;
 	}
 
 	virtual void property_change(PropertyChange change) {
 		Control::property_change(change);
-		if (change.holder == holder && change.property == property) {
+		if (change.holder == holder && change.property == property && change.sub_property == sub_property) {
 			bound_property_change(change.value);
 		}
 	}
@@ -183,7 +192,7 @@ protected:
 
 void BindableControl::send_change(PropertyValue value) {
 	if (holder) {
-		frame->cube.perform_change({holder, property, value});
+		frame->cube.perform_change({holder, property, value, sub_property});
 	}
 }
 

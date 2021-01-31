@@ -89,7 +89,7 @@ void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo
 	//Changes
 	PropertyChange change;
 	while (changes.pop(change)) {
-		change.holder->set(change.property, change.value);
+		change.holder->set(change.property, change.value, change.sub_property);
 	}
 	//Process
 	engine.process_sample(channels, info);

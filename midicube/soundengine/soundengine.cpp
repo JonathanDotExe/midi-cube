@@ -314,7 +314,7 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngin
 	}
 }
 
-PropertyValue SoundEngineChannel::get(size_t prop) {
+PropertyValue SoundEngineChannel::get(size_t prop, size_t sub_prop) {
 	PropertyValue value = {0};
 	switch ((SoundEngineChannelProperty) prop) {
 	case SoundEngineChannelProperty::pChannelActive:
@@ -387,7 +387,7 @@ PropertyValue SoundEngineChannel::get(size_t prop) {
 	return value;
 }
 
-void SoundEngineChannel::set(size_t prop, PropertyValue value) {
+void SoundEngineChannel::set(size_t prop, PropertyValue value, size_t sub_prop) {
 	switch ((SoundEngineChannelProperty) prop) {
 	case SoundEngineChannelProperty::pChannelActive:
 		active = value.bval;
@@ -534,7 +534,7 @@ void SoundEngineDevice::solo (unsigned int channel) {
 	}
 }
 
-PropertyValue SoundEngineDevice::get(size_t prop) {
+PropertyValue SoundEngineDevice::get(size_t prop, size_t sub_prop) {
 	PropertyValue val;
 	switch ((SoundEngineProperty) prop) {
 	case SoundEngineProperty::pEngineMetronomeOn:
@@ -547,7 +547,7 @@ PropertyValue SoundEngineDevice::get(size_t prop) {
 	return val;
 }
 
-void SoundEngineDevice::set(size_t prop, PropertyValue val) {
+void SoundEngineDevice::set(size_t prop, PropertyValue val, size_t sub_prop) {
 	switch ((SoundEngineProperty) prop) {
 	case SoundEngineProperty::pEngineMetronomeOn:
 		play_metronome = val.bval;

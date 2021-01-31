@@ -130,6 +130,11 @@ void Frame::run(ViewController* v) {
 			}
 			redraw = false;
 		}
+		//Close
+		if (request_close) {
+			window.close();
+			request_close = false;
+		}
 		window.display();
 		//Change view
 		if (next_view) {

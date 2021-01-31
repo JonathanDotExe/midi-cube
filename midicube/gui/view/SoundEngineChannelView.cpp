@@ -10,6 +10,7 @@
 #include "SoundEngineView.h"
 #include "ArpeggiatorView.h"
 #include "B3OrganView.h"
+#include "AnalogSynthView.h"
 #include "../../soundengine/organ.h"
 
 SoundEngineChannelView::SoundEngineChannelView(SoundEngineChannel& ch, int channel_index) : channel(ch) {
@@ -253,6 +254,9 @@ SoundEngineChannelView::~SoundEngineChannelView() {
 ViewController* create_view_for_engine(std::string name, SoundEngine& engine, SoundEngineChannel& channel, int channel_index) {
 	if (get_engine_name<B3Organ>() == name) {
 		return new B3OrganView(dynamic_cast<B3Organ&>(engine), channel, channel_index);
+	}
+	else if (get_engine_name<AnalogSynth>() == name) {
+		return new AnalogSynthView(dynamic_cast<AnalogSynth&>(engine), channel, channel_index);
 	}
 	return nullptr;
 }

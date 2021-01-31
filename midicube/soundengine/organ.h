@@ -204,9 +204,9 @@ public:
 
 	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 
-	PropertyValue get(size_t prop);
+	PropertyValue get(size_t prop, size_t sub_prop = 0);
 
-	void set(size_t prop, PropertyValue value);
+	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
 
 };
 

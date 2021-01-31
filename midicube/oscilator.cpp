@@ -69,7 +69,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 	//Compute wave
 	AnalogOscilatorSignal signal = {0, 0};
 	switch(data.waveform) {
-	case AnalogWaveForm::SINE:
+	case AnalogWaveForm::SINE_WAVE:
 		//Modulator
 		signal.modulator = (-cosine_wave(rotation, 1) + cosine_wave(last_rotation, 1))/(time_step * 2 * M_PI);
 		signal.carrier = sine_wave(rotation, 1);
@@ -77,7 +77,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 			signal.carrier -= polyblep(sync_phase, sync_step) * (sine_wave(last_phase, 1) + 1) / 2;
 		}
 		break;
-	case AnalogWaveForm::SAW_DOWN:
+	case AnalogWaveForm::SAW_DOWN_WAVE:
 		signal.carrier = saw_wave_down(rotation, 1);
 		if (data.analog) {
 			signal.carrier += polyblep(phase, step);
@@ -87,7 +87,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		}
 		signal.modulator = 0;
 		break;
-	case AnalogWaveForm::SAW_UP:
+	case AnalogWaveForm::SAW_UP_WAVE:
 		signal.carrier = saw_wave_up(rotation, 1);
 		if (data.analog) {
 			signal.carrier -= polyblep(phase, step);
@@ -97,7 +97,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		}
 		signal.modulator = 0;
 		break;
-	case AnalogWaveForm::SQUARE:
+	case AnalogWaveForm::SQUARE_WAVE:
 		signal.carrier = square_wave(rotation, 1, pulse_width);
 		if (data.analog) {
 			signal.carrier += polyblep(phase, step);
@@ -123,7 +123,6 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 				mul1 = 1/(1 - pulse_width);
 				mul2 = 1/pulse_width;
 			}
-			//TODO
 			signal.carrier += integrated_polyblep(phase, step) * 2 * mul1 * step;
 			double protation = rotation + pulse_width;
 			double pphase = protation - (long int) protation;
@@ -132,7 +131,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		//TODO sync
 		signal.modulator = 0;
 		break;
-	case AnalogWaveForm::NOISE:
+	case AnalogWaveForm::NOISE_WAVE:
 		signal.carrier = noise_wave(rotation, 1);
 		signal.modulator = 0;
 		break;

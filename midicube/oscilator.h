@@ -14,12 +14,12 @@
 #include <vector>
 #include <array>
 
-enum class AnalogWaveForm {
-	SINE, SAW_DOWN, SAW_UP, SQUARE, TRIANGLE_WAVE, NOISE
+enum AnalogWaveForm {
+	SINE_WAVE, SAW_DOWN_WAVE, SAW_UP_WAVE, SQUARE_WAVE, TRIANGLE_WAVE, NOISE_WAVE
 };
 
 struct AnalogOscilatorData {
-	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN;
+	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN_WAVE;
 	bool analog = false;
 	bool sync = false;
 	double pulse_width = 0.5;
