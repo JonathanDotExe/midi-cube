@@ -14,7 +14,7 @@ AnalogOscilator::AnalogOscilator() {
 
 }
 
-static double polyblep(double phase, double step) {
+static inline double polyblep(double phase, double step) {
 	if (phase < step) {
 		phase /= step;
 		return - phase * phase + 2 * phase - 1;
@@ -26,7 +26,7 @@ static double polyblep(double phase, double step) {
 	return 0;
 }
 
-static double integrated_polyblep(double phase, double step) {
+static inline double integrated_polyblep(double phase, double step) {
 	if (phase < step) {
 		phase = phase / step - 1;
 		return - 1 / 3.0 * phase * phase * phase;

@@ -140,7 +140,6 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
 	std::vector<PropertyHolder*> holders;
-	std::cout << part << std::endl;
 
 	SynthPartPropertyHolder* part = &synth.parts.at(this->part);
 	holders.push_back(part);

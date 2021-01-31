@@ -51,6 +51,8 @@ void AudioHandler::init(int out_device, int in_device) {
 	try {
 		audio.openStream(&params, &input_params, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
 		audio.startStream();
+		sample_rate = audio.getStreamSampleRate();
+		time_step = 1.0/sample_rate;
 	}
 	catch (RtAudioError& e) {
 		throw AudioException(e.getMessage().c_str());
