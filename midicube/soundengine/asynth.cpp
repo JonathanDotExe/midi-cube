@@ -468,19 +468,6 @@ void AnalogSynth::process_note_sample(std::array<double, OUTPUT_CHANNELS>& chann
 }
 
 void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
-	//Update properties
-	if (update_request) {
-		submit_change(SynthProperty::pSynthMono, preset.mono);
-		submit_change(SynthProperty::pSynthLegato, preset.legato);
-		submit_change(SynthProperty::pSynthPortamendo, preset.portamendo);
-		submit_change(SynthProperty::pSynthDelayMix, preset.delay_mix);
-		submit_change(SynthProperty::pSynthDelayTime, preset.delay_time);
-		submit_change(SynthProperty::pSynthDelayFeedback, preset.delay_feedback);
-		update_request = false;
-	}
-	for (size_t i = 0; i < parts.size(); ++i) {
-		parts[i].check_update();
-	}
 	//Mono
 	if (preset.mono && status.latest_note) {
 		unsigned int note = status.latest_note->note;
@@ -948,53 +935,58 @@ SynthPartPropertyHolder::SynthPartPropertyHolder(AnalogSynthPreset *p, size_t i)
 
 }
 
-void SynthPartPropertyHolder::check_update() {
-	if (update_request) {
-		OscilatorEntity& osc = preset->oscilators[this->part];
-		ModEnvelopeEntity& env = preset->mod_envs[this->part];
-		LFOEntity& lfo = preset->lfos[this->part];
+void SynthPartPropertyHolder::update_properties() {
+	OscilatorEntity& osc = preset->oscilators[this->part];
+	ModEnvelopeEntity& env = preset->mod_envs[this->part];
+	LFOEntity& lfo = preset->lfos[this->part];
 
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscActive, osc.active);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscAudible, osc.audible);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscAttack, osc.env.attack);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscDecay, osc.env.decay);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscSustain, osc.env.sustain);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscRelease, osc.env.release);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscWaveForm, osc.waveform);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscAnalog, osc.analog);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscSync, osc.sync);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscReset, osc.reset);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscRandomize, osc.randomize);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscUnisonAmount, (int) osc.unison_amount);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscActive, osc.active);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscAudible, osc.audible);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscAttack, osc.env.attack);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscDecay, osc.env.decay);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscSustain, osc.env.sustain);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscRelease, osc.env.release);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscWaveForm, osc.waveform);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscAnalog, osc.analog);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscSync, osc.sync);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscReset, osc.reset);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscRandomize, osc.randomize);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscUnisonAmount, (int) osc.unison_amount);
 
-		submit_change(SynthPartProperty::pSynthOscVolume, osc.volume);
-		submit_change(SynthPartProperty::pSynthOscSyncMul, osc.sync_mul);
-		submit_change(SynthPartProperty::pSynthOscPulseWidth, osc.pulse_width);
-		submit_change(SynthPartProperty::pSynthOscUnisonDetune, osc.unison_detune);
-		submit_change(SynthPartProperty::pSynthOscPanning, osc.panning);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscSemi, osc.semi);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose, osc.transpose);
-		submit_change(SynthPartProperty::pSynthOscPitch, osc.pitch);
+	submit_change(SynthPartProperty::pSynthOscVolume, osc.volume);
+	submit_change(SynthPartProperty::pSynthOscSyncMul, osc.sync_mul);
+	submit_change(SynthPartProperty::pSynthOscPulseWidth, osc.pulse_width);
+	submit_change(SynthPartProperty::pSynthOscUnisonDetune, osc.unison_detune);
+	submit_change(SynthPartProperty::pSynthOscPanning, osc.panning);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscSemi, osc.semi);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose, osc.transpose);
+	submit_change(SynthPartProperty::pSynthOscPitch, osc.pitch);
 
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilter, osc.filter);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterType, osc.filter_type);
-		submit_change(SynthPartProperty::pSynthOscFilterCutoff, osc.filter_cutoff);
-		submit_change(SynthPartProperty::pSynthOscFilterResonance, osc.filter_resonance);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterKBTrack, osc.filter_kb_track);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterKBTrackNote, (int) osc.filter_kb_track_note);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilter, osc.filter);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterType, osc.filter_type);
+	submit_change(SynthPartProperty::pSynthOscFilterCutoff, osc.filter_cutoff);
+	submit_change(SynthPartProperty::pSynthOscFilterResonance, osc.filter_resonance);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterKBTrack, osc.filter_kb_track);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterKBTrackNote, (int) osc.filter_kb_track_note);
 
-		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvActive, env.active);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvAttack, env.env.attack);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvDecay, env.env.decay);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvSustain, env.env.sustain);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthEnvRelease, env.env.release);
-		submit_change(SynthPartProperty::pSynthEnvVolume, env.volume);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthEnvActive, env.active);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthEnvAttack, env.env.attack);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthEnvDecay, env.env.decay);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthEnvSustain, env.env.sustain);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthEnvRelease, env.env.release);
+	submit_change(SynthPartProperty::pSynthEnvVolume, env.volume);
 
-		PropertyHolder::submit_change(SynthPartProperty::pSynthLFOActive, lfo.active);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthLFOFrequency, lfo.freq);
-		PropertyHolder::submit_change(SynthPartProperty::pSynthLFOWaveForm, (int) lfo.waveform);
-		submit_change(SynthPartProperty::pSynthEnvVolume, lfo.volume);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthLFOActive, lfo.active);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthLFOFrequency, lfo.freq);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthLFOWaveForm, (int) lfo.waveform);
+	submit_change(SynthPartProperty::pSynthEnvVolume, lfo.volume);
+}
 
-		update_request = false;
-	}
+void AnalogSynth::update_properties() {
+	submit_change(SynthProperty::pSynthMono, preset.mono);
+	submit_change(SynthProperty::pSynthLegato, preset.legato);
+	submit_change(SynthProperty::pSynthPortamendo, preset.portamendo);
+	submit_change(SynthProperty::pSynthDelayMix, preset.delay_mix);
+	submit_change(SynthProperty::pSynthDelayTime, preset.delay_time);
+	submit_change(SynthProperty::pSynthDelayFeedback, preset.delay_feedback);
 }

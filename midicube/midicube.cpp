@@ -12,7 +12,7 @@ static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleIn
 	((MidiCube*) user_data)->process(channels, info);
 }
 
-MidiCube::MidiCube() : changes(128) {
+MidiCube::MidiCube() : changes(128), update(32) {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -91,6 +91,11 @@ void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo
 	while (changes.pop(change)) {
 		change.holder->set(change.property, change.value, change.sub_property);
 	}
+	//Update
+	PropertyHolder* holder;
+	while (update.pop(holder)) {
+		holder->update_properties();
+	}
 	//Process
 	engine.process_sample(channels, info);
 }
@@ -147,6 +152,10 @@ void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 
 void MidiCube::perform_change(PropertyChange change) {
 	changes.push(change);
+}
+
+void MidiCube::request_update(PropertyHolder* holder) {
+	update.push(holder);
 }
 
 MidiCube::~MidiCube() {

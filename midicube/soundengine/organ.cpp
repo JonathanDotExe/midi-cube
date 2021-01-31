@@ -109,104 +109,6 @@ bool B3Organ::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvir
 
 void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
 	//Update properties
-	if (update_request) {
-		submit_change(B3OrganProperty::pB3Drawbar1,
-				(int) data.preset.drawbars[0]);
-		submit_change(B3OrganProperty::pB3Drawbar2,
-				(int) data.preset.drawbars[1]);
-		submit_change(B3OrganProperty::pB3Drawbar3,
-				(int) data.preset.drawbars[2]);
-		submit_change(B3OrganProperty::pB3Drawbar4,
-				(int) data.preset.drawbars[3]);
-		submit_change(B3OrganProperty::pB3Drawbar5,
-				(int) data.preset.drawbars[4]);
-		submit_change(B3OrganProperty::pB3Drawbar6,
-				(int) data.preset.drawbars[5]);
-		submit_change(B3OrganProperty::pB3Drawbar7,
-				(int) data.preset.drawbars[6]);
-		submit_change(B3OrganProperty::pB3Drawbar8,
-				(int) data.preset.drawbars[7]);
-		submit_change(B3OrganProperty::pB3Drawbar9,
-				(int) data.preset.drawbars[8]);
-		submit_change(B3OrganProperty::pB3DrawbarCC1,
-				(int) data.preset.drawbar_ccs[0]);
-		submit_change(B3OrganProperty::pB3DrawbarCC2,
-				(int) data.preset.drawbar_ccs[1]);
-		submit_change(B3OrganProperty::pB3DrawbarCC3,
-				(int) data.preset.drawbar_ccs[2]);
-		submit_change(B3OrganProperty::pB3DrawbarCC4,
-				(int) data.preset.drawbar_ccs[3]);
-		submit_change(B3OrganProperty::pB3DrawbarCC5,
-				(int) data.preset.drawbar_ccs[4]);
-		submit_change(B3OrganProperty::pB3DrawbarCC6,
-				(int) data.preset.drawbar_ccs[5]);
-		submit_change(B3OrganProperty::pB3DrawbarCC7,
-				(int) data.preset.drawbar_ccs[6]);
-		submit_change(B3OrganProperty::pB3DrawbarCC8,
-				(int) data.preset.drawbar_ccs[7]);
-		submit_change(B3OrganProperty::pB3DrawbarCC9,
-				(int) data.preset.drawbar_ccs[8]);
-		submit_change(B3OrganProperty::pB3HarmonicFoldbackVolume,
-				data.preset.harmonic_foldback_volume);
-		submit_change(B3OrganProperty::pB3AmpOn, data.preset.amplifier.on);
-		submit_change(B3OrganProperty::pB3AmpDistortionType,
-				data.preset.amplifier.type);
-		submit_change(B3OrganProperty::pB3AmpDrive, data.preset.amplifier.drive);
-		submit_change(B3OrganProperty::pB3AmpTone, data.preset.amplifier.tone);
-		submit_change(B3OrganProperty::pB3AmpOnCC,
-				(int) data.preset.amp_cc);
-		submit_change(B3OrganProperty::pB3AmpBoostCC,
-				(int) data.preset.amp_boost_cc);
-		submit_change(B3OrganProperty::pB3AmpDriveCC,
-				(int) data.preset.amp_drive_cc);
-		submit_change(B3OrganProperty::pB3AmpToneCC,
-				(int) data.preset.amp_tone_cc);
-		submit_change(B3OrganProperty::pB3MultiNoteGain,
-				data.preset.multi_note_gain);
-		submit_change(B3OrganProperty::pB3Rotary, data.preset.rotary.on);
-		submit_change(B3OrganProperty::pB3RotarySpeed, data.preset.rotary.fast);
-		submit_change(B3OrganProperty::pB3RotaryCC,
-				(int) data.preset.rotary_cc);
-		submit_change(B3OrganProperty::pB3RotarySpeedCC,
-				(int) data.preset.rotary_speed_cc);
-		submit_change(B3OrganProperty::pB3RotaryStereoMix,
-				data.preset.rotary.stereo_mix);
-		submit_change(B3OrganProperty::pB3AmpBoost, data.preset.amplifier.boost);
-		submit_change(B3OrganProperty::pB3RotaryType, data.preset.rotary.type);
-		submit_change(B3OrganProperty::pB3RotaryDelay,
-				data.preset.rotary.max_delay);
-		submit_change(B3OrganProperty::pB3Percussion, data.preset.percussion);
-		submit_change(B3OrganProperty::pB3PercussionThirdHarmonic,
-				data.preset.percussion_third_harmonic);
-		submit_change(B3OrganProperty::pB3PercussionSoft,
-				data.preset.percussion_soft);
-		submit_change(B3OrganProperty::pB3PercussionFastDecay,
-				data.preset.percussion_fast_decay);
-		submit_change(B3OrganProperty::pB3PercussionSoftVolume,
-				data.preset.percussion_soft_volume);
-		submit_change(B3OrganProperty::pB3PercussionHardVolume,
-				data.preset.percussion_hard_volume);
-		submit_change(B3OrganProperty::pB3PercussionFastDecayTime,
-				data.preset.percussion_fast_decay_time);
-		submit_change(B3OrganProperty::pB3PercussionSlowDecayTime,
-				data.preset.percussion_slow_decay_time);
-		submit_change(B3OrganProperty::pB3PercussionCC,
-				(int) data.preset.percussion_cc);
-		submit_change(B3OrganProperty::pB3PercussionThirdHarmonicCC,
-				(int) data.preset.percussion_third_harmonic_cc);
-		submit_change(B3OrganProperty::pB3PercussionSoftCC,
-				(int) data.preset.percussion_soft_cc);
-		submit_change(B3OrganProperty::pB3PercussionFastDecayCC,
-				(int) data.preset.percussion_fast_decay_cc);
-		submit_change(B3OrganProperty::pB3VibratoMix,
-				data.preset.vibrato_mix);
-		submit_change(B3OrganProperty::pB3VibratoMixCC,
-				(int) data.preset.vibrato_mix_cc);
-		submit_change(B3OrganProperty::pB3SwellCC,
-				(int) data.preset.swell_cc);
-		update_request = false;
-	}
-
 	double swell = this->data.swell * SWELL_RANGE + MIN_SWELL;
 
 	//Percussion
@@ -664,6 +566,103 @@ void B3Organ::set(size_t prop, PropertyValue val, size_t sub_prop) {
 		data.preset.swell_cc = val.ival;
 		break;
 	}
+}
+
+void B3Organ::update_properties() {
+	submit_change(B3OrganProperty::pB3Drawbar1,
+			(int) data.preset.drawbars[0]);
+	submit_change(B3OrganProperty::pB3Drawbar2,
+			(int) data.preset.drawbars[1]);
+	submit_change(B3OrganProperty::pB3Drawbar3,
+			(int) data.preset.drawbars[2]);
+	submit_change(B3OrganProperty::pB3Drawbar4,
+			(int) data.preset.drawbars[3]);
+	submit_change(B3OrganProperty::pB3Drawbar5,
+			(int) data.preset.drawbars[4]);
+	submit_change(B3OrganProperty::pB3Drawbar6,
+			(int) data.preset.drawbars[5]);
+	submit_change(B3OrganProperty::pB3Drawbar7,
+			(int) data.preset.drawbars[6]);
+	submit_change(B3OrganProperty::pB3Drawbar8,
+			(int) data.preset.drawbars[7]);
+	submit_change(B3OrganProperty::pB3Drawbar9,
+			(int) data.preset.drawbars[8]);
+	submit_change(B3OrganProperty::pB3DrawbarCC1,
+			(int) data.preset.drawbar_ccs[0]);
+	submit_change(B3OrganProperty::pB3DrawbarCC2,
+			(int) data.preset.drawbar_ccs[1]);
+	submit_change(B3OrganProperty::pB3DrawbarCC3,
+			(int) data.preset.drawbar_ccs[2]);
+	submit_change(B3OrganProperty::pB3DrawbarCC4,
+			(int) data.preset.drawbar_ccs[3]);
+	submit_change(B3OrganProperty::pB3DrawbarCC5,
+			(int) data.preset.drawbar_ccs[4]);
+	submit_change(B3OrganProperty::pB3DrawbarCC6,
+			(int) data.preset.drawbar_ccs[5]);
+	submit_change(B3OrganProperty::pB3DrawbarCC7,
+			(int) data.preset.drawbar_ccs[6]);
+	submit_change(B3OrganProperty::pB3DrawbarCC8,
+			(int) data.preset.drawbar_ccs[7]);
+	submit_change(B3OrganProperty::pB3DrawbarCC9,
+			(int) data.preset.drawbar_ccs[8]);
+	submit_change(B3OrganProperty::pB3HarmonicFoldbackVolume,
+			data.preset.harmonic_foldback_volume);
+	submit_change(B3OrganProperty::pB3AmpOn, data.preset.amplifier.on);
+	submit_change(B3OrganProperty::pB3AmpDistortionType,
+			data.preset.amplifier.type);
+	submit_change(B3OrganProperty::pB3AmpDrive, data.preset.amplifier.drive);
+	submit_change(B3OrganProperty::pB3AmpTone, data.preset.amplifier.tone);
+	submit_change(B3OrganProperty::pB3AmpOnCC,
+			(int) data.preset.amp_cc);
+	submit_change(B3OrganProperty::pB3AmpBoostCC,
+			(int) data.preset.amp_boost_cc);
+	submit_change(B3OrganProperty::pB3AmpDriveCC,
+			(int) data.preset.amp_drive_cc);
+	submit_change(B3OrganProperty::pB3AmpToneCC,
+			(int) data.preset.amp_tone_cc);
+	submit_change(B3OrganProperty::pB3MultiNoteGain,
+			data.preset.multi_note_gain);
+	submit_change(B3OrganProperty::pB3Rotary, data.preset.rotary.on);
+	submit_change(B3OrganProperty::pB3RotarySpeed, data.preset.rotary.fast);
+	submit_change(B3OrganProperty::pB3RotaryCC,
+			(int) data.preset.rotary_cc);
+	submit_change(B3OrganProperty::pB3RotarySpeedCC,
+			(int) data.preset.rotary_speed_cc);
+	submit_change(B3OrganProperty::pB3RotaryStereoMix,
+			data.preset.rotary.stereo_mix);
+	submit_change(B3OrganProperty::pB3AmpBoost, data.preset.amplifier.boost);
+	submit_change(B3OrganProperty::pB3RotaryType, data.preset.rotary.type);
+	submit_change(B3OrganProperty::pB3RotaryDelay,
+			data.preset.rotary.max_delay);
+	submit_change(B3OrganProperty::pB3Percussion, data.preset.percussion);
+	submit_change(B3OrganProperty::pB3PercussionThirdHarmonic,
+			data.preset.percussion_third_harmonic);
+	submit_change(B3OrganProperty::pB3PercussionSoft,
+			data.preset.percussion_soft);
+	submit_change(B3OrganProperty::pB3PercussionFastDecay,
+			data.preset.percussion_fast_decay);
+	submit_change(B3OrganProperty::pB3PercussionSoftVolume,
+			data.preset.percussion_soft_volume);
+	submit_change(B3OrganProperty::pB3PercussionHardVolume,
+			data.preset.percussion_hard_volume);
+	submit_change(B3OrganProperty::pB3PercussionFastDecayTime,
+			data.preset.percussion_fast_decay_time);
+	submit_change(B3OrganProperty::pB3PercussionSlowDecayTime,
+			data.preset.percussion_slow_decay_time);
+	submit_change(B3OrganProperty::pB3PercussionCC,
+			(int) data.preset.percussion_cc);
+	submit_change(B3OrganProperty::pB3PercussionThirdHarmonicCC,
+			(int) data.preset.percussion_third_harmonic_cc);
+	submit_change(B3OrganProperty::pB3PercussionSoftCC,
+			(int) data.preset.percussion_soft_cc);
+	submit_change(B3OrganProperty::pB3PercussionFastDecayCC,
+			(int) data.preset.percussion_fast_decay_cc);
+	submit_change(B3OrganProperty::pB3VibratoMix,
+			data.preset.vibrato_mix);
+	submit_change(B3OrganProperty::pB3VibratoMixCC,
+			(int) data.preset.vibrato_mix_cc);
+	submit_change(B3OrganProperty::pB3SwellCC,
+			(int) data.preset.swell_cc);
 }
 
 template<>

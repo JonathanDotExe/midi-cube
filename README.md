@@ -17,7 +17,7 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * Boost licensed under the Boost Software License (https://github.com/boostorg/boost https://github.com/boostorg/boost/blob/master/LICENSE_1_0.txt)
 * SFML licensed under the zlib/png license (https://github.com/SFML/SFML https://github.com/SFML/SFML/blob/master/license.md)
 
-##Used Assets
+## Used Assets
 * Liberation font licensed onder the Open Font License (https://github.com/liberationfonts/liberation-fonts/tree/2.1.1 https://github.com/liberationfonts/liberation-fonts/blob/master/LICENSE)
 
 ## Used ressources

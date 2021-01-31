@@ -53,20 +53,17 @@ public:
 
 	boost::lockfree::queue<PropertyChange>* changes = nullptr;
 
-	void request_update() {
-		update_request = true;
-	}
-
 	virtual void set(size_t prop, PropertyValue value, size_t sub_prop = 0) = 0;
 
 	virtual PropertyValue get(size_t prop, size_t sub_prop = 0) = 0;
+
+	virtual void update_properties() = 0;
 
 	virtual ~PropertyHolder() {
 
 	}
 
 protected:
-	std::atomic<bool> update_request;
 
 	inline void submit_change(size_t prop, PropertyValue value, size_t sub_prop = 0);
 

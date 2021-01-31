@@ -40,7 +40,7 @@ void Control::set_visible(bool visible) {
 }
 
 //Frame
-Frame::Frame(MidiCube& c, int width, int height, std::string title) : changes(512), cube(c) {
+Frame::Frame(MidiCube& c, int width, int height, std::string title) : changes(1024), cube(c) {
 	this->width = width;
 	this->height = height;
 	this->title = title;
@@ -169,7 +169,7 @@ void Frame::switch_view(ViewController* view) {
 	prop_holders = scene.prop_holders;
 	for (PropertyHolder* holder : prop_holders) {
 		holder->changes = &changes;
-		holder->request_update();
+		cube.request_update(holder);
 	}
 	request_redraw();
 }

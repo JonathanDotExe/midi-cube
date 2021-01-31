@@ -251,6 +251,8 @@ public:
 
 	void set(size_t prop, PropertyValue value, size_t sub_prop);
 
+	void update_properties();
+
 	SoundEngine* get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel);
 
 	/**
@@ -297,6 +299,8 @@ public:
 	PropertyValue get(size_t prop, size_t sub_prop = 0);
 
 	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
+
+	void update_properties();
 
 	~SoundEngineDevice();
 

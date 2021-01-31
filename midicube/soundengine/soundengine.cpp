@@ -237,34 +237,6 @@ SoundEngineChannel::SoundEngineChannel() {
 
 void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome, SoundEngine* engine) {
 	//Properties
-	if (update_request) {
-		submit_change(SoundEngineChannelProperty::pChannelActive, active);
-		submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
-		submit_change(SoundEngineChannelProperty::pChannelPanning, panning);
-		submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) engine_index);
-
-		submit_change(SoundEngineChannelProperty::pChannelInputDevice, (int) source.input);
-		submit_change(SoundEngineChannelProperty::pChannelInputChannel, (int) source.channel);
-		submit_change(SoundEngineChannelProperty::pChannelStartNote, (int) source.start_note);
-		submit_change(SoundEngineChannelProperty::pChannelEndNote, (int) source.end_note);
-		submit_change(SoundEngineChannelProperty::pChannelStartVelocity, (int) source.start_velocity);
-		submit_change(SoundEngineChannelProperty::pChannelEndVelocity, (int) source.end_velocity);
-		submit_change(SoundEngineChannelProperty::pChannelOctave, source.octave);
-		submit_change(SoundEngineChannelProperty::pChannelTransferChannelAftertouch, source.transfer_channel_aftertouch);
-		submit_change(SoundEngineChannelProperty::pChannelTransferPitchBend, source.transfer_pitch_bend);
-		submit_change(SoundEngineChannelProperty::pChannelTransferCC, source.transfer_cc);
-		submit_change(SoundEngineChannelProperty::pChannelTransferProgChange, source.transfer_prog_change);
-		submit_change(SoundEngineChannelProperty::pChannelTransferOther, source.transfer_other);
-
-		submit_change(SoundEngineChannelProperty::pArpeggiatorOn, arp.on);
-		submit_change(SoundEngineChannelProperty::pArpeggiatorPattern, arp.preset.pattern);
-		submit_change(SoundEngineChannelProperty::pArpeggiatorOctaves, (int) arp.preset.octaves);
-		submit_change(SoundEngineChannelProperty::pArpeggiatorStep, arp.preset.value);
-		submit_change(SoundEngineChannelProperty::pArpeggiatorHold, arp.preset.hold);
-		submit_change(SoundEngineChannelProperty::pArpeggiatorBPM, (int) arp.metronome.get_bpm());
-
-		update_request = false;
-	}
 	if (engine) {
 		std::array<double, OUTPUT_CHANNELS> ch = {};
 		//Arpeggiator
@@ -312,6 +284,33 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngin
 			engine.midi_message(message, info);
 		}
 	}
+}
+
+void SoundEngineChannel::update_properties() {
+	submit_change(SoundEngineChannelProperty::pChannelActive, active);
+	submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
+	submit_change(SoundEngineChannelProperty::pChannelPanning, panning);
+	submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) engine_index);
+
+	submit_change(SoundEngineChannelProperty::pChannelInputDevice, (int) source.input);
+	submit_change(SoundEngineChannelProperty::pChannelInputChannel, (int) source.channel);
+	submit_change(SoundEngineChannelProperty::pChannelStartNote, (int) source.start_note);
+	submit_change(SoundEngineChannelProperty::pChannelEndNote, (int) source.end_note);
+	submit_change(SoundEngineChannelProperty::pChannelStartVelocity, (int) source.start_velocity);
+	submit_change(SoundEngineChannelProperty::pChannelEndVelocity, (int) source.end_velocity);
+	submit_change(SoundEngineChannelProperty::pChannelOctave, source.octave);
+	submit_change(SoundEngineChannelProperty::pChannelTransferChannelAftertouch, source.transfer_channel_aftertouch);
+	submit_change(SoundEngineChannelProperty::pChannelTransferPitchBend, source.transfer_pitch_bend);
+	submit_change(SoundEngineChannelProperty::pChannelTransferCC, source.transfer_cc);
+	submit_change(SoundEngineChannelProperty::pChannelTransferProgChange, source.transfer_prog_change);
+	submit_change(SoundEngineChannelProperty::pChannelTransferOther, source.transfer_other);
+
+	submit_change(SoundEngineChannelProperty::pArpeggiatorOn, arp.on);
+	submit_change(SoundEngineChannelProperty::pArpeggiatorPattern, arp.preset.pattern);
+	submit_change(SoundEngineChannelProperty::pArpeggiatorOctaves, (int) arp.preset.octaves);
+	submit_change(SoundEngineChannelProperty::pArpeggiatorStep, arp.preset.value);
+	submit_change(SoundEngineChannelProperty::pArpeggiatorHold, arp.preset.hold);
+	submit_change(SoundEngineChannelProperty::pArpeggiatorBPM, (int) arp.metronome.get_bpm());
 }
 
 PropertyValue SoundEngineChannel::get(size_t prop, size_t sub_prop) {
@@ -485,12 +484,6 @@ SoundEngineDevice::SoundEngineDevice() : metronome(120){
 }
 
 void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
-	//Update properties
-	if (update_request) {
-		submit_change(SoundEngineProperty::pEngineMetronomeOn, play_metronome);
-		submit_change(SoundEngineProperty::pEngineMetronomeBPM, (int) metronome.get_bpm());
-		update_request = false;
-	}
 	//Channels
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
@@ -556,6 +549,11 @@ void SoundEngineDevice::set(size_t prop, PropertyValue val, size_t sub_prop) {
 		 metronome.set_bpm(val.ival);
 		break;
 	}
+}
+
+void SoundEngineDevice::update_properties() {
+	submit_change(SoundEngineProperty::pEngineMetronomeOn, play_metronome);
+	submit_change(SoundEngineProperty::pEngineMetronomeBPM, (int) metronome.get_bpm());
 }
 
 SoundEngineDevice::~SoundEngineDevice() {
