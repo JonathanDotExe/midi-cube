@@ -66,13 +66,29 @@ Type=idle
 ```
 
 ##Start MIDICube after login
+nano wait.py
+
+```Python
+import asyncio
+
+def async success():
+    print('Starting MIDICube in 5 seconds ...')
+    print('Press ENTER key to interrupt')
+    await asyncio.sleep(5)
+    exit(0)
+
+asyncio.run(main())
+input()
+exit(1)
+
+```
+
 nano .profile
 
 ```
 if [ $(tty) = "/dev/tty1" ] ; then
     cd /home/midicube/midi-cube
-    startx ./start.sh
-    shutdown 0
+    python3 wait.py && startx ./start.sh && shutdown 0
 fi
 
 ```
