@@ -61,10 +61,40 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(mod);
 	}
 
-	//Synth global controls
-	//Mono
+	//Part counts
 	int tmp_x = 10;
 	int tmp_y = pane_height + 20;
+	//Oscilators
+	{
+		Label* title = new Label("Osc Count", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->bind(&synth, SynthProperty::pSynthOscCount);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+	//Mod Env Count
+	{
+		Label* title = new Label("Env Count", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->bind(&synth, SynthProperty::pSynthModEnvCount);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+	{
+		Label* title = new Label("LFO Count", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->bind(&synth, SynthProperty::pSynthLFOCount);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+
+	//Polyphony Mode
+	//Mono
 	{
 		CheckBox* mono = new CheckBox(false, "Mono", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
 		mono->bind(&synth, SynthProperty::pSynthMono);
@@ -84,6 +114,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->drag_mul /= 5;
 		value->bind(&synth, SynthProperty::pSynthPortamendo);
 		controls.push_back(value);
 	}
