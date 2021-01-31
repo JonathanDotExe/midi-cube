@@ -62,41 +62,45 @@ public:
 	}
 
 	AnalogOscilatorSignal signal(double freq, double time_step, size_t index, AnalogOscilatorData data, AnalogOscilatorBankData bdata) {
-		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
+		std::array<AnalogOscilator, U>& osc = oscilators[index];
 		AnalogOscilatorSignal signal;
 		double detune = note_to_freq_transpose(bdata.unison_detune);
 		double ndetune = note_to_freq_transpose(-bdata.unison_detune);
 		double det = detune;
 		double ndet = 1;
-		for (size_t i = 0; i <= bdata.unison_amount && i < osc.size(); ++i) {
-			double d = 1;
-			if (i % 2 == 0) {
-				d = ndet;
-				ndet *= ndetune;
-			}
-			else {
-				d = det;
-				det *= detune;
-			}
-			AnalogOscilatorSignal sig = osc[i].signal(freq * d, time_step, data);
+
+		const size_t size = std::min(bdata.unison_amount + 1, U);
+		const size_t psize = size/2;
+		//Positive
+		size_t i = 0;
+		for (;  i < psize; ++i) {
+			AnalogOscilatorSignal sig = osc[i].signal(freq * det, time_step, data);
 			signal.carrier += sig.carrier;
 			signal.modulator += sig.modulator;
+			det *= detune;
 		}
-		signal.carrier /= (bdata.unison_amount + 1);
-		signal.modulator /= (bdata.unison_amount + 1);
+		//Negative
+		for (;  i < size; ++i) {
+			AnalogOscilatorSignal sig = osc[i].signal(freq * ndet, time_step, data);
+			signal.carrier += sig.carrier;
+			signal.modulator += sig.modulator;
+			ndet *= ndetune;
+		}
+		signal.carrier /= size;
+		signal.modulator /= size;
 		return signal;
 	}
 
 	void randomize(size_t index) {
-		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
-		for (size_t i = 0; i < osc.size(); ++i) {
+		std::array<AnalogOscilator, U>& osc = oscilators[index];
+		for (size_t i = 0; i < U; ++i) {
 			osc[i].randomize();
 		}
 	}
 
 	void reset(size_t index) {
 		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
-		for (size_t i = 0; i < osc.size(); ++i) {
+		for (size_t i = 0; i < U; ++i) {
 			osc[i].reset();
 		}
 	}

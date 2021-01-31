@@ -92,6 +92,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(value);
 	}
 	tmp_x += 90;
+	tmp_y += 75;
 
 	//Polyphony Mode
 	//Mono
