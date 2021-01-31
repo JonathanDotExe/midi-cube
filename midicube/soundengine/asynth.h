@@ -102,6 +102,10 @@ struct AnalogSynthPreset {
 };
 
 enum SynthProperty {
+	pSynthOscCount,
+	pSynthModEnvCount,
+	pSynthLFOCount,
+
 	pSynthMono,
 	pSynthLegato,
 	pSynthPortamendo,

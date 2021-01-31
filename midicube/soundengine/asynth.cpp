@@ -604,15 +604,23 @@ bool AnalogSynth::amp_finished(SampleInfo &info, TriggeredNote &note,
 		KeyboardEnvironment &env, size_t note_index) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.osc_count && finished; ++i) {
-		OscilatorEntity &osc = preset.oscilators[i];
 		size_t index = OSC_INDEX(note_index, i);
-		finished = amp_envs.at(index).is_finished();
+		finished = amp_envs[index].is_finished();
 	}
 	return finished;
 }
 
 void AnalogSynth::set(size_t prop, PropertyValue value, size_t sub_prop) {
 	switch ((SynthProperty) prop) {
+	case SynthProperty::pSynthOscCount:
+		preset.osc_count = value.ival;
+		break;
+	case SynthProperty::pSynthModEnvCount:
+		preset.mod_env_count = value.ival;
+		break;
+	case SynthProperty::pSynthLFOCount:
+		preset.lfo_count = value.ival;
+		break;
 	case SynthProperty::pSynthMono:
 		preset.mono = value.bval;
 		break;
@@ -637,6 +645,15 @@ void AnalogSynth::set(size_t prop, PropertyValue value, size_t sub_prop) {
 PropertyValue AnalogSynth::get(size_t prop, size_t sub_prop) {
 	PropertyValue value;
 	switch ((SynthProperty) prop) {
+	case SynthProperty::pSynthOscCount:
+		value.ival = preset.osc_count;
+		break;
+	case SynthProperty::pSynthModEnvCount:
+		value.ival = preset.mod_env_count;
+		break;
+	case SynthProperty::pSynthLFOCount:
+		value.ival = preset.lfo_count;
+		break;
 	case SynthProperty::pSynthMono:
 		value.bval = preset.mono;
 		break;
@@ -1029,6 +1046,9 @@ void SynthPartPropertyHolder::update_properties() {
 }
 
 void AnalogSynth::update_properties() {
+	submit_change(SynthProperty::pSynthOscCount, (int) preset.osc_count);
+	submit_change(SynthProperty::pSynthModEnvCount, (int) preset.mod_env_count);
+	submit_change(SynthProperty::pSynthLFOCount, (int) preset.lfo_count);
 	submit_change(SynthProperty::pSynthMono, preset.mono);
 	submit_change(SynthProperty::pSynthLegato, preset.legato);
 	submit_change(SynthProperty::pSynthPortamendo, preset.portamendo);
