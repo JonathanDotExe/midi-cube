@@ -357,7 +357,7 @@ AnalogSynth::AnalogSynth() {
 
 static inline double apply_modulation(const FixedScale& scale, PropertyModulation& mod, std::array<double, ANALOG_PART_COUNT>& env_val, std::array<double, ANALOG_PART_COUNT>& lfo_val, std::array<double, ANALOG_CONTROL_COUNT>& controls, double velocity) {
 	double prog = mod.value;
-	prog += env_val.at(mod.mod_env) * mod.mod_env_amount + lfo_val.at(mod.lfo) * mod.lfo_amount + controls.at(mod.cc) * mod.cc_amount + velocity * mod.velocity_amount;
+	prog += env_val[mod.mod_env] * mod.mod_env_amount + lfo_val[mod.lfo] * mod.lfo_amount + controls[mod.cc] * mod.cc_amount + velocity * mod.velocity_amount;
 	prog = fmin(fmax(prog, 0.0), 1.0);
 	return scale.value(prog);
 }
@@ -367,27 +367,28 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 	//Reset amps
 	bool reset_amps = amp_finished(info, note, env, note_index); //TODO maybe use press note event
 	//Mod Envs
-	for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
 		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
 		if (mod_env.active) {
 			size_t index = ENV_INDEX(note_index, i);
 			if  (reset_amps) {
-				mod_envs.at(index).reset();
+				mod_envs[index].reset();
 			}
 
 			double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, controls, note.velocity);
-			env_val.at(i) = mod_envs.at(note_index + i * SOUND_ENGINE_POLYPHONY).amplitude(mod_env.env, info.time_step, note.pressed, env.sustain) * volume;
+			env_val[i] = mod_envs.at(note_index + i * SOUND_ENGINE_POLYPHONY).amplitude(mod_env.env, info.time_step, note.pressed, env.sustain) * volume;
 		}
 	}
 	//Synthesize
 	double lsample = 0;
 	double rsample = 0;
-	for (size_t i = 0; i < preset.oscilators.size(); ++i) {
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
 		if (osc.active) {
 			//Frequency
 			double freq = note.freq;
-			size_t fm_count = osc.fm.size();
+			//FM
+			const size_t fm_count = osc.fm.size();
 			for (size_t i = 0; i < fm_count; ++i) {
 				FrequencyModulatotion& fm = osc.fm[i];
 				if (fm.fm_amount) {
@@ -405,7 +406,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 			size_t index = OSC_INDEX(note_index, i);
 			//Only on note start
 			if  (reset_amps) {
-				amp_envs.at(index).reset();
+				amp_envs[index].reset();
 				if (osc.reset) {
 					oscilators.reset(index);
 				}
@@ -423,7 +424,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 			//Signal
 			AnalogOscilatorSignal sig = oscilators.signal(freq, info.time_step, index, data, bdata);
 			double signal = sig.carrier;
-			modulators.at(index) = sig.modulator * volume;
+			modulators[index] = sig.modulator * volume;
 			if (osc.audible) {
 				//Filter
 				if (osc.filter) {
@@ -433,11 +434,12 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 
 					if (osc.filter_kb_track && filter.cutoff != 1) {
 						double cutoff = factor_to_cutoff(filter.cutoff, info.time_step);
+						//KB track
 						cutoff *= 1 + ((double) note.note - 36)/12.0 * osc.filter_kb_track;
 						filter.cutoff = cutoff_to_factor(cutoff, info.time_step);
 					}
 
-					signal = filters.at(note_index + i * SOUND_ENGINE_POLYPHONY).apply(filter, signal, info.time_step);
+					signal = filters[note_index + i * SOUND_ENGINE_POLYPHONY].apply(filter, signal, info.time_step);
 				}
 				signal *= volume;
 				//Pan
@@ -486,15 +488,13 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 		if (note != last_note) {
 			//Reset envs to attack
 			if (!preset.legato) {
-				//Mod envs
-				for (size_t i = 0; i < preset.mod_envs.size(); ++i) {
+				for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+					//Mod env
 					size_t index = ENV_INDEX(0, i);	//Updating every amp might be a bug source
-					mod_envs.at(index).phase = ATTACK;
-				}
-				//Amp envs
-				for (size_t i = 0; i < preset.oscilators.size(); ++i) {
-					size_t index = OSC_INDEX(0, i);
-					amp_envs.at(index).phase = ATTACK;
+					mod_envs[index].phase = ATTACK;
+					//Amp env
+					index = OSC_INDEX(0, i);
+					amp_envs[index].phase = ATTACK;
 				}
 			}
 			note_port.set(note, info.time, first_port ? 0 : preset.portamendo);
@@ -550,12 +550,12 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 	//TODO move before notes
 	lfo_val = {};
 	lfo_mod = {};
-	for (size_t i = 0; i < preset.lfos.size(); ++i) {
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
 		LFOEntity& lfo = preset.lfos[i];
 		if (lfo.active) {
 			double volume = apply_modulation(VOLUME_SCALE, lfo.volume, env_val, lfo_val, controls, 0);
 			AnalogOscilatorData d = {lfo.waveform};
-			AnalogOscilatorSignal sig = lfos.at(i).signal(lfo.freq, info.time_step, d);
+			AnalogOscilatorSignal sig = lfos[i].signal(lfo.freq, info.time_step, d);
 			lfo_val.at(i) = sig.carrier * volume;
 			lfo_mod.at(i) = sig.modulator * volume;
 		}
@@ -576,7 +576,8 @@ bool AnalogSynth::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardE
 
 bool AnalogSynth::amp_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	bool finished = true;
-	for (size_t i = 0; i < preset.oscilators.size() && finished; ++i) {
+	const size_t size = preset.oscilators.size();
+	for (size_t i = 0; i < size && finished; ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
 		size_t index = OSC_INDEX(note_index, i);
 		if (osc.active) {
