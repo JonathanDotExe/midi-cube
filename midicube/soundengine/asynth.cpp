@@ -367,7 +367,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 	//Reset amps
 	bool reset_amps = amp_finished(info, note, env, note_index); //TODO maybe use press note event
 	//Mod Envs
-	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
 		if (mod_env.active) {
 			size_t index = ENV_INDEX(note_index, i);
@@ -382,7 +382,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS>& channels, Sa
 	//Synthesize
 	double lsample = 0;
 	double rsample = 0;
-	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+	for (size_t i = 0; i < preset.osc_count; ++i) {
 		OscilatorEntity& osc = preset.oscilators[i];
 		if (osc.active) {
 			//Frequency
@@ -475,12 +475,14 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 		if (note != last_note) {
 			//Reset envs to attack
 			if (!preset.legato) {
-				for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+				for (size_t i = 0; i < preset.mod_env_count; ++i) {
 					//Mod env
 					size_t index = ENV_INDEX(0, i);	//Updating every amp might be a bug source
 					mod_envs[index].phase = ATTACK;
+				}
+				for (size_t i = 0; i < preset.osc_count; ++i) {
 					//Amp env
-					index = OSC_INDEX(0, i);
+					size_t index = OSC_INDEX(0, i);
 					amp_envs[index].phase = ATTACK;
 				}
 			}
@@ -537,7 +539,7 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, 
 	//TODO move before notes
 	lfo_val = {};
 	lfo_mod = {};
-	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		LFOEntity& lfo = preset.lfos[i];
 		if (lfo.active) {
 			double volume = apply_modulation(VOLUME_SCALE, lfo.volume, env_val, lfo_val, controls, 0);

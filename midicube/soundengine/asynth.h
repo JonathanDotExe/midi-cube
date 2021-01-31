@@ -90,6 +90,10 @@ struct AnalogSynthPreset {
 	std::array<ModEnvelopeEntity, ANALOG_PART_COUNT> mod_envs;
 	std::array<OscilatorEntity, ANALOG_PART_COUNT> oscilators;
 
+	size_t lfo_count = 1;
+	size_t mod_env_count = 0;
+	size_t osc_count = 0;
+
 	bool mono = false;
 	bool legato = false;
 	double portamendo = 0;
