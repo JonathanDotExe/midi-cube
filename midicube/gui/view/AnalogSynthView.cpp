@@ -91,8 +91,8 @@ Scene AnalogSynthView::create(Frame &frame) {
 		value->bind(&synth, SynthProperty::pSynthLFOCount);
 		controls.push_back(value);
 	}
-	tmp_x += 90;
 	tmp_y += 75;
+	tmp_x = 10;
 
 	//Polyphony Mode
 	//Mono

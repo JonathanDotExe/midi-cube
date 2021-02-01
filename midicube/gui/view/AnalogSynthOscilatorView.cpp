@@ -163,6 +163,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		waveform->bind(part, SynthPartProperty::pSynthOscWaveForm);
 		controls.push_back(waveform);
 	}
+	tmp_y += 50;
 	//Reset and audible
 	{
 		CheckBox* reset = new CheckBox(false, "Reset", main_font, 16, tmp_x, tmp_y, 40, 40);
