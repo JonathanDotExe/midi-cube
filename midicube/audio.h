@@ -55,6 +55,10 @@ private:
 	std::array<double, OUTPUT_CHANNELS> sample_buf = {};
 public:
 
+	AudioHandler() : audio(RtAudio::Api::UNIX_JACK)  {
+
+	}
+
 	~AudioHandler() {
 		close();
 	};
