@@ -283,7 +283,7 @@ void input_callback (double delta, std::vector<unsigned char>* msg, void* arg) {
 //MidiInput
 MidiInput::MidiInput() : MidiHandler::MidiHandler() {
 	try {
-		midiin = new RtMidiIn();
+		midiin = new RtMidiIn(RtMidi::Api::UNIX_JACK);
 	}
 	catch (RtMidiError& error) {
 		throw MidiException(error.what());
@@ -327,7 +327,7 @@ MidiInput::~MidiInput() {
 
 //MidiOutput
 MidiOutput::MidiOutput() : MidiHandler::MidiHandler() {
-	midiout = new RtMidiOut();
+	midiout = new RtMidiOut(RtMidi::Api::UNIX_JACK);
 }
 
 void MidiOutput::send(MidiMessage& message) {

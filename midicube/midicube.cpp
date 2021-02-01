@@ -17,29 +17,6 @@ MidiCube::MidiCube() : changes(128), update(32) {
 }
 
 void MidiCube::init(int out_device, int in_device) {
-	//MIDI Inputs
-	//Input-Devices
-	MidiInput input_dummy;
-	size_t n_ports = input_dummy.available_ports();
-	for (size_t i = 0; i < n_ports; ++i) {
-		MidiInput* input = new MidiInput();
-		std::string name;
-		try {
-			name = input->port_name(i);
-			input->open(i);
-		}
-		catch (MidiException& exc) {
-			delete input;
-			input = nullptr;
-		}
-		if (input != nullptr) {
-			inputs.push_back({input, name});
-			size_t index = inputs.size() - 1;
-			input->set_callback([index, this](double delta, MidiMessage& msg) {
-				midi_callback(msg, index);
-			});
-		}
-	}
 	//Sound Engines
 	fill_sound_engine_device(&engine);
 	//Synth presets
@@ -83,6 +60,29 @@ void MidiCube::init(int out_device, int in_device) {
 	}
 	//Init audio
 	audio_handler.init(out_device, in_device);
+	//MIDI Inputs
+		//Input-Devices
+		MidiInput input_dummy;
+		size_t n_ports = input_dummy.available_ports();
+		for (size_t i = 0; i < n_ports; ++i) {
+			MidiInput* input = new MidiInput();
+			std::string name;
+			try {
+				name = input->port_name(i);
+				input->open(i);
+			}
+			catch (MidiException& exc) {
+				delete input;
+				input = nullptr;
+			}
+			if (input != nullptr) {
+				inputs.push_back({input, name});
+				size_t index = inputs.size() - 1;
+				input->set_callback([index, this](double delta, MidiMessage& msg) {
+					midi_callback(msg, index);
+				});
+			}
+		}
 }
 
 void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
