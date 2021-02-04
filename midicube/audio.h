@@ -55,7 +55,12 @@ private:
 	std::array<double, OUTPUT_CHANNELS> sample_buf = {};
 public:
 
-	AudioHandler() : audio(RtAudio::Api::UNIX_JACK)  {
+	AudioHandler() :
+		audio(
+			#ifdef MIDICUBE_USE_JACK
+				RtAudio::Api::UNIX_JACK
+			#endif
+		)  {
 
 	}
 
