@@ -59,7 +59,7 @@ extern SampleDrumKit* load_drumkit(std::string folder) {
 				unsigned int index = r.second.get<unsigned int>("note", 0);
 				drumkit->notes[index] = {};
 				std::string file = folder + "/" + r.second.get<std::string>("file");
-				if (!read_audio_file(drumkit->notes.at(index), file)) {
+				if (!read_audio_file(drumkit->notes[index], file)) {
 					std::cerr << "Couldn't load drum sample " << file << std::endl;
 					throw std::runtime_error("Couldn't load drum sample " + file);
 				}

@@ -467,7 +467,7 @@ ssize_t SoundEngineChannel::get_engine() {
 	return engine_index;
 }
 
-SoundEngine* SoundEngineChannel::get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel) {
+inline SoundEngine* SoundEngineChannel::get_engine(std::vector<SoundEngineBank*>& engines, unsigned int channel) {
 	ssize_t engine_index = this->engine_index;
 	if (engine_index >= 0 && engine_index < (ssize_t) engines.size()) {
 		return &engines[engine_index]->channel(channel);
@@ -515,7 +515,7 @@ void SoundEngineDevice::add_sound_engine(SoundEngineBank* engine) {
 }
 
 void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
-	SoundEngineChannel& ch = this->channels.at(message.channel);
+	SoundEngineChannel& ch = this->channels[message.channel];
 	SoundEngine* engine = ch.get_engine(sound_engines, message.channel);
 	if (engine) {
 		ch.send(message, info, *engine);

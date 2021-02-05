@@ -99,7 +99,7 @@ public:
 	}
 
 	void reset(size_t index) {
-		std::array<AnalogOscilator, U>& osc = oscilators.at(index);
+		std::array<AnalogOscilator, U>& osc = oscilators[index];
 		for (size_t i = 0; i < U; ++i) {
 			osc[i].reset();
 		}

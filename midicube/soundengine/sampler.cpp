@@ -31,10 +31,10 @@ double SampleSound::get_sample(unsigned int channel, SampleInfo& info, Triggered
 		}
 	}
 	if (!region1) {
-		region1 =  samples.at(samples.size() - 1);
+		region1 =  samples[samples.size() - 1];
 	}
 	if (!region2) {
-		region2 =  samples.at(samples.size() - 1);
+		region2 =  samples[samples.size() - 1];
 	}
 	double prog = 0;
 	if (region2->freq != region1->freq) {
@@ -100,7 +100,7 @@ Sampler::Sampler() {
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	ADSREnvelopeData e = this->sample->get_envelope();
-	ADSREnvelope& en = envs.at(note_index);
+	ADSREnvelope& en = envs[note_index];
 	if (en.is_finished()) {
 		en.reset();
 	}
@@ -111,7 +111,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 }
 
 bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return !note.pressed && envs.at(note_index).is_finished();
+	return !note.pressed && envs[note_index].is_finished();
 }
 
 std::string Sampler::get_name() {

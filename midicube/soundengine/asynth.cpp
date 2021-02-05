@@ -394,7 +394,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val,
 				lfo_val, controls, note.velocity);
 		env_val[i] =
-				mod_envs.at(note_index + i * SOUND_ENGINE_POLYPHONY).amplitude(
+				mod_envs[note_index + i * SOUND_ENGINE_POLYPHONY].amplitude(
 						mod_env.env, info.time_step, note.pressed, env.sustain)
 						* volume;
 	}
@@ -408,7 +408,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		for (size_t i = 0; i < fm_count; ++i) {
 			FrequencyModulatotion &fm = osc.fm[i];
 			if (fm.fm_amount) {
-				freq += modulators.at(OSC_INDEX(note_index, fm.modulator))
+				freq += modulators[OSC_INDEX(note_index, fm.modulator)]
 						* fm.fm_amount;
 			}
 		}
@@ -435,7 +435,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		//Apply modulation
 		double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val,
 				lfo_val, controls, note.velocity)
-				* amp_envs.at(index).amplitude(osc.env, info.time_step,
+				* amp_envs[index].amplitude(osc.env, info.time_step,
 						note.pressed, env.sustain);
 		data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val,
 				lfo_val, controls, note.velocity);
@@ -557,13 +557,13 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 				lfo_val, controls, 0);
 		AnalogOscilatorData d = { lfo.waveform };
 		AnalogOscilatorSignal sig = lfos[i].signal(lfo.freq, info.time_step, d);
-		lfo_val.at(i) = sig.carrier * volume;
-		lfo_mod.at(i) = sig.modulator * volume;
+		lfo_val[i] = sig.carrier * volume;
+		lfo_mod[i] = sig.modulator * volume;
 	}
 }
 
 void AnalogSynth::control_change(unsigned int control, unsigned int value) {
-	controls.at(control) = value / 127.0;
+	controls[control] = value / 127.0;
 }
 
 bool AnalogSynth::note_finished(SampleInfo &info, TriggeredNote &note,

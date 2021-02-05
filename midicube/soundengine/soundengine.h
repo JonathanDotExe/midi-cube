@@ -134,8 +134,8 @@ private:
 	std::array<T, SOUND_ENGINE_MIDI_CHANNELS> engines;
 
 public:
-	SoundEngine& channel(unsigned int channel) {
-		return engines.at(channel);
+	inline SoundEngine& channel(unsigned int channel) {
+		return engines[channel];
 	}
 	std::string get_name() {
 		return get_engine_name<T>();
@@ -250,7 +250,7 @@ public:
 
 	void update_properties();
 
-	SoundEngine* get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel);
+	inline SoundEngine* get_engine(std::vector<SoundEngineBank*>& engines, unsigned int channel);
 
 	/**
 	 * May only be called from GUI thread after GUI has started

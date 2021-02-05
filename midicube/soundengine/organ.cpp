@@ -80,8 +80,8 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, 
 void B3Organ::process_note_sample(double& lsample, double& rsample, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Organ sound
 	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
-	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
-		int tonewheel = note.note + drawbar_notes.at(i) - ORGAN_LOWEST_TONEWHEEL_NOTE;
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
 		trigger_tonewheel(tonewheel, data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount, info, note);
 	}
 	//Percussion
