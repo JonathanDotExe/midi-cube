@@ -94,9 +94,6 @@ public:
 
 	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
 
-	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
-
-	};
 
 	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 

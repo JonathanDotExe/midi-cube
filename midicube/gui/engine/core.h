@@ -9,7 +9,7 @@
 #define MIDICUBE_GUI_ENGINE_CORE_H_
 
 #include <SFML/Graphics.hpp>
-#include <boost/lockfree/queue.hpp>
+#include <boost/lockfree/spsc_queue.hpp>
 #include <functional>
 #include "../../util.h"
 #include "../../property.h"
@@ -107,7 +107,7 @@ private:
 	ViewController* next_view = nullptr;
 	bool request_close = false;
 
-	boost::lockfree::queue<PropertyChange> changes;
+	boost::lockfree::spsc_queue<PropertyChange> changes;
 
 public:
 	MidiCube& cube;

@@ -11,7 +11,8 @@
 #include <cstddef>
 #include <functional>
 #include <atomic>
-#include <boost/lockfree/queue.hpp>
+#include <boost/lockfree/spsc_queue.hpp>
+#include <iostream>
 
 template<typename T>
 struct PropertyType {};
@@ -51,7 +52,7 @@ class PropertyHolder {
 
 public:
 
-	boost::lockfree::queue<PropertyChange>* changes = nullptr;
+	boost::lockfree::spsc_queue<PropertyChange>* changes = nullptr;
 
 	virtual void set(size_t prop, PropertyValue value, size_t sub_prop = 0) = 0;
 
@@ -76,7 +77,9 @@ protected:
 
 void PropertyHolder::submit_change(size_t prop, PropertyValue value, size_t sub_prop) {
 	if (changes) {
-		changes->push({this, prop, value, sub_prop});
+		if (!changes->push({this, prop, value, sub_prop})) {
+			std::cerr << "Lost change message" << std::endl;
+		}
 	}
 }
 

@@ -113,9 +113,6 @@ void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channe
 				}
 			}
 		}
-		else {
-			note_not_pressed(info, note.note[i], i);
-		}
 	}
 	//Static sample
 	process_sample(channels, info, environment, status);

@@ -7,12 +7,13 @@
 
 #include "midicube.h"
 #include "soundengine/engines.h"
+#include <iostream>
 
 static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, void* user_data) {
 	((MidiCube*) user_data)->process(channels, info);
 }
 
-MidiCube::MidiCube() : changes(128), update(32) {
+MidiCube::MidiCube() : changes(128), update(32), messages(128) {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -96,6 +97,11 @@ void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo
 	while (update.pop(holder)) {
 		holder->update_properties();
 	}
+	//Messages
+	MidiMessageWithInput msg;
+	while (messages.pop(msg)) {
+		process_midi(msg.msg, msg.input);
+	}
 	//Process
 	engine.process_sample(channels, info);
 }
@@ -104,7 +110,7 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 	return inputs;
 }
 
-void MidiCube::midi_callback(MidiMessage& message, size_t input) {
+inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	MessageType t = message.get_message_type();
 	SampleInfo info = audio_handler.sample_info();
 	for (size_t i = 0; i < engine.channels.size(); ++i) {
@@ -150,12 +156,23 @@ void MidiCube::midi_callback(MidiMessage& message, size_t input) {
 	}
 }
 
+void MidiCube::midi_callback(MidiMessage& message, size_t input) {
+	MidiMessageWithInput msg = {input, message};
+	if (!messages.push(msg)) {
+		std::cerr << "Lost midi message" << std::endl;
+	}
+}
+
 void MidiCube::perform_change(PropertyChange change) {
-	changes.push(change);
+	if (!changes.push(change)) {
+		std::cerr << "Lost change" << std::endl;
+	}
 }
 
 void MidiCube::request_update(PropertyHolder* holder) {
-	update.push(holder);
+	if (!update.push(holder)) {
+		std::cerr << "Lost update" << std::endl;
+	}
 }
 
 MidiCube::~MidiCube() {
