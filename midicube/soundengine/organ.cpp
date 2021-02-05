@@ -77,7 +77,7 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, 
 	}
 }
 
-void B3Organ::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+void B3Organ::process_note_sample(double& lsample, double& rsample, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Organ sound
 	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 	for (size_t i = 0; i < data.preset.drawbars.size(); ++i) {
@@ -107,7 +107,7 @@ bool B3Organ::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvir
 	return !note.pressed && info.time > ORGAN_MAX_UP_DELAY;
 };
 
-void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
+void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
 	//Update properties
 	double swell = this->data.swell * SWELL_RANGE + MIN_SWELL;
 
@@ -169,17 +169,12 @@ void B3Organ::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, Samp
 	}
 
 	//Amplifier
-	double lsample = sample;
-	double rsample = sample;
+	lsample = sample;
+	rsample = sample;
 	data.amplifier.apply(lsample, rsample, data.preset.amplifier, info);
 
 	//Rotary
 	data.rotary_speaker.apply(lsample, rsample, data.preset.rotary, info);
-
-	//Play
-	for (size_t i = 0; i < channels.size() ; ++i) {
-		channels[i] += i%2 == 0 ? lsample : rsample;
-	}
 }
 
 void B3Organ::control_change(unsigned int control, unsigned int value) {

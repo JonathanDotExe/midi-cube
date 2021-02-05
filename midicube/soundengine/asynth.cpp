@@ -377,7 +377,7 @@ static inline double apply_modulation(const FixedScale &scale,
 	return scale.value(prog);
 }
 
-void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS> &channels,
+void AnalogSynth::process_note(double& lsample, double& rsample,
 		SampleInfo &info, TriggeredNote &note, KeyboardEnvironment &env,
 		size_t note_index) {
 	env_val = { };
@@ -399,8 +399,6 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS> &channels,
 						* volume;
 	}
 	//Synthesize
-	double lsample = 0;
-	double rsample = 0;
 	for (size_t i = 0; i < preset.osc_count; ++i) {
 		OscilatorEntity &osc = preset.oscilators[i];
 		//Frequency
@@ -479,30 +477,22 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS> &channels,
 			//Pan
 			double panning = apply_modulation(PANNING_SCALE, osc.panning,
 					env_val, lfo_val, controls, note.velocity);
+			//Playback
 			lsample += signal * (1 - fmax(0, panning));
 			rsample += signal * (1 - fmax(0, -panning));
-		}
-	}
-
-	//Play
-	for (size_t i = 0; i < channels.size(); ++i) {
-		if (i % 2 == 0) {
-			channels[i] += lsample;
-		} else {
-			channels[i] += rsample;
 		}
 	}
 }
 
 void AnalogSynth::process_note_sample(
-		std::array<double, OUTPUT_CHANNELS> &channels, SampleInfo &info,
+		double& lsample, double& rsample, SampleInfo &info,
 		TriggeredNote &note, KeyboardEnvironment &env, size_t note_index) {
 	if (!preset.mono) {
-		process_note(channels, info, note, env, note_index);
+		process_note(lsample, rsample, info, note, env, note_index);
 	}
 }
 
-void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS> &channels,
+void AnalogSynth::process_sample(double& lsample, double& rsample,
 		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
 	//Mono
 	if (preset.mono && status.latest_note) {
@@ -531,7 +521,7 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS> &channels,
 		e.pitch_bend *= note_to_freq_transpose(
 				pitch - status.latest_note->note);
 
-		process_note(channels, info, *status.latest_note, e, 0);
+		process_note(lsample, rsample, info, *status.latest_note, e, 0);
 	}
 
 	//Delay lines
@@ -539,13 +529,6 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS> &channels,
 		//Get samples
 		double lsample = 0;
 		double rsample = 0;
-		for (size_t i = 0; i < channels.size(); ++i) {
-			if (i % 2 == 0) {
-				lsample += channels[i];
-			} else {
-				rsample += channels[i];
-			}
-		}
 		//Apply delay
 		ldelay.add_isample(lsample, preset.delay_time * info.sample_rate);
 		rdelay.add_isample(rsample, preset.delay_time * info.sample_rate);
@@ -563,14 +546,6 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS> &channels,
 
 		lsample += ldsample * fmin(0.5, preset.delay_mix) * 2;
 		rsample += rdsample * fmin(0.5, preset.delay_mix) * 2;
-
-		for (size_t i = 0; i < channels.size(); ++i) {
-			if (i % 2 == 0) {
-				channels[i] += lsample;
-			} else {
-				channels[i] += rsample;
-			}
-		}
 	}
 	//Move LFOs
 	//TODO move before notes

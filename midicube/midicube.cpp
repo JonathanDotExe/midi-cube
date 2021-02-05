@@ -103,10 +103,7 @@ void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 		process_midi(msg.msg, msg.input);
 	}
 	//Process
-	std::array<double, OUTPUT_CHANNELS> channels = {0, 0};
 	engine.process_sample(lsample, rsample, info);
-	lsample = channels[0];
-	rsample = channels[1];
 }
 
 std::vector<MidiCubeInput> MidiCube::get_inputs() {

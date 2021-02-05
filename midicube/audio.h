@@ -13,8 +13,6 @@
 #include <array>
 #include <rtaudio/RtAudio.h>
 
-#define OUTPUT_CHANNELS 2
-
 class AudioException : public std::exception {
 
 private:

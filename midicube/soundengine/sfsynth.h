@@ -26,7 +26,7 @@ public:
 
 	void release_note(SampleInfo& info, unsigned int note);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
 	virtual ~SoundFontSynth();
 
