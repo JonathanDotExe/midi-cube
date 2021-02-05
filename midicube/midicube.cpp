@@ -104,7 +104,7 @@ void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 	}
 	//Process
 	std::array<double, OUTPUT_CHANNELS> channels = {0, 0};
-	engine.process_sample(channels, info);
+	engine.process_sample(lsample, rsample, info);
 	lsample = channels[0];
 	rsample = channels[1];
 }

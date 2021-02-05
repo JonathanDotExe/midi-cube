@@ -96,7 +96,7 @@ void BaseSoundEngine::release_note(SampleInfo& info, unsigned int note) {
 	this->note.release_note(info, note);
 }
 
-void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+void BaseSoundEngine::process_sample(double& lsample, double& rsample, SampleInfo& info) {
 	EngineStatus status = {0, 0, nullptr};
 	//Notes
 	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
@@ -107,7 +107,7 @@ void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channe
 			else {
 				++status.pressed_notes; //TODO might cause problems in the future
 				note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
-				process_note_sample(channels, info, note.note[i], environment, i);
+				process_note_sample(lsample, rsample, info, note.note[i], environment, i);
 				if (!status.latest_note || status.latest_note->start_time < note.note[i].start_time) {
 					status.latest_note = &note.note[i];
 					status.latest_note_index = i;
@@ -116,7 +116,7 @@ void BaseSoundEngine::process_sample(std::array<double, OUTPUT_CHANNELS>& channe
 		}
 	}
 	//Static sample
-	process_sample(channels, info, environment, status);
+	process_sample(lsample, rsample, info, environment, status);
 }
 
 
@@ -233,10 +233,11 @@ SoundEngineChannel::SoundEngineChannel() {
 	engine_index = -1;
 }
 
-void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info, Metronome& metronome, SoundEngine* engine) {
+void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, SoundEngine* engine) {
 	//Properties
 	if (engine) {
-		std::array<double, OUTPUT_CHANNELS> ch = {};
+		double l = 0;
+		double r = 0;
 		//Arpeggiator
 		if (arp.on) {
 			arp.apply(info,
@@ -249,19 +250,20 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 		}
 		//Process
 		if (active) {
-			engine->process_sample(ch, info);
+			engine->process_sample(lsample, rsample, info);
 		}
 		//Vocoder
-		vocoder.apply(ch[0], ch[1], info.input_sample, vocoder_preset, info);
+		vocoder.apply(l, r, info.input_sample, vocoder_preset, info);
 		//Bit Crusher
-		bitcrusher.apply(ch[0], ch[1], bitcrusher_preset, info);
+		bitcrusher.apply(l, r, bitcrusher_preset, info);
+		//Pan
+		l *= (1 - fmax(0, panning));
+		r *= (1 - fmax(0, -panning));
 		//Looper
-		looper.apply(ch, metronome, info);
+		looper.apply(l, r, metronome, info);
 		//Playback
-		for (size_t i = 0; i < channels.size(); ++i) {
-			double mul = i % 2 == 0 ? (1 - fmax(0, panning)) : (1 - fmax(0, -panning));
-			channels[i] += (ch[i] * volume * mul);
-		}
+		lsample += l;
+		rsample += r;
 	}
 }
 
@@ -483,12 +485,12 @@ SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	metronome.init(0);
 }
 
-void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo &info) {
+void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleInfo &info) {
 	//Channels
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
 		SoundEngine* engine = ch.get_engine(sound_engines, i);
-		ch.process_sample(channels, info, metronome, engine);
+		ch.process_sample(lsample, rsample, info, metronome, engine);
 	}
 	//Metronome
 	if (play_metronome) {
@@ -498,9 +500,8 @@ void SoundEngineDevice::process_sample(std::array<double, OUTPUT_CHANNELS>& chan
 		double vol = metronome_env.amplitude(metronome_env_data, info.time_step, true, false);
 		if (vol) {
 			double sample = sine_wave(info.time, 3520) * vol;
-			for (size_t i = 0; i < channels.size(); ++i) {
-				channels[i] += sample;
-			}
+			lsample += sample;
+			rsample += sample;
 		}
 	}
 }

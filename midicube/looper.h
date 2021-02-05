@@ -23,7 +23,9 @@ struct LooperPreset {
 
 class Looper {
 private:
-	std::array<std::array<double, OUTPUT_CHANNELS>, LOOPER_BUFFER_SIZE> buffer = {};
+	std::array<double, LOOPER_BUFFER_SIZE> lbuffer = {};
+	std::array<double, LOOPER_BUFFER_SIZE> rbuffer = {};
+
 
 public:
 	LooperPreset preset;
@@ -31,7 +33,7 @@ public:
 	std::atomic<bool> record{true};
 	std::atomic<bool> reset{false};	//true will invoke a reset next sample
 
-	void apply(std::array<double, OUTPUT_CHANNELS>& channels, Metronome& metronome, SampleInfo& info);
+	void apply(double& lsample, double& rsample, Metronome& metronome, SampleInfo& info);
 };
 
 

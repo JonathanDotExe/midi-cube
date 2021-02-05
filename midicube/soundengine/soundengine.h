@@ -67,7 +67,7 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int note) = 0;
 
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) = 0;
+	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info) = 0;
 
 	virtual ~SoundEngine() {
 
@@ -90,12 +90,12 @@ public:
 
 	void release_note(SampleInfo& info, unsigned int note);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
-	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
+	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
 
 
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
+	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 
 	};
 
@@ -242,7 +242,7 @@ public:
 
 	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome, SoundEngine* engine);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, SoundEngine* engine);
 
 	PropertyValue get(size_t prop, size_t sub_prop);
 
@@ -289,7 +289,7 @@ public:
 
 	void send(MidiMessage& message, SampleInfo& info);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
 	void solo (unsigned int channel);
 
