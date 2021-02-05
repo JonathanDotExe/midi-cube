@@ -250,7 +250,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 		}
 		//Process
 		if (active) {
-			engine->process_sample(lsample, rsample, info);
+			engine->process_sample(l, r, info);
 		}
 		//Vocoder
 		vocoder.apply(l, r, info.input_sample, vocoder_preset, info);
@@ -262,8 +262,8 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 		//Looper
 		looper.apply(l, r, metronome, info);
 		//Playback
-		lsample += l;
-		rsample += r;
+		lsample += l * volume;
+		rsample += r * volume;
 	}
 }
 
