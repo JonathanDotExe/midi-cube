@@ -9,16 +9,6 @@
 #include "midi.h"
 #include <exception>
 
-#define NOTE_OFF_BIT 0x8
-#define NOTE_ON_BIT 0x9
-#define POLYPHONIC_AFTERTOUCH_BIT 0xA
-#define CONTROL_CHANGE_BIT 0xB
-#define PROGRAM_CHANGE_BIT 0xC
-#define MONOPHONIC_AFTERTOUCH_BIT 0xD
-#define PITCH_BEND_BIT 0xE
-#define SYSEX_BIT 0xF
-
-
 //MidiMessage
 MidiMessage::MidiMessage(std::vector<unsigned char> message) {
 	//Parse message

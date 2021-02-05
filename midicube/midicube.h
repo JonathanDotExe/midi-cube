@@ -20,7 +20,7 @@ struct MidiCubeInput {
 
 struct MidiMessageWithInput {
 	size_t input = 0;
-	MidiMessage msg{{}};
+	MidiMessage msg;
 };
 
 class MidiCube {
