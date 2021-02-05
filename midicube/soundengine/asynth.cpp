@@ -124,8 +124,8 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 		osc.filter_cutoff.mod_env_amount = 0.2;
 		osc.filter_resonance.value = 0.5;
 
-		preset.lfo_count = 1;
-		preset.mod_env_count = 0;
+		preset.lfo_count = 0;
+		preset.mod_env_count = 1;
 		preset.osc_count = 1;
 	}
 		break;

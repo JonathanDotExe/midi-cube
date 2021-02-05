@@ -39,20 +39,21 @@ void AudioHandler::init(int out_device, int in_device) {
 	params.firstChannel = 0;
 
 	//Set up input
-	RtAudio::StreamParameters input_params;
+	/*RtAudio::StreamParameters input_params;
 	input_params.deviceId = in_device >= 0 ? in_device : audio.getDefaultInputDevice();
 	input_params.nChannels = 1;
-	input_params.firstChannel = 0;
+	input_params.firstChannel = 0;*/
 
 	sample_rate = 44100;
 	time_step = 1.0/sample_rate;
 	buffer_size = 256;
 
 	try {
-		audio.openStream(&params, &input_params, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
+		audio.openStream(&params, nullptr, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
 		audio.startStream();
 		sample_rate = audio.getStreamSampleRate();
 		time_step = 1.0/sample_rate;
+		std::cout << "Opened audio stream Sample Rate: " << sample_rate << " Hz ... Buffer Size: " << buffer_size << std::endl;
 	}
 	catch (RtAudioError& e) {
 		throw AudioException(e.getMessage().c_str());
@@ -64,7 +65,7 @@ int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned 
 	//Compute each sample
 	//TODO Use rtaudio time
 	for (size_t i = 0; i < buffer_size; ++i) {
-		info = {time, time_step, sample_rate, sample_time, *input_buffer++};
+		info = {time, time_step, sample_rate, sample_time, 0};
 
 		sample_buf = {0, 0};
 		get_sample(sample_buf, info, user_data);

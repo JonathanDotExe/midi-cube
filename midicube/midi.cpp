@@ -258,7 +258,7 @@ std::vector<std::string> MidiHandler::available_port_names() {
 }
 
 void MidiHandler::open(unsigned int port) {
-	std::cout << "Opening port!" << std::endl;
+	std::cout << "Opening MIDI port: " << rtmidi().getPortName(port) << std::endl;
 	try {
 		rtmidi().openPort(port);
 	}
