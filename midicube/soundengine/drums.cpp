@@ -18,13 +18,12 @@ SampleDrums::SampleDrums () {
 	drumkit = load_drumkit("./data/drumkits/drums1");
 }
 
-void SampleDrums::process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+void SampleDrums::process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	try {
 		if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
 			AudioSample& audio = drumkit->notes[note.note];
-			for (size_t i = 0; i < channels.size(); ++i) {
-				channels[i] += audio.sample(i, info.time - note.start_time, info.sample_rate);
-			}
+			lsample += audio.sample(0, info.time - note.start_time, info.sample_rate);
+			rsample += audio.sample(1, info.time - note.start_time, info.sample_rate);
 		}
 	}
 	catch (std::exception& e) {
@@ -60,7 +59,7 @@ extern SampleDrumKit* load_drumkit(std::string folder) {
 				unsigned int index = r.second.get<unsigned int>("note", 0);
 				drumkit->notes[index] = {};
 				std::string file = folder + "/" + r.second.get<std::string>("file");
-				if (!read_audio_file(drumkit->notes.at(index), file)) {
+				if (!read_audio_file(drumkit->notes[index], file)) {
 					std::cerr << "Couldn't load drum sample " << file << std::endl;
 					throw std::runtime_error("Couldn't load drum sample " + file);
 				}

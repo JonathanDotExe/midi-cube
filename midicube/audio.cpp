@@ -67,12 +67,13 @@ int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned 
 	for (size_t i = 0; i < buffer_size; ++i) {
 		info = {time, time_step, sample_rate, sample_time, 0};
 
-		sample_buf = {0, 0};
-		get_sample(sample_buf, info, user_data);
+		double lsample = 0;
+		double rsample = 0;
+		get_sample(lsample, rsample, info, user_data);
 
 		//TODO array safety
-		*output_buffer++ = sample_buf[0];
-		*output_buffer++ = sample_buf[1];
+		*output_buffer++ = lsample;
+		*output_buffer++ = rsample;
 
 		this->time += time_step;
 		++sample_time;
@@ -86,7 +87,7 @@ void AudioHandler::close() {
 	}
 };
 
-void AudioHandler::set_sample_callback(void (* get_sample) (std::array<double, OUTPUT_CHANNELS>&, SampleInfo&, void*), void* user_data) {
+void AudioHandler::set_sample_callback(void (* get_sample) (double&, double&, SampleInfo&, void*), void* user_data) {
 	this->get_sample = get_sample;
 	this->user_data = user_data;
 }

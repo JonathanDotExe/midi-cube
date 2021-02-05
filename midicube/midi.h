@@ -13,6 +13,15 @@
 #include <exception>
 #include <functional>
 
+#define NOTE_OFF_BIT 0x8
+#define NOTE_ON_BIT 0x9
+#define POLYPHONIC_AFTERTOUCH_BIT 0xA
+#define CONTROL_CHANGE_BIT 0xB
+#define PROGRAM_CHANGE_BIT 0xC
+#define MONOPHONIC_AFTERTOUCH_BIT 0xD
+#define PITCH_BEND_BIT 0xE
+#define SYSEX_BIT 0xF
+
 class MidiException: public std::exception {
 
 private:
@@ -28,147 +37,96 @@ public:
 	}
 };
 
-enum class MessageType {
-	NOTE_OFF,
-	NOTE_ON,
-	POLYPHONIC_AFTERTOUCH,
-	CONTROL_CHANGE,
-	PROGRAM_CHANGE,
-	MONOPHONIC_AFTERTOUCH,
-	PITCH_BEND,
-	SYSEX,
+enum MessageType {
+	NOTE_OFF = NOTE_OFF_BIT,
+	NOTE_ON = NOTE_ON_BIT,
+	POLYPHONIC_AFTERTOUCH = POLYPHONIC_AFTERTOUCH_BIT,
+	CONTROL_CHANGE = CONTROL_CHANGE_BIT,
+	PROGRAM_CHANGE = PROGRAM_CHANGE_BIT,
+	MONOPHONIC_AFTERTOUCH = MONOPHONIC_AFTERTOUCH_BIT,
+	PITCH_BEND = PITCH_BEND_BIT,
+	SYSEX = SYSEX_BIT,
 	INVALID
 };
 
+//Not SYSEX compatible
 class MidiMessage {
 
-private:
-	std::vector<unsigned char> message;
-
-	unsigned char get_status_channel_byte();
-
-	unsigned char get_message_type_bits();
-
-	unsigned char get_channel_bits();
-
-	unsigned char get_first_data_byte();
-
-	unsigned char get_second_data_byte();
-
-	void set_status_channel_byte(unsigned char v);
-
-	void set_message_type_bits(unsigned char v);
-
-	void set_channel_bits(unsigned char v);
-
-	void set_first_data_byte(unsigned char v);
-
-	void set_second_data_byte(unsigned char v);
-
 public:
+	unsigned int channel = 0;
+	MessageType type = INVALID;
+	unsigned int first_data = 0;
+	unsigned int second_data = 0;
+
 	MidiMessage(std::vector<unsigned char> message);
 
-	MessageType get_message_type();
+	MidiMessage() {
 
-	/**
-	 * Every type except SYSEX and INVALID
-	 */
-	unsigned int get_channel();
+	}
 
 	/**
 	 * NOTE_ON, NOTE_OFF, POLYPHONIC_AFTERTOUCH
 	 */
-	unsigned int get_note();
+	inline unsigned int& note() {
+		return first_data;
+	}
 
 	/**
 	 * NOTE_ON, NOTE_OFF
 	 */
-	unsigned int get_velocity();
+	inline unsigned int& velocity() {
+		return second_data;
+	}
 
 	/**
 	 * POLYPHONIC_AFTERTOUCH
 	 */
-	unsigned int get_polyphonic_aftertouch();
+	inline unsigned int& polyphonic_aftertouch() {
+		return second_data;
+	}
 
 	/**
 	 * MONOPHONIC_AFTERTOUCH
 	 */
-	unsigned int get_monophonic_aftertouch();
+	inline unsigned int& monophonic_aftertouch() {
+		return first_data;
+	}
 
 	/**
 	 * PROGRAM_CHANGE
 	 */
-	unsigned int get_program();
+	inline unsigned int& program(){
+		return first_data;
+	}
 
 	/**
 	 * CONTROL_CHANGE
 	 */
-	unsigned int get_control();
+	inline unsigned int& control() {
+		return first_data;
+	}
 
 	/**
 	 * CONTROL_CHANGE
 	 */
-	unsigned int get_value();
+	inline unsigned int& value() {
+		return second_data;
+	}
 
 	/**
 	 * PITCH_BEND
 	 */
-	unsigned int get_pitch_bend();
-
-
-	void set_message_type(MessageType type);
-
-	/**
-	 * Every type except SYSEX and INVALID
-	 */
-	void set_channel(unsigned int v);
-
-	/**
-	 * NOTE_ON, NOTE_OFF, POLYPHONIC_AFTERTOUCH
-	 */
-	void set_note(unsigned int v);
-
-	/**
-	 * NOTE_ON, NOTE_OFF
-	 */
-	void set_velocity(unsigned int v);
-
-	/**
-	 * POLYPHONIC_AFTERTOUCH
-	 */
-	void set_polyphonic_aftertouch(unsigned int v);
-
-	/**
-	 * MONOPHONIC_AFTERTOUCH
-	 */
-	void set_monophonic_aftertouch(unsigned int v);
-
-	/**
-	 * PROGRAM_CHANGE
-	 */
-	void set_program(unsigned int v);
-
-	/**
-	 * CONTROL_CHANGE
-	 */
-	void set_control(unsigned int v);
-
-	/**
-	 * CONTROL_CHANGE
-	 */
-	void set_value(unsigned int v);
+	inline unsigned int get_pitch_bend() {
+		return (second_data << 7) + first_data;
+	}
 
 	/**
 	 * PITCH_BEND
 	 */
-	void set_pitch_bend(unsigned int v);
-
-	/**
-	 * SYSEX
-	 */
-	size_t get_message_length();
-
-	std::vector<unsigned char> get_message();
+	inline void set_pitch_bend(unsigned int v) {
+		first_data  = v & 0x07;
+		second_data = v & 0xF8;
+	}
 
 	std::string to_string();
 

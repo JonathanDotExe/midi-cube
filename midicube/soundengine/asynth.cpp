@@ -377,7 +377,7 @@ static inline double apply_modulation(const FixedScale &scale,
 	return scale.value(prog);
 }
 
-void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS> &channels,
+void AnalogSynth::process_note(double& lsample, double& rsample,
 		SampleInfo &info, TriggeredNote &note, KeyboardEnvironment &env,
 		size_t note_index) {
 	env_val = { };
@@ -394,13 +394,11 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS> &channels,
 		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val,
 				lfo_val, controls, note.velocity);
 		env_val[i] =
-				mod_envs.at(note_index + i * SOUND_ENGINE_POLYPHONY).amplitude(
+				mod_envs[note_index + i * SOUND_ENGINE_POLYPHONY].amplitude(
 						mod_env.env, info.time_step, note.pressed, env.sustain)
 						* volume;
 	}
 	//Synthesize
-	double lsample = 0;
-	double rsample = 0;
 	for (size_t i = 0; i < preset.osc_count; ++i) {
 		OscilatorEntity &osc = preset.oscilators[i];
 		//Frequency
@@ -410,7 +408,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS> &channels,
 		for (size_t i = 0; i < fm_count; ++i) {
 			FrequencyModulatotion &fm = osc.fm[i];
 			if (fm.fm_amount) {
-				freq += modulators.at(OSC_INDEX(note_index, fm.modulator))
+				freq += modulators[OSC_INDEX(note_index, fm.modulator)]
 						* fm.fm_amount;
 			}
 		}
@@ -437,7 +435,7 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS> &channels,
 		//Apply modulation
 		double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val,
 				lfo_val, controls, note.velocity)
-				* amp_envs.at(index).amplitude(osc.env, info.time_step,
+				* amp_envs[index].amplitude(osc.env, info.time_step,
 						note.pressed, env.sustain);
 		data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val,
 				lfo_val, controls, note.velocity);
@@ -479,30 +477,22 @@ void AnalogSynth::process_note(std::array<double, OUTPUT_CHANNELS> &channels,
 			//Pan
 			double panning = apply_modulation(PANNING_SCALE, osc.panning,
 					env_val, lfo_val, controls, note.velocity);
+			//Playback
 			lsample += signal * (1 - fmax(0, panning));
 			rsample += signal * (1 - fmax(0, -panning));
-		}
-	}
-
-	//Play
-	for (size_t i = 0; i < channels.size(); ++i) {
-		if (i % 2 == 0) {
-			channels[i] += lsample;
-		} else {
-			channels[i] += rsample;
 		}
 	}
 }
 
 void AnalogSynth::process_note_sample(
-		std::array<double, OUTPUT_CHANNELS> &channels, SampleInfo &info,
+		double& lsample, double& rsample, SampleInfo &info,
 		TriggeredNote &note, KeyboardEnvironment &env, size_t note_index) {
 	if (!preset.mono) {
-		process_note(channels, info, note, env, note_index);
+		process_note(lsample, rsample, info, note, env, note_index);
 	}
 }
 
-void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS> &channels,
+void AnalogSynth::process_sample(double& lsample, double& rsample,
 		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
 	//Mono
 	if (preset.mono && status.latest_note) {
@@ -531,7 +521,7 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS> &channels,
 		e.pitch_bend *= note_to_freq_transpose(
 				pitch - status.latest_note->note);
 
-		process_note(channels, info, *status.latest_note, e, 0);
+		process_note(lsample, rsample, info, *status.latest_note, e, 0);
 	}
 
 	//Delay lines
@@ -539,13 +529,6 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS> &channels,
 		//Get samples
 		double lsample = 0;
 		double rsample = 0;
-		for (size_t i = 0; i < channels.size(); ++i) {
-			if (i % 2 == 0) {
-				lsample += channels[i];
-			} else {
-				rsample += channels[i];
-			}
-		}
 		//Apply delay
 		ldelay.add_isample(lsample, preset.delay_time * info.sample_rate);
 		rdelay.add_isample(rsample, preset.delay_time * info.sample_rate);
@@ -563,14 +546,6 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS> &channels,
 
 		lsample += ldsample * fmin(0.5, preset.delay_mix) * 2;
 		rsample += rdsample * fmin(0.5, preset.delay_mix) * 2;
-
-		for (size_t i = 0; i < channels.size(); ++i) {
-			if (i % 2 == 0) {
-				channels[i] += lsample;
-			} else {
-				channels[i] += rsample;
-			}
-		}
 	}
 	//Move LFOs
 	//TODO move before notes
@@ -582,13 +557,13 @@ void AnalogSynth::process_sample(std::array<double, OUTPUT_CHANNELS> &channels,
 				lfo_val, controls, 0);
 		AnalogOscilatorData d = { lfo.waveform };
 		AnalogOscilatorSignal sig = lfos[i].signal(lfo.freq, info.time_step, d);
-		lfo_val.at(i) = sig.carrier * volume;
-		lfo_mod.at(i) = sig.modulator * volume;
+		lfo_val[i] = sig.carrier * volume;
+		lfo_mod[i] = sig.modulator * volume;
 	}
 }
 
 void AnalogSynth::control_change(unsigned int control, unsigned int value) {
-	controls.at(control) = value / 127.0;
+	controls[control] = value / 127.0;
 }
 
 bool AnalogSynth::note_finished(SampleInfo &info, TriggeredNote &note,

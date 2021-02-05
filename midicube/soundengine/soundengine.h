@@ -67,7 +67,7 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int note) = 0;
 
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) = 0;
+	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info) = 0;
 
 	virtual ~SoundEngine() {
 
@@ -90,15 +90,12 @@ public:
 
 	void release_note(SampleInfo& info, unsigned int note);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
-	virtual void process_note_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
+	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
 
-	virtual void note_not_pressed(SampleInfo& info, TriggeredNote& note, size_t note_index) {
 
-	};
-
-	virtual void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
+	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 
 	};
 
@@ -137,8 +134,8 @@ private:
 	std::array<T, SOUND_ENGINE_MIDI_CHANNELS> engines;
 
 public:
-	SoundEngine& channel(unsigned int channel) {
-		return engines.at(channel);
+	inline SoundEngine& channel(unsigned int channel) {
+		return engines[channel];
 	}
 	std::string get_name() {
 		return get_engine_name<T>();
@@ -245,7 +242,7 @@ public:
 
 	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, Metronome& metronome, SoundEngine* engine);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, SoundEngine* engine);
 
 	PropertyValue get(size_t prop, size_t sub_prop);
 
@@ -253,7 +250,7 @@ public:
 
 	void update_properties();
 
-	SoundEngine* get_engine(std::vector<SoundEngineBank*> engines, unsigned int channel);
+	inline SoundEngine* get_engine(std::vector<SoundEngineBank*>& engines, unsigned int channel);
 
 	/**
 	 * May only be called from GUI thread after GUI has started
@@ -292,7 +289,7 @@ public:
 
 	void send(MidiMessage& message, SampleInfo& info);
 
-	void process_sample(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
 	void solo (unsigned int channel);
 
