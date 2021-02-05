@@ -36,7 +36,7 @@ public:
 
 	MidiCube();
 	void init(int out_device = -1, int in_device = -1);
-	inline void process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info);
+	inline void process(double& lsample, double& rsample, SampleInfo& info);
 	//Only call from audio thread
 	void perform_change(PropertyChange change);
 	//Only call from GUI thread

@@ -9,8 +9,8 @@
 #include "soundengine/engines.h"
 #include <iostream>
 
-static void process_func(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info, void* user_data) {
-	((MidiCube*) user_data)->process(channels, info);
+static void process_func(double& lsample, double& rsample, SampleInfo& info, void* user_data) {
+	((MidiCube*) user_data)->process(lsample, rsample, info);
 }
 
 MidiCube::MidiCube() : changes(128), update(32), messages(128) {
@@ -86,7 +86,7 @@ void MidiCube::init(int out_device, int in_device) {
 		}
 }
 
-void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo& info) {
+void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 	//Changes
 	PropertyChange change;
 	while (changes.pop(change)) {
@@ -103,7 +103,10 @@ void MidiCube::process(std::array<double, OUTPUT_CHANNELS>& channels, SampleInfo
 		process_midi(msg.msg, msg.input);
 	}
 	//Process
+	std::array<double, OUTPUT_CHANNELS> channels = {0, 0};
 	engine.process_sample(channels, info);
+	lsample = channels[0];
+	rsample = channels[1];
 }
 
 std::vector<MidiCubeInput> MidiCube::get_inputs() {

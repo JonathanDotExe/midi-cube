@@ -43,7 +43,7 @@ class AudioHandler {
 private:
 	RtAudio audio;
 	void* user_data = nullptr;
-	void (* get_sample) (std::array<double, OUTPUT_CHANNELS>&, SampleInfo&, void*) = nullptr;
+	void (* get_sample) (double&, double&, SampleInfo&, void*) = nullptr;
 	/**
 	 * Only for use in the jack audio thread
 	 */
@@ -52,7 +52,6 @@ private:
 	double time_step{0.0};
 	unsigned int sample_rate{0};
 	unsigned int sample_time{0};
-	std::array<double, OUTPUT_CHANNELS> sample_buf = {};
 public:
 
 	AudioHandler() :
@@ -68,7 +67,7 @@ public:
 		close();
 	};
 
-	void set_sample_callback(void (* get_sample) (std::array<double, OUTPUT_CHANNELS>&, SampleInfo&, void*), void* user_data);
+	void set_sample_callback(void (* get_sample) (double&, double&, SampleInfo&, void*), void* user_data);
 
 	void init(int out_device = -1, int in_device = -1);
 
