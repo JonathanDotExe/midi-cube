@@ -55,35 +55,36 @@ void NoteBuffer::release_note(SampleInfo& info, unsigned int note, bool invalida
 
 //BaseSoundEngine
 void BaseSoundEngine::midi_message(MidiMessage& message, SampleInfo& info) {
-	//Note on
-	if (message.get_message_type() == MessageType::NOTE_ON) {
-		press_note(info, message.get_note(), message.get_velocity()/127.0);
-	}
-	//Note off
-	else if (message.get_message_type() == MessageType::NOTE_OFF) {
-		release_note(info, message.get_note());
-	}
-	//Control change
-	else if (message.get_message_type() == MessageType::CONTROL_CHANGE) {
-		control_change(message.get_control(), message.get_value());
-		//Sustain
-		if (message.get_control() == sustain_control) {
-			bool new_sustain = message.get_value() != 0;
-			if (new_sustain != environment.sustain) {
-				if (new_sustain) {
-					environment.sustain_time = info.time;
+	double pitch;
+	switch (message.type) {
+		case MessageType::NOTE_ON:
+			press_note(info, message.note(), message.velocity()/127.0);
+			break;
+		case MessageType::NOTE_OFF:
+			release_note(info, message.note());
+			break;
+		case MessageType::CONTROL_CHANGE:
+			control_change(message.control(), message.value());
+			//Sustain
+			if (message.control() == sustain_control) {
+				bool new_sustain = message.value() != 0;
+				if (new_sustain != environment.sustain) {
+					if (new_sustain) {
+						environment.sustain_time = info.time;
+					}
+					else {
+						environment.sustain_release_time = info.time;
+					}
+					environment.sustain = new_sustain;
 				}
-				else {
-					environment.sustain_release_time = info.time;
-				}
-				environment.sustain = new_sustain;
 			}
-		}
-	}
-	//Pitch bend
-	else if (message.get_message_type() == MessageType::PITCH_BEND) {
-		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
-		environment.pitch_bend = note_to_freq_transpose(pitch);
+			break;
+		case MessageType::PITCH_BEND:
+			pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
+			environment.pitch_bend = note_to_freq_transpose(pitch);
+			break;
+		default:
+			break;
 	}
 }
 
@@ -267,14 +268,16 @@ void SoundEngineChannel::process_sample(std::array<double, OUTPUT_CHANNELS>& cha
 void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine) {
 	if (active) {
 		if (arp.on) {
-			if (message.get_message_type() == MessageType::NOTE_ON) {
-				arp.note.press_note(info, message.get_note(), message.get_velocity()/127.0);
-			}
-			else if (message.get_message_type() == MessageType::NOTE_OFF) {
-				arp.note.release_note(info, message.get_note(), true);
-			}
-			else {
+			switch (message.type) {
+			case MessageType::NOTE_ON:
+				arp.note.press_note(info, message.note(), message.velocity()/127.0);
+				break;
+			case MessageType::NOTE_OFF:
+				arp.note.release_note(info, message.note(), true);
+				break;
+			default:
 				engine.midi_message(message, info);
+				break;
 			}
 		}
 		else {
@@ -511,8 +514,8 @@ void SoundEngineDevice::add_sound_engine(SoundEngineBank* engine) {
 }
 
 void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
-	SoundEngineChannel& ch = this->channels.at(message.get_channel());
-	SoundEngine* engine = ch.get_engine(sound_engines, message.get_channel());
+	SoundEngineChannel& ch = this->channels.at(message.channel);
+	SoundEngine* engine = ch.get_engine(sound_engines, message.channel);
 	if (engine) {
 		ch.send(message, info, *engine);
 	}

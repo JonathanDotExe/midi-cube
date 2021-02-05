@@ -22,15 +22,21 @@ SoundFontSynth::SoundFontSynth() {
 }
 
 void SoundFontSynth::midi_message(MidiMessage& msg, SampleInfo& info) {
-	MessageType type = msg.get_message_type();
-	if (type == MessageType::NOTE_ON) {
-		fluid_synth_noteon(synth, 0, msg.get_note(), msg.get_velocity());
-	}
-	else if (type == MessageType::NOTE_OFF) {
-		fluid_synth_noteoff(synth, 0, msg.get_note());
-	}
-	if (type == MessageType::CONTROL_CHANGE) {
-		fluid_synth_cc(synth, 0, msg.get_control(), msg.get_value());
+	switch (msg.type) {
+	case MessageType::NOTE_ON:
+		fluid_synth_noteon(synth, 0, msg.note(), msg.velocity());
+		break;
+	case MessageType::NOTE_OFF:
+		fluid_synth_noteoff(synth, 0, msg.note());
+		break;
+	case MessageType::CONTROL_CHANGE:
+		fluid_synth_cc(synth, 0, msg.control(), msg.value());
+		break;
+	case MessageType::PITCH_BEND:
+		fluid_synth_pitch_bend(synth, 0, msg.get_pitch_bend());
+		break;
+	default:
+		break;
 	}
 }
 

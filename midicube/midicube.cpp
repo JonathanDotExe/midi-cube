@@ -111,22 +111,21 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 }
 
 inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
-	MessageType t = message.get_message_type();
 	SampleInfo info = audio_handler.sample_info();
 	for (size_t i = 0; i < engine.channels.size(); ++i) {
 		ChannelSource& s = engine.channels[i].source;
-		if (s.input == static_cast<ssize_t>(input) && s.channel == message.get_channel()) {
+		if (s.input == static_cast<ssize_t>(input) && s.channel == message.channel) {
 			bool pass = true;
 			MidiMessage msg = message;
-			switch (t) {
+			switch (message.type) {
 			case MessageType::NOTE_ON:
-				pass = s.start_velocity <= message.get_velocity() && s.end_velocity >= message.get_velocity();
+				pass = s.start_velocity <= message.velocity() && s.end_velocity >= message.velocity();
 				/* no break */
 			case MessageType::NOTE_OFF:
 			case MessageType::POLYPHONIC_AFTERTOUCH:
-				pass = pass && s.start_note <= message.get_note() && s.end_note >= message.get_note();
+				pass = pass && s.start_note <= message.note() && s.end_note >= message.note();
 				if (s.octave) {
-					msg.set_note(msg.get_note() + s.octave * 12);
+					msg.note() += s.octave * 12;
 				}
 				break;
 			case MessageType::CONTROL_CHANGE:
@@ -149,7 +148,7 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 			}
 			//Apply binding
 			if (pass) {
-				msg.set_channel(i);
+				msg.channel = i;
 				engine.send(msg, info);
 			}
 		}
