@@ -168,7 +168,7 @@ class MidiInput : public MidiHandler {
 
 private:
 	std::function<void(double, MidiMessage&)> callback = nullptr;
-	RtMidiIn *midiin = nullptr;
+	RtMidiIn midiin;
 
 public:
 
@@ -192,7 +192,7 @@ protected:
 class MidiOutput : public MidiHandler {
 
 private:
-	RtMidiOut *midiout = nullptr;
+	RtMidiOut midiout;
 
 public:
 

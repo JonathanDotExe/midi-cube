@@ -102,17 +102,11 @@ void input_callback (double delta, std::vector<unsigned char>* msg, void* arg) {
 }
 
 //MidiInput
-MidiInput::MidiInput() : MidiHandler::MidiHandler() {
-	try {
-		midiin = new RtMidiIn(
-			#ifdef MIDICUBE_USE_JACK
-				RtMidi::Api::UNIX_JACK
-			#endif
-		);
-	}
-	catch (RtMidiError& error) {
-		throw MidiException(error.what());
-	}
+MidiInput::MidiInput() : MidiHandler::MidiHandler(), midiin(
+	#ifdef MIDICUBE_USE_JACK
+		RtMidi::Api::UNIX_JACK
+	#endif
+) {
 }
 
 void MidiInput::call_callback(double delta, std::vector<unsigned char>* msg) {
@@ -125,15 +119,15 @@ void MidiInput::set_callback(std::function<void(double, MidiMessage&)> callback)
 }
 
 RtMidi& MidiInput::rtmidi() {
-	return *midiin;
+	return midiin;
 }
 
 void MidiInput::open(unsigned int port) {
 	MidiHandler::open(port);
 	std::cout << "Registering callback" << std::endl;
 	try {
-		midiin->setCallback(&input_callback, this);
-		midiin->ignoreTypes(false, false, false);
+		midiin.setCallback(&input_callback, this);
+		midiin.ignoreTypes(true, true, true);
 	}
 	catch (RtMidiError& error) {
 		throw MidiException(error.what());
@@ -141,8 +135,7 @@ void MidiInput::open(unsigned int port) {
 }
 
 void MidiInput::close() {
-	delete midiin;
-	midiin = nullptr;
+	midiin.closePort();
 }
 
 MidiInput::~MidiInput() {
@@ -151,12 +144,12 @@ MidiInput::~MidiInput() {
 
 
 //MidiOutput
-MidiOutput::MidiOutput() : MidiHandler::MidiHandler() {
-	midiout = new RtMidiOut(
-		#ifdef MIDICUBE_USE_JACK
-			RtMidi::Api::UNIX_JACK
-		#endif
-	);
+MidiOutput::MidiOutput() : MidiHandler::MidiHandler(), midiout(
+	#ifdef MIDICUBE_USE_JACK
+		RtMidi::Api::UNIX_JACK
+	#endif
+) {
+
 }
 
 void MidiOutput::send(MidiMessage& message) {
@@ -171,12 +164,11 @@ void MidiOutput::send(MidiMessage& message) {
 }
 
 RtMidi& MidiOutput::rtmidi() {
-	return *midiout;
+	return midiout;
 }
 
 void MidiOutput::close() {
-	delete midiout;
-	midiout = nullptr;
+	midiout.closePort();
 }
 
 MidiOutput::~MidiOutput() {
