@@ -101,7 +101,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		signal.carrier = square_wave(rotation, 1, pulse_width);
 		if (data.analog) {
 			signal.carrier += polyblep(phase, step);
-			double protation = rotation + pulse_width;
+			double protation = rotation + (1 - pulse_width);
 			signal.carrier -= polyblep(protation - (long int) protation, step);
 
 			if (data.sync && data.sync_mul != 1) {
@@ -124,7 +124,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 				mul2 = 1/pulse_width;
 			}
 			signal.carrier += integrated_polyblep(phase, step) * 2 * mul1 * step;
-			double protation = rotation + pulse_width;
+			double protation = rotation + (1 - pulse_width);
 			double pphase = protation - (long int) protation;
 			signal.carrier -= integrated_polyblep(pphase, step) * 2 * mul2 * step;
 		}
