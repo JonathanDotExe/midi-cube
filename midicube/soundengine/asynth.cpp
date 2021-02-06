@@ -526,9 +526,6 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 
 	//Delay lines
 	if (preset.delay_mix) {
-		//Get samples
-		double lsample = 0;
-		double rsample = 0;
 		//Apply delay
 		ldelay.add_isample(lsample, preset.delay_time * info.sample_rate);
 		rdelay.add_isample(rsample, preset.delay_time * info.sample_rate);

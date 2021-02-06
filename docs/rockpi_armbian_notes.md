@@ -17,18 +17,6 @@ sudo apt install xorg
 ##Change keyboard layout
 sudo dpkg-reconfigure keyboard-configuration
 
-##Install Jack (not needed if you use ALSA directly)
-sudo apt install jackd2
-Allow realtime priority
-sudo apt install libjack-jackd2-dev 
-sudo apt install a2jmidid
-
-###Jack start commands
-```bash
-jackd -P90 -p16 -dalsa -dhw:2,0 -p256 -n4 -r44100 -s &
-a2jmidid -e &
-```
-
 ##Install dependencies
 sudo apt install git
 sudo apt install meson ninja-build
@@ -56,6 +44,10 @@ nano start.sh
 
 chmod +x start.sh
 startx ./start.sh
+
+##Optimize CPU frequency (optional)
+sudo armbian-config
+System > CPU > minimum frequency 1.4 GHz > maximum frequency 1.8 GHz > governor: performance
 
 ##Sources
 * https://docs.armbian.com/User-Guide_Fine-Tuning/
