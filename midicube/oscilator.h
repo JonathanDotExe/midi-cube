@@ -34,10 +34,7 @@ struct AnalogOscilatorSignal {
 class AnalogOscilator {
 private:
 	double rotation = 0;
-	double sync_rotation = 0;
 	double pulse_width = 0.5;
-	double last_phase = 0;
-	double last_val = -1;
 public:
 	AnalogOscilator();
 	AnalogOscilatorSignal signal(double freq, double time_step, AnalogOscilatorData& data);

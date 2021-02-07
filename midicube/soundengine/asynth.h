@@ -18,7 +18,7 @@
 #define ANALOG_CONTROL_COUNT 128
 
 const FixedScale VOLUME_SCALE = {0, {}, 1};
-const FixedScale SYNC_SCALE = {0, {}, 1};
+const FixedScale SYNC_SCALE = {1, {}, 10};
 const FixedScale PULSE_WIDTH_SCALE = {0, {}, 0.5};
 const FixedScale UNISON_DETUNE_SCALE = {0, {}, 1};
 const FixedScale FILTER_CUTOFF_SCALE(0, {}, 1);
@@ -53,7 +53,7 @@ struct OscilatorEntity {
 
 	size_t unison_amount = 0;
 	PropertyModulation volume = {1};
-	PropertyModulation sync_mul = {0.1};
+	PropertyModulation sync_mul = {0.0};
 	PropertyModulation pulse_width = {1};
 	PropertyModulation unison_detune = {0.1};
 	PropertyModulation panning = {0.5};
