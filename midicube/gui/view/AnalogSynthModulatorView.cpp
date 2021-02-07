@@ -48,7 +48,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthEnvAttack);
 	tmp_y += 75;
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, part, tmp_x, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthEnvVolume, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Col 2 - LFO
@@ -65,7 +65,8 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 		Label* title = new Label("Frequency", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 48, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0, 50, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->drag_mul *= 0.25;
 		value->bind(part, SynthPartProperty::pSynthLFOFrequency);
 		controls.push_back(value);
 	}
@@ -82,7 +83,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 	tmp_x = 500;
 	tmp_y += 60;
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, part, tmp_x, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthLFOVolume, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Edit Sources

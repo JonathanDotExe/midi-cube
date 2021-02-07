@@ -34,6 +34,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 		controls->push_back(title);
 
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
+		amount->drag_mul /= 2;
 		amount->bind(holder, prop, SynthModulationProperty::pModModEnvAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
@@ -50,6 +51,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 		controls->push_back(title);
 
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
+		amount->drag_mul /= 2;
 		amount->bind(holder, prop, SynthModulationProperty::pModLFOAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
@@ -66,6 +68,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 		controls->push_back(title);
 
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
+		amount->drag_mul /= 2;
 		amount->bind(holder, prop, SynthModulationProperty::pModVelocityAmount);
 		controls->push_back(amount);
 	}
@@ -76,6 +79,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 		controls->push_back(title);
 
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
+		amount->drag_mul /= 2;
 		amount->bind(holder, prop, SynthModulationProperty::pModCCAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
@@ -223,7 +227,8 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		Label* title = new Label("Ratio", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 48, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0, 50, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->drag_mul /= 10;
 		value->bind(part, SynthPartProperty::pSynthOscTranspose);
 		controls.push_back(value);
 	}

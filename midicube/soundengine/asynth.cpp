@@ -1014,7 +1014,7 @@ void SynthPartPropertyHolder::update_properties() {
 			lfo.freq);
 	PropertyHolder::submit_change(SynthPartProperty::pSynthLFOWaveForm,
 			(int) lfo.waveform);
-	submit_change(SynthPartProperty::pSynthEnvVolume, lfo.volume);
+	submit_change(SynthPartProperty::pSynthLFOVolume, lfo.volume);
 }
 
 void AnalogSynth::update_properties() {
