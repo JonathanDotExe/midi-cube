@@ -9,33 +9,92 @@
 #define MIDICUBE_SYNTHESIS_H_
 
 #include <array>
+#include <cmath>
 
 #define DELAY_BUFFER_SIZE 1048576
 
-extern double db_to_amp(double db);
 
-extern double note_to_freq_transpose (double tnote);
+constexpr double PI2{2 * M_PI};
 
-extern double note_to_freq (double note);
 
-extern double freq_to_radians(double freq);
+inline extern double db_to_amp(double db) {
+	return pow(10, db/10);
+}
 
-extern double sine_wave(double time, double freq);
+inline extern double note_to_freq_transpose (double tnote) {
+	return pow(2, (tnote)/12.0);
+}
 
-extern double cosine_wave(double time, double freq);
+inline extern double note_to_freq (double note) {
+	return 440.0 * pow(2, (note - 69)/12.0);
+}
 
-extern double square_wave(double time, double freq, double pulse_width = 0.5);
+inline extern double freq_to_radians(double freq) {
+	return PI2 * freq;
+}
 
-extern double saw_wave_down(double time, double freq);
+inline extern double sine_wave(double phase) {
+	return sin(PI2 * phase);
+}
 
-extern double saw_wave_up(double time, double freq);
+inline extern double integrated_sine_wave(double phase) {
+	return -cos(PI2 * phase);
+}
 
-extern double triangle_wave(double time, double freq, double pulse_width = 0.5);
 
-/**
- * The arguments are irrelevant here, they are just there if a function pointer to a generic wave function is needed
- */
-extern double noise_wave(double time, double freq);
+inline extern double cosine_wave(double phase) {
+	return cos(PI2 * phase);
+}
+
+
+inline extern double square_wave(double phase, double pulse_width = 0.5) {
+	return phase >= pulse_width ? -1 : 1;
+}
+
+inline extern double integrated_square_wave(double phase, double pulse_width = 0.5) {
+	return phase >= pulse_width ? -phase : phase; //TODO might now work with pulse_width != 0.5
+}
+
+
+inline extern double saw_wave_down(double phase) {
+	return -phase * 2 + 1;
+}
+
+inline extern double integrated_saw_wave_down(double phase) {
+	return (-phase + 1) * phase;
+}
+
+inline extern double saw_wave_up(double phase) {
+	return phase * 2 - 1;
+}
+
+inline extern double integrated_saw_wave_up(double phase) {
+	return (phase - 1) * phase;
+}
+
+inline extern double triangle_wave(double phase, double pulse_width = 0.5) {
+	if (phase < pulse_width) {
+		return phase * 2 * 1/pulse_width - 1;
+	}
+	else {
+		return -2 *(phase - 0.5)/(1 - pulse_width) + 1;
+	}
+}
+
+inline extern double integrated_triangle_wave(double phase, double pulse_width = 0.5) {
+	if (phase < pulse_width) {
+		return (phase * 1/pulse_width - 1) * phase;
+	}
+	else {
+		double inv_pw = 1 - pulse_width;
+		return  (-phase/inv_pw + 1/inv_pw + 1) * phase;
+	}
+}
+
+inline extern double noise_wave() {
+	return ((double) rand())/RAND_MAX* 2 - 1;
+}
+
 
 class DelayBuffer {
 private:

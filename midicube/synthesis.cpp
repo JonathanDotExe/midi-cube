@@ -10,64 +10,6 @@
 #include <iostream>
 
 
-extern double db_to_amp(double db) {
-	return pow(10, db/10);
-}
-
-extern double note_to_freq_transpose (double tnote) {
-	return pow(2, (tnote)/12.0);
-}
-
-extern double note_to_freq (double note) {
-	return 440.0 * pow(2, (note - 69)/12.0);
-}
-
-extern double freq_to_radians(double freq) {
-	return 2 * M_PI * freq;
-}
-
-extern double sine_wave(double time, double freq) {
-	return sin(freq_to_radians(freq) * time);
-}
-
-extern double cosine_wave(double time, double freq) {
-	return cos(freq_to_radians(freq) * time);
-}
-
-
-extern double square_wave(double time, double freq, double pulse_width) {
-	return fmod(time, 1/freq) * freq >= pulse_width ? -1 : 1;
-}
-
-extern double saw_wave_down(double time, double freq) {
-	double interval = 1.0/freq;
-	return -fmod(time, interval)/interval * 2 + 1;
-}
-
-extern double saw_wave_up(double time, double freq) {
-	double interval = 1.0/freq;
-	return fmod(time, interval)/interval * 2 - 1;
-}
-
-extern double triangle_wave(double time, double freq, double pulse_width) {
-	double interval = 1/freq;
-	double phase = fmod(time, interval);
-	if (phase < pulse_width) {
-		return phase * 2 * 1/pulse_width - 1;
-	}
-	else {
-		return -(phase - 0.5) * 2 * 1/(1 - pulse_width) + 1;
-	}
-}
-
-/**
- * The arguments are irrelevant here, they are just there if a function pointer to a generic wave function is needed
- */
-extern double noise_wave(double time, double freq) {
-	return ((double) rand())/RAND_MAX* 2 - 1;
-}
-
-
 //DelayBuffer
 void DelayBuffer::add_sample(double sample, unsigned int delay) {
 	if (delay < buffer.size()) {
