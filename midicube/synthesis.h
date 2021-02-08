@@ -52,7 +52,7 @@ inline extern double square_wave(double phase, double pulse_width = 0.5) {
 }
 
 inline extern double integrated_square_wave(double phase, double pulse_width = 0.5) {
-	return phase >= pulse_width ? pulse_width - phase : phase; //TODO might now work with pulse_width != 0.5
+	return phase >= pulse_width ? -phase : phase; //TODO might now work with pulse_width != 0.5
 }
 
 
@@ -77,7 +77,7 @@ inline extern double triangle_wave(double phase, double pulse_width = 0.5) {
 		return phase * 2 * 1/pulse_width - 1;
 	}
 	else {
-		return 1 - (phase - 0.5) * 2 * 1/(1 - pulse_width) + 1;
+		return -2 *(phase - 0.5)/(1 - pulse_width) + 1;
 	}
 }
 
@@ -86,7 +86,8 @@ inline extern double integrated_triangle_wave(double phase, double pulse_width =
 		return (phase * 1/pulse_width - 1) * phase;
 	}
 	else {
-		return -(phase - 0.5) * 2 * 1/(1 - pulse_width) + 1;
+		double inv_pw = 1 - pulse_width;
+		return  (-phase/inv_pw + 1/inv_pw + 1) * phase;
 	}
 }
 
