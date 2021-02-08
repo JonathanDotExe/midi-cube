@@ -16,27 +16,6 @@
 
 constexpr double PI2{2 * M_PI};
 
-inline extern double db_to_amp(double db);
-
-inline extern double note_to_freq_transpose (double tnote);
-
-inline extern double note_to_freq (double note);
-
-inline extern double freq_to_radians(double freq);
-
-inline extern double sine_wave(double phase);
-
-inline extern double cosine_wave(double phase);
-
-inline extern double square_wave(double phase, double pulse_width = 0.5);
-
-inline extern double saw_wave_down(double phase);
-
-inline extern double saw_wave_up(double phase);
-
-inline extern double triangle_wave(double phase, double pulse_width = 0.5);
-
-inline extern double noise_wave();
 
 inline extern double db_to_amp(double db) {
 	return pow(10, db/10);
@@ -51,33 +30,60 @@ inline extern double note_to_freq (double note) {
 }
 
 inline extern double freq_to_radians(double freq) {
-	return 2 * M_PI * freq;
+	return PI2 * freq;
 }
 
 inline extern double sine_wave(double phase) {
 	return sin(PI2 * phase);
 }
 
+inline extern double integrated_sine_wave(double phase) {
+	return -cos(PI2 * phase);
+}
+
+
 inline extern double cosine_wave(double phase) {
 	return cos(PI2 * phase);
 }
 
 
-inline extern double square_wave(double phase, double pulse_width) {
+inline extern double square_wave(double phase, double pulse_width = 0.5) {
 	return phase >= pulse_width ? -1 : 1;
 }
 
+inline extern double integrated_square_wave(double phase, double pulse_width = 0.5) {
+	return phase >= pulse_width ? -phase : phase; //TODO might now work with pulse_width != 0.5
+}
+
+
 inline extern double saw_wave_down(double phase) {
 	return -phase * 2 + 1;
+}
+
+inline extern double integrated_saw_wave_down(double phase) {
+	return (-phase + 1) * phase;
 }
 
 inline extern double saw_wave_up(double phase) {
 	return phase * 2 - 1;
 }
 
-inline extern double triangle_wave(double phase, double pulse_width) {
+inline extern double integrated_saw_wave_up(double phase) {
+	return (phase - 1) * phase;
+}
+
+inline extern double triangle_wave(double phase, double pulse_width = 0.5) {
 	if (phase < pulse_width) {
 		return phase * 2 * 1/pulse_width - 1;
+	}
+	else {
+		return -(phase - 0.5) * 2 * 1/(1 - pulse_width) + 1;
+	}
+}
+
+inline extern double integrated_triangle_wave(double phase, double pulse_width = 0.5) {
+	if (phase < pulse_width) {
+		return (phase * 1/pulse_width - 1) * phase;
 	}
 	else {
 		return -(phase - 0.5) * 2 * 1/(1 - pulse_width) + 1;
