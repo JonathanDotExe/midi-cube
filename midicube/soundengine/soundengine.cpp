@@ -499,7 +499,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 		}
 		double vol = metronome_env.amplitude(metronome_env_data, info.time_step, true, false);
 		if (vol) {
-			double sample = sine_wave(info.time, 3520) * vol;
+			double sample = sine_wave(fmod(info.time * 3520, 1)) * vol;
 			lsample += sample;
 			rsample += sample;
 		}

@@ -67,14 +67,14 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 	switch(data.waveform) {
 	case AnalogWaveForm::SINE_WAVE:
 		//Modulator
-		signal.modulator = (-cosine_wave(rotation, 1) + cosine_wave(last_rotation, 1))/(time_step * 2 * M_PI);
-		signal.carrier = sine_wave(rotation, 1);
+		signal.modulator = (-cosine_wave(phase) + cosine_wave(fmod(last_rotation, 1)))/(time_step * 2 * M_PI);
+		signal.carrier = sine_wave(phase);
 		/*if (data.analog && data.sync && data.sync_mul != 1) {
 			signal.carrier -= polyblep(sync_phase, sync_step) * (sine_wave(last_phase, 1) + 1) / 2;
 		}*/
 		break;
 	case AnalogWaveForm::SAW_DOWN_WAVE:
-		signal.carrier = saw_wave_down(rotation, 1);
+		signal.carrier = saw_wave_down(phase);
 		if (data.analog) {
 			signal.carrier += polyblep(phase, step);
 			/*if (data.sync && data.sync_mul != 1) {
@@ -84,7 +84,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::SAW_UP_WAVE:
-		signal.carrier = saw_wave_up(rotation, 1);
+		signal.carrier = saw_wave_up(phase);
 		if (data.analog) {
 			signal.carrier -= polyblep(phase, step);
 			/*if (data.sync && data.sync_mul != 1) {
@@ -94,7 +94,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::SQUARE_WAVE:
-		signal.carrier = square_wave(rotation, 1, pulse_width);
+		signal.carrier = square_wave(phase, pulse_width);
 		if (data.analog) {
 			signal.carrier += polyblep(phase, step);
 			double protation = rotation + (1 - pulse_width);
@@ -107,7 +107,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::TRIANGLE_WAVE:
-		signal.carrier = triangle_wave(rotation, 1, pulse_width); //TODO PWM
+		signal.carrier = triangle_wave(phase, pulse_width); //TODO PWM
 		if (data.analog) {
 			double mul1;
 			double mul2;
@@ -128,7 +128,7 @@ AnalogOscilatorSignal AnalogOscilator::signal(double freq, double time_step, Ana
 		signal.modulator = 0;
 		break;
 	case AnalogWaveForm::NOISE_WAVE:
-		signal.carrier = noise_wave(rotation, 1);
+		signal.carrier = noise_wave();
 		signal.modulator = 0;
 		break;
 	}
