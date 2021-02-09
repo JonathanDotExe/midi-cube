@@ -149,6 +149,7 @@ enum SynthPartProperty {
 	pSynthOscSemi,
 	pSynthOscTranspose,
 	pSynthOscPitch,
+	pSynthOscFM,
 
 	pSynthOscFilter,
 	pSynthOscFilterType,

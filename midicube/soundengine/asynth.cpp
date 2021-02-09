@@ -784,6 +784,9 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	case SynthPartProperty::pSynthOscPitch:
 		val = get_mod_prop(osc.pitch, (SynthModulationProperty) sub_prop);
 		break;
+	case SynthPartProperty::pSynthOscFM:
+		val.dval = osc.fm[sub_prop];
+		break;
 	case SynthPartProperty::pSynthOscFilter:
 		val.bval = osc.filter;
 		break;
@@ -898,6 +901,9 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val,
 	case SynthPartProperty::pSynthOscPitch:
 		set_mod_prop(osc.pitch, (SynthModulationProperty) sub_prop, val);
 		break;
+	case SynthPartProperty::pSynthOscFM:
+		osc.fm[sub_prop] = val.dval;
+		break;
 	case SynthPartProperty::pSynthOscFilter:
 		osc.filter = val.bval;
 		break;
@@ -987,6 +993,10 @@ void SynthPartPropertyHolder::update_properties() {
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose,
 			osc.transpose);
 	submit_change(SynthPartProperty::pSynthOscPitch, osc.pitch);
+
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFM, osc.fm[i], i);
+	}
 
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilter,
 			osc.filter);
