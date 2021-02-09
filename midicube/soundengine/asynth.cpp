@@ -185,11 +185,11 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 		osc1.transpose = 0.7;
 		osc1.waveform = AnalogWaveForm::SINE_WAVE;
 		osc1.audible = false;
+		osc1.fm.at(1) = 10;
 		osc1.env = { 0, 0.2, 0, 0.003 };
 
 		OscilatorEntity &osc2 = preset.oscilators.at(1);
 		osc2.waveform = AnalogWaveForm::SINE_WAVE;
-		osc2.fm.push_back( { 10, 0 });
 		osc2.env = { 0.0005, 0.5, 0.0, 0.003 };
 
 		preset.lfo_count = 0;
@@ -201,13 +201,13 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 		OscilatorEntity &osc1 = preset.oscilators.at(0);
 		osc1.waveform = AnalogWaveForm::SINE_WAVE;
 		osc1.audible = false;
+		osc1.fm.at(1) = 0.8;
 		osc1.env = { 0.0005, 0.6, 0.6, 0.2 };
 
 		OscilatorEntity &osc2 = preset.oscilators.at(1);
 		osc2.waveform = AnalogWaveForm::SINE_WAVE;
 		osc2.volume.value = 0.2;
 		osc2.volume.velocity_amount = 0.3;
-		osc2.fm.push_back( { 0.8, 0 });
 		osc2.env = { 0.0005, 1.8, 0.0, 0.1 };
 
 		OscilatorEntity &osc3 = preset.oscilators.at(2);
@@ -216,12 +216,12 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 		osc3.volume.velocity_amount = 1;
 		osc3.transpose = 10;
 		osc3.audible = false;
+		osc3.fm.at(3) = 1.5;
 		osc3.env = { 0.0005, 0.2, 0.4, 0.2 };
 
 		OscilatorEntity &osc4 = preset.oscilators.at(3);
 		osc4.waveform = AnalogWaveForm::SINE_WAVE;
 		osc4.volume.value = 0.5;
-		osc4.fm.push_back( { 1.5, 2 });
 		osc4.env = { 0.0005, 1.7, 0.0, 0.1 };
 
 		preset.lfo_count = 0;
@@ -280,11 +280,11 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 		osc1.waveform = AnalogWaveForm::SINE_WAVE;
 		osc1.semi = 28;
 		osc1.audible = false;
+		osc1.fm.at(1) = 0.4;
 		osc1.env = { 0.0005, 0.12, 0.0, 0.03 };
 
 		OscilatorEntity &osc2 = preset.oscilators.at(1);
 		osc2.waveform = AnalogWaveForm::SINE_WAVE;
-		osc2.fm.push_back( { 0.4, 0 });
 		osc2.env = { 0.0005, 0.8, 0.0, 0.1 };
 
 		preset.delay_mix = 0.25;
@@ -404,14 +404,9 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		//Frequency
 		double freq = note.freq;
 		//FM
-		const size_t fm_count = osc.fm.size();
-		for (size_t i = 0; i < fm_count; ++i) {
-			FrequencyModulatotion &fm = osc.fm[i];
-			if (fm.fm_amount) {
-				freq += modulators[OSC_INDEX(note_index, fm.modulator)]
-						* fm.fm_amount;
-			}
-		}
+		double fm_mod = modulators[OSC_INDEX(note_index, i)];
+		freq += fm_mod;
+		modulators[OSC_INDEX(note_index, i)] = 0;
 		double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val,
 				lfo_mod, controls, note.velocity);
 		if (osc.semi || pitch) {
@@ -448,7 +443,12 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		AnalogOscilatorSignal sig = oscilators.signal(freq, info.time_step,
 				index, data, bdata);
 		double signal = sig.carrier;
-		modulators[index] = sig.modulator * volume;
+		//Frequency modulate others
+		double modulator = sig.modulator * volume;
+		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
+			modulators[OSC_INDEX(note_index, j)] += modulator * osc.fm[j];
+		}
+
 		if (osc.audible) {
 			//Filter
 			if (osc.filter) {
@@ -784,6 +784,9 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	case SynthPartProperty::pSynthOscPitch:
 		val = get_mod_prop(osc.pitch, (SynthModulationProperty) sub_prop);
 		break;
+	case SynthPartProperty::pSynthOscFM:
+		val.dval = osc.fm[sub_prop];
+		break;
 	case SynthPartProperty::pSynthOscFilter:
 		val.bval = osc.filter;
 		break;
@@ -898,6 +901,9 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val,
 	case SynthPartProperty::pSynthOscPitch:
 		set_mod_prop(osc.pitch, (SynthModulationProperty) sub_prop, val);
 		break;
+	case SynthPartProperty::pSynthOscFM:
+		osc.fm[sub_prop] = val.dval;
+		break;
 	case SynthPartProperty::pSynthOscFilter:
 		osc.filter = val.bval;
 		break;
@@ -987,6 +993,10 @@ void SynthPartPropertyHolder::update_properties() {
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose,
 			osc.transpose);
 	submit_change(SynthPartProperty::pSynthOscPitch, osc.pitch);
+
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFM, osc.fm[i], i);
+	}
 
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilter,
 			osc.filter);

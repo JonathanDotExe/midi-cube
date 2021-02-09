@@ -10,6 +10,7 @@
 #include "SoundEngineChannelView.h"
 #include "AnalogSynthOscilatorView.h"
 #include "AnalogSynthModulatorView.h"
+#include "AnalogSynthFMView.h"
 
 AnalogSynthView::AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int channel_index) : synth(s), channel(c) {
 	this->channel_index = channel_index;
@@ -30,7 +31,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 	//Channels
 	int cols = synth.parts.size();
 	int pane_width = (frame.get_width() - 15) / cols;
-	int pane_height = (frame.get_height() - 50 - 5) / 2;
+	int pane_height = 150;
 	for (size_t i = 0; i < synth.parts.size(); ++i) {
 		SynthPartPropertyHolder& part = synth.parts[i];
 		holders.push_back(&part);
@@ -152,7 +153,16 @@ Scene AnalogSynthView::create(Frame &frame) {
 		value->bind(&synth, SynthProperty::pSynthDelayFeedback);
 		controls.push_back(value);
 	}
-	tmp_x += 90;
+
+	tmp_x = 10;
+	tmp_y += 75;
+
+	Button* fm = new Button("FM Algorithm", main_font, 14, tmp_x, tmp_y,  pane_width - 15, 30);
+	fm->rect.setFillColor(sf::Color(0, 180, 255));
+	fm->set_on_click([&frame, this]{
+		frame.change_view(new AnalogSynthFMView(synth, channel, channel_index));
+	});
+	controls.push_back(fm);
 
 
 	//Back Button

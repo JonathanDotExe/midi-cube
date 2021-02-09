@@ -68,7 +68,7 @@ struct OscilatorEntity {
 	double filter_kb_track = 0;
 	unsigned int filter_kb_track_note = 36;
 
-	std::vector<FrequencyModulatotion> fm;
+	std::array<double, ANALOG_PART_COUNT> fm;
 };
 
 struct ModEnvelopeEntity {
@@ -149,6 +149,7 @@ enum SynthPartProperty {
 	pSynthOscSemi,
 	pSynthOscTranspose,
 	pSynthOscPitch,
+	pSynthOscFM,
 
 	pSynthOscFilter,
 	pSynthOscFilterType,

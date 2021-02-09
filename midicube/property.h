@@ -78,7 +78,7 @@ protected:
 void PropertyHolder::submit_change(size_t prop, PropertyValue value, size_t sub_prop) {
 	if (changes) {
 		if (!changes->push({this, prop, value, sub_prop})) {
-			std::cerr << "Lost change message" << std::endl;
+			std::cerr << "Lost change message " << prop << "/" << sub_prop << std::endl;
 		}
 	}
 }
