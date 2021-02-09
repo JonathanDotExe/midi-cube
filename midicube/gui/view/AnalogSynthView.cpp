@@ -10,6 +10,7 @@
 #include "SoundEngineChannelView.h"
 #include "AnalogSynthOscilatorView.h"
 #include "AnalogSynthModulatorView.h"
+#include "AnalogSynthFMView.h"
 
 AnalogSynthView::AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int channel_index) : synth(s), channel(c) {
 	this->channel_index = channel_index;
@@ -152,26 +153,16 @@ Scene AnalogSynthView::create(Frame &frame) {
 		value->bind(&synth, SynthProperty::pSynthDelayFeedback);
 		controls.push_back(value);
 	}
-	tmp_x += 90;
 
-	//FM
-	tmp_x = 400;
-	tmp_y = pane_height + 20;
-	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
-		SynthPartPropertyHolder& part = synth.parts[i];
-		holders.push_back(&part);
-		int y = tmp_y + i * 45;
-		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
-			int x = tmp_x + j * 75;
-			DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y, 70, 40);
-			value->bind(&part, SynthPartProperty::pSynthOscFM, j);
-			//Color if feedback
-			if (i >= j) {
-				value->rect.setFillColor(sf::Color(180, 180, 180));
-			}
-			controls.push_back(value);
-		}
-	}
+	tmp_x = 10;
+	tmp_y += 75;
+
+	Button* fm = new Button("FM Algorithm", main_font, 14, tmp_x, tmp_y,  pane_width - 15, 30);
+	fm->rect.setFillColor(sf::Color(0, 180, 255));
+	fm->set_on_click([&frame, this]{
+		frame.change_view(new AnalogSynthFMView(synth, channel, channel_index));
+	});
+	controls.push_back(fm);
 
 
 	//Back Button
