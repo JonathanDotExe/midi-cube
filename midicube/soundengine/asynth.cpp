@@ -185,7 +185,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 		osc1.transpose = 0.7;
 		osc1.waveform = AnalogWaveForm::SINE_WAVE;
 		osc1.audible = false;
-		osc1.fm.at(1) = 10;
+		osc1.fm.at(1) = 1;
 		osc1.env = { 0, 0.2, 0, 0.003 };
 
 		OscilatorEntity &osc2 = preset.oscilators.at(1);
@@ -201,7 +201,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 		OscilatorEntity &osc1 = preset.oscilators.at(0);
 		osc1.waveform = AnalogWaveForm::SINE_WAVE;
 		osc1.audible = false;
-		osc1.fm.at(1) = 0.8;
+		osc1.fm.at(1) = 0.13;
 		osc1.env = { 0.0005, 0.6, 0.6, 0.2 };
 
 		OscilatorEntity &osc2 = preset.oscilators.at(1);
@@ -216,7 +216,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 		osc3.volume.velocity_amount = 1;
 		osc3.transpose = 10;
 		osc3.audible = false;
-		osc3.fm.at(3) = 1.5;
+		osc3.fm.at(3) = 0.25;
 		osc3.env = { 0.0005, 0.2, 0.4, 0.2 };
 
 		OscilatorEntity &osc4 = preset.oscilators.at(3);
@@ -280,7 +280,8 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 		osc1.waveform = AnalogWaveForm::SINE_WAVE;
 		osc1.semi = 28;
 		osc1.audible = false;
-		osc1.fm.at(1) = 0.4;
+		osc1.fm.at(1) = 1;
+		osc1.volume.value = 0.12;
 		osc1.env = { 0.0005, 0.12, 0.0, 0.03 };
 
 		OscilatorEntity &osc2 = preset.oscilators.at(1);
