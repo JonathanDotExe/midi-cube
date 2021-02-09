@@ -30,7 +30,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 	//Channels
 	int cols = synth.parts.size();
 	int pane_width = (frame.get_width() - 15) / cols;
-	int pane_height = (frame.get_height() - 50 - 5) / 2;
+	int pane_height = 150;
 	for (size_t i = 0; i < synth.parts.size(); ++i) {
 		SynthPartPropertyHolder& part = synth.parts[i];
 		holders.push_back(&part);
@@ -153,6 +153,25 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(value);
 	}
 	tmp_x += 90;
+
+	//FM
+	tmp_x = 400;
+	tmp_y = pane_height + 20;
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+		SynthPartPropertyHolder& part = synth.parts[i];
+		holders.push_back(&part);
+		int y = tmp_y + i * 45;
+		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
+			int x = tmp_x + j * 75;
+			DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y, 70, 40);
+			value->bind(&part, SynthPartProperty::pSynthOscFM, j);
+			//Color if feedback
+			if (i >= j) {
+				value->rect.setFillColor(sf::Color(180, 180, 180));
+			}
+			controls.push_back(value);
+		}
+	}
 
 
 	//Back Button
