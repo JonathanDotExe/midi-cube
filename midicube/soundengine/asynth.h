@@ -191,7 +191,9 @@ protected:
 	}
 };
 
-class AnalogSynth : public BaseSoundEngine, public PropertyHolder {
+#define ANALOG_SYNTH_POLYPHONY 30
+
+class AnalogSynth : public BaseSoundEngine<TriggeredNote, ANALOG_SYNTH_POLYPHONY>, public PropertyHolder {
 
 private:
 	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT, 8> oscilators;

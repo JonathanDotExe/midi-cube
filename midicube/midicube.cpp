@@ -35,7 +35,6 @@ void MidiCube::init(int out_device, int in_device) {
 	apply_preset(BELL_LEAD, static_cast<AnalogSynth&>(bank->channel(11)).preset);
 	//Default setting
 	SoundEngineBank* bank2 = engine.get_sound_engines().at(2);
-	static_cast<BaseSoundEngine&>(bank2->channel(1)).sustain = false;
 	Arpeggiator& arp = engine.channels[1].arp;
 	arp.on = true;
 	arp.preset.octaves = 3;

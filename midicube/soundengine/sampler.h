@@ -71,7 +71,9 @@ public:
 	~SampleSoundStore();
 };
 
-class Sampler : public BaseSoundEngine {
+#define SAMPLER_POLYPHONY 64
+
+class Sampler : public BaseSoundEngine<TriggeredNote, SAMPLER_POLYPHONY> {
 
 private:
 	SampleSound* sample;
