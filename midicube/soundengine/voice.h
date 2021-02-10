@@ -17,12 +17,11 @@
 #include <array>
 #include <functional>
 
-#define SOUND_ENGINE_POLYPHONY 30
-
+template<typename V, size_t P>
 class VoiceManager {
 private:
 	size_t next_freq_slot(SampleInfo& info) {
-		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+		for (size_t i = 0; i < P; ++i) {
 			if (!note[i].valid) {
 				return i;
 			}
@@ -32,7 +31,7 @@ private:
 	}
 
 public:
-	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
+	std::array<V, P> note;
 
 	VoiceManager() {
 		//Init notes
@@ -57,7 +56,7 @@ public:
 
 	void release_note(SampleInfo& info, unsigned int note, bool invalidate = false) {
 		double f = note_to_freq(note);
-		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+		for (size_t i = 0; i < P; ++i) {
 			if (this->note[i].freq == f && this->note[i].pressed) {
 				this->note[i].pressed = false;
 				this->note[i].release_time = info.time;
@@ -70,6 +69,7 @@ public:
 
 };
 
+#define SOUND_ENGINE_POLYPHONY 30
 
 enum ArpeggiatorPattern {
 	ARP_UP, ARP_DOWN, ARP_RANDOM, ARP_UP_DOWN, ARP_UP_CUSTOM, ARP_DOWN_CUSTOM
@@ -94,7 +94,7 @@ private:
 public:
 	bool on = false;
 	ArpeggiatorPreset preset;
-	VoiceManager note;
+	VoiceManager<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
 	Metronome metronome;
 
 	Arpeggiator();
