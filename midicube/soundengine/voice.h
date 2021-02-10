@@ -19,7 +19,7 @@
 
 #define SOUND_ENGINE_POLYPHONY 30
 
-class NoteBuffer {
+class VoiceManager {
 private:
 	size_t next_freq_slot(SampleInfo& info) {
 		for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
@@ -34,7 +34,7 @@ private:
 public:
 	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
 
-	NoteBuffer() {
+	VoiceManager() {
 		//Init notes
 		for (size_t i = 0; i < note.size(); ++i) {
 			note[i].start_time = -1024;
@@ -67,6 +67,43 @@ public:
 			}
 		}
 	}
+
+};
+
+
+enum ArpeggiatorPattern {
+	ARP_UP, ARP_DOWN, ARP_RANDOM, ARP_UP_DOWN, ARP_UP_CUSTOM, ARP_DOWN_CUSTOM
+};
+
+struct ArpeggiatorPreset {
+	ArpeggiatorPattern pattern;
+	std::vector<unsigned int> data;
+	unsigned int octaves = 1;
+	int value = 1;
+	bool hold = false;
+};
+
+class Arpeggiator {
+
+private:
+	unsigned int curr_note = 0;
+	std::size_t data_index = 0;
+	std::size_t note_index = 0;
+	bool restart = true;
+
+public:
+	bool on = false;
+	ArpeggiatorPreset preset;
+	VoiceManager note;
+	Metronome metronome;
+
+	Arpeggiator();
+
+	void apply(SampleInfo& info, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release);
+
+	void press_note(SampleInfo& info, unsigned int note, double velocity);
+
+	void release_note(SampleInfo& info, unsigned int note);
 
 };
 
