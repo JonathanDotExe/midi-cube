@@ -198,8 +198,6 @@ struct AnalogSynthPart {
 	Filter filter;
 	ADSREnvelope amp_env;
 	ADSREnvelope mod_env;
-	AnalogOscilator lfo;
-
 };
 
 struct AnalogSynthVoice : public TriggeredNote {
@@ -211,6 +209,7 @@ class AnalogSynth : public BaseSoundEngine<AnalogSynthVoice, ANALOG_SYNTH_POLYPH
 private:
 	std::array<double, ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT> modulators = {};
 	std::array<double, ANALOG_PART_COUNT> env_val = {};
+	std::array<AnalogOscilator, ANALOG_PART_COUNT> lfos;
 	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
 	std::array<double, ANALOG_PART_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
@@ -221,9 +220,9 @@ private:
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;
 
-	inline void process_note(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	inline void process_note(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 
-	inline bool amp_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 
 public:
 	AnalogSynthPreset preset;
@@ -231,13 +230,13 @@ public:
 
 	AnalogSynth();
 
-	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
 	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	bool note_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 	
 	void set(size_t prop, PropertyValue value, size_t sub_prop);
 	

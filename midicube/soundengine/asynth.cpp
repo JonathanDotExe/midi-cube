@@ -379,7 +379,7 @@ static inline double apply_modulation(const FixedScale &scale,
 }
 
 void AnalogSynth::process_note(double& lsample, double& rsample,
-		SampleInfo &info, TriggeredNote &note, KeyboardEnvironment &env,
+		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env,
 		size_t note_index) {
 	env_val = { };
 	//Reset amps
@@ -387,17 +387,12 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
-		size_t index = ENV_INDEX(note_index, i);
 		if (reset_amps) {
-			mod_envs[index].reset();
+			note.parts[i].mod_env.reset();
 		}
 
-		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val,
-				lfo_val, controls, note.velocity);
-		env_val[i] =
-				mod_envs[note_index + i * ANALOG_SYNTH_POLYPHONY].amplitude(
-						mod_env.env, info.time_step, note.pressed, env.sustain)
-						* volume;
+		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, controls, note.velocity);
+		env_val[i] = note.parts[i].mod_env.amplitude(mod_env.env, info.time_step, note.pressed, env.sustain)* volume;
 	}
 	//Synthesize
 	for (size_t i = 0; i < preset.osc_count; ++i) {
@@ -417,21 +412,21 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 
 		AnalogOscilatorData data = { osc.waveform, osc.analog, osc.sync };
 		AnalogOscilatorBankData bdata = { 0.1, osc.unison_amount };
-		size_t index = OSC_INDEX(note_index, i);
+		AnalogSynthPart& part = note.parts[i];
 		//Only on note start
 		if (reset_amps) {
-			amp_envs[index].reset();
+			part.amp_env.reset();
 			if (osc.reset) {
-				oscilators.reset(index);
+				part.oscilator.reset(0);
 			} else if (osc.randomize) {
-				oscilators.randomize(index);
+				part.oscilator.randomize(0);
 			}
 		}
 
 		//Apply modulation
 		double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val,
 				lfo_val, controls, note.velocity)
-				* amp_envs[index].amplitude(osc.env, info.time_step,
+				* part.amp_env.amplitude(osc.env, info.time_step,
 						note.pressed, env.sustain);
 		data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val,
 				lfo_val, controls, note.velocity);
@@ -441,8 +436,8 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 				osc.unison_detune, env_val, lfo_val, controls, note.velocity);
 
 		//Signal
-		AnalogOscilatorSignal sig = oscilators.signal(freq, info.time_step,
-				index, data, bdata);
+		AnalogOscilatorSignal sig = part.oscilator.signal(freq, info.time_step,
+				1, data, bdata);
 		double signal = sig.carrier;
 		//Frequency modulate others
 		double modulator = sig.modulator * volume;
@@ -465,14 +460,11 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 					double cutoff = factor_to_cutoff(filter.cutoff,
 							info.time_step);
 					//KB track
-					cutoff *= 1
-							+ ((double) note.note - 36) / 12.0
-									* osc.filter_kb_track;
+					cutoff *= 1 + ((double) note.note - 36) / 12.0 * osc.filter_kb_track;
 					filter.cutoff = cutoff_to_factor(cutoff, info.time_step);
 				}
 
-				signal = filters[note_index + i * ANALOG_SYNTH_POLYPHONY].apply(
-						filter, signal, info.time_step);
+				signal = part.filter.apply(filter, signal, info.time_step);
 			}
 			signal *= volume;
 			//Pan
@@ -487,7 +479,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 
 void AnalogSynth::process_note_sample(
 		double& lsample, double& rsample, SampleInfo &info,
-		TriggeredNote &note, KeyboardEnvironment &env, size_t note_index) {
+		AnalogSynthVoice &note, KeyboardEnvironment &env, size_t note_index) {
 	if (!preset.mono) {
 		process_note(lsample, rsample, info, note, env, note_index);
 	}
@@ -564,7 +556,7 @@ void AnalogSynth::control_change(unsigned int control, unsigned int value) {
 	controls[control] = value / 127.0;
 }
 
-bool AnalogSynth::note_finished(SampleInfo &info, TriggeredNote &note,
+bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 		KeyboardEnvironment &env, size_t note_index) {
 	//Mono notes
 	if (preset.mono) {	//TODO not very easy to read/side effects
@@ -573,7 +565,7 @@ bool AnalogSynth::note_finished(SampleInfo &info, TriggeredNote &note,
 	return !note.pressed && amp_finished(info, note, env, note_index);
 }
 
-bool AnalogSynth::amp_finished(SampleInfo &info, TriggeredNote &note,
+bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,
 		KeyboardEnvironment &env, size_t note_index) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.osc_count && finished; ++i) {
