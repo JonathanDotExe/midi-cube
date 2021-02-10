@@ -35,6 +35,7 @@ src = [
 	'midicube/soundengine/sampler.cpp',
 	'midicube/soundengine/sfsynth.cpp',
 	'midicube/soundengine/soundengine.cpp',
+	'midicube/soundengine/voice.cpp',
 	
 	'midicube/gui/engine/control.cpp',
 	'midicube/gui/engine/core.cpp',

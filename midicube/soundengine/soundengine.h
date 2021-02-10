@@ -17,11 +17,11 @@
 #include "../effect/vocoder.h"
 #include "../effect/bitcrusher.h"
 #include "../property.h"
+#include "voice.h"
 #include <string>
 #include <array>
 #include <functional>
 
-#define SOUND_ENGINE_POLYPHONY 30
 #define SOUND_ENGINE_MIDI_CHANNELS 16
 
 class SoundEngineDevice;
@@ -31,21 +31,6 @@ struct EngineStatus {
 	size_t latest_note_index;
 	TriggeredNote* latest_note;
 };
-
-class NoteBuffer {
-private:
-	size_t next_freq_slot(SampleInfo& info);
-
-public:
-	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
-
-	NoteBuffer();
-
-	void press_note(SampleInfo& info, unsigned int note, double velocity);
-	void release_note(SampleInfo& info, unsigned int note, bool invalidate = false);
-
-};
-
 
 class SoundEngineData {
 public:
