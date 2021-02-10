@@ -60,10 +60,11 @@ public:
 
 };
 
+template<typename V, size_t P>
 class BaseSoundEngine : public SoundEngine {
 private:
 	KeyboardEnvironment environment;
-	VoiceManager note;
+	VoiceManager<V, P> note;
 
 public:
 	std::atomic<unsigned int> sustain_control{64};
@@ -77,7 +78,7 @@ public:
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
-	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
+	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) = 0;
 
 
 	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
@@ -88,7 +89,7 @@ public:
 
 	};
 
-	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	virtual bool note_finished(SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) {
 		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
 	};
 
@@ -97,6 +98,76 @@ public:
 	};
 
 };
+
+//BaseSoundEngine
+template<typename V, size_t P>
+void BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info) {
+	double pitch;
+	switch (message.type) {
+		case MessageType::NOTE_ON:
+			press_note(info, message.note(), message.velocity()/127.0);
+			break;
+		case MessageType::NOTE_OFF:
+			release_note(info, message.note());
+			break;
+		case MessageType::CONTROL_CHANGE:
+			control_change(message.control(), message.value());
+			//Sustain
+			if (message.control() == sustain_control) {
+				bool new_sustain = message.value() != 0;
+				if (new_sustain != environment.sustain) {
+					if (new_sustain) {
+						environment.sustain_time = info.time;
+					}
+					else {
+						environment.sustain_release_time = info.time;
+					}
+					environment.sustain = new_sustain;
+				}
+			}
+			break;
+		case MessageType::PITCH_BEND:
+			pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
+			environment.pitch_bend = note_to_freq_transpose(pitch);
+			break;
+		default:
+			break;
+	}
+}
+
+template<typename V, size_t P>
+void BaseSoundEngine<V, P>::press_note(SampleInfo& info, unsigned int note, double velocity) {
+	this->note.press_note(info, note, velocity);
+}
+
+template<typename V, size_t P>
+void BaseSoundEngine<V, P>::release_note(SampleInfo& info, unsigned int note) {
+	this->note.release_note(info, note);
+}
+
+template<typename V, size_t P>
+void BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info) {
+	EngineStatus status = {0, 0, nullptr};
+	//Notes
+	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+		if (note.note[i].valid) {
+			if (note_finished(info, note.note[i], environment, i)) {
+				note.note[i].valid = false;
+			}
+			else {
+				++status.pressed_notes; //TODO might cause problems in the future
+				note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
+				process_note_sample(lsample, rsample, info, note.note[i], environment, i);
+				if (!status.latest_note || status.latest_note->start_time < note.note[i].start_time) {
+					status.latest_note = &note.note[i];
+					status.latest_note_index = i;
+				}
+			}
+		}
+	}
+	//Static sample
+	process_sample(lsample, rsample, info, environment, status);
+}
 
 
 class SoundEngineBank {
