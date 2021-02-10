@@ -29,7 +29,6 @@ class SoundEngineDevice;
 struct EngineStatus {
 	size_t pressed_notes;
 	size_t latest_note_index;
-	TriggeredNote* latest_note;
 };
 
 class SoundEngineData {
@@ -64,11 +63,14 @@ template<typename V, size_t P>
 class BaseSoundEngine : public SoundEngine {
 private:
 	KeyboardEnvironment environment;
+
+protected:
 	VoiceManager<V, P> note;
 
 public:
 	std::atomic<unsigned int> sustain_control{64};
 	std::atomic<bool> sustain{true};
+
 
 	void midi_message(MidiMessage& msg, SampleInfo& info);
 
@@ -147,7 +149,7 @@ void BaseSoundEngine<V, P>::release_note(SampleInfo& info, unsigned int note) {
 
 template<typename V, size_t P>
 void BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info) {
-	EngineStatus status = {0, 0, nullptr};
+	EngineStatus status = {0, 0};
 	//Notes
 	for (size_t i = 0; i < P; ++i) {
 		if (note.note[i].valid) {
@@ -158,8 +160,7 @@ void BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, Sam
 				++status.pressed_notes; //TODO might cause problems in the future
 				note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
 				process_note_sample(lsample, rsample, info, note.note[i], environment, i);
-				if (!status.latest_note || status.latest_note->start_time < note.note[i].start_time) {
-					status.latest_note = &note.note[i];
+				if (!status.pressed_notes || note.note[status.latest_note_index].start_time < note.note[i].start_time) {
 					status.latest_note_index = i;
 				}
 			}

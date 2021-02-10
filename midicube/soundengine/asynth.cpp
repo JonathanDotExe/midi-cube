@@ -488,33 +488,31 @@ void AnalogSynth::process_note_sample(
 void AnalogSynth::process_sample(double& lsample, double& rsample,
 		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
 	//Mono
-	if (preset.mono && status.latest_note) {
-		unsigned int note = status.latest_note->note;
+	if (preset.mono && status.pressed_notes) {
+		AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
 		//Update portamendo
-		if (note != last_note) {
+		if (voice.note != last_note) {
 			//Reset envs to attack
 			if (!preset.legato) {
 				for (size_t i = 0; i < preset.mod_env_count; ++i) {
 					//Mod env
-					size_t index = ENV_INDEX(0, i);	//Updating every amp might be a bug source
-					mod_envs[index].phase = ATTACK;
+					voice.parts[i].mod_env.phase = ATTACK;
 				}
 				for (size_t i = 0; i < preset.osc_count; ++i) {
 					//Amp env
-					size_t index = OSC_INDEX(0, i);
-					amp_envs[index].phase = ATTACK;
+					voice.parts[i].mod_env.phase = ATTACK;
 				}
 			}
-			note_port.set(note, info.time, first_port ? 0 : preset.portamendo);
+			note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo);
 		}
-		last_note = note;
+		last_note = voice.note;
 		first_port = false;
 		double pitch = note_port.get(info.time);
 		KeyboardEnvironment e = env;
 		e.pitch_bend *= note_to_freq_transpose(
-				pitch - status.latest_note->note);
+				pitch - voice.note);
 
-		process_note(lsample, rsample, info, *status.latest_note, e, 0);
+		process_note(lsample, rsample, info, voice, e, 0);
 	}
 
 	//Delay lines
@@ -569,8 +567,7 @@ bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,
 		KeyboardEnvironment &env, size_t note_index) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.osc_count && finished; ++i) {
-		size_t index = OSC_INDEX(note_index, i);
-		finished = amp_envs[index].is_finished();
+		finished = note.parts[i].amp_env.is_finished();
 	}
 	return finished;
 }
