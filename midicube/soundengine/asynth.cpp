@@ -381,7 +381,6 @@ static inline double apply_modulation(const FixedScale &scale,
 void AnalogSynth::process_note(double& lsample, double& rsample,
 		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env,
 		size_t note_index) {
-	env_val = { };
 	//Reset amps
 	bool reset_amps = amp_finished(info, note, env, note_index); //TODO maybe use press note event
 	//Mod Envs
@@ -396,13 +395,13 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 	}
 	//Synthesize
 	for (size_t i = 0; i < preset.osc_count; ++i) {
+		AnalogSynthPart& part = note.parts[i];
 		OscilatorEntity &osc = preset.oscilators[i];
 		//Frequency
 		double freq = note.freq;
 		//FM
-		double fm_mod = modulators[OSC_INDEX(note_index, i)];
-		freq += fm_mod;
-		modulators[OSC_INDEX(note_index, i)] = 0;
+		freq += part.fm;
+		part.fm = 0;
 		double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val,
 				lfo_mod, controls, note.velocity);
 		if (osc.semi || pitch) {
@@ -412,7 +411,6 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 
 		AnalogOscilatorData data = { osc.waveform, osc.analog, osc.sync };
 		AnalogOscilatorBankData bdata = { 0.1, osc.unison_amount };
-		AnalogSynthPart& part = note.parts[i];
 		//Only on note start
 		if (reset_amps) {
 			part.amp_env.reset();
@@ -442,7 +440,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		//Frequency modulate others
 		double modulator = sig.modulator * volume;
 		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
-			modulators[OSC_INDEX(note_index, j)] += modulator * osc.fm[j];
+			note.parts[j].fm += modulator * osc.fm[j];
 		}
 
 		if (osc.audible) {

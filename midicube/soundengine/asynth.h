@@ -198,6 +198,8 @@ struct AnalogSynthPart {
 	Filter filter;
 	ADSREnvelope amp_env;
 	ADSREnvelope mod_env;
+
+	double fm = 0;
 };
 
 struct AnalogSynthVoice : public TriggeredNote {
@@ -207,7 +209,6 @@ struct AnalogSynthVoice : public TriggeredNote {
 class AnalogSynth : public BaseSoundEngine<AnalogSynthVoice, ANALOG_SYNTH_POLYPHONY>, public PropertyHolder {
 
 private:
-	std::array<double, ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT> modulators = {};
 	std::array<double, ANALOG_PART_COUNT> env_val = {};
 	std::array<AnalogOscilator, ANALOG_PART_COUNT> lfos;
 	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
