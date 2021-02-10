@@ -196,11 +196,11 @@ protected:
 class AnalogSynth : public BaseSoundEngine<TriggeredNote, ANALOG_SYNTH_POLYPHONY>, public PropertyHolder {
 
 private:
-	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT, 8> oscilators;
-	std::array<double, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> modulators = {};
-	std::array<Filter, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> filters;
-	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> amp_envs;
-	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> mod_envs;
+	AnalogOscilatorBank<ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT, 8> oscilators;
+	std::array<double, ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT> modulators = {};
+	std::array<Filter, ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT> filters;
+	std::array<ADSREnvelope, ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT> amp_envs;
+	std::array<ADSREnvelope, ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT> mod_envs;
 	std::array<double, ANALOG_PART_COUNT> env_val = {};
 	std::array<AnalogOscilator, ANALOG_PART_COUNT> lfos;
 	std::array<double, ANALOG_PART_COUNT> lfo_val = {};

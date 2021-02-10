@@ -77,7 +77,7 @@ class Sampler : public BaseSoundEngine<TriggeredNote, SAMPLER_POLYPHONY> {
 
 private:
 	SampleSound* sample;
-	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY> envs;
+	std::array<ADSREnvelope, SAMPLER_POLYPHONY> envs;
 
 public:
 

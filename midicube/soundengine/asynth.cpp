@@ -8,8 +8,8 @@
 #include <cmath>
 #include <iostream>
 
-#define OSC_INDEX(note_index,i) (note_index + i * SOUND_ENGINE_POLYPHONY)
-#define ENV_INDEX(note_index,i) (note_index + i * SOUND_ENGINE_POLYPHONY)
+#define OSC_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
+#define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
 void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 	switch (type) {
@@ -395,7 +395,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val,
 				lfo_val, controls, note.velocity);
 		env_val[i] =
-				mod_envs[note_index + i * SOUND_ENGINE_POLYPHONY].amplitude(
+				mod_envs[note_index + i * ANALOG_SYNTH_POLYPHONY].amplitude(
 						mod_env.env, info.time_step, note.pressed, env.sustain)
 						* volume;
 	}
@@ -471,7 +471,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 					filter.cutoff = cutoff_to_factor(cutoff, info.time_step);
 				}
 
-				signal = filters[note_index + i * SOUND_ENGINE_POLYPHONY].apply(
+				signal = filters[note_index + i * ANALOG_SYNTH_POLYPHONY].apply(
 						filter, signal, info.time_step);
 			}
 			signal *= volume;

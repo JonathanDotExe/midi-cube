@@ -69,7 +69,7 @@ public:
 
 };
 
-#define SOUND_ENGINE_POLYPHONY 30
+#define ARPEGGIATOR_POLYPHONY 30
 
 enum ArpeggiatorPattern {
 	ARP_UP, ARP_DOWN, ARP_RANDOM, ARP_UP_DOWN, ARP_UP_CUSTOM, ARP_DOWN_CUSTOM
@@ -94,7 +94,7 @@ private:
 public:
 	bool on = false;
 	ArpeggiatorPreset preset;
-	VoiceManager<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
+	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
 	Metronome metronome;
 
 	Arpeggiator();

@@ -149,7 +149,7 @@ template<typename V, size_t P>
 void BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info) {
 	EngineStatus status = {0, 0, nullptr};
 	//Notes
-	for (size_t i = 0; i < SOUND_ENGINE_POLYPHONY; ++i) {
+	for (size_t i = 0; i < P; ++i) {
 		if (note.note[i].valid) {
 			if (note_finished(info, note.note[i], environment, i)) {
 				note.note[i].valid = false;
