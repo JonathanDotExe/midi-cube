@@ -26,6 +26,8 @@ const FixedScale FILTER_RESONANCE_SCALE(0, {}, 1);
 const FixedScale PITCH_SCALE(-2, {}, 2);
 const FixedScale PANNING_SCALE(-1, {}, 1);
 
+#define ANALOG_SYNTH_POLYPHONY 30
+
 struct PropertyModulation {
 	double value = 0;
 	size_t mod_env = 0;
@@ -191,18 +193,24 @@ protected:
 	}
 };
 
-#define ANALOG_SYNTH_POLYPHONY 30
+struct AnalogSynthPart {
+	AnalogOscilatorBank<1, 8> oscilator;
+	Filter filter;
+	ADSREnvelope amp_env;
+	ADSREnvelope mod_env;
+	AnalogOscilator lfo;
 
-class AnalogSynth : public BaseSoundEngine<TriggeredNote, ANALOG_SYNTH_POLYPHONY>, public PropertyHolder {
+};
+
+struct AnalogSynthVoice : public TriggeredNote {
+	std::array<AnalogSynthPart, ANALOG_PART_COUNT> parts;
+};
+
+class AnalogSynth : public BaseSoundEngine<AnalogSynthVoice, ANALOG_SYNTH_POLYPHONY>, public PropertyHolder {
 
 private:
-	AnalogOscilatorBank<ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT, 8> oscilators;
 	std::array<double, ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT> modulators = {};
-	std::array<Filter, ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT> filters;
-	std::array<ADSREnvelope, ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT> amp_envs;
-	std::array<ADSREnvelope, ANALOG_SYNTH_POLYPHONY * ANALOG_PART_COUNT> mod_envs;
 	std::array<double, ANALOG_PART_COUNT> env_val = {};
-	std::array<AnalogOscilator, ANALOG_PART_COUNT> lfos;
 	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
 	std::array<double, ANALOG_PART_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
