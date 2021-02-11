@@ -415,9 +415,9 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		if (reset_amps) {
 			part.amp_env.reset();
 			if (osc.reset) {
-				part.oscilator.reset(0);
+				part.oscilator.reset();
 			} else if (osc.randomize) {
-				part.oscilator.randomize(0);
+				part.oscilator.randomize();
 			}
 		}
 
@@ -434,8 +434,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 				osc.unison_detune, env_val, lfo_val, controls, note.velocity);
 
 		//Signal
-		AnalogOscilatorSignal sig = part.oscilator.signal(freq, info.time_step,
-				1, data, bdata);
+		AnalogOscilatorSignal sig = part.oscilator.signal(freq, info.time_step, data, bdata);
 		double signal = sig.carrier;
 		//Frequency modulate others
 		double modulator = sig.modulator * volume;

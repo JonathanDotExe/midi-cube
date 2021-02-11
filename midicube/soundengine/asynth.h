@@ -194,7 +194,7 @@ protected:
 };
 
 struct AnalogSynthPart {
-	AnalogOscilatorBank<1, 8> oscilator;
+	UnisonOscilator<8> oscilator;
 //	Filter filter;
 	ADSREnvelope amp_env;
 	ADSREnvelope mod_env;
