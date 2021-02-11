@@ -541,9 +541,9 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 		double volume = apply_modulation(VOLUME_SCALE, lfo.volume, env_val,
 				lfo_val, controls, 0);
 		AnalogOscilatorData d = { lfo.waveform };
-		AnalogOscilatorSignal sig = lfos[i].signal(lfo.freq, info.time_step, d);
-		lfo_val[i] = sig.carrier * volume;
-		lfo_mod[i] = sig.modulator * volume;
+		lfos[i].process(lfo.freq, info.time_step, d);
+		lfo_val[i] = lfos[i].carrier(lfo.freq, info.time_step, d) * volume;
+		lfo_mod[i] = lfos[i].modulator(lfo.freq, info.time_step, d) * volume;
 	}
 }
 

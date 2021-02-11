@@ -61,7 +61,7 @@ public:
 
 	}
 
-	AnalogOscilatorSignal signal(double freq, double time_step, AnalogOscilatorData data, AnalogOscilatorBankData bdata) {
+	AnalogOscilatorSignal signal(double freq, double time_step, AnalogOscilatorData data, AnalogOscilatorBankData bdata, bool carrier = true, bool modulator = true) {
 		AnalogOscilatorSignal signal;
 		double detune = note_to_freq_transpose(bdata.unison_detune);
 		double ndetune = note_to_freq_transpose(-bdata.unison_detune);
@@ -73,16 +73,26 @@ public:
 		//Positive
 		size_t i = 0;
 		for (;  i < psize; ++i) {
-			AnalogOscilatorSignal sig = oscillators[i].signal(freq * det, time_step, data);
-			signal.carrier += sig.carrier;
-			signal.modulator += sig.modulator;
+			double f = freq * det;
+			oscillators[i].process(f, time_step, data);
+			if (carrier) {
+				signal.carrier += oscillators[i].carrier(f, time_step, data);
+			}
+			if (modulator) {
+				signal.modulator += oscillators[i].modulator(f, time_step, data);
+			}
 			det *= detune;
 		}
 		//Negative
 		for (;  i < size; ++i) {
-			AnalogOscilatorSignal sig = oscillators[i].signal(freq * ndet, time_step, data);
-			signal.carrier += sig.carrier;
-			signal.modulator += sig.modulator;
+			double f = freq * ndet;
+			oscillators[i].process(f, time_step, data);
+			if (carrier) {
+				signal.carrier += oscillators[i].carrier(f, time_step, data);
+			}
+			if (modulator) {
+				signal.modulator += oscillators[i].modulator(f, time_step, data);
+			}
 			ndet *= ndetune;
 		}
 		signal.carrier /= size;
