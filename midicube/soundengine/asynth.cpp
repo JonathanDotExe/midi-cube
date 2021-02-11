@@ -772,7 +772,7 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 		val = get_mod_prop(osc.panning, (SynthModulationProperty) sub_prop);
 		break;
 	case SynthPartProperty::pSynthOscSemi:
-		val.dval = osc.semi;
+		val.ival = osc.semi;
 		break;
 	case SynthPartProperty::pSynthOscTranspose:
 		val.dval = osc.transpose;
@@ -889,7 +889,7 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val,
 		set_mod_prop(osc.panning, (SynthModulationProperty) sub_prop, val);
 		break;
 	case SynthPartProperty::pSynthOscSemi:
-		osc.semi = val.dval;
+		osc.semi = val.ival;
 		break;
 	case SynthPartProperty::pSynthOscTranspose:
 		osc.transpose = val.dval;

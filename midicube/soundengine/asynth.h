@@ -59,7 +59,7 @@ struct OscilatorEntity {
 	PropertyModulation pulse_width = {1};
 	PropertyModulation unison_detune = {0.1};
 	PropertyModulation panning = {0.5};
-	double semi = 0;
+	int semi = 0;
 	double transpose = 1;
 	PropertyModulation pitch = {0.5};
 
