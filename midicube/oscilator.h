@@ -34,10 +34,13 @@ struct AnalogOscilatorSignal {
 class AnalogOscilator {
 private:
 	double rotation = 0;
+	double last_rotation = 0;
 	double pulse_width = 0.5;
 public:
 	AnalogOscilator();
-	AnalogOscilatorSignal signal(double freq, double time_step, AnalogOscilatorData& data);
+	void process(double freq, double time_step, AnalogOscilatorData& data);
+	double carrier(double freq, double time_step, AnalogOscilatorData& data);
+	double modulator(double freq, double time_step, AnalogOscilatorData& data);
 	void randomize();
 	void reset();
 	~AnalogOscilator();
