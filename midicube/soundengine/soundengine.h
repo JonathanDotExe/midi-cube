@@ -17,11 +17,11 @@
 #include "../effect/vocoder.h"
 #include "../effect/bitcrusher.h"
 #include "../property.h"
+#include "voice.h"
 #include <string>
 #include <array>
 #include <functional>
 
-#define SOUND_ENGINE_POLYPHONY 30
 #define SOUND_ENGINE_MIDI_CHANNELS 16
 
 class SoundEngineDevice;
@@ -29,23 +29,7 @@ class SoundEngineDevice;
 struct EngineStatus {
 	size_t pressed_notes;
 	size_t latest_note_index;
-	TriggeredNote* latest_note;
 };
-
-class NoteBuffer {
-private:
-	size_t next_freq_slot(SampleInfo& info);
-
-public:
-	std::array<TriggeredNote, SOUND_ENGINE_POLYPHONY> note;
-
-	NoteBuffer();
-
-	void press_note(SampleInfo& info, unsigned int note, double velocity);
-	void release_note(SampleInfo& info, unsigned int note, bool invalidate = false);
-
-};
-
 
 class SoundEngineData {
 public:
@@ -75,14 +59,18 @@ public:
 
 };
 
+template<typename V, size_t P>
 class BaseSoundEngine : public SoundEngine {
 private:
 	KeyboardEnvironment environment;
-	NoteBuffer note;
+
+protected:
+	VoiceManager<V, P> note;
 
 public:
 	std::atomic<unsigned int> sustain_control{64};
 	std::atomic<bool> sustain{true};
+
 
 	void midi_message(MidiMessage& msg, SampleInfo& info);
 
@@ -92,7 +80,7 @@ public:
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
-	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) = 0;
+	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) = 0;
 
 
 	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
@@ -103,7 +91,7 @@ public:
 
 	};
 
-	virtual bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+	virtual bool note_finished(SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) {
 		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
 	};
 
@@ -112,6 +100,75 @@ public:
 	};
 
 };
+
+//BaseSoundEngine
+template<typename V, size_t P>
+void BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info) {
+	double pitch;
+	switch (message.type) {
+		case MessageType::NOTE_ON:
+			press_note(info, message.note(), message.velocity()/127.0);
+			break;
+		case MessageType::NOTE_OFF:
+			release_note(info, message.note());
+			break;
+		case MessageType::CONTROL_CHANGE:
+			control_change(message.control(), message.value());
+			//Sustain
+			if (message.control() == sustain_control) {
+				bool new_sustain = message.value() != 0;
+				if (new_sustain != environment.sustain) {
+					if (new_sustain) {
+						environment.sustain_time = info.time;
+					}
+					else {
+						environment.sustain_release_time = info.time;
+					}
+					environment.sustain = new_sustain;
+				}
+			}
+			break;
+		case MessageType::PITCH_BEND:
+			pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
+			environment.pitch_bend = note_to_freq_transpose(pitch);
+			break;
+		default:
+			break;
+	}
+}
+
+template<typename V, size_t P>
+void BaseSoundEngine<V, P>::press_note(SampleInfo& info, unsigned int note, double velocity) {
+	this->note.press_note(info, note, velocity);
+}
+
+template<typename V, size_t P>
+void BaseSoundEngine<V, P>::release_note(SampleInfo& info, unsigned int note) {
+	this->note.release_note(info, note);
+}
+
+template<typename V, size_t P>
+void BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info) {
+	EngineStatus status = {0, 0};
+	//Notes
+	for (size_t i = 0; i < P; ++i) {
+		if (note.note[i].valid) {
+			if (note_finished(info, note.note[i], environment, i)) {
+				note.note[i].valid = false;
+			}
+			else {
+				++status.pressed_notes; //TODO might cause problems in the future
+				note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
+				process_note_sample(lsample, rsample, info, note.note[i], environment, i);
+				if (!status.pressed_notes || note.note[status.latest_note_index].start_time < note.note[i].start_time) {
+					status.latest_note_index = i;
+				}
+			}
+		}
+	}
+	//Static sample
+	process_sample(lsample, rsample, info, environment, status);
+}
 
 
 class SoundEngineBank {
@@ -140,42 +197,6 @@ public:
 	std::string get_name() {
 		return get_engine_name<T>();
 	}
-};
-
-enum ArpeggiatorPattern {
-	ARP_UP, ARP_DOWN, ARP_RANDOM, ARP_UP_DOWN, ARP_UP_CUSTOM, ARP_DOWN_CUSTOM
-};
-
-struct ArpeggiatorPreset {
-	ArpeggiatorPattern pattern;
-	std::vector<unsigned int> data;
-	unsigned int octaves = 1;
-	int value = 1;
-	bool hold = false;
-};
-
-class Arpeggiator {
-
-private:
-	unsigned int curr_note = 0;
-	std::size_t data_index = 0;
-	std::size_t note_index = 0;
-	bool restart = true;
-
-public:
-	bool on = false;
-	ArpeggiatorPreset preset;
-	NoteBuffer note;
-	Metronome metronome;
-
-	Arpeggiator();
-
-	void apply(SampleInfo& info, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release);
-
-	void press_note(SampleInfo& info, unsigned int note, double velocity);
-
-	void release_note(SampleInfo& info, unsigned int note);
-
 };
 
 struct ChannelSource {

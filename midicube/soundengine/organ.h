@@ -160,7 +160,7 @@ public:
 	double process(SampleInfo& info, double freq);
 };
 
-class B3OrganData : public SoundEngineData{
+class B3OrganData : public SoundEngineData {
 public:
 	B3OrganPreset preset;
 	AmplifierSimulationEffect amplifier;
@@ -180,7 +180,9 @@ public:
 	}
 };
 
-class B3Organ : public BaseSoundEngine, public PropertyHolder {
+#define B3_ORGAN_POLYPHONY 61
+
+class B3Organ : public BaseSoundEngine<TriggeredNote, B3_ORGAN_POLYPHONY> , public PropertyHolder {
 
 private:
 	//Static values

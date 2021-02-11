@@ -8,8 +8,8 @@
 #include <cmath>
 #include <iostream>
 
-#define OSC_INDEX(note_index,i) (note_index + i * SOUND_ENGINE_POLYPHONY)
-#define ENV_INDEX(note_index,i) (note_index + i * SOUND_ENGINE_POLYPHONY)
+#define OSC_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
+#define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
 void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 	switch (type) {
@@ -379,35 +379,29 @@ static inline double apply_modulation(const FixedScale &scale,
 }
 
 void AnalogSynth::process_note(double& lsample, double& rsample,
-		SampleInfo &info, TriggeredNote &note, KeyboardEnvironment &env,
+		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env,
 		size_t note_index) {
-	env_val = { };
 	//Reset amps
 	bool reset_amps = amp_finished(info, note, env, note_index); //TODO maybe use press note event
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
-		size_t index = ENV_INDEX(note_index, i);
 		if (reset_amps) {
-			mod_envs[index].reset();
+			note.parts[i].mod_env.reset();
 		}
 
-		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val,
-				lfo_val, controls, note.velocity);
-		env_val[i] =
-				mod_envs[note_index + i * SOUND_ENGINE_POLYPHONY].amplitude(
-						mod_env.env, info.time_step, note.pressed, env.sustain)
-						* volume;
+		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, controls, note.velocity);
+		env_val[i] = note.parts[i].mod_env.amplitude(mod_env.env, info.time_step, note.pressed, env.sustain)* volume;
 	}
 	//Synthesize
 	for (size_t i = 0; i < preset.osc_count; ++i) {
+		AnalogSynthPart& part = note.parts[i];
 		OscilatorEntity &osc = preset.oscilators[i];
 		//Frequency
 		double freq = note.freq;
 		//FM
-		double fm_mod = modulators[OSC_INDEX(note_index, i)];
-		freq += fm_mod;
-		modulators[OSC_INDEX(note_index, i)] = 0;
+		freq += part.fm;
+		part.fm = 0;
 		double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val,
 				lfo_mod, controls, note.velocity);
 		if (osc.semi || pitch) {
@@ -417,21 +411,20 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 
 		AnalogOscilatorData data = { osc.waveform, osc.analog, osc.sync };
 		AnalogOscilatorBankData bdata = { 0.1, osc.unison_amount };
-		size_t index = OSC_INDEX(note_index, i);
 		//Only on note start
 		if (reset_amps) {
-			amp_envs[index].reset();
+			part.amp_env.reset();
 			if (osc.reset) {
-				oscilators.reset(index);
+				part.oscilator.reset();
 			} else if (osc.randomize) {
-				oscilators.randomize(index);
+				part.oscilator.randomize();
 			}
 		}
 
 		//Apply modulation
 		double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val,
 				lfo_val, controls, note.velocity)
-				* amp_envs[index].amplitude(osc.env, info.time_step,
+				* part.amp_env.amplitude(osc.env, info.time_step,
 						note.pressed, env.sustain);
 		data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val,
 				lfo_val, controls, note.velocity);
@@ -441,13 +434,12 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 				osc.unison_detune, env_val, lfo_val, controls, note.velocity);
 
 		//Signal
-		AnalogOscilatorSignal sig = oscilators.signal(freq, info.time_step,
-				index, data, bdata);
+		AnalogOscilatorSignal sig = part.oscilator.signal(freq, info.time_step, data, bdata);
 		double signal = sig.carrier;
 		//Frequency modulate others
 		double modulator = sig.modulator * volume;
 		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
-			modulators[OSC_INDEX(note_index, j)] += modulator * osc.fm[j];
+			note.parts[j].fm += modulator * osc.fm[j];
 		}
 
 		if (osc.audible) {
@@ -465,14 +457,11 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 					double cutoff = factor_to_cutoff(filter.cutoff,
 							info.time_step);
 					//KB track
-					cutoff *= 1
-							+ ((double) note.note - 36) / 12.0
-									* osc.filter_kb_track;
+					cutoff *= 1 + ((double) note.note - 36) / 12.0 * osc.filter_kb_track;
 					filter.cutoff = cutoff_to_factor(cutoff, info.time_step);
 				}
 
-				signal = filters[note_index + i * SOUND_ENGINE_POLYPHONY].apply(
-						filter, signal, info.time_step);
+				signal = part.filter.apply(filter, signal, info.time_step);
 			}
 			signal *= volume;
 			//Pan
@@ -487,7 +476,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 
 void AnalogSynth::process_note_sample(
 		double& lsample, double& rsample, SampleInfo &info,
-		TriggeredNote &note, KeyboardEnvironment &env, size_t note_index) {
+		AnalogSynthVoice &note, KeyboardEnvironment &env, size_t note_index) {
 	if (!preset.mono) {
 		process_note(lsample, rsample, info, note, env, note_index);
 	}
@@ -496,33 +485,31 @@ void AnalogSynth::process_note_sample(
 void AnalogSynth::process_sample(double& lsample, double& rsample,
 		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
 	//Mono
-	if (preset.mono && status.latest_note) {
-		unsigned int note = status.latest_note->note;
+	if (preset.mono && status.pressed_notes) {
+		AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
 		//Update portamendo
-		if (note != last_note) {
+		if (voice.note != last_note) {
 			//Reset envs to attack
 			if (!preset.legato) {
 				for (size_t i = 0; i < preset.mod_env_count; ++i) {
 					//Mod env
-					size_t index = ENV_INDEX(0, i);	//Updating every amp might be a bug source
-					mod_envs[index].phase = ATTACK;
+					voice.parts[i].mod_env.phase = ATTACK;
 				}
 				for (size_t i = 0; i < preset.osc_count; ++i) {
 					//Amp env
-					size_t index = OSC_INDEX(0, i);
-					amp_envs[index].phase = ATTACK;
+					voice.parts[i].mod_env.phase = ATTACK;
 				}
 			}
-			note_port.set(note, info.time, first_port ? 0 : preset.portamendo);
+			note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo);
 		}
-		last_note = note;
+		last_note = voice.note;
 		first_port = false;
 		double pitch = note_port.get(info.time);
 		KeyboardEnvironment e = env;
 		e.pitch_bend *= note_to_freq_transpose(
-				pitch - status.latest_note->note);
+				pitch - voice.note);
 
-		process_note(lsample, rsample, info, *status.latest_note, e, 0);
+		process_note(lsample, rsample, info, voice, e, 0);
 	}
 
 	//Delay lines
@@ -564,7 +551,7 @@ void AnalogSynth::control_change(unsigned int control, unsigned int value) {
 	controls[control] = value / 127.0;
 }
 
-bool AnalogSynth::note_finished(SampleInfo &info, TriggeredNote &note,
+bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 		KeyboardEnvironment &env, size_t note_index) {
 	//Mono notes
 	if (preset.mono) {	//TODO not very easy to read/side effects
@@ -573,12 +560,11 @@ bool AnalogSynth::note_finished(SampleInfo &info, TriggeredNote &note,
 	return !note.pressed && amp_finished(info, note, env, note_index);
 }
 
-bool AnalogSynth::amp_finished(SampleInfo &info, TriggeredNote &note,
+bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,
 		KeyboardEnvironment &env, size_t note_index) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.osc_count && finished; ++i) {
-		size_t index = OSC_INDEX(note_index, i);
-		finished = amp_envs[index].is_finished();
+		finished = note.parts[i].amp_env.is_finished();
 	}
 	return finished;
 }

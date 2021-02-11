@@ -18,9 +18,9 @@ struct SampleDrumKit {
 	std::unordered_map<unsigned int, AudioSample> notes;
 };
 
+#define SAMPLE_DRUMS_POLYPHONY 30;
 
-
-class SampleDrums : public BaseSoundEngine {
+class SampleDrums : public BaseSoundEngine<TriggeredNote, 30> {
 
 private:
 	SampleDrumKit* drumkit;

@@ -40,11 +40,12 @@ struct FilterData {
 
 class Filter {
 private:
+
+public:
 	double pole1 = 0;
 	double pole2 = 0;
 	double pole3 = 0;
 	double pole4 = 0;
-public:
 	double apply (FilterData& data, double sample, double time_step);
 
 };

@@ -26,6 +26,8 @@ const FixedScale FILTER_RESONANCE_SCALE(0, {}, 1);
 const FixedScale PITCH_SCALE(-2, {}, 2);
 const FixedScale PANNING_SCALE(-1, {}, 1);
 
+#define ANALOG_SYNTH_POLYPHONY 30
+
 struct PropertyModulation {
 	double value = 0;
 	size_t mod_env = 0;
@@ -191,14 +193,22 @@ protected:
 	}
 };
 
-class AnalogSynth : public BaseSoundEngine, public PropertyHolder {
+struct AnalogSynthPart {
+	UnisonOscilator<8> oscilator;
+	Filter filter;
+	ADSREnvelope amp_env;
+	ADSREnvelope mod_env;
+
+	double fm = 0;
+};
+
+struct AnalogSynthVoice : public TriggeredNote {
+	std::array<AnalogSynthPart, ANALOG_PART_COUNT> parts;
+};
+
+class AnalogSynth : public BaseSoundEngine<AnalogSynthVoice, ANALOG_SYNTH_POLYPHONY>, public PropertyHolder {
 
 private:
-	AnalogOscilatorBank<SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT, 8> oscilators;
-	std::array<double, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> modulators = {};
-	std::array<Filter, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> filters;
-	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> amp_envs;
-	std::array<ADSREnvelope, SOUND_ENGINE_POLYPHONY * ANALOG_PART_COUNT> mod_envs;
 	std::array<double, ANALOG_PART_COUNT> env_val = {};
 	std::array<AnalogOscilator, ANALOG_PART_COUNT> lfos;
 	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
@@ -211,9 +221,9 @@ private:
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;
 
-	inline void process_note(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	inline void process_note(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 
-	inline bool amp_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 
 public:
 	AnalogSynthPreset preset;
@@ -221,13 +231,13 @@ public:
 
 	AnalogSynth();
 
-	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
 	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	bool note_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 	
 	void set(size_t prop, PropertyValue value, size_t sub_prop);
 	
