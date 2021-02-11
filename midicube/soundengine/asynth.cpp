@@ -461,8 +461,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 					filter.cutoff = cutoff_to_factor(cutoff, info.time_step);
 				}
 
-				//signal = part.filter.apply(filter, signal, info.time_step);
-				signal = filters[OSC_INDEX(note_index, i)].apply(filter, signal, info.time_step);
+				signal = part.filter.apply(filter, signal, info.time_step);
 			}
 			signal *= volume;
 			//Pan
