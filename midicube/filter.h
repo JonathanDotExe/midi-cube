@@ -34,7 +34,7 @@ enum FilterType {
 
 struct FilterData {
 	FilterType type;
-	double cutoff = 1;
+	double cutoff = 1; //in Hz
 	double resonance = 0;
 };
 

@@ -55,7 +55,7 @@ void AmplifierSimulationEffect::apply(double &lsample, double &rsample, Amplifie
 		//Low-pass
 		FilterData data;
 		data.type = FilterType::LP_12;
-		data.cutoff = cutoff_to_factor(200 + preset.tone * 20000, info.time_step);
+		data.cutoff = 200 + preset.tone * 20000;
 		lsample = lfilter.apply(data, lsample, info.time_step);
 		rsample = lfilter.apply(data, rsample, info.time_step);
 	}
