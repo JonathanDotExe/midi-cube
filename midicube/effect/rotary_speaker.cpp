@@ -13,7 +13,7 @@ static inline double sound_delay(double rotation, double max_delay, unsigned int
 
 RotarySpeakerEffect::RotarySpeakerEffect() {
 	filter_data.type = FilterType::LP_24;
-	filter_data.cutoff = rc_to_cutoff_factor(cutoff_to_rc(800), 1 / 41000.0); //FIXME dependent on the sample rate
+	filter_data.cutoff = 800;
 }
 
 void RotarySpeakerEffect::apply(double &lsample, double &rsample, RotarySpeakerPreset &preset, SampleInfo &info) {

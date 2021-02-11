@@ -66,7 +66,7 @@ public:
 class EnvelopeFollower {
 private:
 	Filter filter;
-	FilterData data{FilterType::LP_12, cutoff_to_factor(20, 1/44100.0), 0}; //FIXME
+	FilterData data{FilterType::LP_12, 20, 0};
 	double value = 0;
 public:
 	EnvelopeFollower();

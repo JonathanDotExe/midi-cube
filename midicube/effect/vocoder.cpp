@@ -11,7 +11,7 @@ VocoderEffect::VocoderEffect() {
 	//Set up bands
 	for (size_t i = 0; i < bands.size(); ++i) {
 		VocoderBand& band = bands.at(i);
-		band.filter_data.cutoff = cutoff_to_factor((VOCODER_HIGH_BAND - VOCODER_LOW_BAND)/VOCODER_BAND_COUNT * i + VOCODER_LOW_BAND, 1/44100.0); //TODO dependent on the sampel rate
+		band.filter_data.cutoff = (VOCODER_HIGH_BAND - VOCODER_LOW_BAND)/VOCODER_BAND_COUNT * i + VOCODER_LOW_BAND; //TODO dependent on the sampel rate
 		band.filter_data.type = FilterType::LP_24;
 	}
 }
@@ -70,7 +70,7 @@ void VocoderEffect::apply(double& lsample, double& rsample, double modulator, Vo
 		}
 		//Highpass
 		if (preset.mod_highpass) {
-			FilterData data = {FilterType::HP_12, cutoff_to_factor(preset.mod_highpass, info.time_step)};
+			FilterData data = {FilterType::HP_12, preset.mod_highpass};
 			modulator = mfilter.apply(data, modulator, info.time_step);
 		}
 		//Mix

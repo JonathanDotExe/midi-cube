@@ -17,13 +17,13 @@
 
 //Filter
 double Filter::apply (FilterData& data, double sample, double time_step) {
-	double cutoff = fmin(data.cutoff, 0.9999999999);
+	double cutoff = cutoff_to_factor(data.cutoff, time_step);
 	double feedback = data.resonance + data.resonance/(1 - cutoff);
 	//Update buffers
-	pole1 += data.cutoff * (sample - pole1 + feedback * (pole1 - pole2));
-	pole2 += data.cutoff * (pole1 - pole2);
-	pole3 += data.cutoff * (pole2 - pole3);
-	pole4 += data.cutoff * (pole3 - pole4);
+	pole1 += cutoff * (sample - pole1 + feedback * (pole1 - pole2));
+	pole2 += cutoff * (pole1 - pole2);
+	pole3 += cutoff * (pole2 - pole3);
+	pole4 += cutoff * (pole3 - pole4);
 	switch (data.type) {
 	case FilterType::LP_12:
 		return pole2;
