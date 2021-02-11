@@ -11,13 +11,24 @@
 #include "filter.h"
 
 
+const double TWO_POLE_FACTOR = 1.0/sqrt(pow(2, 1/2.0) - 1);
+const double FOUR_POLE_FACTOR = 1.0/sqrt(pow(2, 1/4.0) - 1);
+
 /**
  * To convert frequency into filter cutoff use time_step/(rc+time_step)
  */
 
 //Filter
 double Filter::apply (FilterData& data, double sample, double time_step) {
-	double cutoff = cutoff_to_factor(data.cutoff, time_step);
+	//Cutoff pole factor
+	double factor = 1;
+	if (data.type % 2 == 0) {
+		factor = TWO_POLE_FACTOR;
+	}
+	else {
+		factor = FOUR_POLE_FACTOR;
+	}
+	double cutoff = cutoff_to_factor(data.cutoff * factor, time_step);
 	double feedback = data.resonance + data.resonance/(1 - cutoff);
 	//Update buffers
 	pole1 += cutoff * (sample - pole1 + feedback * (pole1 - pole2));
