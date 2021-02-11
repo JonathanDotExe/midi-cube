@@ -434,12 +434,21 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 				osc.unison_detune, env_val, lfo_val, controls, note.velocity);
 
 		//Signal
-		AnalogOscilatorSignal sig = part.oscilator.signal(freq, info.time_step, data, bdata);
+		bool modulates = false;
+		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
+			if (osc.fm[j]) {
+				modulates = true;
+				break;
+			}
+		}
+		AnalogOscilatorSignal sig = part.oscilator.signal(freq, info.time_step, data, bdata, osc.audible, modulates);
 		double signal = sig.carrier;
 		//Frequency modulate others
-		double modulator = sig.modulator * volume;
-		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
-			note.parts[j].fm += modulator * osc.fm[j];
+		if (modulates) {
+			double modulator = sig.modulator * volume;
+			for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
+				note.parts[j].fm += modulator * osc.fm[j];
+			}
 		}
 
 		if (osc.audible) {
@@ -541,9 +550,9 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 		double volume = apply_modulation(VOLUME_SCALE, lfo.volume, env_val,
 				lfo_val, controls, 0);
 		AnalogOscilatorData d = { lfo.waveform };
-		AnalogOscilatorSignal sig = lfos[i].signal(lfo.freq, info.time_step, d);
-		lfo_val[i] = sig.carrier * volume;
-		lfo_mod[i] = sig.modulator * volume;
+		lfos[i].process(lfo.freq, info.time_step, d);
+		lfo_val[i] = lfos[i].carrier(lfo.freq, info.time_step, d) * volume;
+		lfo_mod[i] = lfos[i].modulator(lfo.freq, info.time_step, d) * volume;
 	}
 }
 

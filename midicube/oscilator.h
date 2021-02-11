@@ -34,10 +34,13 @@ struct AnalogOscilatorSignal {
 class AnalogOscilator {
 private:
 	double rotation = 0;
+	double last_rotation = 0;
 	double pulse_width = 0.5;
 public:
 	AnalogOscilator();
-	AnalogOscilatorSignal signal(double freq, double time_step, AnalogOscilatorData& data);
+	void process(double freq, double time_step, AnalogOscilatorData& data);
+	double carrier(double freq, double time_step, AnalogOscilatorData& data);
+	double modulator(double freq, double time_step, AnalogOscilatorData& data);
 	void randomize();
 	void reset();
 	~AnalogOscilator();
@@ -58,7 +61,7 @@ public:
 
 	}
 
-	AnalogOscilatorSignal signal(double freq, double time_step, AnalogOscilatorData data, AnalogOscilatorBankData bdata) {
+	AnalogOscilatorSignal signal(double freq, double time_step, AnalogOscilatorData data, AnalogOscilatorBankData bdata, bool carrier = true, bool modulator = true) {
 		AnalogOscilatorSignal signal;
 		double detune = note_to_freq_transpose(bdata.unison_detune);
 		double ndetune = note_to_freq_transpose(-bdata.unison_detune);
@@ -70,16 +73,26 @@ public:
 		//Positive
 		size_t i = 0;
 		for (;  i < psize; ++i) {
-			AnalogOscilatorSignal sig = oscillators[i].signal(freq * det, time_step, data);
-			signal.carrier += sig.carrier;
-			signal.modulator += sig.modulator;
+			double f = freq * det;
+			oscillators[i].process(f, time_step, data);
+			if (carrier) {
+				signal.carrier += oscillators[i].carrier(f, time_step, data);
+			}
+			if (modulator) {
+				signal.modulator += oscillators[i].modulator(f, time_step, data);
+			}
 			det *= detune;
 		}
 		//Negative
 		for (;  i < size; ++i) {
-			AnalogOscilatorSignal sig = oscillators[i].signal(freq * ndet, time_step, data);
-			signal.carrier += sig.carrier;
-			signal.modulator += sig.modulator;
+			double f = freq * ndet;
+			oscillators[i].process(f, time_step, data);
+			if (carrier) {
+				signal.carrier += oscillators[i].carrier(f, time_step, data);
+			}
+			if (modulator) {
+				signal.modulator += oscillators[i].modulator(f, time_step, data);
+			}
 			ndet *= ndetune;
 		}
 		signal.carrier /= size;
