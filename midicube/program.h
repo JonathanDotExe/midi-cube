@@ -20,6 +20,7 @@ struct Program {
 
 struct Bank {
 	std::string name;
+	std::string filename;
 	std::vector<Program*> programs;
 	~Bank() {
 		std::remove_if(programs.begin(), programs.end(), [](Program* p) {
@@ -30,6 +31,8 @@ struct Bank {
 };
 
 Bank* load_bank(std::string path);
+
+void save_bank(std::string path);
 
 class ProgramManager {
 private:
