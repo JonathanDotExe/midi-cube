@@ -48,26 +48,16 @@ void AmplifierSimulationEffect::apply(double &lsample, double &rsample, Amplifie
 		lsample *= gain;
 		rsample *= gain;
 
-		//Oversample
-		loversampler.upsample(lsample);
-		roversampler.upsample(rsample);
+		//Distortion
+		lsample = apply_distortion(lsample, preset.drive, preset.type);
+		rsample = apply_distortion(rsample, preset.drive, preset.type);
 
-		for (size_t i = 0; i < AMP_OVERSAMPLING; ++i) {
-			//Distortion
-			loversampler.samples[i] = apply_distortion(loversampler.samples[i], preset.drive, preset.type);
-			roversampler.samples[i] = apply_distortion(roversampler.samples[i], preset.drive, preset.type);
-
-			//Low-pass
-			FilterData data;
-			data.type = FilterType::LP_12;
-			data.cutoff = 200 + preset.tone * 20000;
-			loversampler.samples[i] = lfilter.apply(data, loversampler.samples[i], info.time_step);
-			roversampler.samples[i] = lfilter.apply(data, roversampler.samples[i], info.time_step);
-		}
-
-		//Downsample
-		lsample = loversampler.downsample();
-		rsample = roversampler.downsample();
+		//Low-pass
+		FilterData data;
+		data.type = FilterType::LP_12;
+		data.cutoff = 200 + preset.tone * 20000;
+		lsample = lfilter.apply(data, lsample, info.time_step);
+		rsample = rfilter.apply(data, rsample, info.time_step);
 	}
 }
 

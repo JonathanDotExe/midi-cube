@@ -30,8 +30,6 @@ class AmplifierSimulationEffect {
 private:
 	Filter lfilter;
 	Filter rfilter;
-	Oversampler<AMP_OVERSAMPLING> loversampler;
-	Oversampler<AMP_OVERSAMPLING> roversampler;
 public:
 	AmplifierSimulationEffect();
 	void apply(double& lsample, double& rsample, AmplifierSimulationPreset& preset, SampleInfo& info);

@@ -129,20 +129,19 @@ public:
 template<size_t N>
 class Oversampler {
 private:
-	double last = 0;
+
 public:
 	std::array<double, N> samples;
 
 	void upsample(double sample) {
-		for (size_t i = 0; i < N; ++i) {
-			double prog = (i + 1)/(N + 1);
-			samples[i] = last * (1 - prog) + sample * prog;
+		for (size_t i = 0; i < N - 1; ++i) {
+			samples[i] = 0;
 		}
+		samples[N - 1] = sample;
 	}
 
 	double downsample() {
-		last = samples[N - 1]; //N must be over 0
-		return last;
+		return samples[N - 1];
 	}
 };
 

@@ -154,12 +154,12 @@ private:
 	bool hit_border = false;
 	T min;
 	T max;
-	T border;
 
 public:
 	sf::RectangleShape rect;
 	sf::Text text;
 	double drag_mul = 0.0025;
+	T border;
 
 	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
 		this->min = min;
