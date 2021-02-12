@@ -35,6 +35,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
+		amount->border = 0;
 		amount->bind(holder, prop, SynthModulationProperty::pModModEnvAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
@@ -52,6 +53,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
+		amount->border = 0;
 		amount->bind(holder, prop, SynthModulationProperty::pModLFOAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
@@ -69,6 +71,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
+		amount->border = 0;
 		amount->bind(holder, prop, SynthModulationProperty::pModVelocityAmount);
 		controls->push_back(amount);
 	}
@@ -80,6 +83,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
+		amount->border = 0;
 		amount->bind(holder, prop, SynthModulationProperty::pModCCAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
