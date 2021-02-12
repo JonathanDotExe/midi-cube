@@ -12,6 +12,8 @@
 #include "../filter.h"
 #include "../synthesis.h"
 
+#define AMP_OVERSAMPLING 2
+
 enum DistortionType {
 	DIGITAL_DISTORTION, POLYNOMAL_DISTORTION, ARCTAN_DISTORTION
 };
@@ -28,6 +30,8 @@ class AmplifierSimulationEffect {
 private:
 	Filter lfilter;
 	Filter rfilter;
+	Oversampler<AMP_OVERSAMPLING> loversampler;
+	Oversampler<AMP_OVERSAMPLING> roversampler;
 public:
 	AmplifierSimulationEffect();
 	void apply(double& lsample, double& rsample, AmplifierSimulationPreset& preset, SampleInfo& info);
