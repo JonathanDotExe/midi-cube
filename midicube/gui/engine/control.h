@@ -151,8 +151,10 @@ class DragBox : public BindableControl {
 
 private:
 	double progress;
+	bool hit_border = false;
 	T min;
 	T max;
+	T border;
 
 public:
 	sf::RectangleShape rect;
@@ -162,6 +164,7 @@ public:
 	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
 		this->min = min;
 		this->max = max;
+		border = min;
 		this->progress = (value - min)/(max - min);
 
 		this->rect.setFillColor(sf::Color(220, 220, 220));
@@ -187,21 +190,32 @@ public:
 		window.draw(text);
 	}
 
+	virtual void on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
+		hit_border = false;
+	}
+
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
-		T old_val = progress * (max - min) + min;
-		progress += drag_mul * x_motion;
+		if (!hit_border) {
+			T old_val = progress * (max - min) + min;
+			progress += drag_mul * x_motion;
 
-		if (progress < 0) {
-			progress = 0;
-		}
-		else if (progress > 1) {
-			progress = 1;
-		}
+			if (progress < 0) {
+				progress = 0;
+			}
+			else if (progress > 1) {
+				progress = 1;
+			}
 
-		if (old_val != (progress * (max - min) + min)) {
 			T value = progress * (max - min) + min;
-			send_change(value);
-			update_position(this->x, this->y, width, height);
+			if ((old_val > border && value < border) || (old_val < border && value > border)) {
+				value = border;
+				progress = (value - min)/(max - min);
+				hit_border = true;
+			}
+			if (old_val != value) {
+				send_change(value);
+				update_position(this->x, this->y, width, height);
+			}
 		}
 	}
 
