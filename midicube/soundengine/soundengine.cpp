@@ -285,6 +285,8 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 			rsample += sample;
 		}
 	}
+	lsample *= volume;
+	rsample *= volume;
 }
 
 std::vector<SoundEngineBank*> SoundEngineDevice::get_sound_engines() {
@@ -318,6 +320,9 @@ PropertyValue SoundEngineDevice::get(size_t prop, size_t sub_prop) {
 	case SoundEngineProperty::pEngineMetronomeBPM:
 		val.ival = metronome.get_bpm();
 		break;
+	case SoundEngineProperty::pEngineVolume:
+		val.dval = volume;
+		break;
 	}
 	return val;
 }
@@ -330,12 +335,16 @@ void SoundEngineDevice::set(size_t prop, PropertyValue val, size_t sub_prop) {
 	case SoundEngineProperty::pEngineMetronomeBPM:
 		 metronome.set_bpm(val.ival);
 		break;
+	case SoundEngineProperty::pEngineVolume:
+		volume = val.dval;
+		break;
 	}
 }
 
 void SoundEngineDevice::update_properties() {
 	submit_change(SoundEngineProperty::pEngineMetronomeOn, play_metronome);
 	submit_change(SoundEngineProperty::pEngineMetronomeBPM, (int) metronome.get_bpm());
+	submit_change(SoundEngineProperty::pEngineVolume, volume);
 }
 
 SoundEngineDevice::~SoundEngineDevice() {

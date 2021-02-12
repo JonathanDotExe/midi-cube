@@ -246,7 +246,7 @@ private:
 	std::atomic<ssize_t> engine_index{0};
 
 public:
-	double volume{0.3};
+	double volume{1};
 	bool active{false};
 	double panning = 0;
 	ChannelSource source;
@@ -286,7 +286,8 @@ public:
 
 enum SoundEngineProperty {
 	pEngineMetronomeOn,
-	pEngineMetronomeBPM
+	pEngineMetronomeBPM,
+	pEngineVolume,
 };
 
 class SoundEngineDevice : public PropertyHolder {
@@ -301,6 +302,7 @@ public:
 	Metronome metronome;
 	std::atomic<bool> play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
+	double volume{0.2};
 
 	SoundEngineDevice();
 

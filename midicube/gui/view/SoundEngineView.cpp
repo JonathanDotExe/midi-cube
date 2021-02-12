@@ -78,6 +78,11 @@ Scene SoundEngineView::create(Frame& frame) {
 	bpm->bind(this->engine, SoundEngineProperty::pEngineMetronomeBPM);
 	controls.push_back(bpm);
 
+	//Volume
+	DragBox<double>* volume = new DragBox<double>(0, 0, 1, main_font, 18, 330, frame.get_height() - 45, 100, 40);
+	volume->bind(this->engine, SoundEngineProperty::pEngineVolume);
+	controls.push_back(volume);
+
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	exit->set_on_click([&frame]() {
