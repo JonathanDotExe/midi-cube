@@ -17,6 +17,11 @@
 #define ANALOG_PART_COUNT 8
 #define ANALOG_CONTROL_COUNT 128
 
+#define FILTER_MIN 14
+#define FILTER_MAX 44100
+constexpr double FILTER_PROGRESS_START = log(FILTER_MIN)/log(FILTER_MAX);
+constexpr double FILTER_PROGRESS_REST = 1 - FILTER_PROGRESS_START;
+
 const FixedScale VOLUME_SCALE = {0, {}, 1};
 const FixedScale SYNC_SCALE = {1, {}, 10};
 const FixedScale PULSE_WIDTH_SCALE = {0, {}, 0.5};
@@ -27,6 +32,11 @@ const FixedScale PITCH_SCALE(-2, {}, 2);
 const FixedScale PANNING_SCALE(-1, {}, 1);
 
 #define ANALOG_SYNTH_POLYPHONY 30
+
+
+inline double scale_cutoff(double prog) {
+	return pow(FILTER_MAX, FILTER_PROGRESS_START + FILTER_PROGRESS_REST * prog);
+}
 
 struct PropertyModulation {
 	double value = 0;

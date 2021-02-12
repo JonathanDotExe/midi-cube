@@ -455,9 +455,9 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 			//Filter
 			if (osc.filter) {
 				FilterData filter { osc.filter_type };
-				filter.cutoff = factor_to_cutoff(fmin(apply_modulation(FILTER_CUTOFF_SCALE,
+				filter.cutoff = scale_cutoff(apply_modulation(FILTER_CUTOFF_SCALE,
 						osc.filter_cutoff, env_val, lfo_val, controls,
-						note.velocity), 0.99), info.time_step); //TODO optimize
+						note.velocity)); //TODO optimize
 				filter.resonance = apply_modulation(FILTER_RESONANCE_SCALE,
 						osc.filter_resonance, env_val, lfo_val, controls,
 						note.velocity);
