@@ -11,6 +11,7 @@
 #include <string>
 #include <array>
 #include <vector>
+#include <algorithm>
 
 
 struct Program {
@@ -19,8 +20,16 @@ struct Program {
 
 struct Bank {
 	std::string name;
-	std::vector<Program> programs;
+	std::vector<Program*> programs;
+	~Bank() {
+		std::remove_if(programs.begin(), programs.end(), [](Program* p) {
+			delete p;
+			return true;
+		});
+	}
 };
+
+Bank* load_bank(std::string path);
 
 class ProgramManager {
 private:
@@ -28,7 +37,7 @@ private:
 	size_t curr_bank = 0;
 	size_t curr_program = 0;
 public:
-	std::vector<Bank> banks;
+	std::vector<Bank*> banks;
 	ProgramManager(std::string path);
 	void load_all();
 	void save_all();
