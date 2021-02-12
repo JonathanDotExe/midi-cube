@@ -24,6 +24,7 @@ src = [
 	'midicube/metronome.cpp',
 	'midicube/midi.cpp',
 	'midicube/midicube.cpp',
+	'midicube/program.cpp',
 	'midicube/oscilator.cpp',
 	'midicube/property.cpp',
 	'midicube/synthesis.cpp',
