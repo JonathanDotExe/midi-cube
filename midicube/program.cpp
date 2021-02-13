@@ -45,7 +45,22 @@ Bank* load_bank(std::string path, std::string filename) {
 
 void save_bank(Bank& bank, std::string path) {
 	//TODO
-
+	pt::ptree tree;
+	//Name
+	tree.put("bank.name", bank.name);
+	//Programs
+	for (Program* program : bank.programs) {
+		pt::ptree p;
+		save_program(program, p);
+		tree.add_child("bank.programs.program", p);
+	}
+	//Write
+	try {
+		pt::write_json(path, tree);
+	}
+	catch (pt::json_parser_error& e) {
+		std::cerr << "Couldn't save bank " << path << std::endl;
+	}
 }
 
 
