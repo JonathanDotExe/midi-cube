@@ -22,7 +22,6 @@ void save_program(Program* program, pt::ptree& tree) {
 
 Bank* load_bank(std::string path, std::string filename) {
 	pt::ptree tree;
-	Bank* bank = nullptr;
 	try {
 		pt::read_xml(path, tree);
 	}
@@ -30,6 +29,7 @@ Bank* load_bank(std::string path, std::string filename) {
 		std::cerr << "Couldn't load bank " << path << std::endl;
 		return nullptr;
 	}
+	Bank* bank = new Bank();
 	//Name
 	bank->name = tree.get<std::string>("bank.name", filename);
 	//Programs
@@ -68,6 +68,7 @@ ProgramManager::ProgramManager(std::string path) {
 }
 
 void ProgramManager::load_all() {
+	boost::filesystem::create_directory(path);
 	std::regex reg(".*\\.xml");
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
 		std::string file = f.path().string();

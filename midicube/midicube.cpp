@@ -13,7 +13,7 @@ static void process_func(double& lsample, double& rsample, SampleInfo& info, voi
 	((MidiCube*) user_data)->process(lsample, rsample, info);
 }
 
-MidiCube::MidiCube() : changes(128), update(32), messages(128) {
+MidiCube::MidiCube() : prog_mgr("./data/programs"), changes(128), update(32), messages(128) {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -57,6 +57,8 @@ void MidiCube::init(int out_device, int in_device) {
 		engine.channels[i].source.channel = i;
 		engine.channels[i].source.input = 1;
 	}
+	//Load programs
+	prog_mgr.load_all();
 	//Init audio
 	audio_handler.init(out_device, in_device);
 	//MIDI Inputs
@@ -173,6 +175,8 @@ void MidiCube::request_update(PropertyHolder* holder) {
 }
 
 MidiCube::~MidiCube() {
+	//Load programs
+	prog_mgr.save_all();
 	audio_handler.close();
 	for (MidiCubeInput in : inputs) {
 		delete in.in;

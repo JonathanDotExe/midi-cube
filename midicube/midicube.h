@@ -9,6 +9,7 @@
 #define MIDICUBE_MIDICUBE_H_
 
 #include "audio.h"
+#include "program.h"
 #include "soundengine/soundengine.h"
 #include "boost/lockfree/spsc_queue.hpp"
 
@@ -26,6 +27,7 @@ struct MidiMessageWithInput {
 class MidiCube {
 private:
 	AudioHandler audio_handler;
+	ProgramManager prog_mgr;
 	std::vector<MidiCubeInput> inputs;
 	boost::lockfree::spsc_queue<PropertyChange> changes;
 	boost::lockfree::spsc_queue<PropertyHolder*> update;
