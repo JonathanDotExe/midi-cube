@@ -8,13 +8,14 @@
 #include "program.h"
 #include <boost/filesystem.hpp>
 #include <regex>
+#include <iostream>
 
-Bank* load_bank(std::string path, std::string filename) {
+Bank* load_bank(std::string path) {
 	return new Bank{"Default"};	//TODO
 }
 
-Bank* save_bank(std::string path) {
-	return new Bank{"Default"};	//TODO
+void save_bank(std::string path) {
+	//TODO
 }
 
 
@@ -27,9 +28,11 @@ void ProgramManager::load_all() {
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
 		std::string file = f.path().string();
 		if (std::regex_match(file, reg)) {
-			Bank* bank = load_bank(path, f.path().filename().string());
+			Bank* bank = load_bank(file);
 			if (bank) {
-				banks.push_back(bank);
+				if (banks.insert(banks.end(), std::pair<std::string, Bank*>(f.path().stem().string(), bank))) {
+					std::cout << "Preset with filename " << f.path().stem().string() << " already exists!" << std::endl;
+				}
 			}
 		}
 	}
@@ -41,11 +44,14 @@ void ProgramManager::load_all() {
 }
 
 void ProgramManager::save_all() {
-	for (Bank* bank : banks) {
+	for (auto b : banks) {
 
 	}
 }
 
 ProgramManager::~ProgramManager() {
-
+	for (auto b : banks) {
+		delete b.second;
+	}
+	banks.clear();
 }

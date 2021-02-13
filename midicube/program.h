@@ -12,6 +12,7 @@
 #include <array>
 #include <vector>
 #include <algorithm>
+#include <map>
 
 
 struct Program {
@@ -40,7 +41,7 @@ private:
 	size_t curr_bank = 0;
 	size_t curr_program = 0;
 public:
-	std::vector<Bank*> banks;
+	std::map<std::string, Bank*> banks;
 	ProgramManager(std::string path);
 	void load_all();
 	void save_all();
