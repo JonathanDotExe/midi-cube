@@ -24,9 +24,9 @@ Bank* load_bank(std::string path, std::string filename) {
 	pt::ptree tree;
 	Bank* bank = nullptr;
 	try {
-		pt::read_json(path, tree);
+		pt::read_xml(path, tree);
 	}
-	catch (pt::json_parser_error& e) {
+	catch (pt::xml_parser_error& e) {
 		std::cerr << "Couldn't load bank " << path << std::endl;
 		return nullptr;
 	}
@@ -44,7 +44,6 @@ Bank* load_bank(std::string path, std::string filename) {
 }
 
 void save_bank(Bank& bank, std::string path) {
-	//TODO
 	pt::ptree tree;
 	//Name
 	tree.put("bank.name", bank.name);
@@ -56,9 +55,9 @@ void save_bank(Bank& bank, std::string path) {
 	}
 	//Write
 	try {
-		pt::write_json(path, tree);
+		pt::write_xml(path, tree);
 	}
-	catch (pt::json_parser_error& e) {
+	catch (pt::xml_parser_error& e) {
 		std::cerr << "Couldn't save bank " << path << std::endl;
 	}
 }
@@ -69,7 +68,7 @@ ProgramManager::ProgramManager(std::string path) {
 }
 
 void ProgramManager::load_all() {
-	std::regex reg(".*\\.json");
+	std::regex reg(".*\\.xml");
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
 		std::string file = f.path().string();
 		if (std::regex_match(file, reg)) {
@@ -96,7 +95,7 @@ void ProgramManager::load_all() {
 
 void ProgramManager::save_all() {
 	for (auto b : banks) {
-		save_bank(*b.second, path + "/" + b.first + ".json");
+		save_bank(*b.second, path + "/" + b.first + ".xml");
 	}
 }
 
