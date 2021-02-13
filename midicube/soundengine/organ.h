@@ -157,6 +157,7 @@ struct B3OrganTonewheelData {
 	double freq;
 	double press_delay;
 	double release_delay;
+	double volume = 1;
 };
 
 class B3OrganTonewheel {

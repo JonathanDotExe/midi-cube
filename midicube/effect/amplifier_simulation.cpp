@@ -29,7 +29,7 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 		break;
 	case DistortionType::POLYNOMAL_DISTORTION:
 	{
-		sample -= (sample * sample * sample) * drive * 2;
+		sample -= (sample * sample * sample) * drive;
 	}
 		break;
 	case DistortionType::ARCTAN_DISTORTION:
