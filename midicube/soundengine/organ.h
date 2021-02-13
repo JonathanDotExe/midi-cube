@@ -103,7 +103,7 @@ enum OrganChorusVibratoType {
 struct B3OrganPreset {
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbars;
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
-	double harmonic_foldback_volume{1.0};
+	double harmonic_foldback_volume{0.5};
 
 	AmplifierSimulationPreset amplifier;
 	unsigned int amp_cc{28};
@@ -153,6 +153,12 @@ struct B3OrganPreset {
 	}
 };
 
+struct B3OrganTonewheelData {
+	double freq;
+	double press_delay;
+	double release_delay;
+};
+
 class B3OrganTonewheel {
 public:
 	double rotation = 0;
@@ -187,9 +193,7 @@ class B3Organ : public BaseSoundEngine<TriggeredNote, B3_ORGAN_POLYPHONY> , publ
 private:
 	//Static values
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbar_notes;
-	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_frequencies;
-	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_press_delay;
-	std::array<double, ORGAN_TONEWHEEL_AMOUNT> tonewheel_release_delay;
+	std::array<B3OrganTonewheelData, ORGAN_TONEWHEEL_AMOUNT> tonewheel_data;
 
 	void trigger_tonewheel(int tonewheel, double vol, SampleInfo& info, TriggeredNote& note);
 

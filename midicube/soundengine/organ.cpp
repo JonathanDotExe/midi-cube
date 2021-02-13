@@ -44,22 +44,22 @@ B3Organ::B3Organ() {
 
 	//Frequencies
 	int teeth = 1;
-	for (size_t i = 0; i < tonewheel_frequencies.size(); ++i) {
+	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
 		if (i % gear_ratios.size() == 0) {
 			teeth *= 2;
 			if (teeth > 192) {
 				teeth = 192;
 			}
 		}
-		tonewheel_frequencies[i] = 20 * teeth * gear_ratios[(i + (teeth == 192 ? 5 : 0)) % gear_ratios.size()];
+		tonewheel_data[i].freq = 20 * teeth * gear_ratios[(i + (teeth == 192 ? 5 : 0)) % gear_ratios.size()];
 	}
 	//Press/Release delays
 	srand(888800000);
-	for (size_t i = 0; i < tonewheel_press_delay.size(); ++i) {
-		tonewheel_press_delay[i] = (double) rand()/RAND_MAX * ORGAN_MAX_DOWN_DELAY;
+	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
+		tonewheel_data[i].press_delay = (double) rand()/RAND_MAX * ORGAN_MAX_DOWN_DELAY;
 	}
-	for (size_t i = 0; i < tonewheel_release_delay.size(); ++i) {
-		tonewheel_release_delay[i] = (double) rand()/RAND_MAX * ORGAN_MAX_UP_DELAY;
+	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
+		tonewheel_data[i].release_delay = (double) rand()/RAND_MAX * ORGAN_MAX_UP_DELAY;
 	}
 }
 
@@ -72,7 +72,7 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, 
 		tonewheel -= 12;
 		volume *= data.preset.harmonic_foldback_volume;
 	}
-	if (tonewheel >= 0 && info.time >= note.start_time + tonewheel_press_delay[tonewheel] && (note.pressed || info.time <= note.release_time + tonewheel_release_delay[tonewheel])) {
+	if (tonewheel >= 0 && info.time >= note.start_time + tonewheel_data[tonewheel].press_delay && (note.pressed || info.time <= note.release_time + tonewheel_data[tonewheel].release_delay)) {
 		data.tonewheels[tonewheel].volume += volume;
 	}
 }
@@ -124,7 +124,7 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	//Compute samples
 	double sample = 0;
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
-		sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend) * swell;
+		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend) * swell;
 	}
 	//Compress
 	if (status.pressed_notes && data.preset.multi_note_gain != 1) {
