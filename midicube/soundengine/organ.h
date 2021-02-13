@@ -172,7 +172,7 @@ public:
 	B3OrganPreset preset;
 	AmplifierSimulationEffect amplifier;
 	RotarySpeakerEffect rotary_speaker;
-	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels;
+	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels = {};
 	std::array<DelayBuffer, ORGAN_VIBRATO_DELAY_STAGES> delays;
 
 	bool reset_percussion = true;

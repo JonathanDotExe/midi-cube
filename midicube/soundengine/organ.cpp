@@ -61,6 +61,12 @@ B3Organ::B3Organ() {
 	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
 		tonewheel_data[i].release_delay = (double) rand()/RAND_MAX * ORGAN_MAX_UP_DELAY;
 	}
+	//Tonewheel volumes
+	const size_t start_tw = 72;
+	for (size_t i = 0; i < tonewheel_data.size() - start_tw; ++i) {
+		double curr_vol = db_to_amp((-3 * ((int) i/12 + 1)));
+		tonewheel_data[i + start_tw].volume = curr_vol;
+	}
 }
 
 void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, TriggeredNote& note) {
