@@ -10,6 +10,15 @@
 #include <regex>
 #include <iostream>
 
+Program* load_program(pt::ptree& tree) {
+	Program* program = new Program();
+	program->name = tree.get<std::string>("name");
+	return program;
+}
+
+void save_program(Program* program, pt::ptree& tree) {
+	tree.add("name", program->name);
+}
 
 Bank* load_bank(std::string path, std::string filename) {
 	pt::ptree tree;
@@ -18,7 +27,7 @@ Bank* load_bank(std::string path, std::string filename) {
 		pt::read_json(path, tree);
 	}
 	catch (pt::json_parser_error& e) {
-		std::cerr << "Couldn't load sound.json" << std::endl;
+		std::cerr << "Couldn't load bank " << path << std::endl;
 		return nullptr;
 	}
 	//Name
