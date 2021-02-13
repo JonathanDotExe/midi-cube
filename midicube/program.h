@@ -14,6 +14,10 @@
 #include <algorithm>
 #include <map>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
+namespace pt = boost::property_tree;
 
 struct Program {
 	std::string name;
@@ -21,7 +25,6 @@ struct Program {
 
 struct Bank {
 	std::string name;
-	std::string filename;
 	std::vector<Program*> programs;
 	~Bank() {
 		std::remove_if(programs.begin(), programs.end(), [](Program* p) {
@@ -31,7 +34,9 @@ struct Bank {
 	}
 };
 
-Bank* load_bank(std::string path);
+Program* load_program(pt::ptree tree);
+
+Bank* load_bank(std::string path, std::string filename);
 
 void save_bank(Bank& bank, std::string path);
 

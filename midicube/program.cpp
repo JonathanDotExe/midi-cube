@@ -10,8 +10,28 @@
 #include <regex>
 #include <iostream>
 
-Bank* load_bank(std::string path) {
-	return new Bank{"Default"};	//TODO
+
+Bank* load_bank(std::string path, std::string filename) {
+	pt::ptree tree;
+	Bank* bank = nullptr;
+	try {
+		pt::read_json(path, tree);
+	}
+	catch (pt::json_parser_error& e) {
+		std::cerr << "Couldn't load sound.json" << std::endl;
+		return nullptr;
+	}
+	//Name
+	bank->name = tree.get<std::string>("bank.name", filename);
+	//Programs
+	const auto& programs =  tree.get_child_optional("bank.programs");
+	if (programs) {
+		for (pt::ptree::value_type& p : programs.get()) {
+			Program* prog = load_program(p.second);
+			bank->programs.push_back(prog);
+		}
+	}
+	return bank;
 }
 
 void save_bank(Bank& bank, std::string path) {
@@ -29,9 +49,9 @@ void ProgramManager::load_all() {
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
 		std::string file = f.path().string();
 		if (std::regex_match(file, reg)) {
-			Bank* bank = load_bank(file);
+			std::string name = f.path().stem().string();
+			Bank* bank = load_bank(file, name);
 			if (bank) {
-				std::string name = f.path().stem().string();
 				if (banks.find(name) == banks.end()) {
 					banks.insert(banks.end(), std::pair<std::string, Bank*>(name, bank));
 				}
