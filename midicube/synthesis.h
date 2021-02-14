@@ -126,5 +126,23 @@ public:
 	void set(double value, double time, double slope_time);
 };
 
+template<size_t N>
+class Oversampler {
+public:
+	std::array<double, N> samples = {};
+
+	void upsample(double sample) {
+		double last = samples[N - 1];
+		for (size_t i = 0; i < N; ++i) {
+			double prog = (double) (i + 1)/N;
+			samples[i] = last * (1 - prog) + prog * sample;
+		}
+	}
+
+	double downsample() {
+		return samples[N - 1];
+	}
+};
+
 
 #endif /* MIDICUBE_SYNTHESIS_H_ */

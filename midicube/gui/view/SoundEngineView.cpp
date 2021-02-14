@@ -79,6 +79,11 @@ Scene SoundEngineView::create(Frame& frame) {
 	bpm->bind(this->engine, SoundEngineProperty::pEngineMetronomeBPM);
 	controls.push_back(bpm);
 
+	//Volume
+	DragBox<double>* volume = new DragBox<double>(0, 0, 1, main_font, 18, 330, frame.get_height() - 45, 100, 40);
+	volume->bind(this->engine, SoundEngineProperty::pEngineVolume);
+	controls.push_back(volume);
+
 	//Program Button
 	Button* program = new Button("Programs", main_font, 18, frame.get_width() - 170, frame.get_height() - 40, 100, 40);
 	program->set_on_click([&frame]() {

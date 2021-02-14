@@ -29,7 +29,7 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 		break;
 	case DistortionType::POLYNOMAL_DISTORTION:
 	{
-		sample -= (sample * sample * sample) * drive * 1/3;
+		sample -= (sample * sample * sample) * drive;
 	}
 		break;
 	case DistortionType::ARCTAN_DISTORTION:
@@ -54,10 +54,10 @@ void AmplifierSimulationEffect::apply(double &lsample, double &rsample, Amplifie
 
 		//Low-pass
 		FilterData data;
-		data.type = FilterType::LP_12;
+		data.type = FilterType::LP_24;
 		data.cutoff = 200 + preset.tone * 20000;
 		lsample = lfilter.apply(data, lsample, info.time_step);
-		rsample = lfilter.apply(data, rsample, info.time_step);
+		rsample = rfilter.apply(data, rsample, info.time_step);
 	}
 }
 

@@ -44,36 +44,43 @@ B3Organ::B3Organ() {
 
 	//Frequencies
 	int teeth = 1;
-	for (size_t i = 0; i < tonewheel_frequencies.size(); ++i) {
+	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
 		if (i % gear_ratios.size() == 0) {
 			teeth *= 2;
 			if (teeth > 192) {
 				teeth = 192;
 			}
 		}
-		tonewheel_frequencies[i] = 20 * teeth * gear_ratios[(i + (teeth == 192 ? 5 : 0)) % gear_ratios.size()];
+		tonewheel_data[i].freq = 20 * teeth * gear_ratios[(i + (teeth == 192 ? 5 : 0)) % gear_ratios.size()];
 	}
 	//Press/Release delays
 	srand(888800000);
-	for (size_t i = 0; i < tonewheel_press_delay.size(); ++i) {
-		tonewheel_press_delay[i] = (double) rand()/RAND_MAX * ORGAN_MAX_DOWN_DELAY;
+	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
+		tonewheel_data[i].press_delay = (double) rand()/RAND_MAX * ORGAN_MAX_DOWN_DELAY;
 	}
-	for (size_t i = 0; i < tonewheel_release_delay.size(); ++i) {
-		tonewheel_release_delay[i] = (double) rand()/RAND_MAX * ORGAN_MAX_UP_DELAY;
+	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
+		tonewheel_data[i].release_delay = (double) rand()/RAND_MAX * ORGAN_MAX_UP_DELAY;
+	}
+	//Tonewheel volumes
+	const size_t start_tw = 72;
+	for (size_t i = 0; i < tonewheel_data.size() - start_tw; ++i) {
+		double curr_vol = db_to_amp((-3 * ((int) i/12 + 1)));
+		tonewheel_data[i + start_tw].volume = curr_vol;
 	}
 }
 
 void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, TriggeredNote& note) {
+	bool vol_mul = 1;
 	while (tonewheel < 0) {
 		tonewheel += 12;
-		volume *= data.preset.harmonic_foldback_volume;
+		vol_mul = data.preset.harmonic_foldback_volume;
 	}
 	while (tonewheel >= (int) data.tonewheels.size()) {
 		tonewheel -= 12;
-		volume *= data.preset.harmonic_foldback_volume;
+		vol_mul = data.preset.harmonic_foldback_volume;
 	}
-	if (tonewheel >= 0 && info.time >= note.start_time + tonewheel_press_delay[tonewheel] && (note.pressed || info.time <= note.release_time + tonewheel_release_delay[tonewheel])) {
-		data.tonewheels[tonewheel].volume += volume;
+	if (tonewheel >= 0 && info.time >= note.start_time + tonewheel_data[tonewheel].press_delay && (note.pressed || info.time <= note.release_time + tonewheel_data[tonewheel].release_delay)) {
+		data.tonewheels[tonewheel].volume += volume * vol_mul;
 	}
 }
 
@@ -95,13 +102,13 @@ void B3Organ::process_note_sample(double& lsample, double& rsample, SampleInfo &
 	}
 }
 
-static double calc_vol (size_t keys, double comp_factor) {
+/*static double calc_vol (size_t keys, double comp_factor) {
 	double vol = 1;
 	for (size_t i = 2; i <= keys; ++i) {
 		vol += comp_factor * 1.0/(i - 1);
 	}
 	return vol;
-}
+}*/
 
 bool B3Organ::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	return !note.pressed && info.time > ORGAN_MAX_UP_DELAY;
@@ -123,13 +130,16 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	//Play organ sound
 	//Compute samples
 	double sample = 0;
+	double volume = 0;
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
-		sample += data.tonewheels[i].process(info, tonewheel_frequencies[i] * env.pitch_bend) * swell;
+		volume += data.tonewheels[i].volume;
+		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend) * tonewheel_data[i].volume;
 	}
+	sample *= swell;
 	//Compress
-	if (status.pressed_notes && data.preset.multi_note_gain != 1) {
-		double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
-		sample *= v;
+	if (volume && data.preset.multi_note_gain != 1) {
+		//double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
+		sample *= pow(volume, data.preset.multi_note_gain)/volume;
 	}
 
 	//Chorus/Vibrato

@@ -12,6 +12,8 @@
 #include "../filter.h"
 #include "../synthesis.h"
 
+#define AMP_OVERSAMPLING 2
+
 enum DistortionType {
 	DIGITAL_DISTORTION, POLYNOMAL_DISTORTION, ARCTAN_DISTORTION
 };

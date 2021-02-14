@@ -13,7 +13,7 @@ static void process_func(double& lsample, double& rsample, SampleInfo& info, voi
 	((MidiCube*) user_data)->process(lsample, rsample, info);
 }
 
-MidiCube::MidiCube() : prog_mgr("./data/programs"), changes(128), update(32), messages(128) {
+MidiCube::MidiCube() : changes(128), update(32), messages(128), prog_mgr("./data/programs") {
 	prog_mgr.init_user(this);
 	audio_handler.set_sample_callback(&process_func, this);
 }
