@@ -14,7 +14,6 @@ static void process_func(double& lsample, double& rsample, SampleInfo& info, voi
 }
 
 MidiCube::MidiCube() : changes(128), update(32), messages(128), prog_mgr("./data/programs") {
-	prog_mgr.init_user(this);
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -60,6 +59,7 @@ void MidiCube::init(int out_device, int in_device) {
 	}
 	//Load programs
 	prog_mgr.load_all();
+	prog_mgr.init_user(this);
 	//Init audio
 	audio_handler.init(out_device, in_device);
 	//MIDI Inputs
