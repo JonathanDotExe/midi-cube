@@ -64,7 +64,7 @@ B3Organ::B3Organ() {
 	//Tonewheel volumes
 	const size_t start_tw = 72;
 	for (size_t i = 0; i < tonewheel_data.size() - start_tw; ++i) {
-		double curr_vol = db_to_amp((-3 * ((int) i/12 + 1)));
+		double curr_vol = db_to_amp((-6 * ((int) i/12 + 1)));
 		tonewheel_data[i + start_tw].volume = curr_vol;
 	}
 }
@@ -132,7 +132,7 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	double sample = 0;
 	double volume = 0;
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
-		volume += data.tonewheels[i].volume;
+		volume += data.tonewheels[i].volume * tonewheel_data[i].volume;
 		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend) * tonewheel_data[i].volume;
 	}
 	sample *= swell;
