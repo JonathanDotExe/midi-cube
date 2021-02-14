@@ -54,6 +54,11 @@ public:
 	}
 };
 
+enum ProgramManagerProperty {
+	pProgramManagerBank,
+	pProgramManagerProgram,
+};
+
 class ProgramManager : public PropertyHolder {
 private:
 	std::string path;

@@ -75,6 +75,9 @@ void ProgramManager::apply_program(size_t bank, size_t program) {
 	user->apply_program((*b).second->programs.at(program));
 	curr_bank = bank;
 	curr_program = program;
+
+	submit_change(ProgramManagerProperty::pProgramManagerBank, (int) curr_bank);
+	submit_change(ProgramManagerProperty::pProgramManagerProgram, (int) curr_program);
 }
 
 void ProgramManager::load_all() {
@@ -118,12 +121,30 @@ ProgramManager::~ProgramManager() {
 }
 
 void ProgramManager::set(size_t prop, PropertyValue value, size_t sub_prop) {
+	switch ((ProgramManagerProperty) prop) {
+	case ProgramManagerProperty::pProgramManagerBank:
+		apply_program(value.ival, 0);
+		break;
+	case ProgramManagerProperty::pProgramManagerProgram:
+		apply_program(curr_bank, value.ival);
+		break;
+	}
 }
 
 void ProgramManager::update_properties() {
+	submit_change(ProgramManagerProperty::pProgramManagerBank, (int) curr_bank);
+	submit_change(ProgramManagerProperty::pProgramManagerProgram, (int) curr_program);
 }
 
 PropertyValue ProgramManager::get(size_t prop, size_t sub_prop) {
-	PropertyValue val = {0};
+	PropertyValue val;
+	switch ((ProgramManagerProperty) prop) {
+	case ProgramManagerProperty::pProgramManagerBank:
+		val.ival = curr_bank;
+		break;
+	case ProgramManagerProperty::pProgramManagerProgram:
+		val.ival = curr_program;
+		break;
+	}
 	return val;
 }
