@@ -27,13 +27,13 @@ struct MidiMessageWithInput {
 class MidiCube : public ProgramUser {
 private:
 	AudioHandler audio_handler;
-	ProgramManager prog_mgr;
 	std::vector<MidiCubeInput> inputs;
 	boost::lockfree::spsc_queue<PropertyChange> changes;
 	boost::lockfree::spsc_queue<PropertyHolder*> update;
 	boost::lockfree::spsc_queue<MidiMessageWithInput> messages;
 	inline void process_midi(MidiMessage& message, size_t input);
 public:
+	ProgramManager prog_mgr;
 	SoundEngineDevice engine;
 
 	virtual void save_program(Program *prog);

@@ -6,6 +6,7 @@
  */
 
 #include "SoundEngineView.h"
+#include "ProgramView.h"
 #include "SoundEngineChannelView.h"
 
 #include <iostream>
@@ -77,6 +78,13 @@ Scene SoundEngineView::create(Frame& frame) {
 	bpm->drag_mul = 0.00125;
 	bpm->bind(this->engine, SoundEngineProperty::pEngineMetronomeBPM);
 	controls.push_back(bpm);
+
+	//Program Button
+	Button* program = new Button("Programs", main_font, 18, frame.get_width() - 170, frame.get_height() - 40, 100, 40);
+	program->set_on_click([&frame]() {
+		frame.change_view(new ProgramView());
+	});
+	controls.push_back(program);
 
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
