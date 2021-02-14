@@ -49,7 +49,9 @@ class ProgramUser {
 public:
 	virtual void apply_program(Program* prog) = 0;
 	virtual void save_program(Program* prog) = 0;
-	virtual ~ProgramUser();
+	virtual ~ProgramUser() {
+
+	}
 };
 
 class ProgramManager : public PropertyHolder {

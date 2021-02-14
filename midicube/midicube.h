@@ -24,7 +24,7 @@ struct MidiMessageWithInput {
 	MidiMessage msg;
 };
 
-class MidiCube {
+class MidiCube : public ProgramUser {
 private:
 	AudioHandler audio_handler;
 	ProgramManager prog_mgr;
@@ -36,6 +36,8 @@ private:
 public:
 	SoundEngineDevice engine;
 
+	virtual void save_program(Program *prog);
+	virtual void apply_program(Program *prog);
 	MidiCube();
 	void init(int out_device = -1, int in_device = -1);
 	inline void process(double& lsample, double& rsample, SampleInfo& info);

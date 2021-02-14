@@ -14,6 +14,7 @@ static void process_func(double& lsample, double& rsample, SampleInfo& info, voi
 }
 
 MidiCube::MidiCube() : prog_mgr("./data/programs"), changes(128), update(32), messages(128) {
+	prog_mgr.init_user(this);
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -182,4 +183,12 @@ MidiCube::~MidiCube() {
 		delete in.in;
 	}
 	inputs.clear();
+}
+
+void MidiCube::save_program(Program *prog) {
+	//TODO
+}
+
+void MidiCube::apply_program(Program *prog) {
+	//TODO
 }
