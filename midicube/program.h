@@ -104,7 +104,7 @@ public:
 		return (*b).second;
 	}
 
-	Bank* get_bank() {
+	Bank* get_curr_bank() {
 		return get_bank(curr_bank);
 	}
 
