@@ -72,8 +72,8 @@ void ProgramManager::apply_program(size_t bank, size_t program) {
 	curr_bank = bank;
 	curr_program = program;
 
-	submit_change(ProgramManagerProperty::pProgramManagerBank, (int) curr_bank);
-	submit_change(ProgramManagerProperty::pProgramManagerProgram, (int) curr_program);
+	//submit_change(ProgramManagerProperty::pProgramManagerBank, (int) curr_bank);
+	//submit_change(ProgramManagerProperty::pProgramManagerProgram, (int) curr_program);
 }
 
 void ProgramManager::load_all() {
@@ -114,7 +114,7 @@ void ProgramManager::save_all() {
 }
 
 ProgramManager::~ProgramManager() {
-	lock()
+	lock();
 	for (auto b : banks) {
 		delete b.second;
 	}
@@ -122,6 +122,7 @@ ProgramManager::~ProgramManager() {
 	unlock();
 }
 
+/*
 void ProgramManager::set(size_t prop, PropertyValue value, size_t sub_prop) {
 	switch ((ProgramManagerProperty) prop) {
 	case ProgramManagerProperty::pProgramManagerBank:
@@ -149,4 +150,4 @@ PropertyValue ProgramManager::get(size_t prop, size_t sub_prop) {
 		break;
 	}
 	return val;
-}
+}*/

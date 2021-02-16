@@ -60,7 +60,7 @@ enum ProgramManagerProperty {
 	pProgramManagerProgram,
 };
 
-class ProgramManager : public PropertyHolder {
+class ProgramManager {
 private:
 	std::string path;
 	size_t curr_bank = 0;
@@ -93,7 +93,7 @@ public:
 		return success;
 	}
 	//User has to aquire mutex
-	Bank* get_bank(size_t bank = curr_bank) {
+	Bank* get_bank(size_t bank) {
 		auto b = banks.begin();
 		for (size_t i = 0; i < bank; ++i) {
 			if (i >= banks.size()) {
@@ -103,13 +103,14 @@ public:
 		}
 		return (*b).second;
 	}
+
+	Bank* get_bank() {
+		return get_bank(curr_bank);
+	}
+
 	void load_all();
 	void save_all();
 	~ProgramManager();
-
-	virtual void set(size_t prop, PropertyValue value, size_t sub_prop);
-	virtual void update_properties();
-	virtual PropertyValue get(size_t prop, size_t sub_prop);
 };
 
 #endif /* MIDICUBE_PROGRAM_H_ */

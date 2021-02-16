@@ -8,7 +8,8 @@
 #include "ProgramView.h"
 #include "SoundEngineView.h"
 
-ProgramView::ProgramView(size_t page) {
+ProgramView::ProgramView(size_t bank, size_t page) {
+	this->bank = bank;
 	this->page = page;
 }
 
@@ -21,8 +22,6 @@ Scene ProgramView::create(Frame &frame) {
 
 	engine = &frame.cube.engine;
 	prog_mgr = &frame.cube.prog_mgr;
-
-	holders.push_back(prog_mgr);
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
