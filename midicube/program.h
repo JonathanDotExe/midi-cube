@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <functional>
 #include <map>
+#include <mutex>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -66,20 +67,46 @@ private:
 	size_t curr_program = 0;
 	std::map<std::string, Bank*> banks;
 	ProgramUser* user = nullptr;
+	std::mutex mutex;
+
 public:
+
 	ProgramManager(std::string path);
+	inline void lock() {
+		mutex.lock();
+	}
+	inline void unlock() {
+		mutex.unlock();
+	}
+	//Mutex has to be locked by user
 	void apply_program(size_t bank, size_t program);
+
 	bool init_user(ProgramUser* user) {
+		bool success = false;
+		lock();
 		if (!this->user) {
 			this->user = user;
 			apply_program(curr_bank, curr_program);
-			return true;
+			success = true;
 		}
-		return false;
+		unlock();
+		return success;
+	}
+	//User has to aquire mutex
+	Bank* get_bank(size_t bank = curr_bank) {
+		auto b = banks.begin();
+		for (size_t i = 0; i < bank; ++i) {
+			if (i >= banks.size()) {
+				return nullptr;
+			}
+			++b;
+		}
+		return (*b).second;
 	}
 	void load_all();
 	void save_all();
 	~ProgramManager();
+
 	virtual void set(size_t prop, PropertyValue value, size_t sub_prop);
 	virtual void update_properties();
 	virtual PropertyValue get(size_t prop, size_t sub_prop);

@@ -18,8 +18,9 @@ class ProgramView : public ViewController {
 private:
 	SoundEngineDevice* engine = nullptr;
 	ProgramManager* prog_mgr = nullptr;
+	size_t page = 0;
 public:
-	ProgramView();
+	ProgramView(size_t page = 0);
 	virtual ~ProgramView();
 	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);

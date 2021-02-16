@@ -68,11 +68,7 @@ ProgramManager::ProgramManager(std::string path) {
 }
 
 void ProgramManager::apply_program(size_t bank, size_t program) {
-	auto b = banks.begin();
-	for (size_t i = 0; i < bank; ++i) {
-		++b;
-	}
-	user->apply_program((*b).second->programs.at(program));
+	user->apply_program(get_bank(bank)->programs.at(program));
 	curr_bank = bank;
 	curr_program = program;
 
@@ -81,6 +77,7 @@ void ProgramManager::apply_program(size_t bank, size_t program) {
 }
 
 void ProgramManager::load_all() {
+	lock();
 	boost::filesystem::create_directory(path);
 	std::regex reg(".*\\.xml");
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
@@ -105,19 +102,24 @@ void ProgramManager::load_all() {
 		bank->programs.push_back(new Program{"Init"});
 		banks.insert(banks.end(), std::pair<std::string, Bank*>("default", bank));
 	}
+	unlock();
 }
 
 void ProgramManager::save_all() {
+	lock();
 	for (auto b : banks) {
 		save_bank(*b.second, path + "/" + b.first + ".xml");
 	}
+	unlock();
 }
 
 ProgramManager::~ProgramManager() {
+	lock()
 	for (auto b : banks) {
 		delete b.second;
 	}
 	banks.clear();
+	unlock();
 }
 
 void ProgramManager::set(size_t prop, PropertyValue value, size_t sub_prop) {

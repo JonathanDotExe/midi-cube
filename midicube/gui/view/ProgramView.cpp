@@ -8,9 +8,8 @@
 #include "ProgramView.h"
 #include "SoundEngineView.h"
 
-ProgramView::ProgramView() {
-	// TODO Auto-generated constructor stub
-
+ProgramView::ProgramView(size_t page) {
+	this->page = page;
 }
 
 void ProgramView::property_change(PropertyChange change) {
@@ -35,6 +34,14 @@ Scene ProgramView::create(Frame &frame) {
 	//Title
 	Label* title = new Label("Programs", main_font, 24, 10, 10);
 	controls.push_back(title);
+
+	//Programs
+	int rows = 4;
+	int cols = SOUND_ENGINE_MIDI_CHANNELS / rows;
+	int pane_width = (frame.get_width() - 15) / cols;
+	int pane_height = (frame.get_height() - 50 - 5) / rows;
+
+
 
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
