@@ -17,7 +17,8 @@ AnalogSynthOscilatorView::AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineCh
 void AnalogSynthOscilatorView::property_change(PropertyChange change) {
 }
 
-void property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source) {
+std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source) {
+	std::vector<DragBox<double>*> boxes;
 	//Value
 	{
 		Label* title = new Label(name, main_font, 12, x, y);
@@ -26,6 +27,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
 		value->bind(holder, prop, SynthModulationProperty::pModValue);
 		controls->push_back(value);
+		boxes.push_back(value);
 	}
 	x += 90;
 	//Mod Env
@@ -39,6 +41,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 		amount->bind(holder, prop, SynthModulationProperty::pModModEnvAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
+		boxes.push_back(amount);
 
 		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
 		source->bind(holder, prop, SynthModulationProperty::pModModEnv);
@@ -57,6 +60,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 		amount->bind(holder, prop, SynthModulationProperty::pModLFOAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
+		boxes.push_back(amount);
 
 		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
 		source->bind(holder, prop, SynthModulationProperty::pModLFO);
@@ -74,6 +78,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 		amount->border = 0;
 		amount->bind(holder, prop, SynthModulationProperty::pModVelocityAmount);
 		controls->push_back(amount);
+		boxes.push_back(amount);
 	}
 	x += 90;
 	//CC
@@ -87,6 +92,7 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 		amount->bind(holder, prop, SynthModulationProperty::pModCCAmount);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
+		boxes.push_back(amount);
 
 		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_CONTROL_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
 		source->bind(holder, prop, SynthModulationProperty::pModCC);
@@ -94,6 +100,8 @@ void property_mod_controls(std::vector<Control*>* controls, int x, int y, Proper
 		show_source->push_back(source);
 	}
 	x += 90;
+
+	return boxes;
 }
 
 
@@ -295,7 +303,10 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 
 	tmp_x = 500;
 	//Filter Cutoff
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscFilterCutoff, "Cutoff", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscFilterCutoff, "Cutoff", &show_amount, &show_source)
+		.at(0)->to_string = [](double val) {
+			return std::to_string((int) scale_cutoff(val));
+		};
 	tmp_y += 75;
 	//Filter Resonance
 	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscFilterResonance, "Resonance", &show_amount, &show_source);
