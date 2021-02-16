@@ -160,6 +160,9 @@ public:
 	sf::Text text;
 	double drag_mul = 0.0025;
 	T border;
+	std::function<std::string (T t)> to_string = [](T t) {
+		return std::to_string(t);
+	};
 
 	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
 		this->min = min;
@@ -181,7 +184,7 @@ public:
 		rect.setPosition(x, y);
 		rect.setSize(sf::Vector2<float>(width, height));
 		T value = progress * (max - min) + min;
-		text.setString(std::to_string(value));
+		text.setString(to_string(value));
 		center_text(text, x, y, width, height);
 	}
 
