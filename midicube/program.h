@@ -28,7 +28,8 @@ struct Program {
 };
 
 struct Bank {
-	std::string name;
+	std::string name = "";
+	std::string filename = "";
 	std::vector<Program*> programs;
 	~Bank() {
 		std::remove_if(programs.begin(), programs.end(), [](Program* p) {
@@ -65,7 +66,7 @@ private:
 	std::string path;
 	size_t curr_bank = 0;
 	size_t curr_program = 0;
-	std::map<std::string, Bank*> banks;
+	std::vector<Bank*> banks;
 	ProgramUser* user = nullptr;
 	std::mutex mutex;
 
@@ -98,14 +99,7 @@ public:
 	}
 	//User has to aquire mutex
 	Bank* get_bank(size_t bank) {
-		auto b = banks.begin();
-		for (size_t i = 0; i < bank; ++i) {
-			if (i >= banks.size()) {
-				return nullptr;
-			}
-			++b;
-		}
-		return (*b).second;
+		return banks.at(bank);
 	}
 
 	Bank* get_curr_bank() {

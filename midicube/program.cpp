@@ -32,6 +32,7 @@ Bank* load_bank(std::string path, std::string filename) {
 	Bank* bank = new Bank();
 	//Name
 	bank->name = tree.get<std::string>("bank.name", filename);
+	bank->filename = filename;
 	//Programs
 	const auto& programs =  tree.get_child_optional("bank.programs");
 	if (programs) {
@@ -86,21 +87,17 @@ void ProgramManager::load_all() {
 			std::string name = f.path().stem().string();
 			Bank* bank = load_bank(file, name);
 			if (bank) {
-				if (banks.find(name) == banks.end()) {
-					banks.insert(banks.end(), std::pair<std::string, Bank*>(name, bank));
-				}
-				else {
-					std::cout << "Preset with filename " << f.path().stem().string() << " already exists!" << std::endl;
-					delete bank;
-				}
+				banks.push_back(bank);
+				std::cout << "Loaded bank " << bank->name << std::endl;
 			}
 		}
 	}
 	if (banks.size() == 0) {
 		Bank* bank = new Bank();
 		bank->name = "Default";
+		bank->filename = "default";
 		bank->programs.push_back(new Program{"Init"});
-		banks.insert(banks.end(), std::pair<std::string, Bank*>("default", bank));
+		banks.push_back(bank);
 	}
 	unlock();
 }
@@ -108,7 +105,7 @@ void ProgramManager::load_all() {
 void ProgramManager::save_all() {
 	lock();
 	for (auto b : banks) {
-		save_bank(*b.second, path + "/" + b.first + ".xml");
+		save_bank(*b, path + "/" + b->filename + ".xml");
 	}
 	unlock();
 }
@@ -116,7 +113,7 @@ void ProgramManager::save_all() {
 ProgramManager::~ProgramManager() {
 	lock();
 	for (auto b : banks) {
-		delete b.second;
+		delete b;
 	}
 	banks.clear();
 	unlock();
