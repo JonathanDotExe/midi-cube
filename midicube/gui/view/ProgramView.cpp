@@ -40,7 +40,7 @@ Scene ProgramView::create(Frame &frame) {
 		int rows = 4;
 		int cols = 8;
 		int pane_width = (frame.get_width() - 15) / cols;
-		int pane_height = (frame.get_height() - 50 - 5) / rows;
+		int pane_height = pane_width;
 
 		Bank* bank = prog_mgr->get_curr_bank();
 
@@ -53,8 +53,8 @@ Scene ProgramView::create(Frame &frame) {
 			int y = 10 + pane_height * (i / cols);
 
 			//Button
-			Button* button = new Button(prog->name, main_font, 12, x, y,  pane_width, pane_height);
-			button->rect.setFillColor(sf::Color(0, 180, 255));
+			Button* button = new Button(prog->name, main_font, 16, x, y,  pane_width - 5, pane_height - 5);
+			button->rect.setFillColor(sf::Color(200, 200, 200));
 			controls.push_back(button);
 			button->set_on_click([i, start]() {
 				//TODO
