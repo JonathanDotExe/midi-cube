@@ -68,6 +68,7 @@ private:
 	size_t curr_program = 0;
 	std::vector<Bank*> banks;
 	ProgramUser* user = nullptr;
+	std::string program_name = "";
 	std::mutex mutex;
 
 public:
@@ -86,6 +87,8 @@ public:
 	//Mutex has to be locked by user
 	void apply_program(size_t bank, size_t program);
 
+	void overwrite_program();
+
 	bool init_user(ProgramUser* user) {
 		bool success = false;
 		lock();
@@ -101,7 +104,7 @@ public:
 	Bank* get_bank(size_t bank) {
 		return banks.at(bank);
 	}
-
+	//User has to aquire mutex
 	Bank* get_curr_bank() {
 		return get_bank(curr_bank);
 	}

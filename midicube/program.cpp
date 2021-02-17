@@ -69,12 +69,22 @@ ProgramManager::ProgramManager(std::string path) {
 }
 
 void ProgramManager::apply_program(size_t bank, size_t program) {
-	user->apply_program(get_bank(bank)->programs.at(program));
+	Program* prog = get_bank(bank)->programs.at(program);
+	user->apply_program(prog);
 	curr_bank = bank;
 	curr_program = program;
+	program_name = prog->name;
 
 	//submit_change(ProgramManagerProperty::pProgramManagerBank, (int) curr_bank);
 	//submit_change(ProgramManagerProperty::pProgramManagerProgram, (int) curr_program);
+}
+
+void ProgramManager::overwrite_program() {
+	lock();
+	Program* prog = get_bank(curr_bank)->programs.at(curr_program);
+	prog->name = program_name;
+	user->save_program(prog);
+	unlock();
 }
 
 void ProgramManager::load_all() {

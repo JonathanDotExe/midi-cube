@@ -187,6 +187,7 @@ MidiCube::~MidiCube() {
 
 void MidiCube::save_program(Program *prog) {
 	//TODO
+	std::cout << "Saving program: " << prog->name << std::endl;
 }
 
 void MidiCube::apply_program(Program *prog) {
