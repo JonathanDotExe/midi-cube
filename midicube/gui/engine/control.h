@@ -154,12 +154,14 @@ private:
 	bool hit_border = false;
 	T min;
 	T max;
+	int temp_drag = 0;
 
 public:
 	sf::RectangleShape rect;
 	sf::Text text;
 	double drag_mul = 0.0025;
 	T border;
+	int drag_step = 2;
 	std::function<std::string (T t)> to_string = [](T t) {
 		return std::to_string(t);
 	};
@@ -195,29 +197,34 @@ public:
 
 	virtual void on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
 		hit_border = false;
+		temp_drag = 0;
 	}
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 		if (!hit_border) {
-			T old_val = progress * (max - min) + min;
-			progress += drag_mul * x_motion;
+			temp_drag += x_motion;
+			if (abs(temp_drag) >= drag_step) {
+				T old_val = progress * (max - min) + min;
+				progress += drag_mul * ((int) temp_drag/drag_step);
+				temp_drag = temp_drag%drag_step;
 
-			if (progress < 0) {
-				progress = 0;
-			}
-			else if (progress > 1) {
-				progress = 1;
-			}
+				if (progress < 0) {
+					progress = 0;
+				}
+				else if (progress > 1) {
+					progress = 1;
+				}
 
-			T value = progress * (max - min) + min;
-			if ((old_val > border && value < border) || (old_val < border && value > border)) {
-				value = border;
-				progress = (value - min)/(max - min);
-				hit_border = true;
-			}
-			if (old_val != value) {
-				send_change(value);
-				update_position(this->x, this->y, width, height);
+				T value = progress * (max - min) + min;
+				if ((old_val > border && value < border) || (old_val < border && value > border)) {
+					value = border;
+					progress = (value - min)/(max - min);
+					hit_border = true;
+				}
+				if (old_val != value) {
+					send_change(value);
+					update_position(this->x, this->y, width, height);
+				}
 			}
 		}
 	}
