@@ -79,6 +79,10 @@ public:
 		mutex.unlock();
 	}
 	//Mutex has to be locked by user
+	size_t bank_count() {
+		return banks.size();
+	}
+	//Mutex has to be locked by user
 	void apply_program(size_t bank, size_t program);
 
 	bool init_user(ProgramUser* user) {

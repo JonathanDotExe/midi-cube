@@ -25,6 +25,14 @@ Scene ProgramView::create(Frame &frame) {
 
 	prog_mgr->lock();
 	{
+		int rows = 4;
+		int cols = 8;
+
+		//Adjust values
+		bank = std::min(std::max((size_t) 0, (size_t) bank), (size_t) prog_mgr->bank_count() - 1);
+		Bank* bank = prog_mgr->get_bank(this->bank);
+		page = std::min(std::max((size_t) 0, (size_t) page), (size_t) ceil((double) bank->programs.size()/(rows * cols)));
+
 		//Background
 		Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 		controls.push_back(bg);
@@ -32,15 +40,12 @@ Scene ProgramView::create(Frame &frame) {
 		Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 50);
 		controls.push_back(pane);
 
-		Bank* bank = prog_mgr->get_bank(this->bank);
 
 		//Title
 		Label* title = new Label(bank->name + " - Page " + std::to_string(page + 1), main_font, 24, 10, 10);
 		controls.push_back(title);
 
 		//Programs
-		int rows = 4;
-		int cols = 8;
 		int pane_width = (frame.get_width() - 15) / cols;
 		int pane_height = pane_width;
 
@@ -66,22 +71,24 @@ Scene ProgramView::create(Frame &frame) {
 		//Previous bank
 		Button* previous_bank = new Button("<<", main_font, 18, 0, frame.get_height() - 40, 60, 40);
 		previous_bank->set_on_click([&frame, this]() {
-			frame.change_view(new ProgramView(this->bank - 1, 0));
+			frame.change_view(new ProgramView(std::max((ssize_t)this->bank - 1, (ssize_t) 0), 0));
 		});
 		previous_bank->rect.setFillColor(sf::Color(200, 200, 200));
 		controls.push_back(previous_bank);
 		//Previous page
 		Button* previous_page = new Button("<", main_font, 18, 60, frame.get_height() - 40, 60, 40);
 		previous_page->set_on_click([&frame, this]() {
-			frame.change_view(new ProgramView(this->bank, page - 1));
+			frame.change_view(new ProgramView(this->bank, std::max((ssize_t) page - 1, (ssize_t) 0)));
 		});
 		controls.push_back(previous_page);
 
 		//Next page
 		Button* next_page = new Button(">", main_font, 18, frame.get_width() - 70 - 60 * 2, frame.get_height() - 40, 60, 40);
-		next_page->set_on_click([&frame, this]() {
-			frame.change_view(new ProgramView(this->bank, page + 1));
-		});
+		if (start + size < bank->programs.size()) {
+			next_page->set_on_click([&frame, this]() {
+				frame.change_view(new ProgramView(this->bank, page + 1));
+			});
+		}
 		controls.push_back(next_page);
 
 		//Next bank
