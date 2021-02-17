@@ -82,6 +82,13 @@ Scene ProgramView::create(Frame &frame) {
 		});
 		controls.push_back(previous_page);
 
+		//Previous page
+		Button* save = new Button("Save", main_font, 18, 130, frame.get_height() - 40, 100, 40);
+		save->set_on_click([&frame, this]() {
+			prog_mgr->overwrite_program();
+		});
+		controls.push_back(save);
+
 		//Next page
 		Button* next_page = new Button(">", main_font, 18, frame.get_width() - 70 - 60 * 2, frame.get_height() - 40, 60, 40);
 		if (start + size < bank->programs.size()) {
