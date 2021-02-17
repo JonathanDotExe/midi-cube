@@ -191,4 +191,6 @@ void MidiCube::save_program(Program *prog) {
 
 void MidiCube::apply_program(Program *prog) {
 	//TODO
+	//Make thread safe
+	std::cout << "Selected program: " << prog->name << std::endl;
 }

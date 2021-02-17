@@ -56,8 +56,10 @@ Scene ProgramView::create(Frame &frame) {
 			Button* button = new Button(prog->name, main_font, 16, x, y,  pane_width - 5, pane_height - 5);
 			button->rect.setFillColor(sf::Color(200, 200, 200));
 			controls.push_back(button);
-			button->set_on_click([i, start]() {
-				//TODO
+			button->set_on_click([i, start, this]() {
+				prog_mgr->lock();
+				prog_mgr->apply_program(this->bank, start + i);
+				prog_mgr->unlock();
 			});
 		}
 
