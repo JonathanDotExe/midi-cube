@@ -44,8 +44,10 @@ void RotarySpeakerEffect::apply(double &lsample, double &rsample, RotarySpeakerP
 		right_delay.add_isample(bass_sample * (0.5 - bass_rot * 0.5), rbass_delay);
 
 		//Play delay
-		lsample += left_delay.process();
-		rsample += right_delay.process();
+		double l = left_delay.process();
+		double r = right_delay.process();
+		lsample += l + r * preset.stereo_mix;
+		rsample += r + l * preset.stereo_mix;
 	}
 
 	//Rotate speakers
