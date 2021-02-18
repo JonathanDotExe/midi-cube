@@ -106,13 +106,23 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 
 
 void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop) {
+	DragBoxScale<double> scale = {
+			[](double progress, double min, double max) {
+				progress *= progress;
+				return progress * (max - min) + min;
+			},
+			[](double value, double min, double max) {
+				double progress = (value - min)/(max - min);
+				return sqrt(progress);
+			}
+		};
 	//Attack
 	{
 		Label* title = new Label("Attack", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0.0005, 5, main_font, 16, x, y + 15, 80, 40);
-		value->drag_mul /= 5;
+		DragBox<double>* value = new DragBox<double>(0, 0.0005, 5, main_font, 16, x, y + 15, 80, 40, scale);
+		value->drag_step = 4;
 		value->bind(holder, prop);
 		controls->push_back(value);
 	}
@@ -122,8 +132,8 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder
 		Label* title = new Label("Decay", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 10, main_font, 16, x, y + 15, 80, 40);
-		value->drag_mul /= 10;
+		DragBox<double>* value = new DragBox<double>(0, 0, 10, main_font, 16, x, y + 15, 80, 40, scale);
+		value->drag_step = 4;
 		value->bind(holder, prop + 1);
 		controls->push_back(value);
 	}
@@ -133,7 +143,8 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder
 		Label* title = new Label("Sustain", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40, scale);
+		value->drag_step = 4;
 		value->bind(holder, prop + 2);
 		controls->push_back(value);
 	}
@@ -143,8 +154,8 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder
 		Label* title = new Label("Release", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0.0005, 10, main_font, 16, x, y + 15, 80, 40);
-		value->drag_mul /= 10;
+		DragBox<double>* value = new DragBox<double>(0, 0.0005, 10, main_font, 16, x, y + 15, 80, 40, scale);
+		value->drag_step = 4;
 		value->bind(holder, prop + 3);
 		controls->push_back(value);
 	}
@@ -303,10 +314,11 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 
 	tmp_x = 500;
 	//Filter Cutoff
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscFilterCutoff, "Cutoff", &show_amount, &show_source)
-		.at(0)->to_string = [](double val) {
-			return std::to_string((int) scale_cutoff(val));
-		};
+	DragBox<double>* filter = property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscFilterCutoff, "Cutoff", &show_amount, &show_source).at(0);
+	filter->to_string = [](double val) {
+		return std::to_string((int) scale_cutoff(val));
+	};
+	filter->drag_step = 4;
 	tmp_y += 75;
 	//Filter Resonance
 	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscFilterResonance, "Resonance", &show_amount, &show_source);
