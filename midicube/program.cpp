@@ -79,6 +79,16 @@ void ProgramManager::apply_program(size_t bank, size_t program) {
 	//submit_change(ProgramManagerProperty::pProgramManagerProgram, (int) curr_program);
 }
 
+void ProgramManager::delete_program() {
+	lock();
+	Bank* bank = get_curr_bank();
+	bank->programs.erase(bank->programs.begin() + curr_program);
+	if (bank->programs.size() == 0) {
+		bank->programs.push_back(new Program{"Init"});
+	}
+	unlock();
+}
+
 void ProgramManager::save_new_program() {
 	lock();
 	Bank* bank = get_curr_bank();

@@ -87,6 +87,8 @@ public:
 	//Mutex has to be locked by user
 	void apply_program(size_t bank, size_t program);
 
+	void delete_program();
+
 	void save_new_program();
 
 	void overwrite_program();
