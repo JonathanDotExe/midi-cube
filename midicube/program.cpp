@@ -79,6 +79,16 @@ void ProgramManager::apply_program(size_t bank, size_t program) {
 	//submit_change(ProgramManagerProperty::pProgramManagerProgram, (int) curr_program);
 }
 
+void ProgramManager::save_new_program() {
+	lock();
+	Bank* bank = get_curr_bank();
+	Program* prog = new Program();
+	prog->name = program_name;
+	user->save_program(prog);
+	bank->programs.push_back(prog);
+	unlock();
+}
+
 void ProgramManager::overwrite_program() {
 	lock();
 	Program* prog = get_bank(curr_bank)->programs.at(curr_program);
