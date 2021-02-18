@@ -59,12 +59,18 @@ Scene ProgramView::create(Frame &frame) {
 
 			//Button
 			Button* button = new Button(prog->name, main_font, 16, x, y,  pane_width - 5, pane_height - 5);
-			button->rect.setFillColor(sf::Color(200, 200, 200));
+			if (prog_mgr->get_curr_bank_index() == this->bank && prog_mgr->get_curr_program_index() == i + start) {
+				button->rect.setFillColor(sf::Color(0, 180, 255));
+			}
+			else {
+				button->rect.setFillColor(sf::Color(200, 200, 200));
+			}
 			controls.push_back(button);
-			button->set_on_click([i, start, this]() {
+			button->set_on_click([i, start, this, &frame]() {
 				prog_mgr->lock();
 				prog_mgr->apply_program(this->bank, start + i);
 				prog_mgr->unlock();
+				frame.change_view(new ProgramView(this->bank, page));
 			});
 		}
 

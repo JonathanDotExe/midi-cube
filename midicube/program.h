@@ -113,6 +113,14 @@ public:
 		return get_bank(curr_bank);
 	}
 
+	size_t get_curr_bank_index() {
+		return curr_bank;
+	}
+
+	size_t get_curr_program_index() {
+		return curr_program;
+	}
+
 	void load_all();
 	void save_all();
 	~ProgramManager();
