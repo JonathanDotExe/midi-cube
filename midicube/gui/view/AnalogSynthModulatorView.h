@@ -26,9 +26,5 @@ public:
 	virtual Scene create(Frame &frame);
 };
 
-void property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source);
-
-void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop);
-
 
 #endif /* MIDICUBE_GUI_VIEW_ANALOGSYNTHMODULATORVIEW_H_ */
