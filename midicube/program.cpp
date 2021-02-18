@@ -86,6 +86,10 @@ void ProgramManager::delete_program() {
 	if (bank->programs.size() == 0) {
 		bank->programs.push_back(new Program{"Init"});
 	}
+	if (curr_program >= bank->programs.size()) {
+		curr_program--;
+	}
+	apply_program(curr_bank, curr_program);
 	unlock();
 }
 

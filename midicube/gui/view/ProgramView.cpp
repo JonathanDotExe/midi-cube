@@ -98,6 +98,14 @@ Scene ProgramView::create(Frame &frame) {
 		});
 		controls.push_back(new_prog);
 
+		//Delete
+		Button* del = new Button("Delete", main_font, 18, 335, frame.get_height() - 40, 100, 40);
+		del->set_on_click([&frame, this]() {
+			prog_mgr->delete_program();
+			frame.change_view(new ProgramView(this->bank, page));
+		});
+		controls.push_back(del);
+
 		//Next page
 		Button* next_page = new Button(">", main_font, 18, frame.get_width() - 70 - 60 * 2, frame.get_height() - 40, 60, 40);
 		if (start + size < bank->programs.size()) {
