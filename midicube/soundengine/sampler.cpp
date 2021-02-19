@@ -19,14 +19,14 @@ SampleSound::SampleSound() {
 
 }
 
-double SampleSound::get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+SampleZone* SampleSound::get_sample(double freq, double velocity) {
 	//Find regions
-	double sample = 0;
+	SampleZone* zone = nullptr;
 	const size_t velocity_size = samples.size();
 	if (velocity_size >= 1) {
 		size_t i = 0;
 		for (; i < velocity_size; ++i) {
-			if (note.velocity > samples[i]->max_velocity) {
+			if (velocity > samples[i]->max_velocity) {
 				break;
 			}
 		}
@@ -35,16 +35,14 @@ double SampleSound::get_sample(unsigned int channel, SampleInfo& info, Triggered
 		if (zones_size >= 1) {
 			size_t j = 0;
 			for (; j < velocity_size; ++j) {
-				if (note.freq > layer->zones[j]->max_freq) {
+				if (freq > layer->zones[j]->max_freq) {
 					break;
 				}
 			}
-			SampleZone* zone = layer->zones[std::max((ssize_t) 0, (ssize_t) (j - 1))];
-			//Play sound
-			zone->sample.isample(channel, (info.time - note.start_time) * zone->freq/note.freq, info.sample_rate);
+			zone = layer->zones[std::max((ssize_t) 0, (ssize_t) (j - 1))];
 		}
 	}
-	return sample;
+	return zone;
 }
 
 SampleSound::~SampleSound() {
@@ -81,12 +79,15 @@ Sampler::Sampler() {
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.env.is_finished()) {
 		note.env.reset();
+		note.zone = this->sample->get_sample(note.freq, note.velocity);
 	}
-	ADSREnvelopeData e = this->sample->get_envelope();
 
-	double vol = note.env.amplitude(e, info.time_step, note.pressed, env.sustain);
-	lsample += this->sample->get_sample(0, info, note, env) * note.velocity * vol;
-	rsample += this->sample->get_sample(1, info, note, env) * note.velocity * vol;
+	if (note.zone) {
+		double vol = note.env.amplitude(note.zone->env, info.time_step, note.pressed, env.sustain);
+		double time = (info.time - note.start_time) * note.zone->freq/note.freq * env.pitch_bend;
+		lsample += note.zone->sample.isample(0, time, info.sample_rate) * vol;
+		rsample += note.zone->sample.isample(1, time, info.sample_rate) * vol;
+	}
 }
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {

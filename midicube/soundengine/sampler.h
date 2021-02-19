@@ -17,7 +17,7 @@ struct SampleZone {
 	AudioSample sample;
 	double freq = 0;
 	double max_freq = 0;
-	ADSREnvelopeData envelope = {0, 0, 1, 0};
+	ADSREnvelopeData env = {0, 0, 1, 0};
 
 	SampleZone () {
 		sample.clear();
@@ -44,7 +44,7 @@ public:
 
 	SampleSound();
 
-	double get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
+	SampleZone* get_sample(double freq, double velocity);
 
 	~SampleSound();
 
