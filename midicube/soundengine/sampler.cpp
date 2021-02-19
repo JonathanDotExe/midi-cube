@@ -16,42 +16,42 @@ namespace pt = boost::property_tree;
 
 //SampleSound
 SampleSound::SampleSound() {
-	envelope = {0, 0, 1, 0};
-}
 
+}
 
 double SampleSound::get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	//Find regions
-	SampleZone* region1 = nullptr;
-	SampleZone* region2 = nullptr;
-	for (size_t i = 1; i < samples.size() && !region1 && !region2; ++i) {
-		if (samples[i]->freq >= note.freq) {
-			region1 = samples[i - 1];
-			region2 = samples[i];
-		}
-	}
-	if (!region1) {
-		region1 =  samples[samples.size() - 1];
-	}
-	if (!region2) {
-		region2 =  samples[samples.size() - 1];
-	}
-	double prog = 0;
-	if (region2->freq != region1->freq) {
-		prog = (note.freq - region1->freq)/(region2->freq - region1->freq);
-	}
-	else {
-		prog = 0;
-	}
-	//Play sound
-	//TODO use sustain and release samples as well
-	double time = (info.time - note.start_time + note.phase_shift);
 	double sample = 0;
-	if (prog != 1) {
-		sample = region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate);
+	const size_t velocity_size = samples.size();
+	if (velocity_size >= 1) {
+		size_t i = 0;
+		for (; i < velocity_size; ++i) {
+			if (note.velocity > samples[i]->max_velocity) {
+				break;
+			}
+		}
+		SampleVelocityLayer* layer = samples[std::max((ssize_t) 0, (ssize_t) (i - 1))];
+		const size_t zones_size = layer->zones.size();
+		if (zones_size >= 1) {
+
+		}
+		double prog = 0;
+		if (region2->freq != region1->freq) {
+			prog = (note.freq - region1->freq)/(region2->freq - region1->freq);
+		}
+		else {
+			prog = 0;
+		}
+		//Play sound
+		//TODO use sustain and release samples as well
+		double time = (info.time - note.start_time + note.phase_shift);
+		double sample = 0;
+		if (prog != 1) {
+			sample = region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate);
+		}
+		sample = region1->sample.isample(channel, time * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
+				region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate) * (prog);
 	}
-	sample = region1->sample.isample(channel, time * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
-			region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate) * (prog);
 	return sample;
 }
 
