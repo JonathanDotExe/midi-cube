@@ -113,21 +113,21 @@ extern SampleSound* load_sound(std::string folder) {
 
 		//Parse
 		sound = new SampleSound();
-		sound = tree.get<std::string>("sound.name", "Sound");
+		sound->name = tree.get<std::string>("sound.name", "Sound");
 		//Load velocity layers
 		for (auto r : tree.get_child("sound.velocity_layers")) {
 			SampleVelocityLayer* layer = new SampleVelocityLayer();
-			layer->max_velocity = r.second.get<double>("velocity_layer.velocity", 1.0);
+			layer->max_velocity = r.second.get<double>("velocity", 1.0);
 			//Load zones
-			for (auto z : r.second.get_child("velocity_layer.zones")) {
+			for (auto z : r.second.get_child("zones")) {
 				SampleZone* zone = new SampleZone();
-				zone->freq = note_to_freq(z.second.get<double>("zone.note", 60.0));
-				zone->max_freq = note_to_freq(z.second.get<double>("zone.max_note", 127.0));
-				zone->env.attack = z.second.get<double>("zone.amp_env.attack", 0);
-				zone->env.decay = z.second.get<double>("zone.amp_env.decay", 0);
-				zone->env.sustain = z.second.get<double>("zone.amp_env.sustain", 1);
-				zone->env.release = z.second.get<double>("zone.amp_env.release", 0);
-				std::string file = folder + "/" + r.second.get<std::string>("sample");
+				zone->freq = note_to_freq(z.second.get<double>("note", 60.0));
+				zone->max_freq = note_to_freq(z.second.get<double>("max_note", 127.0));
+				zone->env.attack = z.second.get<double>("amp_env.attack", 0);
+				zone->env.decay = z.second.get<double>("amp_env.decay", 0);
+				zone->env.sustain = z.second.get<double>("amp_env.sustain", 1);
+				zone->env.release = z.second.get<double>("amp_env.release", 0);
+				std::string file = folder + "/" + z.second.get<std::string>("sample", "");
 				if (!read_audio_file(zone->sample, file)) {
 					std::cerr << "Couldn't load sample file " << file << std::endl;
 				}
