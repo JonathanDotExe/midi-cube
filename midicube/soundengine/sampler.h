@@ -66,19 +66,23 @@ public:
 
 #define SAMPLER_POLYPHONY 64
 
-class Sampler : public BaseSoundEngine<TriggeredNote, SAMPLER_POLYPHONY> {
+struct SamplerVoice : public TriggeredNote {
+	SampleZone* zone = nullptr;
+	ADSREnvelope env;
+};
+
+class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 
 private:
 	SampleSound* sample;
-	std::array<ADSREnvelope, SAMPLER_POLYPHONY> envs;
 
 public:
 
 	Sampler();
 
-	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	bool note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index);
 
 	std::string get_name();
 
