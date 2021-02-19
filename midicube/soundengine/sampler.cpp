@@ -23,27 +23,23 @@ SampleZone* SampleSound::get_sample(double freq, double velocity) {
 	//Find regions
 	SampleZone* zone = nullptr;
 	const size_t velocity_size = samples.size();
-	std::cout << "Velocities: " << velocity_size << std::endl;
 	if (velocity_size >= 1) {
 		size_t i = 0;
 		for (; i < velocity_size; ++i) {
-			if (velocity > samples[i]->max_velocity) {
+			if (velocity <= samples[i]->max_velocity) {
 				break;
 			}
 		}
-		SampleVelocityLayer* layer = samples[std::max((ssize_t) 0, (ssize_t) (i - 1))];
-		std::cout << "Using layer: " << std::max((ssize_t) 0, (ssize_t) (i - 1)) << std::endl;
+		SampleVelocityLayer* layer = samples[std::max((ssize_t) 0, (ssize_t) i - 1)];
 		const size_t zones_size = layer->zones.size();
-		std::cout << "Zones: " << zones_size << std::endl;
 		if (zones_size >= 1) {
 			size_t j = 0;
 			for (; j < zones_size; ++j) {
-				if (freq > layer->zones[j]->max_freq) {
+				if (freq <= layer->zones[j]->max_freq) {
 					break;
 				}
 			}
-			zone = layer->zones[std::max((ssize_t) 0, (ssize_t) (j - 1))];
-			std::cout << "Using zone: " << std::max((ssize_t) 0, (ssize_t) (j - 1)) << std::endl;
+			zone = layer->zones[std::max((ssize_t) 0, (ssize_t) j - 1)];
 		}
 	}
 	return zone;
@@ -88,7 +84,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 
 	if (note.zone) {
 		double vol = note.env.amplitude(note.zone->env, info.time_step, note.pressed, env.sustain);
-		double time = (info.time - note.start_time) * note.zone->freq/note.freq * env.pitch_bend;
+		vol *= note.zone->amp_velocity_amount * (note.velocity - 1) + 1;
+		double time = (info.time - note.start_time) * note.freq/note.zone->freq * env.pitch_bend;
 		lsample += note.zone->sample.isample(0, time, info.sample_rate) * vol;
 		rsample += note.zone->sample.isample(1, time, info.sample_rate) * vol;
 	}

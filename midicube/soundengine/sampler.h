@@ -19,6 +19,16 @@ struct SampleZone {
 	double max_freq = 0;
 	ADSREnvelopeData env = {0, 0, 1, 0};
 
+	double amp_velocity_amount = 1;
+
+	FilterType type = FilterType::LP_12;
+	bool filter = false;
+	double filter_cutoff = 1;
+	double filter_resonance = 0;
+	double filter_kb_track = 0;
+	unsigned int filter_kb_track_note = 36;
+	double filter_velocity_amount = 0;
+
 	SampleZone () {
 		sample.clear();
 	};
