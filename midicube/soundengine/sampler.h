@@ -27,7 +27,7 @@ struct SampleZone {
 	double filter_resonance = 0;
 	double filter_kb_track = 1;
 	unsigned int filter_kb_track_note = 36;
-	double filter_velocity_amount = 0.7;
+	double filter_velocity_amount = 0.55;
 
 	SampleZone () {
 		sample.clear();
@@ -95,6 +95,10 @@ public:
 	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index);
 
 	bool note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index);
+
+	void press_note(SampleInfo& info, unsigned int note, double velocity);
+
+	void release_note(SampleInfo& info, unsigned int note);
 
 	std::string get_name();
 

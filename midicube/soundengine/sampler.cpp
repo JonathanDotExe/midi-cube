@@ -77,11 +77,6 @@ Sampler::Sampler() {
 }
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	if (note.env.is_finished()) {
-		note.env.reset();
-		note.zone = this->sample->get_sample(note.freq, note.velocity);
-	}
-
 	if (note.zone) {
 		//Volume
 		double vol = note.env.amplitude(note.zone->env, info.time_step, note.pressed, env.sustain);
@@ -117,7 +112,18 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 }
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	return !note.pressed && (note.env.is_finished());
+	return note.env.is_finished();
+}
+
+void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
+	size_t slot = this->note.press_note(info, note, velocity);
+	SamplerVoice& voice = this->note.note[slot];
+	voice.env.reset();
+	voice.zone = this->sample->get_sample(voice.freq, voice.velocity);
+}
+
+void Sampler::release_note(SampleInfo& info, unsigned int note) {
+	BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY>::release_note(info, note);
 }
 
 std::string Sampler::get_name() {

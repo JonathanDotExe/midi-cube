@@ -41,7 +41,7 @@ public:
 		}
 	}
 
-	void press_note(SampleInfo& info, unsigned int note, double velocity) {
+	size_t press_note(SampleInfo& info, unsigned int note, double velocity) {
 		size_t slot = next_freq_slot(info);
 		this->note[slot].freq = note_to_freq(note);
 		this->note[slot].velocity = velocity;
@@ -51,6 +51,7 @@ public:
 		this->note[slot].release_time = 0;
 		this->note[slot].phase_shift = 0;
 		this->note[slot].valid = true;
+		return slot;
 	}
 
 
