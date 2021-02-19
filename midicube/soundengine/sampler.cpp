@@ -23,6 +23,7 @@ SampleZone* SampleSound::get_sample(double freq, double velocity) {
 	//Find regions
 	SampleZone* zone = nullptr;
 	const size_t velocity_size = samples.size();
+	std::cout << "Velocities: " << velocity_size << std::endl;
 	if (velocity_size >= 1) {
 		size_t i = 0;
 		for (; i < velocity_size; ++i) {
@@ -31,15 +32,18 @@ SampleZone* SampleSound::get_sample(double freq, double velocity) {
 			}
 		}
 		SampleVelocityLayer* layer = samples[std::max((ssize_t) 0, (ssize_t) (i - 1))];
+		std::cout << "Using layer: " << std::max((ssize_t) 0, (ssize_t) (i - 1)) << std::endl;
 		const size_t zones_size = layer->zones.size();
+		std::cout << "Zones: " << zones_size << std::endl;
 		if (zones_size >= 1) {
 			size_t j = 0;
-			for (; j < velocity_size; ++j) {
+			for (; j < zones_size; ++j) {
 				if (freq > layer->zones[j]->max_freq) {
 					break;
 				}
 			}
 			zone = layer->zones[std::max((ssize_t) 0, (ssize_t) (j - 1))];
+			std::cout << "Using zone: " << std::max((ssize_t) 0, (ssize_t) (j - 1)) << std::endl;
 		}
 	}
 	return zone;
@@ -88,10 +92,14 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		lsample += note.zone->sample.isample(0, time, info.sample_rate) * vol;
 		rsample += note.zone->sample.isample(1, time, info.sample_rate) * vol;
 	}
+	else {
+		ADSREnvelopeData data = {0, 0, 0, 0};
+		note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
+	}
 }
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	return !note.pressed && note.env.is_finished();
+	return !note.pressed && (note.env.is_finished());
 }
 
 std::string Sampler::get_name() {
@@ -131,7 +139,9 @@ extern SampleSound* load_sound(std::string folder) {
 				if (!read_audio_file(zone->sample, file)) {
 					std::cerr << "Couldn't load sample file " << file << std::endl;
 				}
+				layer->zones.push_back(zone);
 			}
+			sound->samples.push_back(layer);
 		}
 	}
 	catch (pt::xml_parser_error& e) {
