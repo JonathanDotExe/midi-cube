@@ -19,15 +19,15 @@ struct SampleZone {
 	double max_freq = 0;
 	ADSREnvelopeData env = {0, 0, 1, 0};
 
-	double amp_velocity_amount = 1;
+	double amp_velocity_amount = 0.5;
 
-	FilterType type = FilterType::LP_12;
-	bool filter = false;
-	double filter_cutoff = 1;
+	FilterType filter_type = FilterType::LP_12;
+	bool filter = true;
+	double filter_cutoff = 0.10;
 	double filter_resonance = 0;
-	double filter_kb_track = 0;
+	double filter_kb_track = 1;
 	unsigned int filter_kb_track_note = 36;
-	double filter_velocity_amount = 0;
+	double filter_velocity_amount = 0.7;
 
 	SampleZone () {
 		sample.clear();
@@ -79,6 +79,8 @@ public:
 struct SamplerVoice : public TriggeredNote {
 	SampleZone* zone = nullptr;
 	ADSREnvelope env;
+	Filter lfilter;
+	Filter rfilter;
 };
 
 class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {

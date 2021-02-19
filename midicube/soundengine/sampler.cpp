@@ -83,11 +83,32 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 	}
 
 	if (note.zone) {
+		//Volume
 		double vol = note.env.amplitude(note.zone->env, info.time_step, note.pressed, env.sustain);
 		vol *= note.zone->amp_velocity_amount * (note.velocity - 1) + 1;
+		//Sound
 		double time = (info.time - note.start_time) * note.freq/note.zone->freq * env.pitch_bend;
-		lsample += note.zone->sample.isample(0, time, info.sample_rate) * vol;
-		rsample += note.zone->sample.isample(1, time, info.sample_rate) * vol;
+		double l = note.zone->sample.isample(0, time, info.sample_rate) * vol;
+		double r = note.zone->sample.isample(1, time, info.sample_rate) * vol;
+		//Filter
+		if (note.zone->filter) {
+			FilterData filter { note.zone->filter_type };
+			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.zone->filter_cutoff + note.zone->filter_velocity_amount * note.velocity))); //TODO optimize
+			filter.resonance = note.zone->filter_resonance;
+
+			if (note.zone->filter_kb_track) {
+				double cutoff = filter.cutoff;
+				//KB track
+				cutoff *= 1 + ((double) note.note - 36) / 12.0 * note.zone->filter_kb_track;
+				filter.cutoff = cutoff;
+			}
+
+			l = note.lfilter.apply(filter, l, info.time_step);
+			r = note.rfilter.apply(filter, r, info.time_step);
+		}
+		//Playback
+		lsample += l;
+		rsample += r;
 	}
 	else {
 		ADSREnvelopeData data = {0, 0, 0, 0};
