@@ -9,62 +9,40 @@
 #include <iostream>
 #include <fstream>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 namespace pt = boost::property_tree;
 
 
 //SampleSound
 SampleSound::SampleSound() {
-	envelope = {0, 0, 1, 0};
+
 }
 
-
-double SampleSound::get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
+SampleZone* SampleSound::get_sample(double freq, double velocity) {
 	//Find regions
-	SampleRegion* region1 = nullptr;
-	SampleRegion* region2 = nullptr;
-	for (size_t i = 1; i < samples.size() && !region1 && !region2; ++i) {
-		if (samples[i]->freq >= note.freq) {
-			region1 = samples[i - 1];
-			region2 = samples[i];
+	SampleZone* zone = nullptr;
+	const size_t velocity_size = samples.size();
+	if (velocity_size >= 1) {
+		size_t i = 0;
+		for (; i < velocity_size; ++i) {
+			if (velocity <= samples[i]->max_velocity) {
+				break;
+			}
+		}
+		SampleVelocityLayer* layer = samples[std::max((ssize_t) 0, (ssize_t) i - 1)];
+		const size_t zones_size = layer->zones.size();
+		if (zones_size >= 1) {
+			size_t j = 0;
+			for (; j < zones_size; ++j) {
+				if (freq <= layer->zones[j]->max_freq) {
+					break;
+				}
+			}
+			zone = layer->zones[std::max((ssize_t) 0, (ssize_t) j - 1)];
 		}
 	}
-	if (!region1) {
-		region1 =  samples[samples.size() - 1];
-	}
-	if (!region2) {
-		region2 =  samples[samples.size() - 1];
-	}
-	double prog = 0;
-	if (region2->freq != region1->freq) {
-		prog = (note.freq - region1->freq)/(region2->freq - region1->freq);
-	}
-	else {
-		prog = 0;
-	}
-	//Play sound
-	//TODO use sustain and release samples as well
-	double time = (info.time - note.start_time + note.phase_shift);
-	double sample = 0;
-	if (prog != 1) {
-		sample = region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate);
-	}
-	sample = region1->sample.isample(channel, time * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
-			region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate) * (prog);
-	return sample;
-}
-
-void SampleSound::push_sample(SampleRegion* region) {
-	samples.push_back(region);
-}
-
-ADSREnvelopeData SampleSound::get_envelope() {
-	return envelope;
-}
-
-void SampleSound::set_envelope(ADSREnvelopeData env) {
-	this->envelope = env;
+	return zone;
 }
 
 SampleSound::~SampleSound() {
@@ -98,20 +76,48 @@ Sampler::Sampler() {
 	sample = load_sound("./data/samples/piano");
 }
 
-void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	ADSREnvelopeData e = this->sample->get_envelope();
-	ADSREnvelope& en = envs[note_index];
-	if (en.is_finished()) {
-		en.reset();
+void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
+	if (note.env.is_finished()) {
+		note.env.reset();
+		note.zone = this->sample->get_sample(note.freq, note.velocity);
 	}
 
-	double vol = en.amplitude(e, info.time_step, note.pressed, env.sustain);
-	lsample += this->sample->get_sample(0, info, note, env) * note.velocity * vol;
-	rsample += this->sample->get_sample(1, info, note, env) * note.velocity * vol;
+	if (note.zone) {
+		//Volume
+		double vol = note.env.amplitude(note.zone->env, info.time_step, note.pressed, env.sustain);
+		vol *= note.zone->amp_velocity_amount * (note.velocity - 1) + 1;
+		//Sound
+		double time = (info.time - note.start_time) * note.freq/note.zone->freq * env.pitch_bend;
+		double l = note.zone->sample.isample(0, time, info.sample_rate) * vol;
+		double r = note.zone->sample.isample(1, time, info.sample_rate) * vol;
+		//Filter
+		if (note.zone->filter) {
+			FilterData filter { note.zone->filter_type };
+			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.zone->filter_cutoff + note.zone->filter_velocity_amount * note.velocity))); //TODO optimize
+			filter.resonance = note.zone->filter_resonance;
+
+			if (note.zone->filter_kb_track) {
+				double cutoff = filter.cutoff;
+				//KB track
+				cutoff *= 1 + ((double) note.note - 36) / 12.0 * note.zone->filter_kb_track;
+				filter.cutoff = cutoff;
+			}
+
+			l = note.lfilter.apply(filter, l, info.time_step);
+			r = note.rfilter.apply(filter, r, info.time_step);
+		}
+		//Playback
+		lsample += l;
+		rsample += r;
+	}
+	else {
+		ADSREnvelopeData data = {0, 0, 0, 0};
+		note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
+	}
 }
 
-bool Sampler::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return !note.pressed && envs[note_index].is_finished();
+bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
+	return !note.pressed && (note.env.is_finished());
 }
 
 std::string Sampler::get_name() {
@@ -129,44 +135,37 @@ extern SampleSound* load_sound(std::string folder) {
 	pt::ptree tree;
 	SampleSound* sound = nullptr;
 	try {
-		pt::read_json(folder + "/sound.json", tree);
+		pt::read_xml(folder + "/sound.xml", tree);
 
-		//Envelope
-		ADSREnvelopeData env;
-		env.attack = tree.get<double>("attack", 0.0005);
-		env.decay = tree.get<double>("decay", 0.0);
-		env.sustain = tree.get<double>("sustain", 1);
-		env.release = tree.get<double>("release", 0.003);
 		//Parse
 		sound = new SampleSound();
-		sound->set_envelope(env);
-		try {
-			//Load sounds
-			for (auto r : tree.get_child("regions")) {
-				SampleRegion* region = new SampleRegion();
-				try {
-					region->freq = note_to_freq(r.second.get<int>("note", 0));
-					std::string file = folder + "/" + r.second.get<std::string>("file");
-					if (!read_audio_file(region->sample, file)) {
-						throw std::runtime_error("Couldn't load sample file " + file);
-					}
+		sound->name = tree.get<std::string>("sound.name", "Sound");
+		//Load velocity layers
+		for (auto r : tree.get_child("sound.velocity_layers")) {
+			SampleVelocityLayer* layer = new SampleVelocityLayer();
+			layer->max_velocity = r.second.get<double>("velocity", 1.0);
+			//Load zones
+			for (auto z : r.second.get_child("zones")) {
+				SampleZone* zone = new SampleZone();
+				zone->freq = note_to_freq(z.second.get<double>("note", 60.0));
+				zone->max_freq = note_to_freq(z.second.get<double>("max_note", 127.0));
+				zone->env.attack = z.second.get<double>("amp_env.attack", 0);
+				zone->env.decay = z.second.get<double>("amp_env.decay", 0);
+				zone->env.sustain = z.second.get<double>("amp_env.sustain", 1);
+				zone->env.release = z.second.get<double>("amp_env.release", 0);
+				std::string file = folder + "/" + z.second.get<std::string>("sample", "");
+				if (!read_audio_file(zone->sample, file)) {
+					std::cerr << "Couldn't load sample file " << file << std::endl;
 				}
-				catch (std::exception& e) {
-					delete region;
-					region = nullptr;
-					throw e;
-				}
-				sound->push_sample(region);
+				layer->zones.push_back(zone);
 			}
-		}
-		catch (std::exception& e) {
-			delete sound;
-			sound = nullptr;
-			throw e;
+			sound->samples.push_back(layer);
 		}
 	}
-	catch (pt::json_parser_error& e) {
-		std::cerr << "Couldn't load sound.json" << std::endl;
+	catch (pt::xml_parser_error& e) {
+		std::cerr << "Couldn't load sound.xml: " << e.message() << std::endl;
+		delete sound;
+		sound = nullptr;
 	}
 	return sound;
 }

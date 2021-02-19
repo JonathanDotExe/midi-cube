@@ -13,45 +13,48 @@
 #include "../audiofile.h"
 #include "../envelope.h"
 
-struct SampleRegionConfig {
-	std::string filename;
-	double freq;
-};
-
-struct SampleSoundConfig {
-	ADSREnvelope envelope;
-	std::vector<SampleRegionConfig> regions;
-};
-
-
-struct SampleRegion {
+struct SampleZone {
 	AudioSample sample;
-	double freq;
+	double freq = 0;
+	double max_freq = 0;
+	ADSREnvelopeData env = {0, 0, 1, 0};
 
+	double amp_velocity_amount = 0.5;
 
-	SampleRegion () {
+	FilterType filter_type = FilterType::LP_12;
+	bool filter = true;
+	double filter_cutoff = 0.10;
+	double filter_resonance = 0;
+	double filter_kb_track = 1;
+	unsigned int filter_kb_track_note = 36;
+	double filter_velocity_amount = 0.7;
+
+	SampleZone () {
 		sample.clear();
-		freq = 0;
 	};
 
 };
 
-class SampleSound {
-private:
-	std::vector<SampleRegion*> samples;
-	ADSREnvelopeData envelope;
+struct SampleVelocityLayer {
+	double max_velocity;
+	std::vector<SampleZone*> zones = {};
 
+	~SampleVelocityLayer() {
+		for (SampleZone* zone : zones) {
+			delete zone;
+		}
+		zones.clear();
+	}
+};
+
+class SampleSound {
 public:
+	std::string name = "Sample";
+	std::vector<SampleVelocityLayer*> samples = {};
 
 	SampleSound();
 
-	double get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
-
-	void push_sample(SampleRegion* region);
-
-	ADSREnvelopeData get_envelope();
-
-	void set_envelope(ADSREnvelopeData env);
+	SampleZone* get_sample(double freq, double velocity);
 
 	~SampleSound();
 
@@ -73,19 +76,25 @@ public:
 
 #define SAMPLER_POLYPHONY 64
 
-class Sampler : public BaseSoundEngine<TriggeredNote, SAMPLER_POLYPHONY> {
+struct SamplerVoice : public TriggeredNote {
+	SampleZone* zone = nullptr;
+	ADSREnvelope env;
+	Filter lfilter;
+	Filter rfilter;
+};
+
+class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 
 private:
 	SampleSound* sample;
-	std::array<ADSREnvelope, SAMPLER_POLYPHONY> envs;
 
 public:
 
 	Sampler();
 
-	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	bool note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index);
 
 	std::string get_name();
 

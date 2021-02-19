@@ -12,6 +12,15 @@
 #include "audio.h"
 #include <cmath>
 
+#define FILTER_MIN 14
+#define FILTER_MAX 44100
+constexpr double FILTER_PROGRESS_START = log(FILTER_MIN)/log(FILTER_MAX);
+constexpr double FILTER_PROGRESS_REST = 1 - FILTER_PROGRESS_START;
+
+inline double scale_cutoff(double prog) {
+	return pow(FILTER_MAX, FILTER_PROGRESS_START + FILTER_PROGRESS_REST * prog);
+}
+
 inline double cutoff_to_rc(double cutoff) {
 	return 1.0/(2 * M_PI * cutoff);
 }
