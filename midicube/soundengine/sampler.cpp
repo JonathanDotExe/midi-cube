@@ -9,7 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 namespace pt = boost::property_tree;
 
@@ -109,44 +109,35 @@ extern SampleSound* load_sound(std::string folder) {
 	pt::ptree tree;
 	SampleSound* sound = nullptr;
 	try {
-		pt::read_json(folder + "/sound.json", tree);
+		pt::read_xml(folder + "/sound.xml", tree);
 
-		//Envelope
-		ADSREnvelopeData env;
-		env.attack = tree.get<double>("attack", 0.0005);
-		env.decay = tree.get<double>("decay", 0.0);
-		env.sustain = tree.get<double>("sustain", 1);
-		env.release = tree.get<double>("release", 0.003);
 		//Parse
 		sound = new SampleSound();
-		sound->set_envelope(env);
-		try {
-			//Load sounds
-			for (auto r : tree.get_child("regions")) {
-				SampleZone* region = new SampleZone();
-				try {
-					region->freq = note_to_freq(r.second.get<int>("note", 0));
-					std::string file = folder + "/" + r.second.get<std::string>("file");
-					if (!read_audio_file(region->sample, file)) {
-						throw std::runtime_error("Couldn't load sample file " + file);
-					}
+		sound = tree.get<std::string>("sound.name", "Sound");
+		//Load velocity layers
+		for (auto r : tree.get_child("sound.velocity_layers")) {
+			SampleVelocityLayer* layer = new SampleVelocityLayer();
+			layer->max_velocity = r.second.get<double>("velocity_layer.velocity", 1.0);
+			//Load zones
+			for (auto z : r.second.get_child("velocity_layer.zones")) {
+				SampleZone* zone = new SampleZone();
+				zone->freq = note_to_freq(z.second.get<double>("zone.note", 60.0));
+				zone->max_freq = note_to_freq(z.second.get<double>("zone.max_note", 127.0));
+				zone->env.attack = z.second.get<double>("zone.amp_env.attack", 0);
+				zone->env.decay = z.second.get<double>("zone.amp_env.decay", 0);
+				zone->env.sustain = z.second.get<double>("zone.amp_env.sustain", 1);
+				zone->env.release = z.second.get<double>("zone.amp_env.release", 0);
+				std::string file = folder + "/" + r.second.get<std::string>("sample");
+				if (!read_audio_file(zone->sample, file)) {
+					std::cerr << "Couldn't load sample file " << file << std::endl;
 				}
-				catch (std::exception& e) {
-					delete region;
-					region = nullptr;
-					throw e;
-				}
-				sound->push_sample(region);
 			}
 		}
-		catch (std::exception& e) {
-			delete sound;
-			sound = nullptr;
-			throw e;
-		}
 	}
-	catch (pt::json_parser_error& e) {
-		std::cerr << "Couldn't load sound.json" << std::endl;
+	catch (pt::xml_parser_error& e) {
+		std::cerr << "Couldn't load sound.xml: " << e.message() << std::endl;
+		delete sound;
+		sound = nullptr;
 	}
 	return sound;
 }

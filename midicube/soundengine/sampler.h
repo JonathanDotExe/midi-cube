@@ -39,8 +39,8 @@ struct SampleVelocityLayer {
 
 class SampleSound {
 public:
+	std::string name = "Sample";
 	std::vector<SampleVelocityLayer*> samples = {};
-
 
 	SampleSound();
 
