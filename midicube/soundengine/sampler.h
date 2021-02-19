@@ -13,41 +13,40 @@
 #include "../audiofile.h"
 #include "../envelope.h"
 
-struct SampleRegionConfig {
-	std::string filename;
-	double freq;
-};
-
-struct SampleSoundConfig {
-	ADSREnvelope envelope;
-	std::vector<SampleRegionConfig> regions;
-};
-
-
-struct SampleRegion {
+struct SampleZone {
 	AudioSample sample;
-	double freq;
+	double freq = 0;
+	double max_freq = 0;
+	ADSREnvelopeData envelope = {0, 0, 1, 0};
 
-
-	SampleRegion () {
+	SampleZone () {
 		sample.clear();
-		freq = 0;
 	};
 
 };
 
-class SampleSound {
-private:
-	std::vector<SampleRegion*> samples;
-	ADSREnvelopeData envelope;
+struct SampleVelocityLayer {
+	double max_velocity;
+	std::vector<SampleZone*> zones = {};
 
+	~SampleVelocityLayer() {
+		for (SampleZone* zone : zones) {
+			delete zone;
+		}
+		zones.clear();
+	}
+};
+
+class SampleSound {
 public:
+	std::vector<SampleVelocityLayer*> samples = {};
+
 
 	SampleSound();
 
 	double get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
-	void push_sample(SampleRegion* region);
+	void push_sample(SampleZone* region);
 
 	ADSREnvelopeData get_envelope();
 

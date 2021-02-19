@@ -22,8 +22,8 @@ SampleSound::SampleSound() {
 
 double SampleSound::get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env) {
 	//Find regions
-	SampleRegion* region1 = nullptr;
-	SampleRegion* region2 = nullptr;
+	SampleZone* region1 = nullptr;
+	SampleZone* region2 = nullptr;
 	for (size_t i = 1; i < samples.size() && !region1 && !region2; ++i) {
 		if (samples[i]->freq >= note.freq) {
 			region1 = samples[i - 1];
@@ -55,7 +55,7 @@ double SampleSound::get_sample(unsigned int channel, SampleInfo& info, Triggered
 	return sample;
 }
 
-void SampleSound::push_sample(SampleRegion* region) {
+void SampleSound::push_sample(SampleZone* region) {
 	samples.push_back(region);
 }
 
@@ -143,7 +143,7 @@ extern SampleSound* load_sound(std::string folder) {
 		try {
 			//Load sounds
 			for (auto r : tree.get_child("regions")) {
-				SampleRegion* region = new SampleRegion();
+				SampleZone* region = new SampleZone();
 				try {
 					region->freq = note_to_freq(r.second.get<int>("note", 0));
 					std::string file = folder + "/" + r.second.get<std::string>("file");
