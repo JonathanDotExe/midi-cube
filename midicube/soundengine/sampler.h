@@ -46,12 +46,6 @@ public:
 
 	double get_sample(unsigned int channel, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env);
 
-	void push_sample(SampleZone* region);
-
-	ADSREnvelopeData get_envelope();
-
-	void set_envelope(ADSREnvelopeData env);
-
 	~SampleSound();
 
 };

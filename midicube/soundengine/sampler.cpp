@@ -33,38 +33,18 @@ double SampleSound::get_sample(unsigned int channel, SampleInfo& info, Triggered
 		SampleVelocityLayer* layer = samples[std::max((ssize_t) 0, (ssize_t) (i - 1))];
 		const size_t zones_size = layer->zones.size();
 		if (zones_size >= 1) {
-
+			size_t j = 0;
+			for (; j < velocity_size; ++j) {
+				if (note.freq > layer->zones[j]->max_freq) {
+					break;
+				}
+			}
+			SampleZone* zone = layer->zones[std::max((ssize_t) 0, (ssize_t) (j - 1))];
+			//Play sound
+			zone->sample.isample(channel, (info.time - note.start_time) * zone->freq/note.freq, info.sample_rate);
 		}
-		double prog = 0;
-		if (region2->freq != region1->freq) {
-			prog = (note.freq - region1->freq)/(region2->freq - region1->freq);
-		}
-		else {
-			prog = 0;
-		}
-		//Play sound
-		//TODO use sustain and release samples as well
-		double time = (info.time - note.start_time + note.phase_shift);
-		double sample = 0;
-		if (prog != 1) {
-			sample = region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate);
-		}
-		sample = region1->sample.isample(channel, time * note.freq/region1->freq, info.sample_rate) * (1 -prog) +
-				region2->sample.isample(channel, time * note.freq/region2->freq, info.sample_rate) * (prog);
 	}
 	return sample;
-}
-
-void SampleSound::push_sample(SampleZone* region) {
-	samples.push_back(region);
-}
-
-ADSREnvelopeData SampleSound::get_envelope() {
-	return envelope;
-}
-
-void SampleSound::set_envelope(ADSREnvelopeData env) {
-	this->envelope = env;
 }
 
 SampleSound::~SampleSound() {
