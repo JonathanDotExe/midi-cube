@@ -245,7 +245,7 @@ public:
 	}
 
 	T get_value() {
-		return scale.value(progress);
+		return scale.value(progress, min, max);
 	}
 
 	SELECTABLE

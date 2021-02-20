@@ -6,6 +6,7 @@
  */
 
 #include "ProgramView.h"
+#include "ProgramRenameView.h"
 #include "SoundEngineView.h"
 
 ProgramView::ProgramView(size_t bank, size_t page) {
@@ -91,16 +92,18 @@ Scene ProgramView::create(Frame &frame) {
 		//Save
 		Button* save = new Button("Save", main_font, 18, 125, frame.get_height() - 40, 100, 40);
 		save->set_on_click([&frame, this]() {
-			prog_mgr->overwrite_program();
-			frame.change_view(new ProgramView(this->bank, page));
+			frame.change_view(new ProgramRenameView([](ProgramManager* mgr) {
+				mgr->overwrite_program();
+			}));
 		});
 		controls.push_back(save);
 
 		//New
 		Button* new_prog = new Button("New", main_font, 18, 230, frame.get_height() - 40, 100, 40);
 		new_prog->set_on_click([&frame, this]() {
-			prog_mgr->save_new_program();
-			frame.change_view(new ProgramView(this->bank, page));
+			frame.change_view(new ProgramRenameView([](ProgramManager* mgr) {
+				mgr->save_new_program();
+			}));
 		});
 		controls.push_back(new_prog);
 

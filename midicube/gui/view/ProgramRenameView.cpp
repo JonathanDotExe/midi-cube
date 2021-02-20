@@ -9,9 +9,8 @@
 #include "ProgramView.h"
 #include <boost/algorithm/string.hpp>
 
-ProgramRenameView::ProgramRenameView() {
-	// TODO Auto-generated constructor stub
-
+ProgramRenameView::ProgramRenameView(std::function<void(ProgramManager* prog_mgr)> action) {
+	this->action = action;
 }
 
 void ProgramRenameView::property_change(PropertyChange change) {
@@ -42,7 +41,7 @@ Scene ProgramRenameView::create(Frame &frame) {
 		}
 
 		//Rename
-		std::vector<DragBox<size_t>*> boxes;
+		std::vector<DragBox<int>*> boxes;
 		std::string name = prog_mgr->program_name;
 		for (size_t i = 0; i < PROGRAM_NAME_LENGTH; ++i) {
 			size_t index = 0;
@@ -54,8 +53,8 @@ Scene ProgramRenameView::create(Frame &frame) {
 				}
 			}
 
-			DragBox<size_t>* box = new DragBox<size_t>(index, 0, chars.size() - 1, main_font, 18, 50 + 45 * i, 100, 40, 40);
-			box->to_string = [&chars](size_t i) {
+			DragBox<int>* box = new DragBox<int>(index, 0, chars.size() - 1, main_font, 18, 50 + 45 * i, 100, 40, 40);
+			box->to_string = [this](int i) {
 				return std::to_string(chars.at(i));
 			};
 			boxes.push_back(box);
@@ -67,13 +66,14 @@ Scene ProgramRenameView::create(Frame &frame) {
 		back->set_on_click([&frame, boxes, this]() {
 			//Collect name
 			std::string name = "";
-			for (DragBox<size_t>* box : boxes) {
+			for (DragBox<int>* box : boxes) {
 				name += chars.at(box->get_value());
 			}
-			name = boost::trim(name);
+			boost::trim(name);
 			//Update name
 			prog_mgr->lock();
 			prog_mgr->program_name = name;
+			action(prog_mgr);
 			prog_mgr->unlock();
 			//Change view
 			frame.change_view(new ProgramView());

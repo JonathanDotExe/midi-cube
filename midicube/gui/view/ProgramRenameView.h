@@ -13,13 +13,16 @@
 #include "resources.h"
 #include "../../midicube.h"
 #include "../../soundengine/soundengine.h"
+#include <functional>
 
 class ProgramRenameView : public ViewController {
 private:
 	ProgramManager* prog_mgr = nullptr;
 	std::vector<char> chars;
+	//Is executed with a lock on the program manager
+	std::function<void(ProgramManager* prog_mgr)> action = nullptr;
 public:
-	ProgramRenameView();
+	ProgramRenameView(std::function<void(ProgramManager* prog_mgr)> action);
 	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);
 	virtual ~ProgramRenameView();
