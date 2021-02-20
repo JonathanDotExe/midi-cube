@@ -24,6 +24,7 @@
 namespace pt = boost::property_tree;
 
 #define PROGRAM_NAME_LENGTH 20
+#define BANK_NAME_LENGTH 20
 
 struct Program {
 	std::string name;
@@ -73,6 +74,7 @@ private:
 	std::mutex mutex;
 
 public:
+	std::string bank_name = "";
 	std::string program_name = "";
 
 	ProgramManager(std::string path);
@@ -94,6 +96,10 @@ public:
 	void save_new_program();
 
 	void overwrite_program();
+
+	void save_new_bank();
+
+	void overwrite_bank();
 
 	bool init_user(ProgramUser* user) {
 		bool success = false;

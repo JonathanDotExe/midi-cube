@@ -9,6 +9,20 @@
 #include <boost/filesystem.hpp>
 #include <regex>
 #include <iostream>
+#include <cctype>
+
+std::string bank_filename(std::string name) {
+	std::string filename = "";
+	for (char ch : name) {
+		if (ch == ' ' || ch == '_') {
+			filename += '_';
+		}
+		else if (isalpha(ch) || isdigit(ch)) {
+			filename += (char) tolower(ch);
+		}
+	}
+	return filename;
+}
 
 Program* load_program(pt::ptree& tree) {
 	Program* program = new Program();
@@ -108,6 +122,24 @@ void ProgramManager::overwrite_program() {
 	Program* prog = get_bank(curr_bank)->programs.at(curr_program);
 	prog->name = program_name;
 	user->save_program(prog);
+	unlock();
+}
+
+void ProgramManager::save_new_bank() {
+	lock();
+	Bank* bank = new Bank();
+	bank->name = bank_name;
+	bank->filename = bank_filename(bank_name);
+	//TODO check if already exists
+	banks.push_back(bank);
+	unlock();
+}
+
+void ProgramManager::overwrite_bank() {
+	lock();
+	Bank* bank = new Bank();
+	bank->name = bank_name;
+	//Don't update filename
 	unlock();
 }
 
