@@ -7,6 +7,7 @@
 
 #include "ProgramRenameView.h"
 #include "ProgramView.h"
+#include <boost/algorithm/string.hpp>
 
 ProgramRenameView::ProgramRenameView() {
 	// TODO Auto-generated constructor stub
@@ -63,7 +64,18 @@ Scene ProgramRenameView::create(Frame &frame) {
 
 		//Back Button
 		Button* back = new Button("Save", main_font, 18, frame.get_width() - 100, frame.get_height() - 40, 100, 40);
-		back->set_on_click([&frame]() {
+		back->set_on_click([&frame, boxes, this]() {
+			//Collect name
+			std::string name = "";
+			for (DragBox<size_t>* box : boxes) {
+				name += chars.at(box->get_value());
+			}
+			name = boost::trim(name);
+			//Update name
+			prog_mgr->lock();
+			prog_mgr->program_name = name;
+			prog_mgr->unlock();
+			//Change view
 			frame.change_view(new ProgramView());
 		});
 		back->rect.setFillColor(sf::Color::Yellow);
