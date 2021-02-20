@@ -147,6 +147,12 @@ protected:
 };
 
 template <typename T>
+struct DragBoxScale {
+	std::function<T (double, T, T)> value;
+	std::function<double (T, T, T)> progress;
+};
+
+template <typename T>
 class DragBox : public BindableControl {
 
 private:
@@ -154,18 +160,32 @@ private:
 	bool hit_border = false;
 	T min;
 	T max;
+	int temp_drag = 0;
 
 public:
 	sf::RectangleShape rect;
 	sf::Text text;
 	double drag_mul = 0.0025;
 	T border;
+	int drag_step = 2;
+	std::function<std::string (T t)> to_string = [](T t) {
+		return std::to_string(t);
+	};
+	DragBoxScale<T> scale;
 
-	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
+	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0, DragBoxScale<T> scale = {
+			[](double progress, T min, T max) {
+				return progress * (max - min) + min;
+			},
+			[](T value, T min, T max) {
+				return (value - min)/(max - min);
+			}
+		}) : BindableControl (x, y, width, height) {
+		this->scale = scale;
 		this->min = min;
 		this->max = max;
 		border = min;
-		this->progress = (value - min)/(max - min);
+		this->progress = this->scale.progress(value, min, max);
 
 		this->rect.setFillColor(sf::Color(220, 220, 220));
 
@@ -180,8 +200,8 @@ public:
 		Control::update_position(x, y, width, height);
 		rect.setPosition(x, y);
 		rect.setSize(sf::Vector2<float>(width, height));
-		T value = progress * (max - min) + min;
-		text.setString(std::to_string(value));
+		T value = scale.value(progress, min, max);
+		text.setString(to_string(value));
 		center_text(text, x, y, width, height);
 	}
 
@@ -192,29 +212,34 @@ public:
 
 	virtual void on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
 		hit_border = false;
+		temp_drag = 0;
 	}
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 		if (!hit_border) {
-			T old_val = progress * (max - min) + min;
-			progress += drag_mul * x_motion;
+			temp_drag += x_motion;
+			if (abs(temp_drag) >= drag_step) {
+				T old_val = scale.value(progress, min, max);
+				progress += drag_mul * ((int) temp_drag/drag_step);
+				temp_drag = temp_drag%drag_step;
 
-			if (progress < 0) {
-				progress = 0;
-			}
-			else if (progress > 1) {
-				progress = 1;
-			}
+				if (progress < 0) {
+					progress = 0;
+				}
+				else if (progress > 1) {
+					progress = 1;
+				}
 
-			T value = progress * (max - min) + min;
-			if ((old_val > border && value < border) || (old_val < border && value > border)) {
-				value = border;
-				progress = (value - min)/(max - min);
-				hit_border = true;
-			}
-			if (old_val != value) {
-				send_change(value);
-				update_position(this->x, this->y, width, height);
+				T value = scale.value(progress, min, max);
+				if ((old_val > border && value < border) || (old_val < border && value > border)) {
+					value = border;
+					progress = scale.progress(value, min, max);
+					hit_border = true;
+				}
+				if (old_val != value) {
+					send_change(value);
+					update_position(this->x, this->y, width, height);
+				}
 			}
 		}
 	}

@@ -111,7 +111,7 @@ struct B3OrganPreset {
 	unsigned int amp_drive_cc{36};
 	unsigned int amp_tone_cc{37};
 
-	double multi_note_gain{0.75};
+	double multi_note_gain{0.8};
 
 	RotarySpeakerPreset rotary;
 	unsigned int rotary_cc{22};

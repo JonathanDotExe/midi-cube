@@ -379,7 +379,7 @@ Scene B3OrganView::create(Frame &frame) {
 		controls.push_back(gain_label);
 		tmp_y += 25;
 
-		DragBox<double>* gain = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
+		DragBox<double>* gain = new DragBox<double>(0.5, 0.5, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
 		gain->bind(&organ, B3OrganProperty::pB3MultiNoteGain);
 		controls.push_back(gain);
 

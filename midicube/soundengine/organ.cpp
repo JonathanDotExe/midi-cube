@@ -132,7 +132,7 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	double sample = 0;
 	double volume = 0;
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
-		volume += data.tonewheels[i].volume;
+		volume += data.tonewheels[i].volume * tonewheel_data[i].volume;
 		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend) * tonewheel_data[i].volume;
 	}
 	sample *= swell;

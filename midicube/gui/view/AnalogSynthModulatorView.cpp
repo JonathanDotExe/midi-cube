@@ -47,6 +47,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 	//Envelope
 	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthEnvAttack);
 	tmp_y += 75;
+	std::cout << &controls << std::endl;
 	//Volume
 	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthEnvVolume, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
