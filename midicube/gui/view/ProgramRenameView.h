@@ -19,7 +19,6 @@ class ProgramRenameView : public ViewController {
 private:
 	ProgramManager* prog_mgr = nullptr;
 	std::vector<char> chars;
-	//Is executed with a lock on the program manager
 	std::function<void(ProgramManager* prog_mgr)> action = nullptr;
 public:
 	ProgramRenameView(std::function<void(ProgramManager* prog_mgr)> action);

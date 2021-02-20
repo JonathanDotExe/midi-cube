@@ -178,7 +178,7 @@ public:
 				return progress * (max - min) + min;
 			},
 			[](T value, T min, T max) {
-				return (value - min)/(max - min);
+				return ((double) value - min)/(max - min);
 			}
 		}) : BindableControl (x, y, width, height) {
 		this->scale = scale;
