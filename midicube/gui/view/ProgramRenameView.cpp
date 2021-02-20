@@ -32,7 +32,7 @@ Scene ProgramRenameView::create(Frame &frame) {
 		Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 50);
 		controls.push_back(pane);
 
-		std::vector<char> chars = {' '};
+		chars = {' '};
 		for (char i = 'a'; i <= 'z'; ++i) {
 			chars.push_back(i);
 		}
@@ -41,9 +41,24 @@ Scene ProgramRenameView::create(Frame &frame) {
 		}
 
 		//Rename
+		std::vector<DragBox<size_t>*> boxes;
+		std::string name = prog_mgr->program_name;
 		for (size_t i = 0; i < PROGRAM_NAME_LENGTH; ++i) {
-			DragBox<size_t>* box = new DragBox<size_t>(0, 0, chars.size() - 1, main_font, 18, 50 + 45 * i, 100, 40, 40);
+			size_t index = 0;
+			if (i < name.size()) {
+				char ch = name.at(i);
+				auto pos = std::find(chars.begin(), chars.end(), ch);
+				if (pos < chars.end()) {
+					index = pos - chars.begin();
+				}
+			}
 
+			DragBox<size_t>* box = new DragBox<size_t>(index, 0, chars.size() - 1, main_font, 18, 50 + 45 * i, 100, 40, 40);
+			box->to_string = [&chars](size_t i) {
+				return std::to_string(chars.at(i));
+			};
+			boxes.push_back(box);
+			controls.push_back(box);
 		}
 
 		//Back Button

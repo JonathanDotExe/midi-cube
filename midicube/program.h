@@ -70,10 +70,10 @@ private:
 	size_t curr_program = 0;
 	std::vector<Bank*> banks;
 	ProgramUser* user = nullptr;
-	std::string program_name = "";
 	std::mutex mutex;
 
 public:
+	std::string program_name = "";
 
 	ProgramManager(std::string path);
 	inline void lock() {

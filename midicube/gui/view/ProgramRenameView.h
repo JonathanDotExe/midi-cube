@@ -17,6 +17,7 @@
 class ProgramRenameView : public ViewController {
 private:
 	ProgramManager* prog_mgr = nullptr;
+	std::vector<char> chars;
 public:
 	ProgramRenameView();
 	virtual void property_change(PropertyChange change);
