@@ -23,7 +23,7 @@
 
 namespace pt = boost::property_tree;
 
-#define PROGRAM_NAME_LENGTH 16
+#define PROGRAM_NAME_LENGTH 20
 
 struct Program {
 	std::string name;

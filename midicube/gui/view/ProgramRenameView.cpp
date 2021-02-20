@@ -44,6 +44,7 @@ Scene ProgramRenameView::create(Frame &frame) {
 		}
 
 		//Rename
+		int width = PROGRAM_NAME_LENGTH * 45;
 		std::vector<DragBox<int>*> boxes;
 		std::string name = prog_mgr->program_name;
 		for (size_t i = 0; i < PROGRAM_NAME_LENGTH; ++i) {
@@ -56,12 +57,12 @@ Scene ProgramRenameView::create(Frame &frame) {
 				}
 			}
 
-			DragBox<int>* box = new DragBox<int>(index, 0, chars.size() - 1, main_font, 18, 50 + 45 * i, 100, 40, 40);
+			DragBox<int>* box = new DragBox<int>(index, 0, chars.size() - 1, main_font, 30, 0, 0, 0, 0);
 			box->drag_step = 4;
 			box->to_string = [this](int i) {
 				return std::string{chars.at(i)};
 			};
-			box->update_position(50 + 45 * i, 100, 40, 40);
+			box->update_position(frame.get_width()/2 - width/2 + 45 * i, 150, 40, 40);
 			boxes.push_back(box);
 			controls.push_back(box);
 		}
