@@ -21,8 +21,7 @@ Scene ProgramView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<PropertyHolder*> holders;
 
-	engine = &frame.cube.engine;
-	prog_mgr = &frame.cube.prog_mgr;
+	ProgramManager* prog_mgr = &frame.cube.prog_mgr;
 
 	prog_mgr->lock();
 	{
@@ -67,7 +66,7 @@ Scene ProgramView::create(Frame &frame) {
 				button->rect.setFillColor(sf::Color(200, 200, 200));
 			}
 			controls.push_back(button);
-			button->set_on_click([i, start, this, &frame]() {
+			button->set_on_click([i, start, prog_mgr, &frame, this]() {
 				prog_mgr->lock();
 				prog_mgr->apply_program(this->bank, start + i);
 				prog_mgr->unlock();
@@ -91,26 +90,40 @@ Scene ProgramView::create(Frame &frame) {
 
 		//Save
 		Button* save = new Button("Save", main_font, 18, 125, frame.get_height() - 40, 100, 40);
-		save->set_on_click([&frame, this]() {
-			frame.change_view(new ProgramRenameView([](ProgramManager* mgr) {
-				mgr->overwrite_program();
+		save->set_on_click([&frame, prog_mgr]() {
+			prog_mgr->lock();
+			std::string name = prog_mgr->program_name;
+			prog_mgr->unlock();
+			frame.change_view(new ProgramRenameView(name, [prog_mgr](std::string name) {
+				prog_mgr->lock();
+				prog_mgr->program_name = name;
+				prog_mgr->overwrite_program();
+				prog_mgr->unlock();
 			}));
 		});
 		controls.push_back(save);
 
 		//New
 		Button* new_prog = new Button("New", main_font, 18, 230, frame.get_height() - 40, 100, 40);
-		new_prog->set_on_click([&frame, this]() {
-			frame.change_view(new ProgramRenameView([](ProgramManager* mgr) {
-				mgr->save_new_program();
+		new_prog->set_on_click([&frame, prog_mgr]() {
+			prog_mgr->lock();
+			std::string name = prog_mgr->program_name;
+			prog_mgr->unlock();
+			frame.change_view(new ProgramRenameView(name, [prog_mgr](std::string name) {
+				prog_mgr->lock();
+				prog_mgr->program_name = name;
+				prog_mgr->save_new_program();
+				prog_mgr->unlock();
 			}));
 		});
 		controls.push_back(new_prog);
 
 		//Delete
 		Button* del = new Button("Delete", main_font, 18, 335, frame.get_height() - 40, 100, 40);
-		del->set_on_click([&frame, this]() {
+		del->set_on_click([&frame, prog_mgr, this]() {
+			prog_mgr->lock();
 			prog_mgr->delete_program();
+			prog_mgr->unlock();
 			frame.change_view(new ProgramView(this->bank, page));
 		});
 		controls.push_back(del);

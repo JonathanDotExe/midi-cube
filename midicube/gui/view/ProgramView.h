@@ -16,8 +16,6 @@
 
 class ProgramView : public ViewController {
 private:
-	SoundEngineDevice* engine = nullptr;
-	ProgramManager* prog_mgr = nullptr;
 	size_t bank = 0;
 	size_t page = 0;
 public:

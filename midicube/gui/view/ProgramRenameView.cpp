@@ -9,8 +9,9 @@
 #include "ProgramView.h"
 #include <boost/algorithm/string.hpp>
 
-ProgramRenameView::ProgramRenameView(std::function<void(ProgramManager* prog_mgr)> action) {
+ProgramRenameView::ProgramRenameView(std::string name, std::function<void(std::string name)> action) {
 	this->action = action;
+	this->name = name;
 }
 
 void ProgramRenameView::property_change(PropertyChange change) {
@@ -20,9 +21,6 @@ Scene ProgramRenameView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<PropertyHolder*> holders;
 
-	prog_mgr = &frame.cube.prog_mgr;
-
-	prog_mgr->lock();
 	{
 
 		//Background
@@ -46,7 +44,6 @@ Scene ProgramRenameView::create(Frame &frame) {
 		//Rename
 		int width = PROGRAM_NAME_LENGTH * 45;
 		std::vector<DragBox<int>*> boxes;
-		std::string name = prog_mgr->program_name;
 		for (size_t i = 0; i < PROGRAM_NAME_LENGTH; ++i) {
 			size_t index = 0;
 			if (i < name.size()) {
@@ -77,17 +74,13 @@ Scene ProgramRenameView::create(Frame &frame) {
 			}
 			boost::trim(name);
 			//Update name
-			prog_mgr->lock();
-			prog_mgr->program_name = name;
-			prog_mgr->unlock();
-			action(prog_mgr);
+			action(name);
 			//Change view
 			frame.change_view(new ProgramView());
 		});
 		back->rect.setFillColor(sf::Color::Yellow);
 		controls.push_back(back);
 	}
-	prog_mgr->unlock();
 
 	return {controls, holders};
 }

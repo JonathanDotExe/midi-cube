@@ -90,15 +90,15 @@ public:
 	}
 	//Mutex has to be locked by user
 	void apply_program(size_t bank, size_t program);
-
+	//Mutex has to be locked by user
 	void delete_program();
-
+	//Mutex has to be locked by user
 	void save_new_program();
-
+	//Mutex has to be locked by user
 	void overwrite_program();
-
+	//Mutex has to be locked by user
 	void save_new_bank();
-
+	//Mutex has to be locked by user
 	void overwrite_bank();
 
 	bool init_user(ProgramUser* user) {
@@ -112,19 +112,19 @@ public:
 		unlock();
 		return success;
 	}
-	//User has to aquire mutex
+	//Mutex has to be locked by user
 	Bank* get_bank(size_t bank) {
 		return banks.at(bank);
 	}
-	//User has to aquire mutex
+	//Mutex has to be locked by user
 	Bank* get_curr_bank() {
 		return get_bank(curr_bank);
 	}
-
+	//Mutex has to be locked by user
 	size_t get_curr_bank_index() {
 		return curr_bank;
 	}
-
+	//Mutex has to be locked by user
 	size_t get_curr_program_index() {
 		return curr_program;
 	}

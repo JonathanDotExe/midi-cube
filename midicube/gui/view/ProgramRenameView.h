@@ -17,11 +17,11 @@
 
 class ProgramRenameView : public ViewController {
 private:
-	ProgramManager* prog_mgr = nullptr;
+	std::string name;
 	std::vector<char> chars;
-	std::function<void(ProgramManager* prog_mgr)> action = nullptr;
+	std::function<void(std::string name)> action = nullptr;
 public:
-	ProgramRenameView(std::function<void(ProgramManager* prog_mgr)> action);
+	ProgramRenameView(std::string name, std::function<void(std::string name)> action);
 	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);
 	virtual ~ProgramRenameView();

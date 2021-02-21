@@ -94,7 +94,6 @@ void ProgramManager::apply_program(size_t bank, size_t program) {
 }
 
 void ProgramManager::delete_program() {
-	lock();
 	Bank* bank = get_curr_bank();
 	bank->programs.erase(bank->programs.begin() + curr_program);
 	if (bank->programs.size() == 0) {
@@ -104,43 +103,34 @@ void ProgramManager::delete_program() {
 		curr_program--;
 	}
 	apply_program(curr_bank, curr_program);
-	unlock();
 }
 
 void ProgramManager::save_new_program() {
-	lock();
 	Bank* bank = get_curr_bank();
 	Program* prog = new Program();
 	prog->name = program_name;
 	user->save_program(prog);
 	bank->programs.push_back(prog);
-	unlock();
 }
 
 void ProgramManager::overwrite_program() {
-	lock();
 	Program* prog = get_bank(curr_bank)->programs.at(curr_program);
 	prog->name = program_name;
 	user->save_program(prog);
-	unlock();
 }
 
 void ProgramManager::save_new_bank() {
-	lock();
 	Bank* bank = new Bank();
 	bank->name = bank_name;
 	bank->filename = bank_filename(bank_name);
 	//TODO check if already exists
 	banks.push_back(bank);
-	unlock();
 }
 
 void ProgramManager::overwrite_bank() {
-	lock();
 	Bank* bank = new Bank();
 	bank->name = bank_name;
 	//Don't update filename
-	unlock();
 }
 
 void ProgramManager::load_all() {
