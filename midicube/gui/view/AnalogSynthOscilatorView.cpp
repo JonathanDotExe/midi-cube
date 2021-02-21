@@ -112,8 +112,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder
 				return progress * (max - min) + min;
 			},
 			[](double value, double min, double max) {
-				double progress = (value - min)/(max - min);
-				return sqrt(progress);
+				return sqrt((value - min)/(max - min));
 			}
 		};
 	//Attack

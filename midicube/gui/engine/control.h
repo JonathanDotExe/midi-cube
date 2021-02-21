@@ -178,7 +178,7 @@ public:
 				return progress * (max - min) + min;
 			},
 			[](T value, T min, T max) {
-				return (value - min)/(max - min);
+				return ((double) value - min)/(max - min);
 			}
 		}) : BindableControl (x, y, width, height) {
 		this->scale = scale;
@@ -253,7 +253,7 @@ public:
 protected:
 	virtual void bound_property_change(PropertyValue val) {
 		T v = val.get(PropertyType<T>{});
-		progress = fmin(fmax((double) (v - min)/(max - min), 0), 1);
+		progress = fmin(fmax(scale.progress(v, min, max), 0), 1);
 		update_position(this->x, this->y, width, height);
 	}
 
