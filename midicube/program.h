@@ -33,6 +33,7 @@ struct ChannelProgram {
 
 struct Program {
 	std::string name;
+	unsigned int metronome_bpm = 120;
 	std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS> channels = {nullptr};
 
 	~Program() {

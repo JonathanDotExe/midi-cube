@@ -347,12 +347,12 @@ void SoundEngineDevice::update_properties() {
 	submit_change(SoundEngineProperty::pEngineVolume, volume);
 }
 
-void apply_program(std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS>& channels) {
-	//TODO
+void SoundEngineDevice::apply_program(Program* program) {
+	metronome.set_bpm(program->metronome_bpm);
 }
 
-void save_program(std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS>& channels) {
-
+void SoundEngineDevice::save_program(Program* program) {
+	program->metronome_bpm = metronome.get_bpm();
 }
 
 SoundEngineDevice::~SoundEngineDevice() {

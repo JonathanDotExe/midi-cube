@@ -88,6 +88,7 @@ void MidiCube::init(int out_device, int in_device) {
 }
 
 void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
+	mutex.lock();
 	//Changes
 	PropertyChange change;
 	while (changes.pop(change)) {
@@ -105,6 +106,7 @@ void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 	}
 	//Process
 	engine.process_sample(lsample, rsample, info);
+	mutex.unlock();
 }
 
 std::vector<MidiCubeInput> MidiCube::get_inputs() {
@@ -186,12 +188,15 @@ MidiCube::~MidiCube() {
 }
 
 void MidiCube::save_program(Program *prog) {
-	//TODO
-	std::cout << "Saving program: " << prog->name << std::endl;
+	mutex.lock();
+
+	mutex.unlock();
+	std::cout << "Saved program: " << prog->name << std::endl;
 }
 
 void MidiCube::apply_program(Program *prog) {
-	//TODO
-	//Make thread safe
+	mutex.lock();
+	engine.apply_program(prog);
+	mutex.unlock();
 	std::cout << "Selected program: " << prog->name << std::endl;
 }

@@ -321,9 +321,9 @@ public:
 
 	void update_properties();
 
-	void apply_program(std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS>& channels);
+	void apply_program(Program* program);
 
-	void save_program(std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS>& channels);
+	void save_program(Program* program);
 
 	~SoundEngineDevice();
 

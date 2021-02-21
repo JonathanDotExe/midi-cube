@@ -12,6 +12,7 @@
 #include "program.h"
 #include "soundengine/soundengine.h"
 #include "boost/lockfree/spsc_queue.hpp"
+#include <mutex>
 
 
 struct MidiCubeInput {
@@ -31,6 +32,9 @@ private:
 	boost::lockfree::spsc_queue<PropertyChange> changes;
 	boost::lockfree::spsc_queue<PropertyHolder*> update;
 	boost::lockfree::spsc_queue<MidiMessageWithInput> messages;
+	//Only for sync program changes
+	std::mutex mutex;
+
 	inline void process_midi(MidiMessage& message, size_t input);
 public:
 	ProgramManager prog_mgr;
