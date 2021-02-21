@@ -9,6 +9,7 @@
 #define MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_
 
 #include "../midi.h"
+#include "../program.h"
 #include "../envelope.h"
 #include "../audio.h"
 #include "../synthesis.h"
@@ -21,8 +22,6 @@
 #include <string>
 #include <array>
 #include <functional>
-
-#define SOUND_ENGINE_MIDI_CHANNELS 16
 
 class SoundEngineDevice;
 
@@ -321,6 +320,10 @@ public:
 	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
 
 	void update_properties();
+
+	void apply_program(std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS>& channels);
+
+	void save_program(std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS>& channels);
 
 	~SoundEngineDevice();
 

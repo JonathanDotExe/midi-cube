@@ -347,6 +347,14 @@ void SoundEngineDevice::update_properties() {
 	submit_change(SoundEngineProperty::pEngineVolume, volume);
 }
 
+void apply_program(std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS>& channels) {
+	//TODO
+}
+
+void save_program(std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS>& channels) {
+
+}
+
 SoundEngineDevice::~SoundEngineDevice() {
 	//Clear channels
 	for (size_t i = 0; i < channels.size(); ++i) {

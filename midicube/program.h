@@ -20,14 +20,27 @@
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "property.h"
+#include "midi.h"
 
 namespace pt = boost::property_tree;
 
 #define PROGRAM_NAME_LENGTH 20
 #define BANK_NAME_LENGTH 20
 
+struct ChannelProgram {
+
+};
+
 struct Program {
 	std::string name;
+	std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS> channels = {nullptr};
+
+	~Program() {
+		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+			delete channels[i];
+			channels[i] = nullptr;
+		}
+	}
 };
 
 struct Bank {
