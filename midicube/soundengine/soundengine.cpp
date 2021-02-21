@@ -362,6 +362,12 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ch.arp.on = prog.arp_on;
 		ch.arp.metronome.set_bpm(prog.arpeggiator_bpm);
 		ch.arp.preset = prog.arpeggiator;
+
+		//Engine
+		SoundEngine* engine = ch.get_engine(sound_engines, i);
+		if (engine) {
+			engine->apply_program(prog.engine_program);
+		}
 	}
 }
 
@@ -380,6 +386,12 @@ void SoundEngineDevice::save_program(Program* program) {
 		prog.arp_on = ch.arp.on;
 		prog.arpeggiator_bpm = ch.arp.metronome.get_bpm();
 		prog.arpeggiator = ch.arp.preset;
+
+		//Engine
+		SoundEngine* engine = ch.get_engine(sound_engines, i);
+		if (engine) {
+			engine->save_program(&prog.engine_program);
+		}
 	}
 }
 

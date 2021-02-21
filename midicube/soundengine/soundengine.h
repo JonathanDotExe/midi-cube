@@ -29,15 +29,8 @@ struct EngineStatus {
 	size_t latest_note_index;
 };
 
-class SoundEngineData {
-public:
-	virtual SoundEngineData* copy() {
-		return new SoundEngineData();
-	}
+struct EngineProgram {
 
-	virtual ~SoundEngineData() {
-
-	}
 };
 
 class SoundEngine {
@@ -50,6 +43,14 @@ public:
 	virtual void release_note(SampleInfo& info, unsigned int note) = 0;
 
 	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info) = 0;
+
+	virtual void apply_program(EngineProgram* prog) {
+
+	}
+
+	virtual void save_program(EngineProgram** prog) {
+
+	}
 
 	virtual ~SoundEngine() {
 
@@ -283,8 +284,8 @@ public:
 };
 
 struct ChannelProgram {
-	double volume{1};
 	bool active{false};
+	double volume{1};
 	double panning = 0;
 
 	ChannelSource source;
@@ -292,12 +293,14 @@ struct ChannelProgram {
 	unsigned int arpeggiator_bpm = 120;
 	bool arp_on;
 	ArpeggiatorPreset arpeggiator;
+
+	EngineProgram* engine_program = nullptr;
 };
 
 struct Program {
 	std::string name;
 	unsigned int metronome_bpm = 120;
-	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels;
+	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{true}};
 };
 
 enum SoundEngineProperty {
