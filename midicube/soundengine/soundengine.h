@@ -9,7 +9,6 @@
 #define MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_
 
 #include "../midi.h"
-#include "../program.h"
 #include "../envelope.h"
 #include "../audio.h"
 #include "../synthesis.h"
@@ -199,7 +198,7 @@ public:
 };
 
 struct ChannelSource {
-	ssize_t input = -1;
+	ssize_t input = 1;
 	unsigned int channel = 0;
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
@@ -281,6 +280,20 @@ public:
 
 	~SoundEngineChannel();
 
+};
+
+struct ChannelProgram {
+	double volume{1};
+	bool active{false};
+	double panning = 0;
+
+	ChannelSource source;
+};
+
+struct Program {
+	std::string name;
+	unsigned int metronome_bpm = 120;
+	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels;
 };
 
 enum SoundEngineProperty {

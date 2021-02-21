@@ -21,28 +21,12 @@
 
 #include "property.h"
 #include "midi.h"
+#include "soundengine/soundengine.h"
 
 namespace pt = boost::property_tree;
 
 #define PROGRAM_NAME_LENGTH 20
 #define BANK_NAME_LENGTH 20
-
-struct ChannelProgram {
-
-};
-
-struct Program {
-	std::string name;
-	unsigned int metronome_bpm = 120;
-	std::array<ChannelProgram*, SOUND_ENGINE_MIDI_CHANNELS> channels = {nullptr};
-
-	~Program() {
-		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-			delete channels[i];
-			channels[i] = nullptr;
-		}
-	}
-};
 
 struct Bank {
 	std::string name = "";

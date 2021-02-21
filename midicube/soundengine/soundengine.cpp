@@ -348,11 +348,31 @@ void SoundEngineDevice::update_properties() {
 }
 
 void SoundEngineDevice::apply_program(Program* program) {
+	//Global
 	metronome.set_bpm(program->metronome_bpm);
+	//Channels
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		ChannelProgram& prog = program->channels[i];
+		SoundEngineChannel& ch = channels[i];
+		ch.active = prog.active;
+		ch.volume = prog.volume;
+		ch.panning = prog.panning;
+		ch.source = prog.source;
+	}
 }
 
 void SoundEngineDevice::save_program(Program* program) {
+	//Global
 	program->metronome_bpm = metronome.get_bpm();
+	//Channels
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		ChannelProgram& prog = program->channels[i];
+		SoundEngineChannel& ch = channels[i];
+		prog.active = ch.active;
+		prog.volume = ch.volume;
+		prog.panning = ch.panning;
+		prog.source = ch.source;
+	}
 }
 
 SoundEngineDevice::~SoundEngineDevice() {
