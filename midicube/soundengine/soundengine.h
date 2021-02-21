@@ -288,6 +288,10 @@ struct ChannelProgram {
 	double panning = 0;
 
 	ChannelSource source;
+
+	unsigned int arpeggiator_bpm = 120;
+	bool arp_on;
+	ArpeggiatorPreset arpeggiator;
 };
 
 struct Program {

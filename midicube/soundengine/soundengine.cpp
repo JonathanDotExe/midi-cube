@@ -357,7 +357,11 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ch.active = prog.active;
 		ch.volume = prog.volume;
 		ch.panning = prog.panning;
+
 		ch.source = prog.source;
+		ch.arp.on = prog.arp_on;
+		ch.arp.metronome.set_bpm(prog.arpeggiator_bpm);
+		ch.arp.preset = prog.arpeggiator;
 	}
 }
 
@@ -371,7 +375,11 @@ void SoundEngineDevice::save_program(Program* program) {
 		prog.active = ch.active;
 		prog.volume = ch.volume;
 		prog.panning = ch.panning;
+
 		prog.source = ch.source;
+		prog.arp_on = ch.arp.on;
+		prog.arpeggiator_bpm = ch.arp.metronome.get_bpm();
+		prog.arpeggiator = ch.arp.preset;
 	}
 }
 
