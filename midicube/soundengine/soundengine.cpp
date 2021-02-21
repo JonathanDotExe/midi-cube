@@ -354,6 +354,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
+		ch.set_engine(prog.engine_index);
 		ch.active = prog.active;
 		ch.volume = prog.volume;
 		ch.panning = prog.panning;
@@ -378,6 +379,7 @@ void SoundEngineDevice::save_program(Program* program) {
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
+		prog.engine_index = ch.get_engine();
 		prog.active = ch.active;
 		prog.volume = ch.volume;
 		prog.panning = ch.panning;

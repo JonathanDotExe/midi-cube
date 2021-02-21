@@ -284,6 +284,7 @@ public:
 };
 
 struct ChannelProgram {
+	ssize_t engine_index{0};
 	bool active{false};
 	double volume{1};
 	double panning = 0;
@@ -300,7 +301,7 @@ struct ChannelProgram {
 struct Program {
 	std::string name;
 	unsigned int metronome_bpm = 120;
-	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{true}};
+	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{2, true}};
 };
 
 enum SoundEngineProperty {
