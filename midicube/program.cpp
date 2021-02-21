@@ -26,7 +26,7 @@ std::string bank_filename(std::string name) {
 
 Program* load_program(pt::ptree& tree) {
 	Program* program = new Program();
-	program->name = tree.get<std::string>("name");
+	program->name = tree.get<std::string>("name", "Init");
 	return program;
 }
 
@@ -83,11 +83,13 @@ ProgramManager::ProgramManager(std::string path) {
 }
 
 void ProgramManager::apply_program(size_t bank, size_t program) {
-	Program* prog = get_bank(bank)->programs.at(program);
+	Bank* b = get_bank(bank);
+	Program* prog = b->programs.at(program);
 	user->apply_program(prog);
 	curr_bank = bank;
 	curr_program = program;
 	program_name = prog->name;
+	bank_name = b->name;
 
 	//submit_change(ProgramManagerProperty::pProgramManagerBank, (int) curr_bank);
 	//submit_change(ProgramManagerProperty::pProgramManagerProgram, (int) curr_program);
@@ -123,12 +125,13 @@ void ProgramManager::save_new_bank() {
 	Bank* bank = new Bank();
 	bank->name = bank_name;
 	bank->filename = bank_filename(bank_name);
+	bank->programs.push_back(new Program{"Init"});
 	//TODO check if already exists
 	banks.push_back(bank);
 }
 
 void ProgramManager::overwrite_bank() {
-	Bank* bank = new Bank();
+	Bank* bank = get_bank(curr_bank);
 	bank->name = bank_name;
 	//Don't update filename
 }

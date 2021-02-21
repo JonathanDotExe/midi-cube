@@ -128,6 +128,36 @@ Scene ProgramView::create(Frame &frame) {
 		});
 		controls.push_back(del);
 
+		//Rename Bank
+		Button* rename = new Button("Rename", main_font, 18, frame.get_width() - 70 - 60 * 2 - 210, frame.get_height() - 40, 100, 40);
+		rename->set_on_click([&frame, prog_mgr]() {
+			prog_mgr->lock();
+			std::string name = prog_mgr->bank_name;
+			prog_mgr->unlock();
+			frame.change_view(new ProgramRenameView(name, [prog_mgr](std::string name) {
+				prog_mgr->lock();
+				prog_mgr->bank_name = name;
+				prog_mgr->overwrite_bank();
+				prog_mgr->unlock();
+			}));
+		});
+		controls.push_back(rename);
+
+		//New Bank
+		Button* new_bank = new Button("New Bank", main_font, 18, frame.get_width() - 70 - 60 * 2 - 105, frame.get_height() - 40, 100, 40);
+		new_bank->set_on_click([&frame, prog_mgr]() {
+			prog_mgr->lock();
+			std::string name = prog_mgr->bank_name;
+			prog_mgr->unlock();
+			frame.change_view(new ProgramRenameView(name, [prog_mgr](std::string name) {
+				prog_mgr->lock();
+				prog_mgr->bank_name = name;
+				prog_mgr->save_new_bank();
+				prog_mgr->unlock();
+			}));
+		});
+		controls.push_back(new_bank);
+
 		//Next page
 		Button* next_page = new Button(">", main_font, 18, frame.get_width() - 70 - 60 * 2, frame.get_height() - 40, 60, 40);
 		if (start + size < bank->programs.size()) {
