@@ -14,6 +14,9 @@
 const double TWO_POLE_FACTOR = 1.0/sqrt(pow(2, 1/2.0) - 1);
 const double FOUR_POLE_FACTOR = 1.0/sqrt(pow(2, 1/4.0) - 1);
 
+const double HIGHPASS_TWO_POLE_FACTOR = 1.0/sqrt(pow(2, 1/2.0) - 1);
+const double HIGHPASS_FOUR_POLE_FACTOR = 1.0/sqrt(pow(2, 1/4.0) - 1);
+
 /**
  * To convert frequency into filter cutoff use time_step/(rc+time_step)
  */
@@ -22,13 +25,28 @@ const double FOUR_POLE_FACTOR = 1.0/sqrt(pow(2, 1/4.0) - 1);
 double Filter::apply (FilterData& data, double sample, double time_step) {
 	//Cutoff pole factor
 	double factor = 1;
-	if (data.type % 2 == 0) {
+	double cutoff = 0;
+	switch (data.type) {
+	case FilterType::LP_12:
+	case FilterType::BP_12:
 		factor = TWO_POLE_FACTOR;
-	}
-	else {
+		cutoff = cutoff_to_factor(data.cutoff * factor, time_step);
+		break;
+	case FilterType::LP_24:
+	case FilterType::BP_24:
 		factor = FOUR_POLE_FACTOR;
+		cutoff = cutoff_to_factor(data.cutoff * factor, time_step);
+		break;
+	case FilterType::HP_12:
+		factor = HIGHPASS_TWO_POLE_FACTOR;
+		cutoff = cutoff_to_highpass_factor(data.cutoff * factor, time_step);
+		break;
+	case FilterType::HP_24:
+		factor = HIGHPASS_TWO_POLE_FACTOR;
+		cutoff = cutoff_to_highpass_factor(data.cutoff * factor, time_step);
+		break;
 	}
-	double cutoff = cutoff_to_factor(data.cutoff * factor, time_step);
+
 	double feedback = data.resonance + data.resonance/(1 - cutoff);
 	//Update buffers
 	switch (data.type) {

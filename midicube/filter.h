@@ -29,8 +29,16 @@ inline double rc_to_cutoff_factor(double rc, double time_step) {
 	return time_step/(rc+time_step);
 }
 
+inline double rc_to_highpass_cutoff_factor(double rc, double time_step) {
+	return rc/(rc+time_step);
+}
+
 inline double cutoff_to_factor(double cutoff, double time_step) {
 	return rc_to_cutoff_factor(cutoff_to_rc(cutoff), time_step);
+}
+
+inline double cutoff_to_highpass_factor(double cutoff, double time_step) {
+	return rc_to_highpass_cutoff_factor(cutoff_to_rc(cutoff), time_step);
 }
 
 inline double factor_to_cutoff(double cutoff, double time_step) {
