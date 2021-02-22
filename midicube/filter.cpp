@@ -71,9 +71,10 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 			factor = FOUR_POLE_FACTOR;
 		}
 		double cutoff = cutoff_to_highpass_factor(data.cutoff * factor, time_step);
-		double feedback = data.resonance + data.resonance/(1 - cutoff);
+		double feedback = data.resonance + data.resonance/(cutoff);
 		//High pass poles
-		pole1 = cutoff * (sample - last_pole1 + pole1 + feedback * (pole1 - pole2));
+		sample +=  feedback * (pole1 - pole2);
+		pole1 = cutoff * (sample - last_pole1 + pole1);
 		pole2 = cutoff * (pole1 - last_pole2 + pole2);
 		pole3 = cutoff * (pole2 - last_pole3 + pole3);
 		pole4 = cutoff * (pole3 - last_pole4 + pole4);
