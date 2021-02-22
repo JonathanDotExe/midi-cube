@@ -30,7 +30,7 @@ void VocoderEffect::apply(double& lsample, double& rsample, double modulator, Vo
 			modulator_mix = preset.voice_amp/total_mix;
 		}
 		//Gate
-		modulator *= preset.mod_pre_amp;
+		modulator *= preset.modulator_amplification;
 		modulator_env.apply(modulator, info.time_step);
 		if (modulator_env.volume() < preset.gate) {
 			modulator = 0;
@@ -65,8 +65,8 @@ void VocoderEffect::apply(double& lsample, double& rsample, double modulator, Vo
 				double vol = band.env.volume();
 
 				//Vocode carrier
-				lvocoded += lf * vol;
-				rvocoded += rf * vol;
+				lvocoded += lf * vol * preset.vocoder_amplification;
+				rvocoded += rf * vol * preset.vocoder_amplification;
 			}
 		}
 		//Highpass
