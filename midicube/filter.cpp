@@ -31,10 +31,30 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 	double cutoff = cutoff_to_factor(data.cutoff * factor, time_step);
 	double feedback = data.resonance + data.resonance/(1 - cutoff);
 	//Update buffers
-	pole1 += cutoff * (sample - pole1 + feedback * (pole1 - pole2));
-	pole2 += cutoff * (pole1 - pole2);
-	pole3 += cutoff * (pole2 - pole3);
-	pole4 += cutoff * (pole3 - pole4);
+	switch (data.type) {
+	case FilterType::LP_12:
+	case FilterType::LP_24:
+	case FilterType::BP_12:
+	case FilterType::BP_24:
+		//Low-pass poles
+		pole1 += cutoff * (sample - pole1 + feedback * (pole1 - pole2));
+		pole2 += cutoff * (pole1 - pole2);
+		pole3 += cutoff * (pole2 - pole3);
+		pole4 += cutoff * (pole3 - pole4);
+		break;
+	case FilterType::HP_12:
+	case FilterType::HP_24:
+		//High pass poles
+		pole1 = cutoff * (sample - last_pole1 + pole1 + feedback * (pole1 - pole2));
+		pole2 = cutoff * (pole1 - last_pole2 + pole2);
+		pole3 = cutoff * (pole2 - last_pole3 + pole3);
+		pole4 = cutoff * (pole3 - last_pole4 + pole4);
+
+		last_pole1 = pole1;
+		last_pole2 = pole2;
+		last_pole3 = pole3;
+		last_pole4 = pole4;
+	}
 	switch (data.type) {
 	case FilterType::LP_12:
 		return pole2;
