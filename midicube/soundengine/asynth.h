@@ -46,8 +46,6 @@ struct FrequencyModulatotion {
 };
 
 struct OscilatorEntity {
-	bool audible = true;
-	ADSREnvelopeData env{0.0, 0, 1, 0.0};
 	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN_WAVE;
 	bool analog = true;
 	bool sync = false;
@@ -55,14 +53,22 @@ struct OscilatorEntity {
 	bool randomize = false;
 
 	size_t unison_amount = 0;
-	PropertyModulation volume = {1};
+	PropertyModulation volume = {0.0};
 	PropertyModulation sync_mul = {0.0};
 	PropertyModulation pulse_width = {1};
 	PropertyModulation unison_detune = {0.1};
-	PropertyModulation panning = {0.5};
 	int semi = 0;
 	double transpose = 1;
 	PropertyModulation pitch = {0.5};
+
+	size_t operator_index = 0;
+};
+
+struct OperatorEntity {
+	bool audible = true;
+	ADSREnvelopeData env{0.0, 0, 1, 0.0};
+	PropertyModulation volume = {1};
+	PropertyModulation panning = {0.5};
 
 	bool filter = false;
 	FilterType filter_type = FilterType::LP_12;
@@ -89,6 +95,7 @@ struct AnalogSynthPreset {
 	std::array<LFOEntity, ANALOG_PART_COUNT> lfos;
 	std::array<ModEnvelopeEntity, ANALOG_PART_COUNT> mod_envs;
 	std::array<OscilatorEntity, ANALOG_PART_COUNT> oscilators;
+	std::array<OperatorEntity, ANALOG_PART_COUNT> operators;
 
 	size_t lfo_count = 1;
 	size_t mod_env_count = 0;
