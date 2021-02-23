@@ -53,9 +53,9 @@ struct OscilatorEntity {
 	bool randomize = false;
 
 	size_t unison_amount = 0;
-	PropertyModulation volume = {0.0};
+	PropertyModulation volume = {1};
 	PropertyModulation sync_mul = {0.0};
-	PropertyModulation pulse_width = {1};
+	PropertyModulation pulse_width = {1.0};
 	PropertyModulation unison_detune = {0.1};
 	int semi = 0;
 	double transpose = 1;
@@ -96,9 +96,9 @@ struct AnalogSynthPreset {
 	std::array<OscilatorEntity, ANALOG_PART_COUNT> oscilators;
 	std::array<OperatorEntity, ANALOG_PART_COUNT> operators;
 
-	size_t lfo_count = 1;
+	size_t lfo_count = 0;
 	size_t mod_env_count = 0;
-	size_t op_count = 0;
+	size_t op_count = 1;
 
 	bool mono = false;
 	bool legato = false;
@@ -137,7 +137,7 @@ enum SynthModulationProperty {
 };
 
 enum SynthPartProperty {
-	pSynthOscAudible,
+	pSynthOpAudible,
 	pSynthOscWaveForm,
 	pSynthOscAnalog,
 	pSynthOscSync,

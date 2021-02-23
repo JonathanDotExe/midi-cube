@@ -399,7 +399,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 	for (size_t j = 0; j < preset.op_count; ++j) {
 		OperatorEntity& op = preset.operators[j];
 		AnalogSynthPart& op_part = note.parts[j];
-		const size_t max = std::max(i + op.oscilator_count, (size_t) ANALOG_PART_COUNT);
+		const size_t max = std::min(i + op.oscilator_count, (size_t) ANALOG_PART_COUNT);
 		//Reset amp
 		if (reset_amps) {
 			op_part.amp_env.reset();
@@ -740,7 +740,7 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	ModEnvelopeEntity &env = preset->mod_envs[this->part];
 	LFOEntity &lfo = preset->lfos[this->part];
 	switch ((SynthPartProperty) prop) {
-	case SynthPartProperty::pSynthOscAudible:
+	case SynthPartProperty::pSynthOpAudible:
 		val.bval = op.audible;
 		break;
 	case SynthPartProperty::pSynthOpAttack:
@@ -864,7 +864,7 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val,
 	ModEnvelopeEntity &env = preset->mod_envs[this->part];
 	LFOEntity &lfo = preset->lfos[this->part];
 	switch ((SynthPartProperty) prop) {
-	case SynthPartProperty::pSynthOscAudible:
+	case SynthPartProperty::pSynthOpAudible:
 		op.audible = val.bval;
 		break;
 	case SynthPartProperty::pSynthOpAttack:
@@ -991,7 +991,7 @@ void SynthPartPropertyHolder::update_properties() {
 	ModEnvelopeEntity &env = preset->mod_envs[this->part];
 	LFOEntity &lfo = preset->lfos[this->part];
 
-	PropertyHolder::submit_change(SynthPartProperty::pSynthOscAudible,
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpAudible,
 			op.audible);
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOpAttack,
 			op.env.attack);

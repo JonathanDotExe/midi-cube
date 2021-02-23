@@ -68,7 +68,7 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 		}
 		//Audible
 		CheckBox* audible = new CheckBox(false, "", main_font, 16, tmp_x + ANALOG_PART_COUNT * 85 + 35, y, 40, 40);
-		audible->bind(&part, SynthPartProperty::pSynthOscAudible);
+		audible->bind(&part, SynthPartProperty::pSynthOpAudible);
 		controls.push_back(audible);
 
 		//Edit

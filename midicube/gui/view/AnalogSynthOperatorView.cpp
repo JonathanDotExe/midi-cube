@@ -47,7 +47,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 	//Col 1
 	{
 		CheckBox* audible = new CheckBox(false, "Audible", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
-		audible->bind(part, SynthPartProperty::pSynthOscAudible);
+		audible->bind(part, SynthPartProperty::pSynthOpAudible);
 		controls.push_back(audible);
 	}
 

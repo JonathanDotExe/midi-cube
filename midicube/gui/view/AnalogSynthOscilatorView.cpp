@@ -209,9 +209,6 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		controls.push_back(audible);
 		tmp_y += 50;
 	}
-	//ADSR
-	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOpAttack);
-	tmp_y += 75;
 	//Volume
 	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscVolume, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
