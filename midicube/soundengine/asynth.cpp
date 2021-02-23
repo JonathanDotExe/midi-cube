@@ -776,6 +776,12 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	case SynthPartProperty::pSynthOscVolume:
 		val = get_mod_prop(osc.volume, (SynthModulationProperty) sub_prop);
 		break;
+	case SynthPartProperty::pSynthOpVolume:
+		val = get_mod_prop(op.volume, (SynthModulationProperty) sub_prop);
+		break;
+	case SynthPartProperty::pSynthOpOscCount:
+		val.ival = op.oscilator_count;
+		break;
 	case SynthPartProperty::pSynthOscSyncMul:
 		val = get_mod_prop(osc.sync_mul, (SynthModulationProperty) sub_prop);
 		break;
@@ -894,6 +900,12 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val,
 	case SynthPartProperty::pSynthOscVolume:
 		set_mod_prop(osc.volume, (SynthModulationProperty) sub_prop, val);
 		break;
+	case SynthPartProperty::pSynthOpVolume:
+		set_mod_prop(op.volume, (SynthModulationProperty) sub_prop, val);
+		break;
+	case SynthPartProperty::pSynthOpOscCount:
+		op.oscilator_count = val.ival;
+		break;
 	case SynthPartProperty::pSynthOscSyncMul:
 		set_mod_prop(osc.sync_mul, (SynthModulationProperty) sub_prop, val);
 		break;
@@ -1001,6 +1013,8 @@ void SynthPartPropertyHolder::update_properties() {
 			(int) osc.unison_amount);
 
 	submit_change(SynthPartProperty::pSynthOscVolume, osc.volume);
+	submit_change(SynthPartProperty::pSynthOpVolume, op.volume);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpOscCount, (int) op.oscilator_count);
 	submit_change(SynthPartProperty::pSynthOscSyncMul, osc.sync_mul);
 	submit_change(SynthPartProperty::pSynthOscPulseWidth, osc.pulse_width);
 	submit_change(SynthPartProperty::pSynthOscUnisonDetune, osc.unison_detune);

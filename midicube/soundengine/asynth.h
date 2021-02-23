@@ -154,6 +154,8 @@ enum SynthPartProperty {
 	pSynthOscTranspose,
 	pSynthOscPitch,
 
+	pSynthOpVolume,
+	pSynthOpOscCount,
 	pSynthOpAttack,
 	pSynthOpDecay,
 	pSynthOpSustain,
