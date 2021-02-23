@@ -9,6 +9,7 @@
 #include "resources.h"
 #include "SoundEngineChannelView.h"
 #include "AnalogSynthOscilatorView.h"
+#include "AnalogSynthOperatorView.h"
 #include "AnalogSynthModulatorView.h"
 #include "AnalogSynthFMView.h"
 
@@ -53,8 +54,15 @@ Scene AnalogSynthView::create(Frame &frame) {
 			frame.change_view(new AnalogSynthOscilatorView(synth, channel, channel_index, i));
 		});
 		controls.push_back(osc);
+		//Operator
+		Button* op = new Button("Operator", main_font, 14, x + 5, y + 70,  pane_width - 15, 30);
+		op->rect.setFillColor(sf::Color(0, 180, 255));
+		op->set_on_click([&frame, this, i]{
+			frame.change_view(new AnalogSynthOperatorView(synth, channel, channel_index, i));
+		});
+		controls.push_back(op);
 		//Modulators
-		Button* mod = new Button("Modulation", main_font, 14, x + 5, y + 70,  pane_width - 15, 30);
+		Button* mod = new Button("Modulation", main_font, 14, x + 5, y + 110,  pane_width - 15, 30);
 		mod->rect.setFillColor(sf::Color(0, 180, 255));
 		mod->set_on_click([&frame, this, i]{
 			frame.change_view(new AnalogSynthModulatorView(synth, channel, channel_index, i));
@@ -65,9 +73,9 @@ Scene AnalogSynthView::create(Frame &frame) {
 	//Part counts
 	int tmp_x = 10;
 	int tmp_y = pane_height + 20;
-	//Oscilators
+	//Operators
 	{
-		Label* title = new Label("Osc Count", main_font, 12, tmp_x, tmp_y);
+		Label* title = new Label("Operator Count", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
