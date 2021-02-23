@@ -405,7 +405,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 			op_part.amp_env.reset();
 		}
 		//FM
-		double fm = op_part.fm;
+		double fm = op_part.fm * PI2;
 		op_part.fm = 0;
 		bool modulates = false;
 		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {

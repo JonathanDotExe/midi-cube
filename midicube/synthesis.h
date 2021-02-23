@@ -38,7 +38,7 @@ inline extern double sine_wave(double phase) {
 }
 
 inline extern double integrated_sine_wave(double phase) {
-	return -cos(PI2 * phase);
+	return -cos(PI2 * phase)/PI2;
 }
 
 
