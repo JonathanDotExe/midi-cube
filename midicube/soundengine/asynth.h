@@ -60,8 +60,6 @@ struct OscilatorEntity {
 	int semi = 0;
 	double transpose = 1;
 	PropertyModulation pitch = {0.5};
-
-	size_t operator_index = 0;
 };
 
 struct OperatorEntity {
@@ -77,6 +75,7 @@ struct OperatorEntity {
 	double filter_kb_track = 0;
 	unsigned int filter_kb_track_note = 36;
 
+	unsigned int oscilator_count = 1;
 	std::array<double, ANALOG_PART_COUNT> fm;
 };
 
@@ -99,7 +98,7 @@ struct AnalogSynthPreset {
 
 	size_t lfo_count = 1;
 	size_t mod_env_count = 0;
-	size_t osc_count = 0;
+	size_t op_count = 0;
 
 	bool mono = false;
 	bool legato = false;

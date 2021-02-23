@@ -12,6 +12,7 @@
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
 void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
+	/*
 	switch (type) {
 	case SQUASHY_BASS: {
 		ModEnvelopeEntity &mod_env = preset.mod_envs.at(0);
@@ -356,7 +357,7 @@ void apply_preset(SynthFactoryPreset type, AnalogSynthPreset &preset) {
 		preset.osc_count = 4;
 	}
 		break;
-	}
+	}*/
 }
 
 AnalogSynth::AnalogSynth() {
@@ -394,90 +395,107 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		env_val[i] = note.parts[i].mod_env.amplitude(mod_env.env, info.time_step, note.pressed, env.sustain)* volume;
 	}
 	//Synthesize
-	for (size_t i = 0; i < preset.osc_count; ++i) {
-		AnalogSynthPart& part = note.parts[i];
-		OscilatorEntity &osc = preset.oscilators[i];
-		//Frequency
-		double freq = note.freq;
-		//FM
-		freq += part.fm;
-		part.fm = 0;
-		double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val,
-				lfo_mod, controls, note.velocity);
-		if (osc.semi || pitch) {
-			freq = note_to_freq(note.note + osc.semi + pitch);
-		}
-		freq *= env.pitch_bend * osc.transpose;
-
-		AnalogOscilatorData data = { osc.waveform, osc.analog, osc.sync };
-		AnalogOscilatorBankData bdata = { 0.1, osc.unison_amount };
-		//Only on note start
+	size_t i = 0;
+	for (size_t j = 0; j < preset.op_count; ++j) {
+		OperatorEntity& op = preset.operators[j];
+		AnalogSynthPart& op_part = note.parts[j];
+		const size_t max = std::max(i + op.oscilator_count, (size_t) ANALOG_PART_COUNT);
+		//Reset amp
 		if (reset_amps) {
-			part.amp_env.reset();
-			if (osc.reset) {
-				part.oscilator.reset();
-			} else if (osc.randomize) {
-				part.oscilator.randomize();
-			}
+			op_part.amp_env.reset();
 		}
-
-		//Apply modulation
-		double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val,
-				lfo_val, controls, note.velocity)
-				* part.amp_env.amplitude(osc.env, info.time_step,
-						note.pressed, env.sustain);
-		data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val,
-				lfo_val, controls, note.velocity);
-		data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width,
-				env_val, lfo_val, controls, note.velocity);
-		bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE,
-				osc.unison_detune, env_val, lfo_val, controls, note.velocity);
-
-		//Signal
+		//FM
+		double fm = op_part.fm;
+		op_part.fm = 0;
 		bool modulates = false;
 		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
-			if (osc.fm[j]) {
+			if (op.fm[j]) {
 				modulates = true;
 				break;
 			}
 		}
-		AnalogOscilatorSignal sig = part.oscilator.signal(freq, info.time_step, data, bdata, osc.audible, modulates);
-		double signal = sig.carrier;
+		//Oscilators
+		double carrier = 0;
+		double modulator = 0;
+		for (; i < max; ++i) {
+			AnalogSynthPart& part = note.parts[i];
+			OscilatorEntity &osc = preset.oscilators[i];
+			//Frequency
+			double freq = note.freq;
+			//FM
+			freq += fm;
+			double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val,
+					lfo_mod, controls, note.velocity);
+			if (osc.semi || pitch) {
+				freq = note_to_freq(note.note + osc.semi + pitch);
+			}
+			freq *= env.pitch_bend * osc.transpose;
+
+			AnalogOscilatorData data = { osc.waveform, osc.analog, osc.sync };
+			AnalogOscilatorBankData bdata = { 0.1, osc.unison_amount };
+			//Only on note start
+			if (reset_amps) {
+				if (osc.reset) {
+					part.oscilator.reset();
+				} else if (osc.randomize) {
+					part.oscilator.randomize();
+				}
+			}
+
+			//Apply modulation
+			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val,
+				lfo_val, controls, note.velocity);
+			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val,
+					lfo_val, controls, note.velocity);
+			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width,
+					env_val, lfo_val, controls, note.velocity);
+			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE,
+					osc.unison_detune, env_val, lfo_val, controls, note.velocity);
+
+			AnalogOscilatorSignal sig = part.oscilator.signal(freq, info.time_step, data, bdata, op.audible, modulates);
+			carrier += sig.carrier * volume;
+			modulator += sig.modulator * volume;
+		}
+		//Post processing
+		//Volume
+		double volume = apply_modulation(VOLUME_SCALE, op.volume, env_val,
+						lfo_val, controls, note.velocity) * op_part.amp_env.amplitude(op.env, info.time_step,
+						note.pressed, env.sustain);
 		//Frequency modulate others
 		if (modulates) {
-			double modulator = sig.modulator * volume;
-			for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
-				note.parts[j].fm += modulator * osc.fm[j];
+			modulator *= volume;
+			for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+				note.parts[i].fm += modulator * op.fm[i];
 			}
 		}
-
-		if (osc.audible) {
+		//Playback
+		if (op.audible) {
 			//Filter
-			if (osc.filter) {
-				FilterData filter { osc.filter_type };
+			if (op.filter) {
+				FilterData filter { op.filter_type };
 				filter.cutoff = scale_cutoff(apply_modulation(FILTER_CUTOFF_SCALE,
-						osc.filter_cutoff, env_val, lfo_val, controls,
+						op.filter_cutoff, env_val, lfo_val, controls,
 						note.velocity)); //TODO optimize
 				filter.resonance = apply_modulation(FILTER_RESONANCE_SCALE,
-						osc.filter_resonance, env_val, lfo_val, controls,
+						op.filter_resonance, env_val, lfo_val, controls,
 						note.velocity);
 
-				if (osc.filter_kb_track) {
+				if (op.filter_kb_track) {
 					double cutoff = filter.cutoff;
 					//KB track
-					cutoff *= 1 + ((double) note.note - 36) / 12.0 * osc.filter_kb_track;
+					cutoff *= 1 + ((double) note.note - 36) / 12.0 * op.filter_kb_track;
 					filter.cutoff = cutoff;
 				}
 
-				signal = part.filter.apply(filter, signal, info.time_step);
+				carrier = op_part.filter.apply(filter, carrier, info.time_step);
 			}
-			signal *= volume;
+			carrier *= volume;
 			//Pan
-			double panning = apply_modulation(PANNING_SCALE, osc.panning,
+			double panning = apply_modulation(PANNING_SCALE, op.panning,
 					env_val, lfo_val, controls, note.velocity);
 			//Playback
-			lsample += signal * (1 - fmax(0, panning));
-			rsample += signal * (1 - fmax(0, -panning));
+			lsample += carrier * (1 - fmax(0, panning));
+			rsample += carrier * (1 - fmax(0, -panning));
 		}
 	}
 }
@@ -503,7 +521,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 					//Mod env
 					voice.parts[i].mod_env.phase = ATTACK;
 				}
-				for (size_t i = 0; i < preset.osc_count; ++i) {
+				for (size_t i = 0; i < preset.op_count; ++i) {
 					//Amp env
 					voice.parts[i].mod_env.phase = ATTACK;
 				}
@@ -571,7 +589,7 @@ bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,
 		KeyboardEnvironment &env, size_t note_index) {
 	bool finished = true;
-	for (size_t i = 0; i < preset.osc_count && finished; ++i) {
+	for (size_t i = 0; i < preset.op_count && finished; ++i) {
 		finished = note.parts[i].amp_env.is_finished();
 	}
 	return finished;
@@ -580,7 +598,7 @@ bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,
 void AnalogSynth::set(size_t prop, PropertyValue value, size_t sub_prop) {
 	switch ((SynthProperty) prop) {
 	case SynthProperty::pSynthOscCount:
-		preset.osc_count = value.ival;
+		preset.op_count = value.ival;
 		break;
 	case SynthProperty::pSynthModEnvCount:
 		preset.mod_env_count = value.ival;
@@ -613,7 +631,7 @@ PropertyValue AnalogSynth::get(size_t prop, size_t sub_prop) {
 	PropertyValue value;
 	switch ((SynthProperty) prop) {
 	case SynthProperty::pSynthOscCount:
-		value.ival = preset.osc_count;
+		value.ival = preset.op_count;
 		break;
 	case SynthProperty::pSynthModEnvCount:
 		value.ival = preset.mod_env_count;
@@ -1023,7 +1041,7 @@ void SynthPartPropertyHolder::update_properties() {
 }
 
 void AnalogSynth::update_properties() {
-	submit_change(SynthProperty::pSynthOscCount, (int) preset.osc_count);
+	submit_change(SynthProperty::pSynthOscCount, (int) preset.op_count);
 	submit_change(SynthProperty::pSynthModEnvCount, (int) preset.mod_env_count);
 	submit_change(SynthProperty::pSynthLFOCount, (int) preset.lfo_count);
 	submit_change(SynthProperty::pSynthMono, preset.mono);
