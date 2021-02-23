@@ -597,7 +597,7 @@ bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,
 
 void AnalogSynth::set(size_t prop, PropertyValue value, size_t sub_prop) {
 	switch ((SynthProperty) prop) {
-	case SynthProperty::pSynthOscCount:
+	case SynthProperty::pSynthOpCount:
 		preset.op_count = value.ival;
 		break;
 	case SynthProperty::pSynthModEnvCount:
@@ -630,7 +630,7 @@ void AnalogSynth::set(size_t prop, PropertyValue value, size_t sub_prop) {
 PropertyValue AnalogSynth::get(size_t prop, size_t sub_prop) {
 	PropertyValue value;
 	switch ((SynthProperty) prop) {
-	case SynthProperty::pSynthOscCount:
+	case SynthProperty::pSynthOpCount:
 		value.ival = preset.op_count;
 		break;
 	case SynthProperty::pSynthModEnvCount:
@@ -743,16 +743,16 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	case SynthPartProperty::pSynthOscAudible:
 		val.bval = op.audible;
 		break;
-	case SynthPartProperty::pSynthOscAttack:
+	case SynthPartProperty::pSynthOpAttack:
 		val.dval = op.env.attack;
 		break;
-	case SynthPartProperty::pSynthOscDecay:
+	case SynthPartProperty::pSynthOpDecay:
 		val.dval = op.env.decay;
 		break;
-	case SynthPartProperty::pSynthOscSustain:
+	case SynthPartProperty::pSynthOpSustain:
 		val.dval = op.env.sustain;
 		break;
-	case SynthPartProperty::pSynthOscRelease:
+	case SynthPartProperty::pSynthOpRelease:
 		val.dval = op.env.release;
 		break;
 	case SynthPartProperty::pSynthOscWaveForm:
@@ -786,7 +786,7 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 		val = get_mod_prop(osc.unison_detune,
 				(SynthModulationProperty) sub_prop);
 		break;
-	case SynthPartProperty::pSynthOscPanning:
+	case SynthPartProperty::pSynthOpPanning:
 		val = get_mod_prop(op.panning, (SynthModulationProperty) sub_prop);
 		break;
 	case SynthPartProperty::pSynthOscSemi:
@@ -798,27 +798,27 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	case SynthPartProperty::pSynthOscPitch:
 		val = get_mod_prop(osc.pitch, (SynthModulationProperty) sub_prop);
 		break;
-	case SynthPartProperty::pSynthOscFM:
+	case SynthPartProperty::pSynthOpFM:
 		val.dval = op.fm[sub_prop];
 		break;
-	case SynthPartProperty::pSynthOscFilter:
+	case SynthPartProperty::pSynthOpFilter:
 		val.bval = op.filter;
 		break;
-	case SynthPartProperty::pSynthOscFilterType:
+	case SynthPartProperty::pSynthOpFilterType:
 		val.ival = op.filter_type;
 		break;
-	case SynthPartProperty::pSynthOscFilterCutoff:
+	case SynthPartProperty::pSynthOpFilterCutoff:
 		val = get_mod_prop(op.filter_cutoff,
 				(SynthModulationProperty) sub_prop);
 		break;
-	case SynthPartProperty::pSynthOscFilterResonance:
+	case SynthPartProperty::pSynthOpFilterResonance:
 		val = get_mod_prop(op.filter_resonance,
 				(SynthModulationProperty) sub_prop);
 		break;
-	case SynthPartProperty::pSynthOscFilterKBTrack:
+	case SynthPartProperty::pSynthOpFilterKBTrack:
 		val.dval = op.filter_kb_track;
 		break;
-	case SynthPartProperty::pSynthOscFilterKBTrackNote:
+	case SynthPartProperty::pSynthOpFilterKBTrackNote:
 		val.ival = op.filter_kb_track_note;
 		break;
 
@@ -861,16 +861,16 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val,
 	case SynthPartProperty::pSynthOscAudible:
 		op.audible = val.bval;
 		break;
-	case SynthPartProperty::pSynthOscAttack:
+	case SynthPartProperty::pSynthOpAttack:
 		op.env.attack = val.dval;
 		break;
-	case SynthPartProperty::pSynthOscDecay:
+	case SynthPartProperty::pSynthOpDecay:
 		op.env.decay = val.dval;
 		break;
-	case SynthPartProperty::pSynthOscSustain:
+	case SynthPartProperty::pSynthOpSustain:
 		op.env.sustain = val.dval;
 		break;
-	case SynthPartProperty::pSynthOscRelease:
+	case SynthPartProperty::pSynthOpRelease:
 		op.env.release = val.dval;
 		break;
 	case SynthPartProperty::pSynthOscWaveForm:
@@ -904,7 +904,7 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val,
 		set_mod_prop(osc.unison_detune, (SynthModulationProperty) sub_prop,
 				val);
 		break;
-	case SynthPartProperty::pSynthOscPanning:
+	case SynthPartProperty::pSynthOpPanning:
 		set_mod_prop(op.panning, (SynthModulationProperty) sub_prop, val);
 		break;
 	case SynthPartProperty::pSynthOscSemi:
@@ -916,27 +916,27 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val,
 	case SynthPartProperty::pSynthOscPitch:
 		set_mod_prop(osc.pitch, (SynthModulationProperty) sub_prop, val);
 		break;
-	case SynthPartProperty::pSynthOscFM:
+	case SynthPartProperty::pSynthOpFM:
 		op.fm[sub_prop] = val.dval;
 		break;
-	case SynthPartProperty::pSynthOscFilter:
+	case SynthPartProperty::pSynthOpFilter:
 		op.filter = val.bval;
 		break;
-	case SynthPartProperty::pSynthOscFilterType:
+	case SynthPartProperty::pSynthOpFilterType:
 		op.filter_type = (FilterType) val.ival;
 		break;
-	case SynthPartProperty::pSynthOscFilterCutoff:
+	case SynthPartProperty::pSynthOpFilterCutoff:
 		set_mod_prop(op.filter_cutoff, (SynthModulationProperty) sub_prop,
 				val);
 		break;
-	case SynthPartProperty::pSynthOscFilterResonance:
+	case SynthPartProperty::pSynthOpFilterResonance:
 		set_mod_prop(op.filter_resonance, (SynthModulationProperty) sub_prop,
 				val);
 		break;
-	case SynthPartProperty::pSynthOscFilterKBTrack:
+	case SynthPartProperty::pSynthOpFilterKBTrack:
 		op.filter_kb_track = val.dval;
 		break;
-	case SynthPartProperty::pSynthOscFilterKBTrackNote:
+	case SynthPartProperty::pSynthOpFilterKBTrackNote:
 		op.filter_kb_track_note = val.ival;
 		break;
 
@@ -981,13 +981,13 @@ void SynthPartPropertyHolder::update_properties() {
 
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOscAudible,
 			op.audible);
-	PropertyHolder::submit_change(SynthPartProperty::pSynthOscAttack,
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpAttack,
 			op.env.attack);
-	PropertyHolder::submit_change(SynthPartProperty::pSynthOscDecay,
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpDecay,
 			op.env.decay);
-	PropertyHolder::submit_change(SynthPartProperty::pSynthOscSustain,
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpSustain,
 			op.env.sustain);
-	PropertyHolder::submit_change(SynthPartProperty::pSynthOscRelease,
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpRelease,
 			op.env.release);
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOscWaveForm,
 			osc.waveform);
@@ -1004,26 +1004,26 @@ void SynthPartPropertyHolder::update_properties() {
 	submit_change(SynthPartProperty::pSynthOscSyncMul, osc.sync_mul);
 	submit_change(SynthPartProperty::pSynthOscPulseWidth, osc.pulse_width);
 	submit_change(SynthPartProperty::pSynthOscUnisonDetune, osc.unison_detune);
-	submit_change(SynthPartProperty::pSynthOscPanning, op.panning);
+	submit_change(SynthPartProperty::pSynthOpPanning, op.panning);
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOscSemi, osc.semi);
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOscTranspose,
 			osc.transpose);
 	submit_change(SynthPartProperty::pSynthOscPitch, osc.pitch);
 
 	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
-		PropertyHolder::submit_change(SynthPartProperty::pSynthOscFM, op.fm[i], i);
+		PropertyHolder::submit_change(SynthPartProperty::pSynthOpFM, op.fm[i], i);
 	}
 
-	PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilter,
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpFilter,
 			op.filter);
-	PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterType,
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpFilterType,
 			op.filter_type);
-	submit_change(SynthPartProperty::pSynthOscFilterCutoff, op.filter_cutoff);
-	submit_change(SynthPartProperty::pSynthOscFilterResonance,
+	submit_change(SynthPartProperty::pSynthOpFilterCutoff, op.filter_cutoff);
+	submit_change(SynthPartProperty::pSynthOpFilterResonance,
 			op.filter_resonance);
-	PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterKBTrack,
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpFilterKBTrack,
 			op.filter_kb_track);
-	PropertyHolder::submit_change(SynthPartProperty::pSynthOscFilterKBTrackNote,
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpFilterKBTrackNote,
 			(int) op.filter_kb_track_note);
 
 	PropertyHolder::submit_change(SynthPartProperty::pSynthEnvAttack,
@@ -1044,7 +1044,7 @@ void SynthPartPropertyHolder::update_properties() {
 }
 
 void AnalogSynth::update_properties() {
-	submit_change(SynthProperty::pSynthOscCount, (int) preset.op_count);
+	submit_change(SynthProperty::pSynthOpCount, (int) preset.op_count);
 	submit_change(SynthProperty::pSynthModEnvCount, (int) preset.mod_env_count);
 	submit_change(SynthProperty::pSynthLFOCount, (int) preset.lfo_count);
 	submit_change(SynthProperty::pSynthMono, preset.mono);

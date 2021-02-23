@@ -71,7 +71,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(&synth, SynthProperty::pSynthOscCount);
+		value->bind(&synth, SynthProperty::pSynthOpCount);
 		controls.push_back(value);
 	}
 	tmp_x += 90;

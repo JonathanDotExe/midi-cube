@@ -59,7 +59,7 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
 			int x = tmp_x + j * 85 + 35;
 			DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y, 80, 40);
-			value->bind(&part, SynthPartProperty::pSynthOscFM, j);
+			value->bind(&part, SynthPartProperty::pSynthOpFM, j);
 			//Color if feedback
 			if (i >= j) {
 				value->rect.setFillColor(sf::Color(180, 180, 180));

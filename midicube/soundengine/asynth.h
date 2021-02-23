@@ -111,7 +111,7 @@ struct AnalogSynthPreset {
 };
 
 enum SynthProperty {
-	pSynthOscCount,
+	pSynthOpCount,
 	pSynthModEnvCount,
 	pSynthLFOCount,
 
@@ -138,10 +138,6 @@ enum SynthModulationProperty {
 
 enum SynthPartProperty {
 	pSynthOscAudible,
-	pSynthOscAttack,
-	pSynthOscDecay,
-	pSynthOscSustain,
-	pSynthOscRelease,
 	pSynthOscWaveForm,
 	pSynthOscAnalog,
 	pSynthOscSync,
@@ -154,18 +150,23 @@ enum SynthPartProperty {
 	pSynthOscSyncMul,
 	pSynthOscPulseWidth,
 	pSynthOscUnisonDetune,
-	pSynthOscPanning,
 	pSynthOscSemi,
 	pSynthOscTranspose,
 	pSynthOscPitch,
-	pSynthOscFM,
 
-	pSynthOscFilter,
-	pSynthOscFilterType,
-	pSynthOscFilterCutoff,
-	pSynthOscFilterResonance,
-	pSynthOscFilterKBTrack,
-	pSynthOscFilterKBTrackNote,
+	pSynthOpAttack,
+	pSynthOpDecay,
+	pSynthOpSustain,
+	pSynthOpRelease,
+	pSynthOpPanning,
+	pSynthOpFM,
+
+	pSynthOpFilter,
+	pSynthOpFilterType,
+	pSynthOpFilterCutoff,
+	pSynthOpFilterResonance,
+	pSynthOpFilterKBTrack,
+	pSynthOpFilterKBTrackNote,
 
 	pSynthEnvVolume,
 	pSynthEnvAttack,
