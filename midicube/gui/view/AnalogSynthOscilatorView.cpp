@@ -196,12 +196,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		reset->bind(part, SynthPartProperty::pSynthOscReset);
 		controls.push_back(reset);
 	}
-	{
-		CheckBox* audible = new CheckBox(false, "Audible", main_font, 16, tmp_x + 160, tmp_y, 40, 40);
-		audible->bind(part, SynthPartProperty::pSynthOscAudible);
-		controls.push_back(audible);
-		tmp_y += 50;
-	}
+	tmp_y += 50;
 	//Randomize and sync
 	{
 		CheckBox* reset = new CheckBox(false, "Randomize", main_font, 16, tmp_x, tmp_y, 40, 40);
@@ -214,14 +209,8 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		controls.push_back(audible);
 		tmp_y += 50;
 	}
-	//ADSR
-	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscAttack);
-	tmp_y += 75;
 	//Volume
 	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscVolume, "Volume", &show_amount, &show_source);
-	tmp_y += 75;
-	//Panning
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscPanning, "Panning", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Unison
@@ -270,57 +259,6 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	tmp_y += 75;
 	//Unison Detune
 	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscUnisonDetune, "Unison Det.", &show_amount, &show_source);
-	tmp_y += 75;
-
-	//Filter Section
-	//Filter
-	{
-		CheckBox* active = new CheckBox(false, "Filter", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
-		active->bind(part, SynthPartProperty::pSynthOscFilter);
-		controls.push_back(active);
-	}
-	tmp_x += 100;
-	//Filter Type
-	{
-		std::vector<std::string> filter_types = {"LP 12", "LP 24", "HP 12", "HP 24", "BP 12", "BP 24"};
-
-		ComboBox* filter_type = new ComboBox(1, filter_types, main_font, 16, 0, tmp_x, tmp_y + 15, 150, 40);
-		filter_type->bind(part, SynthPartProperty::pSynthOscFilterType);
-		controls.push_back(filter_type);
-	}
-	tmp_x += 160;
-	//KB Track
-	{
-		Label* title = new Label("KB Track", main_font, 12, tmp_x, tmp_y);
-		controls.push_back(title);
-
-		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(part, SynthPartProperty::pSynthOscFilterKBTrack);
-		controls.push_back(value);
-	}
-	tmp_x += 90;
-	//KB Track Note
-	{
-		Label* title = new Label("KB Track Note", main_font, 12, tmp_x, tmp_y);
-		controls.push_back(title);
-
-		DragBox<int>* value = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(part, SynthPartProperty::pSynthOscFilterKBTrackNote);
-		controls.push_back(value);
-	}
-	tmp_x += 90;
-	tmp_y += 75;
-
-	tmp_x = 500;
-	//Filter Cutoff
-	DragBox<double>* filter = property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscFilterCutoff, "Cutoff", &show_amount, &show_source).at(0);
-	filter->to_string = [](double val) {
-		return std::to_string((int) scale_cutoff(val));
-	};
-	filter->drag_step = 4;
-	tmp_y += 75;
-	//Filter Resonance
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscFilterResonance, "Resonance", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Edit Sources
