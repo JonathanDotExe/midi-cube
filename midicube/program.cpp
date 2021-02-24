@@ -39,6 +39,19 @@ Program* load_program(pt::ptree& tree) {
 				program->channels[i].active = c.second.get<bool>("active", false);
 				program->channels[i].volume = c.second.get<double>("volume", 1);
 				program->channels[i].panning = c.second.get<double>("panning", 0.5);
+				//Source
+				program->channels[i].source.input = c.second.get<ssize_t>("source.input", 1);
+				program->channels[i].source.channel = c.second.get<unsigned int>("source.channel", 0);
+				program->channels[i].source.start_note = c.second.get<unsigned int>("source.start_note", 0);
+				program->channels[i].source.end_note = c.second.get<unsigned int>("source.end_note", 127);
+				program->channels[i].source.start_velocity = c.second.get<unsigned int>("source.start_velocity", 0);
+				program->channels[i].source.end_velocity = c.second.get<unsigned int>("source.end_velocity", 127);
+				program->channels[i].source.octave = c.second.get<int>("source.octave", 0);
+				program->channels[i].source.transfer_channel_aftertouch = c.second.get<bool>("source.transfer_channel_aftertouch", true);
+				program->channels[i].source.transfer_pitch_bend = c.second.get<bool>("source.transfer_pitch_bend", true);
+				program->channels[i].source.transfer_cc = c.second.get<bool>("source.transfer_cc", true);
+				program->channels[i].source.transfer_prog_change = c.second.get<bool>("source.transfer_prog_change", true);
+				program->channels[i].source.transfer_other = c.second.get<bool>("source.transfer_other", true);
 			}
 			++i;
 		}
@@ -57,6 +70,19 @@ void save_program(Program* program, pt::ptree& tree) {
 		c.put("active", program->channels[i].active);
 		c.put("volume", program->channels[i].volume);
 		c.put("panning", program->channels[i].panning);
+		//Source
+		c.put("source.input", program->channels[i].source.input);
+		c.put("source.channel", program->channels[i].source.channel);
+		c.put("source.start_note", program->channels[i].source.start_note);
+		c.put("source.end_note", program->channels[i].source.end_note);
+		c.put("source.start_velocity", program->channels[i].source.start_velocity);
+		c.put("source.end_velocity", program->channels[i].source.end_velocity);
+		c.put("source.octave", program->channels[i].source.octave);
+		c.put("source.transfer_channel_aftertouch", program->channels[i].source.transfer_channel_aftertouch);
+		c.put("source.transfer_pitch_bend", program->channels[i].source.transfer_pitch_bend);
+		c.put("source.transfer_cc", program->channels[i].source.transfer_cc);
+		c.put("source.transfer_prog_change", program->channels[i].source.transfer_prog_change);
+		c.put("source.transfer_other", program->channels[i].source.transfer_other);
 		tree.add_child("channels.channel", c);
 	}
 }
