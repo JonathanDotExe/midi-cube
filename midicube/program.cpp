@@ -27,11 +27,38 @@ std::string bank_filename(std::string name) {
 Program* load_program(pt::ptree& tree) {
 	Program* program = new Program();
 	program->name = tree.get<std::string>("name", "Init");
+	program->metronome_bpm = tree.get<unsigned int>("metronome_bpm", 120);
+	//Channels
+	const auto& channels = tree.get_child_optional("channels");
+	if (channels) {
+		size_t i = 0;
+		for (pt::ptree::value_type& c : channels.get()) {
+			if (i < program->channels.size()) {
+				//Channel
+				program->channels[i].engine_index = c.second.get<ssize_t>("engine", -1);
+				program->channels[i].active = c.second.get<bool>("active", false);
+				program->channels[i].volume = c.second.get<double>("volume", 1);
+				program->channels[i].panning = c.second.get<double>("panning", 0.5);
+			}
+			++i;
+		}
+	}
 	return program;
 }
 
 void save_program(Program* program, pt::ptree& tree) {
-	tree.add("name", program->name);
+	tree.put("name", program->name);
+	tree.put("metronome_bpm", program->metronome_bpm);
+	//Channels
+	for (size_t i = 0; i < program->channels.size(); ++i) {
+		pt::ptree c;
+		//Channel
+		c.put("engine", program->channels[i].engine_index);
+		c.put("active", program->channels[i].active);
+		c.put("volume", program->channels[i].volume);
+		c.put("panning", program->channels[i].panning);
+		tree.add_child("channels.channel", c);
+	}
 }
 
 Bank* load_bank(std::string path, std::string filename) {

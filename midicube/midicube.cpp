@@ -191,7 +191,7 @@ MidiCube::~MidiCube() {
 
 void MidiCube::save_program(Program *prog) {
 	mutex.lock();
-
+	engine.save_program(prog);
 	mutex.unlock();
 	std::cout << "Saved program: " << prog->name << std::endl;
 }

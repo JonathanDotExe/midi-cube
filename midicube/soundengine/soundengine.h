@@ -287,7 +287,7 @@ public:
 };
 
 struct ChannelProgram {
-	ssize_t engine_index{0};
+	ssize_t engine_index{-1};
 	bool active{false};
 	double volume{1};
 	double panning = 0;
