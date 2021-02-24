@@ -52,6 +52,14 @@ Program* load_program(pt::ptree& tree) {
 				program->channels[i].source.transfer_cc = c.second.get<bool>("source.transfer_cc", true);
 				program->channels[i].source.transfer_prog_change = c.second.get<bool>("source.transfer_prog_change", true);
 				program->channels[i].source.transfer_other = c.second.get<bool>("source.transfer_other", true);
+
+				//Arpeggiator
+				program->channels[i].arp_on = c.second.get<bool>("arpeggiator.on", false);
+				program->channels[i].arpeggiator_bpm = c.second.get<unsigned int>("arpeggiator.bpm", 120);
+				program->channels[i].arpeggiator.pattern = static_cast<ArpeggiatorPattern>(c.second.get<size_t>("arpeggiator.pattern", 0));
+				program->channels[i].arpeggiator.octaves = c.second.get<unsigned int>("arpeggiator.octaves", 1);
+				program->channels[i].arpeggiator.value = c.second.get<unsigned int>("arpeggiator.note_value", 1);
+				program->channels[i].arpeggiator.hold = c.second.get<bool>("arpeggiator.hold", false);
 			}
 			++i;
 		}
@@ -83,6 +91,14 @@ void save_program(Program* program, pt::ptree& tree) {
 		c.put("source.transfer_cc", program->channels[i].source.transfer_cc);
 		c.put("source.transfer_prog_change", program->channels[i].source.transfer_prog_change);
 		c.put("source.transfer_other", program->channels[i].source.transfer_other);
+		//Arpeggiator
+		c.put("arpeggiator.on", program->channels[i].arp_on);
+		c.put("arpeggiator.bpm", program->channels[i].arpeggiator_bpm);
+		c.put("arpeggiator.pattern", static_cast<size_t>(program->channels[i].arpeggiator.pattern));
+		c.put("arpeggiator.octaves", program->channels[i].arpeggiator.octaves);
+		c.put("arpeggiator.note_value", program->channels[i].arpeggiator.value);
+		c.put("arpeggiator.hold", program->channels[i].arpeggiator.hold);
+
 		tree.add_child("channels.channel", c);
 	}
 }

@@ -91,7 +91,7 @@ void SoundEngineChannel::update_properties() {
 	submit_change(SoundEngineChannelProperty::pArpeggiatorOn, arp.on);
 	submit_change(SoundEngineChannelProperty::pArpeggiatorPattern, arp.preset.pattern);
 	submit_change(SoundEngineChannelProperty::pArpeggiatorOctaves, (int) arp.preset.octaves);
-	submit_change(SoundEngineChannelProperty::pArpeggiatorStep, arp.preset.value);
+	submit_change(SoundEngineChannelProperty::pArpeggiatorStep, (int) arp.preset.value);
 	submit_change(SoundEngineChannelProperty::pArpeggiatorHold, arp.preset.hold);
 	submit_change(SoundEngineChannelProperty::pArpeggiatorBPM, (int) arp.metronome.get_bpm());
 }

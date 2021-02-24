@@ -80,7 +80,7 @@ struct ArpeggiatorPreset {
 	ArpeggiatorPattern pattern;
 	std::vector<unsigned int> data;
 	unsigned int octaves = 1;
-	int value = 1;
+	unsigned int value = 1;
 	bool hold = false;
 };
 
