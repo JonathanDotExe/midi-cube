@@ -73,12 +73,11 @@ public:
 #define ARPEGGIATOR_POLYPHONY 30
 
 enum ArpeggiatorPattern {
-	ARP_UP, ARP_DOWN, ARP_RANDOM, ARP_UP_DOWN, ARP_UP_CUSTOM, ARP_DOWN_CUSTOM
+	ARP_UP, ARP_DOWN, ARP_RANDOM, ARP_UP_DOWN, ARP_DOWN_UP
 };
 
 struct ArpeggiatorPreset {
 	ArpeggiatorPattern pattern;
-	std::vector<unsigned int> data;
 	unsigned int octaves = 1;
 	int value = 1;
 	bool hold = false;
