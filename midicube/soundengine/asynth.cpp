@@ -1068,3 +1068,25 @@ void AnalogSynth::update_properties() {
 	submit_change(SynthProperty::pSynthDelayTime, preset.delay_time);
 	submit_change(SynthProperty::pSynthDelayFeedback, preset.delay_feedback);
 }
+
+void AnalogSynth::save_program(EngineProgram **prog) {
+	AnalogSynthProgram* p = dynamic_cast<AnalogSynthProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new AnalogSynthProgram();
+	}
+	p->preset = preset;
+	*prog = p;
+}
+
+void AnalogSynth::apply_program(EngineProgram *prog) {
+	AnalogSynthProgram* p = dynamic_cast<AnalogSynthProgram*>(prog);
+	//Create new
+	if (p) {
+		preset = p->preset;
+	}
+	else {
+		preset = {};
+	}
+}

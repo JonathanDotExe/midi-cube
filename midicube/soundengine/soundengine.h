@@ -29,8 +29,11 @@ struct EngineStatus {
 	size_t latest_note_index;
 };
 
-struct EngineProgram {
+class EngineProgram {
+public:
+	virtual ~EngineProgram() {
 
+	}
 };
 
 class SoundEngine {
