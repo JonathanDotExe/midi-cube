@@ -46,8 +46,6 @@ struct FrequencyModulatotion {
 };
 
 struct OscilatorEntity {
-	bool audible = true;
-	ADSREnvelopeData env{0.0, 0, 1, 0.0};
 	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN_WAVE;
 	bool analog = true;
 	bool sync = false;
@@ -57,12 +55,18 @@ struct OscilatorEntity {
 	size_t unison_amount = 0;
 	PropertyModulation volume = {1};
 	PropertyModulation sync_mul = {0.0};
-	PropertyModulation pulse_width = {1};
+	PropertyModulation pulse_width = {1.0};
 	PropertyModulation unison_detune = {0.1};
-	PropertyModulation panning = {0.5};
 	int semi = 0;
 	double transpose = 1;
 	PropertyModulation pitch = {0.5};
+};
+
+struct OperatorEntity {
+	bool audible = true;
+	ADSREnvelopeData env{0.0, 0, 1, 0.0};
+	PropertyModulation volume = {1};
+	PropertyModulation panning = {0.5};
 
 	bool filter = false;
 	FilterType filter_type = FilterType::LP_12;
@@ -71,6 +75,7 @@ struct OscilatorEntity {
 	double filter_kb_track = 0;
 	unsigned int filter_kb_track_note = 36;
 
+	unsigned int oscilator_count = 1;
 	std::array<double, ANALOG_PART_COUNT> fm;
 };
 
@@ -89,10 +94,11 @@ struct AnalogSynthPreset {
 	std::array<LFOEntity, ANALOG_PART_COUNT> lfos;
 	std::array<ModEnvelopeEntity, ANALOG_PART_COUNT> mod_envs;
 	std::array<OscilatorEntity, ANALOG_PART_COUNT> oscilators;
+	std::array<OperatorEntity, ANALOG_PART_COUNT> operators;
 
-	size_t lfo_count = 1;
+	size_t lfo_count = 0;
 	size_t mod_env_count = 0;
-	size_t osc_count = 0;
+	size_t op_count = 1;
 
 	bool mono = false;
 	bool legato = false;
@@ -105,7 +111,7 @@ struct AnalogSynthPreset {
 };
 
 enum SynthProperty {
-	pSynthOscCount,
+	pSynthOpCount,
 	pSynthModEnvCount,
 	pSynthLFOCount,
 
@@ -131,11 +137,7 @@ enum SynthModulationProperty {
 };
 
 enum SynthPartProperty {
-	pSynthOscAudible,
-	pSynthOscAttack,
-	pSynthOscDecay,
-	pSynthOscSustain,
-	pSynthOscRelease,
+	pSynthOpAudible,
 	pSynthOscWaveForm,
 	pSynthOscAnalog,
 	pSynthOscSync,
@@ -148,18 +150,25 @@ enum SynthPartProperty {
 	pSynthOscSyncMul,
 	pSynthOscPulseWidth,
 	pSynthOscUnisonDetune,
-	pSynthOscPanning,
 	pSynthOscSemi,
 	pSynthOscTranspose,
 	pSynthOscPitch,
-	pSynthOscFM,
 
-	pSynthOscFilter,
-	pSynthOscFilterType,
-	pSynthOscFilterCutoff,
-	pSynthOscFilterResonance,
-	pSynthOscFilterKBTrack,
-	pSynthOscFilterKBTrackNote,
+	pSynthOpVolume,
+	pSynthOpOscCount,
+	pSynthOpAttack,
+	pSynthOpDecay,
+	pSynthOpSustain,
+	pSynthOpRelease,
+	pSynthOpPanning,
+	pSynthOpFM,
+
+	pSynthOpFilter,
+	pSynthOpFilterType,
+	pSynthOpFilterCutoff,
+	pSynthOpFilterResonance,
+	pSynthOpFilterKBTrack,
+	pSynthOpFilterKBTrackNote,
 
 	pSynthEnvVolume,
 	pSynthEnvAttack,

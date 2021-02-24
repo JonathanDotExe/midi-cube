@@ -29,8 +29,16 @@ inline double rc_to_cutoff_factor(double rc, double time_step) {
 	return time_step/(rc+time_step);
 }
 
+inline double rc_to_highpass_cutoff_factor(double rc, double time_step) {
+	return rc/(rc+time_step);
+}
+
 inline double cutoff_to_factor(double cutoff, double time_step) {
 	return rc_to_cutoff_factor(cutoff_to_rc(cutoff), time_step);
+}
+
+inline double cutoff_to_highpass_factor(double cutoff, double time_step) {
+	return rc_to_highpass_cutoff_factor(cutoff_to_rc(cutoff), time_step);
 }
 
 inline double factor_to_cutoff(double cutoff, double time_step) {
@@ -43,7 +51,7 @@ enum FilterType {
 
 struct FilterData {
 	FilterType type;
-	double cutoff = 1; //in Hz
+	double cutoff = 44100; //in Hz
 	double resonance = 0;
 };
 
@@ -55,6 +63,11 @@ public:
 	double pole2 = 0;
 	double pole3 = 0;
 	double pole4 = 0;
+
+	double last_pole1 = 0;
+	double last_pole2 = 0;
+	double last_pole3 = 0;
+	double last_pole4 = 0;
 	double apply (FilterData& data, double sample, double time_step);
 
 };

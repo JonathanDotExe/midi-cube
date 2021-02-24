@@ -46,3 +46,4 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * https://math.stackexchange.com/questions/178079/integration-of-sawtooth-square-and-triangle-wave-functions
 * https://www.kvraudio.com/forum/viewtopic.php?t=445438
 * https://stackoverflow.com/questions/3055815/dsp-filter-sweep-effect
+* https://www.electronics-tutorials.ws/de/filtern/passiver-tiefpassfilter.html
