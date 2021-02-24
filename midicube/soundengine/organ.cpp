@@ -678,3 +678,30 @@ std::string get_engine_name<B3Organ>() {
 void __fix_link_organ_name__ () {
 	get_engine_name<B3Organ>();
 }
+
+void B3Organ::save_program(EngineProgram **prog) {
+	B3OrganProgram* p = dynamic_cast<B3OrganProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new B3OrganProgram();
+	}
+	p->preset = data.preset;
+	p->amplifier = data.amplifier;
+	p->rotary_speaker = data.rotary_speaker;
+	*prog = p;
+}
+
+void B3Organ::apply_program(EngineProgram *prog) {
+	B3OrganProgram* p = dynamic_cast<B3OrganProgram*>(prog);
+	if (!p) {
+		data.preset = p->preset;
+		data.amplifier = p->amplifier;
+		data.rotary_speaker = p->rotary_speaker;
+	}
+	else {
+		data.preset = {};
+		data.amplifier = {};
+		data.rotary_speaker = {};
+	}
+}

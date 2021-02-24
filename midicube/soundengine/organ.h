@@ -167,7 +167,7 @@ public:
 	double process(SampleInfo& info, double freq);
 };
 
-class B3OrganData{
+class B3OrganData {
 public:
 	B3OrganPreset preset;
 	AmplifierSimulationEffect amplifier;
@@ -181,6 +181,13 @@ public:
 	bool scanner_inverse = false;
 
 	double swell = 1;
+};
+
+class B3OrganProgram : public EngineProgram {
+public:
+	B3OrganPreset preset;
+	AmplifierSimulationEffect amplifier;
+	RotarySpeakerEffect rotary_speaker;
 };
 
 #define B3_ORGAN_POLYPHONY 61
@@ -212,6 +219,10 @@ public:
 	PropertyValue get(size_t prop, size_t sub_prop = 0);
 
 	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
+
+	void save_program(EngineProgram **prog);
+
+	void apply_program(EngineProgram *prog);
 
 };
 
