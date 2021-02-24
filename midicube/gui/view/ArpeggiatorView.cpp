@@ -23,7 +23,7 @@ Scene ArpeggiatorView::create(Frame &frame) {
 	holders.push_back(&channel);
 
 	//Sound engines
-	std::vector<std::string> patterns{"Up", "Down", "Up/Down", "Random"};
+	std::vector<std::string> patterns{"Up", "Down", "Random", "Up/Down", "Down/Up"};
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());

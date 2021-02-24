@@ -93,7 +93,25 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 			//TODO
 			break;
 		case ArpeggiatorPattern::ARP_RANDOM:
-			//TODO
+			//Count pressed notes
+			size_t count = 0;
+			for (size_t i = 0; i < this->note.note.size(); ++i) {
+				count += this->note.note[i].pressed;
+			}
+			if (count > 0) {
+				size_t next = rand() % count;
+				size_t octave = rand() % preset.octaves;
+				//Find next note
+				count = 0;
+				for (size_t i = 0; i < this->note.note.size() && count <= next; ++i) {
+					if (this->note.note[i].pressed) {
+						next_note = this->note.note[i].note + octave * 12;
+						next_index = i;
+						++count;
+					}
+				}
+			}
+
 			break;
 		}
 		//Press note
