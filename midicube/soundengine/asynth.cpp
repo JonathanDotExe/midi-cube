@@ -1095,6 +1095,19 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 
 }
 
+static boost::property_tree::ptree save_prop_mod(PropertyModulation mod) {
+	boost::property_tree::ptree tree;
+	tree.put("value", mod.value);
+	tree.put("mod_env", mod.mod_env);
+	tree.put("mod_env_amount", mod.mod_env_amount);
+	tree.put("lfo", mod.lfo);
+	tree.put("lfo_amount", mod.lfo_amount);
+	tree.put("velocity_amount", mod.velocity_amount);
+	tree.put("cc", mod.cc);
+	tree.put("cc_amount", mod.cc_amount);
+	return tree;
+}
+
 boost::property_tree::ptree AnalogSynthProgram::save() {
 	boost::property_tree::ptree tree;
 	//Global patch info
@@ -1109,6 +1122,14 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	tree.put("delay_time", preset.delay_time);
 	tree.put("delay_feedback", preset.delay_feedback);
 	tree.put("delay_mix", preset.delay_mix);
+
+	//LFOs
+	for (size_t i = 0; i < preset.lfo_count; ++i) {
+		boost::property_tree::ptree lfo;
+		lfo.add_child("volume", save_prop_mod(preset.lfos[i].volume));
+		lfo.put("freq", preset.lfos[i].freq);
+		lfo.put("waveform", (int) preset.lfos[i].waveform);
+	}
 
 	return tree;
 }
