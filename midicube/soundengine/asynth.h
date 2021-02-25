@@ -220,6 +220,9 @@ class AnalogSynthProgram : public EngineProgram {
 public:
 	AnalogSynthPreset preset;
 
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
 	virtual ~AnalogSynthProgram() {
 
 	}

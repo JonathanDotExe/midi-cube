@@ -1090,3 +1090,25 @@ void AnalogSynth::apply_program(EngineProgram *prog) {
 		preset = {};
 	}
 }
+
+void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
+
+}
+
+boost::property_tree::ptree AnalogSynthProgram::save() {
+	boost::property_tree::ptree tree;
+	//Global patch info
+	tree.put("lfo_count", preset.lfo_count);
+	tree.put("mod_env_count", preset.mod_env_count);
+	tree.put("op_count", preset.op_count);
+
+	tree.put("mono", preset.mono);
+	tree.put("legato", preset.legato);
+	tree.put("portamendo", preset.portamendo);
+
+	tree.put("delay_time", preset.delay_time);
+	tree.put("delay_feedback", preset.delay_feedback);
+	tree.put("delay_mix", preset.delay_mix);
+
+	return tree;
+}
