@@ -1104,6 +1104,7 @@ static boost::property_tree::ptree save_prop_mod(PropertyModulation mod) {
 	return tree;
 }
 
+
 static PropertyModulation load_prop_mod(boost::property_tree::ptree tree) {
 	PropertyModulation mod;
 	mod.value = tree.get<double>("value", 0);
@@ -1115,6 +1116,14 @@ static PropertyModulation load_prop_mod(boost::property_tree::ptree tree) {
 	mod.mod_env = tree.get<size_t>("cc", 1);
 	mod.cc_amount = tree.get<double>("cc_amount", 0);
 	return mod;
+}
+
+static PropertyModulation load_prop_mod(boost::property_tree::ptree parent, std::string path) {
+	const auto& val = parent.get_child_optional(path);
+	if (val) {
+		return load_prop_mod(val.get());
+	}
+	return {};
 }
 
 static ADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
@@ -1151,6 +1160,18 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	preset.delay_time = tree.get<double>("delay_time", 0.0);
 	preset.delay_feedback = tree.get<double>("delay_feedback", 0.0);
 	preset.delay_mix = tree.get<double>("delay_mix", 0.0);
+
+	//LFOs
+	const auto& lfos = tree.get_child_optional("channels");
+	if (lfos) {
+		size_t i = 0;
+		for (pt::ptree::value_type& lfo : lfos.get()) {
+			preset.lfos[i].volume = load_prop_mod(lfo.second, "volume");
+			preset.lfos[i].freq = lfo.second.get<double>("freq", 1);
+			preset.lfos[i].waveform = (AnalogWaveForm) lfo.second.get<int>("waveform", 0);
+			++i;
+		}
+	}
 }
 
 boost::property_tree::ptree AnalogSynthProgram::save() {
