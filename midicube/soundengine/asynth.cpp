@@ -1091,10 +1091,6 @@ void AnalogSynth::apply_program(EngineProgram *prog) {
 	}
 }
 
-void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
-
-}
-
 static boost::property_tree::ptree save_prop_mod(PropertyModulation mod) {
 	boost::property_tree::ptree tree;
 	tree.put("value", mod.value);
@@ -1139,6 +1135,22 @@ static boost::property_tree::ptree save_adsr(ADSREnvelopeData data) {
 	tree.put("sustain", data.sustain);
 	tree.put("release", data.release);
 	return tree;
+}
+
+void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
+	preset = {};
+	//Global patch info
+	preset.lfo_count = tree.get<size_t>("lfo_count", 0);
+	preset.mod_env_count = tree.get<size_t>("mod_env_count", 0);
+	preset.op_count = tree.get<size_t>("op_count", 1);
+
+	preset.mono = tree.get<bool>("mono", false);
+	preset.legato = tree.get<bool>("legato", false);
+	preset.portamendo = tree.get<double>("portamendo", 0.0);
+
+	preset.delay_time = tree.get<double>("delay_time", 0.0);
+	preset.delay_feedback = tree.get<double>("delay_feedback", 0.0);
+	preset.delay_mix = tree.get<double>("delay_mix", 0.0);
 }
 
 boost::property_tree::ptree AnalogSynthProgram::save() {
