@@ -1108,6 +1108,30 @@ static boost::property_tree::ptree save_prop_mod(PropertyModulation mod) {
 	return tree;
 }
 
+static PropertyModulation load_prop_mod(boost::property_tree::ptree tree) {
+	PropertyModulation mod;
+	mod.value = tree.get<double>("value", 0);
+	mod.mod_env = tree.get<size_t>("mod_env", 0);
+	mod.mod_env_amount = tree.get<double>("mod_env_amount", 0);
+	mod.lfo = tree.get<size_t>("lfo", 0);
+	mod.lfo_amount = tree.get<double>("lfo_amount", 0);
+	mod.velocity_amount = tree.get<double>("velocity_amount", 0);
+	mod.mod_env = tree.get<size_t>("cc", 1);
+	mod.cc_amount = tree.get<double>("cc_amount", 0);
+	return mod;
+}
+
+static ADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
+	ADSREnvelopeData data;
+
+	data.attack = tree.get("attack", 0.0005);
+	data.decay = tree.get("decay", 0.0);
+	data.sustain = tree.get("sustain", 1);
+	data.release = tree.get("release", 0.0005);
+
+	return data;
+}
+
 static boost::property_tree::ptree save_adsr(ADSREnvelopeData data) {
 	boost::property_tree::ptree tree;
 	tree.put("attack", data.attack);
