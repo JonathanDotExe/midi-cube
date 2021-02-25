@@ -1154,9 +1154,9 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	//Operators
 	size_t osc_count = 0;
 	for (size_t i = 0; i < preset.op_count; ++i) {
-		OperatorEntity& entity = preset.operators[i];
+		OperatorEntity& op = preset.operators[i];
 		//Oscilators
-		for (size_t j = 0; j < entity.oscilator_count && j + osc_count < ANALOG_PART_COUNT; ++i) {
+		for (size_t j = 0; j < op.oscilator_count && j + osc_count < ANALOG_PART_COUNT; ++i) {
 			boost::property_tree::ptree o;
 			OscilatorEntity& osc = preset.oscilators[osc_count + j];
 			o.put("waveform", (int) osc.waveform);
@@ -1174,14 +1174,33 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 			o.put("semi", osc.semi);
 			o.put("transpose", osc.transpose);
 			o.add_child("pitch", save_prop_mod(osc.pitch));
-		}
-		osc_count += entity.oscilator_count;
-		boost::property_tree::ptree lfo;
-		lfo.add_child("volume", save_prop_mod(preset.lfos[i].volume));
-		lfo.put("freq", preset.lfos[i].freq);
-		lfo.put("waveform", (int) preset.lfos[i].waveform);
 
-		tree.add_child("lfos.lfo", lfo);
+			tree.add_child("oscilators.oscilator", o);
+		}
+		osc_count += op.oscilator_count;
+
+		//Operator
+		boost::property_tree::ptree o;
+		o.put("audible", op.audible);
+		o.add_child("env", save_adsr(op.env));
+		o.add_child("volume", save_prop_mod(op.volume));
+		o.add_child("panning", save_prop_mod(op.panning));
+
+		o.put("filter", op.filter);
+		o.put("filter_type", (int) op.filter_type);
+		o.add_child("filter_cutoff", save_prop_mod(op.filter_cutoff));
+		o.add_child("filter_resonance", save_prop_mod(op.filter_resonance));
+		o.put("filter_kb_track", op.filter_kb_track);
+		o.put("filter_kb_track_note", op.filter_kb_track_note);
+
+		o.put("oscilator_count", op.oscilator_count);
+
+		//FM
+		for (size_t k = 0; k < ANALOG_PART_COUNT; ++k) {
+			o.add("fm.amount", op.fm[k]);
+		}
+
+		tree.add_child("operators.operator", o);
 	}
 
 	return tree;
