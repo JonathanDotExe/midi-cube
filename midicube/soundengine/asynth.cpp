@@ -1108,6 +1108,15 @@ static boost::property_tree::ptree save_prop_mod(PropertyModulation mod) {
 	return tree;
 }
 
+static boost::property_tree::ptree save_adsr(ADSREnvelopeData data) {
+	boost::property_tree::ptree tree;
+	tree.put("attack", data.attack);
+	tree.put("decay", data.decay);
+	tree.put("sustain", data.sustain);
+	tree.put("release", data.release);
+	return tree;
+}
+
 boost::property_tree::ptree AnalogSynthProgram::save() {
 	boost::property_tree::ptree tree;
 	//Global patch info
@@ -1129,7 +1138,20 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		lfo.add_child("volume", save_prop_mod(preset.lfos[i].volume));
 		lfo.put("freq", preset.lfos[i].freq);
 		lfo.put("waveform", (int) preset.lfos[i].waveform);
+
+		tree.add_child("lfos.lfo", lfo);
 	}
+
+	//Envs
+	for (size_t i = 0; i < preset.mod_env_count; ++i) {
+		boost::property_tree::ptree env;
+		env.add_child("volume", save_prop_mod(preset.mod_envs[i].volume));
+		env.put("env", save_adsr(preset.mod_envs[i].env));
+
+		tree.add_child("mod_envs.mod_ens", env);
+	}
+
+	//
 
 	return tree;
 }
