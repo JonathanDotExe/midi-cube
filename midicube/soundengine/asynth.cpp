@@ -1151,7 +1151,38 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		tree.add_child("mod_envs.mod_ens", env);
 	}
 
-	//
+	//Operators
+	size_t osc_count = 0;
+	for (size_t i = 0; i < preset.op_count; ++i) {
+		OperatorEntity& entity = preset.operators[i];
+		//Oscilators
+		for (size_t j = 0; j < entity.oscilator_count && j + osc_count < ANALOG_PART_COUNT; ++i) {
+			boost::property_tree::ptree o;
+			OscilatorEntity& osc = preset.oscilators[osc_count + j];
+			o.put("waveform", (int) osc.waveform);
+			o.put("analog", osc.analog);
+			o.put("sync", osc.sync);
+			o.put("reset", osc.reset);
+			o.put("randomize", osc.randomize);
+
+			o.put("unison_amount", osc.unison_amount);
+			o.add_child("volume", save_prop_mod(osc.volume));
+			o.add_child("sync_mul", save_prop_mod(osc.sync_mul));
+			o.add_child("pulse_width", save_prop_mod(osc.pulse_width));
+			o.add_child("unison_detune", save_prop_mod(osc.unison_detune));
+
+			o.put("semi", osc.semi);
+			o.put("transpose", osc.transpose);
+			o.add_child("pitch", save_prop_mod(osc.pitch));
+		}
+		osc_count += entity.oscilator_count;
+		boost::property_tree::ptree lfo;
+		lfo.add_child("volume", save_prop_mod(preset.lfos[i].volume));
+		lfo.put("freq", preset.lfos[i].freq);
+		lfo.put("waveform", (int) preset.lfos[i].waveform);
+
+		tree.add_child("lfos.lfo", lfo);
+	}
 
 	return tree;
 }
