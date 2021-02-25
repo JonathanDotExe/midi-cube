@@ -27,7 +27,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 	}
 	//Pattern
 	if (metronome.is_beat(info.sample_time, info.sample_rate, preset.value)) {
-		unsigned int next_note = 128;
+		int next_note = 128;
 		long int next_index = -1;
 
 		unsigned int lowest_note = 128;
@@ -45,8 +45,8 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 					}
 					//Find next highest note
 					for (unsigned int octave = 0; octave < preset.octaves; ++octave) {
-						unsigned int n = this->note.note[i].note + octave * 12;
-						if (n < next_note && (n > curr_note || (n == curr_note && note_index > i))) {
+						int n = this->note.note[i].note + octave * 12;
+						if (n < next_note && (n > (int) curr_note || (n == (int) curr_note && note_index > i))) {
 							next_note = n;
 							next_index = i;
 							break;
@@ -61,6 +61,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 			}
 			break;
 		case ArpeggiatorPattern::ARP_DOWN:
+			next_note = -1;
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
 				if (this->note.note[i].pressed) {
 					if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note) {
@@ -69,9 +70,9 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 					}
 					//Find next lowest note
 					for (unsigned int o = 0; o < preset.octaves; ++o) {
-						unsigned int octave = preset.octaves - o - 1;
-						unsigned int n = this->note.note[i].note + octave * 12;
-						if (n > next_note && (n > curr_note || (n == curr_note && note_index > i))) {
+						int octave = preset.octaves - o - 1;
+						int n = this->note.note[i].note + octave * 12;
+						if (n > next_note && (n < (int) curr_note || (n == (int) curr_note && note_index > i))) {
 							next_note = n;
 							next_index = i;
 							break;
@@ -88,12 +89,29 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 		case ArpeggiatorPattern::ARP_UP_DOWN:
 			//TODO
 			break;
-		case ArpeggiatorPattern::ARP_RANDOM:
+		case ArpeggiatorPattern::ARP_DOWN_UP:
 			//TODO
 			break;
-		case ArpeggiatorPattern::ARP_UP_CUSTOM:
-			break;
-		case ArpeggiatorPattern::ARP_DOWN_CUSTOM:
+		case ArpeggiatorPattern::ARP_RANDOM:
+			//Count pressed notes
+			size_t count = 0;
+			for (size_t i = 0; i < this->note.note.size(); ++i) {
+				count += this->note.note[i].pressed;
+			}
+			if (count > 0) {
+				size_t next = rand() % count;
+				size_t octave = rand() % preset.octaves;
+				//Find next note
+				count = 0;
+				for (size_t i = 0; i < this->note.note.size() && count <= next; ++i) {
+					if (this->note.note[i].pressed) {
+						next_note = this->note.note[i].note + octave * 12;
+						next_index = i;
+						++count;
+					}
+				}
+			}
+
 			break;
 		}
 		//Press note
