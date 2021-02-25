@@ -22,6 +22,10 @@
 #include <array>
 #include <functional>
 
+#include <boost/property_tree/ptree.hpp>
+
+namespace pt = boost::property_tree;
+
 class SoundEngineDevice;
 
 struct EngineStatus {
@@ -31,6 +35,10 @@ struct EngineStatus {
 
 class EngineProgram {
 public:
+	virtual void load(pt::ptree tree) = 0;
+
+	virtual pt::ptree save() = 0;
+
 	virtual ~EngineProgram() {
 
 	}

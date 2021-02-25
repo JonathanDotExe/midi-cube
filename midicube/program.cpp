@@ -6,6 +6,8 @@
  */
 
 #include "program.h"
+#include "soundengine/organ.h"
+#include "soundengine/asynth.h"
 #include <boost/filesystem.hpp>
 #include <regex>
 #include <iostream>
@@ -60,6 +62,21 @@ Program* load_program(pt::ptree& tree) {
 				program->channels[i].arpeggiator.octaves = c.second.get<unsigned int>("arpeggiator.octaves", 1);
 				program->channels[i].arpeggiator.value = c.second.get<unsigned int>("arpeggiator.note_value", 1);
 				program->channels[i].arpeggiator.hold = c.second.get<bool>("arpeggiator.hold", false);
+
+				//Sound engine
+				//FIXME
+				//Organ
+				if (program->channels[i].engine_index == 1) {
+					program->channels[i].engine_program = new B3OrganProgram();
+				}
+				//Synth
+				else if (program->channels[i].engine_index == 1) {
+					program->channels[i].engine_program = new AnalogSynthProgram();
+				}
+				const auto& preset =  tree.get_child_optional("preset");
+				if (preset && program->channels[i].engine_program) {
+					program->channels[i].engine_program->load(preset.get());
+				}
 			}
 			++i;
 		}
@@ -98,6 +115,12 @@ void save_program(Program* program, pt::ptree& tree) {
 		c.put("arpeggiator.octaves", program->channels[i].arpeggiator.octaves);
 		c.put("arpeggiator.note_value", program->channels[i].arpeggiator.value);
 		c.put("arpeggiator.hold", program->channels[i].arpeggiator.hold);
+		//Sound Engine
+		if (program->channels[i].engine_program) {
+			pt::ptree preset = program->channels[i].engine_program->save();
+			c.add_child("preset", preset);
+		}
+
 
 		tree.add_child("channels.channel", c);
 	}
