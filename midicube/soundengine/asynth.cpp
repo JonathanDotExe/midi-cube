@@ -1301,7 +1301,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		boost::property_tree::ptree env;
 		env.add_child("volume", save_prop_mod(preset.mod_envs[i].volume));
-		env.put("env", save_adsr(preset.mod_envs[i].env));
+		env.add_child("env", save_adsr(preset.mod_envs[i].env));
 
 		tree.add_child("mod_envs.mod_ens", env);
 	}
