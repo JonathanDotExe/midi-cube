@@ -692,13 +692,11 @@ void B3Organ::save_program(EngineProgram **prog) {
 
 void B3Organ::apply_program(EngineProgram *prog) {
 	B3OrganProgram* p = dynamic_cast<B3OrganProgram*>(prog);
-	if (!p) {
+	if (p) {
 		data.preset = p->preset;
 	}
 	else {
 		data.preset = {};
-		data.amplifier = {};
-		data.rotary_speaker = {};
 	}
 }
 
@@ -783,7 +781,7 @@ boost::property_tree::ptree B3OrganProgram::save() {
 	//Drawbars
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
 		tree.add("drawbars.drawbar", preset.drawbars[i]);
-		tree.add("drawbar_ccs.drawbar", preset.drawbars[i]);
+		tree.add("drawbar_ccs.drawbar", preset.drawbar_ccs[i]);
 	}
 
 	//Modeling

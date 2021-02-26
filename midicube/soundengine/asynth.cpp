@@ -1311,7 +1311,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	for (size_t i = 0; i < preset.op_count; ++i) {
 		OperatorEntity& op = preset.operators[i];
 		//Oscilators
-		for (size_t j = 0; j < op.oscilator_count && j + osc_count < ANALOG_PART_COUNT; ++i) {
+		for (size_t j = 0; j < op.oscilator_count && j + osc_count < ANALOG_PART_COUNT; ++j) {
 			boost::property_tree::ptree o;
 			OscilatorEntity& osc = preset.oscilators[osc_count + j];
 			o.put("waveform", (int) osc.waveform);
