@@ -687,8 +687,6 @@ void B3Organ::save_program(EngineProgram **prog) {
 		p = new B3OrganProgram();
 	}
 	p->preset = data.preset;
-	p->amplifier = data.amplifier;
-	p->rotary_speaker = data.rotary_speaker;
 	*prog = p;
 }
 
@@ -696,12 +694,46 @@ void B3Organ::apply_program(EngineProgram *prog) {
 	B3OrganProgram* p = dynamic_cast<B3OrganProgram*>(prog);
 	if (!p) {
 		data.preset = p->preset;
-		data.amplifier = p->amplifier;
-		data.rotary_speaker = p->rotary_speaker;
 	}
 	else {
 		data.preset = {};
 		data.amplifier = {};
 		data.rotary_speaker = {};
 	}
+}
+
+void B3OrganProgram::load(boost::property_tree::ptree tree) {
+}
+
+boost::property_tree::ptree B3OrganProgram::save() {
+	boost::property_tree::ptree tree;
+
+	//Drawbars
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		tree.add("drawbars.drawbar", preset.drawbars[i]);
+		tree.add("drawbar_ccs.drawbar", preset.drawbars[i]);
+	}
+
+	//Modeling
+	tree.put("harmonic_foldback_volume", preset.harmonic_foldback_volume);
+	tree.put("multi_note_gain", preset.multi_note_gain);
+
+	//Percussion
+	tree.put("percussion", preset.percussion);
+	tree.put("percussion_third_harmonic", preset.percussion_third_harmonic);
+	tree.put("percussion_soft", preset.percussion_soft);
+	tree.put("percussion_fast_decay", preset.percussion_fast_decay);
+
+	tree.put("percussion_cc", preset.percussion_cc);
+	tree.put("percussion_third_harmonic_cc", preset.percussion_third_harmonic_cc);
+	tree.put("percussion_soft_cc", preset.percussion_soft_cc);
+	tree.put("percussion_fast_decay_cc", preset.percussion_fast_decay_cc);
+
+	//Vibrato/Chorus
+	tree.put("vibrato_mix", preset.vibrato_mix);
+	tree.put("vibrato_mix_cc", preset.vibrato_mix_cc);
+	tree.put("swell_cc", preset.swell_cc);
+
+
+	return tree;
 }
