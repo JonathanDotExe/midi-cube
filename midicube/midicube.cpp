@@ -13,7 +13,7 @@ static void process_func(double& lsample, double& rsample, SampleInfo& info, voi
 	((MidiCube*) user_data)->process(lsample, rsample, info);
 }
 
-MidiCube::MidiCube() : changes(128), update(32), messages(128) {
+MidiCube::MidiCube() : changes(128), update(32), messages(128), prog_mgr("./data/programs") {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -59,6 +59,9 @@ void MidiCube::init(int out_device, int in_device) {
 		engine.channels[i].source.channel = i;
 		engine.channels[i].source.input = 1;
 	}
+	//Load programs
+	prog_mgr.load_all();
+	prog_mgr.init_user(this);
 	//Init audio
 	audio_handler.init(out_device, in_device);
 
@@ -89,6 +92,7 @@ void MidiCube::init(int out_device, int in_device) {
 }
 
 void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
+	mutex.lock();
 	//Changes
 	PropertyChange change;
 	while (changes.pop(change)) {
@@ -106,6 +110,7 @@ void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 	}
 	//Process
 	engine.process_sample(lsample, rsample, info);
+	mutex.unlock();
 }
 
 std::vector<MidiCubeInput> MidiCube::get_inputs() {
@@ -177,9 +182,25 @@ void MidiCube::request_update(PropertyHolder* holder) {
 }
 
 MidiCube::~MidiCube() {
+	//Load programs
+	prog_mgr.save_all();
 	audio_handler.close();
 	for (MidiCubeInput in : inputs) {
 		delete in.in;
 	}
 	inputs.clear();
+}
+
+void MidiCube::save_program(Program *prog) {
+	mutex.lock();
+	engine.save_program(prog);
+	mutex.unlock();
+	std::cout << "Saved program: " << prog->name << std::endl;
+}
+
+void MidiCube::apply_program(Program *prog) {
+	mutex.lock();
+	engine.apply_program(prog);
+	mutex.unlock();
+	std::cout << "Selected program: " << prog->name << std::endl;
 }

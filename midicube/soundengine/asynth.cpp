@@ -1068,3 +1068,295 @@ void AnalogSynth::update_properties() {
 	submit_change(SynthProperty::pSynthDelayTime, preset.delay_time);
 	submit_change(SynthProperty::pSynthDelayFeedback, preset.delay_feedback);
 }
+
+void AnalogSynth::save_program(EngineProgram **prog) {
+	AnalogSynthProgram* p = dynamic_cast<AnalogSynthProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new AnalogSynthProgram();
+	}
+	p->preset = preset;
+	*prog = p;
+}
+
+void AnalogSynth::apply_program(EngineProgram *prog) {
+	AnalogSynthProgram* p = dynamic_cast<AnalogSynthProgram*>(prog);
+	//Create new
+	if (p) {
+		preset = p->preset;
+	}
+	else {
+		preset = {};
+	}
+}
+
+static boost::property_tree::ptree save_prop_mod(PropertyModulation mod) {
+	boost::property_tree::ptree tree;
+	tree.put("value", mod.value);
+	tree.put("mod_env", mod.mod_env);
+	tree.put("mod_env_amount", mod.mod_env_amount);
+	tree.put("lfo", mod.lfo);
+	tree.put("lfo_amount", mod.lfo_amount);
+	tree.put("velocity_amount", mod.velocity_amount);
+	tree.put("cc", mod.cc);
+	tree.put("cc_amount", mod.cc_amount);
+	return tree;
+}
+
+
+static PropertyModulation load_prop_mod(boost::property_tree::ptree tree) {
+	PropertyModulation mod;
+	mod.value = tree.get<double>("value", 0);
+	mod.mod_env = tree.get<size_t>("mod_env", 0);
+	mod.mod_env_amount = tree.get<double>("mod_env_amount", 0);
+	mod.lfo = tree.get<size_t>("lfo", 0);
+	mod.lfo_amount = tree.get<double>("lfo_amount", 0);
+	mod.velocity_amount = tree.get<double>("velocity_amount", 0);
+	mod.cc = tree.get<size_t>("cc", 1);
+	mod.cc_amount = tree.get<double>("cc_amount", 0);
+	return mod;
+}
+
+static PropertyModulation load_prop_mod(boost::property_tree::ptree parent, std::string path) {
+	const auto& val = parent.get_child_optional(path);
+	if (val) {
+		return load_prop_mod(val.get());
+	}
+	return {};
+}
+
+static ADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
+	ADSREnvelopeData data;
+
+	data.attack = tree.get("attack", 0.0005);
+	data.decay = tree.get("decay", 0.0);
+	data.sustain = tree.get("sustain", 1);
+	data.release = tree.get("release", 0.0005);
+
+	return data;
+}
+
+static ADSREnvelopeData load_adsr(boost::property_tree::ptree parent, std::string path) {
+	const auto& val = parent.get_child_optional(path);
+	if (val) {
+		return load_adsr(val.get());
+	}
+	return {0.0005, 0, 1, 0.0005};
+}
+
+
+static boost::property_tree::ptree save_adsr(ADSREnvelopeData data) {
+	boost::property_tree::ptree tree;
+	tree.put("attack", data.attack);
+	tree.put("decay", data.decay);
+	tree.put("sustain", data.sustain);
+	tree.put("release", data.release);
+	return tree;
+}
+
+void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
+	preset = {};
+	//Global patch info
+	preset.lfo_count = tree.get<size_t>("lfo_count", 0);
+	preset.mod_env_count = tree.get<size_t>("mod_env_count", 0);
+	preset.op_count = tree.get<size_t>("op_count", 1);
+
+	preset.mono = tree.get<bool>("mono", false);
+	preset.legato = tree.get<bool>("legato", false);
+	preset.portamendo = tree.get<double>("portamendo", 0.0);
+
+	preset.delay_time = tree.get<double>("delay_time", 0.0);
+	preset.delay_feedback = tree.get<double>("delay_feedback", 0.0);
+	preset.delay_mix = tree.get<double>("delay_mix", 0.0);
+
+	//LFOs
+	const auto& lfos = tree.get_child_optional("lfos");
+	if (lfos) {
+		size_t i = 0;
+		for (pt::ptree::value_type& lfo : lfos.get()) {
+			if (i >= ANALOG_PART_COUNT) {
+				break;
+			}
+			preset.lfos[i].volume = load_prop_mod(lfo.second, "volume");
+			preset.lfos[i].freq = lfo.second.get<double>("freq", 1);
+			preset.lfos[i].waveform = (AnalogWaveForm) lfo.second.get<int>("waveform", 0);
+			++i;
+		}
+	}
+
+	//Envs
+	const auto& envs = tree.get_child_optional("mod_envs");
+	if (envs) {
+		size_t i = 0;
+		for (pt::ptree::value_type& env : envs.get()) {
+			if (i >= ANALOG_PART_COUNT) {
+				break;
+			}
+			preset.mod_envs[i].volume = load_prop_mod(env.second, "volume");
+			preset.mod_envs[i].env = load_adsr(env.second, "env");
+			++i;
+		}
+	}
+
+	//Oscilators
+	const auto& oscs = tree.get_child_optional("oscilators");
+	if (oscs) {
+		size_t i = 0;
+		for (pt::ptree::value_type& o : oscs.get()) {
+			if (i >= ANALOG_PART_COUNT) {
+				break;
+			}
+			OscilatorEntity& osc = preset.oscilators[i];
+			osc.waveform = (AnalogWaveForm) o.second.get<int>("waveform", 0);
+			osc.analog = o.second.get<bool>("analog", true);
+			osc.sync = o.second.get<bool>("sync", false);
+			osc.reset = o.second.get<bool>("reset", false);
+			osc.randomize = o.second.get<bool>("randomize", false);
+
+			osc.unison_amount = o.second.get<size_t>("unison_amount", 0);
+			osc.volume = load_prop_mod(o.second, "volume");
+			osc.sync_mul = load_prop_mod(o.second, "sync_mul");
+			osc.pulse_width = load_prop_mod(o.second, "pulse_width");
+			osc.unison_detune = load_prop_mod(o.second, "unison_detune");
+
+			osc.semi = o.second.get<int>("semi", 0);
+			osc.transpose = o.second.get<double>("transpose", 0);
+			osc.pitch = load_prop_mod(o.second, "pitch");
+			++i;
+		}
+	}
+
+	//Operators
+	const auto& ops = tree.get_child_optional("operators");
+	if (ops) {
+		size_t i = 0;
+		for (pt::ptree::value_type& o : ops.get()) {
+			if (i >= ANALOG_PART_COUNT) {
+				break;
+			}
+
+			OperatorEntity& op = preset.operators[i];
+
+			op.audible = o.second.get<bool>("audible", true);
+			op.env = load_adsr(o.second, "env");
+			op.volume = load_prop_mod(o.second, "volume");
+			op.panning = load_prop_mod(o.second, "panning");
+
+			op.filter = o.second.get<bool>("filter", true);
+			op.filter_type = (FilterType) o.second.get<int>("filter_type", 0);
+			op.filter_cutoff = load_prop_mod(o.second, "filter_cutoff");
+			op.filter_resonance = load_prop_mod(o.second, "filter_resonance");
+			op.filter_kb_track = o.second.get<double>("filter_kb_track", 0);
+			op.filter_kb_track_note = o.second.get<int>("filter_kb_track", 36);
+
+			op.oscilator_count = o.second.get<size_t>("oscilator_count", 1);
+
+
+			const auto& fm = tree.get_child_optional("operators");
+			size_t k = 0;
+			if (fm) {
+				for (pt::ptree::value_type& f : fm.get()) {
+					if (k >= ANALOG_PART_COUNT) {
+						break;
+					}
+
+					op.fm[k] = f.second.get_value<double>(0.0);
+
+					++k;
+				}
+			}
+
+			++i;
+		}
+	}
+}
+
+boost::property_tree::ptree AnalogSynthProgram::save() {
+	boost::property_tree::ptree tree;
+	//Global patch info
+	tree.put("lfo_count", preset.lfo_count);
+	tree.put("mod_env_count", preset.mod_env_count);
+	tree.put("op_count", preset.op_count);
+
+	tree.put("mono", preset.mono);
+	tree.put("legato", preset.legato);
+	tree.put("portamendo", preset.portamendo);
+
+	tree.put("delay_time", preset.delay_time);
+	tree.put("delay_feedback", preset.delay_feedback);
+	tree.put("delay_mix", preset.delay_mix);
+
+	//LFOs
+	for (size_t i = 0; i < preset.lfo_count; ++i) {
+		boost::property_tree::ptree lfo;
+		lfo.add_child("volume", save_prop_mod(preset.lfos[i].volume));
+		lfo.put("freq", preset.lfos[i].freq);
+		lfo.put("waveform", (int) preset.lfos[i].waveform);
+
+		tree.add_child("lfos.lfo", lfo);
+	}
+
+	//Envs
+	for (size_t i = 0; i < preset.mod_env_count; ++i) {
+		boost::property_tree::ptree env;
+		env.add_child("volume", save_prop_mod(preset.mod_envs[i].volume));
+		env.add_child("env", save_adsr(preset.mod_envs[i].env));
+
+		tree.add_child("mod_envs.mod_ens", env);
+	}
+
+	//Operators
+	size_t osc_count = 0;
+	for (size_t i = 0; i < preset.op_count; ++i) {
+		OperatorEntity& op = preset.operators[i];
+		//Oscilators
+		for (size_t j = 0; j < op.oscilator_count && j + osc_count < ANALOG_PART_COUNT; ++j) {
+			boost::property_tree::ptree o;
+			OscilatorEntity& osc = preset.oscilators[osc_count + j];
+			o.put("waveform", (int) osc.waveform);
+			o.put("analog", osc.analog);
+			o.put("sync", osc.sync);
+			o.put("reset", osc.reset);
+			o.put("randomize", osc.randomize);
+
+			o.put("unison_amount", osc.unison_amount);
+			o.add_child("volume", save_prop_mod(osc.volume));
+			o.add_child("sync_mul", save_prop_mod(osc.sync_mul));
+			o.add_child("pulse_width", save_prop_mod(osc.pulse_width));
+			o.add_child("unison_detune", save_prop_mod(osc.unison_detune));
+
+			o.put("semi", osc.semi);
+			o.put("transpose", osc.transpose);
+			o.add_child("pitch", save_prop_mod(osc.pitch));
+
+			tree.add_child("oscilators.oscilator", o);
+		}
+		osc_count += op.oscilator_count;
+
+		//Operator
+		boost::property_tree::ptree o;
+		o.put("audible", op.audible);
+		o.add_child("env", save_adsr(op.env));
+		o.add_child("volume", save_prop_mod(op.volume));
+		o.add_child("panning", save_prop_mod(op.panning));
+
+		o.put("filter", op.filter);
+		o.put("filter_type", (int) op.filter_type);
+		o.add_child("filter_cutoff", save_prop_mod(op.filter_cutoff));
+		o.add_child("filter_resonance", save_prop_mod(op.filter_resonance));
+		o.put("filter_kb_track", op.filter_kb_track);
+		o.put("filter_kb_track_note", op.filter_kb_track_note);
+
+		o.put("oscilator_count", op.oscilator_count);
+
+		//FM
+		for (size_t k = 0; k < ANALOG_PART_COUNT; ++k) {
+			o.add("fm.amount", op.fm[k]);
+		}
+
+		tree.add_child("operators.operator", o);
+	}
+
+	return tree;
+}

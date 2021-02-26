@@ -24,6 +24,7 @@ src = [
 	'midicube/metronome.cpp',
 	'midicube/midi.cpp',
 	'midicube/midicube.cpp',
+	'midicube/program.cpp',
 	'midicube/oscilator.cpp',
 	'midicube/property.cpp',
 	'midicube/synthesis.cpp',
@@ -49,6 +50,8 @@ src = [
 	'midicube/gui/view/AnalogSynthView.cpp',
 	'midicube/gui/view/ArpeggiatorView.cpp',
 	'midicube/gui/view/B3OrganView.cpp',
+	'midicube/gui/view/ProgramRenameView.cpp',
+	'midicube/gui/view/ProgramView.cpp',
 	'midicube/gui/view/SoundEngineChannelView.cpp',
 	'midicube/gui/view/SoundEngineView.cpp',
 	

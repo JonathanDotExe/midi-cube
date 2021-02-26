@@ -216,6 +216,18 @@ struct AnalogSynthVoice : public TriggeredNote {
 	std::array<AnalogSynthPart, ANALOG_PART_COUNT> parts;
 };
 
+class AnalogSynthProgram : public EngineProgram {
+public:
+	AnalogSynthPreset preset;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~AnalogSynthProgram() {
+
+	}
+};
+
 class AnalogSynth : public BaseSoundEngine<AnalogSynthVoice, ANALOG_SYNTH_POLYPHONY>, public PropertyHolder {
 
 private:
@@ -254,6 +266,10 @@ public:
 	PropertyValue get(size_t prop, size_t sub_prop);
 
 	void update_properties();
+
+	void save_program(EngineProgram **prog);
+
+	void apply_program(EngineProgram *prog);
 
 	~AnalogSynth();
 

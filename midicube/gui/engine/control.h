@@ -244,6 +244,10 @@ public:
 		}
 	}
 
+	T get_value() {
+		return scale.value(progress, min, max);
+	}
+
 	SELECTABLE
 
 	virtual ~DragBox() {

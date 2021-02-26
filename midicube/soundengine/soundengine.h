@@ -22,7 +22,9 @@
 #include <array>
 #include <functional>
 
-#define SOUND_ENGINE_MIDI_CHANNELS 16
+#include <boost/property_tree/ptree.hpp>
+
+namespace pt = boost::property_tree;
 
 class SoundEngineDevice;
 
@@ -31,13 +33,13 @@ struct EngineStatus {
 	size_t latest_note_index;
 };
 
-class SoundEngineData {
+class EngineProgram {
 public:
-	virtual SoundEngineData* copy() {
-		return new SoundEngineData();
-	}
+	virtual void load(pt::ptree tree) = 0;
 
-	virtual ~SoundEngineData() {
+	virtual pt::ptree save() = 0;
+
+	virtual ~EngineProgram() {
 
 	}
 };
@@ -52,6 +54,14 @@ public:
 	virtual void release_note(SampleInfo& info, unsigned int note) = 0;
 
 	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info) = 0;
+
+	virtual void apply_program(EngineProgram* prog) {
+
+	}
+
+	virtual void save_program(EngineProgram** prog) {
+
+	}
 
 	virtual ~SoundEngine() {
 
@@ -200,7 +210,7 @@ public:
 };
 
 struct ChannelSource {
-	ssize_t input = -1;
+	ssize_t input = 1;
 	unsigned int channel = 0;
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
@@ -284,6 +294,27 @@ public:
 
 };
 
+struct ChannelProgram {
+	ssize_t engine_index{-1};
+	bool active{false};
+	double volume{1};
+	double panning = 0;
+
+	ChannelSource source;
+
+	unsigned int arpeggiator_bpm = 120;
+	bool arp_on;
+	ArpeggiatorPreset arpeggiator;
+
+	EngineProgram* engine_program = nullptr;
+};
+
+struct Program {
+	std::string name;
+	unsigned int metronome_bpm = 120;
+	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{2, true}};
+};
+
 enum SoundEngineProperty {
 	pEngineMetronomeOn,
 	pEngineMetronomeBPM,
@@ -321,6 +352,10 @@ public:
 	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
 
 	void update_properties();
+
+	void apply_program(Program* program);
+
+	void save_program(Program* program);
 
 	~SoundEngineDevice();
 

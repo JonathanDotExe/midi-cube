@@ -104,14 +104,13 @@ struct B3OrganPreset {
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbars;
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	double harmonic_foldback_volume{0.5};
+	double multi_note_gain{0.8};
 
 	AmplifierSimulationPreset amplifier;
 	unsigned int amp_cc{28};
 	unsigned int amp_boost_cc{35};
 	unsigned int amp_drive_cc{36};
 	unsigned int amp_tone_cc{37};
-
-	double multi_note_gain{0.8};
 
 	RotarySpeakerPreset rotary;
 	unsigned int rotary_cc{22};
@@ -167,7 +166,7 @@ public:
 	double process(SampleInfo& info, double freq);
 };
 
-class B3OrganData : public SoundEngineData {
+class B3OrganData {
 public:
 	B3OrganPreset preset;
 	AmplifierSimulationEffect amplifier;
@@ -181,10 +180,14 @@ public:
 	bool scanner_inverse = false;
 
 	double swell = 1;
+};
 
-	virtual SoundEngineData* copy() {
-		return new B3OrganData();	//TODO
-	}
+class B3OrganProgram : public EngineProgram {
+public:
+	B3OrganPreset preset;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
 };
 
 #define B3_ORGAN_POLYPHONY 61
@@ -216,6 +219,10 @@ public:
 	PropertyValue get(size_t prop, size_t sub_prop = 0);
 
 	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
+
+	void save_program(EngineProgram **prog);
+
+	void apply_program(EngineProgram *prog);
 
 };
 

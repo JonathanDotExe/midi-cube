@@ -678,3 +678,153 @@ std::string get_engine_name<B3Organ>() {
 void __fix_link_organ_name__ () {
 	get_engine_name<B3Organ>();
 }
+
+void B3Organ::save_program(EngineProgram **prog) {
+	B3OrganProgram* p = dynamic_cast<B3OrganProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new B3OrganProgram();
+	}
+	p->preset = data.preset;
+	*prog = p;
+}
+
+void B3Organ::apply_program(EngineProgram *prog) {
+	B3OrganProgram* p = dynamic_cast<B3OrganProgram*>(prog);
+	if (p) {
+		data.preset = p->preset;
+	}
+	else {
+		data.preset = {};
+	}
+}
+
+void B3OrganProgram::load(boost::property_tree::ptree tree) {
+	preset = {};
+	//Drawbars
+	const auto& drawbars = tree.get_child_optional("drawbars");
+	size_t i = 0;
+	if (drawbars) {
+		for (pt::ptree::value_type& d : drawbars.get()) {
+			if (i >= ORGAN_DRAWBAR_COUNT) {
+				break;
+			}
+
+			preset.drawbars[i] = d.second.get_value<unsigned int>(preset.drawbars[i]);
+
+			++i;
+		}
+	}
+	//Drawbar CCs
+	const auto& drawbar_ccs = tree.get_child_optional("drawbar_ccs");
+	i = 0;
+	if (drawbar_ccs) {
+		for (pt::ptree::value_type& d : drawbars.get()) {
+			if (i >= ORGAN_DRAWBAR_COUNT) {
+				break;
+			}
+
+			preset.drawbar_ccs[i] = d.second.get_value<unsigned int>(preset.drawbar_ccs[i]);
+			++i;
+		}
+	}
+
+	//Modeling
+	preset.harmonic_foldback_volume = tree.get<double>("harmonic_foldback_volume", 0.5);
+	preset.multi_note_gain = tree.get<double>("multi_note_gain", 0.8);
+
+	//Amplifier
+	preset.amplifier.on = tree.get<bool>("amplifier.on", false);
+	preset.amplifier.boost = tree.get<double>("amplifier.boost", 0);
+	preset.amplifier.drive = tree.get<double>("amplifier.drive", 0);
+	preset.amplifier.tone = tree.get<double>("amplifier.tone", 0.6);
+	preset.amplifier.type = (DistortionType) tree.get<int>("amplifier.distortion_type", DistortionType::ARCTAN_DISTORTION);
+
+	preset.amp_cc = tree.get<bool>("amplifier.on_cc", 28);
+	preset.amp_boost_cc = tree.get<double>("amplifier.boost_cc", 35);
+	preset.amp_drive_cc = tree.get<double>("amplifier.drive_cc", 36);
+	preset.amp_tone_cc = tree.get<double>("amplifier.tone_cc", 37);
+
+	//Rotary
+	preset.rotary.on = tree.get<bool>("rotary.on", false);
+	preset.rotary.fast = tree.get<bool>("rotary.fast", false);
+	preset.rotary.stereo_mix = tree.get<double>("rotary.stereo_mix", 0.5);
+	preset.rotary.type = tree.get<bool>("rotary.type", false);
+
+	preset.rotary_cc = tree.get<unsigned int>("rotary.on_cc", 22);
+	preset.rotary_speed_cc = tree.get<unsigned int>("rotary.speed_cc", 23);
+
+	tree.put("rotary.on_cc", preset.rotary_cc);
+	tree.put("rotary.speed_cc", preset.rotary_speed_cc);
+
+	//Percussion
+	preset.percussion = tree.get<bool>("percussion", false);
+	preset.percussion_third_harmonic = tree.get<bool>("percussion_third_harmonic", true);
+	preset.percussion_soft = tree.get<bool>("percussion_soft", true);
+	preset.percussion_fast_decay = tree.get<bool>("percussion_fast_decay", true);
+
+	preset.percussion_cc = tree.get<unsigned int>("percussion_cc", 24);
+	preset.percussion_third_harmonic_cc = tree.get<unsigned int>("percussion_third_harmonic_cc", 25);
+	preset.percussion_soft_cc = tree.get<unsigned int>("percussion_soft_cc", 26);
+	preset.percussion_fast_decay_cc = tree.get<unsigned int>("percussion_fast_decay_cc", 27);
+
+	//Vibrato/Chorus
+	preset.vibrato_mix = tree.get<double>("vibrato_mix", 0.0);
+	preset.vibrato_mix_cc = tree.get<unsigned int>("vibrato_mix_cc", 38);
+	preset.swell_cc = tree.get<unsigned int>("swell_cc", 11);
+}
+
+boost::property_tree::ptree B3OrganProgram::save() {
+	boost::property_tree::ptree tree;
+
+	//Drawbars
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		tree.add("drawbars.drawbar", preset.drawbars[i]);
+		tree.add("drawbar_ccs.drawbar", preset.drawbar_ccs[i]);
+	}
+
+	//Modeling
+	tree.put("harmonic_foldback_volume", preset.harmonic_foldback_volume);
+	tree.put("multi_note_gain", preset.multi_note_gain);
+
+	//Amplifier
+	tree.put("amplifier.on", preset.amplifier.on);
+	tree.put("amplifier.boost", preset.amplifier.boost);
+	tree.put("amplifier.drive", preset.amplifier.drive);
+	tree.put("amplifier.tone", preset.amplifier.tone);
+	tree.put("amplifier.distortion_type", (int) preset.amplifier.type);
+
+	tree.put("amplifier.on_cc", preset.amp_cc);
+	tree.put("amplifier.boost_cc", preset.amp_boost_cc);
+	tree.put("amplifier.drive_cc", preset.amp_drive_cc);
+	tree.put("amplifier.tone_cc", preset.amp_tone_cc);
+
+	//Rotary
+	tree.put("rotary.on", preset.rotary.on);
+	tree.put("rotary.fast", preset.rotary.fast);
+	tree.put("rotary.stereo_mix", preset.rotary.stereo_mix);
+	tree.put("rotary.type", preset.rotary.type);
+
+	tree.put("rotary.on_cc", preset.rotary_cc);
+	tree.put("rotary.speed_cc", preset.rotary_speed_cc);
+
+	//Percussion
+	tree.put("percussion", preset.percussion);
+	tree.put("percussion_third_harmonic", preset.percussion_third_harmonic);
+	tree.put("percussion_soft", preset.percussion_soft);
+	tree.put("percussion_fast_decay", preset.percussion_fast_decay);
+
+	tree.put("percussion_cc", preset.percussion_cc);
+	tree.put("percussion_third_harmonic_cc", preset.percussion_third_harmonic_cc);
+	tree.put("percussion_soft_cc", preset.percussion_soft_cc);
+	tree.put("percussion_fast_decay_cc", preset.percussion_fast_decay_cc);
+
+	//Vibrato/Chorus
+	tree.put("vibrato_mix", preset.vibrato_mix);
+	tree.put("vibrato_mix_cc", preset.vibrato_mix_cc);
+	tree.put("swell_cc", preset.swell_cc);
+
+
+	return tree;
+}

@@ -91,7 +91,7 @@ void SoundEngineChannel::update_properties() {
 	submit_change(SoundEngineChannelProperty::pArpeggiatorOn, arp.on);
 	submit_change(SoundEngineChannelProperty::pArpeggiatorPattern, arp.preset.pattern);
 	submit_change(SoundEngineChannelProperty::pArpeggiatorOctaves, (int) arp.preset.octaves);
-	submit_change(SoundEngineChannelProperty::pArpeggiatorStep, arp.preset.value);
+	submit_change(SoundEngineChannelProperty::pArpeggiatorStep, (int) arp.preset.value);
 	submit_change(SoundEngineChannelProperty::pArpeggiatorHold, arp.preset.hold);
 	submit_change(SoundEngineChannelProperty::pArpeggiatorBPM, (int) arp.metronome.get_bpm());
 }
@@ -345,6 +345,56 @@ void SoundEngineDevice::update_properties() {
 	submit_change(SoundEngineProperty::pEngineMetronomeOn, play_metronome);
 	submit_change(SoundEngineProperty::pEngineMetronomeBPM, (int) metronome.get_bpm());
 	submit_change(SoundEngineProperty::pEngineVolume, volume);
+}
+
+void SoundEngineDevice::apply_program(Program* program) {
+	//Global
+	metronome.set_bpm(program->metronome_bpm);
+	//Channels
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		ChannelProgram& prog = program->channels[i];
+		SoundEngineChannel& ch = channels[i];
+		ch.set_engine(prog.engine_index);
+		ch.active = prog.active;
+		ch.volume = prog.volume;
+		ch.panning = prog.panning;
+
+		ch.source = prog.source;
+		ch.arp.on = prog.arp_on;
+		ch.arp.metronome.set_bpm(prog.arpeggiator_bpm);
+		ch.arp.preset = prog.arpeggiator;
+
+		//Engine
+		SoundEngine* engine = ch.get_engine(sound_engines, i);
+		if (engine) {
+			engine->apply_program(prog.engine_program);
+		}
+	}
+}
+
+void SoundEngineDevice::save_program(Program* program) {
+	//Global
+	program->metronome_bpm = metronome.get_bpm();
+	//Channels
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		ChannelProgram& prog = program->channels[i];
+		SoundEngineChannel& ch = channels[i];
+		prog.engine_index = ch.get_engine();
+		prog.active = ch.active;
+		prog.volume = ch.volume;
+		prog.panning = ch.panning;
+
+		prog.source = ch.source;
+		prog.arp_on = ch.arp.on;
+		prog.arpeggiator_bpm = ch.arp.metronome.get_bpm();
+		prog.arpeggiator = ch.arp.preset;
+
+		//Engine
+		SoundEngine* engine = ch.get_engine(sound_engines, i);
+		if (engine) {
+			engine->save_program(&prog.engine_program);
+		}
+	}
 }
 
 SoundEngineDevice::~SoundEngineDevice() {

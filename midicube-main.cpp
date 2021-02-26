@@ -6,7 +6,7 @@
 using namespace std;
 
 struct MidiCubePtr {
-	MidiCube* cube;
+	MidiCube* cube = nullptr;
 	~MidiCubePtr() {
 		delete cube;
 	}
