@@ -718,6 +718,17 @@ boost::property_tree::ptree B3OrganProgram::save() {
 	tree.put("harmonic_foldback_volume", preset.harmonic_foldback_volume);
 	tree.put("multi_note_gain", preset.multi_note_gain);
 
+	//Amplifier
+	tree.put("amplifier.on", preset.amplifier.on);
+	tree.put("amplifier.boost", preset.amplifier.boost);
+	tree.put("amplifier.drive", preset.amplifier.drive);
+	tree.put("amplifier.tone", preset.amplifier.tone);
+	tree.put("amplifier.distortion_type", (int) preset.amplifier.type);
+	tree.put("amplifier.on_cc", preset.amp_cc);
+	tree.put("amplifier.boost_cc", preset.amp_boost_cc);
+	tree.put("amplifier.drive_cc", preset.amp_drive_cc);
+	tree.put("amplifier.tone_cc", preset.amp_tone_cc);
+
 	//Percussion
 	tree.put("percussion", preset.percussion);
 	tree.put("percussion_third_harmonic", preset.percussion_third_harmonic);
