@@ -729,6 +729,15 @@ boost::property_tree::ptree B3OrganProgram::save() {
 	tree.put("amplifier.drive_cc", preset.amp_drive_cc);
 	tree.put("amplifier.tone_cc", preset.amp_tone_cc);
 
+	//Rotary
+	tree.put("rotary.on", preset.rotary.on);
+	tree.put("rotary.fast", preset.rotary.fast);
+	tree.put("rotary.stereo_mix", preset.rotary.stereo_mix);
+	tree.put("rotary.type", preset.rotary.type);
+
+	tree.put("rotary.on_cc", preset.rotary_cc);
+	tree.put("rotary.speed_cc", preset.rotary_speed_cc);
+
 	//Percussion
 	tree.put("percussion", preset.percussion);
 	tree.put("percussion_third_harmonic", preset.percussion_third_harmonic);
