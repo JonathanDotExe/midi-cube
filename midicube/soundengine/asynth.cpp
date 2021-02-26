@@ -1189,12 +1189,40 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	const auto& envs = tree.get_child_optional("mod_envs");
 	if (envs) {
 		size_t i = 0;
-		for (pt::ptree::value_type& env : lfos.get()) {
+		for (pt::ptree::value_type& env : envs.get()) {
 			if (i >= ANALOG_PART_COUNT) {
 				break;
 			}
 			preset.mod_envs[i].volume = load_prop_mod(env.second, "volume");
-			preset.mod_envs[i].env = env.second.get<double>("freq", 1);
+			preset.mod_envs[i].env = load_adsr(env.second, "env");
+			++i;
+		}
+	}
+
+	//Oscilators
+	const auto& oscs = tree.get_child_optional("oscilators");
+	if (oscs) {
+		size_t i = 0;
+		for (pt::ptree::value_type& o : oscs.get()) {
+			if (i >= ANALOG_PART_COUNT) {
+				break;
+			}
+			OscilatorEntity& osc = preset.oscilators[i];
+			osc.waveform = (AnalogWaveForm) o.second.get<int>("waveform", 0);
+			osc.analog = o.second.get<bool>("analog", true);
+			osc.sync = o.second.get<bool>("sync", false);
+			osc.reset = o.second.get<bool>("reset", false);
+			osc.randomize = o.second.get<bool>("randomize", false);
+
+			osc.unison_amount = o.second.get<size_t>("unison_amount", 0);
+			osc.volume = load_prop_mod(o.second, "volume");
+			osc.sync_mul = load_prop_mod(o.second, "sync_mul");
+			osc.pulse_width = load_prop_mod(o.second, "pulse_width");
+			osc.unison_detune = load_prop_mod(o.second, "unison_detune");
+
+			osc.semi = o.second.get<int>("semi", 0);
+			osc.transpose = o.second.get<double>("transpose", 0);
+			osc.pitch = load_prop_mod(o.second, "pitch");
 			++i;
 		}
 	}
