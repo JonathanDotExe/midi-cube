@@ -70,10 +70,10 @@ Program* load_program(pt::ptree& tree) {
 					program->channels[i].engine_program = new B3OrganProgram();
 				}
 				//Synth
-				else if (program->channels[i].engine_index == 1) {
+				else if (program->channels[i].engine_index == 2) {
 					program->channels[i].engine_program = new AnalogSynthProgram();
 				}
-				const auto& preset =  tree.get_child_optional("preset");
+				const auto& preset =  c.second.get_child_optional("preset");
 				if (preset && program->channels[i].engine_program) {
 					program->channels[i].engine_program->load(preset.get());
 				}

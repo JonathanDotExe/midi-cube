@@ -1113,7 +1113,7 @@ static PropertyModulation load_prop_mod(boost::property_tree::ptree tree) {
 	mod.lfo = tree.get<size_t>("lfo", 0);
 	mod.lfo_amount = tree.get<double>("lfo_amount", 0);
 	mod.velocity_amount = tree.get<double>("velocity_amount", 0);
-	mod.mod_env = tree.get<size_t>("cc", 1);
+	mod.cc = tree.get<size_t>("cc", 1);
 	mod.cc_amount = tree.get<double>("cc_amount", 0);
 	return mod;
 }
