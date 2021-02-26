@@ -1226,6 +1226,50 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			++i;
 		}
 	}
+
+	//Operators
+	const auto& ops = tree.get_child_optional("operators");
+	if (ops) {
+		size_t i = 0;
+		for (pt::ptree::value_type& o : ops.get()) {
+			if (i >= ANALOG_PART_COUNT) {
+				break;
+			}
+
+			OperatorEntity& op = preset.operators[i];
+
+			op.audible = o.second.get<bool>("audible", true);
+			op.env = load_adsr(o.second, "env");
+			op.volume = load_prop_mod(o.second, "volume");
+			op.panning = load_prop_mod(o.second, "panning");
+
+			op.filter = o.second.get<bool>("filter", true);
+			op.filter_type = (FilterType) o.second.get<int>("filter_type", 0);
+			op.filter_cutoff = load_prop_mod(o.second, "filter_cutoff");
+			op.filter_resonance = load_prop_mod(o.second, "filter_resonance");
+			op.filter_kb_track = o.second.get<double>("filter_kb_track", 0);
+			op.filter_kb_track_note = o.second.get<int>("filter_kb_track", 36);
+
+			op.oscilator_count = o.second.get<size_t>("oscilator_count", 1);
+
+
+			const auto& fm = tree.get_child_optional("operators");
+			size_t k = 0;
+			if (fm) {
+				for (pt::ptree::value_type& f : fm.get()) {
+					if (k >= ANALOG_PART_COUNT) {
+						break;
+					}
+
+					op.fm[k] = f.second.get_value<double>(0.0);
+
+					++k;
+				}
+			}
+
+			++i;
+		}
+	}
 }
 
 boost::property_tree::ptree AnalogSynthProgram::save() {
