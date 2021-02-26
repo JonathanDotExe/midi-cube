@@ -703,6 +703,36 @@ void B3Organ::apply_program(EngineProgram *prog) {
 }
 
 void B3OrganProgram::load(boost::property_tree::ptree tree) {
+	//Drawbars
+	const auto& drawbars = tree.get_child_optional("drawbars");
+	size_t i = 0;
+	if (drawbars) {
+		for (pt::ptree::value_type& d : drawbars.get()) {
+			if (i >= ORGAN_DRAWBAR_COUNT) {
+				break;
+			}
+
+			preset.drawbars[i] = d.second.get_value<unsigned int>(preset.drawbars[i]);
+
+			++i;
+		}
+	}
+
+	//Drawbar CCs
+	const auto& drawbar_ccs = tree.get_child_optional("drawbar_ccs");
+	i = 0;
+	if (drawbar_ccs) {
+		for (pt::ptree::value_type& d : drawbars.get()) {
+			if (i >= ORGAN_DRAWBAR_COUNT) {
+				break;
+			}
+
+			preset.drawbar_ccs[i] = d.second.get_value<unsigned int>(preset.drawbar_ccs[i]);
+			++i;
+		}
+	}
+
+
 }
 
 boost::property_tree::ptree B3OrganProgram::save() {
