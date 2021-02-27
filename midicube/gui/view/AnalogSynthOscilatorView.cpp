@@ -142,8 +142,8 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder
 		Label* title = new Label("Sustain", main_font, 12, x, y);
 		controls->push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40, scale);
-		value->drag_step = 4;
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		value->drag_step = 2;
 		value->bind(holder, prop + 2);
 		controls->push_back(value);
 	}
