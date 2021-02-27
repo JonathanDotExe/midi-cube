@@ -15,11 +15,11 @@
 
 struct SampleFilter {
 	FilterType filter_type = FilterType::LP_12;
-	double filter_cutoff = 0.10;
+	double filter_cutoff = 1;
 	double filter_resonance = 0;
-	double filter_kb_track = 1;
+	double filter_kb_track = 0;
 	unsigned int filter_kb_track_note = 36;
-	double filter_velocity_amount = 0.6;
+	double filter_velocity_amount = 0.0;
 };
 
 struct SampleEnvelope {
@@ -31,8 +31,8 @@ struct SampleZone {
 	AudioSample sample;
 	double freq = 0;
 	double max_freq = 0;
-	size_t filter = 0;
-	size_t env = 0;
+	ssize_t filter = -1;
+	ssize_t env = -1;
 
 	SampleZone () {
 		sample.clear();

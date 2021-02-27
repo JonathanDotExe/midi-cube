@@ -81,7 +81,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		double vol = 1;
 		if (note.env_data) {
 			//Volume
-			double vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
+			vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
 			vol *= note.env_data->amp_velocity_amount * (note.velocity - 1) + 1;
 		}
 		//Sound
@@ -124,10 +124,10 @@ void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	voice.env.reset();
 	voice.zone = this->sample->get_sample(voice.freq, voice.velocity);
 	if (voice.zone) {
-		if (voice.zone->env < sample->envelopes.size()) {
+		if (voice.zone->env >= 0 && (size_t) voice.zone->env < sample->envelopes.size()) {
 			voice.env_data = &sample->envelopes[voice.zone->env];
 		}
-		if (voice.zone->filter < sample->filters.size()) {
+		if (voice.zone->filter >= 0 && (size_t) voice.zone->filter < sample->filters.size()) {
 			voice.filter = &sample->filters[voice.zone->filter];
 		}
 	}
