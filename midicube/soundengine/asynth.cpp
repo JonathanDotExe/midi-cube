@@ -1131,7 +1131,7 @@ static ADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
 
 	data.attack = tree.get("attack", 0.0005);
 	data.decay = tree.get("decay", 0.0);
-	data.sustain = tree.get("sustain", 1);
+	data.sustain = tree.get("sustain", 1.0);
 	data.release = tree.get("release", 0.0005);
 
 	return data;

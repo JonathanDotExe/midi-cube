@@ -64,7 +64,7 @@ B3Organ::B3Organ() {
 	//Tonewheel volumes
 	const size_t start_tw = 72;
 	for (size_t i = 0; i < tonewheel_data.size() - start_tw; ++i) {
-		double curr_vol = db_to_amp((-3 * ((int) i/12 + 1)));
+		double curr_vol = db_to_amp((-2 * ((int) i/12 + 1)));
 		tonewheel_data[i + start_tw].volume = curr_vol;
 	}
 }
@@ -731,7 +731,7 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	}
 
 	//Modeling
-	preset.harmonic_foldback_volume = tree.get<double>("harmonic_foldback_volume", 0.5);
+	preset.harmonic_foldback_volume = tree.get<double>("harmonic_foldback_volume", 1);
 	preset.multi_note_gain = tree.get<double>("multi_note_gain", 0.8);
 
 	//Amplifier
@@ -741,10 +741,10 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	preset.amplifier.tone = tree.get<double>("amplifier.tone", 0.6);
 	preset.amplifier.type = (DistortionType) tree.get<int>("amplifier.distortion_type", DistortionType::ARCTAN_DISTORTION);
 
-	preset.amp_cc = tree.get<bool>("amplifier.on_cc", 28);
-	preset.amp_boost_cc = tree.get<double>("amplifier.boost_cc", 35);
-	preset.amp_drive_cc = tree.get<double>("amplifier.drive_cc", 36);
-	preset.amp_tone_cc = tree.get<double>("amplifier.tone_cc", 37);
+	preset.amp_cc = tree.get<unsigned int>("amplifier.on_cc", 28);
+	preset.amp_boost_cc = tree.get<unsigned int>("amplifier.boost_cc", 35);
+	preset.amp_drive_cc = tree.get<unsigned int>("amplifier.drive_cc", 36);
+	preset.amp_tone_cc = tree.get<unsigned int>("amplifier.tone_cc", 37);
 
 	//Rotary
 	preset.rotary.on = tree.get<bool>("rotary.on", false);
