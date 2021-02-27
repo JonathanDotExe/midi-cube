@@ -124,7 +124,12 @@ void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	voice.env.reset();
 	voice.zone = this->sample->get_sample(voice.freq, voice.velocity);
 	if (voice.zone) {
-
+		if (voice.zone->env < sample->envelopes.size()) {
+			voice.env_data = &sample->envelopes[voice.zone->env];
+		}
+		if (voice.zone->filter < sample->filters.size()) {
+			voice.filter = &sample->filters[voice.zone->filter];
+		}
 	}
 }
 
