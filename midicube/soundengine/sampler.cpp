@@ -157,6 +157,48 @@ extern SampleSound* load_sound(std::string folder) {
 		//Parse
 		sound = new SampleSound();
 		sound->name = tree.get<std::string>("sound.name", "Sound");
+		//Load Envelopes
+		for (auto e : tree.get_child("sound.envelopes")) {
+			SampleEnvelope env = {};
+			env.amp_velocity_amount = e.second.get<double>("velocity_amount", 0);
+			env.env.attack = e.second.get<double>("attack", 0);
+			env.env.decay = e.second.get<double>("decay", 0);
+			env.env.sustain = e.second.get<double>("sustain", 1);
+			env.env.release = e.second.get<double>("release", 0);
+
+			sound->envelopes.push_back(env);
+		}
+		//Load Filters
+		for (auto f : tree.get_child("sound.filters")) {
+			SampleFilter filter = {};
+			filter.filter_cutoff = f.second.get<double>("cutoff", 1);
+			filter.filter_kb_track = f.second.get<double>("kb_track", 0);
+			filter.filter_kb_track_note = f.second.get<unsigned int>("kb_track_note", 36);
+			filter.filter_resonance = f.second.get<double>("resonance", 0);
+			filter.filter_velocity_amount = f.second.get<double>("velocity_amount", 0);
+
+			std::string type = f.second.get<std::string>("type");
+			if (type == "LP_12") {
+				filter.filter_type = FilterType::LP_12;
+			}
+			else if (type == "LP_24") {
+				filter.filter_type = FilterType::LP_24;
+			}
+			else if (type == "HP_12") {
+				filter.filter_type = FilterType::HP_12;
+			}
+			else if (type == "HP_24") {
+				filter.filter_type = FilterType::HP_24;
+			}
+			else if (type == "BP_12") {
+				filter.filter_type = FilterType::LP_12;
+			}
+			else if (type == "BP_24") {
+				filter.filter_type = FilterType::LP_24;
+			}
+
+			sound->filters.push_back(filter);
+		}
 		//Load velocity layers
 		for (auto r : tree.get_child("sound.velocity_layers")) {
 			SampleVelocityLayer* layer = new SampleVelocityLayer();
@@ -166,10 +208,8 @@ extern SampleSound* load_sound(std::string folder) {
 				SampleZone* zone = new SampleZone();
 				zone->freq = note_to_freq(z.second.get<double>("note", 60.0));
 				zone->max_freq = note_to_freq(z.second.get<double>("max_note", 127.0));
-				zone->env.attack = z.second.get<double>("amp_env.attack", 0);
-				zone->env.decay = z.second.get<double>("amp_env.decay", 0);
-				zone->env.sustain = z.second.get<double>("amp_env.sustain", 1);
-				zone->env.release = z.second.get<double>("amp_env.release", 0);
+				zone->env = z.second.get<double>("envelope", 0);
+				zone->filter = z.second.get<double>("filter", 0);
 				std::string file = folder + "/" + z.second.get<std::string>("sample", "");
 				if (!read_audio_file(zone->sample, file)) {
 					std::cerr << "Couldn't load sample file " << file << std::endl;
