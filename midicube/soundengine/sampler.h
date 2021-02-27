@@ -13,21 +13,25 @@
 #include "../audiofile.h"
 #include "../envelope.h"
 
-struct SampleZone {
-	AudioSample sample;
-	double freq = 0;
-	double max_freq = 0;
-	ADSREnvelopeData env = {0, 0, 1, 0};
-
-	double amp_velocity_amount = 0.5;
-
+struct SampleFilter {
 	FilterType filter_type = FilterType::LP_12;
-	bool filter = true;
+	bool filter = false;
 	double filter_cutoff = 0.10;
 	double filter_resonance = 0;
 	double filter_kb_track = 1;
 	unsigned int filter_kb_track_note = 36;
-	double filter_velocity_amount = 0.55;
+	double filter_velocity_amount = 0.6;
+};
+
+struct SampleEnvelope {
+	ADSREnvelopeData env = {0, 0, 1, 0};
+	double amp_velocity_amount = 0.0;
+};
+
+struct SampleZone {
+	AudioSample sample;
+	double freq = 0;
+	double max_freq = 0;
 
 	SampleZone () {
 		sample.clear();
@@ -50,6 +54,8 @@ struct SampleVelocityLayer {
 class SampleSound {
 public:
 	std::string name = "Sample";
+	std::vector<SampleEnvelope> envelopes = {};
+	std::vector<SampleFilter> filters = {};
 	std::vector<SampleVelocityLayer*> samples = {};
 
 	SampleSound();
@@ -107,6 +113,8 @@ public:
 };
 
 extern SampleSound* load_sound(std::string folder);
+
+extern void save_sound(std::string file);
 
 
 #endif /* MIDICUBE_SOUNDENGINE_SAMPLER_H_ */

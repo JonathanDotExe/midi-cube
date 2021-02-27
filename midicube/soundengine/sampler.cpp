@@ -176,6 +176,10 @@ extern SampleSound* load_sound(std::string folder) {
 	return sound;
 }
 
+extern void save_sound(std::string file) {
+
+}
+
 template<>
 std::string get_engine_name<Sampler>() {
 	return "Sampler";
