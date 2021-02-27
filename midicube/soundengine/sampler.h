@@ -15,7 +15,6 @@
 
 struct SampleFilter {
 	FilterType filter_type = FilterType::LP_12;
-	bool filter = false;
 	double filter_cutoff = 0.10;
 	double filter_resonance = 0;
 	double filter_kb_track = 1;
@@ -32,6 +31,8 @@ struct SampleZone {
 	AudioSample sample;
 	double freq = 0;
 	double max_freq = 0;
+	size_t filter = 0;
+	size_t env = 0;
 
 	SampleZone () {
 		sample.clear();
@@ -84,6 +85,8 @@ public:
 
 struct SamplerVoice : public TriggeredNote {
 	SampleZone* zone = nullptr;
+	SampleEnvelope* env_data = nullptr;
+	SampleFilter* filter = nullptr;
 	ADSREnvelope env;
 	Filter lfilter;
 	Filter rfilter;

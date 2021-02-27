@@ -78,23 +78,26 @@ Sampler::Sampler() {
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.zone) {
-		//Volume
-		double vol = note.env.amplitude(note.zone->env, info.time_step, note.pressed, env.sustain);
-		vol *= note.zone->amp_velocity_amount * (note.velocity - 1) + 1;
+		double vol = 1;
+		if (note.env_data) {
+			//Volume
+			double vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
+			vol *= note.env_data->amp_velocity_amount * (note.velocity - 1) + 1;
+		}
 		//Sound
 		double time = (info.time - note.start_time) * note.freq/note.zone->freq * env.pitch_bend;
 		double l = note.zone->sample.isample(0, time, info.sample_rate) * vol;
 		double r = note.zone->sample.isample(1, time, info.sample_rate) * vol;
 		//Filter
-		if (note.zone->filter) {
-			FilterData filter { note.zone->filter_type };
-			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.zone->filter_cutoff + note.zone->filter_velocity_amount * note.velocity))); //TODO optimize
-			filter.resonance = note.zone->filter_resonance;
+		if (note.filter) {
+			FilterData filter { note.filter->filter_type };
+			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.filter->filter_cutoff + note.filter->filter_velocity_amount * note.velocity))); //TODO optimize
+			filter.resonance = note.filter->filter_resonance;
 
-			if (note.zone->filter_kb_track) {
+			if (note.filter->filter_kb_track) {
 				double cutoff = filter.cutoff;
 				//KB track
-				cutoff *= 1 + ((double) note.note - 36) / 12.0 * note.zone->filter_kb_track;
+				cutoff *= 1 + ((double) note.note - 36) / 12.0 * note.filter->filter_kb_track;
 				filter.cutoff = cutoff;
 			}
 
@@ -120,6 +123,9 @@ void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	SamplerVoice& voice = this->note.note[slot];
 	voice.env.reset();
 	voice.zone = this->sample->get_sample(voice.freq, voice.velocity);
+	if (voice.zone) {
+
+	}
 }
 
 void Sampler::release_note(SampleInfo& info, unsigned int note) {
