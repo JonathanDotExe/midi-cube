@@ -45,13 +45,14 @@ Program* load_program(pt::ptree& tree) {
 						if (j >= SOUND_ENGINE_SCENE_AMOUNT) {
 							break;
 						}
-						program->channels[i].active[j] = s.second.get_value(false);
+						program->channels[i].active[j] = s.second.get_value<bool>(false);
+						++j;
 					}
-					++j;
 				}
 				else {
 					program->channels[i].active =  {c.second.get<bool>("active", false)};
 				}
+				std::cout << "First active " << program->channels[i].active[0] << std::endl;
 				program->channels[i].volume = c.second.get<double>("volume", 1);
 				program->channels[i].panning = c.second.get<double>("panning", 0.5);
 				//Source
