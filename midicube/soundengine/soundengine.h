@@ -273,9 +273,9 @@ public:
 
 	SoundEngineChannel();
 
-	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine);
+	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine, size_t scene);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, SoundEngine* engine);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, SoundEngine* engine, size_t scene);
 
 	PropertyValue get(size_t prop, size_t sub_prop);
 
