@@ -48,7 +48,7 @@ void SoundFontSynth::release_note(SampleInfo& info, unsigned int note) {
 	fluid_synth_noteoff(synth, 0, note);
 }
 
-void SoundFontSynth::process_sample(double& lsample, double& rsample, SampleInfo& info) {
+EngineStatus SoundFontSynth::process_sample(double& lsample, double& rsample, SampleInfo& info) {
 	float left = 0;
 	float right = 0;
 	fluid_synth_write_float(synth, 1, &left, 0, 1, &right, 0, 1);
@@ -56,6 +56,8 @@ void SoundFontSynth::process_sample(double& lsample, double& rsample, SampleInfo
 	//Play
 	lsample += left * 5;
 	rsample += right * 5;
+
+	return {0, 0};
 }
 
 SoundFontSynth::~SoundFontSynth() {

@@ -20,7 +20,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 		double l = 0;
 		double r = 0;
 
-		if (active[scene]) {
+		if (active[scene] || status.pressed_notes) {
 			//Arpeggiator
 			if (arp.on) {
 				arp.apply(info,
@@ -32,7 +32,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				});
 			}
 			//Process
-			engine->process_sample(l, r, info);
+			status = engine->process_sample(l, r, info);
 			//Vocoder
 			vocoder.apply(l, r, info.input_sample, vocoder_preset, info);
 			//Bit Crusher
@@ -50,7 +50,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 }
 
 void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine, size_t scene) {
-	if (active[scene]) {
+	if (active[scene] || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
 		if (arp.on) {
 			switch (message.type) {
 			case MessageType::NOTE_ON:
