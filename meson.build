@@ -52,6 +52,7 @@ src = [
 	'midicube/gui/view/B3OrganView.cpp',
 	'midicube/gui/view/ProgramRenameView.cpp',
 	'midicube/gui/view/ProgramView.cpp',
+	'midicube/gui/view/SceneView.cpp',
 	'midicube/gui/view/SoundEngineChannelView.cpp',
 	'midicube/gui/view/SoundEngineView.cpp',
 	
