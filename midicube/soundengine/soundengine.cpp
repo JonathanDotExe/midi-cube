@@ -354,6 +354,12 @@ void SoundEngineDevice::apply_program(Program* program) {
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
+		//Reset old engine
+		SoundEngine* engine = ch.get_engine(sound_engines, i);
+		if (engine) {
+			engine->apply_program(nullptr);
+		}
+
 		ch.set_engine(prog.engine_index);
 		ch.active = prog.active;
 		ch.volume = prog.volume;
@@ -365,7 +371,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ch.arp.preset = prog.arpeggiator;
 
 		//Engine
-		SoundEngine* engine = ch.get_engine(sound_engines, i);
+		engine = ch.get_engine(sound_engines, i);
 		if (engine) {
 			engine->apply_program(prog.engine_program);
 		}
