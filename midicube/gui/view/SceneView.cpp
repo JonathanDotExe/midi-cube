@@ -35,7 +35,7 @@ Scene SceneView::create(Frame &frame) {
 		int x = 10 + pane_width * (i % cols);
 		int y = 10 + pane_height * (i / cols);
 		//Engine
-		Button* scene = new Button("Scene " + std::to_string(i + 1), main_font, 12, x, y,  pane_width - 5, pane_height - 5);
+		Button* scene = new Button("Scene " + std::to_string(i + 1), main_font, 32, x, y,  pane_width - 5, pane_height - 5);
 		if (this->engine->scene == i) {
 			scene->rect.setFillColor(sf::Color(0, 180, 255));
 		}
@@ -55,7 +55,7 @@ Scene SceneView::create(Frame &frame) {
 	}
 
 	//Exit Button
-	Button* exit = new Button("Exit", main_font, 32, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
+	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	exit->set_on_click([&frame]() {
 		frame.change_view(new SoundEngineView());
 	});
