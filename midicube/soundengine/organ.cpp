@@ -720,7 +720,7 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	const auto& drawbar_ccs = tree.get_child_optional("drawbar_ccs");
 	i = 0;
 	if (drawbar_ccs) {
-		for (pt::ptree::value_type& d : drawbars.get()) {
+		for (pt::ptree::value_type& d : drawbar_ccs.get()) {
 			if (i >= ORGAN_DRAWBAR_COUNT) {
 				break;
 			}
