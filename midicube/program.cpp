@@ -38,7 +38,20 @@ Program* load_program(pt::ptree& tree) {
 			if (i < program->channels.size()) {
 				//Channel
 				program->channels[i].engine_index = c.second.get<ssize_t>("engine", -1);
-				program->channels[i].active = c.second.get<bool>("active", false);
+				const auto& scenes = c.second.get_child_optional("scenes");
+				if (scenes) {
+					size_t j = 0;
+					for (pt::ptree::value_type& s : scenes.get()) {
+						if (j >= SOUND_ENGINE_SCENE_AMOUNT) {
+							break;
+						}
+						program->channels[i].active[j] = s.second.get_value(false);
+					}
+					++j;
+				}
+				else {
+					program->channels[i].active =  {c.second.get<bool>("active", false)};
+				}
 				program->channels[i].volume = c.second.get<double>("volume", 1);
 				program->channels[i].panning = c.second.get<double>("panning", 0.5);
 				//Source
@@ -92,7 +105,9 @@ void save_program(Program* program, pt::ptree& tree) {
 		pt::ptree c;
 		//Channel
 		c.put("engine", program->channels[i].engine_index);
-		c.put("active", program->channels[i].active);
+		for (size_t j = 0; j < SOUND_ENGINE_SCENE_AMOUNT; ++j) {
+			c.add("scenes.active", program->channels[i].active[j]);
+		}
 		c.put("volume", program->channels[i].volume);
 		c.put("panning", program->channels[i].panning);
 		//Source

@@ -350,6 +350,7 @@ void SoundEngineDevice::update_properties() {
 void SoundEngineDevice::apply_program(Program* program) {
 	//Global
 	metronome.set_bpm(program->metronome_bpm);
+	scene = 0;
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelProgram& prog = program->channels[i];

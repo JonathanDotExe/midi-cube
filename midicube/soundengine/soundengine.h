@@ -307,7 +307,7 @@ public:
 
 struct ChannelProgram {
 	ssize_t engine_index{-1};
-	bool active{false};
+	std::array<bool, SOUND_ENGINE_SCENE_AMOUNT> active{false};
 	double volume{1};
 	double panning = 0;
 
