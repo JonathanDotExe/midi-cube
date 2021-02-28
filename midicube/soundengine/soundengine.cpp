@@ -71,7 +71,7 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngin
 }
 
 void SoundEngineChannel::update_properties() {
-	submit_change(SoundEngineChannelProperty::pChannelActive, active);
+	submit_change(SoundEngineChannelProperty::pChannelActive, active[device->scene]);
 	submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
 	submit_change(SoundEngineChannelProperty::pChannelPanning, panning);
 	submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) engine_index);
@@ -101,7 +101,7 @@ PropertyValue SoundEngineChannel::get(size_t prop, size_t sub_prop) {
 	PropertyValue value = {0};
 	switch ((SoundEngineChannelProperty) prop) {
 	case SoundEngineChannelProperty::pChannelActive:
-		value.bval = active;
+		value.bval = active[device->scene];
 		break;
 	case SoundEngineChannelProperty::pChannelVolume:
 		value.dval = volume;
@@ -173,7 +173,7 @@ PropertyValue SoundEngineChannel::get(size_t prop, size_t sub_prop) {
 void SoundEngineChannel::set(size_t prop, PropertyValue value, size_t sub_prop) {
 	switch ((SoundEngineChannelProperty) prop) {
 	case SoundEngineChannelProperty::pChannelActive:
-		active = value.bval;
+		active[device->scene] = value.bval;
 		break;
 	case SoundEngineChannelProperty::pChannelVolume:
 		volume = value.dval;
@@ -265,6 +265,10 @@ SoundEngineChannel::~SoundEngineChannel() {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	metronome.init(0);
+	for (size_t i = 0; i < this->channels.size(); ++i) {
+		SoundEngineChannel& ch = this->channels[i];
+		ch.init_device(this);
+	}
 }
 
 void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleInfo &info) {

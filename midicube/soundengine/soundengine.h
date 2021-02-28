@@ -253,9 +253,12 @@ enum SoundEngineChannelProperty {
 	pArpeggiatorBPM
 };
 
+class SoundEngineDevice;
+
 class SoundEngineChannel : public PropertyHolder {
 private:
 	std::atomic<ssize_t> engine_index{0};
+	SoundEngineDevice* device = nullptr;
 
 public:
 	double volume{1};
@@ -272,6 +275,12 @@ public:
 	BitCrusherEffect bitcrusher;
 
 	SoundEngineChannel();
+
+	void init_device(SoundEngineDevice* device) {
+		if (!this->device) {
+			this->device = device;
+		}
+	}
 
 	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine, size_t scene);
 
