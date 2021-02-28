@@ -305,12 +305,6 @@ void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	}
 }
 
-void SoundEngineDevice::solo (unsigned int channel) {
-	for (size_t i = 0; i < channels.size(); ++i) {
-		channels[i].active = channel == i;
-	}
-}
-
 PropertyValue SoundEngineDevice::get(size_t prop, size_t sub_prop) {
 	PropertyValue val;
 	switch ((SoundEngineProperty) prop) {

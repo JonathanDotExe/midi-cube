@@ -26,6 +26,8 @@
 
 namespace pt = boost::property_tree;
 
+#define SOUND_ENGINE_SCENE_AMOUNT 8
+
 class SoundEngineDevice;
 
 struct EngineStatus {
@@ -257,7 +259,7 @@ private:
 
 public:
 	double volume{1};
-	bool active{false};
+	std::array<bool, SOUND_ENGINE_SCENE_AMOUNT> active{false};
 	double panning = 0;
 	ChannelSource source;
 	Arpeggiator arp;
@@ -334,6 +336,7 @@ public:
 	std::atomic<bool> play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	double volume{0.2};
+	std::atomic<size_t> scene{0};
 
 	SoundEngineDevice();
 
@@ -344,8 +347,6 @@ public:
 	void send(MidiMessage& message, SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
-
-	void solo (unsigned int channel);
 
 	PropertyValue get(size_t prop, size_t sub_prop = 0);
 
