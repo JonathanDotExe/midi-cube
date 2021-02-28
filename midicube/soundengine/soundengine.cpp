@@ -14,32 +14,33 @@ SoundEngineChannel::SoundEngineChannel() {
 	engine_index = -1;
 }
 
-void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, SoundEngine* engine) {
+void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, SoundEngine* engine, size_t scene) {
 	//Properties
 	if (engine) {
 		double l = 0;
 		double r = 0;
-		//Arpeggiator
-		if (arp.on) {
-			arp.apply(info,
-			[engine](SampleInfo& i, unsigned int note, double velocity) {
-				engine->press_note(i, note, velocity);
-			},
-			[engine](SampleInfo& i, unsigned int note) {
-				engine->release_note(i, note);
-			});
+
+		if (active[scene] || status.pressed_notes) {
+			//Arpeggiator
+			if (arp.on) {
+				arp.apply(info,
+				[engine](SampleInfo& i, unsigned int note, double velocity) {
+					engine->press_note(i, note, velocity);
+				},
+				[engine](SampleInfo& i, unsigned int note) {
+					engine->release_note(i, note);
+				});
+			}
+			//Process
+			status = engine->process_sample(l, r, info);
+			//Vocoder
+			vocoder.apply(l, r, info.input_sample, vocoder_preset, info);
+			//Bit Crusher
+			bitcrusher.apply(l, r, bitcrusher_preset, info);
+			//Pan
+			l *= (1 - fmax(0, panning));
+			r *= (1 - fmax(0, -panning));
 		}
-		//Process
-		if (active) {
-			engine->process_sample(l, r, info);
-		}
-		//Vocoder
-		vocoder.apply(l, r, info.input_sample, vocoder_preset, info);
-		//Bit Crusher
-		bitcrusher.apply(l, r, bitcrusher_preset, info);
-		//Pan
-		l *= (1 - fmax(0, panning));
-		r *= (1 - fmax(0, -panning));
 		//Looper
 		looper.apply(l, r, metronome, info);
 		//Playback
@@ -48,8 +49,8 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	}
 }
 
-void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine) {
-	if (active) {
+void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine, size_t scene) {
+	if (active[scene] || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
 		if (arp.on) {
 			switch (message.type) {
 			case MessageType::NOTE_ON:
@@ -70,7 +71,7 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngin
 }
 
 void SoundEngineChannel::update_properties() {
-	submit_change(SoundEngineChannelProperty::pChannelActive, active);
+	submit_change(SoundEngineChannelProperty::pChannelActive, active[device->scene]);
 	submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
 	submit_change(SoundEngineChannelProperty::pChannelPanning, panning);
 	submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) engine_index);
@@ -100,7 +101,7 @@ PropertyValue SoundEngineChannel::get(size_t prop, size_t sub_prop) {
 	PropertyValue value = {0};
 	switch ((SoundEngineChannelProperty) prop) {
 	case SoundEngineChannelProperty::pChannelActive:
-		value.bval = active;
+		value.bval = active[device->scene];
 		break;
 	case SoundEngineChannelProperty::pChannelVolume:
 		value.dval = volume;
@@ -172,7 +173,7 @@ PropertyValue SoundEngineChannel::get(size_t prop, size_t sub_prop) {
 void SoundEngineChannel::set(size_t prop, PropertyValue value, size_t sub_prop) {
 	switch ((SoundEngineChannelProperty) prop) {
 	case SoundEngineChannelProperty::pChannelActive:
-		active = value.bval;
+		active[device->scene] = value.bval;
 		break;
 	case SoundEngineChannelProperty::pChannelVolume:
 		volume = value.dval;
@@ -264,14 +265,19 @@ SoundEngineChannel::~SoundEngineChannel() {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	metronome.init(0);
+	for (size_t i = 0; i < this->channels.size(); ++i) {
+		SoundEngineChannel& ch = this->channels[i];
+		ch.init_device(this);
+	}
 }
 
 void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleInfo &info) {
 	//Channels
+	size_t scene = this->scene;
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
 		SoundEngine* engine = ch.get_engine(sound_engines, i);
-		ch.process_sample(lsample, rsample, info, metronome, engine);
+		ch.process_sample(lsample, rsample, info, metronome, engine, scene);
 	}
 	//Metronome
 	if (play_metronome) {
@@ -301,13 +307,7 @@ void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	SoundEngineChannel& ch = this->channels[message.channel];
 	SoundEngine* engine = ch.get_engine(sound_engines, message.channel);
 	if (engine) {
-		ch.send(message, info, *engine);
-	}
-}
-
-void SoundEngineDevice::solo (unsigned int channel) {
-	for (size_t i = 0; i < channels.size(); ++i) {
-		channels[i].active = channel == i;
+		ch.send(message, info, *engine, scene);
 	}
 }
 
@@ -350,6 +350,7 @@ void SoundEngineDevice::update_properties() {
 void SoundEngineDevice::apply_program(Program* program) {
 	//Global
 	metronome.set_bpm(program->metronome_bpm);
+	scene = 0;
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelProgram& prog = program->channels[i];

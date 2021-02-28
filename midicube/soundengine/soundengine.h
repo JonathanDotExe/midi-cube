@@ -26,11 +26,13 @@
 
 namespace pt = boost::property_tree;
 
+#define SOUND_ENGINE_SCENE_AMOUNT 8
+
 class SoundEngineDevice;
 
 struct EngineStatus {
-	size_t pressed_notes;
-	size_t latest_note_index;
+	size_t pressed_notes = 0;
+	size_t latest_note_index = 0;
 };
 
 class EngineProgram {
@@ -53,7 +55,7 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int note) = 0;
 
-	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info) = 0;
+	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info) = 0;
 
 	virtual void apply_program(EngineProgram* prog) {
 
@@ -88,7 +90,7 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int note);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info);
+	EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info);
 
 	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) = 0;
 
@@ -158,7 +160,7 @@ void BaseSoundEngine<V, P>::release_note(SampleInfo& info, unsigned int note) {
 }
 
 template<typename V, size_t P>
-void BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info) {
+EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info) {
 	EngineStatus status = {0, 0};
 	//Notes
 	for (size_t i = 0; i < P; ++i) {
@@ -178,6 +180,8 @@ void BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, Sam
 	}
 	//Static sample
 	process_sample(lsample, rsample, info, environment, status);
+
+	return status;
 }
 
 
@@ -251,13 +255,16 @@ enum SoundEngineChannelProperty {
 	pArpeggiatorBPM
 };
 
+class SoundEngineDevice;
+
 class SoundEngineChannel : public PropertyHolder {
 private:
 	std::atomic<ssize_t> engine_index{0};
+	SoundEngineDevice* device = nullptr;
 
 public:
 	double volume{1};
-	bool active{false};
+	std::array<bool, SOUND_ENGINE_SCENE_AMOUNT> active{false};
 	double panning = 0;
 	ChannelSource source;
 	Arpeggiator arp;
@@ -269,11 +276,19 @@ public:
 	BitCrusherPreset bitcrusher_preset;
 	BitCrusherEffect bitcrusher;
 
+	EngineStatus status = {};
+
 	SoundEngineChannel();
 
-	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine);
+	void init_device(SoundEngineDevice* device) {
+		if (!this->device) {
+			this->device = device;
+		}
+	}
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, SoundEngine* engine);
+	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine, size_t scene);
+
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, SoundEngine* engine, size_t scene);
 
 	PropertyValue get(size_t prop, size_t sub_prop);
 
@@ -296,7 +311,7 @@ public:
 
 struct ChannelProgram {
 	ssize_t engine_index{-1};
-	bool active{false};
+	std::array<bool, SOUND_ENGINE_SCENE_AMOUNT> active{false};
 	double volume{1};
 	double panning = 0;
 
@@ -334,6 +349,7 @@ public:
 	std::atomic<bool> play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	double volume{0.2};
+	std::atomic<size_t> scene{0};
 
 	SoundEngineDevice();
 
@@ -344,8 +360,6 @@ public:
 	void send(MidiMessage& message, SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
-
-	void solo (unsigned int channel);
 
 	PropertyValue get(size_t prop, size_t sub_prop = 0);
 

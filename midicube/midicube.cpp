@@ -42,12 +42,12 @@ void MidiCube::init(int out_device, int in_device) {
 	arp.metronome.set_bpm(440);
 
 	//Default engines
-	engine.channels[0].active = true;
+	engine.channels[0].active[0] = true;
 	//engine.channels[0].vocoder_preset.on = true;
 
 	engine.channels[0].set_engine(2);
 
-	engine.channels[9].active = true;
+	engine.channels[9].active[0] = true;
 	engine.channels[9].set_engine(3);
 
 	engine.channels[15].vocoder_preset.on = true;
