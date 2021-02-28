@@ -30,7 +30,6 @@ Scene SceneView::create(Frame &frame) {
 	int cols = SOUND_ENGINE_SCENE_AMOUNT/ rows;
 	int pane_width = (frame.get_width() - 15) / cols;
 	int pane_height = (frame.get_height() - 50 - 5) / rows;
-	std::array<Button*, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
 		//Background pane
 		int x = 10 + pane_width * (i % cols);
@@ -43,7 +42,7 @@ Scene SceneView::create(Frame &frame) {
 		else {
 			scene->rect.setFillColor(sf::Color(200, 200, 200));
 		}
-		scene->set_on_click([&frame, scenes, this, i]() {
+		scene->set_on_click([&frame, this, i]() {
 			//Change scene
 			scenes[this->engine->scene]->rect.setFillColor(sf::Color(200, 200, 200));
 			this->engine->scene = i;

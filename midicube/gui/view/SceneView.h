@@ -17,6 +17,7 @@
 class SceneView : public ViewController {
 private:
 	SoundEngineDevice* engine = nullptr;
+	std::array<Button*, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 public:
 	SceneView();
 	virtual ~SceneView();
