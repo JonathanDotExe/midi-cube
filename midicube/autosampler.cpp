@@ -24,6 +24,16 @@ void AutoSampler::request_params() {
 	}
 	std::cout << "Which audio device should be sampled?" << std::endl;
 	std::cin >> audio_device;
+
+	//Velocities
+	int vel = 0;
+	while (vel >= 0) {
+		std::cout << "Which velocity should be sampled? (-1 to stop)" << std::endl;
+		std::cin >> vel;
+		if (vel >= 0) {
+			velocities.push_back(vel);
+		}
+	}
 }
 
 void AutoSampler::init() {
