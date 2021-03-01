@@ -18,7 +18,7 @@
 
 class AutoSampler {
 private:
-	RtAudio audio;
+	RtAudio rtaudio;
 	RtMidiOut rtmidi;
 
 	unsigned int channel = 0;
@@ -27,6 +27,9 @@ private:
 
 	unsigned int curr_note = 0;
 	unsigned int curr_velocity = 0;
+
+	unsigned int audio_device = 0;
+	unsigned int midi_device = 0;
 
 	std::atomic<bool> started = false;
 
