@@ -27,6 +27,7 @@ void AutoSampler::request_params() {
 }
 
 void AutoSampler::init() {
+
 }
 
 inline int AutoSampler::process(double *output_buffer, double *input_buffer,

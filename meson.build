@@ -62,3 +62,16 @@ src = [
 ]
 
 executable('midi-cube', src, dependencies: deps, link_args: '-latomic')
+
+sampler_deps = [
+	dependency('rtaudio'),
+	dependency('rtmidi'),
+	dependency('sndfile')
+]
+
+sampler_src = [
+	'autosampler-main.cpp',
+	'midicube/autosampler.cpp'
+]
+
+executable('midi-cube-autosampler', sampler_src, dependencies: sampler_deps, link_args: '-latomic')

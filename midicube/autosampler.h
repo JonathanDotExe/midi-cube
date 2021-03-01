@@ -31,7 +31,7 @@ private:
 	unsigned int audio_device = 0;
 	unsigned int midi_device = 0;
 
-	std::atomic<bool> started = false;
+	std::atomic<bool> started{false};
 
 public:
 
