@@ -34,6 +34,20 @@ void AutoSampler::request_params() {
 			velocities.push_back(vel);
 		}
 	}
+
+	//Notes
+	unsigned int note = 0;
+	unsigned int end_note = 0;
+	unsigned int step = 0;
+	std::cout << "Which note do you want to start with?" << std::endl;
+	std::cin >> note;
+	std::cout << "Which note do you want to end with?" << std::endl;
+	std::cin >> end_note;
+	std::cout << "Which steps should be between the notes?" << std::endl;
+	std::cin >> step;
+	for (; note <= end_note; note += step) {
+		notes.push_back(note);
+	}
 }
 
 void AutoSampler::init() {
