@@ -86,6 +86,11 @@ void AutoSampler::init() {
 
 inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 		unsigned int buffer_size, double time) {
+	if (!started_sampling) {
+		started_sampling = true;
+		//First note
+		rtmidi.sendMessage({});
+	}
 	for (size_t i = 0; i < buffer_size; ++i) {
 		double l = *input_buffer++;
 		double r = *input_buffer++;
