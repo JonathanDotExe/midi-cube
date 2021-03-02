@@ -50,8 +50,36 @@ void AutoSampler::request_params() {
 	}
 }
 
-void AutoSampler::init() {
+int sampler_process(void* output_buffer, void* input_buffer, unsigned int buffer_size, double time, RtAudioStreamStatus status, void* arg) {
+	AutoSampler* handler = (AutoSampler*) arg;
+	return handler->process((double*) output_buffer, (double*) input_buffer, buffer_size, time);
+}
 
+
+void AutoSampler::init() {
+	//Open midi
+	std::cout << "Opening port " << rtmidi.getPortName(midi_device) << std::endl;
+	rtmidi.openPort(midi_device);
+
+	//Open audio
+	//Set up options
+	RtAudio::StreamOptions options;
+	options.flags = options.flags | RTAUDIO_SCHEDULE_REALTIME;
+	options.priority = 90;
+
+	//Set up input
+	RtAudio::StreamParameters input_params;
+	input_params.deviceId = audio_device;
+	input_params.nChannels = 2;
+	input_params.firstChannel = 0;
+
+	double sample_rate = 44100;
+	unsigned int buffer_size = 256;
+
+	rtaudio.openStream(nullptr, &input_params, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &sampler_process, this);
+	rtaudio.startStream();
+	sample_rate = rtaudio.getStreamSampleRate();
+	std::cout << "Opened audio stream Sample Rate: " << sample_rate << " Hz ... Buffer Size: " << buffer_size << std::endl;
 }
 
 inline int AutoSampler::process(double *output_buffer, double *input_buffer,
