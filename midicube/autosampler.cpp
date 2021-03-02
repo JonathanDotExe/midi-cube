@@ -7,6 +7,8 @@
 
 #include "autosampler.h"
 
+#define MAX_QUIET_TIME 44100
+
 void AutoSampler::request_params() {
 	std::cout << "Welcome to the Auto-Sample tool for MIDICube!" << std::endl;
 	//MIDI device
@@ -84,6 +86,32 @@ void AutoSampler::init() {
 
 inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 		unsigned int buffer_size, double time) {
+	for (size_t i = 0; i < buffer_size; ++i) {
+		double l = *input_buffer++;
+		double r = *input_buffer++;
 
+		//Check if audio started
+		if (!started_audio && (l || r)) {
+			started_audio = true;
+		}
+
+		//Process signal
+		if (started_audio) {
+			lsample.push_back(l);
+			rsample.push_back(r);
+
+			//Update last signal time
+			if ((l || r)) {
+				last_signal_time = lsample.size() - 1;
+			}
+
+			//Check end
+			if (last_signal_time + MAX_QUIET_TIME < time) {
+				started_audio = false;
+				//TODO save
+				//TODO next note
+			}
+		}
+	}
 	return 0;
 }

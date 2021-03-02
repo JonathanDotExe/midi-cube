@@ -25,21 +25,37 @@ private:
 	std::vector<unsigned int> notes;
 	std::vector<unsigned int> velocities;
 
-	unsigned int curr_note = 0;
-	unsigned int curr_velocity = 0;
-
 	unsigned int audio_device = 0;
 	unsigned int midi_device = 0;
 
-	std::atomic<bool> started{false};
+	size_t curr_note = 0;
+	size_t curr_velocity = 0;
+
+	bool started_audio = false;
+	size_t last_signal_time = 0;
+	size_t time = 0;
+
+	std::vector<double> lsample;
+	std::vector<double> rsample;
+
 
 public:
+
+	AutoSampler() {
+		lsample.reserve(2646000);
+		rsample.reserve(2646000);
+	}
 
 	void request_params();
 
 	void init();
 
 	inline int process(double* output_buffer, double* input_buffer, unsigned int buffer_size, double time);
+
+	~AutoSampler() {
+		rtaudio.closeStream();
+		rtmidi.closePort();
+	}
 
 };
 
