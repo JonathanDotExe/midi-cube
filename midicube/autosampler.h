@@ -16,6 +16,10 @@
 #include <rtmidi/RtMidi.h>
 #include <rtaudio/RtAudio.h>
 
+#include "audiofile.h"
+
+#define AUTOSAMPLER_CHANNELS 2
+
 class AutoSampler {
 private:
 	RtAudio rtaudio;
@@ -35,7 +39,7 @@ private:
 	bool pressed = false;
 	size_t last_signal_time = 0;
 
-	std::vector<double> lsample;
+	AudioSample sample;
 	std::vector<double> rsample;
 
 

@@ -77,5 +77,7 @@ struct AudioSample {
 
 bool read_audio_file(AudioSample& audio, std::string fname);
 
+bool write_audio_file(AudioSample& audio, std::string fname);
+
 
 #endif /* MIDICUBE_AUDIOFILE_H_ */
