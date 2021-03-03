@@ -78,7 +78,7 @@ void AutoSampler::init() {
 	//Set up input
 	RtAudio::StreamParameters input_params;
 	input_params.deviceId = audio_device;
-	input_params.nChannels = 2;
+	input_params.nChannels = AUTOSAMPLER_CHANNELS;
 	input_params.firstChannel = 0;
 
 	unsigned int buffer_size = 256;
@@ -102,7 +102,7 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 
 				//First note
 				unsigned char status = 0x90 | ((char) channel & 0x0F);
-				std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), (unsigned char) notes.at(curr_velocity)};
+				std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), (unsigned char) velocities.at(curr_velocity)};
 				rtmidi.sendMessage(&msg);
 
 				std::cout << "Sampling note " << notes.at(curr_note) << " at velocity " << velocities.at(curr_velocity) << "!" << std::endl;
@@ -117,10 +117,11 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 			double l = *input_buffer++;
 			double r = *input_buffer++;
 
-			bool loud = l || r;
+			bool loud = std::abs(l) > 0.0001 || std::abs(r) > 0.0001;
 
 			//Check if audio started
 			if (!started_audio && loud) {
+				std::cout << "Started recording" << std::endl;
 				started_audio = true;
 			}
 
@@ -147,7 +148,7 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 					std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), 0};
 					std::cout << "Finished sampling note " << notes.at(curr_note) << " at velocity " << velocities.at(curr_velocity) << "!" << std::endl;
 					//Save
-					write_audio_file(sample, folder + "/" + prefix + "_" + std::to_string(curr_note) + "_" + std::to_string(curr_velocity) + ".wav");
+					write_audio_file(sample, folder + "/" + prefix + "_" + std::to_string(notes.at(curr_note)) + "_" + std::to_string(velocities.at(curr_velocity)) + ".wav");
 
 					rtmidi.sendMessage(&msg);
 					pressed = false;
