@@ -124,7 +124,7 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 				}
 
 				//Check end
-				if (last_signal_time + MAX_QUIET_TIME < time) {
+				if (last_signal_time + MAX_QUIET_TIME < lsample.size()) {
 					started_audio = false;
 					last_signal_time = 0;
 					//TODO save
