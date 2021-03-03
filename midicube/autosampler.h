@@ -32,24 +32,23 @@ private:
 	unsigned int audio_device = 0;
 	unsigned int midi_device = 0;
 
+	unsigned int sample_rate = 44100;
+
 	size_t curr_note = 0;
 	size_t curr_velocity = 0;
 
 	bool started_audio = false;
 	bool pressed = false;
-	size_t last_signal_time = 0;
+	double last_signal_time = 0;
 
 	AudioSample sample;
-	std::vector<double> rsample;
-
 
 public:
 
 	std::atomic<bool> running{true};
 
 	AutoSampler() {
-		lsample.reserve(2646000);
-		rsample.reserve(2646000);
+
 	}
 
 	void request_params();

@@ -7,7 +7,7 @@
 
 #include "autosampler.h"
 
-#define MAX_QUIET_TIME 44100
+#define MAX_QUIET_TIME 1.0
 
 void AutoSampler::request_params() {
 	std::cout << "Welcome to the Auto-Sample tool for MIDICube!" << std::endl;
@@ -75,7 +75,6 @@ void AutoSampler::init() {
 	input_params.nChannels = 2;
 	input_params.firstChannel = 0;
 
-	double sample_rate = 44100;
 	unsigned int buffer_size = 256;
 
 	rtaudio.openStream(nullptr, &input_params, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &sampler_process, this);
@@ -91,6 +90,10 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 		//Press note
 		if (!pressed) {
 			if (curr_note < notes.size() && curr_velocity < velocities.size()) {
+				sample.clear();
+				sample.channels = AUTOSAMPLER_CHANNELS;
+				sample.sample_rate = sample_rate;
+
 				//First note
 				unsigned char status = 0x90 | ((char) channel & 0x0F);
 				std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), (unsigned char) notes.at(curr_velocity)};
@@ -108,28 +111,28 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 			double l = *input_buffer++;
 			double r = *input_buffer++;
 
+			bool loud = l || r;
+
 			//Check if audio started
-			if (!started_audio && (l || r)) {
+			if (!started_audio && loud) {
 				started_audio = true;
 			}
 
 			//Process signal
 			if (started_audio) {
-				lsample.push_back(l);
-				rsample.push_back(r);
+				sample.samples.push_back(l);
+				sample.samples.push_back(r);
 
 				//Update last signal time
-				if ((l || r)) {
-					last_signal_time = lsample.size() - 1;
+				if (loud) {
+					last_signal_time = sample.duration();
 				}
 
 				//Check end
-				if (last_signal_time + MAX_QUIET_TIME < lsample.size()) {
+				if (last_signal_time + MAX_QUIET_TIME < sample.duration()) {
 					started_audio = false;
 					last_signal_time = 0;
 					//TODO save
-					lsample.clear();
-					rsample.clear();
 					//Release old note
 					unsigned char status = 0x80 | ((char) channel & 0x0F);
 					std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), 0};
