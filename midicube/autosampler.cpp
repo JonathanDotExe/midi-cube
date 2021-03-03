@@ -86,35 +86,60 @@ void AutoSampler::init() {
 
 inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 		unsigned int buffer_size, double time) {
-	if (!started_sampling) {
-		started_sampling = true;
-		//First note
-		rtmidi.sendMessage({});
-	}
-	for (size_t i = 0; i < buffer_size; ++i) {
-		double l = *input_buffer++;
-		double r = *input_buffer++;
 
-		//Check if audio started
-		if (!started_audio && (l || r)) {
-			started_audio = true;
+	for (size_t i = 0; i < buffer_size; ++i) {
+		//Press note
+		if (!pressed && curr_note < notes.size() && curr_velocity < velocities.size()) {
+			//First note
+			unsigned char status = 0x90 | ((char) channel & 0x0F);
+			std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), (unsigned char) notes.at(curr_velocity)};
+			rtmidi.sendMessage(&msg);
+
+			std::cout << "Sampling note " << notes.at(curr_note) << " at velocity " << velocities.at(curr_velocity) << "!" << std::endl;
+			pressed = true;
 		}
 
-		//Process signal
-		if (started_audio) {
-			lsample.push_back(l);
-			rsample.push_back(r);
+		if (pressed) {
+			double l = *input_buffer++;
+			double r = *input_buffer++;
 
-			//Update last signal time
-			if ((l || r)) {
-				last_signal_time = lsample.size() - 1;
+			//Check if audio started
+			if (!started_audio && (l || r)) {
+				started_audio = true;
 			}
 
-			//Check end
-			if (last_signal_time + MAX_QUIET_TIME < time) {
-				started_audio = false;
-				//TODO save
-				//TODO next note
+			//Process signal
+			if (started_audio) {
+				lsample.push_back(l);
+				rsample.push_back(r);
+
+				//Update last signal time
+				if ((l || r)) {
+					last_signal_time = lsample.size() - 1;
+				}
+
+				//Check end
+				if (last_signal_time + MAX_QUIET_TIME < time) {
+					started_audio = false;
+					//TODO save
+					lsample.clear();
+					rsample.clear();
+					//Release old note
+					unsigned char status = 0x80 | ((char) channel & 0x0F);
+					std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), 0};
+
+					std::cout << "Finished sampling note " << notes.at(curr_note) << " at velocity " << velocities.at(curr_velocity) << "!" << std::endl;
+
+					rtmidi.sendMessage(&msg);
+					pressed = false;
+
+					//Find next note/velocity
+					curr_note++;
+					if (curr_note >= notes.size()) {
+						curr_note = 0;
+						curr_velocity++;
+					}
+				}
 			}
 		}
 	}

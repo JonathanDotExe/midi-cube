@@ -31,8 +31,8 @@ private:
 	size_t curr_note = 0;
 	size_t curr_velocity = 0;
 
-	bool started_sampling = false;
 	bool started_audio = false;
+	bool pressed = false;
 	size_t last_signal_time = 0;
 	size_t time = 0;
 
