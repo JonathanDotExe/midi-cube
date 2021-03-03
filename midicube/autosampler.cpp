@@ -50,6 +50,12 @@ void AutoSampler::request_params() {
 	for (; note <= end_note; note += step) {
 		notes.push_back(note);
 	}
+
+	std::cout << "Where should the audio files be saved?" << std::endl;
+	std::cin >> folder;
+
+	std::cout << "What should the filename prefix be?" << std::endl;
+	std::cin >> prefix;
 }
 
 int sampler_process(void* output_buffer, void* input_buffer, unsigned int buffer_size, double time, RtAudioStreamStatus status, void* arg) {
@@ -132,12 +138,16 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 				if (last_signal_time + MAX_QUIET_TIME < sample.duration()) {
 					started_audio = false;
 					last_signal_time = 0;
-					//TODO save
+					//Shorten sample
+					while (!sample.samples.at(sample.samples.size() - 1)) {
+						sample.samples.pop_back();
+					}
 					//Release old note
 					unsigned char status = 0x80 | ((char) channel & 0x0F);
 					std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), 0};
-
 					std::cout << "Finished sampling note " << notes.at(curr_note) << " at velocity " << velocities.at(curr_velocity) << "!" << std::endl;
+					//Save
+					write_audio_file(sample, folder + "/" + prefix + "_" + std::to_string(curr_note) + "_" + std::to_string(curr_velocity) + ".wav");
 
 					rtmidi.sendMessage(&msg);
 					pressed = false;

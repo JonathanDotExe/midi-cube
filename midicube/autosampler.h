@@ -32,6 +32,9 @@ private:
 	unsigned int audio_device = 0;
 	unsigned int midi_device = 0;
 
+	std::string folder;
+	std::string prefix;
+
 	unsigned int sample_rate = 44100;
 
 	size_t curr_note = 0;
