@@ -89,14 +89,19 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 
 	for (size_t i = 0; i < buffer_size; ++i) {
 		//Press note
-		if (!pressed && curr_note < notes.size() && curr_velocity < velocities.size()) {
-			//First note
-			unsigned char status = 0x90 | ((char) channel & 0x0F);
-			std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), (unsigned char) notes.at(curr_velocity)};
-			rtmidi.sendMessage(&msg);
+		if (!pressed) {
+			if (curr_note < notes.size() && curr_velocity < velocities.size()) {
+				//First note
+				unsigned char status = 0x90 | ((char) channel & 0x0F);
+				std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), (unsigned char) notes.at(curr_velocity)};
+				rtmidi.sendMessage(&msg);
 
-			std::cout << "Sampling note " << notes.at(curr_note) << " at velocity " << velocities.at(curr_velocity) << "!" << std::endl;
-			pressed = true;
+				std::cout << "Sampling note " << notes.at(curr_note) << " at velocity " << velocities.at(curr_velocity) << "!" << std::endl;
+				pressed = true;
+			}
+			else {
+				running = false;
+			}
 		}
 
 		if (pressed) {
@@ -121,6 +126,7 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 				//Check end
 				if (last_signal_time + MAX_QUIET_TIME < time) {
 					started_audio = false;
+					last_signal_time = 0;
 					//TODO save
 					lsample.clear();
 					rsample.clear();

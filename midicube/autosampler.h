@@ -34,13 +34,14 @@ private:
 	bool started_audio = false;
 	bool pressed = false;
 	size_t last_signal_time = 0;
-	size_t time = 0;
 
 	std::vector<double> lsample;
 	std::vector<double> rsample;
 
 
 public:
+
+	std::atomic<bool> running{true};
 
 	AutoSampler() {
 		lsample.reserve(2646000);
