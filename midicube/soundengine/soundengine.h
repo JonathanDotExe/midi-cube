@@ -315,11 +315,7 @@ public:
 
 struct ChannelProgram {
 	ssize_t engine_index{-1};
-	std::array<bool, SOUND_ENGINE_SCENE_AMOUNT> active{false};
-	double volume{1};
-	double panning = 0;
-
-	ChannelSource source;
+	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 
 	unsigned int arpeggiator_bpm = 120;
 	bool arp_on;
