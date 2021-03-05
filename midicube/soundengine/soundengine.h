@@ -255,6 +255,13 @@ enum SoundEngineChannelProperty {
 	pArpeggiatorBPM
 };
 
+struct SoundEngineScene {
+	bool active = false;
+	double volume = 1;
+	double panning = 0;
+	ChannelSource source;
+};
+
 class SoundEngineDevice;
 
 class SoundEngineChannel : public PropertyHolder {
@@ -263,10 +270,7 @@ private:
 	SoundEngineDevice* device = nullptr;
 
 public:
-	double volume{1};
-	std::array<bool, SOUND_ENGINE_SCENE_AMOUNT> active{false};
-	double panning = 0;
-	ChannelSource source;
+	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	Arpeggiator arp;
 	Looper looper;
 

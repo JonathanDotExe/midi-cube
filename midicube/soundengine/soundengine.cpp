@@ -20,7 +20,9 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 		double l = 0;
 		double r = 0;
 
-		if (active[scene] || status.pressed_notes) {
+		SoundEngineScene& s = scenes[scene];
+
+		if (s.active || status.pressed_notes) {
 			//Arpeggiator
 			if (arp.on) {
 				arp.apply(info,
@@ -38,19 +40,19 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			//Bit Crusher
 			bitcrusher.apply(l, r, bitcrusher_preset, info);
 			//Pan
-			l *= (1 - fmax(0, panning));
-			r *= (1 - fmax(0, -panning));
+			l *= (1 - fmax(0, s.panning));
+			r *= (1 - fmax(0, -s.panning));
 		}
 		//Looper
 		looper.apply(l, r, metronome, info);
 		//Playback
-		lsample += l * volume;
-		rsample += r * volume;
+		lsample += l * s.volume;
+		rsample += r * s.volume;
 	}
 }
 
 void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine, size_t scene) {
-	if (active[scene] || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
+	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
 		if (arp.on) {
 			switch (message.type) {
 			case MessageType::NOTE_ON:

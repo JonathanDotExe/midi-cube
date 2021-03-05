@@ -42,12 +42,12 @@ void MidiCube::init(int out_device, int in_device) {
 	arp.metronome.set_bpm(440);
 
 	//Default engines
-	engine.channels[0].active[0] = true;
+	engine.channels[0].scenes[0].active = true;
 	//engine.channels[0].vocoder_preset.on = true;
 
 	engine.channels[0].set_engine(2);
 
-	engine.channels[9].active[0] = true;
+	engine.channels[9].scenes[0].active = true;
 	engine.channels[9].set_engine(3);
 
 	engine.channels[15].vocoder_preset.on = true;
@@ -56,8 +56,8 @@ void MidiCube::init(int out_device, int in_device) {
 	//engine.channels[10].bitcrusher_preset.bits = 8;
 
 	for (size_t i = 0; i < engine.channels.size(); ++i) {
-		engine.channels[i].source.channel = i;
-		engine.channels[i].source.input = 1;
+		engine.channels[i].scenes[0].source.channel = i;
+		engine.channels[i].scenes[0].source.input = 1;
 	}
 	//Load programs
 	prog_mgr.load_all();
@@ -120,7 +120,7 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	SampleInfo info = audio_handler.sample_info();
 	for (size_t i = 0; i < engine.channels.size(); ++i) {
-		ChannelSource& s = engine.channels[i].source;
+		ChannelSource& s = engine.channels[i].scenes[engine.scene].source;
 		if (s.input == static_cast<ssize_t>(input) && s.channel == message.channel) {
 			bool pass = true;
 			MidiMessage msg = message;
