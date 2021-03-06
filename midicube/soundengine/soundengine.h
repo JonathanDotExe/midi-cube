@@ -342,7 +342,7 @@ private:
 	std::vector<SoundEngineBank*> sound_engines;
 
 	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
-	ADSREnvelope metronome_env;
+	LinearADSREnvelope metronome_env;
 
 public:
 	Metronome metronome;

@@ -78,7 +78,7 @@ public:
 
 struct SamplerVoice : public TriggeredNote {
 	SampleZone* zone = nullptr;
-	ADSREnvelope env;
+	LinearADSREnvelope env;
 	Filter lfilter;
 	Filter rfilter;
 };

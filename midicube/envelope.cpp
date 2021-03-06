@@ -10,7 +10,7 @@
 #include <iostream>
 
 //ADSREnvelope
-double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
+double LinearADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
 	//Goto release phase
 	if (!pressed && phase < RELEASE) {
 		last_vol = volume;
@@ -60,6 +60,83 @@ double ADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pr
 			 last_vol = volume;
 			 phase = FINISHED;
 		 }
+		break;
+	case FINISHED:
+		break;
+	}
+	return volume;
+}
+
+//AnalogADSREnvelope
+double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
+	double time = 0;
+	double step = 0;
+	double s = 0;
+	//Goto release phase
+	if (!pressed && phase < RELEASE) {
+		last_vol = volume;
+		phase = RELEASE;
+	}
+
+	switch (phase) {
+	case ATTACK:
+		step = time_step/data.attack;
+		s = pow(time, slope);
+		if (data.attack != 0) {
+			volume += s - last;
+			last = s;
+		}
+		else {
+			volume = 1;
+		}
+		last = s;
+		if (volume >= 1) {
+			volume = 1;
+			last_vol = volume;
+			phase = DECAY;
+			last = 0;
+		}
+		break;
+	case DECAY:
+		step = time_step/data.decay;
+		s = pow(time, slope);
+		if (data.decay != 0) {
+			volume -= (s - last_vol) * (1 - data.sustain);
+			last = s;
+		}
+		else {
+			volume = data.sustain;
+		}
+
+		last = s;
+		if (volume <= data.sustain) {
+			volume = data.sustain;
+			last_vol = volume;
+			phase = SUSTAIN;
+			last = 0;
+		}
+		break;
+	case SUSTAIN:
+		break;
+	case RELEASE:
+		step = time_step/data.release;
+		s = pow(time, slope);
+		if (!sustain) {
+			if (data.release != 0) {
+				volume -= (s - last_vol) * last_vol;
+			}
+			else {
+				volume = 0;
+			}
+		}
+
+		last = s;
+		if (volume <= 0) {
+			volume = 0;
+			last_vol = volume;
+			phase = FINISHED;
+			last = 0;
+		}
 		break;
 	case FINISHED:
 		break;

@@ -462,7 +462,6 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 						lfo_val, controls, note.velocity) * op_part.amp_env.amplitude(op.env, info.time_step,
 						note.pressed, env.sustain);
 		//Envelope waveshape
-		volume *= volume;
 		//Frequency modulate others
 		if (modulates) {
 			modulator *= volume;
