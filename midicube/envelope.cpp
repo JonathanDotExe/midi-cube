@@ -101,7 +101,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		step = time_step/data.decay;
 		s = pow(time, slope);
 		if (data.decay != 0) {
-			volume -= (s - last_vol) * (1 - data.sustain);
+			volume -= (s - last) * (1 - data.sustain);
 			last = s;
 		}
 		else {
@@ -123,7 +123,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		s = pow(time, slope);
 		if (!sustain) {
 			if (data.release != 0) {
-				volume -= (s - last_vol) * last_vol;
+				volume -= (s - last) * last_vol;
 			}
 			else {
 				volume = 0;
@@ -141,6 +141,9 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 	case FINISHED:
 		break;
 	}
+
+	time += step;
+
 	return volume;
 }
 
