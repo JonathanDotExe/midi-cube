@@ -69,13 +69,14 @@ double LinearADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 
 //AnalogADSREnvelope
 double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
-	double time = 0;
 	double step = 0;
 	double s = 0;
 	//Goto release phase
 	if (!pressed && phase < RELEASE) {
 		last_vol = volume;
 		phase = RELEASE;
+		last = 0;
+		time = 0;
 	}
 
 	switch (phase) {
@@ -95,6 +96,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 			last_vol = volume;
 			phase = DECAY;
 			last = 0;
+			time = 0;
 		}
 		break;
 	case DECAY:
@@ -114,6 +116,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 			last_vol = volume;
 			phase = SUSTAIN;
 			last = 0;
+			time = 0;
 		}
 		break;
 	case SUSTAIN:
@@ -136,6 +139,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 			last_vol = volume;
 			phase = FINISHED;
 			last = 0;
+			time = 0;
 		}
 		break;
 	case FINISHED:
