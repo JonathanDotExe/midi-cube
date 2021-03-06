@@ -7,6 +7,7 @@
 
 #include "SoundEngineView.h"
 #include "ProgramView.h"
+#include "SceneView.h"
 #include "SoundEngineChannelView.h"
 
 #include <iostream>
@@ -83,6 +84,13 @@ Scene SoundEngineView::create(Frame& frame) {
 	DragBox<double>* volume = new DragBox<double>(0, 0, 1, main_font, 18, 330, frame.get_height() - 45, 100, 40);
 	volume->bind(this->engine, SoundEngineProperty::pEngineVolume);
 	controls.push_back(volume);
+
+	//Scene
+	Button* scene = new Button("Scenes", main_font, 18, frame.get_width() - 270, frame.get_height() - 40, 100, 40);
+	scene->set_on_click([&frame]() {
+		frame.change_view(new SceneView());
+	});
+	controls.push_back(scene);
 
 	//Program Button
 	Button* program = new Button("Programs", main_font, 18, frame.get_width() - 170, frame.get_height() - 40, 100, 40);

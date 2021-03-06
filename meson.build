@@ -5,7 +5,6 @@ deps = [
 	dependency('rtaudio'),
 	dependency('rtmidi'),
 	dependency('sndfile'),
-	dependency('fluidsynth'),
 	dependency('sfml-system'),
 	dependency('sfml-window'),
 	dependency('sfml-graphics'),
@@ -34,7 +33,6 @@ src = [
 	'midicube/soundengine/drums.cpp',
 	'midicube/soundengine/organ.cpp',
 	'midicube/soundengine/sampler.cpp',
-	'midicube/soundengine/sfsynth.cpp',
 	'midicube/soundengine/soundengine.cpp',
 	'midicube/soundengine/voice.cpp',
 	
@@ -52,6 +50,7 @@ src = [
 	'midicube/gui/view/B3OrganView.cpp',
 	'midicube/gui/view/ProgramRenameView.cpp',
 	'midicube/gui/view/ProgramView.cpp',
+	'midicube/gui/view/SceneView.cpp',
 	'midicube/gui/view/SoundEngineChannelView.cpp',
 	'midicube/gui/view/SoundEngineView.cpp',
 	

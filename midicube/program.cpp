@@ -38,22 +38,33 @@ Program* load_program(pt::ptree& tree) {
 			if (i < program->channels.size()) {
 				//Channel
 				program->channels[i].engine_index = c.second.get<ssize_t>("engine", -1);
-				program->channels[i].active = c.second.get<bool>("active", false);
-				program->channels[i].volume = c.second.get<double>("volume", 1);
-				program->channels[i].panning = c.second.get<double>("panning", 0.5);
-				//Source
-				program->channels[i].source.input = c.second.get<ssize_t>("source.input", 1);
-				program->channels[i].source.channel = c.second.get<unsigned int>("source.channel", 0);
-				program->channels[i].source.start_note = c.second.get<unsigned int>("source.start_note", 0);
-				program->channels[i].source.end_note = c.second.get<unsigned int>("source.end_note", 127);
-				program->channels[i].source.start_velocity = c.second.get<unsigned int>("source.start_velocity", 0);
-				program->channels[i].source.end_velocity = c.second.get<unsigned int>("source.end_velocity", 127);
-				program->channels[i].source.octave = c.second.get<int>("source.octave", 0);
-				program->channels[i].source.transfer_channel_aftertouch = c.second.get<bool>("source.transfer_channel_aftertouch", true);
-				program->channels[i].source.transfer_pitch_bend = c.second.get<bool>("source.transfer_pitch_bend", true);
-				program->channels[i].source.transfer_cc = c.second.get<bool>("source.transfer_cc", true);
-				program->channels[i].source.transfer_prog_change = c.second.get<bool>("source.transfer_prog_change", true);
-				program->channels[i].source.transfer_other = c.second.get<bool>("source.transfer_other", true);
+				const auto& scenes = c.second.get_child_optional("scenes");
+				if (scenes) {
+					size_t j = 0;
+					for (pt::ptree::value_type& s : scenes.get()) {
+						if (j >= SOUND_ENGINE_SCENE_AMOUNT) {
+							break;
+						}
+						program->channels[i].scenes[j].active = s.second.get<bool>("active", false);
+						program->channels[i].scenes[j].volume = s.second.get<double>("volume", 1);
+						program->channels[i].scenes[j].panning = s.second.get<double>("panning", 0.5);
+						//Source
+						program->channels[i].scenes[j].source.input = s.second.get<ssize_t>("source.input", 1);
+						program->channels[i].scenes[j].source.channel = s.second.get<unsigned int>("source.channel", 0);
+						program->channels[i].scenes[j].source.start_note = s.second.get<unsigned int>("source.start_note", 0);
+						program->channels[i].scenes[j].source.end_note = s.second.get<unsigned int>("source.end_note", 127);
+						program->channels[i].scenes[j].source.start_velocity = s.second.get<unsigned int>("source.start_velocity", 0);
+						program->channels[i].scenes[j].source.end_velocity = s.second.get<unsigned int>("source.end_velocity", 127);
+						program->channels[i].scenes[j].source.octave = s.second.get<int>("source.octave", 0);
+						program->channels[i].scenes[j].source.transfer_channel_aftertouch = s.second.get<bool>("source.transfer_channel_aftertouch", true);
+						program->channels[i].scenes[j].source.transfer_pitch_bend = s.second.get<bool>("source.transfer_pitch_bend", true);
+						program->channels[i].scenes[j].source.transfer_cc = s.second.get<bool>("source.transfer_cc", true);
+						program->channels[i].scenes[j].source.transfer_prog_change = s.second.get<bool>("source.transfer_prog_change", true);
+						program->channels[i].scenes[j].source.transfer_other = s.second.get<bool>("source.transfer_other", true);
+
+						++j;
+					}
+				}
 
 				//Arpeggiator
 				program->channels[i].arp_on = c.second.get<bool>("arpeggiator.on", false);
@@ -92,22 +103,28 @@ void save_program(Program* program, pt::ptree& tree) {
 		pt::ptree c;
 		//Channel
 		c.put("engine", program->channels[i].engine_index);
-		c.put("active", program->channels[i].active);
-		c.put("volume", program->channels[i].volume);
-		c.put("panning", program->channels[i].panning);
-		//Source
-		c.put("source.input", program->channels[i].source.input);
-		c.put("source.channel", program->channels[i].source.channel);
-		c.put("source.start_note", program->channels[i].source.start_note);
-		c.put("source.end_note", program->channels[i].source.end_note);
-		c.put("source.start_velocity", program->channels[i].source.start_velocity);
-		c.put("source.end_velocity", program->channels[i].source.end_velocity);
-		c.put("source.octave", program->channels[i].source.octave);
-		c.put("source.transfer_channel_aftertouch", program->channels[i].source.transfer_channel_aftertouch);
-		c.put("source.transfer_pitch_bend", program->channels[i].source.transfer_pitch_bend);
-		c.put("source.transfer_cc", program->channels[i].source.transfer_cc);
-		c.put("source.transfer_prog_change", program->channels[i].source.transfer_prog_change);
-		c.put("source.transfer_other", program->channels[i].source.transfer_other);
+		for (size_t j = 0; j < SOUND_ENGINE_SCENE_AMOUNT; ++j) {
+			pt::ptree s;
+
+			s.put("active", program->channels[i].scenes[j].active);
+			s.put("volume", program->channels[i].scenes[j].volume);
+			s.put("panning", program->channels[i].scenes[j].panning);
+			//Source
+			s.put("source.input", program->channels[i].scenes[j].source.input);
+			s.put("source.channel", program->channels[i].scenes[j].source.channel);
+			s.put("source.start_note", program->channels[i].scenes[j].source.start_note);
+			s.put("source.end_note", program->channels[i].scenes[j].source.end_note);
+			s.put("source.start_velocity", program->channels[i].scenes[j].source.start_velocity);
+			s.put("source.end_velocity", program->channels[i].scenes[j].source.end_velocity);
+			s.put("source.octave", program->channels[i].scenes[j].source.octave);
+			s.put("source.transfer_channel_aftertouch", program->channels[i].scenes[j].source.transfer_channel_aftertouch);
+			s.put("source.transfer_pitch_bend", program->channels[i].scenes[j].source.transfer_pitch_bend);
+			s.put("source.transfer_cc", program->channels[i].scenes[j].source.transfer_cc);
+			s.put("source.transfer_prog_change", program->channels[i].scenes[j].source.transfer_prog_change);
+			s.put("source.transfer_other", program->channels[i].scenes[j].source.transfer_other);
+
+			c.add_child("scenes.scene", s);
+		}
 		//Arpeggiator
 		c.put("arpeggiator.on", program->channels[i].arp_on);
 		c.put("arpeggiator.bpm", program->channels[i].arpeggiator_bpm);

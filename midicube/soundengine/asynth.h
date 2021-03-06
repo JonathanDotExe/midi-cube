@@ -206,8 +206,8 @@ protected:
 struct AnalogSynthPart {
 	UnisonOscilator<8> oscilator;
 	Filter filter;
-	ADSREnvelope amp_env;
-	ADSREnvelope mod_env;
+	AnalogADSREnvelope amp_env;
+	LinearADSREnvelope mod_env;
 
 	double fm = 0;
 };

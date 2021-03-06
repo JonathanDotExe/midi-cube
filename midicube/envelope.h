@@ -43,7 +43,7 @@ enum ADSREnvelopePhase {
 	ATTACK, DECAY, SUSTAIN, RELEASE, FINISHED
 };
 
-class ADSREnvelope {
+class LinearADSREnvelope {
 
 public:
 	ADSREnvelopePhase phase = FINISHED;
@@ -60,6 +60,31 @@ public:
 		phase = ATTACK;
 		volume = 0;
 		last_vol = 0;
+	}
+};
+
+class AnalogADSREnvelope {
+
+public:
+	ADSREnvelopePhase phase = FINISHED;
+	double volume = 0;
+	double time = 0;
+	double last = 0;
+	double last_vol = 0;
+	double slope = 1/3.0;
+
+	double amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain);
+
+	inline bool is_finished() {
+		return phase == FINISHED;
+	}
+
+	inline void reset () {
+		phase = ATTACK;
+		volume = 0;
+		last_vol = 0;
+		time = 0;
+		last = 0;
 	}
 };
 
