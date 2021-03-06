@@ -128,9 +128,10 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 			case MessageType::NOTE_ON:
 				pass = s.start_velocity <= message.velocity() && s.end_velocity >= message.velocity();
 				/* no break */
-			case MessageType::NOTE_OFF:
 			case MessageType::POLYPHONIC_AFTERTOUCH:
 				pass = pass && s.start_note <= message.note() && s.end_note >= message.note();
+				/* no break */
+			case MessageType::NOTE_OFF:
 				if (s.octave) {
 					msg.note() += s.octave * 12;
 				}
