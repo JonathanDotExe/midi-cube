@@ -93,6 +93,15 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 		unsigned int buffer_size, double time) {
 
 	for (size_t i = 0; i < buffer_size; ++i) {
+		double l = *input_buffer++;
+		double r = *input_buffer++;
+
+		bool loud = std::abs(l) > 0.0001 || std::abs(r) > 0.0001;
+
+		//Update last signal time
+		if (loud) {
+			last_signal_time = sample.duration();
+		}
 		//Press note
 		if (!pressed) {
 			if (curr_note < notes.size() && curr_velocity < velocities.size()) {
@@ -114,11 +123,6 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 		}
 
 		if (pressed) {
-			double l = *input_buffer++;
-			double r = *input_buffer++;
-
-			bool loud = std::abs(l) > 0.0001 || std::abs(r) > 0.0001;
-
 			//Check if audio started
 			if (!started_audio && loud) {
 				std::cout << "Started recording" << std::endl;
@@ -129,11 +133,6 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 			if (started_audio) {
 				sample.samples.push_back(l);
 				sample.samples.push_back(r);
-
-				//Update last signal time
-				if (loud) {
-					last_signal_time = sample.duration();
-				}
 
 				//Check end
 				if (last_signal_time + MAX_QUIET_TIME < sample.duration()) {
@@ -165,3 +164,18 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 	}
 	return 0;
 }
+
+void SampleSoundCreator::request_params() {
+	std::cout << "Welcome to the sample configuration tool for MIDICube!" << std::endl;
+
+	std::cout << "How should your sound be called?" << std::endl;
+	std::cin >> sound_name;
+
+	std::cout << "How should your sound be saved called?" << std::endl;
+	std::cin >> path;
+}
+
+void SampleSoundCreator::generate_sound() {
+
+}
+
