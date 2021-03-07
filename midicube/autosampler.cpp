@@ -194,13 +194,28 @@ void SampleSoundCreator::generate_sound() {
 
 	//Determine velocity layers and notes
 	std::vector<unsigned int> notes = {};
-	std::vector<unsigned int> velocity = {};
+	std::vector<unsigned int> velocities = {};
 	std::regex reg(".*\\.wav");
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
 		if (std::regex_match(f.path().string(), reg)) {
+			std::vector<std::string> split;
+			boost::split(split, f.path().stem().string(), boost::is_any_of("_"));
 
+			unsigned int note = std::stoi(split.at(1));
+			unsigned int velocity = std::stoi(split.at(2));
+
+			if (std::find(notes.begin(), notes.end(), note) == notes.end()) {
+				notes.push_back(note);
+			}
+			if (std::find(velocities.begin(), velocities.end(), velocity) == velocities.end()) {
+				velocities.push_back(velocity);
+			}
 		}
 	}
+	std::sort(notes.begin(), notes.end());
+	std::sort(velocities.begin(), velocities.end());
+
+
 
 }
 
