@@ -196,14 +196,18 @@ void SampleSoundCreator::generate_sound() {
 	std::vector<unsigned int> notes = {};
 	std::vector<unsigned int> velocities = {};
 	std::regex reg(".*\\.wav");
+	std::string prefix = "";
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
 		if (std::regex_match(f.path().string(), reg)) {
+			//Get params
 			std::vector<std::string> split;
 			boost::split(split, f.path().stem().string(), boost::is_any_of("_"));
 
+			prefix = split.at(0); //FIXME
 			unsigned int note = std::stoi(split.at(1));
 			unsigned int velocity = std::stoi(split.at(2));
 
+			//Add to list
 			if (std::find(notes.begin(), notes.end(), note) == notes.end()) {
 				notes.push_back(note);
 			}
@@ -212,10 +216,31 @@ void SampleSoundCreator::generate_sound() {
 			}
 		}
 	}
+	//Sort
 	std::sort(notes.begin(), notes.end());
 	std::sort(velocities.begin(), velocities.end());
 
+	//Generate
+	for (unsigned int velocity : velocities) {
+		pt::ptree layer;
+		for (unsigned int note : notes) {
+			pt::ptree zone;
+			zone.put("note", note);
+			zone.put("highest_note", note); //TODO different methods
+			zone.put("envelope", 0);
+			zone.put("filter", -1);
+			zone.put("sample", prefix + "_" + note + "_" + velocity + ".wav");
+			layer.add_child("zones.zone", zone);
+		}
+		tree.add_child("sound.velocity_layers.velocity_layer", layer);
+	}
 
-
+	//Save to file
+	try {
+		pt::write_xml(path + "/sound.xml", tree);
+	}
+	catch (pt::xml_parser_error& e) {
+		std::cerr << "Couldn't save file!" << std::endl;
+	}
 }
 
