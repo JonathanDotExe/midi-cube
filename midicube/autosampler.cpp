@@ -14,7 +14,7 @@
 
 namespace pt = boost::property_tree;
 
-#define MAX_QUIET_TIME 1.0
+#define MAX_QUIET_TIME 2.0
 
 void AutoSampler::request_params() {
 	std::cout << "Welcome to the Auto-Sample tool for MIDICube!" << std::endl;
@@ -103,7 +103,7 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 		double l = *input_buffer++;
 		double r = *input_buffer++;
 
-		bool loud = std::abs(l) > 0.0001 || std::abs(r) > 0.0001;
+		bool loud = std::abs(l) > 0.0003 || std::abs(r) > 0.0003;
 
 		//Update last signal time
 		if (loud) {
@@ -192,7 +192,7 @@ void SampleSoundCreator::generate_sound() {
 	tree.put("sound.envelopes.envelope.sustain", 1.0);
 	tree.put("sound.envelopes.envelope.release", 0.01);
 
-	tree.put("filters", "");
+	tree.put("sound.filters", "");
 
 	//Determine velocity layers and notes
 	std::vector<unsigned int> notes = {};
