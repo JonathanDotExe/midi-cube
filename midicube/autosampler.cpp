@@ -186,11 +186,13 @@ void SampleSoundCreator::generate_sound() {
 	pt::ptree tree;
 	tree.put("sound.name", sound_name);
 	//ADSR
-	tree.put("sound.enevelopes.envelope.velocity_amount", 0.0);
-	tree.put("sound.enevelopes.envelope.attack", 0.0);
-	tree.put("sound.enevelopes.envelope.decay", 0.0);
-	tree.put("sound.enevelopes.envelope.sustain", 1.0);
-	tree.put("sound.enevelopes.envelope.release", 0.01);
+	tree.put("sound.envelopes.envelope.velocity_amount", 0.0);
+	tree.put("sound.envelopes.envelope.attack", 0.0);
+	tree.put("sound.envelopes.envelope.decay", 0.0);
+	tree.put("sound.envelopes.envelope.sustain", 1.0);
+	tree.put("sound.envelopes.envelope.release", 0.01);
+
+	tree.put("filters", "");
 
 	//Determine velocity layers and notes
 	std::vector<unsigned int> notes = {};
@@ -227,7 +229,7 @@ void SampleSoundCreator::generate_sound() {
 		for (unsigned int note : notes) {
 			pt::ptree zone;
 			zone.put("note", note);
-			zone.put("highest_note", note); //TODO different methods
+			zone.put("max_note", note); //TODO different methods
 			zone.put("envelope", 0);
 			zone.put("filter", -1);
 			zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");

@@ -35,6 +35,7 @@ SampleZone* SampleSound::get_sample(double freq, double velocity) {
 		if (zones_size >= 1) {
 			size_t j = 0;
 			for (; j < zones_size; ++j) {
+				std::cout << freq << "/" << layer->zones[j]->max_freq << std::endl;
 				if (freq <= layer->zones[j]->max_freq) {
 					break;
 				}
