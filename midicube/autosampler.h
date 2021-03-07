@@ -67,6 +67,24 @@ public:
 
 };
 
+enum SampleTemplate {
+	PIANO, ELECTRIC_PIANO
+};
 
+class SampleSoundCreator {
+private:
+	std::string sound_name = "";
+	std::string path = "";
+	SampleTemplate tmp;
+	std::vector<std::string> tmp_names = {"Piano (decaying sound with piano characteristics)", "Electric Piano (simple decaying sound)"};
+public:
+	SampleSoundCreator();
+
+	void request_params();
+
+	void generate_sound();
+
+	~SampleSoundCreator();
+};
 
 #endif /* MIDICUBE_AUTOSAMPLER_H_ */
