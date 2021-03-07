@@ -315,7 +315,7 @@ public:
 
 struct ChannelProgram {
 	ssize_t engine_index{-1};
-	double volume = 1;
+	double volume = 0.5;
 	double panning = 0;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 

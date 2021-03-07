@@ -64,7 +64,7 @@ Program* load_program(pt::ptree& tree) {
 					}
 				}
 
-				program->channels[i].volume = c.second.get<double>("volume", 1);
+				program->channels[i].volume = c.second.get<double>("volume", 0.5);
 				program->channels[i].panning = c.second.get<double>("panning", 0);
 
 				//Arpeggiator
