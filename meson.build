@@ -65,7 +65,9 @@ executable('midi-cube', src, dependencies: deps, link_args: '-latomic')
 sampler_deps = [
 	dependency('rtaudio'),
 	dependency('rtmidi'),
-	dependency('sndfile')
+	dependency('sndfile'),
+	cxx.find_library('boost_system'),
+	cxx.find_library('boost_filesystem')
 ]
 
 sampler_src = [

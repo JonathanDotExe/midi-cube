@@ -6,6 +6,13 @@
  */
 
 #include "autosampler.h"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+#include <regex>
+
+namespace pt = boost::property_tree;
 
 #define MAX_QUIET_TIME 1.0
 
@@ -176,6 +183,24 @@ void SampleSoundCreator::request_params() {
 }
 
 void SampleSoundCreator::generate_sound() {
+	pt::ptree tree;
+	tree.put("sound.name", sound_name);
+	//ADSR
+	tree.put("sound.enevelopes.envelope.velocity_amount", 0.0);
+	tree.put("sound.enevelopes.envelope.attack", 0.0);
+	tree.put("sound.enevelopes.envelope.decay", 0.0);
+	tree.put("sound.enevelopes.envelope.sustain", 1.0);
+	tree.put("sound.enevelopes.envelope.release", 0.01);
+
+	//Determine velocity layers and notes
+	std::vector<unsigned int> notes = {};
+	std::vector<unsigned int> velocity = {};
+	std::regex reg(".*\\.wav");
+	for (const auto& f : boost::filesystem::directory_iterator(path)) {
+		if (std::regex_match(f.path().string(), reg)) {
+
+		}
+	}
 
 }
 
