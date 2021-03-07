@@ -257,8 +257,6 @@ enum SoundEngineChannelProperty {
 
 struct SoundEngineScene {
 	bool active = false;
-	double volume = 1;
-	double panning = 0;
 	ChannelSource source;
 };
 
@@ -270,6 +268,8 @@ private:
 	SoundEngineDevice* device = nullptr;
 
 public:
+	double volume = 0.5;
+	double panning = 0;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	Arpeggiator arp;
 	Looper looper;
@@ -315,6 +315,8 @@ public:
 
 struct ChannelProgram {
 	ssize_t engine_index{-1};
+	double volume = 1;
+	double panning = 0;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 
 	unsigned int arpeggiator_bpm = 120;

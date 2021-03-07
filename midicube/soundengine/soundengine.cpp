@@ -40,14 +40,14 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			//Bit Crusher
 			bitcrusher.apply(l, r, bitcrusher_preset, info);
 			//Pan
-			l *= (1 - fmax(0, s.panning));
-			r *= (1 - fmax(0, -s.panning));
+			l *= (1 - fmax(0, panning));
+			r *= (1 - fmax(0, -panning));
 		}
 		//Looper
 		looper.apply(l, r, metronome, info);
 		//Playback
-		lsample += l * s.volume;
-		rsample += r * s.volume;
+		lsample += l * volume;
+		rsample += r * volume;
 	}
 }
 
@@ -75,8 +75,8 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngin
 void SoundEngineChannel::update_properties() {
 	SoundEngineScene& scene = scenes[device->scene];
 	submit_change(SoundEngineChannelProperty::pChannelActive, scene.active);
-	submit_change(SoundEngineChannelProperty::pChannelVolume, scene.volume);
-	submit_change(SoundEngineChannelProperty::pChannelPanning, scene.panning);
+	submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
+	submit_change(SoundEngineChannelProperty::pChannelPanning, panning);
 	submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) engine_index);
 
 	submit_change(SoundEngineChannelProperty::pChannelInputDevice, (int) scene.source.input);
@@ -108,10 +108,10 @@ PropertyValue SoundEngineChannel::get(size_t prop, size_t sub_prop) {
 		value.bval = scene.active;
 		break;
 	case SoundEngineChannelProperty::pChannelVolume:
-		value.dval = scene.volume;
+		value.dval = volume;
 		break;
 	case SoundEngineChannelProperty::pChannelPanning:
-		value.dval = scene.panning;
+		value.dval = panning;
 		break;
 	case SoundEngineChannelProperty::pChannelSoundEngine:
 		value.ival = engine_index;
@@ -181,10 +181,10 @@ void SoundEngineChannel::set(size_t prop, PropertyValue value, size_t sub_prop) 
 		scene.active = value.bval;
 		break;
 	case SoundEngineChannelProperty::pChannelVolume:
-		scene.volume = value.dval;
+		volume = value.dval;
 		break;
 	case SoundEngineChannelProperty::pChannelPanning:
-		scene.panning = value.dval;
+		panning = value.dval;
 		break;
 	case SoundEngineChannelProperty::pChannelSoundEngine:
 		engine_index = value.ival;
@@ -367,6 +367,8 @@ void SoundEngineDevice::apply_program(Program* program) {
 		}
 
 		ch.set_engine(prog.engine_index);
+		ch.volume = prog.volume;
+		ch.panning = prog.panning;
 		ch.scenes = prog.scenes;
 		ch.arp.on = prog.arp_on;
 		ch.arp.metronome.set_bpm(prog.arpeggiator_bpm);
@@ -388,6 +390,8 @@ void SoundEngineDevice::save_program(Program* program) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
 		prog.engine_index = ch.get_engine();
+		prog.volume = ch.volume;
+		prog.panning = ch.panning;
 		prog.scenes = ch.scenes;
 		prog.arp_on = ch.arp.on;
 		prog.arpeggiator_bpm = ch.arp.metronome.get_bpm();

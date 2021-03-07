@@ -46,8 +46,6 @@ Program* load_program(pt::ptree& tree) {
 							break;
 						}
 						program->channels[i].scenes[j].active = s.second.get<bool>("active", false);
-						program->channels[i].scenes[j].volume = s.second.get<double>("volume", 1);
-						program->channels[i].scenes[j].panning = s.second.get<double>("panning", 0.5);
 						//Source
 						program->channels[i].scenes[j].source.input = s.second.get<ssize_t>("source.input", 1);
 						program->channels[i].scenes[j].source.channel = s.second.get<unsigned int>("source.channel", 0);
@@ -65,6 +63,9 @@ Program* load_program(pt::ptree& tree) {
 						++j;
 					}
 				}
+
+				program->channels[i].volume = c.second.get<double>("volume", 1);
+				program->channels[i].panning = c.second.get<double>("panning", 0);
 
 				//Arpeggiator
 				program->channels[i].arp_on = c.second.get<bool>("arpeggiator.on", false);
@@ -107,8 +108,6 @@ void save_program(Program* program, pt::ptree& tree) {
 			pt::ptree s;
 
 			s.put("active", program->channels[i].scenes[j].active);
-			s.put("volume", program->channels[i].scenes[j].volume);
-			s.put("panning", program->channels[i].scenes[j].panning);
 			//Source
 			s.put("source.input", program->channels[i].scenes[j].source.input);
 			s.put("source.channel", program->channels[i].scenes[j].source.channel);
@@ -125,6 +124,8 @@ void save_program(Program* program, pt::ptree& tree) {
 
 			c.add_child("scenes.scene", s);
 		}
+		c.put("volume", program->channels[i].volume);
+		c.put("panning", program->channels[i].panning);
 		//Arpeggiator
 		c.put("arpeggiator.on", program->channels[i].arp_on);
 		c.put("arpeggiator.bpm", program->channels[i].arpeggiator_bpm);
