@@ -223,13 +223,14 @@ void SampleSoundCreator::generate_sound() {
 	//Generate
 	for (unsigned int velocity : velocities) {
 		pt::ptree layer;
+		layer.put("velocity", velocity/127.0);
 		for (unsigned int note : notes) {
 			pt::ptree zone;
 			zone.put("note", note);
 			zone.put("highest_note", note); //TODO different methods
 			zone.put("envelope", 0);
 			zone.put("filter", -1);
-			zone.put("sample", prefix + "_" + note + "_" + velocity + ".wav");
+			zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
 			layer.add_child("zones.zone", zone);
 		}
 		tree.add_child("sound.velocity_layers.velocity_layer", layer);
