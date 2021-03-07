@@ -81,7 +81,7 @@ struct OperatorEntity {
 
 struct ModEnvelopeEntity {
 	PropertyModulation volume = {1};
-	ADSREnvelopeData env{0.0, 0, 1, 0.0};
+	ADSREnvelopeData env{0.0005, 0, 1, 0.0005};
 };
 
 struct LFOEntity {

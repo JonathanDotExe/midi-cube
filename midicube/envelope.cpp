@@ -146,7 +146,9 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		break;
 	}
 
-	time += step;
+	if (!sustain || phase != ADSREnvelopePhase::RELEASE) {
+		time += step;
+	}
 
 	return volume;
 }
