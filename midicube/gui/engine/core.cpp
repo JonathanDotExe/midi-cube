@@ -52,7 +52,8 @@ Frame::Frame(MidiCube& c, int width, int height, std::string title) : changes(20
 void Frame::run(ViewController* v) {
 	//Main loop
 	sf::RenderWindow window(sf::VideoMode(width, height), title);
-	window.setFramerateLimit(30);
+	window.setFramerateLimit(60);
+	window.setVerticalSyncEnabled(true);
 	#ifndef MIDICUBE_NO_WINDOW_ORIGIN
 		window.setPosition(sf::Vector2i(0, 0));
 	#endif
@@ -124,7 +125,7 @@ void Frame::run(ViewController* v) {
 			}
 		}
 		//Render
-		if (redraw) {
+		//if (redraw) {
 			window.clear(sf::Color(80, 80, 80));
 			for (Control* control : controls) {
 				if (control->is_visible()) {
@@ -132,7 +133,7 @@ void Frame::run(ViewController* v) {
 				}
 			}
 			redraw = false;
-		}
+		//}
 		//Close
 		if (request_close) {
 			window.close();
