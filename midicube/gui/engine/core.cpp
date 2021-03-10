@@ -52,8 +52,7 @@ Frame::Frame(MidiCube& c, int width, int height, std::string title) : changes(20
 void Frame::run(ViewController* v) {
 	//Main loop
 	sf::RenderWindow window(sf::VideoMode(width, height), title);
-	window.setFramerateLimit(60);
-	window.setVerticalSyncEnabled(true);
+	window.setFramerateLimit(30);
 	#ifndef MIDICUBE_NO_WINDOW_ORIGIN
 		window.setPosition(sf::Vector2i(0, 0));
 	#endif
