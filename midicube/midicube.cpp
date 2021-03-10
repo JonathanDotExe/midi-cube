@@ -13,7 +13,7 @@ static void process_func(double& lsample, double& rsample, SampleInfo& info, voi
 	((MidiCube*) user_data)->process(lsample, rsample, info);
 }
 
-MidiCube::MidiCube() : changes(128), update(32), messages(128), prog_mgr("./data/programs") {
+MidiCube::MidiCube() : changes(128), update(32), prog_mgr("./data/programs") {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -82,10 +82,6 @@ void MidiCube::init(int out_device, int in_device) {
 		}
 		if (input != nullptr) {
 			inputs.push_back({input, name});
-			size_t index = inputs.size() - 1;
-			input->set_callback([index, this](double delta, MidiMessage& msg) {
-				midi_callback(msg, index);
-			});
 		}
 	}
 	srand(time(NULL));
@@ -104,9 +100,13 @@ void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 		holder->update_properties();
 	}
 	//Messages
-	MidiMessageWithInput msg;
-	while (messages.pop(msg)) {
-		process_midi(msg.msg, msg.input);
+	size_t i = 0;
+	for (MidiCubeInput in : inputs) {
+		MidiMessage msg;
+		while (in.in->read(&msg)) {
+			process_midi(msg, i);
+		}
+		++i;
 	}
 	//Process
 	engine.process_sample(lsample, rsample, info);
@@ -160,13 +160,6 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 				engine.send(msg, info);
 			}
 		}
-	}
-}
-
-void MidiCube::midi_callback(MidiMessage& message, size_t input) {
-	MidiMessageWithInput msg = {input, message};
-	if (!messages.push(msg)) {
-		std::cerr << "Lost midi message" << std::endl;
 	}
 }
 

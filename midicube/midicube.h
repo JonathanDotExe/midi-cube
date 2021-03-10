@@ -31,7 +31,6 @@ private:
 	std::vector<MidiCubeInput> inputs;
 	boost::lockfree::spsc_queue<PropertyChange> changes;
 	boost::lockfree::spsc_queue<PropertyHolder*> update;
-	boost::lockfree::spsc_queue<MidiMessageWithInput> messages;
 	//Only for sync program changes
 	std::mutex mutex;
 
@@ -50,8 +49,6 @@ public:
 	//Only call from GUI thread
 	void request_update(PropertyHolder* holder);
 	std::vector<MidiCubeInput> get_inputs();
-	//Only call from midi thread
-	void midi_callback(MidiMessage& message, size_t input);
 	~MidiCube();
 };
 
