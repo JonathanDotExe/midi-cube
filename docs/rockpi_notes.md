@@ -46,6 +46,7 @@ mkdir data
 mkdir data/soundfonts
 
 #Make script and start
+Inputs and outputs should be 0 for jack
 nano start-midi-cube.sh
 
 ./build/midi-cube \[number-of-output-device\]  \[number-of-input-device\] > midicube_log.txt
@@ -92,6 +93,7 @@ nano .profile
 
 ```
 if [ $(tty) = "/dev/tty1" ] ; then
+    jackd -P90 -p16 -dalsa -dhw:2,0 -p256 -n4 -r44100 -s &
     cd /home/midicube/midi-cube
     python3 wait.py && startx ./start.sh && shutdown 0
 fi

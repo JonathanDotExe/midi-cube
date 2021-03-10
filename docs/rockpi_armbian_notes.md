@@ -21,7 +21,7 @@ sudo dpkg-reconfigure keyboard-configuration
 sudo apt install git
 sudo apt install meson ninja-build
 
-sudo apt install libsndfile-dev libsfml-dev librtaudio-dev librtmidi-dev libboost-all-dev libfluidsynth-dev
+sudo apt install libsndfile-dev libsfml-dev librtaudio-dev librtmidi-dev libboost-all-dev
 
 ##Install midi-cube
 git clone https://github.com/JonathanDotExe/midi-cube
@@ -33,7 +33,6 @@ meson configure --buildtype release
 ninja
 cd ..
 mkdir data
-mkdir data/soundfonts
 
 ##Make script and start
 nano start.sh
@@ -47,7 +46,7 @@ startx ./start.sh
 
 ##Optimize CPU frequency (optional)
 sudo armbian-config
-System > CPU > minimum frequency 1.4 GHz > maximum frequency 1.8 GHz > governor: performance
+System > CPU > minimum frequency 1.8 GHz > maximum frequency 1.8 GHz > governor: performance
 
 ##Sources
 * https://docs.armbian.com/User-Guide_Fine-Tuning/
