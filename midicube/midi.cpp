@@ -97,25 +97,12 @@ MidiHandler::~MidiHandler() {
 }
 
 
-void input_callback (double delta, std::vector<unsigned char>* msg, void* arg) {
-	static_cast<MidiInput*>(arg)->call_callback(delta, msg);
-}
-
 //MidiInput
 MidiInput::MidiInput() : MidiHandler::MidiHandler(), midiin(
 	#ifdef MIDICUBE_USE_JACK
 		RtMidi::Api::UNIX_JACK
 	#endif
 ) {
-}
-
-void MidiInput::call_callback(double delta, std::vector<unsigned char>* msg) {
-	MidiMessage message(*msg);
-	callback(delta, message);
-}
-
-void MidiInput::set_callback(std::function<void(double, MidiMessage&)> callback) {
-	this->callback = callback;
 }
 
 RtMidi& MidiInput::rtmidi() {
@@ -126,12 +113,20 @@ void MidiInput::open(unsigned int port) {
 	MidiHandler::open(port);
 	std::cout << "Registering callback" << std::endl;
 	try {
-		midiin.setCallback(&input_callback, this);
 		midiin.ignoreTypes(true, true, true);
 	}
 	catch (RtMidiError& error) {
 		throw MidiException(error.what());
 	}
+}
+
+bool MidiInput::read(MidiMessage* msg) {
+	midiin.getMessage(&buffer);
+	if (buffer.size()) {
+		*msg = {buffer};
+		return true;
+	}
+	return false;
 }
 
 void MidiInput::close() {

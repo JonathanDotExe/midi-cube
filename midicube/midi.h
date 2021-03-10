@@ -169,8 +169,8 @@ protected:
 class MidiInput : public MidiHandler {
 
 private:
-	std::function<void(double, MidiMessage&)> callback = nullptr;
 	RtMidiIn midiin;
+	std::vector<unsigned char> buffer;
 
 public:
 
@@ -178,11 +178,9 @@ public:
 
 	~MidiInput();
 
-	void call_callback(double deltatime, std::vector<unsigned char>* msg);
-
-	void set_callback(std::function<void(double, MidiMessage&)>);
-
 	void open(unsigned int port);
+
+	bool read(MidiMessage* msg);
 
 	void close();
 
