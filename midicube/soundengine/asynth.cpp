@@ -382,15 +382,9 @@ static inline double apply_modulation(const FixedScale &scale,
 void AnalogSynth::process_note(double& lsample, double& rsample,
 		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env,
 		size_t note_index) {
-	//Reset amps
-	bool reset_amps = amp_finished(info, note, env, note_index); //TODO maybe use press note event
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
-		if (reset_amps) {
-			note.parts[i].mod_env.reset();
-		}
-
 		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, controls, note.velocity);
 		env_val[i] = note.parts[i].mod_env.amplitude(mod_env.env, info.time_step, note.pressed, env.sustain)* volume;
 	}
@@ -400,10 +394,6 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		OperatorEntity& op = preset.operators[j];
 		AnalogSynthPart& op_part = note.parts[j];
 		const size_t max = std::min(i + op.oscilator_count, (size_t) ANALOG_PART_COUNT);
-		//Reset amp
-		if (reset_amps) {
-			op_part.amp_env.reset();
-		}
 		//FM
 		double fm = op_part.fm * PI2;
 		op_part.fm = 0;
@@ -433,14 +423,6 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 
 			AnalogOscilatorData data = { osc.waveform, osc.analog, osc.sync };
 			AnalogOscilatorBankData bdata = { 0.1, osc.unison_amount };
-			//Only on note start
-			if (reset_amps) {
-				if (osc.reset) {
-					part.oscilator.reset();
-				} else if (osc.randomize) {
-					part.oscilator.randomize();
-				}
-			}
 
 			//Apply modulation
 			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val,
@@ -584,6 +566,31 @@ bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 		note_index = 0;
 	}
 	return !note.pressed && amp_finished(info, note, env, note_index);
+}
+
+void AnalogSynth::press_note(SampleInfo& info, unsigned int note, double velocity) {
+	AnalogSynthVoice& voice = this->note.note[this->note.press_note(info, note, velocity)];
+	for (size_t i = 0; i < preset.mod_env_count; ++i) {
+		voice.parts[i].mod_env.reset();
+	}
+	size_t j = 0;
+	for (size_t i = 0; i < preset.op_count; ++i) {
+		OperatorEntity& op = preset.operators[i];
+		voice.parts[i].amp_env.reset();
+		size_t max = std::max(j + op.oscilator_count, (size_t) ANALOG_PART_COUNT);
+		for (; j < max; ++j) {
+			OscilatorEntity& osc = preset.oscilators[j];
+			if (osc.reset) {
+				voice.parts[j].oscilator.reset();
+			} else if (osc.randomize) {
+				voice.parts[j].oscilator.randomize();
+			}
+		}
+	}
+}
+
+void AnalogSynth::release_note(SampleInfo& info, unsigned int note) {
+	BaseSoundEngine::release_note(info, note);
 }
 
 bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,

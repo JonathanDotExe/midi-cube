@@ -265,6 +265,10 @@ public:
 	
 	PropertyValue get(size_t prop, size_t sub_prop);
 
+	void press_note(SampleInfo& info, unsigned int note, double velocity);
+
+	void release_note(SampleInfo& info, unsigned int note);
+
 	void update_properties();
 
 	void save_program(EngineProgram **prog);
