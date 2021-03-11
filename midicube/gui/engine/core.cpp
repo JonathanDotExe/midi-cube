@@ -124,7 +124,7 @@ void Frame::run(ViewController* v) {
 			}
 		}
 		//Render
-		//if (redraw) {
+		if (redraw) {
 			window.clear(sf::Color(80, 80, 80));
 			for (Control* control : controls) {
 				if (control->is_visible()) {
@@ -132,7 +132,7 @@ void Frame::run(ViewController* v) {
 				}
 			}
 			redraw = false;
-		//}
+		}
 		//Close
 		if (request_close) {
 			window.close();
