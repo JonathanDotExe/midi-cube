@@ -15,6 +15,8 @@
 namespace pt = boost::property_tree;
 
 
+SampleSoundStore global_sample_store = {};
+
 //SampleSound
 SampleSound::SampleSound() {
 
@@ -62,7 +64,7 @@ void SampleSoundStore::load_sounds(std::string folder) {
 	for (const auto& f : boost::filesystem::directory_iterator(folder)) {
 		std::string file = f.path().string();
 		SampleSound* s = load_sound(file);
-		samples.at(s->name) = s;
+		samples.insert({s->name, s});
 	}
 }
 
@@ -143,7 +145,6 @@ std::string Sampler::get_name() {
 }
 
 Sampler::~Sampler() {
-	delete sample;
 	sample = nullptr;
 }
 
