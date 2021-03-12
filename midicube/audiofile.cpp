@@ -7,6 +7,7 @@
 
 #include "audiofile.h"
 #include <sndfile.h>
+#include <sndfile.hh>
 #include <iostream>
 
 #ifndef _countof
@@ -47,4 +48,11 @@ bool read_audio_file(AudioSample& audio, std::string fname) {
 		file = nullptr;
 	}
 	return success;
+}
+
+bool write_audio_file(AudioSample& audio, std::string fname) {
+	SndfileHandle file = SndfileHandle(fname.c_str(), SFM_WRITE, SF_FORMAT_WAV | SF_FORMAT_PCM_24, audio.channels, audio.sample_rate);
+	file.write(&audio.samples[0], audio.samples.size());
+
+	return true; //TODO
 }

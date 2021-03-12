@@ -18,6 +18,7 @@ MidiCube::MidiCube() : changes(128), update(32), prog_mgr("./data/programs") {
 }
 
 void MidiCube::init(int out_device, int in_device) {
+	global_sample_store.load_sounds("./data/samples");
 	//Sound Engines
 	fill_sound_engine_device(&engine);
 	//Synth presets

@@ -13,21 +13,26 @@
 #include "../audiofile.h"
 #include "../envelope.h"
 
+struct SampleFilter {
+	FilterType filter_type = FilterType::LP_12;
+	double filter_cutoff = 1;
+	double filter_resonance = 0;
+	double filter_kb_track = 0;
+	unsigned int filter_kb_track_note = 36;
+	double filter_velocity_amount = 0.0;
+};
+
+struct SampleEnvelope {
+	ADSREnvelopeData env = {0, 0, 1, 0};
+	double amp_velocity_amount = 0.0;
+};
+
 struct SampleZone {
 	AudioSample sample;
 	double freq = 0;
 	double max_freq = 0;
-	ADSREnvelopeData env = {0, 0, 1, 0};
-
-	double amp_velocity_amount = 0.5;
-
-	FilterType filter_type = FilterType::LP_12;
-	bool filter = true;
-	double filter_cutoff = 0.10;
-	double filter_resonance = 0;
-	double filter_kb_track = 1;
-	unsigned int filter_kb_track_note = 36;
-	double filter_velocity_amount = 0.55;
+	ssize_t filter = -1;
+	ssize_t env = -1;
 
 	SampleZone () {
 		sample.clear();
@@ -50,6 +55,8 @@ struct SampleVelocityLayer {
 class SampleSound {
 public:
 	std::string name = "Sample";
+	std::vector<SampleEnvelope> envelopes = {};
+	std::vector<SampleFilter> filters = {};
 	std::vector<SampleVelocityLayer*> samples = {};
 
 	SampleSound();
@@ -69,15 +76,17 @@ public:
 
 	void load_sounds(std::string folder);
 
-	void load_sound(std::string folder);
-
 	~SampleSoundStore();
 };
+
+extern SampleSoundStore global_sample_store;
 
 #define SAMPLER_POLYPHONY 64
 
 struct SamplerVoice : public TriggeredNote {
 	SampleZone* zone = nullptr;
+	SampleEnvelope* env_data = nullptr;
+	SampleFilter* filter = nullptr;
 	LinearADSREnvelope env;
 	Filter lfilter;
 	Filter rfilter;
@@ -107,6 +116,8 @@ public:
 };
 
 extern SampleSound* load_sound(std::string folder);
+
+extern void save_sound(std::string file);
 
 
 #endif /* MIDICUBE_SOUNDENGINE_SAMPLER_H_ */

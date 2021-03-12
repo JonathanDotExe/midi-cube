@@ -10,9 +10,12 @@
 #include <fstream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/filesystem.hpp>
 
 namespace pt = boost::property_tree;
 
+
+SampleSoundStore global_sample_store = {};
 
 //SampleSound
 SampleSound::SampleSound() {
@@ -54,15 +57,15 @@ SampleSound::~SampleSound() {
 
 //SampleSoundStore
 SampleSound* SampleSoundStore::get_sound(std::string name) {
-	return samples[name];
+	return samples.at(name);
 }
 
 void SampleSoundStore::load_sounds(std::string folder) {
-	//TODO
-}
-
-void SampleSoundStore::load_sound(std::string folder) {
-	//TODO
+	for (const auto& f : boost::filesystem::directory_iterator(folder)) {
+		std::string file = f.path().string();
+		SampleSound* s = load_sound(file);
+		samples.insert({s->name, s});
+	}
 }
 
 SampleSoundStore::~SampleSoundStore() {
@@ -73,28 +76,31 @@ SampleSoundStore::~SampleSoundStore() {
 
 //Sampler
 Sampler::Sampler() {
-	sample = load_sound("./data/samples/piano");
+	sample = global_sample_store.get_sound("piano");
 }
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.zone) {
-		//Volume
-		double vol = note.env.amplitude(note.zone->env, info.time_step, note.pressed, env.sustain);
-		vol *= note.zone->amp_velocity_amount * (note.velocity - 1) + 1;
+		double vol = 1;
+		if (note.env_data) {
+			//Volume
+			vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
+			vol *= note.env_data->amp_velocity_amount * (note.velocity - 1) + 1;
+		}
 		//Sound
 		double time = (info.time - note.start_time) * note.freq/note.zone->freq * env.pitch_bend;
 		double l = note.zone->sample.isample(0, time, info.sample_rate) * vol;
 		double r = note.zone->sample.isample(1, time, info.sample_rate) * vol;
 		//Filter
-		if (note.zone->filter) {
-			FilterData filter { note.zone->filter_type };
-			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.zone->filter_cutoff + note.zone->filter_velocity_amount * note.velocity))); //TODO optimize
-			filter.resonance = note.zone->filter_resonance;
+		if (note.filter) {
+			FilterData filter { note.filter->filter_type };
+			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.filter->filter_cutoff + note.filter->filter_velocity_amount * note.velocity))); //TODO optimize
+			filter.resonance = note.filter->filter_resonance;
 
-			if (note.zone->filter_kb_track) {
+			if (note.filter->filter_kb_track) {
 				double cutoff = filter.cutoff;
 				//KB track
-				cutoff *= 1 + ((double) note.note - 36) / 12.0 * note.zone->filter_kb_track;
+				cutoff *= 1 + ((double) note.note - 36) / 12.0 * note.filter->filter_kb_track;
 				filter.cutoff = cutoff;
 			}
 
@@ -120,6 +126,14 @@ void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	SamplerVoice& voice = this->note.note[slot];
 	voice.env.reset();
 	voice.zone = this->sample->get_sample(voice.freq, voice.velocity);
+	if (voice.zone) {
+		if (voice.zone->env >= 0 && (size_t) voice.zone->env < sample->envelopes.size()) {
+			voice.env_data = &sample->envelopes[voice.zone->env];
+		}
+		if (voice.zone->filter >= 0 && (size_t) voice.zone->filter < sample->filters.size()) {
+			voice.filter = &sample->filters[voice.zone->filter];
+		}
+	}
 }
 
 void Sampler::release_note(SampleInfo& info, unsigned int note) {
@@ -131,7 +145,6 @@ std::string Sampler::get_name() {
 }
 
 Sampler::~Sampler() {
-	delete sample;
 	sample = nullptr;
 }
 
@@ -146,6 +159,48 @@ extern SampleSound* load_sound(std::string folder) {
 		//Parse
 		sound = new SampleSound();
 		sound->name = tree.get<std::string>("sound.name", "Sound");
+		//Load Envelopes
+		for (auto e : tree.get_child("sound.envelopes")) {
+			SampleEnvelope env = {};
+			env.amp_velocity_amount = e.second.get<double>("velocity_amount", 0);
+			env.env.attack = e.second.get<double>("attack", 0);
+			env.env.decay = e.second.get<double>("decay", 0);
+			env.env.sustain = e.second.get<double>("sustain", 1);
+			env.env.release = e.second.get<double>("release", 0);
+
+			sound->envelopes.push_back(env);
+		}
+		//Load Filters
+		for (auto f : tree.get_child("sound.filters")) {
+			SampleFilter filter = {};
+			filter.filter_cutoff = f.second.get<double>("cutoff", 1);
+			filter.filter_kb_track = f.second.get<double>("kb_track", 0);
+			filter.filter_kb_track_note = f.second.get<unsigned int>("kb_track_note", 36);
+			filter.filter_resonance = f.second.get<double>("resonance", 0);
+			filter.filter_velocity_amount = f.second.get<double>("velocity_amount", 0);
+
+			std::string type = f.second.get<std::string>("type");
+			if (type == "LP_12") {
+				filter.filter_type = FilterType::LP_12;
+			}
+			else if (type == "LP_24") {
+				filter.filter_type = FilterType::LP_24;
+			}
+			else if (type == "HP_12") {
+				filter.filter_type = FilterType::HP_12;
+			}
+			else if (type == "HP_24") {
+				filter.filter_type = FilterType::HP_24;
+			}
+			else if (type == "BP_12") {
+				filter.filter_type = FilterType::LP_12;
+			}
+			else if (type == "BP_24") {
+				filter.filter_type = FilterType::LP_24;
+			}
+
+			sound->filters.push_back(filter);
+		}
 		//Load velocity layers
 		for (auto r : tree.get_child("sound.velocity_layers")) {
 			SampleVelocityLayer* layer = new SampleVelocityLayer();
@@ -155,10 +210,8 @@ extern SampleSound* load_sound(std::string folder) {
 				SampleZone* zone = new SampleZone();
 				zone->freq = note_to_freq(z.second.get<double>("note", 60.0));
 				zone->max_freq = note_to_freq(z.second.get<double>("max_note", 127.0));
-				zone->env.attack = z.second.get<double>("amp_env.attack", 0);
-				zone->env.decay = z.second.get<double>("amp_env.decay", 0);
-				zone->env.sustain = z.second.get<double>("amp_env.sustain", 1);
-				zone->env.release = z.second.get<double>("amp_env.release", 0);
+				zone->env = z.second.get<double>("envelope", 0);
+				zone->filter = z.second.get<double>("filter", 0);
 				std::string file = folder + "/" + z.second.get<std::string>("sample", "");
 				if (!read_audio_file(zone->sample, file)) {
 					std::cerr << "Couldn't load sample file " << file << std::endl;
@@ -174,6 +227,10 @@ extern SampleSound* load_sound(std::string folder) {
 		sound = nullptr;
 	}
 	return sound;
+}
+
+extern void save_sound(std::string file) {
+
 }
 
 template<>
