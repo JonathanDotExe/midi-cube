@@ -76,10 +76,10 @@ public:
 
 	void load_sounds(std::string folder);
 
-	void load_sound(std::string folder);
-
 	~SampleSoundStore();
 };
+
+extern SampleSoundStore global_sample_store;
 
 #define SAMPLER_POLYPHONY 64
 

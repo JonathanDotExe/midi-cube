@@ -10,6 +10,7 @@
 #include <fstream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/filesystem.hpp>
 
 namespace pt = boost::property_tree;
 
@@ -35,7 +36,6 @@ SampleZone* SampleSound::get_sample(double freq, double velocity) {
 		if (zones_size >= 1) {
 			size_t j = 0;
 			for (; j < zones_size; ++j) {
-				std::cout << freq << "/" << layer->zones[j]->max_freq << std::endl;
 				if (freq <= layer->zones[j]->max_freq) {
 					break;
 				}
@@ -55,15 +55,15 @@ SampleSound::~SampleSound() {
 
 //SampleSoundStore
 SampleSound* SampleSoundStore::get_sound(std::string name) {
-	return samples[name];
+	return samples.at(name);
 }
 
 void SampleSoundStore::load_sounds(std::string folder) {
-	//TODO
-}
-
-void SampleSoundStore::load_sound(std::string folder) {
-	//TODO
+	for (const auto& f : boost::filesystem::directory_iterator(folder)) {
+		std::string file = f.path().string();
+		SampleSound* s = load_sound(file);
+		samples.at(s->name) = s;
+	}
 }
 
 SampleSoundStore::~SampleSoundStore() {
@@ -74,7 +74,7 @@ SampleSoundStore::~SampleSoundStore() {
 
 //Sampler
 Sampler::Sampler() {
-	sample = load_sound("./data/samples/piano");
+	sample = global_sample_store.get_sound("piano");
 }
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
