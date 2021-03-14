@@ -46,8 +46,8 @@ void RotarySpeakerEffect::apply(double &lsample, double &rsample, RotarySpeakerP
 		//Play delay
 		double l = left_delay.process();
 		double r = right_delay.process();
-		lsample += l + r * preset.stereo_mix;
-		rsample += r + l * preset.stereo_mix;
+		lsample = l + r * preset.stereo_mix;
+		rsample = r + l * preset.stereo_mix;
 	}
 
 	//Rotate speakers
@@ -58,12 +58,12 @@ void RotarySpeakerEffect::apply(double &lsample, double &rsample, RotarySpeakerP
 	if (curr_rotary_fast != preset.fast) {
 		curr_rotary_fast = preset.fast;
 		if (curr_rotary_fast) {
-			horn_speed.set(ROTARY_HORN_FAST_FREQUENCY, info.time, ROTARY_HORN_FAST_RAMP);
-			bass_speed.set(ROTARY_BASS_FAST_FREQUENCY, info.time, ROTARY_BASS_FAST_RAMP);
+			horn_speed.set(preset.horn_fast_frequency, info.time, preset.horn_fast_ramp);
+			bass_speed.set(preset.bass_fast_frequency, info.time, preset.horn_slow_frequency);
 		}
 		else {
-			horn_speed.set(ROTARY_HORN_SLOW_FREQUENCY, info.time, ROTARY_HORN_SLOW_RAMP);
-			bass_speed.set(ROTARY_BASS_SLOW_FREQUENCY, info.time, ROTARY_BASS_SLOW_RAMP);
+			horn_speed.set(preset.horn_slow_frequency, info.time, preset.horn_slow_ramp);
+			bass_speed.set(preset.bass_slow_frequency, info.time, preset.bass_slow_ramp);
 		}
 	}
 }
