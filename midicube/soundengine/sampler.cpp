@@ -64,7 +64,9 @@ void SampleSoundStore::load_sounds(std::string folder) {
 	for (const auto& f : boost::filesystem::directory_iterator(folder)) {
 		std::string file = f.path().string();
 		SampleSound* s = load_sound(file);
-		samples.insert({s->name, s});
+		if (s) {
+			samples.insert({s->name, s});
+		}
 	}
 }
 
@@ -222,7 +224,7 @@ extern SampleSound* load_sound(std::string folder) {
 		}
 	}
 	catch (pt::xml_parser_error& e) {
-		std::cerr << "Couldn't load sound.xml: " << e.message() << std::endl;
+		std::cerr << "Couldn't load " << folder << "/sound.xml: " << e.message() << std::endl;
 		delete sound;
 		sound = nullptr;
 	}

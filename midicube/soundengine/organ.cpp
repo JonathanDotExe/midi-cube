@@ -79,8 +79,14 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, 
 		tonewheel -= 12;
 		vol_mul = data.preset.harmonic_foldback_volume;
 	}
-	if (tonewheel >= 0 && info.time >= note.start_time + tonewheel_data[tonewheel].press_delay && (note.pressed || info.time <= note.release_time + tonewheel_data[tonewheel].release_delay)) {
-		data.tonewheels[tonewheel].volume += volume * vol_mul;
+	if (tonewheel >= 0 &&
+			info.time >= note.start_time + tonewheel_data[tonewheel].press_delay) {
+		if (note.pressed || info.time <= note.release_time + tonewheel_data[tonewheel].release_delay) {
+			data.tonewheels[tonewheel].volume += volume * vol_mul * fmin(1, (info.time - note.start_time - tonewheel_data[tonewheel].press_delay)/data.preset.click_attack);
+		}
+		else {
+			data.tonewheels[tonewheel].volume += volume * vol_mul * fmax(0, 1 - (info.time - note.release_time - tonewheel_data[tonewheel].release_delay)/data.preset.click_attack);
+		}
 	}
 }
 
@@ -111,7 +117,7 @@ void B3Organ::process_note_sample(double& lsample, double& rsample, SampleInfo &
 }*/
 
 bool B3Organ::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return !note.pressed && info.time > ORGAN_MAX_UP_DELAY;
+	return !note.pressed && info.time > ORGAN_MAX_UP_DELAY + data.preset.click_attack;
 };
 
 void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
