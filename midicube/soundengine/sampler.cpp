@@ -84,7 +84,7 @@ Sampler::Sampler() {
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.zone) {
 		double vol = 1;
-		if (note.env_data) {
+		if (note.env_data && !note.env_data->sustain_entire_sample) {
 			//Volume
 			vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
 			vol *= note.env_data->amp_velocity_amount * (note.velocity - 1) + 1;
@@ -120,7 +120,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 }
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	return note.env.is_finished();
+	return note.env_data->sustain_entire_sample ? note.start_time + note.zone->sample.duration() * note.zone->freq/note.freq < info.time : note.env.is_finished();
 }
 
 void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
