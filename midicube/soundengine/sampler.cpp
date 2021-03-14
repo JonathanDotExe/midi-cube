@@ -169,6 +169,7 @@ extern SampleSound* load_sound(std::string folder) {
 			env.env.decay = e.second.get<double>("decay", 0);
 			env.env.sustain = e.second.get<double>("sustain", 1);
 			env.env.release = e.second.get<double>("release", 0);
+			env.sustain_entire_sample = e.second.get<bool>("sustain_entire_sample", false);
 
 			sound->envelopes.push_back(env);
 		}
