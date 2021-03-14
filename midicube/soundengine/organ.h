@@ -21,9 +21,8 @@
 #define ORGAN_TONEWHEEL_AMOUNT 91
 #define ORGAN_LOWEST_TONEWHEEL_NOTE 24
 
-//TODO more accurate click (contact bounce) and anti-aliasing
-#define ORGAN_MAX_DOWN_DELAY 0.007
-#define ORGAN_MAX_UP_DELAY 0.007
+#define ORGAN_MAX_DOWN_DELAY 0.0035
+#define ORGAN_MAX_UP_DELAY 0.0025
 
 #define MIN_SWELL 0.1
 #define SWELL_RANGE (1 - MIN_SWELL)
@@ -105,7 +104,7 @@ struct B3OrganPreset {
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	double harmonic_foldback_volume{1};
 	double multi_note_gain{0.8};
-	double click_attack = 0.0005;
+	double click_attack = 0.00025;
 
 	AmplifierSimulationPreset amplifier;
 	unsigned int amp_cc{28};

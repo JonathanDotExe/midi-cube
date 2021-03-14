@@ -117,7 +117,7 @@ void B3Organ::process_note_sample(double& lsample, double& rsample, SampleInfo &
 }*/
 
 bool B3Organ::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
-	return !note.pressed && info.time > ORGAN_MAX_UP_DELAY + data.preset.click_attack;
+	return !note.pressed && info.time > note.release_time + ORGAN_MAX_UP_DELAY + data.preset.click_attack;
 };
 
 void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
