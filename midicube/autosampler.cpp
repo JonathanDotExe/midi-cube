@@ -45,6 +45,10 @@ void AutoSampler::request_params() {
 		}
 	}
 
+	//Sample sustain
+	std::cout << "Do you want to record with sustain pedal down? (0/1)" << std::endl;
+	std::cin >> record_sustain;
+
 	//Notes
 	unsigned int note = 0;
 	unsigned int end_note = 0;
@@ -117,8 +121,14 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 				sample.channels = AUTOSAMPLER_CHANNELS;
 				sample.sample_rate = sample_rate;
 
-				//First note
+				//Sustain pedal
 				unsigned char status = 0x90 | ((char) channel & 0x0F);
+				if (record_sustain) {
+					std::vector<unsigned char> msg = {status, (unsigned char) 64, (unsigned char) 127};
+					rtmidi.sendMessage(&msg);
+				}
+
+				//First note
 				std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), (unsigned char) velocities.at(curr_velocity)};
 				rtmidi.sendMessage(&msg);
 
@@ -155,7 +165,7 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 					std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), 0};
 					std::cout << "Finished sampling note " << notes.at(curr_note) << " at velocity " << velocities.at(curr_velocity) << "!" << std::endl;
 					//Save
-					write_audio_file(sample, folder + "/" + prefix + "_" + std::to_string(notes.at(curr_note)) + "_" + std::to_string(velocities.at(curr_velocity)) + ".wav");
+					write_audio_file(sample, folder + "/" + prefix + "_" + std::to_string(notes.at(curr_note)) + "_" + std::to_string(velocities.at(curr_velocity)) + (record_sustain ? "_sustain" : "") + ".wav");
 
 					rtmidi.sendMessage(&msg);
 					pressed = false;

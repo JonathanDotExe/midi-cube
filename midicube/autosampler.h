@@ -28,6 +28,7 @@ private:
 	unsigned int channel = 0;
 	std::vector<unsigned int> notes;
 	std::vector<unsigned int> velocities;
+	bool record_sustain = false;
 
 	unsigned int audio_device = 0;
 	unsigned int midi_device = 0;
