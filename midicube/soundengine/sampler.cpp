@@ -228,6 +228,10 @@ extern SampleSound* load_sound(std::string folder) {
 				if (!read_audio_file(zone->sample, file)) {
 					std::cerr << "Couldn't load sample file " << file << std::endl;
 				}
+				std::string sfile = folder + "/" + z.second.get<std::string>("sustain_sample", "");
+				if (!read_audio_file(zone->sustain_sample, sfile)) {
+					std::cerr << "Couldn't load sample file " << file << std::endl;
+				}
 				layer->zones.push_back(zone);
 			}
 			sound->samples.push_back(layer);
