@@ -30,6 +30,7 @@ struct SampleEnvelope {
 
 struct SampleZone {
 	AudioSample sample;
+	AudioSample sustain_sample;
 	double freq = 0;
 	double max_freq = 0;
 	ssize_t filter = -1;
@@ -37,6 +38,7 @@ struct SampleZone {
 
 	SampleZone () {
 		sample.clear();
+		sustain_sample.clear();
 	};
 
 };
@@ -85,6 +87,7 @@ extern SampleSoundStore global_sample_store;
 #define SAMPLER_POLYPHONY 64
 
 struct SamplerVoice : public TriggeredNote {
+	bool sustain_sample = false;
 	SampleZone* zone = nullptr;
 	SampleEnvelope* env_data = nullptr;
 	SampleFilter* filter = nullptr;

@@ -73,11 +73,9 @@ public:
 
 template<typename V, size_t P>
 class BaseSoundEngine : public SoundEngine {
-private:
-	KeyboardEnvironment environment;
-
 protected:
 	VoiceManager<V, P> note;
+	KeyboardEnvironment environment;
 
 public:
 	std::atomic<unsigned int> sustain_control{64};

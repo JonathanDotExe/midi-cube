@@ -91,8 +91,16 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		}
 		//Sound
 		double time = (info.time - note.start_time) * note.freq/note.zone->freq * env.pitch_bend;
-		double l = note.zone->sample.isample(0, time, info.sample_rate) * vol;
-		double r = note.zone->sample.isample(1, time, info.sample_rate) * vol;
+		double l;
+		double r;
+		if (note.sustain_sample) {
+			l = note.zone->sustain_sample.isample(0, time, info.sample_rate) * vol;
+			r = note.zone->sustain_sample.isample(1, time, info.sample_rate) * vol;
+		}
+		else {
+			l = note.zone->sample.isample(0, time, info.sample_rate) * vol;
+			r = note.zone->sample.isample(1, time, info.sample_rate) * vol;
+		}
 		//Filter
 		if (note.filter) {
 			FilterData filter { note.filter->filter_type };
@@ -129,6 +137,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	voice.env.reset();
 	voice.zone = this->sample->get_sample(voice.freq, voice.velocity);
 	if (voice.zone) {
+		voice.sustain_sample = environment.sustain && voice.zone->sustain_sample.samples.size();
 		if (voice.zone->env >= 0 && (size_t) voice.zone->env < sample->envelopes.size()) {
 			voice.env_data = &sample->envelopes[voice.zone->env];
 		}
