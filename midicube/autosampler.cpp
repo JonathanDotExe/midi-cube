@@ -15,6 +15,7 @@
 namespace pt = boost::property_tree;
 
 #define MAX_QUIET_TIME 2.0
+#define PIANO_HIGH_NOTE_START 89
 
 void AutoSampler::request_params() {
 	std::cout << "Welcome to the Auto-Sample tool for MIDICube!" << std::endl;
@@ -184,13 +185,27 @@ void SampleSoundCreator::request_params() {
 
 void SampleSoundCreator::generate_sound() {
 	pt::ptree tree;
+	//Piano algorithm
 	tree.put("sound.name", sound_name);
 	//ADSR
-	tree.put("sound.envelopes.envelope.velocity_amount", 0.0);
-	tree.put("sound.envelopes.envelope.attack", 0.0);
-	tree.put("sound.envelopes.envelope.decay", 0.0);
-	tree.put("sound.envelopes.envelope.sustain", 1.0);
-	tree.put("sound.envelopes.envelope.release", 0.01);
+	//Piano envelopes
+	{
+		pt::ptree env;
+		env.put("velocity_amount", 0.0);
+		env.put("attack", 0.0);
+		env.put("decay", 0.0);
+		env.put("sustain", 1.0);
+		env.put("release", 0.15);
+
+		tree.add_child("sound.envelopes.envelope", env);
+	}
+	{
+		pt::ptree env;
+		env.put("velocity_amount", 0.0);
+		env.put("sustain_entire_sample", true);
+
+		tree.add_child("sound.envelopes.envelope", env);
+	}
 
 	tree.put("sound.filters", "");
 
@@ -226,14 +241,33 @@ void SampleSoundCreator::generate_sound() {
 	for (unsigned int velocity : velocities) {
 		pt::ptree layer;
 		layer.put("velocity", velocity/127.0);
+		bool reached_high_part = false;
+		unsigned int last_note = 0;
 		for (unsigned int note : notes) {
+			if (!reached_high_part) {
+				if (note >= PIANO_HIGH_NOTE_START) {
+					if (last_note < PIANO_HIGH_NOTE_START) {
+						pt::ptree zone;
+						zone.put("note", note);
+						zone.put("max_note", PIANO_HIGH_NOTE_START - 1); //TODO different methods
+						zone.put("envelope", 0);
+						zone.put("filter", -1);
+						zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
+						layer.add_child("zones.zone", zone);
+					}
+					reached_high_part = true;
+				}
+			}
+
 			pt::ptree zone;
 			zone.put("note", note);
 			zone.put("max_note", note); //TODO different methods
-			zone.put("envelope", 0);
+			zone.put("envelope", reached_high_part ? 1 : 0);
 			zone.put("filter", -1);
 			zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
 			layer.add_child("zones.zone", zone);
+
+			last_note = note;
 		}
 		tree.add_child("sound.velocity_layers.velocity_layer", layer);
 	}
