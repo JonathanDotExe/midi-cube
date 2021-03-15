@@ -224,6 +224,7 @@ void SampleSoundCreator::generate_sound() {
 	std::vector<unsigned int> velocities = {};
 	std::regex reg(".*\\.wav");
 	std::string prefix = "";
+	bool sustain = false;
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
 		if (std::regex_match(f.path().string(), reg)) {
 			//Get params
@@ -233,6 +234,8 @@ void SampleSoundCreator::generate_sound() {
 			prefix = split.at(0); //FIXME
 			unsigned int note = std::stoi(split.at(1));
 			unsigned int velocity = std::stoi(split.at(2));
+
+			sustain = sustain || (split.size() > 3 && split.at(3) == "sustain"); //FIXME
 
 			//Add to list
 			if (std::find(notes.begin(), notes.end(), note) == notes.end()) {
@@ -263,6 +266,9 @@ void SampleSoundCreator::generate_sound() {
 						zone.put("envelope", 0);
 						zone.put("filter", -1);
 						zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
+						if (sustain) {
+							zone.put("sustain_sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + "_sustain.wav");
+						}
 						layer.add_child("zones.zone", zone);
 					}
 					reached_high_part = true;
