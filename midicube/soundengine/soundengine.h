@@ -262,7 +262,7 @@ class SoundEngineDevice;
 
 class SoundEngineChannel : public PropertyHolder {
 private:
-	std::atomic<ssize_t> engine_index{0};
+	SoundEngine* engine = nullptr;
 	SoundEngineDevice* device = nullptr;
 
 public:
@@ -298,14 +298,13 @@ public:
 
 	void update_properties();
 
-	inline SoundEngine* get_engine(std::vector<SoundEngineBank*>& engines, unsigned int channel);
+	inline SoundEngine* get_engine();
 
-	/**
-	 * May only be called from GUI thread after GUI has started
-	 */
-	void set_engine(ssize_t engine);
+	inline void set_engine(SoundEngine* engine);
 
-	ssize_t get_engine();
+	void set_engine_index(ssize_t engine);
+
+	ssize_t get_engine_index();
 
 	~SoundEngineChannel();
 

@@ -55,7 +55,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	Button* edit_engine = new Button("Edit", main_font, 18, 10, 130, 300, 60);
 	edit_engine->set_on_click([this, &frame]() {
 		//TODO not optimal solution
-		ssize_t engine_index = channel.get_engine();
+		ssize_t engine_index = channel.get_engine_index();
 		if (engine_index >= 0) {
 			std::string name = frame.cube.engine.get_sound_engines().at(engine_index)->get_name();
 			SoundEngine& en = frame.cube.engine.get_sound_engines().at(engine_index)->channel(channel_index);
