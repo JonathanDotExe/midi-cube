@@ -77,6 +77,7 @@ private:
 	std::string sound_name = "";
 	std::string path = "";
 	SampleTemplate tmp = PIANO;
+	bool smoothen_layers = true;
 	std::vector<std::string> tmp_names = {"Piano (decaying sound with piano characteristics)", "Electric Piano (simple decaying sound)"};
 public:
 	SampleSoundCreator() {

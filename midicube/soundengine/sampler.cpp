@@ -84,11 +84,13 @@ Sampler::Sampler() {
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.zone) {
 		double vol = 1;
+		double vel_amount = note.zone->amp_velocity_amount;
 		if (note.env_data && !note.env_data->sustain_entire_sample) {
 			//Volume
 			vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
-			vol *= note.env_data->amp_velocity_amount * (note.velocity - 1) + 1;
+			vel_amount += note.env_data->amp_velocity_amount;
 		}
+		vol *= vel_amount * (note.velocity - 1) + 1;
 		//Sound
 		double time = (info.time - note.start_time) * note.freq/note.zone->freq * env.pitch_bend;
 		double l;
@@ -221,6 +223,7 @@ extern SampleSound* load_sound(std::string folder) {
 			for (auto z : r.second.get_child("zones")) {
 				SampleZone* zone = new SampleZone();
 				zone->freq = note_to_freq(z.second.get<double>("note", 60.0));
+				zone->amp_velocity_amount = z.second.get<double>("amp_velocity_amount", 0);
 				zone->max_freq = note_to_freq(z.second.get<double>("max_note", 127.0));
 				zone->env = z.second.get<double>("envelope", 0);
 				zone->filter = z.second.get<double>("filter", 0);
