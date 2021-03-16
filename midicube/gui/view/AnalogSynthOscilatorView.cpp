@@ -252,13 +252,28 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscPulseWidth, "Shape/PW", &show_amount, &show_source);
 	tmp_y += 75;
 	//Pitch
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscPitch, "Pitch", &show_amount, &show_source);
+	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscPitch, "Pitch", &show_amount, &show_source)) {
+		c->to_string = [](double val) {
+			return std::to_string(val >= 0 ? PITCH_SCALE.value(val) : -PITCH_SCALE.value(-val));
+		};
+		break; //FIXME
+	}
 	tmp_y += 75;
 	//Sync
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscSyncMul, "Sync", &show_amount, &show_source);
+	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscSyncMul, "Sync", &show_amount, &show_source)) {
+		c->to_string = [](double val) {
+			return std::to_string(val >= 0 ? SYNC_SCALE.value(val) : -SYNC_SCALE.value(-val));
+		};
+		break; //FIXME
+	}
 	tmp_y += 75;
 	//Unison Detune
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscUnisonDetune, "Unison Det.", &show_amount, &show_source);
+	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscUnisonDetune, "Unison Det.", &show_amount, &show_source)) {
+		c->to_string = [](double val) {
+			return std::to_string(val >= 0 ? UNISON_DETUNE_SCALE.value(val) : -UNISON_DETUNE_SCALE.value(-val));
+		};
+		break; //FIXME
+	}
 	tmp_y += 75;
 
 	//Edit Sources
