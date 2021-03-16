@@ -342,6 +342,8 @@ public:
 
 	virtual std::string get_name() = 0;
 
+	virtual bool matches(SoundEngine* engine) = 0;
+
 	virtual ~SoundEngineBuilder() {
 
 	};
@@ -355,6 +357,10 @@ public:
 	}
 	std::string get_name() {
 		return get_engine_name<T>();
+	}
+
+	bool matches(SoundEngine* engine) {
+		return dynamic_cast<T*>(engine) != nullptr;
 	}
 };
 

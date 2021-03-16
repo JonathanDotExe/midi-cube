@@ -11,7 +11,7 @@
 
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {
-	enginee = nullptr;
+	engine = nullptr;
 }
 
 void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, SoundEngine* engine, size_t scene) {
@@ -77,7 +77,7 @@ void SoundEngineChannel::update_properties() {
 	submit_change(SoundEngineChannelProperty::pChannelActive, scene.active);
 	submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
 	submit_change(SoundEngineChannelProperty::pChannelPanning, panning);
-	submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) engine_index);
+	submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) get_engine_index());
 
 	submit_change(SoundEngineChannelProperty::pChannelInputDevice, (int) scene.source.input);
 	submit_change(SoundEngineChannelProperty::pChannelInputChannel, (int) scene.source.channel);
@@ -114,7 +114,7 @@ PropertyValue SoundEngineChannel::get(size_t prop, size_t sub_prop) {
 		value.dval = panning;
 		break;
 	case SoundEngineChannelProperty::pChannelSoundEngine:
-		value.ival = engine_index;
+		value.ival = get_engine_index();
 		break;
 	case SoundEngineChannelProperty::pChannelInputDevice:
 		value.ival = scene.source.input;
@@ -187,7 +187,7 @@ void SoundEngineChannel::set(size_t prop, PropertyValue value, size_t sub_prop) 
 		panning = value.dval;
 		break;
 	case SoundEngineChannelProperty::pChannelSoundEngine:
-		engine_index = value.ival;
+		set_engine_index(value.ival);
 		break;
 	case SoundEngineChannelProperty::pChannelInputDevice:
 		scene.source.input= value.ival;
