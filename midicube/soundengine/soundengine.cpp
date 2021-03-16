@@ -300,12 +300,12 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 	rsample *= volume;
 }
 
-std::vector<SoundEngineBank*> SoundEngineDevice::get_sound_engines() {
-	return sound_engines;
+std::vector<SoundEngineBuilder*> SoundEngineDevice::get_engine_builders() {
+	return engine_builders;
 }
 
-void SoundEngineDevice::add_sound_engine(SoundEngineBank* engine) {
-	sound_engines.push_back(engine);
+void SoundEngineDevice::add_sound_engine(SoundEngineBuilder* engine) {
+	engine_builders.push_back(engine);
 }
 
 void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
@@ -411,8 +411,8 @@ SoundEngineDevice::~SoundEngineDevice() {
 		channels[i].set_engine(-1);
 	}
 	//Delete engines
-	for (SoundEngineBank* engine : sound_engines) {
+	for (SoundEngineBuilder* engine : engine_builders) {
 		delete engine;
 	}
-	sound_engines.clear();
+	engine_builders.clear();
 }

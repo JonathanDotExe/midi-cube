@@ -336,10 +336,33 @@ enum SoundEngineProperty {
 	pEngineVolume,
 };
 
+
+class SoundEngineBuilder {
+public:
+	virtual SoundEngine* build() = 0;
+
+	virtual std::string get_name() = 0;
+
+	virtual ~SoundEngineBuilder() {
+
+	};
+};
+
+template <typename T>
+class TemplateSoundEngineBuilder : public SoundEngineBuilder {
+public:
+	inline SoundEngine* build() {
+		return new T();
+	}
+	std::string get_name() {
+		return get_engine_name<T>();
+	}
+};
+
 class SoundEngineDevice : public PropertyHolder {
 
 private:
-	std::vector<SoundEngineBank*> sound_engines;
+	std::vector<SoundEngineBuilder*> engine_builders;
 
 	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
 	LinearADSREnvelope metronome_env;
@@ -353,9 +376,9 @@ public:
 
 	SoundEngineDevice();
 
-	std::vector<SoundEngineBank*> get_sound_engines();
+	std::vector<SoundEngineBuilder*> get_engine_builders();
 
-	void add_sound_engine(SoundEngineBank* engine);
+	void add_sound_engine(SoundEngineBuilder* engine);
 
 	void send(MidiMessage& message, SampleInfo& info);
 
@@ -375,27 +398,5 @@ public:
 
 };
 
-
-class SoundEngineBuilder {
-public:
-	virtual SoundEngine* build() = 0;
-
-	virtual std::string get_name() = 0;
-
-	virtual ~SoundEngineBuilder() {
-
-	};
-};
-
-template <typename T>
-class TemplateSoundEngineBuilder : public SoundEngineBank {
-public:
-	inline SoundEngine* build() {
-		return new T();
-	}
-	std::string get_name() {
-		return get_engine_name<T>();
-	}
-};
 
 #endif /* MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_ */
