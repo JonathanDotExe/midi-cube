@@ -376,6 +376,26 @@ public:
 };
 
 
+class SoundEngineBuilder {
+public:
+	virtual SoundEngine* build() = 0;
 
+	virtual std::string get_name() = 0;
+
+	virtual ~SoundEngineBuilder() {
+
+	};
+};
+
+template <typename T>
+class TemplateSoundEngineBuilder : public SoundEngineBank {
+public:
+	inline SoundEngine* build() {
+		return new T();
+	}
+	std::string get_name() {
+		return get_engine_name<T>();
+	}
+};
 
 #endif /* MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_ */
