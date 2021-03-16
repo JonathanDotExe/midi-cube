@@ -250,13 +250,43 @@ void SampleSoundCreator::generate_sound() {
 	std::sort(notes.begin(), notes.end());
 	std::sort(velocities.begin(), velocities.end());
 
+
+	std::vector<std::vector<double>> vols = {};
 	//Generate
+	size_t v = 0;
+	unsigned int last_velocity = 0;
 	for (unsigned int velocity : velocities) {
+		size_t n = 0;
+
+		vols.push_back({});
 		pt::ptree layer;
 		layer.put("velocity", velocity/127.0);
 		bool reached_high_part = false;
 		unsigned int last_note = 0;
 		for (unsigned int note : notes) {
+			double velocity_amount = 0;
+			//Smooth velocity
+			if (smoothen_layers) {
+				//TODO seperate volumes for sustain
+				//Find volume
+				double vol = 0;
+				AudioSample sample;
+				std::string file = path + "/" + prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav";
+				if (!read_audio_file(sample, file)) {
+					std::cerr << "Couldn't load sample file " << file << std::endl;
+				}
+				for (double s : sample.samples) {
+					if (abs(s) > vol) {
+						vol = abs(s);
+					}
+				}
+				//Double calc velocity amount
+				double last = v > 0 ? vols.at(v - 1).at(n) : 0;
+				velocity_amount = (1 - last/vol) * 127.0 / (velocity - last_velocity);
+
+				vols.at(v).push_back(vol);
+			}
+			//Zone
 			if (!reached_high_part) {
 				if (note >= PIANO_HIGH_NOTE_START) {
 					if (last_note < PIANO_HIGH_NOTE_START) {
@@ -280,12 +310,16 @@ void SampleSoundCreator::generate_sound() {
 			zone.put("max_note", note); //TODO different methods
 			zone.put("envelope", reached_high_part ? 1 : 0);
 			zone.put("filter", -1);
+			zone.put("amp_velocity_amount", velocity_amount);
 			zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
 			layer.add_child("zones.zone", zone);
 
 			last_note = note;
+			n++;
 		}
 		tree.add_child("sound.velocity_layers.velocity_layer", layer);
+		last_velocity = velocity;
+		v++;
 	}
 
 	//Save to file
