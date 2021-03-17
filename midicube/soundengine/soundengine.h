@@ -262,7 +262,7 @@ class SoundEngineDevice;
 
 class SoundEngineChannel : public PropertyHolder {
 private:
-	std::atomic<ssize_t> engine_index{0};
+	SoundEngine* engine = nullptr;
 	SoundEngineDevice* device = nullptr;
 
 public:
@@ -288,9 +288,9 @@ public:
 		}
 	}
 
-	void send(MidiMessage& message, SampleInfo& info, SoundEngine& engine, size_t scene);
+	void send(MidiMessage& message, SampleInfo& info, size_t scene);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, SoundEngine* engine, size_t scene);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, size_t scene);
 
 	PropertyValue get(size_t prop, size_t sub_prop);
 
@@ -298,14 +298,13 @@ public:
 
 	void update_properties();
 
-	inline SoundEngine* get_engine(std::vector<SoundEngineBank*>& engines, unsigned int channel);
+	inline SoundEngine* get_engine();
 
-	/**
-	 * May only be called from GUI thread after GUI has started
-	 */
-	void set_engine(ssize_t engine);
+	inline void set_engine(SoundEngine* engine);
 
-	ssize_t get_engine();
+	void set_engine_index(ssize_t engine);
+
+	ssize_t get_engine_index();
 
 	~SoundEngineChannel();
 
@@ -336,10 +335,39 @@ enum SoundEngineProperty {
 	pEngineVolume,
 };
 
+
+class SoundEngineBuilder {
+public:
+	virtual SoundEngine* build() = 0;
+
+	virtual std::string get_name() = 0;
+
+	virtual bool matches(SoundEngine* engine) = 0;
+
+	virtual ~SoundEngineBuilder() {
+
+	};
+};
+
+template <typename T>
+class TemplateSoundEngineBuilder : public SoundEngineBuilder {
+public:
+	inline SoundEngine* build() {
+		return new T();
+	}
+	std::string get_name() {
+		return get_engine_name<T>();
+	}
+
+	bool matches(SoundEngine* engine) {
+		return dynamic_cast<T*>(engine) != nullptr;
+	}
+};
+
 class SoundEngineDevice : public PropertyHolder {
 
 private:
-	std::vector<SoundEngineBank*> sound_engines;
+	std::vector<SoundEngineBuilder*> engine_builders;
 
 	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
 	LinearADSREnvelope metronome_env;
@@ -353,9 +381,9 @@ public:
 
 	SoundEngineDevice();
 
-	std::vector<SoundEngineBank*> get_sound_engines();
+	std::vector<SoundEngineBuilder*> get_engine_builders();
 
-	void add_sound_engine(SoundEngineBank* engine);
+	void add_sound_engine(SoundEngineBuilder* engine);
 
 	void send(MidiMessage& message, SampleInfo& info);
 
@@ -374,8 +402,6 @@ public:
 	~SoundEngineDevice();
 
 };
-
-
 
 
 #endif /* MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_ */

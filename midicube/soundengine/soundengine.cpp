@@ -11,10 +11,10 @@
 
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {
-	engine_index = -1;
+	engine = nullptr;
 }
 
-void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, SoundEngine* engine, size_t scene) {
+void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, size_t scene) {
 	//Properties
 	if (engine) {
 		double l = 0;
@@ -26,10 +26,10 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			//Arpeggiator
 			if (arp.on) {
 				arp.apply(info,
-				[engine](SampleInfo& i, unsigned int note, double velocity) {
+				[this](SampleInfo& i, unsigned int note, double velocity) {
 					engine->press_note(i, note, velocity);
 				},
-				[engine](SampleInfo& i, unsigned int note) {
+				[this](SampleInfo& i, unsigned int note) {
 					engine->release_note(i, note);
 				});
 			}
@@ -51,7 +51,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	}
 }
 
-void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine, size_t scene) {
+void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t scene) {
 	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
 		if (arp.on) {
 			switch (message.type) {
@@ -62,12 +62,12 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngin
 				arp.note.release_note(info, message.note(), true);
 				break;
 			default:
-				engine.midi_message(message, info);
+				engine->midi_message(message, info);
 				break;
 			}
 		}
 		else {
-			engine.midi_message(message, info);
+			engine->midi_message(message, info);
 		}
 	}
 }
@@ -77,7 +77,7 @@ void SoundEngineChannel::update_properties() {
 	submit_change(SoundEngineChannelProperty::pChannelActive, scene.active);
 	submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
 	submit_change(SoundEngineChannelProperty::pChannelPanning, panning);
-	submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) engine_index);
+	submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) get_engine_index());
 
 	submit_change(SoundEngineChannelProperty::pChannelInputDevice, (int) scene.source.input);
 	submit_change(SoundEngineChannelProperty::pChannelInputChannel, (int) scene.source.channel);
@@ -114,7 +114,7 @@ PropertyValue SoundEngineChannel::get(size_t prop, size_t sub_prop) {
 		value.dval = panning;
 		break;
 	case SoundEngineChannelProperty::pChannelSoundEngine:
-		value.ival = engine_index;
+		value.ival = get_engine_index();
 		break;
 	case SoundEngineChannelProperty::pChannelInputDevice:
 		value.ival = scene.source.input;
@@ -187,7 +187,7 @@ void SoundEngineChannel::set(size_t prop, PropertyValue value, size_t sub_prop) 
 		panning = value.dval;
 		break;
 	case SoundEngineChannelProperty::pChannelSoundEngine:
-		engine_index = value.ival;
+		set_engine_index(value.ival);
 		break;
 	case SoundEngineChannelProperty::pChannelInputDevice:
 		scene.source.input= value.ival;
@@ -246,24 +246,40 @@ void SoundEngineChannel::set(size_t prop, PropertyValue value, size_t sub_prop) 
 	}
 }
 
-void SoundEngineChannel::set_engine(ssize_t engine_index) {
-	this->engine_index = engine_index;
-}
-
-ssize_t SoundEngineChannel::get_engine() {
-	return engine_index;
-}
-
-inline SoundEngine* SoundEngineChannel::get_engine(std::vector<SoundEngineBank*>& engines, unsigned int channel) {
-	ssize_t engine_index = this->engine_index;
-	if (engine_index >= 0 && engine_index < (ssize_t) engines.size()) {
-		return &engines[engine_index]->channel(channel);
+void SoundEngineChannel::set_engine_index(ssize_t engine_index) {
+	auto builders = device->get_engine_builders();
+	if (engine_index >= 0 && (size_t) engine_index < builders.size()) {
+		set_engine(builders.at(engine_index)->build());
 	}
-	return nullptr;
+	else {
+		set_engine(nullptr);
+	}
+}
+
+ssize_t SoundEngineChannel::get_engine_index() {
+	auto builders = device->get_engine_builders();
+	ssize_t index = -1;
+	for (size_t i = 0; i < builders.size(); ++i) {
+		if (builders[i]->matches(engine)) {
+			index = i;
+			break;
+		}
+	}
+	return index;
+}
+
+inline SoundEngine* SoundEngineChannel::get_engine() {
+	return engine;
+}
+
+void SoundEngineChannel::set_engine(SoundEngine* engine) {
+	delete this->engine;
+	this->engine = engine;
 }
 
 SoundEngineChannel::~SoundEngineChannel() {
-	set_engine(-1);
+	delete engine;
+	engine = nullptr;
 }
 
 
@@ -281,8 +297,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 	size_t scene = this->scene;
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
-		SoundEngine* engine = ch.get_engine(sound_engines, i);
-		ch.process_sample(lsample, rsample, info, metronome, engine, scene);
+		ch.process_sample(lsample, rsample, info, metronome, scene);
 	}
 	//Metronome
 	if (play_metronome) {
@@ -300,19 +315,19 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 	rsample *= volume;
 }
 
-std::vector<SoundEngineBank*> SoundEngineDevice::get_sound_engines() {
-	return sound_engines;
+std::vector<SoundEngineBuilder*> SoundEngineDevice::get_engine_builders() {
+	return engine_builders;
 }
 
-void SoundEngineDevice::add_sound_engine(SoundEngineBank* engine) {
-	sound_engines.push_back(engine);
+void SoundEngineDevice::add_sound_engine(SoundEngineBuilder* engine) {
+	engine_builders.push_back(engine);
 }
 
 void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	SoundEngineChannel& ch = this->channels[message.channel];
-	SoundEngine* engine = ch.get_engine(sound_engines, message.channel);
+	SoundEngine* engine = ch.get_engine();
 	if (engine) {
-		ch.send(message, info, *engine, scene);
+		ch.send(message, info, scene);
 	}
 }
 
@@ -361,12 +376,12 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
 		//Reset old engine
-		SoundEngine* engine = ch.get_engine(sound_engines, i);
+		SoundEngine* engine = ch.get_engine();
 		if (engine) {
 			engine->apply_program(nullptr);
 		}
 
-		ch.set_engine(prog.engine_index);
+		ch.set_engine_index(prog.engine_index);
 		ch.volume = prog.volume;
 		ch.panning = prog.panning;
 		ch.scenes = prog.scenes;
@@ -375,7 +390,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ch.arp.preset = prog.arpeggiator;
 
 		//Engine
-		engine = ch.get_engine(sound_engines, i);
+		engine = ch.get_engine();
 		if (engine) {
 			engine->apply_program(prog.engine_program);
 		}
@@ -389,7 +404,7 @@ void SoundEngineDevice::save_program(Program* program) {
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
-		prog.engine_index = ch.get_engine();
+		prog.engine_index = ch.get_engine_index();
 		prog.volume = ch.volume;
 		prog.panning = ch.panning;
 		prog.scenes = ch.scenes;
@@ -398,7 +413,7 @@ void SoundEngineDevice::save_program(Program* program) {
 		prog.arpeggiator = ch.arp.preset;
 
 		//Engine
-		SoundEngine* engine = ch.get_engine(sound_engines, i);
+		SoundEngine* engine = ch.get_engine();
 		if (engine) {
 			engine->save_program(&prog.engine_program);
 		}
@@ -408,11 +423,11 @@ void SoundEngineDevice::save_program(Program* program) {
 SoundEngineDevice::~SoundEngineDevice() {
 	//Clear channels
 	for (size_t i = 0; i < channels.size(); ++i) {
-		channels[i].set_engine(-1);
+		channels[i].set_engine_index(-1);
 	}
 	//Delete engines
-	for (SoundEngineBank* engine : sound_engines) {
+	for (SoundEngineBuilder* engine : engine_builders) {
 		delete engine;
 	}
-	sound_engines.clear();
+	engine_builders.clear();
 }

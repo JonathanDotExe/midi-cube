@@ -21,19 +21,6 @@ void MidiCube::init(int out_device, int in_device) {
 	global_sample_store.load_sounds("./data/samples");
 	//Sound Engines
 	fill_sound_engine_device(&engine);
-	//Synth presets
-	SoundEngineBank* bank = engine.get_sound_engines().at(2);
-	apply_preset(CLEAN_SAW, static_cast<AnalogSynth&>(bank->channel(0)).preset);
-	apply_preset(PULSE_BASS, static_cast<AnalogSynth&>(bank->channel(1)).preset);
-	apply_preset(STRONG_PAD, static_cast<AnalogSynth&>(bank->channel(2)).preset);
-	apply_preset(DELAY_CHORDS, static_cast<AnalogSynth&>(bank->channel(3)).preset);
-	apply_preset(POLY_SWEEP, static_cast<AnalogSynth&>(bank->channel(4)).preset);
-	apply_preset(FM_E_PIANO, static_cast<AnalogSynth&>(bank->channel(5)).preset);
-	apply_preset(POLY_SWEEP, static_cast<AnalogSynth&>(bank->channel(6)).preset);
-	apply_preset(BRASS_PAD, static_cast<AnalogSynth&>(bank->channel(7)).preset);
-	apply_preset(FM_KALIMBA, static_cast<AnalogSynth&>(bank->channel(8)).preset);
-	apply_preset(SYNTH_BRASS, static_cast<AnalogSynth&>(bank->channel(10)).preset);
-	apply_preset(BELL_LEAD, static_cast<AnalogSynth&>(bank->channel(11)).preset);
 	//Default setting
 	Arpeggiator& arp = engine.channels[1].arp;
 	arp.on = true;
@@ -46,10 +33,10 @@ void MidiCube::init(int out_device, int in_device) {
 	engine.channels[0].scenes[0].active = true;
 	//engine.channels[0].vocoder_preset.on = true;
 
-	engine.channels[0].set_engine(2);
+	engine.channels[0].set_engine_index(2);
 
 	engine.channels[9].scenes[0].active = true;
-	engine.channels[9].set_engine(3);
+	engine.channels[9].set_engine_index(3);
 
 	engine.channels[15].vocoder_preset.on = true;
 
