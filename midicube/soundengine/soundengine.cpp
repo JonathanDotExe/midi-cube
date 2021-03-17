@@ -14,7 +14,7 @@ SoundEngineChannel::SoundEngineChannel() {
 	engine = nullptr;
 }
 
-void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, SoundEngine* engine, size_t scene) {
+void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, size_t scene) {
 	//Properties
 	if (engine) {
 		double l = 0;
@@ -26,10 +26,10 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			//Arpeggiator
 			if (arp.on) {
 				arp.apply(info,
-				[engine](SampleInfo& i, unsigned int note, double velocity) {
+				[this](SampleInfo& i, unsigned int note, double velocity) {
 					engine->press_note(i, note, velocity);
 				},
-				[engine](SampleInfo& i, unsigned int note) {
+				[this](SampleInfo& i, unsigned int note) {
 					engine->release_note(i, note);
 				});
 			}
@@ -51,7 +51,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	}
 }
 
-void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngine& engine, size_t scene) {
+void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t scene) {
 	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
 		if (arp.on) {
 			switch (message.type) {
@@ -62,12 +62,12 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, SoundEngin
 				arp.note.release_note(info, message.note(), true);
 				break;
 			default:
-				engine.midi_message(message, info);
+				engine->midi_message(message, info);
 				break;
 			}
 		}
 		else {
-			engine.midi_message(message, info);
+			engine->midi_message(message, info);
 		}
 	}
 }
@@ -297,8 +297,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 	size_t scene = this->scene;
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
-		SoundEngine* engine = ch.get_engine();
-		ch.process_sample(lsample, rsample, info, metronome, engine, scene);
+		ch.process_sample(lsample, rsample, info, metronome, scene);
 	}
 	//Metronome
 	if (play_metronome) {
@@ -328,7 +327,7 @@ void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	SoundEngineChannel& ch = this->channels[message.channel];
 	SoundEngine* engine = ch.get_engine();
 	if (engine) {
-		ch.send(message, info, *engine, scene);
+		ch.send(message, info, scene);
 	}
 }
 
