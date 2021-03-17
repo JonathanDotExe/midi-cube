@@ -28,7 +28,7 @@ Scene SoundEngineView::create(Frame& frame) {
 	holders.push_back(this->engine);
 	SoundEngineDevice& sound_engine = frame.cube.engine;
 	//Sound engines
-	for (SoundEngineBank* engine : sound_engine.get_sound_engines()) {
+	for (SoundEngineBuilder* engine : sound_engine.get_engine_builders()) {
 		engine_names.push_back(engine->get_name());
 	}
 

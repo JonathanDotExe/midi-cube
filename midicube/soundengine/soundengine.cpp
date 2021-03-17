@@ -249,7 +249,7 @@ void SoundEngineChannel::set(size_t prop, PropertyValue value, size_t sub_prop) 
 void SoundEngineChannel::set_engine_index(ssize_t engine_index) {
 	auto builders = device->get_engine_builders();
 	if (engine_index >= 0 && (size_t) engine_index < builders.size()) {
-		set_engine(builders.at(index)->build());
+		set_engine(builders.at(engine_index)->build());
 	}
 	else {
 		set_engine(nullptr);
@@ -257,7 +257,15 @@ void SoundEngineChannel::set_engine_index(ssize_t engine_index) {
 }
 
 ssize_t SoundEngineChannel::get_engine_index() {
-	return engine_index;
+	auto builders = device->get_engine_builders();
+	ssize_t index = -1;
+	for (size_t i = 0; i < builders.size(); ++i) {
+		if (builders[i]->matches(engine)) {
+			index = i;
+			break;
+		}
+	}
+	return index;
 }
 
 inline SoundEngine* SoundEngineChannel::get_engine() {
@@ -289,7 +297,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 	size_t scene = this->scene;
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
-		SoundEngine* engine = ch.get_engine_index(sound_engines, i);
+		SoundEngine* engine = ch.get_engine();
 		ch.process_sample(lsample, rsample, info, metronome, engine, scene);
 	}
 	//Metronome
@@ -318,7 +326,7 @@ void SoundEngineDevice::add_sound_engine(SoundEngineBuilder* engine) {
 
 void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	SoundEngineChannel& ch = this->channels[message.channel];
-	SoundEngine* engine = ch.get_engine_index(sound_engines, message.channel);
+	SoundEngine* engine = ch.get_engine();
 	if (engine) {
 		ch.send(message, info, *engine, scene);
 	}
@@ -369,7 +377,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
 		//Reset old engine
-		SoundEngine* engine = ch.get_engine_index(sound_engines, i);
+		SoundEngine* engine = ch.get_engine();
 		if (engine) {
 			engine->apply_program(nullptr);
 		}
@@ -383,7 +391,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ch.arp.preset = prog.arpeggiator;
 
 		//Engine
-		engine = ch.get_engine_index(sound_engines, i);
+		engine = ch.get_engine();
 		if (engine) {
 			engine->apply_program(prog.engine_program);
 		}
@@ -406,7 +414,7 @@ void SoundEngineDevice::save_program(Program* program) {
 		prog.arpeggiator = ch.arp.preset;
 
 		//Engine
-		SoundEngine* engine = ch.get_engine_index(sound_engines, i);
+		SoundEngine* engine = ch.get_engine();
 		if (engine) {
 			engine->save_program(&prog.engine_program);
 		}
