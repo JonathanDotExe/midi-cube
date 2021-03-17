@@ -298,9 +298,9 @@ public:
 
 	void update_properties();
 
-	inline SoundEngine* get_engine();
+	SoundEngine* get_engine();
 
-	inline void set_engine(SoundEngine* engine);
+	void set_engine(SoundEngine* engine);
 
 	void set_engine_index(ssize_t engine);
 
