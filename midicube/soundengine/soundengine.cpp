@@ -268,7 +268,7 @@ ssize_t SoundEngineChannel::get_engine_index() {
 	return index;
 }
 
-inline SoundEngine* SoundEngineChannel::get_engine() {
+SoundEngine* SoundEngineChannel::get_engine() {
 	return engine;
 }
 
