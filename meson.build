@@ -28,6 +28,7 @@ src = [
 	'midicube/property.cpp',
 	'midicube/synthesis.cpp',
 	'midicube/util.cpp',
+	'midicube/wavetable.cpp',
 	
 	'midicube/soundengine/asynth.cpp',
 	'midicube/soundengine/drums.cpp',
