@@ -11,17 +11,23 @@
 #include <cstddef>
 #include <cmath>
 #include <array>
+#include <functional>
 
-template <typename F, size_t N>
+template <size_t N>
 class WaveTable {
 private:
+	std::function<double (double)> func;
 	std::array<double, N> data;
 
 public:
 
+	WaveTable(std::function<double (double)> f) : func(f) {
+
+	}
+
 	void init() {
 		for (size_t i = 0; i < N; ++i) {
-			data[i] = F((double) i/(N - 1));
+			data[i] = func((double) i/(N - 1));
 		}
 	}
 
