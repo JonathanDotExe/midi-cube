@@ -12,7 +12,6 @@
 
 #include <array>
 #include "filter.h"
-#include "wavetables.h"
 
 struct TriggeredNote {
 	double start_time = 0;

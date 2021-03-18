@@ -6,6 +6,7 @@
  */
 
 #include "envelope.h"
+#include "wavetable.h"
 #include <cmath>
 #include <iostream>
 
@@ -66,6 +67,12 @@ double LinearADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 	}
 	return volume;
 }
+
+double analog_adsr_wave(double prog) {
+	return pow(prog, 2.0/3.0);
+}
+
+WaveTable<1024> ANALOG_ADSR_WAVE(analog_adsr_wave);
 
 //AnalogADSREnvelope
 double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
