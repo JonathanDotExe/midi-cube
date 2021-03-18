@@ -67,10 +67,7 @@ class AnalogADSREnvelope {
 
 public:
 	ADSREnvelopePhase phase = FINISHED;
-	double volume = 0;
 	double time = 0;
-	double last = 0;
-	double last_vol = 0;
 
 	double amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain);
 
@@ -80,10 +77,7 @@ public:
 
 	inline void reset () {
 		phase = ATTACK;
-		volume = 0;
-		last_vol = 0;
 		time = 0;
-		last = 0;
 	}
 };
 
