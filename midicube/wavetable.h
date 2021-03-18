@@ -16,16 +16,11 @@
 template <size_t N>
 class WaveTable {
 private:
-	std::function<double (double)> func;
 	std::array<double, N> data;
 
 public:
 
-	WaveTable(std::function<double (double)> f) : func(f) {
-
-	}
-
-	void init() {
+	WaveTable(std::function<double (double)> func) {
 		for (size_t i = 0; i < N; ++i) {
 			data[i] = func((double) i/(N - 1));
 		}

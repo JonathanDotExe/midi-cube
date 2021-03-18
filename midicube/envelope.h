@@ -12,6 +12,7 @@
 
 #include <array>
 #include "filter.h"
+#include "wavetables.h"
 
 struct TriggeredNote {
 	double start_time = 0;
@@ -71,7 +72,6 @@ public:
 	double time = 0;
 	double last = 0;
 	double last_vol = 0;
-	double slope = 2/3.0;
 
 	double amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain);
 

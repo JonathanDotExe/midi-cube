@@ -9,16 +9,14 @@
 #define MIDICUBE_WAVETABLES_H_
 
 #include "wavetable.h"
+#include <cmath>
 
 double analog_adsr_wave(double prog) {
-	return 0;
+	return pow(prog, 2.0/3.0);
 }
 
 WaveTable<1024> ANALOG_ADSR_WAVE(analog_adsr_wave);
 
-void init_wavetables() {
-	ANALOG_ADSR_WAVE.init();
-}
 
 
 #endif /* MIDICUBE_WAVETABLES_H_ */

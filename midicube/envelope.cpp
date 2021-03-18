@@ -82,7 +82,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 	switch (phase) {
 	case ATTACK:
 		step = time_step/data.attack;
-		s = pow(time, slope);
+		s = ANALOG_ADSR_WAVE.get_value(time);
 		if (data.attack != 0) {
 			volume += s - last;
 			last = s;
@@ -101,7 +101,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		break;
 	case DECAY:
 		step = time_step/data.decay;
-		s = pow(time, slope);
+		s = ANALOG_ADSR_WAVE.get_value(time);
 		if (data.decay != 0) {
 			volume -= (s - last) * (1 - data.sustain);
 			last = s;
@@ -123,7 +123,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		break;
 	case RELEASE:
 		step = time_step/data.release;
-		s = pow(time, slope);
+		s = ANALOG_ADSR_WAVE.get_value(time);
 		if (!sustain) {
 			if (data.release != 0) {
 				volume -= (s - last) * last_vol;
