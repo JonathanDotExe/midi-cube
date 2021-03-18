@@ -508,7 +508,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 					voice.parts[i].mod_env.phase = ATTACK;
 				}
 			}
-			note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo);
+			note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * abs((int) voice.note - last_note) / 50.0);
 		}
 		last_note = voice.note;
 		first_port = false;
