@@ -112,7 +112,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 	case RELEASE:
 		step = time_step/data.release;
 		volume = (1 - ANALOG_ADSR_WAVE.get_value(time)) * data.sustain;
-		if (data.release == 0 || volume <= sustain) {
+		if (data.release == 0 || volume <= 0) {
 			volume = 0;
 			phase = FINISHED;
 			time = 0;
