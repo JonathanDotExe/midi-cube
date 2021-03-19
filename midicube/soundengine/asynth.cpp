@@ -1260,7 +1260,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			op.oscilator_count = o.second.get<size_t>("oscilator_count", 1);
 
 
-			const auto& fm = tree.get_child_optional("operators");
+			const auto& fm = o.second.get_child_optional("fm");
 			size_t k = 0;
 			if (fm) {
 				for (pt::ptree::value_type& f : fm.get()) {
