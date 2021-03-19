@@ -77,12 +77,12 @@ WaveTable<1024> ANALOG_ADSR_WAVE(analog_adsr_wave);
 //AnalogADSREnvelope
 double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
 	double step = 0;
-	double volume = 0;
 	//Goto release phase
 	if (!pressed && phase < RELEASE) {
 		phase = RELEASE;
 		time = 0;
 		step = 0;
+		last_vol = volume;
 	}
 
 	switch (phase) {
@@ -94,16 +94,18 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 			phase = DECAY;
 			time = 0;
 			step = 0;
+			last_vol = volume;
 		}
 		break;
 	case DECAY:
 		step = time_step/data.decay;
-		volume = 1 - (ANALOG_ADSR_WAVE.get_value(time) * (1 - data.sustain));
+		volume = 1 - (ANALOG_ADSR_WAVE.get_value(time) * (last_vol - data.sustain));
 		if (data.decay == 0 || volume <= data.sustain) {
 			volume = data.sustain;
 			phase = SUSTAIN;
 			time = 0;
 			step = 0;
+			last_vol = volume;
 		}
 		break;
 	case SUSTAIN:
@@ -111,12 +113,13 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		break;
 	case RELEASE:
 		step = time_step/data.release;
-		volume = (1 - ANALOG_ADSR_WAVE.get_value(time)) * data.sustain;
+		volume = (1 - ANALOG_ADSR_WAVE.get_value(time)) * last_vol;
 		if (data.release == 0 || volume <= 0) {
 			volume = 0;
 			phase = FINISHED;
 			time = 0;
 			step = 0;
+			last_vol = volume;
 		}
 		break;
 	case FINISHED:
