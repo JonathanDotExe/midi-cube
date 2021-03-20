@@ -502,25 +502,35 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 			AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
+				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * abs((int) voice.note - mono_voice.note) / 50.0);
+			}
+			//Trigger note
+			if (!mono_voice.valid) {
+				mono_voice.valid = true;
 				//Reset envs to attack
-				if (!preset.legato) {
-					for (size_t i = 0; i < preset.mod_env_count; ++i) {
+				for (size_t i = 0; i < preset.mod_env_count; ++i) {
+					if (!preset.legato || mono_voice.parts[i].mod_env.phase == FINISHED) {
 						//Mod env
 						mono_voice.parts[i].mod_env.phase = ATTACK;
 					}
-					for (size_t i = 0; i < preset.op_count; ++i) {
+				}
+				for (size_t i = 0; i < preset.op_count; ++i) {
+					if (!preset.legato || mono_voice.parts[i].mod_env.phase == FINISHED) {
 						//Amp env
-						mono_voice.parts[i].mod_env.phase = ATTACK;
+						mono_voice.parts[i].amp_env.phase = ATTACK;
+						mono_voice.parts[i].amp_env.time = 0;
 					}
 				}
-				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * abs((int) voice.note - mono_voice.note) / 50.0);
 			}
 			mono_voice.note = voice.note;
 			first_port = false;
 		}
 
 		//Playback
-		if (!amp_finished(info, mono_voice, env)) {
+		if (amp_finished(info, mono_voice, env)) {
+			mono_voice.valid = false;
+		}
+		if (mono_voice.valid) {
 			double pitch = note_port.get(info.time);
 			KeyboardEnvironment e = env;
 			e.pitch_bend *= note_to_freq_transpose(
