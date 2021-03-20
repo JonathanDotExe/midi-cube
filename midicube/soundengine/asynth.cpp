@@ -497,31 +497,37 @@ void AnalogSynth::process_note_sample(
 void AnalogSynth::process_sample(double& lsample, double& rsample,
 		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
 	//Mono
-	if (preset.mono && status.pressed_notes) {
-		AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
-		//Update portamendo
-		if (voice.note != last_note) {
-			//Reset envs to attack
-			if (!preset.legato) {
-				for (size_t i = 0; i < preset.mod_env_count; ++i) {
-					//Mod env
-					voice.parts[i].mod_env.phase = ATTACK;
+	if (preset.mono) {
+		if (status.pressed_notes) {
+			AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
+			//Update portamendo
+			if (voice.note != mono_voice.note) {
+				//Reset envs to attack
+				if (!preset.legato) {
+					for (size_t i = 0; i < preset.mod_env_count; ++i) {
+						//Mod env
+						mono_voice.parts[i].mod_env.phase = ATTACK;
+					}
+					for (size_t i = 0; i < preset.op_count; ++i) {
+						//Amp env
+						mono_voice.parts[i].mod_env.phase = ATTACK;
+					}
 				}
-				for (size_t i = 0; i < preset.op_count; ++i) {
-					//Amp env
-					voice.parts[i].mod_env.phase = ATTACK;
-				}
+				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * abs((int) voice.note - mono_voice.note) / 50.0);
 			}
-			note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * abs((int) voice.note - last_note) / 50.0);
+			mono_voice.note = voice.note;
+			first_port = false;
 		}
-		last_note = voice.note;
-		first_port = false;
-		double pitch = note_port.get(info.time);
-		KeyboardEnvironment e = env;
-		e.pitch_bend *= note_to_freq_transpose(
-				pitch - voice.note);
 
-		process_note(lsample, rsample, info, voice, e);
+		//Playback
+		if (!amp_finished(info, mono_voice, env)) {
+			double pitch = note_port.get(info.time);
+			KeyboardEnvironment e = env;
+			e.pitch_bend *= note_to_freq_transpose(
+					pitch - mono_voice.note);
+
+			process_note(lsample, rsample, info, mono_voice, e);
+		}
 	}
 
 	//Delay lines

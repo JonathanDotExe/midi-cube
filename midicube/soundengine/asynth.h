@@ -243,7 +243,6 @@ private:
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
 
 	bool first_port = true;
-	unsigned int last_note = 0;
 	PortamendoBuffer note_port{0, 0};
 	AnalogSynthVoice mono_voice;
 	DelayBuffer ldelay;
