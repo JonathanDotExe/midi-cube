@@ -380,8 +380,7 @@ static inline double apply_modulation(const FixedScale &scale,
 }
 
 void AnalogSynth::process_note(double& lsample, double& rsample,
-		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env,
-		size_t note_index) {
+		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env) {
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
@@ -491,7 +490,7 @@ void AnalogSynth::process_note_sample(
 		double& lsample, double& rsample, SampleInfo &info,
 		AnalogSynthVoice &note, KeyboardEnvironment &env, size_t note_index) {
 	if (!preset.mono) {
-		process_note(lsample, rsample, info, note, env, note_index);
+		process_note(lsample, rsample, info, note, env);
 	}
 }
 
@@ -522,7 +521,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 		e.pitch_bend *= note_to_freq_transpose(
 				pitch - voice.note);
 
-		process_note(lsample, rsample, info, voice, e, 0);
+		process_note(lsample, rsample, info, voice, e);
 	}
 
 	//Delay lines
@@ -567,10 +566,10 @@ void AnalogSynth::control_change(unsigned int control, unsigned int value) {
 bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 		KeyboardEnvironment &env, size_t note_index) {
 	//Mono notes
-	if (preset.mono) {	//TODO not very easy to read/side effects
-		note_index = 0;
+	if (preset.mono) {
+		return !note.pressed;
 	}
-	return !note.pressed && amp_finished(info, note, env, note_index);
+	return !note.pressed && amp_finished(info, note, env);
 }
 
 void AnalogSynth::press_note(SampleInfo& info, unsigned int note, double velocity) {
@@ -599,7 +598,7 @@ void AnalogSynth::release_note(SampleInfo& info, unsigned int note) {
 }
 
 bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,
-		KeyboardEnvironment &env, size_t note_index) {
+		KeyboardEnvironment &env) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.op_count && finished; ++i) {
 		finished = note.parts[i].amp_env.is_finished();
