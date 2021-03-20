@@ -69,6 +69,8 @@ struct OperatorEntity {
 	PropertyModulation panning = {0.5};
 
 	bool filter = false;
+	bool pre_filter_drive = false;
+	double pre_filter_drive_amount = 0;
 	FilterType filter_type = FilterType::LP_12;
 	PropertyModulation filter_cutoff = {1};
 	PropertyModulation filter_resonance = {0};
@@ -77,6 +79,7 @@ struct OperatorEntity {
 
 	unsigned int oscilator_count = 1;
 	std::array<double, ANALOG_PART_COUNT> fm;
+
 };
 
 struct ModEnvelopeEntity {

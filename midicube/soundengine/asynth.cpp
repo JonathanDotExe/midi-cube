@@ -454,6 +454,11 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		if (op.audible) {
 			//Filter
 			if (op.filter) {
+				//Pre drive
+				if (op.pre_filter_drive) {
+					carrier = 2 / M_PI * atan(carrier * (1 + op.pre_filter_drive_amount * 2));
+				}
+
 				FilterData filter { op.filter_type };
 				filter.cutoff = scale_cutoff(apply_modulation(FILTER_CUTOFF_SCALE,
 						op.filter_cutoff, env_val, lfo_val, controls,
