@@ -167,6 +167,8 @@ enum SynthPartProperty {
 	pSynthOpFM,
 
 	pSynthOpFilter,
+	pSynthOpPreFilterDrive,
+	pSynthOpPreFilterDriveAmount,
 	pSynthOpFilterType,
 	pSynthOpFilterCutoff,
 	pSynthOpFilterResonance,

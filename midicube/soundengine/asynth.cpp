@@ -456,7 +456,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 			if (op.filter) {
 				//Pre drive
 				if (op.pre_filter_drive) {
-					carrier = 2 / M_PI * atan(carrier * (1 + op.pre_filter_drive_amount * 2));
+					carrier = atan(carrier * (1.5 + op.pre_filter_drive_amount * 10));
 				}
 
 				FilterData filter { op.filter_type };
@@ -822,6 +822,12 @@ PropertyValue SynthPartPropertyHolder::get(size_t prop, size_t sub_prop) {
 	case SynthPartProperty::pSynthOpFilter:
 		val.bval = op.filter;
 		break;
+	case SynthPartProperty::pSynthOpPreFilterDrive:
+		val.bval = op.pre_filter_drive;
+		break;
+	case SynthPartProperty::pSynthOpPreFilterDriveAmount:
+		val.dval = op.pre_filter_drive_amount;
+		break;
 	case SynthPartProperty::pSynthOpFilterType:
 		val.ival = op.filter_type;
 		break;
@@ -946,6 +952,12 @@ void SynthPartPropertyHolder::set(size_t prop, PropertyValue val,
 	case SynthPartProperty::pSynthOpFilter:
 		op.filter = val.bval;
 		break;
+	case SynthPartProperty::pSynthOpPreFilterDrive:
+		op.pre_filter_drive = val.bval;
+		break;
+	case SynthPartProperty::pSynthOpPreFilterDriveAmount:
+		op.pre_filter_drive_amount = val.dval;
+		break;
 	case SynthPartProperty::pSynthOpFilterType:
 		op.filter_type = (FilterType) val.ival;
 		break;
@@ -1042,6 +1054,10 @@ void SynthPartPropertyHolder::update_properties() {
 
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOpFilter,
 			op.filter);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpPreFilterDrive,
+			op.pre_filter_drive);
+	PropertyHolder::submit_change(SynthPartProperty::pSynthOpPreFilterDriveAmount,
+			op.pre_filter_drive_amount);
 	PropertyHolder::submit_change(SynthPartProperty::pSynthOpFilterType,
 			op.filter_type);
 	submit_change(SynthPartProperty::pSynthOpFilterCutoff, op.filter_cutoff);
