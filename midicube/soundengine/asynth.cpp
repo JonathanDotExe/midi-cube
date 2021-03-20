@@ -507,6 +507,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 			//Trigger note
 			if (!mono_voice.valid) {
 				mono_voice.valid = true;
+				mono_voice.pressed = true;
 				//Reset envs to attack
 				for (size_t i = 0; i < preset.mod_env_count; ++i) {
 					if (!preset.legato || mono_voice.parts[i].mod_env.phase == FINISHED) {
@@ -523,13 +524,14 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 				}
 			}
 			mono_voice.note = voice.note;
+			mono_voice.freq = voice.freq;
 			first_port = false;
+		}
+		else {
+			mono_voice.pressed = false;
 		}
 
 		//Playback
-		if (amp_finished(info, mono_voice, env)) {
-			mono_voice.valid = false;
-		}
 		if (mono_voice.valid) {
 			double pitch = note_port.get(info.time);
 			KeyboardEnvironment e = env;
@@ -537,6 +539,9 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 					pitch - mono_voice.note);
 
 			process_note(lsample, rsample, info, mono_voice, e);
+			if (amp_finished(info, mono_voice, e)) {
+				mono_voice.valid = false;
+			}
 		}
 	}
 
