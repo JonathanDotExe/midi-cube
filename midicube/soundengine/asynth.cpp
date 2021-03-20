@@ -1271,7 +1271,9 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			op.volume = load_prop_mod(o.second, "volume");
 			op.panning = load_prop_mod(o.second, "panning");
 
-			op.filter = o.second.get<bool>("filter", true);
+			op.filter = o.second.get<bool>("filter", false);
+			op.pre_filter_drive = o.second.get<bool>("pre_filter_drive", false);
+			op.pre_filter_drive_amount = o.second.get<double>("pre_filter_drive_amount", 0);
 			op.filter_type = (FilterType) o.second.get<int>("filter_type", 0);
 			op.filter_cutoff = load_prop_mod(o.second, "filter_cutoff");
 			op.filter_resonance = load_prop_mod(o.second, "filter_resonance");
@@ -1370,6 +1372,8 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		o.add_child("panning", save_prop_mod(op.panning));
 
 		o.put("filter", op.filter);
+		o.put("pre_filter_drive", op.pre_filter_drive);
+		o.put("pre_filter_drive_amount", op.pre_filter_drive_amount);
 		o.put("filter_type", (int) op.filter_type);
 		o.add_child("filter_cutoff", save_prop_mod(op.filter_cutoff));
 		o.add_child("filter_resonance", save_prop_mod(op.filter_resonance));
