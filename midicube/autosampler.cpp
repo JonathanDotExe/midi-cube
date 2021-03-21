@@ -189,7 +189,13 @@ void SampleSoundCreator::request_params() {
 	std::cout << "How should your sound be called?" << std::endl;
 	std::cin >> sound_name;
 
-	std::cout << "How should your sound be saved called?" << std::endl;
+	std::cout << "Do you want to smoothen the velocity layers (different volumes)? (0/1)" << std::endl;
+	std::cin >> smoothen_layers;
+
+	std::cout << "Do you want ignore the lowest velocity layer (only use it as reference volume)? (0/1)" << std::endl;
+	std::cin >> ignore_first_layer;
+
+	std::cout << "Where should your sound be saved?" << std::endl;
 	std::cin >> path;
 }
 
@@ -287,7 +293,7 @@ void SampleSoundCreator::generate_sound() {
 				vols.at(v).push_back(vol);
 			}
 			//Zone
-			if (v > 0 || !leave_first_layer) {
+			if (v > 0 || !ignore_first_layer) {
 				if (!reached_high_part) {
 					if (note >= PIANO_HIGH_NOTE_START) {
 						if (last_note < PIANO_HIGH_NOTE_START) {
@@ -319,7 +325,7 @@ void SampleSoundCreator::generate_sound() {
 				n++;
 			}
 		}
-		if (v > 0 || !leave_first_layer) {
+		if (v > 0 || !ignore_first_layer) {
 			tree.add_child("sound.velocity_layers.velocity_layer", layer);
 			last_velocity = velocity;
 		}
