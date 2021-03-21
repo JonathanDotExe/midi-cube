@@ -505,7 +505,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * abs((int) voice.note - mono_voice.note) / 50.0);
 			}
 			//Trigger note
-			if (!mono_voice.valid) {
+			if (!mono_voice.pressed || voice.note != mono_voice.note) {
 				mono_voice.valid = true;
 				mono_voice.pressed = true;
 				//Reset envs to attack
