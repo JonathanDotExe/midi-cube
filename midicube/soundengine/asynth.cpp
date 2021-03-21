@@ -380,8 +380,7 @@ static inline double apply_modulation(const FixedScale &scale,
 }
 
 void AnalogSynth::process_note(double& lsample, double& rsample,
-		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env,
-		size_t note_index) {
+		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env) {
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
@@ -491,38 +490,60 @@ void AnalogSynth::process_note_sample(
 		double& lsample, double& rsample, SampleInfo &info,
 		AnalogSynthVoice &note, KeyboardEnvironment &env, size_t note_index) {
 	if (!preset.mono) {
-		process_note(lsample, rsample, info, note, env, note_index);
+		process_note(lsample, rsample, info, note, env);
 	}
 }
 
 void AnalogSynth::process_sample(double& lsample, double& rsample,
 		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
 	//Mono
-	if (preset.mono && status.pressed_notes) {
-		AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
-		//Update portamendo
-		if (voice.note != last_note) {
-			//Reset envs to attack
-			if (!preset.legato) {
+	if (preset.mono) {
+		if (status.pressed_notes) {
+			AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
+			//Update portamendo
+			if (voice.note != mono_voice.note) {
+				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * abs((int) voice.note - mono_voice.note) / 50.0);
+			}
+			//Trigger note
+			if (!mono_voice.pressed || voice.note != mono_voice.note) {
+				mono_voice.valid = true;
+				mono_voice.pressed = true;
+				//Reset envs to attack
 				for (size_t i = 0; i < preset.mod_env_count; ++i) {
-					//Mod env
-					voice.parts[i].mod_env.phase = ATTACK;
+					if (!preset.legato || mono_voice.parts[i].mod_env.phase >= RELEASE) {
+						//Mod env
+						mono_voice.parts[i].mod_env.phase = ATTACK;
+					}
 				}
 				for (size_t i = 0; i < preset.op_count; ++i) {
-					//Amp env
-					voice.parts[i].mod_env.phase = ATTACK;
+					if (!preset.legato || mono_voice.parts[i].amp_env.phase >= RELEASE) {
+						//Amp env
+						mono_voice.parts[i].amp_env.phase = ATTACK;
+						mono_voice.parts[i].amp_env.time = 0;
+						mono_voice.parts[i].amp_env.last = 0;
+					}
 				}
 			}
-			note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * abs((int) voice.note - last_note) / 50.0);
+			mono_voice.note = voice.note;
+			mono_voice.freq = voice.freq;
+			first_port = false;
 		}
-		last_note = voice.note;
-		first_port = false;
-		double pitch = note_port.get(info.time);
-		KeyboardEnvironment e = env;
-		e.pitch_bend *= note_to_freq_transpose(
-				pitch - voice.note);
+		else {
+			mono_voice.pressed = false;
+		}
 
-		process_note(lsample, rsample, info, voice, e, 0);
+		//Playback
+		if (mono_voice.valid) {
+			double pitch = note_port.get(info.time);
+			KeyboardEnvironment e = env;
+			e.pitch_bend *= note_to_freq_transpose(
+					pitch - mono_voice.note);
+
+			process_note(lsample, rsample, info, mono_voice, e);
+			if (amp_finished(info, mono_voice, e)) {
+				mono_voice.valid = false;
+			}
+		}
 	}
 
 	//Delay lines
@@ -567,10 +588,10 @@ void AnalogSynth::control_change(unsigned int control, unsigned int value) {
 bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 		KeyboardEnvironment &env, size_t note_index) {
 	//Mono notes
-	if (preset.mono) {	//TODO not very easy to read/side effects
-		note_index = 0;
+	if (preset.mono) {
+		return !note.pressed;
 	}
-	return !note.pressed && amp_finished(info, note, env, note_index);
+	return !note.pressed && amp_finished(info, note, env);
 }
 
 void AnalogSynth::press_note(SampleInfo& info, unsigned int note, double velocity) {
@@ -599,7 +620,7 @@ void AnalogSynth::release_note(SampleInfo& info, unsigned int note) {
 }
 
 bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,
-		KeyboardEnvironment &env, size_t note_index) {
+		KeyboardEnvironment &env) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.op_count && finished; ++i) {
 		finished = note.parts[i].amp_env.is_finished();

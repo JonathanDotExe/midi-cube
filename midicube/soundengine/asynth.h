@@ -243,14 +243,14 @@ private:
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
 
 	bool first_port = true;
-	unsigned int last_note = 0;
 	PortamendoBuffer note_port{0, 0};
+	AnalogSynthVoice mono_voice;
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;
 
-	inline void process_note(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
+	inline void process_note(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
 
-	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
+	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
 
 public:
 	AnalogSynthPreset preset;

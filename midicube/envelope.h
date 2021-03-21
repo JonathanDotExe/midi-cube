@@ -70,6 +70,7 @@ public:
 	double time = 0;
 	double last_vol = 0;
 	double volume = 0;
+	double last = 0;
 
 	double amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain);
 
@@ -82,6 +83,7 @@ public:
 		time = 0;
 		last_vol = 0;
 		volume = 0;
+		last = 0;
 	}
 };
 
