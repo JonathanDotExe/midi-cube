@@ -319,6 +319,9 @@ void SampleSoundCreator::generate_sound() {
 				zone.put("filter", -1);
 				zone.put("amp_velocity_amount", velocity_amount);
 				zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
+				if (sustain) {
+					zone.put("sustain_sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + "_sustain.wav");
+				}
 				layer.add_child("zones.zone", zone);
 
 				last_note = note;
