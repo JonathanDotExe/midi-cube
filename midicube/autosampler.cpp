@@ -108,7 +108,7 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 		double l = *input_buffer++;
 		double r = *input_buffer++;
 
-		bool loud = std::abs(l) > 0.0003 || std::abs(r) > 0.0003;
+		bool loud = std::abs(l) > 0.0002 || std::abs(r) > 0.0002;
 
 		//Update last signal time
 		if (loud) {
@@ -122,7 +122,7 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 				sample.sample_rate = sample_rate;
 
 				//Sustain pedal
-				unsigned char status = 0x90 | ((char) channel & 0x0F);
+				unsigned char status = 0xB0 | ((char) channel & 0x0F);
 				if (record_sustain) {
 					std::vector<unsigned char> msg = {status, (unsigned char) 64, (unsigned char) 127};
 					rtmidi.sendMessage(&msg);
