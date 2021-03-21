@@ -287,38 +287,42 @@ void SampleSoundCreator::generate_sound() {
 				vols.at(v).push_back(vol);
 			}
 			//Zone
-			if (!reached_high_part) {
-				if (note >= PIANO_HIGH_NOTE_START) {
-					if (last_note < PIANO_HIGH_NOTE_START) {
-						pt::ptree zone;
-						zone.put("note", note);
-						zone.put("max_note", PIANO_HIGH_NOTE_START - 1); //TODO different methods
-						zone.put("envelope", 0);
-						zone.put("filter", -1);
-						zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
-						if (sustain) {
-							zone.put("sustain_sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + "_sustain.wav");
+			if (v > 0 || !leave_first_layer) {
+				if (!reached_high_part) {
+					if (note >= PIANO_HIGH_NOTE_START) {
+						if (last_note < PIANO_HIGH_NOTE_START) {
+							pt::ptree zone;
+							zone.put("note", note);
+							zone.put("max_note", PIANO_HIGH_NOTE_START - 1); //TODO different methods
+							zone.put("envelope", 0);
+							zone.put("filter", -1);
+							zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
+							if (sustain) {
+								zone.put("sustain_sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + "_sustain.wav");
+							}
+							layer.add_child("zones.zone", zone);
 						}
-						layer.add_child("zones.zone", zone);
+						reached_high_part = true;
 					}
-					reached_high_part = true;
 				}
+
+				pt::ptree zone;
+				zone.put("note", note);
+				zone.put("max_note", note); //TODO different methods
+				zone.put("envelope", reached_high_part ? 1 : 0);
+				zone.put("filter", -1);
+				zone.put("amp_velocity_amount", velocity_amount);
+				zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
+				layer.add_child("zones.zone", zone);
+
+				last_note = note;
+				n++;
 			}
-
-			pt::ptree zone;
-			zone.put("note", note);
-			zone.put("max_note", note); //TODO different methods
-			zone.put("envelope", reached_high_part ? 1 : 0);
-			zone.put("filter", -1);
-			zone.put("amp_velocity_amount", velocity_amount);
-			zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
-			layer.add_child("zones.zone", zone);
-
-			last_note = note;
-			n++;
 		}
-		tree.add_child("sound.velocity_layers.velocity_layer", layer);
-		last_velocity = velocity;
+		if (v > 0 || !leave_first_layer) {
+			tree.add_child("sound.velocity_layers.velocity_layer", layer);
+			last_velocity = velocity;
+		}
 		v++;
 	}
 
