@@ -520,6 +520,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 						//Amp env
 						mono_voice.parts[i].amp_env.phase = ATTACK;
 						mono_voice.parts[i].amp_env.time = 0;
+						mono_voice.parts[i].amp_env.last = 0;
 					}
 				}
 			}
