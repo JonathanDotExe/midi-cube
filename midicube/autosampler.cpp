@@ -293,10 +293,9 @@ void SampleSoundCreator::generate_sound() {
 						vol = fabs(s);
 					}
 				}
-				std::cout << vol << std::endl;
 				//Double calc velocity amount
 				double last = v > 0 ? vols.at(v - 1).at(n) : 0;
-				velocity_amount = (1.0 - last/vol) * 127.0 / (velocity - last_velocity);
+				velocity_amount = (1.0 - fmax(last/vol, 0)) * 127.0 / (velocity - last_velocity);
 
 				vols.at(v).push_back(vol);
 			}
