@@ -129,6 +129,7 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 				}
 
 				//First note
+				status = 0x90 | ((char) channel & 0x0F);
 				std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), (unsigned char) velocities.at(curr_velocity)};
 				rtmidi.sendMessage(&msg);
 
@@ -164,6 +165,12 @@ inline int AutoSampler::process(double *output_buffer, double *input_buffer,
 					unsigned char status = 0x80 | ((char) channel & 0x0F);
 					std::vector<unsigned char> msg = {status, (unsigned char) notes.at(curr_note), 0};
 					std::cout << "Finished sampling note " << notes.at(curr_note) << " at velocity " << velocities.at(curr_velocity) << "!" << std::endl;
+					//Sustain pedal
+					status = 0xB0 | ((char) channel & 0x0F);
+					if (record_sustain) {
+						std::vector<unsigned char> msg = {status, (unsigned char) 64, (unsigned char) 0};
+						rtmidi.sendMessage(&msg);
+					}
 					//Save
 					write_audio_file(sample, folder + "/" + prefix + "_" + std::to_string(notes.at(curr_note)) + "_" + std::to_string(velocities.at(curr_velocity)) + (record_sustain ? "_sustain" : "") + ".wav");
 
