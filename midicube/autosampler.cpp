@@ -271,7 +271,6 @@ void SampleSoundCreator::generate_sound() {
 	std::vector<std::vector<double>> vols = {};
 	//Generate
 	size_t v = 0;
-	unsigned int last_velocity = 0;
 	for (unsigned int velocity : velocities) {
 		size_t n = 0;
 
@@ -282,25 +281,42 @@ void SampleSoundCreator::generate_sound() {
 		unsigned int last_note = 0;
 		for (unsigned int note : notes) {
 			double velocity_amount = 0;
-			//Smooth velocity
-			if (smoothen_layers) {
-				//TODO seperate volumes for sustain
-				//Find volume
-				double vol = 0;
-				AudioSample sample;
-				std::string file = path + "/" + prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav";
+			//Find volume
+			double vol = 0;
+			double sustain_vol = 0;
+			AudioSample sample;
+			std::string file = path + "/" + prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav";
+			if (!read_audio_file(sample, file)) {
+				std::cerr << "Couldn't load sample file " << file << std::endl;
+			}
+			for (double s : sample.samples) {
+				if (fabs(s) > vol) {
+					vol = fabs(s);
+				}
+			}
+			//Sustain
+			if (sustain) {
+				file = path + "/" + prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav";
 				if (!read_audio_file(sample, file)) {
 					std::cerr << "Couldn't load sample file " << file << std::endl;
 				}
 				for (double s : sample.samples) {
-					if (fabs(s) > vol) {
-						vol = fabs(s);
+					if (fabs(s) > sustain_vol) {
+						sustain_vol = fabs(s);
 					}
 				}
-				if (vol > max_vol) {// TODO Incorporate sustain volume
-					max_vol = vol;
-				}
-				//Double calc velocity amount
+
+			}
+			if (vol > max_vol) {
+				max_vol = vol;
+			}
+			if (sustain_vol > max_vol) {
+				max_vol = sustain_vol;
+			}
+			//Smooth velocity
+			if (smoothen_layers) {
+				//Calc velocity amount
+				//TODO seperate volumes for sustain
 				double last = v > 0 ? vols.at(v - 1).at(n) : 0;
 				velocity_amount = fmax(1 - last/vol, 0);
 
@@ -345,7 +361,6 @@ void SampleSoundCreator::generate_sound() {
 		if (v > 0 || !ignore_first_layer) {
 			tree.add_child("sound.velocity_layers.velocity_layer", layer);
 		}
-		last_velocity = velocity;
 		v++;
 	}
 
