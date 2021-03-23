@@ -31,7 +31,7 @@ struct SampleEnvelope {
 struct SampleZone {
 	AudioSample sample;
 	AudioSample sustain_sample;
-	double amp_velocity_amount = 0.0;
+	double layer_velocity_amount = 0.0;
 	double freq = 0;
 	double max_freq = 0;
 	ssize_t filter = -1;
@@ -56,6 +56,17 @@ struct SampleVelocityLayer {
 	}
 };
 
+struct SamplerVoice : public TriggeredNote {
+	bool sustain_sample = false;
+	double layer_amp = 1;
+	SampleZone* zone = nullptr;
+	SampleEnvelope* env_data = nullptr;
+	SampleFilter* filter = nullptr;
+	LinearADSREnvelope env;
+	Filter lfilter;
+	Filter rfilter;
+};
+
 class SampleSound {
 public:
 	std::string name = "Sample";
@@ -65,7 +76,7 @@ public:
 
 	SampleSound();
 
-	SampleZone* get_sample(double freq, double velocity);
+	void get_sample(double freq, double velocity, SamplerVoice& voic, bool sustain);
 
 	~SampleSound();
 
@@ -86,16 +97,6 @@ public:
 extern SampleSoundStore global_sample_store;
 
 #define SAMPLER_POLYPHONY 64
-
-struct SamplerVoice : public TriggeredNote {
-	bool sustain_sample = false;
-	SampleZone* zone = nullptr;
-	SampleEnvelope* env_data = nullptr;
-	SampleFilter* filter = nullptr;
-	LinearADSREnvelope env;
-	Filter lfilter;
-	Filter rfilter;
-};
 
 class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 

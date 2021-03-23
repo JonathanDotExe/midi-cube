@@ -324,7 +324,7 @@ void SampleSoundCreator::generate_sound() {
 				zone.put("max_note", note); //TODO different methods
 				zone.put("envelope", reached_high_part ? 1 : 0);
 				zone.put("filter", -1);
-				zone.put("amp_velocity_amount", velocity_amount);
+				zone.put("layer_velocity_amount", velocity_amount);
 				zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
 				if (sustain) {
 					zone.put("sustain_sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + "_sustain.wav");

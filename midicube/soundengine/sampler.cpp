@@ -22,16 +22,20 @@ SampleSound::SampleSound() {
 
 }
 
-SampleZone* SampleSound::get_sample(double freq, double velocity) {
+void SampleSound::get_sample(double freq, double velocity, SamplerVoice& voice, bool sustain) {
 	//Find regions
+	double last_vel = 0;
+	double curr_vel = 0;
 	SampleZone* zone = nullptr;
 	const size_t velocity_size = samples.size();
 	if (velocity_size >= 1) {
 		size_t i = 0;
 		for (; i < velocity_size; ++i) {
+			curr_vel = samples[i]->max_velocity;
 			if (velocity <= samples[i]->max_velocity) {
 				break;
 			}
+			last_vel = samples[i]->max_velocity;
 		}
 		SampleVelocityLayer* layer = samples[std::max((ssize_t) 0, (ssize_t) i - 1)];
 		const size_t zones_size = layer->zones.size();
@@ -45,7 +49,17 @@ SampleZone* SampleSound::get_sample(double freq, double velocity) {
 			zone = layer->zones[std::max((ssize_t) 0, (ssize_t) j - 1)];
 		}
 	}
-	return zone;
+	//Update zone
+	if (voice.zone) {
+		voice.layer_amp = 1 - voice.zone->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel));
+		voice.sustain_sample = sustain && voice.zone->sustain_sample.samples.size();
+		if (voice.zone->env >= 0 && (size_t) voice.zone->env < envelopes.size()) {
+			voice.env_data = &envelopes[voice.zone->env];
+		}
+		if (voice.zone->filter >= 0 && (size_t) voice.zone->filter < filters.size()) {
+			voice.filter = &filters[voice.zone->filter];
+		}
+	}
 }
 
 SampleSound::~SampleSound() {
@@ -84,13 +98,14 @@ Sampler::Sampler() {
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.zone) {
 		double vol = 1;
-		double vel_amount = note.zone->amp_velocity_amount;
+		double vel_amount = 0;
 		if (note.env_data && !note.env_data->sustain_entire_sample) {
 			//Volume
 			vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
 			vel_amount += note.env_data->amp_velocity_amount;
 		}
 		vol *= vel_amount * (note.velocity - 1) + 1;
+		vol *= note.layer_amp;
 		//Sound
 		double time = (info.time - note.start_time) * note.freq/note.zone->freq * env.pitch_bend;
 		double l;
@@ -137,16 +152,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	size_t slot = this->note.press_note(info, note, velocity);
 	SamplerVoice& voice = this->note.note[slot];
 	voice.env.reset();
-	voice.zone = this->sample->get_sample(voice.freq, voice.velocity);
-	if (voice.zone) {
-		voice.sustain_sample = environment.sustain && voice.zone->sustain_sample.samples.size();
-		if (voice.zone->env >= 0 && (size_t) voice.zone->env < sample->envelopes.size()) {
-			voice.env_data = &sample->envelopes[voice.zone->env];
-		}
-		if (voice.zone->filter >= 0 && (size_t) voice.zone->filter < sample->filters.size()) {
-			voice.filter = &sample->filters[voice.zone->filter];
-		}
-	}
+	this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);
 }
 
 void Sampler::release_note(SampleInfo& info, unsigned int note) {
@@ -223,7 +229,7 @@ extern SampleSound* load_sound(std::string folder) {
 			for (auto z : r.second.get_child("zones")) {
 				SampleZone* zone = new SampleZone();
 				zone->freq = note_to_freq(z.second.get<double>("note", 60.0));
-				zone->amp_velocity_amount = z.second.get<double>("amp_velocity_amount", 0);
+				zone->layer_velocity_amount = z.second.get<double>("layer_velocity_amount", 0);
 				zone->max_freq = note_to_freq(z.second.get<double>("max_note", 127.0));
 				zone->env = z.second.get<double>("envelope", 0);
 				zone->filter = z.second.get<double>("filter", 0);
