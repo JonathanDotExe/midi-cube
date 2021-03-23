@@ -31,7 +31,6 @@ struct SampleEnvelope {
 struct SampleZone {
 	AudioSample sample;
 	AudioSample sustain_sample;
-	double amp_velocity_amount = 0.0;
 	double freq = 0;
 	double max_freq = 0;
 	ssize_t filter = -1;
