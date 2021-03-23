@@ -24,6 +24,7 @@ struct SampleFilter {
 
 struct SampleEnvelope {
 	ADSREnvelopeData env = {0, 0, 1, 0};
+	double fade_out = 0;
 	double amp_velocity_amount = 0.0;
 	bool sustain_entire_sample = false;
 };

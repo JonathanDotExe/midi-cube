@@ -100,24 +100,20 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 	if (note.zone) {
 		double vol = 1;
 		double vel_amount = 0;
-		if (note.env_data && !note.env_data->sustain_entire_sample) {
-			//Volume
-			vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
-			vel_amount += note.env_data->amp_velocity_amount;
-		}
-		vol *= vel_amount * (note.velocity - 1) + 1;
-		vol *= note.layer_amp;
 		//Sound
 		double time = (info.time - note.start_time) * note.freq/note.zone->freq * env.pitch_bend;
+		double duration = 0;
 		double l;
 		double r;
 		if (note.sustain_sample) {
-			l = note.zone->sustain_sample.isample(0, time, info.sample_rate) * vol;
-			r = note.zone->sustain_sample.isample(1, time, info.sample_rate) * vol;
+			duration = note.zone->sustain_sample.duration();
+			l = note.zone->sustain_sample.isample(0, time, info.sample_rate);
+			r = note.zone->sustain_sample.isample(1, time, info.sample_rate);
 		}
 		else {
-			l = note.zone->sample.isample(0, time, info.sample_rate) * vol;
-			r = note.zone->sample.isample(1, time, info.sample_rate) * vol;
+			duration = note.zone->sample.duration();
+			l = note.zone->sample.isample(0, time, info.sample_rate);
+			r = note.zone->sample.isample(1, time, info.sample_rate);
 		}
 		//Filter
 		if (note.filter) {
@@ -135,9 +131,21 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 			l = note.lfilter.apply(filter, l, info.time_step);
 			r = note.rfilter.apply(filter, r, info.time_step);
 		}
+		//Volume
+		if (note.env_data && !note.env_data->sustain_entire_sample) {
+			//Volume
+			vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
+			vel_amount += note.env_data->amp_velocity_amount;
+			//Fade out
+			if (time > duration - note.env_data->fade_out) {
+				vol *= 1 - (time - duration)/note.env_data->fade_out;
+			}
+		}
+		vol *= vel_amount * (note.velocity - 1) + 1;
+		vol *= note.layer_amp;
 		//Playback
-		lsample += l;
-		rsample += r;
+		lsample += l * vol;
+		rsample += r * vol;
 	}
 	else {
 		ADSREnvelopeData data = {0, 0, 0, 0};
@@ -189,6 +197,7 @@ extern SampleSound* load_sound(std::string folder) {
 			env.env.sustain = e.second.get<double>("sustain", 1);
 			env.env.release = e.second.get<double>("release", 0);
 			env.sustain_entire_sample = e.second.get<bool>("sustain_entire_sample", false);
+			env.fade_out = e.second.get<double>("fade_out", 0);
 
 			sound->envelopes.push_back(env);
 		}
