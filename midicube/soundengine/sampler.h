@@ -70,6 +70,7 @@ struct SamplerVoice : public TriggeredNote {
 class SampleSound {
 public:
 	std::string name = "Sample";
+	double volume = 1;
 	std::vector<SampleEnvelope> envelopes = {};
 	std::vector<SampleFilter> filters = {};
 	std::vector<SampleVelocityLayer*> samples = {};

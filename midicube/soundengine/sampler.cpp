@@ -52,7 +52,7 @@ void SampleSound::get_sample(double freq, double velocity, SamplerVoice& voice, 
 	//Update zone
 	voice.zone = zone;
 	if (voice.zone) {
-		voice.layer_amp = 1 - voice.zone->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel));
+		voice.layer_amp = 1 - voice.zone->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel)) * volume;
 		voice.sustain_sample = sustain && voice.zone->sustain_sample.samples.size();
 		if (voice.zone->env >= 0 && (size_t) voice.zone->env < envelopes.size()) {
 			voice.env_data = &envelopes[voice.zone->env];
@@ -179,6 +179,7 @@ extern SampleSound* load_sound(std::string folder) {
 		//Parse
 		sound = new SampleSound();
 		sound->name = tree.get<std::string>("sound.name", "Sound");
+		sound->volume = tree.get<double>("sound.volume", 1);
 		//Load Envelopes
 		for (auto e : tree.get_child("sound.envelopes")) {
 			SampleEnvelope env = {};

@@ -202,6 +202,9 @@ void SampleSoundCreator::request_params() {
 	std::cout << "Do you want ignore the lowest velocity layer (only use it as reference volume)? (0/1)" << std::endl;
 	std::cin >> ignore_first_layer;
 
+	std::cout << "Do you want to normalize the audio? (0/1)" << std::endl;
+	std::cin >> normalize;
+
 	std::cout << "Where should your sound be saved?" << std::endl;
 	std::cin >> path;
 }
@@ -238,6 +241,7 @@ void SampleSoundCreator::generate_sound() {
 	std::regex reg(".*\\.wav");
 	std::string prefix = "";
 	bool sustain = false;
+	double max_vol = 0;
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
 		if (std::regex_match(f.path().string(), reg)) {
 			//Get params
@@ -293,6 +297,9 @@ void SampleSoundCreator::generate_sound() {
 						vol = fabs(s);
 					}
 				}
+				if (vol > max_vol) {// TODO Incorporate sustain volume
+					max_vol = vol;
+				}
 				//Double calc velocity amount
 				double last = v > 0 ? vols.at(v - 1).at(n) : 0;
 				velocity_amount = fmax(1 - last/vol, 0);
@@ -341,6 +348,8 @@ void SampleSoundCreator::generate_sound() {
 		last_velocity = velocity;
 		v++;
 	}
+
+	tree.put("sound.volume", 1/max_vol);
 
 	//Save to file
 	try {
