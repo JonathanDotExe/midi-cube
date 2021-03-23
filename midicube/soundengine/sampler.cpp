@@ -101,7 +101,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		double vol = 1;
 		double vel_amount = 0;
 		//Sound
-		double time = (info.time - note.start_time) * note.freq/note.zone->freq * env.pitch_bend;
+		double time = (info.time - note.start_time) * note.freq/note.zone->freq;
 		double duration = 0;
 		double l;
 		double r;
@@ -131,14 +131,16 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 			l = note.lfilter.apply(filter, l, info.time_step);
 			r = note.rfilter.apply(filter, r, info.time_step);
 		}
-		//Volume
-		if (note.env_data && !note.env_data->sustain_entire_sample) {
-			//Volume
-			vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
-			vel_amount += note.env_data->amp_velocity_amount;
+		//Env
+		if (note.env_data) {
+			if (!note.env_data->sustain_entire_sample) {
+				//Volume
+				vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
+				vel_amount += note.env_data->amp_velocity_amount;
+			}
 			//Fade out
-			if (time > duration - note.env_data->fade_out) {
-				vol *= 1 - (time - duration)/note.env_data->fade_out;
+			if (duration - note.env_data->fade_out < time) {
+				vol *= fmax(0, 1 - (time - duration + note.env_data->fade_out)/note.env_data->fade_out);
 			}
 		}
 		vol *= vel_amount * (note.velocity - 1) + 1;
