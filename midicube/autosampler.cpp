@@ -276,12 +276,13 @@ void SampleSoundCreator::generate_sound() {
 		layer.put("velocity", velocity/127.0);
 		bool reached_high_part = false;
 		unsigned int last_note = 0;
-		double vol = 0;
 		for (unsigned int note : notes) {
+			double velocity_amount = 0;
 			//Smooth velocity
 			if (smoothen_layers) {
 				//TODO seperate volumes for sustain
 				//Find volume
+				double vol = 0;
 				AudioSample sample;
 				std::string file = path + "/" + prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav";
 				if (!read_audio_file(sample, file)) {
@@ -292,7 +293,9 @@ void SampleSoundCreator::generate_sound() {
 						vol = fabs(s);
 					}
 				}
-
+				//Double calc velocity amount
+				double last = v > 0 ? vols.at(v - 1).at(n) : 0;
+				velocity_amount = (1.0 - fmax(last/vol, 0)) * 127.0 / (velocity - last_velocity);
 
 				vols.at(v).push_back(vol);
 			}
@@ -321,6 +324,7 @@ void SampleSoundCreator::generate_sound() {
 				zone.put("max_note", note); //TODO different methods
 				zone.put("envelope", reached_high_part ? 1 : 0);
 				zone.put("filter", -1);
+				zone.put("amp_velocity_amount", velocity_amount);
 				zone.put("sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + ".wav");
 				if (sustain) {
 					zone.put("sustain_sample", prefix + "_" + std::to_string(note) + "_" + std::to_string(velocity) + "_sustain.wav");
