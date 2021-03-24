@@ -65,7 +65,7 @@ public:
 
 	bool collides (int x, int y);
 
-	virtual void property_change(PropertyChange change) {
+	virtual void update_properties() {
 
 	}
 

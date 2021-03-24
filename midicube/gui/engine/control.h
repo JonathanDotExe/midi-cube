@@ -138,14 +138,14 @@ public:
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion);
 
+	virtual void update_properties();
+
 	SELECTABLE
 
 	virtual ~Slider() {
 
 	}
 
-protected:
-	virtual void bound_property_change(PropertyValue val);
 };
 
 template <typename T>
@@ -258,8 +258,8 @@ public:
 	}
 
 protected:
-	virtual void bound_property_change(PropertyValue val) {
-		T v = val.get(PropertyType<T>{});
+	virtual void update_properties() {
+		T v = property.get();
 		progress = fmin(fmax(scale.progress(v, min, max), 0), 1);
 		update_position(this->x, this->y, width, height);
 	}
@@ -296,14 +296,13 @@ public:
 
 	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
 
+	virtual void update_properties();
+
 	SELECTABLE
 
 	virtual ~CheckBox() {
 
 	}
-
-protected:
-	virtual void bound_property_change(PropertyValue val);
 
 };
 
@@ -341,14 +340,13 @@ public:
 
 	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
 
+	virtual void update_properties();
+
 	SELECTABLE
 
 	virtual ~ComboBox() {
 
 	}
-
-protected:
-	virtual void bound_property_change(PropertyValue val);
 };
 
 template<int MAX>
@@ -437,17 +435,17 @@ public:
 		}
 	}
 
+	virtual void update_properties() {
+		progress = (double) property.get() / MAX;
+		update_position(x, y, width, height);
+	}
+
 	SELECTABLE
 
 	virtual ~Drawbar() {
 
 	}
 
-protected:
-	virtual void bound_property_change(PropertyValue val) {
-		progress = (double) val.ival / MAX;
-		update_position(x, y, width, height);
-	}
 };
 
 class OrganSwitch : public Control {
@@ -492,12 +490,11 @@ public:
 
 	SELECTABLE
 
+	virtual void update_properties();
+
 	virtual ~OrganSwitch() {
 
 	}
-
-protected:
-	virtual void bound_property_change(PropertyValue val);
 
 };
 
