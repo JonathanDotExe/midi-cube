@@ -38,6 +38,7 @@ private:
 public:
 	ProgramManager prog_mgr;
 	SoundEngineDevice engine;
+	std::atomic<bool> updated = false;
 
 	virtual void save_program(Program *prog);
 	virtual void apply_program(Program *prog);

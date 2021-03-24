@@ -111,10 +111,6 @@ public:
 
 	virtual Scene create(Frame& frame) = 0;
 
-	virtual void property_change(PropertyChange change) {
-
-	}
-
 	virtual ~ViewController() {
 
 	}
@@ -127,7 +123,6 @@ private:
 	std::string title;
 	ViewController* view;
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> prop_holders;
 
 	bool mouse_pressed = false;
 	int last_mouse_x = 0;
@@ -138,15 +133,13 @@ private:
 	ViewController* next_view = nullptr;
 	bool request_close = false;
 
-	boost::lockfree::spsc_queue<PropertyChange> changes;
-
 public:
 	MidiCube& cube;
 	Frame(MidiCube& cube, int width, int height, std::string title);
 
 	void run(ViewController* v);
 
-	virtual void property_change(PropertyChange change);
+	void update_properties();
 
 	void request_redraw() {
 		redraw = true;
@@ -160,8 +153,6 @@ public:
 		delete next_view;
 		next_view = view;
 	}
-
-
 
 	virtual ~Frame();
 
