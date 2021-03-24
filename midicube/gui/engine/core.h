@@ -17,6 +17,33 @@
 
 #define SELECTABLE virtual bool selectable() const { return true; };
 
+template <typename T>
+class PropertyBinding {
+private:
+	std::function<T ()> get_func = nullptr;
+	std::function<void (T)> set_func = nullptr;
+
+public:
+	T get() {
+		return get_func;
+	}
+
+	void set(T t) {
+		set_func(t);
+	}
+
+	template <typename E>
+	void bind(E& e) {
+		get_func = [&e]() {
+			return e;
+		};
+		set_func = [&e](T t) {
+			e = t;
+		};
+	}
+
+};
+
 class Frame;
 
 class Control {
