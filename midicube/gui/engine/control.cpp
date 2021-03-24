@@ -97,7 +97,7 @@ void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 
 	if (old_prog != progress) {
 		double value = (max - min) * progress + min;
-		send_change(value);
+		property.set(value);
 		update_position(this->x, this->y, width, height);
 	}
 }
@@ -129,7 +129,7 @@ void CheckBox::draw(sf::RenderWindow& window, bool selected) {
 void CheckBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	if (button == sf::Mouse::Left) {
 		checked = !checked;
-		send_change(checked);
+		property.set(checked);
 		frame->request_redraw();
 	}
 }
@@ -158,7 +158,7 @@ void ComboBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	if (index >= (int) values.size()) {
 		index = 0;
 	}
-	send_change(index + start_val);
+	property.set(index + start_val);
 	update_position(this->x, this->y, width, height);
 }
 
@@ -201,7 +201,7 @@ void OrganSwitch::draw(sf::RenderWindow& window, bool selected) {
 void OrganSwitch::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	if (button == sf::Mouse::Left) {
 		checked = !checked;
-		send_change(checked);
+		property.set(checked);
 		update_position(this->x, this->y, width, height);
 	}
 }

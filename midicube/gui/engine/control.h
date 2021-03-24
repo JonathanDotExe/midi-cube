@@ -109,6 +109,8 @@ public:
 	sf::RectangleShape context_rect;
 	sf::Text text;
 
+	PropertyBinding<double> property;
+
 	Slider(double value, double min, double max, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, double slider_width = 0.7, double button_height = 0.15) : Control (x, y, width, height) {
 		this->min = min;
 		this->max = max;
@@ -172,6 +174,7 @@ public:
 		return std::to_string(t);
 	};
 	DragBoxScale<T> scale;
+	PropertyBinding<T> property;
 
 	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0, DragBoxScale<T> scale = {
 			[](double progress, T min, T max) {
@@ -237,7 +240,7 @@ public:
 					hit_border = true;
 				}
 				if (old_val != value) {
-					send_change(value);
+					property.set(value);
 					update_position(this->x, this->y, width, height);
 				}
 			}
@@ -271,6 +274,7 @@ public:
 	sf::RectangleShape rect;
 	sf::RectangleShape inner_rect;
 	sf::Text text;
+	PropertyBinding<double> property;
 
 	CheckBox(bool checked, std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
 		this->checked = checked;
@@ -312,6 +316,7 @@ private:
 public:
 	sf::RectangleShape rect;
 	sf::Text text;
+	PropertyBinding<bool> property;
 
 	ComboBox(int value, std::vector<std::string> values, sf::Font& font, int text_size = 12, int start_val = 0, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
 		this->start_val = start_val;
@@ -360,6 +365,7 @@ public:
 	sf::RectangleShape button_rect;
 	sf::Text title_text;
 	sf::Text text;
+	PropertyBinding<unsigned int> property;
 
 	Drawbar(int value, sf::Font& font, std::string title, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : Control (x, y, width, height) {
 		this->progress = (double) value/MAX;
@@ -426,7 +432,7 @@ public:
 
 		int value = MAX * progress;
 		if (old_val != value) {
-			send_change(value);
+			property.set(value);
 			update_position(this->x, this->y, width, height);
 		}
 	}
@@ -453,6 +459,7 @@ public:
 	sf::RectangleShape deactivated_rect;
 	sf::Text on_text;
 	sf::Text off_text;
+	PropertyBinding<bool> property;
 
 	OrganSwitch(bool checked, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, std::string on_text="On", std::string off_text="Off", int switch_text_size = 12) : Control (x, y, width, height) {
 		this->checked = checked;
