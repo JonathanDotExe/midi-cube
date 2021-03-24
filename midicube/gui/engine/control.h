@@ -93,7 +93,7 @@ public:
 	}
 };
 
-class Slider : public BindableControl {
+class Slider : public Control {
 
 private:
 	double progress;
@@ -109,7 +109,7 @@ public:
 	sf::RectangleShape context_rect;
 	sf::Text text;
 
-	Slider(double value, double min, double max, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, double slider_width = 0.7, double button_height = 0.15) : BindableControl (x, y, width, height) {
+	Slider(double value, double min, double max, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, double slider_width = 0.7, double button_height = 0.15) : Control (x, y, width, height) {
 		this->min = min;
 		this->max = max;
 		this->progress = (value - min)/(max - min);
@@ -153,7 +153,7 @@ struct DragBoxScale {
 };
 
 template <typename T>
-class DragBox : public BindableControl {
+class DragBox : public Control {
 
 private:
 	double progress;
@@ -180,7 +180,7 @@ public:
 			[](T value, T min, T max) {
 				return ((double) value - min)/(max - min);
 			}
-		}) : BindableControl (x, y, width, height) {
+		}) : Control (x, y, width, height) {
 		this->scale = scale;
 		this->min = min;
 		this->max = max;
@@ -263,7 +263,7 @@ protected:
 
 };
 
-class CheckBox : public BindableControl {
+class CheckBox : public Control {
 private:
 	bool checked = false;
 
@@ -272,7 +272,7 @@ public:
 	sf::RectangleShape inner_rect;
 	sf::Text text;
 
-	CheckBox(bool checked, std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
+	CheckBox(bool checked, std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
 		this->checked = checked;
 
 		this->text.setFont(font);
@@ -303,7 +303,7 @@ protected:
 
 };
 
-class ComboBox : public BindableControl {
+class ComboBox : public Control {
 private:
 	int start_val = 0;
 	int index = 0;
@@ -313,7 +313,7 @@ public:
 	sf::RectangleShape rect;
 	sf::Text text;
 
-	ComboBox(int value, std::vector<std::string> values, sf::Font& font, int text_size = 12, int start_val = 0, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
+	ComboBox(int value, std::vector<std::string> values, sf::Font& font, int text_size = 12, int start_val = 0, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
 		this->start_val = start_val;
 		this->index = value - start_val;
 		this->values = values;
@@ -347,7 +347,7 @@ protected:
 };
 
 template<int MAX>
-class Drawbar : public BindableControl {
+class Drawbar : public Control {
 
 private:
 	double progress;
@@ -361,7 +361,7 @@ public:
 	sf::Text title_text;
 	sf::Text text;
 
-	Drawbar(int value, sf::Font& font, std::string title, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : BindableControl (x, y, width, height) {
+	Drawbar(int value, sf::Font& font, std::string title, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : Control (x, y, width, height) {
 		this->progress = (double) value/MAX;
 
 		this->slider_width = slider_width;
@@ -444,7 +444,7 @@ protected:
 	}
 };
 
-class OrganSwitch : public BindableControl {
+class OrganSwitch : public Control {
 private:
 	bool checked = false;
 
@@ -454,7 +454,7 @@ public:
 	sf::Text on_text;
 	sf::Text off_text;
 
-	OrganSwitch(bool checked, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, std::string on_text="On", std::string off_text="Off", int switch_text_size = 12) : BindableControl (x, y, width, height) {
+	OrganSwitch(bool checked, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, std::string on_text="On", std::string off_text="Off", int switch_text_size = 12) : Control (x, y, width, height) {
 		this->checked = checked;
 
 		activated_rect.setFillColor(sf::Color::White);
