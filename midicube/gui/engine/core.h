@@ -25,11 +25,15 @@ private:
 
 public:
 	T get() {
-		return get_func;
+		return get_func();
 	}
 
 	void set(T t) {
 		set_func(t);
+	}
+
+	bool is_bound() {
+		return set_func && get_func;
 	}
 
 	template <typename E>

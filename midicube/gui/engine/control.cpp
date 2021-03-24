@@ -103,8 +103,10 @@ void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 }
 
 void Slider::update_properties() {
-	progress = fmin(fmax((property.get() - min)/(max - min), 0), 1);
-	update_position(this->x, this->y, width, height);
+	if (property.is_bound()) {
+		progress = fmin(fmax((property.get() - min)/(max - min), 0), 1);
+		update_position(this->x, this->y, width, height);
+	}
 }
 
 //CheckBox
@@ -135,8 +137,10 @@ void CheckBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 }
 
 void CheckBox::update_properties() {
-	checked = property.get();
-	frame->request_redraw();
+	if (property.is_bound()) {
+		checked = property.get();
+		frame->request_redraw();
+	}
 }
 
 //ComboBox
@@ -163,8 +167,10 @@ void ComboBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 }
 
 void ComboBox::update_properties() {
-	index = property.get() - start_val;
-	update_position(this->x, this->y, width, height);
+	if (property.is_bound()) {
+		index = property.get() - start_val;
+		update_position(this->x, this->y, width, height);
+	}
 }
 
 //OrganSwitch
@@ -207,7 +213,9 @@ void OrganSwitch::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 }
 
 void OrganSwitch::update_properties(){
-	checked = property.get();
-	update_position(x, y, width, height);
+	if (property.is_bound()) {
+		checked = property.get();
+		update_position(x, y, width, height);
+	}
 }
 

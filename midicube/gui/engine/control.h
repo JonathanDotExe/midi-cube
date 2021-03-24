@@ -259,9 +259,11 @@ public:
 
 protected:
 	virtual void update_properties() {
-		T v = property.get();
-		progress = fmin(fmax(scale.progress(v, min, max), 0), 1);
-		update_position(this->x, this->y, width, height);
+		if (property.is_bound()) {
+			T v = property.get();
+			progress = fmin(fmax(scale.progress(v, min, max), 0), 1);
+			update_position(this->x, this->y, width, height);
+		}
 	}
 
 };
@@ -436,8 +438,10 @@ public:
 	}
 
 	virtual void update_properties() {
-		progress = (double) property.get() / MAX;
-		update_position(x, y, width, height);
+		if (property.is_bound()) {
+			progress = (double) property.get() / MAX;
+			update_position(x, y, width, height);
+		}
 	}
 
 	SELECTABLE
