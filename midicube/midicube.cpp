@@ -13,7 +13,7 @@ static void process_func(double& lsample, double& rsample, SampleInfo& info, voi
 	((MidiCube*) user_data)->process(lsample, rsample, info);
 }
 
-MidiCube::MidiCube() : prog_mgr("./data/programs") {
+MidiCube::MidiCube() : realtime_actions(2048), return_actions(2048), prog_mgr("./data/programs") {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -77,6 +77,12 @@ void MidiCube::init(int out_device, int in_device) {
 
 void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 	mutex.lock();
+	//Lock actions
+	Action* action = nullptr;
+	while (realtime_actions.pop(action)) {
+		action->execute();
+		return_actions.push(action);
+	}
 	//Messages
 	size_t i = 0;
 	for (MidiCubeInput in : inputs) {
