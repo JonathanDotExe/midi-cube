@@ -212,18 +212,18 @@ public:
 };
 
 struct ChannelSource {
-	std::atomic<ssize_t> input{1};
-	std::atomic<unsigned int> channel{0};
-	std::atomic<unsigned int> start_note{0};
-	std::atomic<unsigned int> end_note{127};
-	std::atomic<unsigned int> start_velocity{0};
-	std::atomic<unsigned int> end_velocity{127};
-	std::atomic<int> octave{0};
-	std::atomic<bool> transfer_channel_aftertouch{true};
-	std::atomic<bool> transfer_pitch_bend{true};
-	std::atomic<bool> transfer_cc{true};
-	std::atomic<bool> transfer_prog_change{true};
-	std::atomic<bool> transfer_other{true};
+	ssize_t input = 1;
+	unsigned int channel = 0;
+	unsigned int start_note = 0;
+	unsigned int end_note = 127;
+	unsigned int start_velocity = 0;
+	unsigned int end_velocity = 127;
+	int octave = 0;
+	bool transfer_channel_aftertouch = true;
+	bool transfer_pitch_bend = true;
+	bool transfer_cc = true;
+	bool transfer_prog_change = true;
+	bool transfer_other = true;
 };
 
 enum SoundEngineChannelProperty {
@@ -254,7 +254,7 @@ enum SoundEngineChannelProperty {
 };
 
 struct SoundEngineScene {
-	std::atomic<bool> active{false};
+	bool active = false;
 	ChannelSource source;
 };
 
@@ -266,8 +266,8 @@ private:
 	SoundEngineDevice* device = nullptr;
 
 public:
-	std::atomic<double> volume = 0.5;
-	std::atomic<double> panning = 0;
+	double volume = 0.5;
+	double panning = 0;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	Arpeggiator arp;
 	Looper looper;
