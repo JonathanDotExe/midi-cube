@@ -30,54 +30,54 @@ const FixedScale PANNING_SCALE(-1, {}, 1);
 
 
 struct PropertyModulation {
-	double value = 0;
-	size_t mod_env = 0;
-	double mod_env_amount = 0;
-	size_t lfo = 0;
-	double lfo_amount = 0;
-	double velocity_amount = 0;
-	size_t cc = 1;
-	double cc_amount = 0;
+	std::atomic<double> value{0};
+	std::atomic<size_t> mod_env{0};
+	std::atomic<double> mod_env_amount{0};
+	std::atomic<size_t> lfo{0};
+	std::atomic<double> lfo_amount{0};
+	std::atomic<double> velocity_amount{0};
+	std::atomic<size_t> cc{1};
+	std::atomic<double> cc_amount{0};
 };
 
 struct FrequencyModulatotion {
-	double fm_amount = 0;
-	size_t modulator = 0;
+	std::atomic<double> fm_amount{0};
+	std::atomic<size_t> modulator{0};
 };
 
 struct OscilatorEntity {
-	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN_WAVE;
-	bool analog = true;
-	bool sync = false;
-	bool reset = false;
-	bool randomize = false;
+	std::atomic<AnalogWaveForm> waveform = AnalogWaveForm::SAW_DOWN_WAVE;
+	std::atomic<bool> analog = true;
+	std::atomic<bool> sync = false;
+	std::atomic<bool> reset = false;
+	std::atomic<bool> randomize = false;
 
-	size_t unison_amount = 0;
+	std::atomic<size_t> unison_amount = 0;
 	PropertyModulation volume = {1};
 	PropertyModulation sync_mul = {0.0};
 	PropertyModulation pulse_width = {1.0};
 	PropertyModulation unison_detune = {0.1};
-	int semi = 0;
-	double transpose = 1;
+	std::atomic<int> semi = 0;
+	std::atomic<double> transpose = 1;
 	PropertyModulation pitch = {0.5};
 };
 
 struct OperatorEntity {
-	bool audible = true;
-	ADSREnvelopeData env{0.0005, 0, 1, 0.0005};
+	std::atomic<bool> audible = true;
+	AtomicADSREnvelopeData env{0.0005, 0, 1, 0.0005};
 	PropertyModulation volume = {1};
 	PropertyModulation panning = {0.5};
 
-	bool filter = false;
-	bool pre_filter_drive = false;
-	double pre_filter_drive_amount = 0;
-	FilterType filter_type = FilterType::LP_12;
+	std::atomic<bool> filter = false;
+	std::atomic<bool> pre_filter_drive = false;
+	std::atomic<double> pre_filter_drive_amount = 0;
+	std::atomic<FilterType> filter_type = FilterType::LP_12;
 	PropertyModulation filter_cutoff = {1};
 	PropertyModulation filter_resonance = {0};
-	double filter_kb_track = 0;
-	unsigned int filter_kb_track_note = 36;
+	std::atomic<double> filter_kb_track = 0;
+	std::atomic<unsigned int> filter_kb_track_note = 36;
 
-	unsigned int oscilator_count = 1;
+	std::atomic<unsigned int> oscilator_count = 1;
 	std::array<double, ANALOG_PART_COUNT> fm;
 
 };

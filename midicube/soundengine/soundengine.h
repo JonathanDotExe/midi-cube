@@ -266,8 +266,8 @@ private:
 	SoundEngineDevice* device = nullptr;
 
 public:
-	double volume = 0.5;
-	double panning = 0;
+	std::atomic<double> volume = 0.5;
+	std::atomic<double> panning = 0;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	Arpeggiator arp;
 	Looper looper;

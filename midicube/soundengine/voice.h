@@ -77,10 +77,10 @@ enum ArpeggiatorPattern {
 };
 
 struct ArpeggiatorPreset {
-	ArpeggiatorPattern pattern;
-	unsigned int octaves = 1;
-	unsigned int value = 1;
-	bool hold = false;
+	std::atomic<ArpeggiatorPattern> pattern;
+	std::atomic<unsigned int> octaves{1};
+	std::atomic<unsigned int> value{1};
+	std::atomic<bool> hold{false};
 };
 
 class Arpeggiator {
@@ -92,7 +92,7 @@ private:
 	bool restart = true;
 
 public:
-	bool on = false;
+	std::atomic<bool> on = false;
 	ArpeggiatorPreset preset;
 	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
 	Metronome metronome;
