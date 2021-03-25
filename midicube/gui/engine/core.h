@@ -48,6 +48,21 @@ public:
 
 };
 
+class Action {
+
+public:
+
+	virtual void execute() = 0;
+
+	virtual void returned() = 0;
+
+	virtual ~Action() {
+
+	}
+};
+
+
+
 class Frame;
 
 class Control {
