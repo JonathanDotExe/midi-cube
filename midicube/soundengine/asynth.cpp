@@ -503,7 +503,14 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
 				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * abs((int) voice.note - mono_voice.note) / 50.0);
+
 			}
+			if (!preset.legato || !mono_voice.valid) {
+				mono_voice.velocity = voice.velocity;
+			}
+			mono_voice.note = voice.note;
+			mono_voice.freq = voice.freq;
+			first_port = false;
 			//Trigger note
 			if (!mono_voice.pressed || voice.note != mono_voice.note) {
 				mono_voice.valid = true;
@@ -524,9 +531,6 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 					}
 				}
 			}
-			mono_voice.note = voice.note;
-			mono_voice.freq = voice.freq;
-			first_port = false;
 		}
 		else {
 			mono_voice.pressed = false;
