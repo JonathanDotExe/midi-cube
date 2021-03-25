@@ -14,52 +14,9 @@
 #include "../../util.h"
 #include "../../property.h"
 #include "../../midicube.h"
+#include "data.h"
 
 #define SELECTABLE virtual bool selectable() const { return true; };
-
-template <typename T>
-class PropertyBinding {
-private:
-	std::function<T ()> get_func = nullptr;
-	std::function<void (T)> set_func = nullptr;
-
-public:
-	T get() {
-		return get_func();
-	}
-
-	void set(T t) {
-		set_func(t);
-	}
-
-	bool is_bound() {
-		return set_func && get_func;
-	}
-
-	template <typename E>
-	void bind(E& e) {
-		get_func = [&e]() {
-			return e;
-		};
-		set_func = [&e](T t) {
-			e = t;
-		};
-	}
-
-};
-
-class Action {
-
-public:
-
-	virtual void execute() = 0;
-
-	virtual void returned() = 0;
-
-	virtual ~Action() {
-
-	}
-};
 
 
 
