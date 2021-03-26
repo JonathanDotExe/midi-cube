@@ -95,12 +95,12 @@ public:
 template <typename T>
 class PropertyBinding {
 private:
-	std::function<T ()> get_func = nullptr;
+	std::function<void (std::function<void (T)>)> get_func = nullptr;
 	std::function<void (T)> set_func = nullptr;
 
 public:
-	T get() {
-		return get_func();
+	void get(std::function<void (T)> callback) {
+		get_func(callback);
 	}
 
 	void set(T t) {
@@ -112,12 +112,12 @@ public:
 	}
 
 	template <typename E>
-	void bind(E& e) {
-		get_func = [&e]() {
-			return e;
+	void bind(E& e, ActionHandler& handler) {
+		get_func = [&e, &handler](std::function<void (T)> callback) {
+			handler.queue_action(new GetValueAction<E, T>(e, callback));
 		};
-		set_func = [&e](T t) {
-			e = t;
+		set_func = [&e, &handler](T t) {
+			handler.queue_action(new SetValueAction<E, T>(e, t));
 		};
 	}
 
