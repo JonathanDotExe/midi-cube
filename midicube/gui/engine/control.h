@@ -260,9 +260,11 @@ public:
 protected:
 	virtual void update_properties() {
 		if (property.is_bound()) {
-			T v = property.get();
-			progress = fmin(fmax(scale.progress(v, min, max), 0), 1);
-			update_position(this->x, this->y, width, height);
+			property.get([this](T v) {
+				progress = fmin(fmax(scale.progress(v, min, max), 0), 1);
+				update_position(this->x, this->y, width, height);
+			});
+
 		}
 	}
 
@@ -439,8 +441,10 @@ public:
 
 	virtual void update_properties() {
 		if (property.is_bound()) {
-			progress = (double) property.get() / MAX;
-			update_position(x, y, width, height);
+			property.get([this](int v) {
+				progress = (double) v / MAX;
+				update_position(x, y, width, height);
+			});
 		}
 	}
 

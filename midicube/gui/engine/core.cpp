@@ -69,7 +69,7 @@ void Frame::run(ViewController* v) {
 			cube.updated = false;
 		}
 		//Execute return actions
-		cube.execute_return_actions();
+		cube.action_handler.execute_return_actions();
 		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {
