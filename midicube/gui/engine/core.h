@@ -14,7 +14,7 @@
 #include "../../util.h"
 #include "../../property.h"
 #include "../../midicube.h"
-#include "data.h"
+#include "../../data.h"
 
 #define SELECTABLE virtual bool selectable() const { return true; };
 

@@ -12,7 +12,6 @@
 #include "program.h"
 #include "data.h"
 #include "soundengine/soundengine.h"
-#include "boost/lockfree/spsc_queue.hpp"
 #include <mutex>
 
 
@@ -30,8 +29,6 @@ class MidiCube : public ProgramUser {
 private:
 	AudioHandler audio_handler;
 	std::vector<MidiCubeInput> inputs;
-	boost::lockfree::spsc_queue<Action*> realtime_actions;
-	boost::lockfree::spsc_queue<Action*> return_actions;
 	//Only for sync program changes
 	std::mutex mutex;
 
@@ -39,6 +36,7 @@ private:
 public:
 	ProgramManager prog_mgr;
 	SoundEngineDevice engine;
+	ActionHandler action_handler;
 	std::atomic<bool> updated{false};
 
 	virtual void save_program(Program *prog);
@@ -47,6 +45,7 @@ public:
 	void init(int out_device = -1, int in_device = -1);
 	inline void process(double& lsample, double& rsample, SampleInfo& info);
 	std::vector<MidiCubeInput> get_inputs();
+
 	~MidiCube();
 };
 

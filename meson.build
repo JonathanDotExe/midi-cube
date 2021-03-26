@@ -17,6 +17,7 @@ src = [
 	
 	'midicube/audio.cpp',
 	'midicube/audiofile.cpp',
+	'midicube/data.cpp',
 	'midicube/envelope.cpp',
 	'midicube/filter.cpp',
 	'midicube/looper.cpp',
@@ -39,7 +40,6 @@ src = [
 	
 	'midicube/gui/engine/control.cpp',
 	'midicube/gui/engine/core.cpp',
-	'midicube/gui/engine/data.cpp',
 	'midicube/gui/engine/util.cpp',
 	
 	'midicube/gui/view/resources.cpp',
