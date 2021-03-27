@@ -62,7 +62,7 @@ private:
 
 public:
 
-	SetValueAction(T& var, V val) : t(var), V(val) {
+	SetValueAction(T& var, V val) : t(var), v(val) {
 
 	}
 
