@@ -26,8 +26,8 @@ public:
 	virtual Scene create(Frame &frame);
 };
 
-std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source);
+std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyModulation& mod, ActionHandler& handler, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source);
 
-void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop);
+void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeData& data, ActionHandler& handler);
 
 #endif /* MIDICUBE_GUI_VIEW_ANALOGSYNTHOSCILATORVIEW_H_ */

@@ -17,7 +17,7 @@ AnalogSynthOscilatorView::AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineCh
 void AnalogSynthOscilatorView::property_change(PropertyChange change) {
 }
 
-std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source) {
+std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyModulation& mod, ActionHandler& handler, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source) {
 	std::vector<DragBox<double>*> boxes;
 	//Value
 	{
@@ -25,7 +25,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		controls->push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
-		value->bind(holder, prop, SynthModulationProperty::pModValue);
+		value->property.bind(mod.value, handler);
 		controls->push_back(value);
 		boxes.push_back(value);
 	}
@@ -38,13 +38,13 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
 		amount->border = 0;
-		amount->bind(holder, prop, SynthModulationProperty::pModModEnvAmount);
+		amount->property.bind(mod.mod_env_amount, handler);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 		boxes.push_back(amount);
 
 		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
-		source->bind(holder, prop, SynthModulationProperty::pModModEnv);
+		source->property.bind(mod.mod_env, handler);
 		controls->push_back(source);
 		show_source->push_back(source);
 	}
@@ -57,13 +57,13 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
 		amount->border = 0;
-		amount->bind(holder, prop, SynthModulationProperty::pModLFOAmount);
+		amount->property.bind(mod.lfo_amount, handler);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 		boxes.push_back(amount);
 
 		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
-		source->bind(holder, prop, SynthModulationProperty::pModLFO);
+		source->property.bind(mod.lfo_amount, handler);
 		controls->push_back(source);
 		show_source->push_back(source);
 	}
@@ -76,7 +76,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
 		amount->border = 0;
-		amount->bind(holder, prop, SynthModulationProperty::pModVelocityAmount);
+		amount->property.bind(mod.velocity_amount, handler);
 		controls->push_back(amount);
 		boxes.push_back(amount);
 	}
@@ -89,13 +89,13 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
 		amount->border = 0;
-		amount->bind(holder, prop, SynthModulationProperty::pModCCAmount);
+		amount->property.bind(mod.cc_amount, handler);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 		boxes.push_back(amount);
 
 		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_CONTROL_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
-		source->bind(holder, prop, SynthModulationProperty::pModCC);
+		source->property.bind(mod.cc, handler);
 		controls->push_back(source);
 		show_source->push_back(source);
 	}
@@ -105,7 +105,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 }
 
 
-void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder* holder, size_t prop) {
+void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeData& data, ActionHandler& handler) {
 	DragBoxScale<double> scale = {
 			[](double progress, double min, double max) {
 				progress *= progress;
@@ -122,7 +122,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder
 
 		DragBox<double>* value = new DragBox<double>(0, 0.0005, 5, main_font, 16, x, y + 15, 80, 40, scale);
 		value->drag_step = 4;
-		value->bind(holder, prop);
+		value->property.bind(data.attack, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -133,7 +133,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 10, main_font, 16, x, y + 15, 80, 40, scale);
 		value->drag_step = 4;
-		value->bind(holder, prop + 1);
+		value->property.bind(data.decay, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -144,7 +144,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
 		value->drag_step = 2;
-		value->bind(holder, prop + 2);
+		value->property.bind(data.sustain, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -155,7 +155,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, PropertyHolder
 
 		DragBox<double>* value = new DragBox<double>(0, 0.0005, 10, main_font, 16, x, y + 15, 80, 40, scale);
 		value->drag_step = 4;
-		value->bind(holder, prop + 3);
+		value->property.bind(data.release, handler);
 		controls->push_back(value);
 	}
 	x += 90;
