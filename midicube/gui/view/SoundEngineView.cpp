@@ -20,6 +20,8 @@ Scene SoundEngineView::create(Frame& frame) {
 	std::vector<Control*> controls;
 	std::vector<PropertyHolder*> holders;
 
+	ActionHandler& handler = frame.cube.action_handler;
+
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
@@ -53,7 +55,7 @@ Scene SoundEngineView::create(Frame& frame) {
 
 		//Active
 		CheckBox* active = new CheckBox(false, "", main_font, 12, x + pane_width - 30, y + 5, 20, 20);
-		active->bind(&channel, SoundEngineChannelProperty::pChannelActive);
+		active->property.bind(engine->volume, handler);
 		controls.push_back(active);
 		//Engine
 		Button* engine = new Button("Engine", main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
@@ -66,13 +68,13 @@ Scene SoundEngineView::create(Frame& frame) {
 
 		//Volume
 		Slider* volume = new Slider(0, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);
-		volume->bind(&channel, SoundEngineChannelProperty::pChannelVolume);
+		volume->property.bind(channel.volume, handler);
 		controls.push_back(volume);
 	}
 
 	//Metronome
 	CheckBox* metronome = new CheckBox(false, "Metronome", main_font, 18, 10, frame.get_height() - 45, 40, 40);
-	metronome->bind(this->engine, SoundEngineProperty::pEngineMetronomeOn);
+	metronome->property.bind(engine->play_metronome, handler);
 	controls.push_back(metronome);
 
 	DragBox<int>* bpm = new DragBox<int>(120, 10, 480, main_font, 18, 200, frame.get_height() - 45, 100, 40);
@@ -82,7 +84,7 @@ Scene SoundEngineView::create(Frame& frame) {
 
 	//Volume
 	DragBox<double>* volume = new DragBox<double>(0, 0, 1, main_font, 18, 330, frame.get_height() - 45, 100, 40);
-	volume->bind(this->engine, SoundEngineProperty::pEngineVolume);
+	volume->property.bind(engine->volume, handler);
 	controls.push_back(volume);
 
 	//Scene

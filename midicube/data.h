@@ -27,7 +27,7 @@ public:
 };
 
 template <typename T, typename V>
-class GetValueAction {
+class GetValueAction : public Action{
 
 private:
 	T& t;
@@ -54,7 +54,7 @@ public:
 };
 
 template <typename T, typename V>
-class SetValueAction {
+class SetValueAction : public Action {
 
 private:
 	T& t;
