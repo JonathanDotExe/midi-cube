@@ -14,6 +14,31 @@
 #include <vector>
 #include <array>
 
+
+static inline double polyblep(double phase, double step) {
+	if (phase < step) {
+		phase /= step;
+		return - phase * phase + 2 * phase - 1;
+	}
+	else if (phase > (1 - step)) {
+		phase = (phase - 1)/step;
+		return phase * phase + 2 * phase + 1;
+	}
+	return 0;
+}
+
+static inline double integrated_polyblep(double phase, double step) {
+	if (phase < step) {
+		phase = phase / step - 1;
+		return - 1 / 3.0 * phase * phase * phase;
+	}
+	else if (phase > (1 - step)) {
+		phase = (phase - 1) / step + 1;
+		return 1 / 3.0 * phase * phase * phase;
+	}
+	return 0;
+}
+
 enum AnalogWaveForm {
 	SINE_WAVE, SAW_DOWN_WAVE, SAW_UP_WAVE, SQUARE_WAVE, TRIANGLE_WAVE, NOISE_WAVE
 };

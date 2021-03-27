@@ -170,7 +170,7 @@ class B3OrganTonewheel {
 public:
 	double rotation = 0;
 	double volume = 0;
-	double process(SampleInfo& info, double freq);
+	double process(SampleInfo& info, double freq, OrganType type);
 };
 
 class B3OrganData {

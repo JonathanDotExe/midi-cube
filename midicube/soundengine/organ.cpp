@@ -7,17 +7,26 @@
 
 
 #include "organ.h"
+#include "../oscilator.h"
 #include <cmath>
 
 //B3OrganTonewheel
-double B3OrganTonewheel::process(SampleInfo& info, double freq) {
+double B3OrganTonewheel::process(SampleInfo& info, double freq, OrganType type) {
 	//Rotation
 	double volume = this->volume;
 	rotation += freq * info.time_step;
 	this->volume = 0;
 	//Signal
 	if (volume) {
-		return sin(freq_to_radians(rotation)) * volume;
+		if (type == ORGAN_TYPE_B3) {
+			return sin(freq_to_radians(rotation)) * volume;
+		}
+		else {
+			double phase = fmod(rotation, 1.0);
+			double pphase = fmod(rotation + 0.5, 1.0);
+			double step = info.time_step * freq;
+			return triangle_wave(phase) + integrated_polyblep(phase, step) * 4 * step - integrated_polyblep(pphase, step) * 4 * step;
+		}
 	}
 	else {
 		return 0;
@@ -139,7 +148,7 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	double volume = 0;
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
 		volume += data.tonewheels[i].volume * tonewheel_data[i].volume;
-		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend) * tonewheel_data[i].volume;
+		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend, data.preset.type) * tonewheel_data[i].volume;
 	}
 	sample *= swell;
 	//Compress

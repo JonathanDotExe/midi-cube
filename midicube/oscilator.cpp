@@ -14,30 +14,6 @@ AnalogOscilator::AnalogOscilator() {
 
 }
 
-static inline double polyblep(double phase, double step) {
-	if (phase < step) {
-		phase /= step;
-		return - phase * phase + 2 * phase - 1;
-	}
-	else if (phase > (1 - step)) {
-		phase = (phase - 1)/step;
-		return phase * phase + 2 * phase + 1;
-	}
-	return 0;
-}
-
-static inline double integrated_polyblep(double phase, double step) {
-	if (phase < step) {
-		phase = phase / step - 1;
-		return - 1 / 3.0 * phase * phase * phase;
-	}
-	else if (phase > (1 - step)) {
-		phase = (phase - 1) / step + 1;
-		return 1 / 3.0 * phase * phase * phase;
-	}
-	return 0;
-}
-
 void AnalogOscilator::process(double freq, double time_step, AnalogOscilatorData& data) {
 	//Set freq to sync slave
 	if (data.sync) {
