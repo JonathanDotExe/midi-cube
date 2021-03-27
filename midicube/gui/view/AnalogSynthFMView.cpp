@@ -21,6 +21,8 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 	std::vector<PropertyHolder*> holders;
 	holders.push_back(&synth);
 
+	ActionHandler& handler = frame.cube.action_handler;
+
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
@@ -50,8 +52,7 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 
 	//Grid
 	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
-		SynthPartPropertyHolder& part = synth.parts[i];
-		holders.push_back(&part);
+		OperatorEntity& op = synth.preset.operators.at(i);
 
 		int y = tmp_y + i * 45;
 		Label* osc = new Label("Osc " + std::to_string(i + 1), main_font, 12, tmp_x, y + 10);
@@ -59,7 +60,7 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
 			int x = tmp_x + j * 85 + 35;
 			DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y, 80, 40);
-			value->bind(&part, SynthPartProperty::pSynthOpFM, j);
+			value->property.bind(op.fm.at(j), handler);
 			//Color if feedback
 			if (i >= j) {
 				value->rect.setFillColor(sf::Color(180, 180, 180));
@@ -68,7 +69,7 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 		}
 		//Audible
 		CheckBox* audible = new CheckBox(false, "", main_font, 16, tmp_x + ANALOG_PART_COUNT * 85 + 35, y, 40, 40);
-		audible->bind(&part, SynthPartProperty::pSynthOpAudible);
+		audible->property.bind(op.audible, handler);
 		controls.push_back(audible);
 
 		//Edit
