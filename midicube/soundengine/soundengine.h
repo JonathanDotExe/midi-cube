@@ -374,7 +374,7 @@ private:
 
 public:
 	Metronome metronome;
-	std::atomic<bool> play_metronome{false};
+	bool play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	double volume{0.2};
 	std::atomic<size_t> scene{0};

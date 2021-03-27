@@ -319,7 +319,7 @@ private:
 public:
 	sf::RectangleShape rect;
 	sf::Text text;
-	PropertyBinding<bool> property;
+	PropertyBinding<int> property;
 
 	ComboBox(int value, std::vector<std::string> values, sf::Font& font, int text_size = 12, int start_val = 0, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
 		this->start_val = start_val;

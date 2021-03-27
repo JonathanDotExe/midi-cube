@@ -67,7 +67,7 @@ public:
 	}
 
 	virtual void execute() {
-		t = v;
+		t = static_cast<T>(v);
 	}
 
 	virtual void returned() {
