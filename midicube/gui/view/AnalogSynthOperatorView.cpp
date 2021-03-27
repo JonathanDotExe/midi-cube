@@ -31,8 +31,8 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 	std::vector<Control*> show_source;
 	std::vector<PropertyHolder*> holders;
 
-	SynthPartPropertyHolder* part = &synth.parts.at(this->part);
-	holders.push_back(part);
+	ActionHandler& handler = frame.cube.action_handler;
+	OperatorEntity& op = synth.preset.operators.at(this->part);
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -47,7 +47,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 	//Col 1
 	{
 		CheckBox* audible = new CheckBox(false, "Audible", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
-		audible->bind(part, SynthPartProperty::pSynthOpAudible);
+		audible->property.bind(op.audible, handler);
 		controls.push_back(audible);
 	}
 
@@ -56,20 +56,20 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, 0, 8, main_font, 16, tmp_x + 160, tmp_y + 15, 80, 40);
-		value->bind(part, SynthPartProperty::pSynthOpOscCount);
+		value->property.bind(op.oscilator_count, handler);
 		controls.push_back(value);
 	}
 
 	tmp_y += 75;
 
 	//ADSR
-	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOpAttack);
+	adsr_controls(&controls, tmp_x, tmp_y, op.env, handler);
 	tmp_y += 75;
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOpVolume, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, op.volume, handler, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 	//Panning
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOpPanning, "Panning", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, op.panning, handler, "Panning", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Col 2
@@ -80,7 +80,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 	//Filter
 	{
 		CheckBox* active = new CheckBox(false, "Filter", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
-		active->bind(part, SynthPartProperty::pSynthOpFilter);
+		active->property.bind(op.filter, handler);
 		controls.push_back(active);
 	}
 	tmp_x += 100;
@@ -89,7 +89,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 		std::vector<std::string> filter_types = {"LP 12", "LP 24", "HP 12", "HP 24", "BP 12", "BP 24"};
 
 		ComboBox* filter_type = new ComboBox(1, filter_types, main_font, 16, 0, tmp_x, tmp_y + 15, 150, 40);
-		filter_type->bind(part, SynthPartProperty::pSynthOpFilterType);
+		filter_type->property.bind(op.filter_type, handler);
 		controls.push_back(filter_type);
 	}
 	tmp_x += 160;
@@ -99,7 +99,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(part, SynthPartProperty::pSynthOpFilterKBTrack);
+		value->property.bind(op.filter_kb_track, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -109,7 +109,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(part, SynthPartProperty::pSynthOpFilterKBTrackNote);
+		value->property.bind(op.filter_kb_track_note, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -119,7 +119,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 	//Drive
 	{
 		CheckBox* active = new CheckBox(false, "Drive", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
-		active->bind(part, SynthPartProperty::pSynthOpPreFilterDrive);
+		active->property.bind(op.pre_filter_drive, handler);
 		controls.push_back(active);
 	}
 	tmp_x += 90;
@@ -129,7 +129,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(part, SynthPartProperty::pSynthOpPreFilterDriveAmount);
+		value->property.bind(op.pre_filter_drive_amount, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -138,14 +138,14 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 
 	tmp_x = 500;
 	//Filter Cutoff
-	DragBox<double>* filter = property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOpFilterCutoff, "Cutoff", &show_amount, &show_source).at(0);
+	DragBox<double>* filter = property_mod_controls(&controls, tmp_x, tmp_y, op.filter_cutoff, handler, "Cutoff", &show_amount, &show_source).at(0);
 	filter->to_string = [](double val) {
 		return std::to_string((int) scale_cutoff(val));
 	};
 	filter->drag_step = 4;
 	tmp_y += 75;
 	//Filter Resonance
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOpFilterResonance, "Resonance", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, op.filter_resonance, handler, "Resonance", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Edit Sources
