@@ -167,8 +167,8 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	std::vector<Control*> show_source;
 	std::vector<PropertyHolder*> holders;
 
-	SynthPartPropertyHolder* part = &synth.parts.at(this->part);
-	holders.push_back(part);
+	ActionHandler& handler = frame.cube.action_handler;
+	OscilatorEntity& osc = synth.preset.oscilators.at(this->part);
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -186,31 +186,31 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
-		waveform->bind(part, SynthPartProperty::pSynthOscWaveForm);
+		waveform->property.bind(osc.waveform, handler);
 		controls.push_back(waveform);
 	}
 	tmp_y += 50;
 	//Reset and audible
 	{
 		CheckBox* reset = new CheckBox(false, "Reset", main_font, 16, tmp_x, tmp_y, 40, 40);
-		reset->bind(part, SynthPartProperty::pSynthOscReset);
+		reset->property.bind(osc.reset, handler);
 		controls.push_back(reset);
 	}
 	tmp_y += 50;
 	//Randomize and sync
 	{
 		CheckBox* reset = new CheckBox(false, "Randomize", main_font, 16, tmp_x, tmp_y, 40, 40);
-		reset->bind(part, SynthPartProperty::pSynthOscRandomize);
+		reset->property.bind(osc.randomize, handler);
 		controls.push_back(reset);
 	}
 	{
 		CheckBox* audible = new CheckBox(false, "Sync", main_font, 16, tmp_x + 160, tmp_y, 40, 40);
-		audible->bind(part, SynthPartProperty::pSynthOscSync);
+		audible->property.bind(osc.sync, handler);
 		controls.push_back(audible);
 		tmp_y += 50;
 	}
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscVolume, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, osc.volume, handler, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Unison
@@ -219,7 +219,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, 0, 7, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(part, SynthPartProperty::pSynthOscUnisonAmount);
+		value->property.bind(osc.unison_amount, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -229,7 +229,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, -48, 48, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(part, SynthPartProperty::pSynthOscSemi);
+		value->property.bind(osc.semi, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -240,7 +240,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 50, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul /= 10;
-		value->bind(part, SynthPartProperty::pSynthOscTranspose);
+		value->property.bind(osc.transpose, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -249,10 +249,10 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	tmp_x = 500;
 	tmp_y = 10;
 	//Pulse Width
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscPulseWidth, "Shape/PW", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, osc.pulse_width, handler, "Shape/PW", &show_amount, &show_source);
 	tmp_y += 75;
 	//Pitch
-	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscPitch, "Pitch", &show_amount, &show_source)) {
+	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, osc.pitch, handler, "Pitch", &show_amount, &show_source)) {
 		c->to_string = [](double val) {
 			return std::to_string(val >= 0 ? PITCH_SCALE.value(val) : -PITCH_SCALE.value(-val));
 		};
@@ -260,7 +260,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	}
 	tmp_y += 75;
 	//Sync
-	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscSyncMul, "Sync", &show_amount, &show_source)) {
+	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, osc.sync_mul, handler, "Sync", &show_amount, &show_source)) {
 		c->to_string = [](double val) {
 			return std::to_string(val >= 0 ? SYNC_SCALE.value(val) : -SYNC_SCALE.value(-val));
 		};
@@ -268,7 +268,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	}
 	tmp_y += 75;
 	//Unison Detune
-	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthOscUnisonDetune, "Unison Det.", &show_amount, &show_source)) {
+	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, osc.unison_detune, handler, "Unison Det.", &show_amount, &show_source)) {
 		c->to_string = [](double val) {
 			return std::to_string(val >= 0 ? UNISON_DETUNE_SCALE.value(val) : -UNISON_DETUNE_SCALE.value(-val));
 		};
