@@ -264,6 +264,9 @@ void B3Organ::control_change(unsigned int control, unsigned int value) {
 PropertyValue B3Organ::get(size_t prop, size_t sub_prop) {
 	PropertyValue val;
 	switch ((B3OrganProperty) prop) {
+	case B3OrganProperty::pB3OrganType:
+		val.ival = data.preset.type;
+		break;
 	case B3OrganProperty::pB3Drawbar1:
 		val.ival = data.preset.drawbars[0];
 		break;
@@ -423,6 +426,9 @@ PropertyValue B3Organ::get(size_t prop, size_t sub_prop) {
 
 void B3Organ::set(size_t prop, PropertyValue val, size_t sub_prop) {
 	switch ((B3OrganProperty) prop) {
+	case B3OrganProperty::pB3OrganType:
+		data.preset.type = (OrganType) val.ival;
+		break;
 	case B3OrganProperty::pB3Drawbar1:
 		data.preset.drawbars[0] = val.ival;
 		break;
@@ -580,6 +586,8 @@ void B3Organ::set(size_t prop, PropertyValue val, size_t sub_prop) {
 }
 
 void B3Organ::update_properties() {
+	submit_change(B3OrganProperty::pB3OrganType,
+			(int) data.preset.type);
 	submit_change(B3OrganProperty::pB3Drawbar1,
 			(int) data.preset.drawbars[0]);
 	submit_change(B3OrganProperty::pB3Drawbar2,

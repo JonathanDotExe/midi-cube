@@ -32,6 +32,8 @@
 
 
 enum B3OrganProperty {
+	pB3OrganType,
+
 	pB3Drawbar1,
 	pB3Drawbar2,
 	pB3Drawbar3,
@@ -99,7 +101,12 @@ enum OrganChorusVibratoType {
 	B3_NONE, B3_CHORUS_1, B3_CHORUS_2, B3_CHORUS_3, B3_VIBRATO_1, B3_VIBRATO_2, B3_VIBRATO_3
 };
 
+enum OrganType {
+	ORGAN_TYPE_B3, ORGAN_TYPE_TRANSISTOR
+};
+
 struct B3OrganPreset {
+	OrganType type = ORGAN_TYPE_B3;
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbars;
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	double harmonic_foldback_volume{1};
