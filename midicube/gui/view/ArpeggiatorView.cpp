@@ -78,7 +78,7 @@ Scene ArpeggiatorView::create(Frame &frame) {
 
 		DragBox<int>* bpm = new DragBox<int>(0, 10, 480, main_font, 18, 10, tmp_y, 150, 60);
 		tmp_y += 70;
-		bpm->bind(&channel, SoundEngineChannelProperty::pArpeggiatorBPM);
+		bpm->property.bind_function<unsigned int>(std::bind(&Metronome::get_bpm, &channel.arp.metronome), std::bind(&Metronome::set_bpm, &channel.arp.metronome, std::placeholders::_1), handler);
 		controls.push_back(bpm);
 	}
 

@@ -23,6 +23,7 @@ void SoundEngineChannelView::property_change(PropertyChange change) {
 Scene SoundEngineChannelView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<PropertyHolder*> holders;
+	ActionHandler& handler = frame.cube.action_handler;
 
 	holders.push_back(&channel);
 
@@ -48,7 +49,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Engine
 	ComboBox* engine = new ComboBox(0, engine_names, main_font, 24, -1, 10, 45, 300, 80);
 	engine->rect.setFillColor(sf::Color(0, 180, 255));
-	engine->bind(&channel, SoundEngineChannelProperty::pChannelSoundEngine);
+	engine->property.bind_function<ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), std::bind(&SoundEngineChannel::set_engine_index, &channel, std::placeholders::_1), handler);
 	controls.push_back(engine);
 
 	//Edit
