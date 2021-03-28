@@ -25,7 +25,7 @@ void ActionHandler::execute_realtime_actions() {
 void ActionHandler::execute_return_actions() {
 	Action* action = nullptr;
 	while (return_actions.pop(action)) {
-		action->execute();
+		action->returned();
 		delete action;
 	}
 }
