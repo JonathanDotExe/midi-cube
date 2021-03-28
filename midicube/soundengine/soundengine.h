@@ -224,6 +224,103 @@ struct ChannelSource {
 	bool transfer_cc = true;
 	bool transfer_prog_change = true;
 	bool transfer_other = true;
+
+	unsigned int get_channel() const {
+		return channel;
+	}
+
+	void set_channel(unsigned int channel = 0) {
+		this->channel = channel;
+	}
+
+	unsigned int get_end_note() const {
+		return end_note;
+	}
+
+	void set_end_note(unsigned int endNote = 127) {
+		end_note = endNote;
+	}
+
+	unsigned int get_end_velocity() const {
+		return end_velocity;
+	}
+
+	void set_end_velocity(unsigned int endVelocity = 127) {
+		end_velocity = endVelocity;
+	}
+
+	ssize_t get_input() const {
+		return input;
+	}
+
+	void set_input(ssize_t input = 1) {
+		this->input = input;
+	}
+
+	int get_octave() const {
+		return octave;
+	}
+
+	void set_octave(int octave = 0) {
+		this->octave = octave;
+	}
+
+	unsigned int get_start_note() const {
+		return start_note;
+	}
+
+	void set_start_note(unsigned int startNote = 0) {
+		start_note = startNote;
+	}
+
+	unsigned int get_start_velocity() const {
+		return start_velocity;
+	}
+
+	void set_start_velocity(unsigned int startVelocity = 0) {
+		start_velocity = startVelocity;
+	}
+
+	bool is_transfer_cc() const {
+		return transfer_cc;
+	}
+
+	void set_transfer_cc(bool transferCc = true) {
+		transfer_cc = transferCc;
+	}
+
+	bool is_transfer_channel_aftertouch() const {
+		return transfer_channel_aftertouch;
+	}
+
+	void set_transfer_channel_aftertouch(
+			bool transferChannelAftertouch = true) {
+		transfer_channel_aftertouch = transferChannelAftertouch;
+	}
+
+	bool is_transfer_other() const {
+		return transfer_other;
+	}
+
+	void set_transfer_other(bool transferOther = true) {
+		transfer_other = transferOther;
+	}
+
+	bool is_transfer_pitch_bend() const {
+		return transfer_pitch_bend;
+	}
+
+	void set_transfer_pitch_bend(bool transferPitchBend = true) {
+		transfer_pitch_bend = transferPitchBend;
+	}
+
+	bool is_transfer_prog_change() const {
+		return transfer_prog_change;
+	}
+
+	void set_transfer_prog_change(bool transferProgChange = true) {
+		transfer_prog_change = transferProgChange;
+	}
 };
 
 enum SoundEngineChannelProperty {
@@ -258,57 +355,7 @@ struct SoundEngineScene {
 	ChannelSource source;
 };
 
-class SoundEngineDevice;
-
-class SoundEngineChannel : public PropertyHolder {
-private:
-	SoundEngine* engine = nullptr;
-	SoundEngineDevice* device = nullptr;
-
-public:
-	double volume = 0.5;
-	double panning = 0;
-	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
-	Arpeggiator arp;
-	Looper looper;
-
-	//Effects
-	VocoderPreset vocoder_preset;
-	VocoderEffect vocoder;
-	BitCrusherPreset bitcrusher_preset;
-	BitCrusherEffect bitcrusher;
-
-	EngineStatus status = {};
-
-	SoundEngineChannel();
-
-	void init_device(SoundEngineDevice* device) {
-		if (!this->device) {
-			this->device = device;
-		}
-	}
-
-	void send(MidiMessage& message, SampleInfo& info, size_t scene);
-
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, size_t scene);
-
-	PropertyValue get(size_t prop, size_t sub_prop);
-
-	void set(size_t prop, PropertyValue value, size_t sub_prop);
-
-	void update_properties();
-
-	SoundEngine* get_engine();
-
-	void set_engine(SoundEngine* engine);
-
-	void set_engine_index(ssize_t engine);
-
-	ssize_t get_engine_index();
-
-	~SoundEngineChannel();
-
-};
+class SoundEngineChannel;
 
 struct ChannelProgram {
 	ssize_t engine_index{-1};
@@ -403,5 +450,160 @@ public:
 
 };
 
+class SoundEngineDevice;
+
+class SoundEngineChannel : public PropertyHolder {
+private:
+	SoundEngine* engine = nullptr;
+	SoundEngineDevice* device = nullptr;
+
+public:
+	double volume = 0.5;
+	double panning = 0;
+	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
+	Arpeggiator arp;
+	Looper looper;
+
+	//Effects
+	VocoderPreset vocoder_preset;
+	VocoderEffect vocoder;
+	BitCrusherPreset bitcrusher_preset;
+	BitCrusherEffect bitcrusher;
+
+	EngineStatus status = {};
+
+	SoundEngineChannel();
+
+	void init_device(SoundEngineDevice* device) {
+		if (!this->device) {
+			this->device = device;
+		}
+	}
+
+	void send(MidiMessage& message, SampleInfo& info, size_t scene);
+
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, size_t scene);
+
+	PropertyValue get(size_t prop, size_t sub_prop);
+
+	void set(size_t prop, PropertyValue value, size_t sub_prop);
+
+	void update_properties();
+
+	SoundEngine* get_engine();
+
+	void set_engine(SoundEngine* engine);
+
+	void set_engine_index(ssize_t engine);
+
+	ssize_t get_engine_index();
+
+	~SoundEngineChannel();
+
+	unsigned int get_source_channel() const {
+		return scenes[device->scene].source.channel;
+	}
+
+	void set_source_channel(unsigned int channel = 0) {
+		scenes[device->scene].source.channel = channel;
+	}
+
+	unsigned int get_end_note() const {
+		return scenes[device->scene].source.end_note;
+	}
+
+	void set_end_note(unsigned int endNote = 127) {
+		scenes[device->scene].source.end_note = endNote;
+	}
+
+	unsigned int get_end_velocity() const {
+		return scenes[device->scene].source.end_velocity;
+	}
+
+	void set_end_velocity(unsigned int endVelocity = 127) {
+		scenes[device->scene].source.end_velocity = endVelocity;
+	}
+
+	ssize_t get_input() const {
+		return scenes[device->scene].source.input;
+	}
+
+	void set_input(ssize_t input = 1) {
+		scenes[device->scene].source.input = input;
+	}
+
+	int get_octave() const {
+		return scenes[device->scene].source.octave;
+	}
+
+	void set_octave(int octave = 0) {
+		scenes[device->scene].source.octave = octave;
+	}
+
+	unsigned int get_start_note() const {
+		return scenes[device->scene].source.start_note;
+	}
+
+	void set_start_note(unsigned int startNote = 0) {
+		scenes[device->scene].source.start_note = startNote;
+	}
+
+	unsigned int get_start_velocity() const {
+		return scenes[device->scene].source.start_velocity;
+	}
+
+	void set_start_velocity(unsigned int startVelocity = 0) {
+		scenes[device->scene].source.start_velocity = startVelocity;
+	}
+
+	bool is_transfer_cc() const {
+		return scenes[device->scene].source.transfer_cc;
+	}
+
+	void set_transfer_cc(bool transferCc = true) {
+		scenes[device->scene].source.transfer_cc = transferCc;
+	}
+
+	bool is_transfer_channel_aftertouch() const {
+		return scenes[device->scene].source.transfer_channel_aftertouch;
+	}
+
+	void set_transfer_channel_aftertouch(
+			bool transferChannelAftertouch = true) {
+		scenes[device->scene].source.transfer_channel_aftertouch = transferChannelAftertouch;
+	}
+
+	bool is_transfer_other() const {
+		return scenes[device->scene].source.transfer_other;
+	}
+
+	void set_transfer_other(bool transferOther = true) {
+		scenes[device->scene].source.transfer_other = transferOther;
+	}
+
+	bool is_transfer_pitch_bend() const {
+		return scenes[device->scene].source.transfer_pitch_bend;
+	}
+
+	void set_transfer_pitch_bend(bool transferPitchBend = true) {
+		scenes[device->scene].source.transfer_pitch_bend = transferPitchBend;
+	}
+
+	bool is_transfer_prog_change() const {
+		return scenes[device->scene].source.transfer_prog_change;
+	}
+
+	void set_transfer_prog_change(bool transferProgChange = true) {
+		scenes[device->scene].source.transfer_prog_change = transferProgChange;
+	}
+
+	bool is_active() const {
+		return scenes[device->scene].active;
+	}
+
+	void set_active(bool active = false) {
+		scenes[device->scene].active = active;
+	}
+};
 
 #endif /* MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_ */
