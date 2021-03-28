@@ -48,7 +48,7 @@ public:
 class SoundEngine {
 
 public:
-	virtual void midi_message(MidiMessage& msg, SampleInfo& info) = 0;
+	virtual bool midi_message(MidiMessage& msg, SampleInfo& info) = 0;
 
 	virtual void press_note(SampleInfo& info, unsigned int note, double velocity) = 0;
 
@@ -81,7 +81,7 @@ public:
 	std::atomic<bool> sustain{true};
 
 
-	void midi_message(MidiMessage& msg, SampleInfo& info);
+	bool midi_message(MidiMessage& msg, SampleInfo& info);
 
 	virtual void press_note(SampleInfo& info, unsigned int note, double velocity);
 
@@ -96,8 +96,8 @@ public:
 
 	};
 
-	virtual void control_change(unsigned int control, unsigned int value) {
-
+	virtual bool control_change(unsigned int control, unsigned int value) {
+		return false;
 	};
 
 	virtual bool note_finished(SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) {
@@ -112,8 +112,9 @@ public:
 
 //BaseSoundEngine
 template<typename V, size_t P>
-void BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info) {
+bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info) {
 	double pitch;
+	bool changed = false;
 	switch (message.type) {
 		case MessageType::NOTE_ON:
 			press_note(info, message.note(), message.velocity()/127.0);
@@ -122,7 +123,7 @@ void BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info)
 			release_note(info, message.note());
 			break;
 		case MessageType::CONTROL_CHANGE:
-			control_change(message.control(), message.value());
+			changed = control_change(message.control(), message.value());
 			//Sustain
 			if (message.control() == sustain_control) {
 				bool new_sustain = message.value() != 0;
@@ -144,6 +145,7 @@ void BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info)
 		default:
 			break;
 	}
+	return changed;
 }
 
 template<typename V, size_t P>
@@ -258,7 +260,7 @@ public:
 		}
 	}
 
-	void send(MidiMessage& message, SampleInfo& info, size_t scene);
+	bool send(MidiMessage& message, SampleInfo& info, size_t scene);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, size_t scene);
 
@@ -402,7 +404,7 @@ public:
 
 	void add_sound_engine(SoundEngineBuilder* engine);
 
-	void send(MidiMessage& message, SampleInfo& info);
+	bool send(MidiMessage& message, SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 

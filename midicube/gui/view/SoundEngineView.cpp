@@ -64,7 +64,7 @@ Scene SoundEngineView::create(Frame& frame) {
 			frame.change_view(new SoundEngineChannelView(channel, i));
 		});
 
-		handler.queue_action(new GetFunctionAction<ssize_t, ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), [this](size_t index) {
+		handler.queue_action(new GetFunctionAction<ssize_t, ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), [this, i](size_t index) {
 			engine_buttons[i]->update_text(index < 0 ? "None" : engine_names[index]);
 		}));
 

@@ -193,72 +193,75 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	data.rotary_speaker.apply(lsample, rsample, data.preset.rotary, info);
 }
 
-void B3Organ::control_change(unsigned int control, unsigned int value) {
+bool B3Organ::control_change(unsigned int control, unsigned int value) {
+	bool change = false;
 	//Drawbars
 	for (size_t i = 0; i < data.preset.drawbar_ccs.size(); ++i) {
 		if (data.preset.drawbar_ccs[i] == control) {
 			data.preset.drawbars[i] = round((double) value/127 * ORGAN_DRAWBAR_MAX);
-			submit_change(B3OrganProperty::pB3Drawbar1 + i, (int) data.preset.drawbars[i]);
+			change = true;
 		}
 	}
 	//Rotary
 	if (control == data.preset.rotary_cc) {
 		data.preset.rotary.on = value > 0;
-		submit_change(B3OrganProperty::pB3Rotary, data.preset.rotary.on);
+		change = true;
 	}
 	if (control == data.preset.rotary_speed_cc) {
 		data.preset.rotary.fast = value > 0;
-		submit_change(B3OrganProperty::pB3RotarySpeed, data.preset.rotary.fast);
+		change = true;
 	}
 	//Amp
 	if (control == data.preset.amp_cc) {
 		data.preset.amplifier.on = value > 0;
-		submit_change(B3OrganProperty::pB3AmpOn, data.preset.amplifier.on);
+		change = true;
 	}
 	//Boost
 	if (control == data.preset.amp_boost_cc) {
 		data.preset.amplifier.boost = value/127.0;
-		submit_change(B3OrganProperty::pB3AmpBoost, data.preset.amplifier.boost);
+		change = true;
 	}
 	//Drive
 	if (control == data.preset.amp_drive_cc) {
 		data.preset.amplifier.drive = value/127.0;
-		submit_change(B3OrganProperty::pB3AmpDrive, data.preset.amplifier.drive);
+		change = true;
 	}
 	//Tone
 	if (control == data.preset.amp_tone_cc) {
 		data.preset.amplifier.tone = value/127.0;
-		submit_change(B3OrganProperty::pB3AmpTone, data.preset.amplifier.tone);
+		change = true;
 	}
 	//Percussion
 	if (control == data.preset.percussion_cc) {
 		data.preset.percussion = value > 0;
-		submit_change(B3OrganProperty::pB3Percussion, data.preset.percussion);
+		change = true;
 	}
 	//Percussion Third Harmonic
 	if (control == data.preset.percussion_third_harmonic_cc) {
 		data.preset.percussion_third_harmonic = value > 0;
-		submit_change(B3OrganProperty::pB3PercussionThirdHarmonic, data.preset.percussion_third_harmonic);
+		change = true;
 	}
 	//Percussion Fast Decay
 	if (control == data.preset.percussion_fast_decay_cc) {
 		data.preset.percussion_fast_decay = value > 0;
-		submit_change(B3OrganProperty::pB3PercussionFastDecay, data.preset.percussion_fast_decay);
+		change = true;
 	}
 	//Percussion Soft
 	if (control == data.preset.percussion_soft_cc) {
 		data.preset.percussion_soft = value > 0;
-		submit_change(B3OrganProperty::pB3PercussionSoft, data.preset.percussion_soft);
+		change = true;
 	}
 	//Vibrato Mix
 	if (control == data.preset.vibrato_mix_cc) {
 		data.preset.vibrato_mix = value/127.0;
-		submit_change(B3OrganProperty::pB3VibratoMix, data.preset.vibrato_mix);
+		change = true;
 	}
 	//Swell
 	if (control == data.preset.swell_cc) {
 		data.swell = value/127.0;
 	}
+
+	return change;
 }
 
 template<>

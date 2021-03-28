@@ -582,8 +582,9 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	}
 }
 
-void AnalogSynth::control_change(unsigned int control, unsigned int value) {
+bool AnalogSynth::control_change(unsigned int control, unsigned int value) {
 	controls[control] = value / 127.0;
+	return false;
 }
 
 bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
@@ -924,3 +925,17 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 
 	return tree;
 }
+
+AnalogSynth::~AnalogSynth() {
+
+}
+
+template<>
+std::string get_engine_name<AnalogSynth>() {
+	return "Analog Synth";
+}
+
+void __fix_link_asynth_name__ () {
+	get_engine_name<AnalogSynth>();
+}
+

@@ -167,7 +167,7 @@ public:
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
-	void control_change(unsigned int control, unsigned int value);
+	bool control_change(unsigned int control, unsigned int value);
 
 	bool note_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 	

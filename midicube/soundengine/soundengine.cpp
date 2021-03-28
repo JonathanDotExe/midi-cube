@@ -51,7 +51,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	}
 }
 
-void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t scene) {
+bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t scene) {
 	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
 		if (arp.on) {
 			switch (message.type) {
@@ -62,14 +62,15 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t sce
 				arp.note.release_note(info, message.note(), true);
 				break;
 			default:
-				engine->midi_message(message, info);
+				return engine->midi_message(message, info); //FIXME
 				break;
 			}
 		}
 		else {
-			engine->midi_message(message, info);
+			return engine->midi_message(message, info);
 		}
 	}
+	return false;
 }
 
 void SoundEngineChannel::set_engine_index(ssize_t engine_index) {
@@ -253,12 +254,13 @@ void SoundEngineDevice::add_sound_engine(SoundEngineBuilder* engine) {
 	engine_builders.push_back(engine);
 }
 
-void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
+bool SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	SoundEngineChannel& ch = this->channels[message.channel];
 	SoundEngine* engine = ch.get_engine();
 	if (engine) {
-		ch.send(message, info, scene);
+		return ch.send(message, info, scene);
 	}
+	return false;
 }
 
 
