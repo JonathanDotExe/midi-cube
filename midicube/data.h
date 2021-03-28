@@ -54,6 +54,33 @@ public:
 };
 
 template <typename T, typename V>
+class GetFunctionAction : public Action{
+
+private:
+	std::function<T ()> get_func;
+	V v;
+	std::function<void(V)> callback;
+
+public:
+
+	GetFunctionAction(std::function<T ()> f, std::function<void(V)> c) : get_func(f), callback(c) {
+
+	}
+
+	virtual void execute() {
+		v = get_func();
+	}
+
+	virtual void returned() {
+		callback(v);
+	}
+
+	virtual ~GetFunctionAction() {
+
+	}
+};
+
+template <typename T, typename V>
 class SetValueAction : public Action {
 
 private:
@@ -75,6 +102,33 @@ public:
 	}
 
 	virtual ~SetValueAction() {
+
+	}
+
+};
+
+template <typename T, typename V>
+class SetFunctionAction : public Action {
+
+private:
+	std::function<void (T)> set_func;
+	V v;
+
+public:
+
+	SetFunctionAction(std::function<void (T)> f, V val) : set_func(f), v(val) {
+
+	}
+
+	virtual void execute() {
+		set_func(static_cast<T>(v));
+	}
+
+	virtual void returned() {
+
+	}
+
+	virtual ~SetFunctionAction() {
 
 	}
 };
@@ -118,6 +172,16 @@ public:
 		};
 		set_func = [&e, &handler](T t) {
 			handler.queue_action(new SetValueAction<E, T>(e, t));
+		};
+	}
+
+	template <typename E>
+	void bind_function(std::function<E ()> get, std::function<void (E)> set, ActionHandler& handler) {
+		get_func = [get, &handler](std::function<void (T)> callback) {
+			handler.queue_action(new GetFunctionAction<E, T>(get, callback));
+		};
+		set_func = [set, &handler](T t) {
+			handler.queue_action(new SetFunctionAction<E, T>(set, t));
 		};
 	}
 
