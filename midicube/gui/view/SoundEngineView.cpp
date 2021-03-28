@@ -18,7 +18,6 @@ SoundEngineView::SoundEngineView() : ViewController() {
 
 Scene SoundEngineView::create(Frame& frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
 
 	ActionHandler& handler = frame.cube.action_handler;
 
@@ -27,7 +26,7 @@ Scene SoundEngineView::create(Frame& frame) {
 	controls.push_back(bg);
 
 	this->engine = &frame.cube.engine;
-	holders.push_back(this->engine);
+
 	SoundEngineDevice& sound_engine = frame.cube.engine;
 	//Sound engines
 	for (SoundEngineBuilder* engine : sound_engine.get_engine_builders()) {
@@ -41,7 +40,6 @@ Scene SoundEngineView::create(Frame& frame) {
 	int pane_height = (frame.get_height() - 50 - 5) / rows;
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = sound_engine.channels[i];
-		holders.push_back(&channel);
 		//Background pane
 		int x = 10 + pane_width * (i % cols);
 		int y = 10 + pane_height * (i / cols);
@@ -65,6 +63,10 @@ Scene SoundEngineView::create(Frame& frame) {
 		engine->set_on_click([&channel, i, &frame]() {
 			frame.change_view(new SoundEngineChannelView(channel, i));
 		});
+
+		handler.queue_action(new GetFunctionAction<ssize_t, ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), [this](size_t index) {
+			engine_buttons[i]->update_text(index < 0 ? "None" : engine_names[index]);
+		}));
 
 		//Volume
 		Slider* volume = new Slider(0, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);
@@ -110,19 +112,7 @@ Scene SoundEngineView::create(Frame& frame) {
 	controls.push_back(exit);
 
 
-	return {controls, holders};
-}
-
-
-void SoundEngineView::property_change(PropertyChange change) {
-	if (change.property == SoundEngineChannelProperty::pChannelSoundEngine) {
-		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-			SoundEngineChannel& channel = engine->channels[i];
-			if (&channel == change.holder) {
-				engine_buttons[i]->update_text(change.value.ival < 0 ? "None" : engine_names[change.value.ival]);
-			}
-		}
-	}
+	return {controls};
 }
 
 SoundEngineView::~SoundEngineView() {
