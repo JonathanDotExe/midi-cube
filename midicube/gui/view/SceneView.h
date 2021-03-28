@@ -21,7 +21,6 @@ private:
 public:
 	SceneView();
 	virtual ~SceneView();
-	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);
 };
 

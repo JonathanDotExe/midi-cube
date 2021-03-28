@@ -17,13 +17,8 @@ AnalogSynthView::AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int chan
 	this->channel_index = channel_index;
 }
 
-void AnalogSynthView::property_change(PropertyChange change) {
-}
-
 Scene AnalogSynthView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
-	holders.push_back(&synth);
 
 	ActionHandler& handler = frame.cube.action_handler;
 
@@ -32,12 +27,10 @@ Scene AnalogSynthView::create(Frame &frame) {
 	controls.push_back(bg);
 
 	//Channels
-	int cols = synth.parts.size();
+	int cols = ANALOG_PART_COUNT;
 	int pane_width = (frame.get_width() - 15) / cols;
 	int pane_height = 150;
-	for (size_t i = 0; i < synth.parts.size(); ++i) {
-		SynthPartPropertyHolder& part = synth.parts[i];
-		holders.push_back(&part);
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
 		//Background pane
 		int x = 10 + pane_width * (i % cols);
 		int y = 10;
@@ -183,7 +176,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 	});
 	controls.push_back(back);
 
-	return {controls, holders};
+	return {controls};
 }
 
 AnalogSynthView::~AnalogSynthView() {

@@ -14,12 +14,8 @@ ProgramView::ProgramView(size_t bank, size_t page) {
 	this->page = page;
 }
 
-void ProgramView::property_change(PropertyChange change) {
-}
-
 Scene ProgramView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
 
 	ProgramManager* prog_mgr = &frame.cube.prog_mgr;
 
@@ -185,7 +181,7 @@ Scene ProgramView::create(Frame &frame) {
 	}
 	prog_mgr->unlock();
 
-	return {controls, holders};
+	return {controls};
 }
 
 ProgramView::~ProgramView() {

@@ -20,7 +20,6 @@ private:
 	int channel_index;
 public:
 	AnalogSynthFMView(AnalogSynth& s, SoundEngineChannel& c, int channel_index);
-	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);
 	virtual ~AnalogSynthFMView();
 };

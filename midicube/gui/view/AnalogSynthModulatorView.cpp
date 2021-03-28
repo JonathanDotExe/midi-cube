@@ -16,14 +16,10 @@ AnalogSynthModulatorView::AnalogSynthModulatorView(AnalogSynth &s,
 	this->part = part;
 }
 
-void AnalogSynthModulatorView::property_change(PropertyChange change) {
-}
-
 Scene AnalogSynthModulatorView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
-	std::vector<PropertyHolder*> holders;
 
 	ActionHandler& handler = frame.cube.action_handler;
 	ModEnvelopeEntity& env = synth.preset.mod_envs.at(this->part);
@@ -118,7 +114,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 		c->set_visible(edit_source);
 	}
 
-	return {controls, holders};
+	return {controls};
 }
 
 AnalogSynthModulatorView::~AnalogSynthModulatorView() {

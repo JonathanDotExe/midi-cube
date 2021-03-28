@@ -13,16 +13,11 @@ ArpeggiatorView::ArpeggiatorView(SoundEngineChannel& ch, int channel_index) : ch
 	this->channel_index = channel_index;
 }
 
-void ArpeggiatorView::property_change(PropertyChange change) {
-}
-
 Scene ArpeggiatorView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
 
 
 	ActionHandler& handler = frame.cube.action_handler;
-	holders.push_back(&channel);
 
 	//Sound engines
 	std::vector<std::string> patterns{"Up", "Down", "Random", "Up/Down", "Down/Up"};
@@ -101,7 +96,7 @@ Scene ArpeggiatorView::create(Frame &frame) {
 	});
 	controls.push_back(back);
 
-	return {controls, holders};
+	return {controls};
 }
 
 

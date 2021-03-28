@@ -21,7 +21,6 @@ private:
 public:
 	ProgramView(size_t bank = 0, size_t page = 0);
 	virtual ~ProgramView();
-	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);
 };
 

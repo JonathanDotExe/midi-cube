@@ -239,7 +239,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	});
 	controls.push_back(back);
 
-	return {controls, holders};
+	return {controls};
 }
 
 SoundEngineChannelView::~SoundEngineChannelView() {

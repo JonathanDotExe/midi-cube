@@ -22,7 +22,6 @@ private:
 public:
 	AnalogSynthOperatorView(AnalogSynth& s, SoundEngineChannel& c, int channel_index, size_t part);
 	virtual ~AnalogSynthOperatorView();
-	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);
 };
 

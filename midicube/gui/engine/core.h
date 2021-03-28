@@ -12,7 +12,6 @@
 #include <boost/lockfree/spsc_queue.hpp>
 #include <functional>
 #include "../../util.h"
-#include "../../property.h"
 #include "../../midicube.h"
 #include "../../data.h"
 
@@ -72,7 +71,6 @@ public:
 
 struct Scene {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> prop_holders;
 };
 
 class ViewController {

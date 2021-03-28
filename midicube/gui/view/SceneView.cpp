@@ -12,12 +12,8 @@ SceneView::SceneView() {
 
 }
 
-void SceneView::property_change(PropertyChange change) {
-}
-
 Scene SceneView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -63,7 +59,7 @@ Scene SceneView::create(Frame &frame) {
 	controls.push_back(exit);
 
 
-	return {controls, holders};
+	return {controls};
 }
 
 

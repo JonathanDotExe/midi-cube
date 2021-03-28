@@ -13,13 +13,8 @@ AnalogSynthFMView::AnalogSynthFMView(AnalogSynth& s, SoundEngineChannel& c, int 
 	this->channel_index = channel_index;
 }
 
-void AnalogSynthFMView::property_change(PropertyChange change) {
-}
-
 Scene AnalogSynthFMView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
-	holders.push_back(&synth);
 
 	ActionHandler& handler = frame.cube.action_handler;
 
@@ -89,7 +84,7 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 	});
 	controls.push_back(back);
 
-	return {controls, holders};
+	return {controls};
 }
 
 AnalogSynthFMView::~AnalogSynthFMView() {

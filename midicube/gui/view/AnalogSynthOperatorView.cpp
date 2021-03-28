@@ -22,14 +22,10 @@ AnalogSynthOperatorView::~AnalogSynthOperatorView() {
 
 }
 
-void AnalogSynthOperatorView::property_change(PropertyChange change) {
-}
-
 Scene AnalogSynthOperatorView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
-	std::vector<PropertyHolder*> holders;
 
 	ActionHandler& handler = frame.cube.action_handler;
 	OperatorEntity& op = synth.preset.operators.at(this->part);
@@ -177,5 +173,5 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 		c->set_visible(edit_source);
 	}
 
-	return {controls, holders};
+	return {controls};
 }

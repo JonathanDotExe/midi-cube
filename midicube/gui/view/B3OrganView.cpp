@@ -13,15 +13,10 @@ B3OrganView::B3OrganView(B3Organ& o, SoundEngineChannel& ch, int channel_index) 
 	this->channel_index = channel_index;
 }
 
-void B3OrganView::property_change(PropertyChange change) {
-
-}
 
 Scene B3OrganView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
 	ActionHandler& handler = frame.cube.action_handler;
-	holders.push_back(&organ);
 
 	std::vector<Control*> hide_midi = {};
 	std::vector<Control*> show_midi = {};
@@ -417,7 +412,7 @@ Scene B3OrganView::create(Frame &frame) {
 		control->set_visible(!this->edit_midi);
 	}
 
-	return {controls, holders};
+	return {controls};
 }
 
 
