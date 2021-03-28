@@ -26,7 +26,6 @@ src = [
 	'midicube/midicube.cpp',
 	'midicube/program.cpp',
 	'midicube/oscilator.cpp',
-	'midicube/property.cpp',
 	'midicube/synthesis.cpp',
 	'midicube/util.cpp',
 	'midicube/wavetable.cpp',

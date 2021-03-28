@@ -17,15 +17,9 @@ SoundEngineChannelView::SoundEngineChannelView(SoundEngineChannel& ch, int chann
 	this->channel_index = channel_index;
 }
 
-void SoundEngineChannelView::property_change(PropertyChange change) {
-}
-
 Scene SoundEngineChannelView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
 	ActionHandler& handler = frame.cube.action_handler;
-
-	holders.push_back(&channel);
 
 	//Sound engines
 	std::vector<std::string> engine_names;
