@@ -16,7 +16,6 @@
 #include "../looper.h"
 #include "../effect/vocoder.h"
 #include "../effect/bitcrusher.h"
-#include "../property.h"
 #include "voice.h"
 #include <string>
 #include <array>
@@ -224,130 +223,6 @@ struct ChannelSource {
 	bool transfer_cc = true;
 	bool transfer_prog_change = true;
 	bool transfer_other = true;
-
-	unsigned int get_channel() const {
-		return channel;
-	}
-
-	void set_channel(unsigned int channel = 0) {
-		this->channel = channel;
-	}
-
-	unsigned int get_end_note() const {
-		return end_note;
-	}
-
-	void set_end_note(unsigned int endNote = 127) {
-		end_note = endNote;
-	}
-
-	unsigned int get_end_velocity() const {
-		return end_velocity;
-	}
-
-	void set_end_velocity(unsigned int endVelocity = 127) {
-		end_velocity = endVelocity;
-	}
-
-	ssize_t get_input() const {
-		return input;
-	}
-
-	void set_input(ssize_t input = 1) {
-		this->input = input;
-	}
-
-	int get_octave() const {
-		return octave;
-	}
-
-	void set_octave(int octave = 0) {
-		this->octave = octave;
-	}
-
-	unsigned int get_start_note() const {
-		return start_note;
-	}
-
-	void set_start_note(unsigned int startNote = 0) {
-		start_note = startNote;
-	}
-
-	unsigned int get_start_velocity() const {
-		return start_velocity;
-	}
-
-	void set_start_velocity(unsigned int startVelocity = 0) {
-		start_velocity = startVelocity;
-	}
-
-	bool is_transfer_cc() const {
-		return transfer_cc;
-	}
-
-	void set_transfer_cc(bool transferCc = true) {
-		transfer_cc = transferCc;
-	}
-
-	bool is_transfer_channel_aftertouch() const {
-		return transfer_channel_aftertouch;
-	}
-
-	void set_transfer_channel_aftertouch(
-			bool transferChannelAftertouch = true) {
-		transfer_channel_aftertouch = transferChannelAftertouch;
-	}
-
-	bool is_transfer_other() const {
-		return transfer_other;
-	}
-
-	void set_transfer_other(bool transferOther = true) {
-		transfer_other = transferOther;
-	}
-
-	bool is_transfer_pitch_bend() const {
-		return transfer_pitch_bend;
-	}
-
-	void set_transfer_pitch_bend(bool transferPitchBend = true) {
-		transfer_pitch_bend = transferPitchBend;
-	}
-
-	bool is_transfer_prog_change() const {
-		return transfer_prog_change;
-	}
-
-	void set_transfer_prog_change(bool transferProgChange = true) {
-		transfer_prog_change = transferProgChange;
-	}
-};
-
-enum SoundEngineChannelProperty {
-	pChannelActive,
-	pChannelVolume,
-	pChannelPanning,
-	pChannelSoundEngine,
-
-	pChannelInputDevice,
-	pChannelInputChannel,
-	pChannelStartNote,
-	pChannelEndNote,
-	pChannelStartVelocity,
-	pChannelEndVelocity,
-	pChannelOctave,
-	pChannelTransferChannelAftertouch,
-	pChannelTransferPitchBend,
-	pChannelTransferCC,
-	pChannelTransferProgChange,
-	pChannelTransferOther,
-
-	pArpeggiatorOn,
-	pArpeggiatorPattern,
-	pArpeggiatorOctaves,
-	pArpeggiatorStep,
-	pArpeggiatorHold,
-	pArpeggiatorBPM
 };
 
 struct SoundEngineScene {
@@ -355,104 +230,7 @@ struct SoundEngineScene {
 	ChannelSource source;
 };
 
-class SoundEngineChannel;
-
-struct ChannelProgram {
-	ssize_t engine_index{-1};
-	double volume = 0.5;
-	double panning = 0;
-	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
-
-	unsigned int arpeggiator_bpm = 120;
-	bool arp_on;
-	ArpeggiatorPreset arpeggiator;
-
-	EngineProgram* engine_program = nullptr;
-};
-
-struct Program {
-	std::string name;
-	unsigned int metronome_bpm = 120;
-	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{2, true}};
-};
-
-enum SoundEngineProperty {
-	pEngineMetronomeOn,
-	pEngineMetronomeBPM,
-	pEngineVolume,
-};
-
-
-class SoundEngineBuilder {
-public:
-	virtual SoundEngine* build() = 0;
-
-	virtual std::string get_name() = 0;
-
-	virtual bool matches(SoundEngine* engine) = 0;
-
-	virtual ~SoundEngineBuilder() {
-
-	};
-};
-
-template <typename T>
-class TemplateSoundEngineBuilder : public SoundEngineBuilder {
-public:
-	inline SoundEngine* build() {
-		return new T();
-	}
-	std::string get_name() {
-		return get_engine_name<T>();
-	}
-
-	bool matches(SoundEngine* engine) {
-		return dynamic_cast<T*>(engine) != nullptr;
-	}
-};
-
-class SoundEngineDevice : public PropertyHolder {
-
-private:
-	std::vector<SoundEngineBuilder*> engine_builders;
-
-	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
-	LinearADSREnvelope metronome_env;
-
-public:
-	Metronome metronome;
-	bool play_metronome{false};
-	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
-	double volume{0.2};
-	std::atomic<size_t> scene{0};
-
-	SoundEngineDevice();
-
-	std::vector<SoundEngineBuilder*> get_engine_builders();
-
-	void add_sound_engine(SoundEngineBuilder* engine);
-
-	void send(MidiMessage& message, SampleInfo& info);
-
-	void process_sample(double& lsample, double& rsample, SampleInfo& info);
-
-	PropertyValue get(size_t prop, size_t sub_prop = 0);
-
-	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
-
-	void update_properties();
-
-	void apply_program(Program* program);
-
-	void save_program(Program* program);
-
-	~SoundEngineDevice();
-
-};
-
-class SoundEngineDevice;
-
-class SoundEngineChannel : public PropertyHolder {
+class SoundEngineChannel {
 private:
 	SoundEngine* engine = nullptr;
 	SoundEngineDevice* device = nullptr;
@@ -484,12 +262,6 @@ public:
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, size_t scene);
 
-	PropertyValue get(size_t prop, size_t sub_prop);
-
-	void set(size_t prop, PropertyValue value, size_t sub_prop);
-
-	void update_properties();
-
 	SoundEngine* get_engine();
 
 	void set_engine(SoundEngine* engine);
@@ -500,110 +272,147 @@ public:
 
 	~SoundEngineChannel();
 
-	unsigned int get_source_channel() const {
-		return scenes[device->scene].source.channel;
-	}
+	unsigned int get_source_channel() const;
 
-	void set_source_channel(unsigned int channel = 0) {
-		scenes[device->scene].source.channel = channel;
-	}
+	void set_source_channel(unsigned int channel = 0);
 
-	unsigned int get_end_note() const {
-		return scenes[device->scene].source.end_note;
-	}
+	unsigned int get_end_note() const;
 
-	void set_end_note(unsigned int endNote = 127) {
-		scenes[device->scene].source.end_note = endNote;
-	}
+	void set_end_note(unsigned int endNote = 127);
 
-	unsigned int get_end_velocity() const {
-		return scenes[device->scene].source.end_velocity;
-	}
+	unsigned int get_end_velocity() const;
 
-	void set_end_velocity(unsigned int endVelocity = 127) {
-		scenes[device->scene].source.end_velocity = endVelocity;
-	}
+	void set_end_velocity(unsigned int endVelocity = 127);
 
-	ssize_t get_input() const {
-		return scenes[device->scene].source.input;
-	}
+	ssize_t get_input() const;
 
-	void set_input(ssize_t input = 1) {
-		scenes[device->scene].source.input = input;
-	}
+	void set_input(ssize_t input = 1);
 
-	int get_octave() const {
-		return scenes[device->scene].source.octave;
-	}
+	int get_octave() const;
 
-	void set_octave(int octave = 0) {
-		scenes[device->scene].source.octave = octave;
-	}
+	void set_octave(int octave = 0);
 
-	unsigned int get_start_note() const {
-		return scenes[device->scene].source.start_note;
-	}
+	unsigned int get_start_note() const;
 
-	void set_start_note(unsigned int startNote = 0) {
-		scenes[device->scene].source.start_note = startNote;
-	}
+	void set_start_note(unsigned int startNote = 0);
 
-	unsigned int get_start_velocity() const {
-		return scenes[device->scene].source.start_velocity;
-	}
+	unsigned int get_start_velocity() const;
 
-	void set_start_velocity(unsigned int startVelocity = 0) {
-		scenes[device->scene].source.start_velocity = startVelocity;
-	}
+	void set_start_velocity(unsigned int startVelocity = 0);
 
-	bool is_transfer_cc() const {
-		return scenes[device->scene].source.transfer_cc;
-	}
+	bool is_transfer_cc() const;
 
-	void set_transfer_cc(bool transferCc = true) {
-		scenes[device->scene].source.transfer_cc = transferCc;
-	}
+	void set_transfer_cc(bool transferCc = true);
 
-	bool is_transfer_channel_aftertouch() const {
-		return scenes[device->scene].source.transfer_channel_aftertouch;
-	}
+	bool is_transfer_channel_aftertouch() const;
 
 	void set_transfer_channel_aftertouch(
-			bool transferChannelAftertouch = true) {
-		scenes[device->scene].source.transfer_channel_aftertouch = transferChannelAftertouch;
+			bool transferChannelAftertouch = true);
+
+	bool is_transfer_other() const;
+
+	void set_transfer_other(bool transferOther = true);
+
+	bool is_transfer_pitch_bend() const;
+
+	void set_transfer_pitch_bend(bool transferPitchBend = true);
+
+	bool is_transfer_prog_change() const;
+
+	void set_transfer_prog_change(bool transferProgChange = true);
+
+	bool is_active() const;
+
+	void set_active(bool active = false);
+};
+
+struct ChannelProgram {
+	ssize_t engine_index{-1};
+	double volume = 0.5;
+	double panning = 0;
+	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
+
+	unsigned int arpeggiator_bpm = 120;
+	bool arp_on;
+	ArpeggiatorPreset arpeggiator;
+
+	EngineProgram* engine_program = nullptr;
+};
+
+struct Program {
+	std::string name;
+	unsigned int metronome_bpm = 120;
+	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{2, true}};
+};
+
+/*
+enum SoundEngineProperty {
+	pEngineMetronomeOn,
+	pEngineMetronomeBPM,
+	pEngineVolume,
+};
+*/
+
+class SoundEngineBuilder {
+public:
+	virtual SoundEngine* build() = 0;
+
+	virtual std::string get_name() = 0;
+
+	virtual bool matches(SoundEngine* engine) = 0;
+
+	virtual ~SoundEngineBuilder() {
+
+	};
+};
+
+template <typename T>
+class TemplateSoundEngineBuilder : public SoundEngineBuilder {
+public:
+	inline SoundEngine* build() {
+		return new T();
+	}
+	std::string get_name() {
+		return get_engine_name<T>();
 	}
 
-	bool is_transfer_other() const {
-		return scenes[device->scene].source.transfer_other;
-	}
-
-	void set_transfer_other(bool transferOther = true) {
-		scenes[device->scene].source.transfer_other = transferOther;
-	}
-
-	bool is_transfer_pitch_bend() const {
-		return scenes[device->scene].source.transfer_pitch_bend;
-	}
-
-	void set_transfer_pitch_bend(bool transferPitchBend = true) {
-		scenes[device->scene].source.transfer_pitch_bend = transferPitchBend;
-	}
-
-	bool is_transfer_prog_change() const {
-		return scenes[device->scene].source.transfer_prog_change;
-	}
-
-	void set_transfer_prog_change(bool transferProgChange = true) {
-		scenes[device->scene].source.transfer_prog_change = transferProgChange;
-	}
-
-	bool is_active() const {
-		return scenes[device->scene].active;
-	}
-
-	void set_active(bool active = false) {
-		scenes[device->scene].active = active;
+	bool matches(SoundEngine* engine) {
+		return dynamic_cast<T*>(engine) != nullptr;
 	}
 };
+
+class SoundEngineDevice {
+
+private:
+	std::vector<SoundEngineBuilder*> engine_builders;
+
+	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
+	LinearADSREnvelope metronome_env;
+
+public:
+	Metronome metronome;
+	bool play_metronome{false};
+	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
+	double volume{0.2};
+	std::atomic<size_t> scene{0};
+
+	SoundEngineDevice();
+
+	std::vector<SoundEngineBuilder*> get_engine_builders();
+
+	void add_sound_engine(SoundEngineBuilder* engine);
+
+	void send(MidiMessage& message, SampleInfo& info);
+
+	void process_sample(double& lsample, double& rsample, SampleInfo& info);
+
+	void apply_program(Program* program);
+
+	void save_program(Program* program);
+
+	~SoundEngineDevice();
+
+};
+
 
 #endif /* MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_ */
