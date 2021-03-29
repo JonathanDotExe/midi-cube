@@ -40,6 +40,7 @@ class AudioHandler {
 
 private:
 	RtAudio audio;
+	bool input = false;
 	void* user_data = nullptr;
 	void (* get_sample) (double&, double&, SampleInfo&, void*) = nullptr;
 	/**

@@ -48,8 +48,21 @@ void AudioHandler::init(int out_device, int in_device) {
 	time_step = 1.0/sample_rate;
 	buffer_size = 256;
 
+	input = in_device >= 0;
+
+	RtAudio::DeviceInfo out_info = audio.getDeviceInfo(params.deviceId);
+	std::cout << "Using output device " << out_info.name << " with two channels" << std::endl;
+
+	if (input) {
+		RtAudio::DeviceInfo in_info = audio.getDeviceInfo(params.deviceId);
+		std::cout << "Using input device " << in_info.name << " with one channels" << std::endl;
+	}
+	else {
+		std::cout << "Using no input device" << std::endl;
+	}
+
 	try {
-		audio.openStream(&params, nullptr, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
+		audio.openStream(&params, input ? &input_params : nullptr, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
 		audio.startStream();
 		sample_rate = audio.getStreamSampleRate();
 		time_step = 1.0/sample_rate;
@@ -65,7 +78,8 @@ int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned 
 	//Compute each sample
 	//TODO Use rtaudio time
 	for (size_t i = 0; i < buffer_size; ++i) {
-		info = {time, time_step, sample_rate, sample_time, 0};
+		double in = input ? *input_buffer++ : 0;
+		info = {time, time_step, sample_rate, sample_time, in};
 
 		double lsample = 0;
 		double rsample = 0;
