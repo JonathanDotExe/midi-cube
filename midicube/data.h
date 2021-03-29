@@ -43,12 +43,10 @@ public:
 
 	virtual void execute() {
 		v = t;
-		std::cout << "Execute get: " << v << std::endl;
 	}
 
 	virtual void returned() {
 		callback(v);
-		std::cout << "Execute callback: " << v << std::endl;
 	}
 
 	virtual ~GetValueAction() {

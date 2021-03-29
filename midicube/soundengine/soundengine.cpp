@@ -92,6 +92,7 @@ ssize_t SoundEngineChannel::get_engine_index() {
 			break;
 		}
 	}
+
 	return index;
 }
 
