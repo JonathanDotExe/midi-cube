@@ -11,14 +11,20 @@ ActionHandler::ActionHandler() : realtime_actions(2048), return_actions(2048) {
 }
 
 void ActionHandler::queue_action(Action *action) {
-	realtime_actions.push(action);
+	if (!realtime_actions.push(action)) {
+		delete action;
+		std::cout << "Warning: Lost requested action" << std::endl;
+	}
 }
 
 void ActionHandler::execute_realtime_actions() {
 	Action* action = nullptr;
 	while (realtime_actions.pop(action)) {
 		action->execute();
-		return_actions.push(action);
+		if (!return_actions.push(action)) {
+			delete action;
+			std::cout << "Warning: Lost returned action" << std::endl;
+		}
 	}
 }
 
