@@ -16,16 +16,14 @@ AnalogSynthModulatorView::AnalogSynthModulatorView(AnalogSynth &s,
 	this->part = part;
 }
 
-void AnalogSynthModulatorView::property_change(PropertyChange change) {
-}
-
 Scene AnalogSynthModulatorView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
-	std::vector<PropertyHolder*> holders;
-	SynthPartPropertyHolder* part = &synth.parts.at(this->part);
-	holders.push_back(part);
+
+	ActionHandler& handler = frame.cube.action_handler;
+	ModEnvelopeEntity& env = synth.preset.mod_envs.at(this->part);
+	LFOEntity& lfo = synth.preset.lfos.at(this->part);
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -45,11 +43,11 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 	}
 	tmp_y += 30;
 	//Envelope
-	adsr_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthEnvAttack);
+	adsr_controls(&controls, tmp_x, tmp_y, env.env, handler);
 	tmp_y += 75;
 	std::cout << &controls << std::endl;
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthEnvVolume, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, env.volume, handler, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Col 2 - LFO
@@ -68,7 +66,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 50, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul *= 0.25;
-		value->bind(part, SynthPartProperty::pSynthLFOFrequency);
+		value->property.bind(lfo.freq, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -78,13 +76,13 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
-		waveform->bind(part, SynthPartProperty::pSynthLFOWaveForm);
+		waveform->property.bind(lfo.waveform, handler);
 		controls.push_back(waveform);
 	}
 	tmp_x = 500;
 	tmp_y += 60;
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, part, SynthPartProperty::pSynthLFOVolume, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, lfo.volume, handler, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Edit Sources
@@ -116,7 +114,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 		c->set_visible(edit_source);
 	}
 
-	return {controls, holders};
+	return {controls};
 }
 
 AnalogSynthModulatorView::~AnalogSynthModulatorView() {

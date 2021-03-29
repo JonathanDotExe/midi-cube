@@ -13,7 +13,7 @@ static void process_func(double& lsample, double& rsample, SampleInfo& info, voi
 	((MidiCube*) user_data)->process(lsample, rsample, info);
 }
 
-MidiCube::MidiCube() : changes(128), update(32), prog_mgr("./data/programs") {
+MidiCube::MidiCube() : prog_mgr("./data/programs") {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -77,16 +77,8 @@ void MidiCube::init(int out_device, int in_device) {
 
 void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 	mutex.lock();
-	//Changes
-	PropertyChange change;
-	while (changes.pop(change)) {
-		change.holder->set(change.property, change.value, change.sub_property);
-	}
-	//Update
-	PropertyHolder* holder;
-	while (update.pop(holder)) {
-		holder->update_properties();
-	}
+	//Lock actions
+	action_handler.execute_realtime_actions();
 	//Messages
 	size_t i = 0;
 	for (MidiCubeInput in : inputs) {
@@ -100,6 +92,8 @@ void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 	engine.process_sample(lsample, rsample, info);
 	mutex.unlock();
 }
+
+
 
 std::vector<MidiCubeInput> MidiCube::get_inputs() {
 	return inputs;
@@ -145,21 +139,11 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 			//Apply binding
 			if (pass) {
 				msg.channel = i;
-				engine.send(msg, info);
+				if (engine.send(msg, info)) {
+					updated = false;
+				}
 			}
 		}
-	}
-}
-
-void MidiCube::perform_change(PropertyChange change) {
-	if (!changes.push(change)) {
-		std::cerr << "Lost change" << std::endl;
-	}
-}
-
-void MidiCube::request_update(PropertyHolder* holder) {
-	if (!update.push(holder)) {
-		std::cerr << "Lost update" << std::endl;
 	}
 }
 

@@ -17,6 +17,7 @@ src = [
 	
 	'midicube/audio.cpp',
 	'midicube/audiofile.cpp',
+	'midicube/data.cpp',
 	'midicube/envelope.cpp',
 	'midicube/filter.cpp',
 	'midicube/looper.cpp',
@@ -25,7 +26,6 @@ src = [
 	'midicube/midicube.cpp',
 	'midicube/program.cpp',
 	'midicube/oscilator.cpp',
-	'midicube/property.cpp',
 	'midicube/synthesis.cpp',
 	'midicube/util.cpp',
 	'midicube/wavetable.cpp',

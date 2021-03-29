@@ -14,12 +14,8 @@ ProgramRenameView::ProgramRenameView(std::string name, std::function<void(std::s
 	this->name = name;
 }
 
-void ProgramRenameView::property_change(PropertyChange change) {
-}
-
 Scene ProgramRenameView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
 
 	{
 
@@ -82,7 +78,7 @@ Scene ProgramRenameView::create(Frame &frame) {
 		controls.push_back(back);
 	}
 
-	return {controls, holders};
+	return {controls};
 }
 
 

@@ -19,7 +19,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "property.h"
 #include "midi.h"
 #include "soundengine/soundengine.h"
 

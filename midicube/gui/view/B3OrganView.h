@@ -20,7 +20,6 @@ private:
 	bool edit_midi = false;
 public:
 	B3OrganView(B3Organ& organ, SoundEngineChannel& channel, int channel_index);
-	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);
 	virtual ~B3OrganView();
 };

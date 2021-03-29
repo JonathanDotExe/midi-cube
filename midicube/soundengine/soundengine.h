@@ -16,7 +16,6 @@
 #include "../looper.h"
 #include "../effect/vocoder.h"
 #include "../effect/bitcrusher.h"
-#include "../property.h"
 #include "voice.h"
 #include <string>
 #include <array>
@@ -49,7 +48,7 @@ public:
 class SoundEngine {
 
 public:
-	virtual void midi_message(MidiMessage& msg, SampleInfo& info) = 0;
+	virtual bool midi_message(MidiMessage& msg, SampleInfo& info) = 0;
 
 	virtual void press_note(SampleInfo& info, unsigned int note, double velocity) = 0;
 
@@ -82,7 +81,7 @@ public:
 	std::atomic<bool> sustain{true};
 
 
-	void midi_message(MidiMessage& msg, SampleInfo& info);
+	bool midi_message(MidiMessage& msg, SampleInfo& info);
 
 	virtual void press_note(SampleInfo& info, unsigned int note, double velocity);
 
@@ -97,8 +96,8 @@ public:
 
 	};
 
-	virtual void control_change(unsigned int control, unsigned int value) {
-
+	virtual bool control_change(unsigned int control, unsigned int value) {
+		return false;
 	};
 
 	virtual bool note_finished(SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) {
@@ -113,8 +112,9 @@ public:
 
 //BaseSoundEngine
 template<typename V, size_t P>
-void BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info) {
+bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info) {
 	double pitch;
+	bool changed = false;
 	switch (message.type) {
 		case MessageType::NOTE_ON:
 			press_note(info, message.note(), message.velocity()/127.0);
@@ -123,7 +123,7 @@ void BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info)
 			release_note(info, message.note());
 			break;
 		case MessageType::CONTROL_CHANGE:
-			control_change(message.control(), message.value());
+			changed = control_change(message.control(), message.value());
 			//Sustain
 			if (message.control() == sustain_control) {
 				bool new_sustain = message.value() != 0;
@@ -145,6 +145,7 @@ void BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info)
 		default:
 			break;
 	}
+	return changed;
 }
 
 template<typename V, size_t P>
@@ -226,41 +227,12 @@ struct ChannelSource {
 	bool transfer_other = true;
 };
 
-enum SoundEngineChannelProperty {
-	pChannelActive,
-	pChannelVolume,
-	pChannelPanning,
-	pChannelSoundEngine,
-
-	pChannelInputDevice,
-	pChannelInputChannel,
-	pChannelStartNote,
-	pChannelEndNote,
-	pChannelStartVelocity,
-	pChannelEndVelocity,
-	pChannelOctave,
-	pChannelTransferChannelAftertouch,
-	pChannelTransferPitchBend,
-	pChannelTransferCC,
-	pChannelTransferProgChange,
-	pChannelTransferOther,
-
-	pArpeggiatorOn,
-	pArpeggiatorPattern,
-	pArpeggiatorOctaves,
-	pArpeggiatorStep,
-	pArpeggiatorHold,
-	pArpeggiatorBPM
-};
-
 struct SoundEngineScene {
 	bool active = false;
 	ChannelSource source;
 };
 
-class SoundEngineDevice;
-
-class SoundEngineChannel : public PropertyHolder {
+class SoundEngineChannel {
 private:
 	SoundEngine* engine = nullptr;
 	SoundEngineDevice* device = nullptr;
@@ -288,15 +260,9 @@ public:
 		}
 	}
 
-	void send(MidiMessage& message, SampleInfo& info, size_t scene);
+	bool send(MidiMessage& message, SampleInfo& info, size_t scene);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, size_t scene);
-
-	PropertyValue get(size_t prop, size_t sub_prop);
-
-	void set(size_t prop, PropertyValue value, size_t sub_prop);
-
-	void update_properties();
 
 	SoundEngine* get_engine();
 
@@ -308,6 +274,58 @@ public:
 
 	~SoundEngineChannel();
 
+	unsigned int get_source_channel() const;
+
+	void set_source_channel(unsigned int channel = 0);
+
+	unsigned int get_end_note() const;
+
+	void set_end_note(unsigned int endNote = 127);
+
+	unsigned int get_end_velocity() const;
+
+	void set_end_velocity(unsigned int endVelocity = 127);
+
+	ssize_t get_input() const;
+
+	void set_input(ssize_t input = 1);
+
+	int get_octave() const;
+
+	void set_octave(int octave = 0);
+
+	unsigned int get_start_note() const;
+
+	void set_start_note(unsigned int startNote = 0);
+
+	unsigned int get_start_velocity() const;
+
+	void set_start_velocity(unsigned int startVelocity = 0);
+
+	bool is_transfer_cc() const;
+
+	void set_transfer_cc(bool transferCc = true);
+
+	bool is_transfer_channel_aftertouch() const;
+
+	void set_transfer_channel_aftertouch(
+			bool transferChannelAftertouch = true);
+
+	bool is_transfer_other() const;
+
+	void set_transfer_other(bool transferOther = true);
+
+	bool is_transfer_pitch_bend() const;
+
+	void set_transfer_pitch_bend(bool transferPitchBend = true);
+
+	bool is_transfer_prog_change() const;
+
+	void set_transfer_prog_change(bool transferProgChange = true);
+
+	bool is_active() const;
+
+	void set_active(bool active = false);
 };
 
 struct ChannelProgram {
@@ -329,12 +347,13 @@ struct Program {
 	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{2, true}};
 };
 
+/*
 enum SoundEngineProperty {
 	pEngineMetronomeOn,
 	pEngineMetronomeBPM,
 	pEngineVolume,
 };
-
+*/
 
 class SoundEngineBuilder {
 public:
@@ -364,7 +383,7 @@ public:
 	}
 };
 
-class SoundEngineDevice : public PropertyHolder {
+class SoundEngineDevice {
 
 private:
 	std::vector<SoundEngineBuilder*> engine_builders;
@@ -374,7 +393,7 @@ private:
 
 public:
 	Metronome metronome;
-	std::atomic<bool> play_metronome{false};
+	bool play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	double volume{0.2};
 	std::atomic<size_t> scene{0};
@@ -385,15 +404,9 @@ public:
 
 	void add_sound_engine(SoundEngineBuilder* engine);
 
-	void send(MidiMessage& message, SampleInfo& info);
+	bool send(MidiMessage& message, SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
-
-	PropertyValue get(size_t prop, size_t sub_prop = 0);
-
-	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
-
-	void update_properties();
 
 	void apply_program(Program* program);
 

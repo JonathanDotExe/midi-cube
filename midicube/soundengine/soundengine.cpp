@@ -51,7 +51,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	}
 }
 
-void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t scene) {
+bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t scene) {
 	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
 		if (arp.on) {
 			switch (message.type) {
@@ -62,188 +62,15 @@ void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t sce
 				arp.note.release_note(info, message.note(), true);
 				break;
 			default:
-				engine->midi_message(message, info);
+				return engine->midi_message(message, info); //FIXME
 				break;
 			}
 		}
 		else {
-			engine->midi_message(message, info);
+			return engine->midi_message(message, info);
 		}
 	}
-}
-
-void SoundEngineChannel::update_properties() {
-	SoundEngineScene& scene = scenes[device->scene];
-	submit_change(SoundEngineChannelProperty::pChannelActive, scene.active);
-	submit_change(SoundEngineChannelProperty::pChannelVolume, volume);
-	submit_change(SoundEngineChannelProperty::pChannelPanning, panning);
-	submit_change(SoundEngineChannelProperty::pChannelSoundEngine, (int) get_engine_index());
-
-	submit_change(SoundEngineChannelProperty::pChannelInputDevice, (int) scene.source.input);
-	submit_change(SoundEngineChannelProperty::pChannelInputChannel, (int) scene.source.channel);
-	submit_change(SoundEngineChannelProperty::pChannelStartNote, (int) scene.source.start_note);
-	submit_change(SoundEngineChannelProperty::pChannelEndNote, (int) scene.source.end_note);
-	submit_change(SoundEngineChannelProperty::pChannelStartVelocity, (int) scene.source.start_velocity);
-	submit_change(SoundEngineChannelProperty::pChannelEndVelocity, (int) scene.source.end_velocity);
-	submit_change(SoundEngineChannelProperty::pChannelOctave, scene.source.octave);
-	submit_change(SoundEngineChannelProperty::pChannelTransferChannelAftertouch, scene.source.transfer_channel_aftertouch);
-	submit_change(SoundEngineChannelProperty::pChannelTransferPitchBend, scene.source.transfer_pitch_bend);
-	submit_change(SoundEngineChannelProperty::pChannelTransferCC, scene.source.transfer_cc);
-	submit_change(SoundEngineChannelProperty::pChannelTransferProgChange, scene.source.transfer_prog_change);
-	submit_change(SoundEngineChannelProperty::pChannelTransferOther, scene.source.transfer_other);
-
-	submit_change(SoundEngineChannelProperty::pArpeggiatorOn, arp.on);
-	submit_change(SoundEngineChannelProperty::pArpeggiatorPattern, arp.preset.pattern);
-	submit_change(SoundEngineChannelProperty::pArpeggiatorOctaves, (int) arp.preset.octaves);
-	submit_change(SoundEngineChannelProperty::pArpeggiatorStep, (int) arp.preset.value);
-	submit_change(SoundEngineChannelProperty::pArpeggiatorHold, arp.preset.hold);
-	submit_change(SoundEngineChannelProperty::pArpeggiatorBPM, (int) arp.metronome.get_bpm());
-}
-
-PropertyValue SoundEngineChannel::get(size_t prop, size_t sub_prop) {
-	SoundEngineScene& scene = scenes[device->scene];
-	PropertyValue value = {0};
-	switch ((SoundEngineChannelProperty) prop) {
-	case SoundEngineChannelProperty::pChannelActive:
-		value.bval = scene.active;
-		break;
-	case SoundEngineChannelProperty::pChannelVolume:
-		value.dval = volume;
-		break;
-	case SoundEngineChannelProperty::pChannelPanning:
-		value.dval = panning;
-		break;
-	case SoundEngineChannelProperty::pChannelSoundEngine:
-		value.ival = get_engine_index();
-		break;
-	case SoundEngineChannelProperty::pChannelInputDevice:
-		value.ival = scene.source.input;
-		break;
-	case SoundEngineChannelProperty::pChannelInputChannel:
-		value.ival = scene.source.channel;
-		break;
-	case SoundEngineChannelProperty::pChannelStartNote:
-		value.ival = scene.source.start_note;
-		break;
-	case SoundEngineChannelProperty::pChannelEndNote:
-		value.ival = scene.source.end_note;
-		break;
-	case SoundEngineChannelProperty::pChannelStartVelocity:
-		value.ival = scene.source.start_velocity;
-		break;
-	case SoundEngineChannelProperty::pChannelEndVelocity:
-		value.ival = scene.source.end_velocity;
-		break;
-	case SoundEngineChannelProperty::pChannelOctave:
-		value.ival = scene.source.octave;
-		break;
-	case SoundEngineChannelProperty::pChannelTransferChannelAftertouch:
-		value.bval = scene.source.transfer_channel_aftertouch;
-		break;
-	case SoundEngineChannelProperty::pChannelTransferPitchBend:
-		value.bval = scene.source.transfer_pitch_bend;
-		break;
-	case SoundEngineChannelProperty::pChannelTransferCC:
-		value.bval = scene.source.transfer_cc;
-		break;
-	case SoundEngineChannelProperty::pChannelTransferProgChange:
-		value.bval = scene.source.transfer_prog_change;
-		break;
-	case SoundEngineChannelProperty::pChannelTransferOther:
-		value.bval = scene.source.transfer_other;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorOn:
-		value.bval = arp.on;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorPattern:
-		value.ival = arp.preset.pattern;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorOctaves:
-		value.ival = arp.preset.octaves;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorStep:
-		value.ival = arp.preset.value;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorHold:
-		value.bval = arp.preset.hold;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorBPM:
-		value.ival = arp.metronome.get_bpm();
-		break;
-	}
-	return value;
-}
-
-void SoundEngineChannel::set(size_t prop, PropertyValue value, size_t sub_prop) {
-	SoundEngineScene& scene = scenes[device->scene];
-	switch ((SoundEngineChannelProperty) prop) {
-	case SoundEngineChannelProperty::pChannelActive:
-		scene.active = value.bval;
-		break;
-	case SoundEngineChannelProperty::pChannelVolume:
-		volume = value.dval;
-		break;
-	case SoundEngineChannelProperty::pChannelPanning:
-		panning = value.dval;
-		break;
-	case SoundEngineChannelProperty::pChannelSoundEngine:
-		set_engine_index(value.ival);
-		break;
-	case SoundEngineChannelProperty::pChannelInputDevice:
-		scene.source.input= value.ival;
-		break;
-	case SoundEngineChannelProperty::pChannelInputChannel:
-		scene.source.channel = value.ival;
-		break;
-	case SoundEngineChannelProperty::pChannelStartNote:
-		scene.source.start_note = value.ival;
-		break;
-	case SoundEngineChannelProperty::pChannelEndNote:
-		scene.source.end_note = value.ival;
-		break;
-	case SoundEngineChannelProperty::pChannelStartVelocity:
-		scene.source.start_velocity = value.ival;
-		break;
-	case SoundEngineChannelProperty::pChannelEndVelocity:
-		scene.source.end_velocity = value.ival;
-		break;
-	case SoundEngineChannelProperty::pChannelOctave:
-		scene.source.octave = value.ival;
-		break;
-	case SoundEngineChannelProperty::pChannelTransferChannelAftertouch:
-		scene.source.transfer_channel_aftertouch = value.bval;
-		break;
-	case SoundEngineChannelProperty::pChannelTransferPitchBend:
-		scene.source.transfer_pitch_bend = value.bval;
-		break;
-	case SoundEngineChannelProperty::pChannelTransferCC:
-		scene.source.transfer_cc = value.bval;
-		break;
-	case SoundEngineChannelProperty::pChannelTransferProgChange:
-		scene.source.transfer_prog_change = value.bval;
-		break;
-	case SoundEngineChannelProperty::pChannelTransferOther:
-		scene.source.transfer_other = value.bval;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorOn:
-		arp.on = value.bval;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorPattern:
-		arp.preset.pattern = static_cast<ArpeggiatorPattern>(value.ival);
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorOctaves:
-		arp.preset.octaves = value.ival;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorStep:
-		arp.preset.value = value.ival;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorHold:
-		arp.preset.hold = value.bval;
-		break;
-	case SoundEngineChannelProperty::pArpeggiatorBPM:
-		arp.metronome.set_bpm(value.ival);
-		break;
-	}
+	return false;
 }
 
 void SoundEngineChannel::set_engine_index(ssize_t engine_index) {
@@ -265,6 +92,7 @@ ssize_t SoundEngineChannel::get_engine_index() {
 			break;
 		}
 	}
+
 	return index;
 }
 
@@ -282,6 +110,110 @@ SoundEngineChannel::~SoundEngineChannel() {
 	engine = nullptr;
 }
 
+unsigned int SoundEngineChannel::get_source_channel() const {
+	return scenes[device->scene].source.channel;
+}
+
+void SoundEngineChannel::set_source_channel(unsigned int channel) {
+	scenes[device->scene].source.channel = channel;
+}
+
+unsigned int SoundEngineChannel::get_end_note() const {
+	return scenes[device->scene].source.end_note;
+}
+
+void SoundEngineChannel::set_end_note(unsigned int endNote) {
+	scenes[device->scene].source.end_note = endNote;
+}
+
+unsigned int SoundEngineChannel::get_end_velocity() const {
+	return scenes[device->scene].source.end_velocity;
+}
+
+void SoundEngineChannel::set_end_velocity(unsigned int endVelocity) {
+	scenes[device->scene].source.end_velocity = endVelocity;
+}
+
+ssize_t SoundEngineChannel::get_input() const {
+	return scenes[device->scene].source.input;
+}
+
+void SoundEngineChannel::set_input(ssize_t input) {
+	scenes[device->scene].source.input = input;
+}
+
+int SoundEngineChannel::get_octave() const {
+	return scenes[device->scene].source.octave;
+}
+
+void SoundEngineChannel::set_octave(int octave) {
+	scenes[device->scene].source.octave = octave;
+}
+
+unsigned int SoundEngineChannel::get_start_note() const {
+	return scenes[device->scene].source.start_note;
+}
+
+void SoundEngineChannel::set_start_note(unsigned int startNote) {
+	scenes[device->scene].source.start_note = startNote;
+}
+
+unsigned int SoundEngineChannel::get_start_velocity() const {
+	return scenes[device->scene].source.start_velocity;
+}
+
+void SoundEngineChannel::set_start_velocity(unsigned int startVelocity) {
+	scenes[device->scene].source.start_velocity = startVelocity;
+}
+
+bool SoundEngineChannel::is_transfer_cc() const {
+	return scenes[device->scene].source.transfer_cc;
+}
+
+void SoundEngineChannel::set_transfer_cc(bool transferCc) {
+	scenes[device->scene].source.transfer_cc = transferCc;
+}
+
+bool SoundEngineChannel::is_transfer_channel_aftertouch() const {
+	return scenes[device->scene].source.transfer_channel_aftertouch;
+}
+
+void SoundEngineChannel::set_transfer_channel_aftertouch(
+		bool transferChannelAftertouch) {
+	scenes[device->scene].source.transfer_channel_aftertouch = transferChannelAftertouch;
+}
+
+bool SoundEngineChannel::is_transfer_other() const {
+	return scenes[device->scene].source.transfer_other;
+}
+
+void SoundEngineChannel::set_transfer_other(bool transferOther) {
+	scenes[device->scene].source.transfer_other = transferOther;
+}
+
+bool SoundEngineChannel::is_transfer_pitch_bend() const {
+	return scenes[device->scene].source.transfer_pitch_bend;
+}
+
+void SoundEngineChannel::set_transfer_pitch_bend(bool transferPitchBend) {
+	scenes[device->scene].source.transfer_pitch_bend = transferPitchBend;
+}
+
+bool SoundEngineChannel::is_transfer_prog_change() const {
+	return scenes[device->scene].source.transfer_prog_change;
+}
+
+void SoundEngineChannel::set_transfer_prog_change(bool transferProgChange) {
+	scenes[device->scene].source.transfer_prog_change = transferProgChange;
+}
+
+bool SoundEngineChannel::is_active() const {
+	return scenes[device->scene].active;
+}
+
+void SoundEngineChannel::set_active(bool active) {
+	scenes[device->scene].active = active;
+}
 
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
@@ -323,49 +255,15 @@ void SoundEngineDevice::add_sound_engine(SoundEngineBuilder* engine) {
 	engine_builders.push_back(engine);
 }
 
-void SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
+bool SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	SoundEngineChannel& ch = this->channels[message.channel];
 	SoundEngine* engine = ch.get_engine();
 	if (engine) {
-		ch.send(message, info, scene);
+		return ch.send(message, info, scene);
 	}
+	return false;
 }
 
-PropertyValue SoundEngineDevice::get(size_t prop, size_t sub_prop) {
-	PropertyValue val;
-	switch ((SoundEngineProperty) prop) {
-	case SoundEngineProperty::pEngineMetronomeOn:
-		val.bval = play_metronome;
-		break;
-	case SoundEngineProperty::pEngineMetronomeBPM:
-		val.ival = metronome.get_bpm();
-		break;
-	case SoundEngineProperty::pEngineVolume:
-		val.dval = volume;
-		break;
-	}
-	return val;
-}
-
-void SoundEngineDevice::set(size_t prop, PropertyValue val, size_t sub_prop) {
-	switch ((SoundEngineProperty) prop) {
-	case SoundEngineProperty::pEngineMetronomeOn:
-		play_metronome = val.bval;
-		break;
-	case SoundEngineProperty::pEngineMetronomeBPM:
-		 metronome.set_bpm(val.ival);
-		break;
-	case SoundEngineProperty::pEngineVolume:
-		volume = val.dval;
-		break;
-	}
-}
-
-void SoundEngineDevice::update_properties() {
-	submit_change(SoundEngineProperty::pEngineMetronomeOn, play_metronome);
-	submit_change(SoundEngineProperty::pEngineMetronomeBPM, (int) metronome.get_bpm());
-	submit_change(SoundEngineProperty::pEngineVolume, volume);
-}
 
 void SoundEngineDevice::apply_program(Program* program) {
 	//Global

@@ -22,7 +22,6 @@ private:
 	std::function<void(std::string name)> action = nullptr;
 public:
 	ProgramRenameView(std::string name, std::function<void(std::string name)> action);
-	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);
 	virtual ~ProgramRenameView();
 };

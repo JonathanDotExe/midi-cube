@@ -40,7 +40,7 @@ void Control::set_visible(bool visible) {
 }
 
 //Frame
-Frame::Frame(MidiCube& c, int width, int height, std::string title) : changes(2048), cube(c) {
+Frame::Frame(MidiCube& c, int width, int height, std::string title) : cube(c) {
 	this->width = width;
 	this->height = height;
 	this->title = title;
@@ -61,14 +61,15 @@ void Frame::run(ViewController* v) {
 	switch_view(v);
 
 	while (window.isOpen()) {
-		//Poll property changes
-		PropertyChange change;
-		while (changes.pop(change)) {
-			view->property_change(change);
+		//Property changes
+		if (cube.updated) {
 			for (Control* control : controls) {
-				control->property_change(change);
+				control->update_properties();
 			}
+			cube.updated = false;
 		}
+		//Execute return actions
+		cube.action_handler.execute_return_actions();
 		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -147,11 +148,8 @@ void Frame::run(ViewController* v) {
 	}
 }
 
-void Frame::property_change(PropertyChange change) {
-	for (Control* control : controls) {
-		control->property_change(change);
-	}
-	view->property_change(change);
+void Frame::update_properties() {
+
 }
 
 void Frame::switch_view(ViewController* view) {
@@ -166,13 +164,8 @@ void Frame::switch_view(ViewController* view) {
 	controls.clear();
 	for (Control* control : scene.controls) {
 		control->frame = this;
+		control->update_properties();
 		controls.push_back(control);
-	}
-	//Prop holders
-	prop_holders = scene.prop_holders;
-	for (PropertyHolder* holder : prop_holders) {
-		holder->changes = &changes;
-		cube.request_update(holder);
 	}
 	request_redraw();
 }
@@ -181,9 +174,6 @@ Frame::~Frame() {
 	delete view;
 	for (Control* control : controls) {
 		delete control;
-	}
-	for (PropertyHolder* holder : prop_holders) {
-		holder->changes = nullptr;
 	}
 }
 
