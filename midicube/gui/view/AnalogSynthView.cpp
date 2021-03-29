@@ -17,25 +17,20 @@ AnalogSynthView::AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int chan
 	this->channel_index = channel_index;
 }
 
-void AnalogSynthView::property_change(PropertyChange change) {
-}
-
 Scene AnalogSynthView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
-	holders.push_back(&synth);
+
+	ActionHandler& handler = frame.cube.action_handler;
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
 
 	//Channels
-	int cols = synth.parts.size();
+	int cols = ANALOG_PART_COUNT;
 	int pane_width = (frame.get_width() - 15) / cols;
 	int pane_height = 150;
-	for (size_t i = 0; i < synth.parts.size(); ++i) {
-		SynthPartPropertyHolder& part = synth.parts[i];
-		holders.push_back(&part);
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
 		//Background pane
 		int x = 10 + pane_width * (i % cols);
 		int y = 10;
@@ -79,7 +74,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(&synth, SynthProperty::pSynthOpCount);
+		value->property.bind(synth.preset.op_count, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -89,7 +84,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(&synth, SynthProperty::pSynthModEnvCount);
+		value->property.bind(synth.preset.mod_env_count, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -97,7 +92,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		Label* title = new Label("LFO Count", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
 		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(&synth, SynthProperty::pSynthLFOCount);
+		value->property.bind(synth.preset.lfo_count, handler);
 		controls.push_back(value);
 	}
 	tmp_y += 75;
@@ -107,14 +102,14 @@ Scene AnalogSynthView::create(Frame &frame) {
 	//Mono
 	{
 		CheckBox* mono = new CheckBox(false, "Mono", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
-		mono->bind(&synth, SynthProperty::pSynthMono);
+		mono->property.bind(synth.preset.mono, handler);
 		controls.push_back(mono);
 	}
 	tmp_x += 120;
 	//Legato
 	{
 		CheckBox* legato = new CheckBox(false, "Legato", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
-		legato->bind(&synth, SynthProperty::pSynthLegato);
+		legato->property.bind(synth.preset.legato, handler);
 		controls.push_back(legato);
 	}
 	tmp_x += 120;
@@ -125,7 +120,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul /= 5;
-		value->bind(&synth, SynthProperty::pSynthPortamendo);
+		value->property.bind(synth.preset.portamendo, handler);
 		controls.push_back(value);
 	}
 	tmp_x = 10;
@@ -138,7 +133,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(&synth, SynthProperty::pSynthDelayMix);
+		value->property.bind(synth.preset.delay_mix, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -148,7 +143,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(&synth, SynthProperty::pSynthDelayTime);
+		value->property.bind(synth.preset.delay_time, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -158,7 +153,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->bind(&synth, SynthProperty::pSynthDelayFeedback);
+		value->property.bind(synth.preset.delay_feedback, handler);
 		controls.push_back(value);
 	}
 
@@ -181,7 +176,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 	});
 	controls.push_back(back);
 
-	return {controls, holders};
+	return {controls};
 }
 
 AnalogSynthView::~AnalogSynthView() {

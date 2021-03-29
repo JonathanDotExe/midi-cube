@@ -93,7 +93,7 @@ public:
 	}
 };
 
-class Slider : public BindableControl {
+class Slider : public Control {
 
 private:
 	double progress;
@@ -109,7 +109,9 @@ public:
 	sf::RectangleShape context_rect;
 	sf::Text text;
 
-	Slider(double value, double min, double max, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, double slider_width = 0.7, double button_height = 0.15) : BindableControl (x, y, width, height) {
+	PropertyBinding<double> property;
+
+	Slider(double value, double min, double max, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, double slider_width = 0.7, double button_height = 0.15) : Control (x, y, width, height) {
 		this->min = min;
 		this->max = max;
 		this->progress = (value - min)/(max - min);
@@ -136,14 +138,14 @@ public:
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion);
 
+	virtual void update_properties();
+
 	SELECTABLE
 
 	virtual ~Slider() {
 
 	}
 
-protected:
-	virtual void bound_property_change(PropertyValue val);
 };
 
 template <typename T>
@@ -153,7 +155,7 @@ struct DragBoxScale {
 };
 
 template <typename T>
-class DragBox : public BindableControl {
+class DragBox : public Control {
 
 private:
 	double progress;
@@ -172,6 +174,7 @@ public:
 		return std::to_string(t);
 	};
 	DragBoxScale<T> scale;
+	PropertyBinding<T> property;
 
 	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0, DragBoxScale<T> scale = {
 			[](double progress, T min, T max) {
@@ -180,7 +183,7 @@ public:
 			[](T value, T min, T max) {
 				return ((double) value - min)/(max - min);
 			}
-		}) : BindableControl (x, y, width, height) {
+		}) : Control (x, y, width, height) {
 		this->scale = scale;
 		this->min = min;
 		this->max = max;
@@ -237,7 +240,7 @@ public:
 					hit_border = true;
 				}
 				if (old_val != value) {
-					send_change(value);
+					property.set(value);
 					update_position(this->x, this->y, width, height);
 				}
 			}
@@ -255,15 +258,19 @@ public:
 	}
 
 protected:
-	virtual void bound_property_change(PropertyValue val) {
-		T v = val.get(PropertyType<T>{});
-		progress = fmin(fmax(scale.progress(v, min, max), 0), 1);
-		update_position(this->x, this->y, width, height);
+	virtual void update_properties() {
+		if (property.is_bound()) {
+			property.get([this](T v) {
+				progress = fmin(fmax(scale.progress(v, min, max), 0), 1);
+				update_position(this->x, this->y, width, height);
+			});
+
+		}
 	}
 
 };
 
-class CheckBox : public BindableControl {
+class CheckBox : public Control {
 private:
 	bool checked = false;
 
@@ -271,8 +278,9 @@ public:
 	sf::RectangleShape rect;
 	sf::RectangleShape inner_rect;
 	sf::Text text;
+	PropertyBinding<double> property;
 
-	CheckBox(bool checked, std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
+	CheckBox(bool checked, std::string text, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
 		this->checked = checked;
 
 		this->text.setFont(font);
@@ -292,18 +300,17 @@ public:
 
 	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
 
+	virtual void update_properties();
+
 	SELECTABLE
 
 	virtual ~CheckBox() {
 
 	}
 
-protected:
-	virtual void bound_property_change(PropertyValue val);
-
 };
 
-class ComboBox : public BindableControl {
+class ComboBox : public Control {
 private:
 	int start_val = 0;
 	int index = 0;
@@ -312,8 +319,9 @@ private:
 public:
 	sf::RectangleShape rect;
 	sf::Text text;
+	PropertyBinding<int> property;
 
-	ComboBox(int value, std::vector<std::string> values, sf::Font& font, int text_size = 12, int start_val = 0, int x = 0, int y = 0, int width = 0, int height = 0) : BindableControl (x, y, width, height) {
+	ComboBox(int value, std::vector<std::string> values, sf::Font& font, int text_size = 12, int start_val = 0, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
 		this->start_val = start_val;
 		this->index = value - start_val;
 		this->values = values;
@@ -336,18 +344,17 @@ public:
 
 	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
 
+	virtual void update_properties();
+
 	SELECTABLE
 
 	virtual ~ComboBox() {
 
 	}
-
-protected:
-	virtual void bound_property_change(PropertyValue val);
 };
 
 template<int MAX>
-class Drawbar : public BindableControl {
+class Drawbar : public Control {
 
 private:
 	double progress;
@@ -360,8 +367,9 @@ public:
 	sf::RectangleShape button_rect;
 	sf::Text title_text;
 	sf::Text text;
+	PropertyBinding<unsigned int> property;
 
-	Drawbar(int value, sf::Font& font, std::string title, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : BindableControl (x, y, width, height) {
+	Drawbar(int value, sf::Font& font, std::string title, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : Control (x, y, width, height) {
 		this->progress = (double) value/MAX;
 
 		this->slider_width = slider_width;
@@ -426,8 +434,17 @@ public:
 
 		int value = MAX * progress;
 		if (old_val != value) {
-			send_change(value);
+			property.set(value);
 			update_position(this->x, this->y, width, height);
+		}
+	}
+
+	virtual void update_properties() {
+		if (property.is_bound()) {
+			property.get([this](int v) {
+				progress = (double) v / MAX;
+				update_position(x, y, width, height);
+			});
 		}
 	}
 
@@ -437,14 +454,9 @@ public:
 
 	}
 
-protected:
-	virtual void bound_property_change(PropertyValue val) {
-		progress = (double) val.ival / MAX;
-		update_position(x, y, width, height);
-	}
 };
 
-class OrganSwitch : public BindableControl {
+class OrganSwitch : public Control {
 private:
 	bool checked = false;
 
@@ -453,8 +465,9 @@ public:
 	sf::RectangleShape deactivated_rect;
 	sf::Text on_text;
 	sf::Text off_text;
+	PropertyBinding<bool> property;
 
-	OrganSwitch(bool checked, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, std::string on_text="On", std::string off_text="Off", int switch_text_size = 12) : BindableControl (x, y, width, height) {
+	OrganSwitch(bool checked, sf::Font& font, int x = 0, int y = 0, int width = 0, int height = 0, std::string on_text="On", std::string off_text="Off", int switch_text_size = 12) : Control (x, y, width, height) {
 		this->checked = checked;
 
 		activated_rect.setFillColor(sf::Color::White);
@@ -485,12 +498,11 @@ public:
 
 	SELECTABLE
 
+	virtual void update_properties();
+
 	virtual ~OrganSwitch() {
 
 	}
-
-protected:
-	virtual void bound_property_change(PropertyValue val);
 
 };
 

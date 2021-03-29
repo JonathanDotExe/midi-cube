@@ -13,7 +13,6 @@
 #include "../synthesis.h"
 #include "../effect/rotary_speaker.h"
 #include "../effect/amplifier_simulation.h"
-#include "../property.h"
 
 #define ORGAN_DRAWBAR_COUNT 9
 #define ORGAN_DRAWBAR_MAX 8
@@ -29,73 +28,6 @@
 
 #define ORGAN_VIBRATO_RATE 7
 #define ORGAN_VIBRATO_DELAY_STAGES 9
-
-
-enum B3OrganProperty {
-	pB3OrganType,
-
-	pB3Drawbar1,
-	pB3Drawbar2,
-	pB3Drawbar3,
-	pB3Drawbar4,
-	pB3Drawbar5,
-	pB3Drawbar6,
-	pB3Drawbar7,
-	pB3Drawbar8,
-	pB3Drawbar9,
-
-	pB3DrawbarCC1,
-	pB3DrawbarCC2,
-	pB3DrawbarCC3,
-	pB3DrawbarCC4,
-	pB3DrawbarCC5,
-	pB3DrawbarCC6,
-	pB3DrawbarCC7,
-	pB3DrawbarCC8,
-	pB3DrawbarCC9,
-
-	pB3HarmonicFoldbackVolume,
-
-	pB3AmpOn,
-	pB3AmpDrive,
-	pB3AmpBoost,
-	pB3AmpTone,
-	pB3AmpDistortionType,
-	pB3AmpOnCC,
-	pB3AmpBoostCC,
-	pB3AmpDriveCC,
-	pB3AmpToneCC,
-
-	pB3MultiNoteGain,
-
-	pB3Rotary,
-	pB3RotarySpeed,
-	pB3RotaryCC,
-	pB3RotarySpeedCC,
-
-	pB3RotaryStereoMix,
-	pB3RotaryType,
-	pB3RotaryDelay,
-
-	pB3Percussion,
-	pB3PercussionThirdHarmonic,
-	pB3PercussionSoft,
-	pB3PercussionFastDecay,
-
-	pB3PercussionSoftVolume,
-	pB3PercussionHardVolume,
-	pB3PercussionFastDecayTime,
-	pB3PercussionSlowDecayTime,
-
-	pB3PercussionCC,
-	pB3PercussionThirdHarmonicCC,
-	pB3PercussionSoftCC,
-	pB3PercussionFastDecayCC,
-
-	pB3VibratoMix,
-	pB3VibratoMixCC,
-	pB3SwellCC,
-};
 
 enum OrganChorusVibratoType {
 	B3_NONE, B3_CHORUS_1, B3_CHORUS_2, B3_CHORUS_3, B3_VIBRATO_1, B3_VIBRATO_2, B3_VIBRATO_3
@@ -199,7 +131,7 @@ public:
 
 #define B3_ORGAN_POLYPHONY 61
 
-class B3Organ : public BaseSoundEngine<TriggeredNote, B3_ORGAN_POLYPHONY> , public PropertyHolder {
+class B3Organ : public BaseSoundEngine<TriggeredNote, B3_ORGAN_POLYPHONY> {
 
 private:
 	//Static values
@@ -217,15 +149,9 @@ public:
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
-	void control_change(unsigned int control, unsigned int value);
+	bool control_change(unsigned int control, unsigned int value);
 
 	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
-
-	void update_properties();
-
-	PropertyValue get(size_t prop, size_t sub_prop = 0);
-
-	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
 
 	void save_program(EngineProgram **prog);
 

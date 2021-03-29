@@ -12,7 +12,6 @@
 #include "../oscilator.h"
 #include "../filter.h"
 #include "../util.h"
-#include "../property.h"
 
 #define ANALOG_PART_COUNT 8
 #define ANALOG_CONTROL_COUNT 128
@@ -27,6 +26,7 @@ const FixedScale PITCH_SCALE(-2, {}, 2);
 const FixedScale PANNING_SCALE(-1, {}, 1);
 
 #define ANALOG_SYNTH_POLYPHONY 30
+
 
 
 struct PropertyModulation {
@@ -82,6 +82,7 @@ struct OperatorEntity {
 
 };
 
+
 struct ModEnvelopeEntity {
 	PropertyModulation volume = {1};
 	ADSREnvelopeData env{0.0005, 0, 1, 0.0005};
@@ -113,101 +114,6 @@ struct AnalogSynthPreset {
 	double delay_mix = 0;
 };
 
-enum SynthProperty {
-	pSynthOpCount,
-	pSynthModEnvCount,
-	pSynthLFOCount,
-
-	pSynthMono,
-	pSynthLegato,
-	pSynthPortamendo,
-
-	pSynthDelayTime,
-	pSynthDelayFeedback,
-	pSynthDelayMix
-};
-
-
-enum SynthModulationProperty {
-	pModValue,
-	pModModEnv,
-	pModModEnvAmount,
-	pModLFO,
-	pModLFOAmount,
-	pModVelocityAmount,
-	pModCC,
-	pModCCAmount,
-};
-
-enum SynthPartProperty {
-	pSynthOpAudible,
-	pSynthOscWaveForm,
-	pSynthOscAnalog,
-	pSynthOscSync,
-	pSynthOscReset,
-	pSynthOscRandomize,
-
-	pSynthOscUnisonAmount,
-
-	pSynthOscVolume,
-	pSynthOscSyncMul,
-	pSynthOscPulseWidth,
-	pSynthOscUnisonDetune,
-	pSynthOscSemi,
-	pSynthOscTranspose,
-	pSynthOscPitch,
-
-	pSynthOpVolume,
-	pSynthOpOscCount,
-	pSynthOpAttack,
-	pSynthOpDecay,
-	pSynthOpSustain,
-	pSynthOpRelease,
-	pSynthOpPanning,
-	pSynthOpFM,
-
-	pSynthOpFilter,
-	pSynthOpPreFilterDrive,
-	pSynthOpPreFilterDriveAmount,
-	pSynthOpFilterType,
-	pSynthOpFilterCutoff,
-	pSynthOpFilterResonance,
-	pSynthOpFilterKBTrack,
-	pSynthOpFilterKBTrackNote,
-
-	pSynthEnvVolume,
-	pSynthEnvAttack,
-	pSynthEnvDecay,
-	pSynthEnvSustain,
-	pSynthEnvRelease,
-
-	pSynthLFOVolume,
-	pSynthLFOFrequency,
-	pSynthLFOWaveForm,
-};
-
-class SynthPartPropertyHolder : public PropertyHolder {
-public:
-	AnalogSynthPreset* preset;
-	size_t part;
-	SynthPartPropertyHolder(AnalogSynthPreset* p = nullptr, size_t part = 0);
-	PropertyValue get(size_t prop, size_t sub_prop = 0);
-	void set(size_t prop, PropertyValue value, size_t sub_prop = 0);
-	void update_properties();
-
-protected:
-	inline void submit_change(size_t prop, PropertyModulation& mod) {
-		PropertyHolder::submit_change(prop, mod.value, SynthModulationProperty::pModValue);
-		PropertyHolder::submit_change(prop, (int) mod.mod_env, SynthModulationProperty::pModModEnv);
-		PropertyHolder::submit_change(prop, mod.mod_env_amount, SynthModulationProperty::pModModEnvAmount);
-		PropertyHolder::submit_change(prop, (int) mod.lfo, SynthModulationProperty::pModLFO);
-		PropertyHolder::submit_change(prop, mod.lfo_amount, SynthModulationProperty::pModLFOAmount);
-		PropertyHolder::submit_change(prop, mod.velocity_amount, SynthModulationProperty::pModVelocityAmount);
-		PropertyHolder::submit_change(prop, (int) mod.cc, SynthModulationProperty::pModCC);
-		PropertyHolder::submit_change(prop, mod.cc_amount, SynthModulationProperty::pModCCAmount);
-	}
-};
-
 struct AnalogSynthPart {
 	UnisonOscilator<8> oscilator;
 	Filter filter;
@@ -233,7 +139,7 @@ public:
 	}
 };
 
-class AnalogSynth : public BaseSoundEngine<AnalogSynthVoice, ANALOG_SYNTH_POLYPHONY>, public PropertyHolder {
+class AnalogSynth : public BaseSoundEngine<AnalogSynthVoice, ANALOG_SYNTH_POLYPHONY> {
 
 private:
 	std::array<double, ANALOG_PART_COUNT> env_val = {};
@@ -254,7 +160,6 @@ private:
 
 public:
 	AnalogSynthPreset preset;
-	std::array<SynthPartPropertyHolder, ANALOG_PART_COUNT> parts;
 
 	AnalogSynth();
 
@@ -262,19 +167,13 @@ public:
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
-	void control_change(unsigned int control, unsigned int value);
+	bool control_change(unsigned int control, unsigned int value);
 
 	bool note_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 	
-	void set(size_t prop, PropertyValue value, size_t sub_prop);
-	
-	PropertyValue get(size_t prop, size_t sub_prop);
-
 	void press_note(SampleInfo& info, unsigned int note, double velocity);
 
 	void release_note(SampleInfo& info, unsigned int note);
-
-	void update_properties();
 
 	void save_program(EngineProgram **prog);
 

@@ -97,14 +97,18 @@ void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 
 	if (old_prog != progress) {
 		double value = (max - min) * progress + min;
-		send_change(value);
+		property.set(value);
 		update_position(this->x, this->y, width, height);
 	}
 }
 
-void Slider::bound_property_change(PropertyValue val) {
-	progress = fmin(fmax((val.dval - min)/(max - min), 0), 1);
-	update_position(this->x, this->y, width, height);
+void Slider::update_properties() {
+	if (property.is_bound()) {
+		property.get([this](double v) {
+			progress = fmin(fmax((v - min)/(max - min), 0), 1);
+			update_position(this->x, this->y, width, height);
+		});
+	}
 }
 
 //CheckBox
@@ -129,14 +133,18 @@ void CheckBox::draw(sf::RenderWindow& window, bool selected) {
 void CheckBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	if (button == sf::Mouse::Left) {
 		checked = !checked;
-		send_change(checked);
+		property.set(checked);
 		frame->request_redraw();
 	}
 }
 
-void CheckBox::bound_property_change(PropertyValue val) {
-	checked = val.bval;
-	frame->request_redraw();
+void CheckBox::update_properties() {
+	if (property.is_bound()) {
+		property.get([this](bool v) {
+			checked = v;
+			frame->request_redraw();
+		});
+	}
 }
 
 //ComboBox
@@ -158,13 +166,17 @@ void ComboBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	if (index >= (int) values.size()) {
 		index = 0;
 	}
-	send_change(index + start_val);
+	property.set(index + start_val);
 	update_position(this->x, this->y, width, height);
 }
 
-void ComboBox::bound_property_change(PropertyValue val) {
-	index = val.ival - start_val;
-	update_position(this->x, this->y, width, height);
+void ComboBox::update_properties() {
+	if (property.is_bound()) {
+		property.get([this](double v) {
+			index = v - start_val;
+			update_position(this->x, this->y, width, height);
+		});
+	}
 }
 
 //OrganSwitch
@@ -201,13 +213,17 @@ void OrganSwitch::draw(sf::RenderWindow& window, bool selected) {
 void OrganSwitch::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	if (button == sf::Mouse::Left) {
 		checked = !checked;
-		send_change(checked);
+		property.set(checked);
 		update_position(this->x, this->y, width, height);
 	}
 }
 
-void OrganSwitch::bound_property_change(PropertyValue val) {
-	checked = val.bval;
-	update_position(x, y, width, height);
+void OrganSwitch::update_properties(){
+	if (property.is_bound()) {
+		property.get([this](bool v) {
+			checked = v;
+			frame->request_redraw();
+		});
+	}
 }
 

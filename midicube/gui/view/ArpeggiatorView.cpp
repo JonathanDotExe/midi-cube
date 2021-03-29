@@ -13,14 +13,11 @@ ArpeggiatorView::ArpeggiatorView(SoundEngineChannel& ch, int channel_index) : ch
 	this->channel_index = channel_index;
 }
 
-void ArpeggiatorView::property_change(PropertyChange change) {
-}
-
 Scene ArpeggiatorView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
 
-	holders.push_back(&channel);
+
+	ActionHandler& handler = frame.cube.action_handler;
 
 	//Sound engines
 	std::vector<std::string> patterns{"Up", "Down", "Random", "Up/Down", "Down/Up"};
@@ -40,19 +37,19 @@ Scene ArpeggiatorView::create(Frame &frame) {
 	//Active
 	int tmp_y = 40;
 	CheckBox* active = new CheckBox(true, "Active", main_font, 18, 10, tmp_y, 40, 40);
-	active->bind(&channel, SoundEngineChannelProperty::pArpeggiatorOn);
+	active->property.bind(channel.arp.on, handler);
 	controls.push_back(active);
 
 	//Hold
 	CheckBox* hold = new CheckBox(true, "Hold", main_font, 18, 150, tmp_y, 40, 40);
-	hold->bind(&channel, SoundEngineChannelProperty::pArpeggiatorHold);
+	hold->property.bind(channel.arp.preset.hold, handler);
 	controls.push_back(hold);
 	tmp_y += 50;
 
 	//Pattern
 	ComboBox* pattern = new ComboBox(0, patterns, main_font, 24, 0, 10, tmp_y, 300, 60);
 	pattern->rect.setFillColor(sf::Color(0, 180, 255));
-	pattern->bind(&channel, SoundEngineChannelProperty::pArpeggiatorPattern);
+	pattern->property.bind(channel.arp.preset.pattern, handler);
 	controls.push_back(pattern);
 	tmp_y += 70;
 
@@ -64,7 +61,7 @@ Scene ArpeggiatorView::create(Frame &frame) {
 
 		DragBox<int>* octave = new DragBox<int>(1, 1, 4, main_font, 18, 10, tmp_y, 150, 60);
 		tmp_y += 70;
-		octave->bind(&channel, SoundEngineChannelProperty::pArpeggiatorOctaves);
+		octave->property.bind(channel.arp.preset.octaves, handler);
 		controls.push_back(octave);
 	}
 
@@ -76,7 +73,7 @@ Scene ArpeggiatorView::create(Frame &frame) {
 
 		DragBox<int>* bpm = new DragBox<int>(0, 10, 480, main_font, 18, 10, tmp_y, 150, 60);
 		tmp_y += 70;
-		bpm->bind(&channel, SoundEngineChannelProperty::pArpeggiatorBPM);
+		bpm->property.bind_function<unsigned int>(std::bind(&Metronome::get_bpm, &channel.arp.metronome), std::bind(&Metronome::set_bpm, &channel.arp.metronome, std::placeholders::_1), handler);
 		controls.push_back(bpm);
 	}
 
@@ -88,7 +85,7 @@ Scene ArpeggiatorView::create(Frame &frame) {
 
 		DragBox<int>* step = new DragBox<int>(0, 1, 32, main_font, 18, 10, tmp_y, 150, 60);
 		tmp_y += 70;
-		step->bind(&channel, SoundEngineChannelProperty::pArpeggiatorStep);
+		step->property.bind(channel.arp.preset.value, handler);
 		controls.push_back(step);
 	}
 
@@ -99,7 +96,7 @@ Scene ArpeggiatorView::create(Frame &frame) {
 	});
 	controls.push_back(back);
 
-	return {controls, holders};
+	return {controls};
 }
 
 

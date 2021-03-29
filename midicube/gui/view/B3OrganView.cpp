@@ -13,14 +13,10 @@ B3OrganView::B3OrganView(B3Organ& o, SoundEngineChannel& ch, int channel_index) 
 	this->channel_index = channel_index;
 }
 
-void B3OrganView::property_change(PropertyChange change) {
-
-}
 
 Scene B3OrganView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	std::vector<PropertyHolder*> holders;
-	holders.push_back(&organ);
+	ActionHandler& handler = frame.cube.action_handler;
 
 	std::vector<Control*> hide_midi = {};
 	std::vector<Control*> show_midi = {};
@@ -39,12 +35,12 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3RotaryCC);
+		midi->property.bind(organ.data.preset.rotary_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 		OrganSwitch* rotary = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60);
-		rotary->bind(&organ, B3OrganProperty::pB3Rotary);
+		rotary->property.bind(organ.data.preset.rotary.on, handler);
 		hide_midi.push_back(rotary);
 		controls.push_back(rotary);
 
@@ -58,12 +54,12 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3RotarySpeedCC);
+		midi->property.bind(organ.data.preset.rotary_speed_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 		OrganSwitch* rotary_speed = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60, "Fast", "Slow");
-		rotary_speed->bind(&organ, B3OrganProperty::pB3RotarySpeed);
+		rotary_speed->property.bind(organ.data.preset.rotary.fast, handler);
 		controls.push_back(rotary_speed);
 		hide_midi.push_back(rotary_speed);
 
@@ -78,12 +74,12 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3AmpOnCC);
+		midi->property.bind(organ.data.preset.amp_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 		OrganSwitch* amplifier = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60);
-		amplifier->bind(&organ, B3OrganProperty::pB3AmpOn);
+		amplifier->property.bind(organ.data.preset.amplifier.on, handler);
 		controls.push_back(amplifier);
 		hide_midi.push_back(amplifier);
 
@@ -98,13 +94,13 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3AmpBoostCC);
+		midi->property.bind(organ.data.preset.amp_boost_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 
 		DragBox<double>* boost = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
-		boost->bind(&organ, B3OrganProperty::pB3AmpBoost);
+		boost->property.bind(organ.data.preset.amplifier.boost, handler);
 		controls.push_back(boost);
 		hide_midi.push_back(boost);
 
@@ -119,12 +115,12 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3AmpDriveCC);
+		midi->property.bind(organ.data.preset.amp_drive_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 		DragBox<double>* overdrive = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
-		overdrive->bind(&organ, B3OrganProperty::pB3AmpDrive);
+		overdrive->property.bind(organ.data.preset.amplifier.drive, handler);
 		controls.push_back(overdrive);
 		hide_midi.push_back(overdrive);
 
@@ -139,7 +135,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		ComboBox* distortion_type = new ComboBox(0, {"Digital", "Polynomal", "Arctan"}, main_font, 16, 0, 10, tmp_y, 80, 60);
-		distortion_type->bind(&organ, B3OrganProperty::pB3AmpDistortionType);
+		distortion_type->property.bind(organ.data.preset.amplifier.type, handler);
 		controls.push_back(distortion_type);
 
 		tmp_y += 65;
@@ -156,12 +152,12 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3AmpToneCC);
+		midi->property.bind(organ.data.preset.amp_tone_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 		DragBox<double>* amp_tone = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		amp_tone->bind(&organ, B3OrganProperty::pB3AmpTone);
+		amp_tone->property.bind(organ.data.preset.amplifier.tone, handler);
 		controls.push_back(amp_tone);
 		hide_midi.push_back(amp_tone);
 
@@ -178,12 +174,12 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3VibratoMixCC);
+		midi->property.bind(organ.data.preset.vibrato_mix_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 		DragBox<double>* vibrato = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		vibrato->bind(&organ, B3OrganProperty::pB3VibratoMix);
+		vibrato->property.bind(organ.data.preset.vibrato_mix, handler);
 		controls.push_back(vibrato);
 		hide_midi.push_back(vibrato);
 
@@ -200,7 +196,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<double>* rotary_stereo = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		rotary_stereo->bind(&organ, B3OrganProperty::pB3RotaryStereoMix);
+		rotary_stereo->property.bind(organ.data.preset.rotary.stereo_mix, handler);
 		controls.push_back(rotary_stereo);
 
 		tmp_y += 65;
@@ -216,7 +212,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		OrganSwitch* rotary_type = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "1", "2");
-		rotary_type->bind(&organ, B3OrganProperty::pB3RotaryType);
+		rotary_type->property.bind(organ.data.preset.rotary.type, handler);
 		controls.push_back(rotary_type);
 
 		tmp_y += 65;
@@ -234,7 +230,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		ComboBox* organ_type = new ComboBox(0, {"B3", "Transistor"}, main_font, 16, 0, tmp_x, tmp_y, 80, 60);
-				organ_type->bind(&organ, B3OrganProperty::pB3OrganType);
+				organ_type->property.bind(organ.data.preset.type, handler);
 				controls.push_back(organ_type);
 		hide_midi.push_back(organ_type);
 
@@ -251,7 +247,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3SwellCC);
+		midi->property.bind(organ.data.preset.swell_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 		tmp_y += 65;
@@ -287,11 +283,11 @@ Scene B3OrganView::create(Frame &frame) {
 		Drawbar<ORGAN_DRAWBAR_MAX>* drawbar = new Drawbar<ORGAN_DRAWBAR_MAX>(0, main_font, titles[i], tmp_x, 60, 60, 300, colors[i]);
 		drawbar->text.setFillColor(sf::Color::White);
 		drawbar->title_text.setFillColor(sf::Color::Yellow);
-		drawbar->bind(&organ, B3OrganProperty::pB3Drawbar1 + i);
+		drawbar->property.bind(organ.data.preset.drawbars.at(i), handler);
 		controls.push_back(drawbar);
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 60, 60);
-		midi->bind(&organ, B3OrganProperty::pB3DrawbarCC1 + i);
+		midi->property.bind(organ.data.preset.drawbar_ccs.at(i), handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 		tmp_x += 70;
@@ -308,12 +304,12 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3PercussionCC);
+		midi->property.bind(organ.data.preset.percussion_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 		OrganSwitch* percussion = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60);
-		percussion->bind(&organ, B3OrganProperty::pB3Percussion);
+		percussion->property.bind(organ.data.preset.percussion, handler);;
 		controls.push_back(percussion);
 		hide_midi.push_back(percussion);
 
@@ -327,12 +323,12 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3PercussionFastDecayCC);
+		midi->property.bind(organ.data.preset.percussion_fast_decay_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 		OrganSwitch* percussion_decay = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "Fast", "Slow");
-		percussion_decay->bind(&organ, B3OrganProperty::pB3PercussionFastDecay);
+		percussion_decay->property.bind(organ.data.preset.percussion_fast_decay, handler);
 		controls.push_back(percussion_decay);
 		hide_midi.push_back(percussion_decay);
 
@@ -346,12 +342,12 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3PercussionSoftCC);
+		midi->property.bind(organ.data.preset.percussion_soft_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 		OrganSwitch* percussion_volume = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "Soft", "Hard");
-		percussion_volume->bind(&organ, B3OrganProperty::pB3PercussionSoft);
+		percussion_volume->property.bind(organ.data.preset.percussion_soft, handler);
 		controls.push_back(percussion_volume);
 		hide_midi.push_back(percussion_volume);
 
@@ -365,12 +361,12 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
-		midi->bind(&organ, B3OrganProperty::pB3PercussionThirdHarmonicCC);
+		midi->property.bind(organ.data.preset.percussion_third_harmonic_cc, handler);
 		controls.push_back(midi);
 		show_midi.push_back(midi);
 
 		OrganSwitch* percussion_harmonic = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "3rd", "2nd");
-		percussion_harmonic->bind(&organ, B3OrganProperty::pB3PercussionThirdHarmonic);
+		percussion_harmonic->property.bind(organ.data.preset.percussion_third_harmonic_cc, handler);
 		controls.push_back(percussion_harmonic);
 		hide_midi.push_back(percussion_harmonic);
 
@@ -385,7 +381,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<double>* foldback = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		foldback->bind(&organ, B3OrganProperty::pB3HarmonicFoldbackVolume);
+		foldback->property.bind(organ.data.preset.harmonic_foldback_volume, handler);
 		controls.push_back(foldback);
 
 		tmp_y += 65;
@@ -398,7 +394,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		DragBox<double>* gain = new DragBox<double>(0.5, 0.5, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		gain->bind(&organ, B3OrganProperty::pB3MultiNoteGain);
+		gain->property.bind(organ.data.preset.multi_note_gain, handler);
 		controls.push_back(gain);
 
 		tmp_y += 65;
@@ -434,7 +430,7 @@ Scene B3OrganView::create(Frame &frame) {
 		control->set_visible(!this->edit_midi);
 	}
 
-	return {controls, holders};
+	return {controls};
 }
 
 

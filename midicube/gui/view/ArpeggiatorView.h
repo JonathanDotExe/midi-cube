@@ -18,7 +18,6 @@ private:
 
 public:
 	ArpeggiatorView(SoundEngineChannel& channel, int channel_index);
-	virtual void property_change(PropertyChange change);
 	virtual Scene create(Frame &frame);
 	virtual ~ArpeggiatorView();
 };

@@ -25,8 +25,6 @@ public:
 
 	virtual Scene create(Frame& frame);
 
-	virtual void property_change(PropertyChange change);
-
 	virtual ~SoundEngineView();
 
 };
