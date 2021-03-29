@@ -31,8 +31,12 @@ void AnalogOscilator::process(double freq, double time_step, AnalogOscilatorData
 	}
 	//Sync
 	if (data.sync) {
-		if (rotation >= data.sync_mul) {
+		if (sync_next) {
+			sync_next = false;
 			rotation = fmod(rotation, data.sync_mul);
+		}
+		else if (rotation >= data.sync_mul) {
+			sync_next = true;
 		}
 		//TODO respond to sync mul changes with polyblep
 	}
