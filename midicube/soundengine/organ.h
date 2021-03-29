@@ -29,12 +29,16 @@
 #define ORGAN_VIBRATO_RATE 7
 #define ORGAN_VIBRATO_DELAY_STAGES 9
 
-
 enum OrganChorusVibratoType {
 	B3_NONE, B3_CHORUS_1, B3_CHORUS_2, B3_CHORUS_3, B3_VIBRATO_1, B3_VIBRATO_2, B3_VIBRATO_3
 };
 
+enum OrganType {
+	ORGAN_TYPE_B3, ORGAN_TYPE_TRANSISTOR
+};
+
 struct B3OrganPreset {
+	OrganType type = ORGAN_TYPE_B3;
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbars;
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	double harmonic_foldback_volume{1};
@@ -98,7 +102,7 @@ class B3OrganTonewheel {
 public:
 	double rotation = 0;
 	double volume = 0;
-	double process(SampleInfo& info, double freq);
+	double process(SampleInfo& info, double freq, OrganType type);
 };
 
 class B3OrganData {

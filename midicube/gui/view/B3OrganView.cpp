@@ -220,6 +220,24 @@ Scene B3OrganView::create(Frame &frame) {
 
 	tmp_x += 100;
 	tmp_y -= 65 + 25;
+
+	//Organ Type
+	{
+		Label* label = new Label("Organ Type", main_font, 18,tmp_x, tmp_y);
+		label->text.setFillColor(sf::Color::White);
+		controls.push_back(label);
+		hide_midi.push_back(label);
+		tmp_y += 25;
+
+		ComboBox* organ_type = new ComboBox(0, {"B3", "Transistor"}, main_font, 16, 0, tmp_x, tmp_y, 80, 60);
+				organ_type->property.bind(organ.data.preset.type, handler);
+				controls.push_back(organ_type);
+		hide_midi.push_back(organ_type);
+
+		tmp_y += 65;
+	}
+
+	tmp_y -= 65 + 25;
 	//Swell
 	{
 		Label* label = new Label("Swell", main_font, 18, tmp_x, tmp_y);
@@ -236,7 +254,7 @@ Scene B3OrganView::create(Frame &frame) {
 	}
 
 	tmp_x -= 100 * 4;
-	tmp_y -= (65 + 25) * 2;
+	tmp_y -= (65 + 25) * 2 - 25;
 	//Drawbars
 	std::vector<sf::Color> colors = {
 			sf::Color(150, 0, 0),
