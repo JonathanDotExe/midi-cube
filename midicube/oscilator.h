@@ -63,8 +63,6 @@ private:
 	double pulse_width = 0.5;
 
 	bool sync_next = false;
-	double last_sync_carrier = 0;
-	double last_sync_modulator = 0;
 public:
 	AnalogOscilator();
 	void process(double freq, double time_step, AnalogOscilatorData& data);

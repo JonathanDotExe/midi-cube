@@ -35,7 +35,7 @@ void AnalogOscilator::process(double freq, double time_step, AnalogOscilatorData
 			sync_next = false;
 			rotation = fmod(rotation, data.sync_mul);
 		}
-		else if (rotation >= data.sync_mul) {
+		else if (rotation + step >= data.sync_mul) {
 			sync_next = true;
 		}
 		//TODO respond to sync mul changes with polyblep
@@ -44,7 +44,12 @@ void AnalogOscilator::process(double freq, double time_step, AnalogOscilatorData
 
 double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorData& data) {
 	double phase = rotation - (long int) rotation;
+	double sync_phase = 1;
 	if (data.sync) {
+		sync_phase = (data.sync_mul) - (long int) (data.sync_mul);
+		if (sync_phase == 0) {
+			sync_phase = 1;
+		}
 		freq *= data.sync_mul;
 	}
 	double step = freq * time_step;
@@ -59,7 +64,11 @@ double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorDa
 		case AnalogWaveForm::SAW_DOWN_WAVE:
 			signal = saw_wave_down(phase);
 			if (data.analog) {
-				signal += polyblep(phase, step);
+				double blep_amt = 1;
+				if (sync_next || rotation < step) {
+					blep_amt = -saw_wave_down(sync_phase);
+				}
+				signal += polyblep(phase, step) * blep_amt;
 			}
 			break;
 		case AnalogWaveForm::SAW_UP_WAVE:
@@ -77,7 +86,7 @@ double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorDa
 			}
 			break;
 		case AnalogWaveForm::TRIANGLE_WAVE:
-			signal = triangle_wave(phase, pulse_width); //TODO PWM
+			signal = triangle_wave(phase, pulse_width);
 			if (data.analog) {
 				double mul1;
 				double mul2;
