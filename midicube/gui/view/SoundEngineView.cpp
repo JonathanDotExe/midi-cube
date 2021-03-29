@@ -53,7 +53,7 @@ Scene SoundEngineView::create(Frame& frame) {
 
 		//Active
 		CheckBox* active = new CheckBox(false, "", main_font, 12, x + pane_width - 30, y + 5, 20, 20);
-		active->property.bind(engine->volume, handler);
+		active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), handler);
 		controls.push_back(active);
 		//Engine
 		Button* engine = new Button("Engine", main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
