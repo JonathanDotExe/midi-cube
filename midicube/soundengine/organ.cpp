@@ -25,7 +25,7 @@ double B3OrganTonewheel::process(SampleInfo& info, double freq, OrganType type) 
 			double phase = fmod(rotation, 1.0);
 			double pphase = fmod(rotation + 0.5, 1.0);
 			double step = info.time_step * freq;
-			return triangle_wave(phase) + integrated_polyblep(phase, step) * 4 * step - integrated_polyblep(pphase, step) * 4 * step;
+			return (triangle_wave(phase) + integrated_polyblep(phase, step) * 4 * step - integrated_polyblep(pphase, step) * 4 * step) * volume;
 		}
 	}
 	else {
