@@ -30,15 +30,12 @@ void AnalogOscilator::process(double freq, double time_step, AnalogOscilatorData
 		pulse_width = data.pulse_width;
 	}
 	//Sync
-	if (data.sync) {
-		if (sync_next) {
-			sync_next = false;
-			rotation = fmod(rotation, data.sync_mul);
-		}
-		else if (rotation + step >= data.sync_mul) {
+	if (sync_next) {
+		sync_next = false;
+		rotation = fmod(rotation, data.sync_mul);
+	}
+	else if (data.sync && rotation + step >= data.sync_mul) {
 			sync_next = true;
-		}
-		//TODO respond to sync mul changes with polyblep
 	}
 }
 
@@ -60,6 +57,13 @@ double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorDa
 		case AnalogWaveForm::SINE_WAVE:
 			//Modulator
 			signal = sine_wave(phase);
+			if (data.analog && data.sync) {
+				double blep_amt = 0;
+				if (sync_next || rotation < step) {
+					blep_amt = -sine_wave(sync_phase)/2;
+				}
+				signal += polyblep(phase, step) * blep_amt;
+			}
 			break;
 		case AnalogWaveForm::SAW_DOWN_WAVE:
 			signal = saw_wave_down(phase);
@@ -74,20 +78,36 @@ double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorDa
 		case AnalogWaveForm::SAW_UP_WAVE:
 			signal = saw_wave_up(phase);
 			if (data.analog) {
-				signal -= polyblep(phase, step);
+				double blep_amt = 1;
+				if (sync_next || rotation < step) {
+					blep_amt = saw_wave_up(sync_phase);
+				}
+				signal -= polyblep(phase, step) * blep_amt;
 			}
 			break;
 		case AnalogWaveForm::SQUARE_WAVE:
 			signal = square_wave(phase, pulse_width);
 			if (data.analog) {
-				signal += polyblep(phase, step);
+				double blep_amt1 = 1;
+				double blep_amt2 = 1;
+				if (sync_next || rotation < step) {
+					blep_amt1 = -square_wave(sync_phase, pulse_width);
+					blep_amt2 = -blep_amt1;
+				}
+				signal += polyblep(phase, step) * blep_amt1;
 				double protation = rotation + (1 - pulse_width);
-				signal -= polyblep(protation - (long int) protation, step);
+				signal -= polyblep(protation - (long int) protation, step) * blep_amt2;
 			}
 			break;
 		case AnalogWaveForm::TRIANGLE_WAVE:
 			signal = triangle_wave(phase, pulse_width);
 			if (data.analog) {
+				double blep_amt1 = 1;
+				double blep_amt2 = 1;
+				if (sync_next || rotation < step) {
+					blep_amt1 = -triangle_wave(sync_phase, pulse_width);
+					blep_amt2 = -blep_amt1;
+				}
 				double mul1;
 				double mul2;
 				if (phase < pulse_width) {
@@ -98,10 +118,10 @@ double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorDa
 					mul1 = 1/(1 - pulse_width);
 					mul2 = 1/pulse_width;
 				}
-				signal += integrated_polyblep(phase, step) * 2 * mul1 * step;
+				signal += integrated_polyblep(phase, step) * 2 * mul1 * step * blep_amt1;
 				double protation = rotation + (1 - pulse_width);
 				double pphase = protation - (long int) protation;
-				signal -= integrated_polyblep(pphase, step) * 2 * mul2 * step;
+				signal -= integrated_polyblep(pphase, step) * 2 * mul2 * step * blep_amt2;
 			}
 			break;
 		case AnalogWaveForm::NOISE_WAVE:
