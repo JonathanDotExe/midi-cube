@@ -505,9 +505,6 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 			if (!preset.legato || !mono_voice.valid) {
 				mono_voice.velocity = voice.velocity;
 			}
-			mono_voice.note = voice.note;
-			mono_voice.freq = voice.freq;
-			first_port = false;
 			//Trigger note
 			if (!mono_voice.pressed || voice.note != mono_voice.note) {
 				mono_voice.valid = true;
@@ -528,6 +525,10 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 					}
 				}
 			}
+
+			mono_voice.note = voice.note;
+			mono_voice.freq = voice.freq;
+			first_port = false;
 		}
 		else {
 			mono_voice.pressed = false;
