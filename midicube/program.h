@@ -20,6 +20,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "midi.h"
+#include "data.h"
 #include "soundengine/soundengine.h"
 
 namespace pt = boost::property_tree;
@@ -129,6 +130,36 @@ public:
 	void load_all();
 	void save_all();
 	~ProgramManager();
+};
+
+class ApplyProgramAction : public Action {
+private:
+	ProgramUser& user;
+	Program* prog;
+	std::function<void (Program*)> callback;
+
+public:
+	ApplyProgramAction(ProgramUser& u, Program* p, std::function<void (Program*)> c);
+	virtual void returned();
+	virtual void execute();
+	virtual ~ApplyProgramAction() {
+
+	}
+};
+
+class SaveProgramAction : public Action {
+private:
+	ProgramUser& user;
+	Program* prog;
+	std::function<void (Program*)> callback;
+
+public:
+	SaveProgramAction(ProgramUser& u, Program* p, std::function<void (Program*)> c);
+	virtual void returned();
+	virtual void execute();
+	virtual ~SaveProgramAction() {
+
+	}
 };
 
 #endif /* MIDICUBE_PROGRAM_H_ */

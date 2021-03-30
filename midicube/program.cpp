@@ -288,32 +288,27 @@ ProgramManager::~ProgramManager() {
 	unlock();
 }
 
-/*
-void ProgramManager::set(size_t prop, PropertyValue value, size_t sub_prop) {
-	switch ((ProgramManagerProperty) prop) {
-	case ProgramManagerProperty::pProgramManagerBank:
-		apply_program(value.ival, 0);
-		break;
-	case ProgramManagerProperty::pProgramManagerProgram:
-		apply_program(curr_bank, value.ival);
-		break;
-	}
+ApplyProgramAction::ApplyProgramAction(ProgramUser &u, Program *p, std::function<void (Program*)> c) : user(u), prog(p), callback(c) {
+
 }
 
-void ProgramManager::update_properties() {
-	submit_change(ProgramManagerProperty::pProgramManagerBank, (int) curr_bank);
-	submit_change(ProgramManagerProperty::pProgramManagerProgram, (int) curr_program);
+void ApplyProgramAction::returned() {
+	callback(prog);
 }
 
-PropertyValue ProgramManager::get(size_t prop, size_t sub_prop) {
-	PropertyValue val;
-	switch ((ProgramManagerProperty) prop) {
-	case ProgramManagerProperty::pProgramManagerBank:
-		val.ival = curr_bank;
-		break;
-	case ProgramManagerProperty::pProgramManagerProgram:
-		val.ival = curr_program;
-		break;
-	}
-	return val;
-}*/
+void ApplyProgramAction::execute() {
+	user.apply_program(prog);
+}
+
+SaveProgramAction::SaveProgramAction(ProgramUser &u, Program *p, std::function<void (Program*)> c) : user(u), prog(p), callback(c) {
+
+}
+
+void SaveProgramAction::returned() {
+	callback(prog);
+}
+
+void SaveProgramAction::execute() {
+	user.save_program(prog);
+}
+
