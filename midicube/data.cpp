@@ -36,8 +36,8 @@ void ActionHandler::execute_return_actions() {
 	}
 }
 
-FunctionAction::FunctionAction(std::function<void()> e = nullptr,
-		std::function<void()> r = nullptr) : exec(e), ret(r) {
+FunctionAction::FunctionAction(std::function<void()> e,
+		std::function<void()> r) : exec(e), ret(r) {
 }
 
 void FunctionAction::execute() {

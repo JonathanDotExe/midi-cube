@@ -35,7 +35,7 @@ private:
 
 public:
 
-	FunctionAction(std::function<void()> e, std::function<void()> r);
+	FunctionAction(std::function<void()> e = nullptr, std::function<void()> r = nullptr);
 
 	virtual void execute();
 

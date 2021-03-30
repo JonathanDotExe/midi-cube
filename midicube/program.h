@@ -134,34 +134,4 @@ public:
 	~ProgramManager();
 };
 
-class ApplyProgramAction : public Action {
-private:
-	ProgramUser& user;
-	Program* prog;
-	std::function<void (Program*)> callback;
-
-public:
-	ApplyProgramAction(ProgramUser& u, Program* p, std::function<void (Program*)> c);
-	virtual void returned();
-	virtual void execute();
-	virtual ~ApplyProgramAction() {
-
-	}
-};
-
-class SaveProgramAction : public Action {
-private:
-	ProgramUser& user;
-	Program* prog;
-	std::function<void (Program*)> callback;
-
-public:
-	SaveProgramAction(ProgramUser& u, Program* p, std::function<void (Program*)> c);
-	virtual void returned();
-	virtual void execute();
-	virtual ~SaveProgramAction() {
-
-	}
-};
-
 #endif /* MIDICUBE_PROGRAM_H_ */
