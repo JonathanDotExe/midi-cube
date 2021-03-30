@@ -27,6 +27,25 @@ public:
 	}
 };
 
+class FunctionAction : public Action {
+
+private:
+	std::function<void()> exec;
+	std::function<void()> ret;
+
+public:
+
+	FunctionAction(std::function<void()> e = nullptr, std::function<void()> r = nullptr);
+
+	virtual void execute();
+
+	virtual void returned();
+
+	virtual ~FunctionAction() {
+
+	}
+};
+
 template <typename T, typename V>
 class GetValueAction : public Action{
 

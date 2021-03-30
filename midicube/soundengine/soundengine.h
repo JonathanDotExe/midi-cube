@@ -339,6 +339,10 @@ struct ChannelProgram {
 	ArpeggiatorPreset arpeggiator;
 
 	EngineProgram* engine_program = nullptr;
+
+	~ChannelProgram() {
+		delete engine_program;
+	}
 };
 
 struct Program {

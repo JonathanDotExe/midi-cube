@@ -50,6 +50,7 @@ void save_bank(Bank& bank, std::string path);
 
 class ProgramUser {
 public:
+	//Methods are executed in realtime thread
 	virtual void apply_program(Program* prog) = 0;
 	virtual void save_program(Program* prog) = 0;
 	virtual ~ProgramUser() {
@@ -68,6 +69,7 @@ private:
 	size_t curr_bank = 0;
 	size_t curr_program = 0;
 	std::vector<Bank*> banks;
+	ActionHandler& handler;
 	ProgramUser* user = nullptr;
 	std::mutex mutex;
 
@@ -75,7 +77,7 @@ public:
 	std::string bank_name = "";
 	std::string program_name = "";
 
-	ProgramManager(std::string path);
+	ProgramManager(std::string path, ActionHandler& h);
 	inline void lock() {
 		mutex.lock();
 	}
@@ -130,36 +132,6 @@ public:
 	void load_all();
 	void save_all();
 	~ProgramManager();
-};
-
-class ApplyProgramAction : public Action {
-private:
-	ProgramUser& user;
-	Program* prog;
-	std::function<void (Program*)> callback;
-
-public:
-	ApplyProgramAction(ProgramUser& u, Program* p, std::function<void (Program*)> c);
-	virtual void returned();
-	virtual void execute();
-	virtual ~ApplyProgramAction() {
-
-	}
-};
-
-class SaveProgramAction : public Action {
-private:
-	ProgramUser& user;
-	Program* prog;
-	std::function<void (Program*)> callback;
-
-public:
-	SaveProgramAction(ProgramUser& u, Program* p, std::function<void (Program*)> c);
-	virtual void returned();
-	virtual void execute();
-	virtual ~SaveProgramAction() {
-
-	}
 };
 
 #endif /* MIDICUBE_PROGRAM_H_ */

@@ -188,47 +188,67 @@ void save_bank(Bank& bank, std::string path) {
 }
 
 
-ProgramManager::ProgramManager(std::string path) {
+ProgramManager::ProgramManager(std::string path, ActionHandler& h) : handler(h) {
 	this->path = path;
 }
 
 void ProgramManager::apply_program(size_t bank, size_t program) {
-	Bank* b = get_bank(bank);
-	Program* prog = b->programs.at(program);
-	user->apply_program(prog);
-	curr_bank = bank;
-	curr_program = program;
-	program_name = prog->name;
-	bank_name = b->name;
-
-	//submit_change(ProgramManagerProperty::pProgramManagerBank, (int) curr_bank);
-	//submit_change(ProgramManagerProperty::pProgramManagerProgram, (int) curr_program);
+	handler.queue_action(new FunctionAction([this, bank, program]() {
+		lock();
+		Bank* b = get_bank(bank);
+		Program* prog = b->programs.at(program);
+		user->apply_program(prog);
+		curr_bank = bank;
+		curr_program = program;
+		program_name = prog->name;
+		bank_name = b->name;
+		unlock();
+	}));
 }
 
 void ProgramManager::delete_program() {
-	Bank* bank = get_curr_bank();
-	bank->programs.erase(bank->programs.begin() + curr_program);
-	if (bank->programs.size() == 0) {
-		bank->programs.push_back(new Program{"Init"});
-	}
-	if (curr_program >= bank->programs.size()) {
-		curr_program--;
-	}
-	apply_program(curr_bank, curr_program);
+	handler.queue_action(new FunctionAction([this]() {
+		lock();
+		//Delete
+		Bank* bank = get_curr_bank();
+		bank->programs.erase(bank->programs.begin() + curr_program);
+		if (bank->programs.size() == 0) {
+			bank->programs.push_back(new Program{"Init"});
+		}
+		if (curr_program >= bank->programs.size()) {
+			curr_program--;
+		}
+
+		//Apply
+		Program* prog = bank->programs.at(curr_program);
+		user->apply_program(prog);
+		program_name = prog->name;
+		unlock();
+	}));
 }
 
 void ProgramManager::save_new_program() {
-	Bank* bank = get_curr_bank();
-	Program* prog = new Program();
-	prog->name = program_name;
-	user->save_program(prog);
-	bank->programs.push_back(prog);
+	handler.queue_action(new FunctionAction([this]() {
+		lock();
+		Bank* bank = get_curr_bank();
+		Program* prog = new Program();
+		prog->name = program_name;
+
+		user->save_program(prog);
+		bank->programs.push_back(prog);
+		unlock();
+	}));
 }
 
 void ProgramManager::overwrite_program() {
-	Program* prog = get_bank(curr_bank)->programs.at(curr_program);
-	prog->name = program_name;
-	user->save_program(prog);
+	handler.queue_action(new FunctionAction([this]() {
+		lock();
+		Program* prog = get_bank(curr_bank)->programs.at(curr_program);
+
+		prog->name = program_name;
+		user->save_program(prog);
+		unlock();
+	}));
 }
 
 void ProgramManager::save_new_bank() {
@@ -286,29 +306,5 @@ ProgramManager::~ProgramManager() {
 	}
 	banks.clear();
 	unlock();
-}
-
-ApplyProgramAction::ApplyProgramAction(ProgramUser &u, Program *p, std::function<void (Program*)> c) : user(u), prog(p), callback(c) {
-
-}
-
-void ApplyProgramAction::returned() {
-	callback(prog);
-}
-
-void ApplyProgramAction::execute() {
-	user.apply_program(prog);
-}
-
-SaveProgramAction::SaveProgramAction(ProgramUser &u, Program *p, std::function<void (Program*)> c) : user(u), prog(p), callback(c) {
-
-}
-
-void SaveProgramAction::returned() {
-	callback(prog);
-}
-
-void SaveProgramAction::execute() {
-	user.save_program(prog);
 }
 

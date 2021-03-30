@@ -13,7 +13,7 @@ static void process_func(double& lsample, double& rsample, SampleInfo& info, voi
 	((MidiCube*) user_data)->process(lsample, rsample, info);
 }
 
-MidiCube::MidiCube() : prog_mgr("./data/programs") {
+MidiCube::MidiCube() : prog_mgr("./data/programs", action_handler) {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -76,7 +76,6 @@ void MidiCube::init(int out_device, int in_device) {
 }
 
 void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
-	mutex.lock();
 	//Lock actions
 	action_handler.execute_realtime_actions();
 	//Messages
@@ -90,10 +89,7 @@ void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 	}
 	//Process
 	engine.process_sample(lsample, rsample, info);
-	mutex.unlock();
 }
-
-
 
 std::vector<MidiCubeInput> MidiCube::get_inputs() {
 	return inputs;
@@ -158,15 +154,11 @@ MidiCube::~MidiCube() {
 }
 
 void MidiCube::save_program(Program *prog) {
-	mutex.lock();
 	engine.save_program(prog);
-	mutex.unlock();
 	std::cout << "Saved program: " << prog->name << std::endl;
 }
 
 void MidiCube::apply_program(Program *prog) {
-	mutex.lock();
 	engine.apply_program(prog);
-	mutex.unlock();
 	std::cout << "Selected program: " << prog->name << std::endl;
 }

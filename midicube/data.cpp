@@ -36,4 +36,18 @@ void ActionHandler::execute_return_actions() {
 	}
 }
 
+FunctionAction::FunctionAction(std::function<void()> e,
+		std::function<void()> r) : exec(e), ret(r) {
+}
 
+void FunctionAction::execute() {
+	if (exec) {
+		exec();
+	}
+}
+
+void FunctionAction::returned() {
+	if (ret) {
+		ret();
+	}
+}
