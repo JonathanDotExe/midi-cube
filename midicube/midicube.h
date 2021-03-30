@@ -29,8 +29,6 @@ class MidiCube : public ProgramUser {
 private:
 	AudioHandler audio_handler;
 	std::vector<MidiCubeInput> inputs;
-	//Only for sync program changes
-	std::mutex mutex;
 
 	inline void process_midi(MidiMessage& message, size_t input);
 public:
