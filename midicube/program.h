@@ -50,6 +50,7 @@ void save_bank(Bank& bank, std::string path);
 
 class ProgramUser {
 public:
+	//Methods are executed in realtime thread
 	virtual void apply_program(Program* prog) = 0;
 	virtual void save_program(Program* prog) = 0;
 	virtual ~ProgramUser() {
@@ -68,6 +69,7 @@ private:
 	size_t curr_bank = 0;
 	size_t curr_program = 0;
 	std::vector<Bank*> banks;
+	ActionHandler& handler;
 	ProgramUser* user = nullptr;
 	std::mutex mutex;
 
@@ -75,7 +77,7 @@ public:
 	std::string bank_name = "";
 	std::string program_name = "";
 
-	ProgramManager(std::string path);
+	ProgramManager(std::string path, ActionHandler& h);
 	inline void lock() {
 		mutex.lock();
 	}
