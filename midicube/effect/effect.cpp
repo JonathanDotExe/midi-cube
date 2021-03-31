@@ -5,11 +5,23 @@
  *      Author: jojo
  */
 
-#ifndef MIDICUBE_EFFECT_EFFECT_CPP_
-#define MIDICUBE_EFFECT_EFFECT_CPP_
+#include "effect.h"
+
+const Effect* InsertEffect::get_effect() const {
+	return effect;
+}
+
+void InsertEffect::set_effect(Effect *effect) {
+	delete this->effect;
+	this->effect = effect;
+}
 
 
+const Effect* MasterEffect::get_effect() const {
+	return effect;
+}
 
-
-
-#endif /* MIDICUBE_EFFECT_EFFECT_CPP_ */
+void MasterEffect::set_effect(Effect *effect) {
+	delete this->effect;
+	this->effect = effect;
+}
