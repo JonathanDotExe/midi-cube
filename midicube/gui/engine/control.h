@@ -240,7 +240,9 @@ public:
 					hit_border = true;
 				}
 				if (old_val != value) {
-					property.set(value);
+					if (property.is_bound()) {
+						property.set(value);
+					}
 					update_position(this->x, this->y, width, height);
 				}
 			}
@@ -434,7 +436,9 @@ public:
 
 		int value = MAX * progress;
 		if (old_val != value) {
-			property.set(value);
+			if (property.is_bound()) {
+				property.set(value);
+			}
 			update_position(this->x, this->y, width, height);
 		}
 	}
