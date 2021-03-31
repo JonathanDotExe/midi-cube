@@ -17,9 +17,6 @@ SoundEngineChannel::SoundEngineChannel() {
 void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, size_t scene) {
 	//Properties
 	if (engine) {
-		double l = 0;
-		double r = 0;
-
 		SoundEngineScene& s = scenes[scene];
 
 		if (s.active || status.pressed_notes) {
@@ -34,20 +31,20 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				});
 			}
 			//Process
-			status = engine->process_sample(l, r, info);
+			status = engine->process_sample(lsample, rsample, info);
 			//Effects
 			for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
-				effects[i].apply(l, r, info);
+				effects[i].apply(lsample, rsample, info);
 			}
 			//Pan
-			l *= (1 - fmax(0, panning));
-			r *= (1 - fmax(0, -panning));
+			lsample *= (1 - fmax(0, panning));
+			rsample *= (1 - fmax(0, -panning));
 		}
 		//Looper
-		looper.apply(l, r, metronome, info);
+		looper.apply(lsample, rsample, metronome, info);
 		//Playback
-		lsample += l * volume;
-		rsample += r * volume;
+		lsample *= volume;
+		rsample *= volume;
 	}
 }
 
@@ -227,9 +224,36 @@ SoundEngineDevice::SoundEngineDevice() : metronome(120){
 void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleInfo &info) {
 	//Channels
 	size_t scene = this->scene;
-	for (size_t i = 0; i < this->channels.size(); ++i) {
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		double l = 0;
+		double r = 0;
 		SoundEngineChannel& ch = this->channels[i];
-		ch.process_sample(lsample, rsample, info, metronome, scene);
+		ch.process_sample(l, r, info, metronome, scene);
+
+		if (ch.master_send >= 0 && ch.master_send < SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
+			effects[ch.master_send].lsample += l;
+			effects[ch.master_send].rsample += r;
+		}
+		else {
+			lsample += l;
+			rsample += r;
+		}
+	}
+	//Effects
+	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
+		MasterEffect& effect = effects[i];
+		double l = 0;
+		double r = 0;
+		effect.apply(l, r, info);
+
+		if (effect.next_effect > i && effect.next_effect < SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
+			effects[effect.next_effect].lsample += l;
+			effects[effect.next_effect].rsample += r;
+		}
+		else {
+			lsample += l;
+			rsample += r;
+		}
 	}
 	//Metronome
 	if (play_metronome) {

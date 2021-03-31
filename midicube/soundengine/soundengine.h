@@ -28,7 +28,7 @@ namespace pt = boost::property_tree;
 
 #define SOUND_ENGINE_SCENE_AMOUNT 8
 #define CHANNEL_INSERT_EFFECT_AMOUNT 2
-#define SOUND_ENGINE_MASTER_EFFECT_AMOUNT 32
+#define SOUND_ENGINE_MASTER_EFFECT_AMOUNT 16
 
 class SoundEngineDevice;
 
@@ -374,6 +374,7 @@ public:
 	Metronome metronome;
 	bool play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
+	std::array<MasterEffect, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
 	double volume{0.2};
 	std::atomic<size_t> scene{0};
 
