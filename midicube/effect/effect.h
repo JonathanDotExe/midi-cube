@@ -62,4 +62,5 @@ public:
 };
 
 
+
 #endif /* MIDICUBE_EFFECT_EFFECT_H_ */

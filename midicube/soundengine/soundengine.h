@@ -183,34 +183,8 @@ EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsam
 	return status;
 }
 
-
-class SoundEngineBank {
-public:
-	virtual SoundEngine& channel(unsigned int channel) = 0;
-
-	virtual std::string get_name() = 0;
-
-	virtual ~SoundEngineBank() {
-
-	};
-};
-
 template <typename T>
 std::string get_engine_name();
-
-template <typename T>
-class TemplateSoundEngineBank : public SoundEngineBank {
-private:
-	std::array<T, SOUND_ENGINE_MIDI_CHANNELS> engines;
-
-public:
-	inline SoundEngine& channel(unsigned int channel) {
-		return engines[channel];
-	}
-	std::string get_name() {
-		return get_engine_name<T>();
-	}
-};
 
 struct ChannelSource {
 	ssize_t input = 1;
