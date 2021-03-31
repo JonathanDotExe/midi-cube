@@ -9,6 +9,7 @@
 #define MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_
 
 #include "../midi.h"
+#include "../effect/effect.h"
 #include "../envelope.h"
 #include "../audio.h"
 #include "../synthesis.h"
@@ -26,6 +27,8 @@
 namespace pt = boost::property_tree;
 
 #define SOUND_ENGINE_SCENE_AMOUNT 8
+#define CHANNEL_INSERT_EFFECT_AMOUNT 2
+#define SOUND_ENGINE_MASTER_EFFECT_AMOUNT 32
 
 class SoundEngineDevice;
 
@@ -219,10 +222,8 @@ public:
 	Looper looper;
 
 	//Effects
-	VocoderPreset vocoder_preset;
-	VocoderEffect vocoder;
-	BitCrusherPreset bitcrusher_preset;
-	BitCrusherEffect bitcrusher;
+	std::array<InsertEffect, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
+	ssize_t master_send = -1;
 
 	EngineStatus status = {};
 

@@ -43,3 +43,9 @@ void MasterEffect::set_effect(Effect *effect) {
 	delete this->effect;
 	this->effect = effect;
 }
+
+InsertEffect::~InsertEffect() {
+}
+
+MasterEffect::~MasterEffect() {
+}

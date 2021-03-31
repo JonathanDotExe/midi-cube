@@ -35,10 +35,10 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			}
 			//Process
 			status = engine->process_sample(l, r, info);
-			//Vocoder
-			vocoder.apply(l, r, info.input_sample, vocoder_preset, info);
-			//Bit Crusher
-			bitcrusher.apply(l, r, bitcrusher_preset, info);
+			//Effects
+			for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
+				effects[i].apply(l, r, info);
+			}
 			//Pan
 			l *= (1 - fmax(0, panning));
 			r *= (1 - fmax(0, -panning));
