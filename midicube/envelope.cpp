@@ -13,7 +13,7 @@
 //ADSREnvelope
 double LinearADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
 	//Goto release phase
-	if (!pressed && phase < RELEASE) {
+	if (!pressed && !sustain && phase < RELEASE) {
 		last_vol = volume;
 		phase = RELEASE;
 	}
