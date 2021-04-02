@@ -71,8 +71,8 @@ SampleSound::~SampleSound() {
 }
 
 //SampleSoundStore
-SampleSound* SampleSoundStore::get_sound(std::string name) {
-	return samples.at(name);
+SampleSound* SampleSoundStore::get_sound(size_t index) {
+	return samples.at(index);
 }
 
 void SampleSoundStore::load_sounds(std::string folder) {
@@ -80,20 +80,20 @@ void SampleSoundStore::load_sounds(std::string folder) {
 		std::string file = f.path().string();
 		SampleSound* s = load_sound(file);
 		if (s) {
-			samples.insert({s->name, s});
+			samples.push_back(s);
 		}
 	}
 }
 
 SampleSoundStore::~SampleSoundStore() {
-	for (std::pair<std::string, SampleSound*> s : samples) {
-		delete s.second;
+	for (auto s : samples) {
+		delete s;
 	}
 }
 
 //Sampler
 Sampler::Sampler() {
-	sample = global_sample_store.get_sound("piano");
+	sample = global_sample_store.get_sound(0);
 }
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {

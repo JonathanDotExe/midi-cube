@@ -8,7 +8,6 @@
 #ifndef MIDICUBE_SOUNDENGINE_SAMPLER_H_
 #define MIDICUBE_SOUNDENGINE_SAMPLER_H_
 
-#include <unordered_map>
 #include "soundengine.h"
 #include "../audiofile.h"
 #include "../envelope.h"
@@ -101,10 +100,10 @@ public:
 
 class SampleSoundStore {
 private:
-	std::unordered_map<std::string, SampleSound*> samples;
+	std::vector<SampleSound*> samples;
 public:
 
-	SampleSound* get_sound(std::string name);
+	SampleSound* get_sound(size_t index);
 
 	void load_sounds(std::string folder);
 
