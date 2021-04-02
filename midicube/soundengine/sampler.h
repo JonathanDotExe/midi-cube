@@ -107,6 +107,8 @@ public:
 
 	void load_sounds(std::string folder);
 
+	std::vector<SampleSound*> get_sounds();
+
 	~SampleSoundStore();
 };
 
@@ -132,6 +134,10 @@ public:
 	void release_note(SampleInfo& info, unsigned int note);
 
 	std::string get_name();
+
+	ssize_t get_sound_index();
+
+	void set_sound_index(ssize_t index);
 
 	~Sampler();
 

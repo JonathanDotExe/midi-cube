@@ -85,6 +85,10 @@ void SampleSoundStore::load_sounds(std::string folder) {
 	}
 }
 
+std::vector<SampleSound*> SampleSoundStore::get_sounds() {
+	return samples;
+}
+
 SampleSoundStore::~SampleSoundStore() {
 	for (auto s : samples) {
 		delete s;
@@ -188,6 +192,24 @@ void Sampler::release_note(SampleInfo& info, unsigned int note) {
 
 std::string Sampler::get_name() {
 	return "Sampler";
+}
+
+ssize_t Sampler::get_sound_index() {
+	auto sounds = global_sample_store.get_sounds();
+	ssize_t index = std::find(sounds.begin(), sounds.end(), sample) - sounds.begin();
+	if (index >= (ssize_t) sounds.size()) {
+		index = -1;
+	}
+	return index;
+}
+
+void Sampler::set_sound_index(ssize_t index) {
+	if (index < 0) {
+		sample = nullptr;
+	}
+	else {
+		sample = global_sample_store.get_sound(index);
+	}
 }
 
 Sampler::~Sampler() {
