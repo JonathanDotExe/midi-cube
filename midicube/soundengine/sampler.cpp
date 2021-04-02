@@ -100,14 +100,27 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 	if (note.zone) {
 		double vol = 1;
 		double vel_amount = 0;
-		//Sound
+
 		double l;
 		double r;
+		//Sound
 		if (note.sustain_sample) {
+			//Loop
+			if (note.zone->loop) {
+
+			}
+
 			l = note.zone->sustain_sample.isample(0, note.time, info.sample_rate);
 			r = note.zone->sustain_sample.isample(1, note.time, info.sample_rate);
 		}
 		else {
+			//Loop
+			if (note.zone->loop) {
+				if (note.hit_loop) {
+
+				}
+			}
+
 			l = note.zone->sample.isample(0, note.time, info.sample_rate);
 			r = note.zone->sample.isample(1, note.time, info.sample_rate);
 		}
@@ -156,9 +169,15 @@ bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnviro
 void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	size_t slot = this->note.press_note(info, note, velocity);
 	SamplerVoice& voice = this->note.note[slot];
-	voice.time = 0;
-	voice.env.reset();
 	this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);
+	if (voice.zone && voice.zone->loop == LoopType::ALWAYS_LOOP) {
+		voice.time = voice.sustain_sample ? voice.zone->sustain_loop_start : voice.zone->loop_start;
+	}
+	else {
+		voice.time = 0;
+	}
+	voice.hit_loop = false;
+	voice.env.reset();
 }
 
 void Sampler::release_note(SampleInfo& info, unsigned int note) {

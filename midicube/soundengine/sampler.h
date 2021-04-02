@@ -41,6 +41,10 @@ struct SampleZone {
 	unsigned int loop_end = 0;
 	unsigned int loop_crossfade = 0;
 
+	unsigned int sustain_loop_start = 0;
+	unsigned int sustain_loop_end = 0;
+	unsigned int sustain_loop_crossfade = 0;
+
 	double layer_velocity_amount = 0.0;
 	double freq = 0;
 	double max_freq = 0;
@@ -68,6 +72,7 @@ struct SampleVelocityLayer {
 
 struct SamplerVoice : public TriggeredNote {
 	double time = 0;
+	bool hit_loop = false;
 	bool sustain_sample = false;
 	double layer_amp = 1;
 	SampleZone* zone = nullptr;
