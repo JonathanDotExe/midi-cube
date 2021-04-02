@@ -35,6 +35,7 @@ struct SampleEnvelope {
 struct SampleZone {
 	AudioSample sample;
 	AudioSample sustain_sample;
+
 	LoopType loop = NO_LOOP;
 	unsigned int loop_start = 0;
 	unsigned int loop_end = 0;
@@ -66,6 +67,7 @@ struct SampleVelocityLayer {
 };
 
 struct SamplerVoice : public TriggeredNote {
+	double time = 0;
 	bool sustain_sample = false;
 	double layer_amp = 1;
 	SampleZone* zone = nullptr;

@@ -101,16 +101,15 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		double vol = 1;
 		double vel_amount = 0;
 		//Sound
-		double time = (info.time - note.start_time) * note.freq/note.zone->freq;
 		double l;
 		double r;
 		if (note.sustain_sample) {
-			l = note.zone->sustain_sample.isample(0, time, info.sample_rate);
-			r = note.zone->sustain_sample.isample(1, time, info.sample_rate);
+			l = note.zone->sustain_sample.isample(0, note.time, info.sample_rate);
+			r = note.zone->sustain_sample.isample(1, note.time, info.sample_rate);
 		}
 		else {
-			l = note.zone->sample.isample(0, time, info.sample_rate);
-			r = note.zone->sample.isample(1, time, info.sample_rate);
+			l = note.zone->sample.isample(0, note.time, info.sample_rate);
+			r = note.zone->sample.isample(1, note.time, info.sample_rate);
 		}
 		//Filter
 		if (note.filter) {
@@ -138,6 +137,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		}
 		vol *= vel_amount * (note.velocity - 1) + 1;
 		vol *= note.layer_amp;
+
+		note.time += note.freq/note.zone->freq * env.pitch_bend * info.time_step;
 		//Playback
 		lsample += l * vol;
 		rsample += r * vol;
@@ -155,6 +156,7 @@ bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnviro
 void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	size_t slot = this->note.press_note(info, note, velocity);
 	SamplerVoice& voice = this->note.note[slot];
+	voice.time = 0;
 	voice.env.reset();
 	this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);
 }
