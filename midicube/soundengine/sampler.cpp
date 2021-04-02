@@ -106,8 +106,17 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		//Sound
 		//Loop
 		if (note.zone->loop) {
+			double loop_start_time = (double) note.sample->loop_start / note.sample->sample.sample_rate;
+			double loop_duration_time = (double) note.sample->loop_duration / note.sample->sample.sample_rate;
+			double loop_end_time = loop_start_time + loop_duration_time;
 			if (note.hit_loop) {
-
+				//Loop again
+				if (note.time >= loop_end_time) {
+					note.time = loop_start_time + fmod(note.time - loop_start_time, loop_duration_time);
+				}
+			}
+			else if (note.time >= loop_start_time) {
+				note.hit_loop = true;
 			}
 		}
 
