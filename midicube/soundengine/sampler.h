@@ -13,6 +13,10 @@
 #include "../audiofile.h"
 #include "../envelope.h"
 
+enum LoopType {
+	NO_LOOP, ATTACK_LOOP, ALWAYS_LOOP
+};
+
 struct SampleFilter {
 	FilterType filter_type = FilterType::LP_12;
 	double filter_cutoff = 1;
@@ -32,6 +36,11 @@ struct SampleEnvelope {
 struct SampleZone {
 	AudioSample sample;
 	AudioSample sustain_sample;
+	LoopType loop = NO_LOOP;
+	unsigned int loop_start = 0;
+	unsigned int loop_end = 0;
+	unsigned int loop_crossfade = 0;
+
 	double layer_velocity_amount = 0.0;
 	double freq = 0;
 	double max_freq = 0;
