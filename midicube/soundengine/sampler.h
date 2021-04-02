@@ -32,18 +32,18 @@ struct SampleEnvelope {
 	bool sustain_entire_sample = false;
 };
 
-struct SampleZone {
+struct LoopedAudioSample {
 	AudioSample sample;
-	AudioSample sustain_sample;
-
-	LoopType loop = NO_LOOP;
 	unsigned int loop_start = 0;
 	unsigned int loop_end = 0;
 	unsigned int loop_crossfade = 0;
+};
 
-	unsigned int sustain_loop_start = 0;
-	unsigned int sustain_loop_end = 0;
-	unsigned int sustain_loop_crossfade = 0;
+struct SampleZone {
+	LoopedAudioSample sample;
+	LoopedAudioSample sustain_sample;
+	LoopType loop = NO_LOOP;
+
 
 	double layer_velocity_amount = 0.0;
 	double freq = 0;
@@ -52,8 +52,8 @@ struct SampleZone {
 	ssize_t env = -1;
 
 	SampleZone () {
-		sample.clear();
-		sustain_sample.clear();
+		sample.sample.clear();
+		sustain_sample.sample.clear();
 	};
 
 };
@@ -73,9 +73,9 @@ struct SampleVelocityLayer {
 struct SamplerVoice : public TriggeredNote {
 	double time = 0;
 	bool hit_loop = false;
-	bool sustain_sample = false;
 	double layer_amp = 1;
 	SampleZone* zone = nullptr;
+	LoopedAudioSample* sample = nullptr;
 	SampleEnvelope* env_data = nullptr;
 	SampleFilter* filter = nullptr;
 	LinearADSREnvelope env;

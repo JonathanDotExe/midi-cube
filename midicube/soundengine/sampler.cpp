@@ -53,7 +53,7 @@ void SampleSound::get_sample(double freq, double velocity, SamplerVoice& voice, 
 	voice.zone = zone;
 	if (voice.zone) {
 		voice.layer_amp = 1 - voice.zone->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel)) * volume;
-		voice.sustain_sample = sustain && voice.zone->sustain_sample.samples.size();
+		voice.sample = (sustain && voice.zone->sustain_sample.sample.samples.size()) ? &voice.zone->sustain_sample : &voice.zone->sample;
 		if (voice.zone->env >= 0 && (size_t) voice.zone->env < envelopes.size()) {
 			voice.env_data = &envelopes[voice.zone->env];
 		}
@@ -97,33 +97,23 @@ Sampler::Sampler() {
 }
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	if (note.zone) {
+	if (note.zone && note.sample) {
 		double vol = 1;
 		double vel_amount = 0;
 
 		double l;
 		double r;
 		//Sound
-		if (note.sustain_sample) {
-			//Loop
-			if (note.zone->loop) {
+		//Loop
+		if (note.zone->loop) {
+			if (note.hit_loop) {
 
 			}
-
-			l = note.zone->sustain_sample.isample(0, note.time, info.sample_rate);
-			r = note.zone->sustain_sample.isample(1, note.time, info.sample_rate);
 		}
-		else {
-			//Loop
-			if (note.zone->loop) {
-				if (note.hit_loop) {
 
-				}
-			}
+		l = note.sample->sample.isample(0, note.time, info.sample_rate);
+		r = note.sample->sample.isample(1, note.time, info.sample_rate);
 
-			l = note.zone->sample.isample(0, note.time, info.sample_rate);
-			r = note.zone->sample.isample(1, note.time, info.sample_rate);
-		}
 		//Filter
 		if (note.filter) {
 			FilterData filter { note.filter->filter_type };
@@ -163,7 +153,10 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 }
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	return note.env_data->sustain_entire_sample ? note.start_time + note.zone->sample.duration() * note.zone->freq/note.freq < info.time : note.env.is_finished();
+	if (note.zone && note.sample) {
+		return note.env_data->sustain_entire_sample ? note.time < note.sample->sample.duration() : note.env.is_finished();
+	}
+	return true;
 }
 
 void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
@@ -171,7 +164,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	SamplerVoice& voice = this->note.note[slot];
 	this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);
 	if (voice.zone && voice.zone->loop == LoopType::ALWAYS_LOOP) {
-		voice.time = voice.sustain_sample ? voice.zone->sustain_loop_start : voice.zone->loop_start;
+		voice.time = voice.sample->loop_start;
 	}
 	else {
 		voice.time = 0;
@@ -260,12 +253,12 @@ extern SampleSound* load_sound(std::string folder) {
 				zone->env = z.second.get<double>("envelope", 0);
 				zone->filter = z.second.get<double>("filter", 0);
 				std::string file = folder + "/" + z.second.get<std::string>("sample", "");
-				if (!read_audio_file(zone->sample, file)) {
+				if (!read_audio_file(zone->sample.sample, file)) {
 					std::cerr << "Couldn't load sample file " << file << std::endl;
 				}
 				std::string sfile = folder + "/" + z.second.get<std::string>("sustain_sample", "");
 				if (sfile != folder + "/") {
-					if (!read_audio_file(zone->sustain_sample, sfile)) {
+					if (!read_audio_file(zone->sustain_sample.sample, sfile)) {
 						std::cerr << "Couldn't load sample file " << sfile << std::endl;
 					}
 				}
