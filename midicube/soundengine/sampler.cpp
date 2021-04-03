@@ -319,3 +319,13 @@ void __fix_link_sampler_name__ () {
 	get_engine_name<Sampler>();
 }
 
+//SamplerProgram
+void SamplerProgram::load(boost::property_tree::ptree tree) {
+	sound_name = tree.get("sound_name", "");
+}
+
+boost::property_tree::ptree SamplerProgram::save() {
+	boost::property_tree::ptree tree;
+	tree.put("sound_name", sound_name);
+	return tree;
+}

@@ -98,6 +98,18 @@ public:
 
 };
 
+class SamplerProgram : public EngineProgram {
+public:
+	std::string sound_name;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~SamplerProgram() {
+
+	}
+};
+
 class SampleSoundStore {
 private:
 	std::vector<SampleSound*> samples;
