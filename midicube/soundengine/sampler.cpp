@@ -230,6 +230,7 @@ void Sampler::set_sound_index(ssize_t index) {
 }
 
 void Sampler::save_program(EngineProgram **prog) {
+	std::cout << "Save" << std::endl;
 	SamplerProgram* p = dynamic_cast<SamplerProgram*>(*prog);
 	//Create new
 	if (!p) {
