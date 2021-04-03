@@ -89,6 +89,15 @@ std::vector<SampleSound*> SampleSoundStore::get_sounds() {
 	return samples;
 }
 
+SampleSound* SampleSoundStore::get_sound(std::string name) {
+	for (auto s : samples) {
+		if (s->name == name) {
+			return s;
+		}
+	}
+	return nullptr;
+}
+
 SampleSoundStore::~SampleSoundStore() {
 	for (auto s : samples) {
 		delete s;
@@ -175,7 +184,15 @@ bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnviro
 void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	size_t slot = this->note.press_note(info, note, velocity);
 	SamplerVoice& voice = this->note.note[slot];
-	this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);
+	if (this->sample) {
+		this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);
+	}
+	else {
+		voice.zone = nullptr;
+		voice.sample = nullptr;
+		voice.filter = nullptr;
+		voice.env_data = nullptr;
+	}
 	if (voice.zone && voice.zone->loop == LoopType::ALWAYS_LOOP) {
 		voice.time = voice.sample->loop_start;
 	}
@@ -209,6 +226,28 @@ void Sampler::set_sound_index(ssize_t index) {
 	}
 	else {
 		sample = global_sample_store.get_sound(index);
+	}
+}
+
+void Sampler::save_program(EngineProgram **prog) {
+	SamplerProgram* p = dynamic_cast<SamplerProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new SamplerProgram();
+	}
+	p->sound_name = this->sample ? this->sample->name : "";
+	*prog = p;
+}
+
+void Sampler::apply_program(EngineProgram *prog) {
+	SamplerProgram* p = dynamic_cast<SamplerProgram*>(prog);
+	//Create new
+	if (p) {
+		sample = global_sample_store.get_sound(p->sound_name);
+	}
+	else {
+		sample = nullptr;
 	}
 }
 

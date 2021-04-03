@@ -117,6 +117,8 @@ public:
 
 	SampleSound* get_sound(size_t index);
 
+	SampleSound* get_sound(std::string name);
+
 	void load_sounds(std::string folder);
 
 	std::vector<SampleSound*> get_sounds();
@@ -150,6 +152,10 @@ public:
 	ssize_t get_sound_index();
 
 	void set_sound_index(ssize_t index);
+
+	void save_program(EngineProgram **prog);
+
+	void apply_program(EngineProgram *prog);
 
 	~Sampler();
 
