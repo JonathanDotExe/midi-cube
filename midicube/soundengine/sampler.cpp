@@ -52,7 +52,7 @@ void SampleSound::get_sample(double freq, double velocity, SamplerVoice& voice, 
 	//Update zone
 	voice.zone = zone;
 	if (voice.zone) {
-		voice.layer_amp = 1 - voice.zone->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel)) * volume;
+		voice.layer_amp = (1 - voice.zone->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel))) * volume;
 		voice.sample = (sustain && voice.zone->sustain_sample.sample.samples.size()) ? &voice.zone->sustain_sample : &voice.zone->sample;
 		if (voice.zone->env >= 0 && (size_t) voice.zone->env < envelopes.size()) {
 			voice.env_data = &envelopes[voice.zone->env];
