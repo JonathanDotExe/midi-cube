@@ -114,18 +114,29 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		double vol = 1;
 		double vel_amount = 0;
 
-		double l;
-		double r;
+		double l = 0;
+		double r = 0;
+		double crossfade = 1;
 		//Sound
 		//Loop
 		if (note.zone->loop) {
 			double loop_start_time = (double) note.sample->loop_start / note.sample->sample.sample_rate;
 			double loop_duration_time = (double) note.sample->loop_duration / note.sample->sample.sample_rate;
+			double loop_crossfade_time = (double) note.sample->loop_crossfade / note.sample->sample.sample_rate;
 			double loop_end_time = loop_start_time + loop_duration_time;
+			double crossfade_start_time = loop_start_time - loop_crossfade_time;
+			double crossfade_end_time = loop_end_time - loop_crossfade_time;
 			if (note.hit_loop) {
 				//Loop again
 				if (note.time >= loop_end_time) {
 					note.time = loop_start_time + fmod(note.time - loop_start_time, loop_duration_time);
+				}
+				//Crossfade
+				else if (note.time > crossfade_end_time) {
+					double diff = note.time - crossfade_end_time;
+					crossfade = diff / loop_crossfade_time;
+					l += note.sample->sample.isample(0, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
+					r += note.sample->sample.isample(1, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
 				}
 			}
 			else if (note.time >= loop_start_time) {
@@ -133,8 +144,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 			}
 		}
 
-		l = note.sample->sample.isample(0, note.time, info.sample_rate);
-		r = note.sample->sample.isample(1, note.time, info.sample_rate);
+		l += note.sample->sample.isample(0, note.time, info.sample_rate) * crossfade;
+		r += note.sample->sample.isample(1, note.time, info.sample_rate) * crossfade;
 
 		//Filter
 		if (note.filter) {
