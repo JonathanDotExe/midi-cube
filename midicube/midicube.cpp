@@ -136,7 +136,7 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 			if (pass) {
 				msg.channel = i;
 				if (engine.send(msg, info)) {
-					updated = false;
+					updated = true;
 				}
 			}
 		}
