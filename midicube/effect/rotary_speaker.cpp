@@ -48,6 +48,8 @@ void RotarySpeakerEffect::apply(double &lsample, double &rsample, RotarySpeakerP
 		double r = right_delay.process();
 		lsample = l + r * preset.stereo_mix;
 		rsample = r + l * preset.stereo_mix;
+		lsample *= 2.0/(1 + preset.stereo_mix);
+		rsample *= 2.0/(1 + preset.stereo_mix);
 	}
 
 	//Rotate speakers
