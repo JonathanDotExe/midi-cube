@@ -40,11 +40,12 @@ void Control::set_visible(bool visible) {
 }
 
 //Frame
-Frame::Frame(MidiCube& c, int width, int height, std::string title) : cube(c) {
+Frame::Frame(MidiCube& c, int width, int height, std::string title, bool render_sleep) : cube(c) {
 	this->width = width;
 	this->height = height;
 	this->title = title;
 	this->view = nullptr;
+	this->render_sleep = render_sleep;
 
 	this->selected = nullptr;
 }
@@ -125,7 +126,7 @@ void Frame::run(ViewController* v) {
 			}
 		}
 		//Render
-		if (redraw) {
+		if (redraw || !render_sleep) {
 			window.clear(sf::Color(80, 80, 80));
 			for (Control* control : controls) {
 				if (control->is_visible()) {

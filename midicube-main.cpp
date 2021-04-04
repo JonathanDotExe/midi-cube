@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
 	//Parse args
 	int out_device = -1;
 	int in_device = -1;
+	bool screen_sleep = true;
 	if (argc > 1) {
 		out_device = atoi(argv[1]);
 		cout << out_device << endl;
@@ -23,6 +24,10 @@ int main(int argc, char **argv) {
 	if (argc > 2) {
 		in_device = atoi(argv[2]);
 		cout << in_device << endl;
+	}
+	if (argc > 3) {
+		screen_sleep = atoi(argv[3]);
+		cout << screen_sleep << endl;
 	}
 	//Create MIDICube
 	MidiCubePtr ptr;
