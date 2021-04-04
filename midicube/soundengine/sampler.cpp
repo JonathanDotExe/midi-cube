@@ -324,7 +324,7 @@ extern SampleSound* load_sound(std::string folder) {
 				zone->env = z.second.get<double>("envelope", 0);
 				zone->filter = z.second.get<double>("filter", 0);
 				//Loop
-				std::string type = z.second.get<std::string>("loop_type");
+				std::string type = z.second.get<std::string>("loop_type", "NO_LOOP");
 				if (type == "NO_LOOP") {
 					zone->loop = LoopType::NO_LOOP;
 				}
@@ -338,9 +338,9 @@ extern SampleSound* load_sound(std::string folder) {
 				//Sample
 				if (z.second.get_child_optional("sample.name")) {
 					file = folder + "/" + z.second.get<std::string>("sample.name", "");
-					zone->sample.loop_start = z.second.get<std::string>("sample.loop_start", 0);
-					zone->sample.loop_duration = z.second.get<std::string>("sample.loop_duration", 0);
-					zone->sample.loop_crossfade = z.second.get<std::string>("sample.loop_crossfade", 0);
+					zone->sample.loop_start = z.second.get<unsigned int>("sample.loop_start", 0);
+					zone->sample.loop_duration = z.second.get<unsigned int>("sample.loop_duration", 0);
+					zone->sample.loop_crossfade = z.second.get<unsigned int>("sample.loop_crossfade", 0);
 				}
 				else {
 					file = folder + "/" + z.second.get<std::string>("sample", "");
@@ -351,9 +351,9 @@ extern SampleSound* load_sound(std::string folder) {
 				std::string sfile;
 				if (z.second.get_child_optional("sustain_sample.name")) {
 					sfile = folder + "/" + z.second.get<std::string>("sustain_sample.name", "");
-					zone->sustain_sample.loop_start = z.second.get<std::string>("sustain_sample.loop_start", 0);
-					zone->sustain_sample.loop_duration = z.second.get<std::string>("sustain_sample.loop_duration", 0);
-					zone->sustain_sample.loop_crossfade = z.second.get<std::string>("sustain_sample.loop_crossfade", 0);
+					zone->sustain_sample.loop_start = z.second.get<unsigned int>("sustain_sample.loop_start", 0);
+					zone->sustain_sample.loop_duration = z.second.get<unsigned int>("sustain_sample.loop_duration", 0);
+					zone->sustain_sample.loop_crossfade = z.second.get<unsigned int>("sustain_sample.loop_crossfade", 0);
 				}
 				else {
 					sfile = folder + "/" + z.second.get<std::string>("sustain_sample", "");
