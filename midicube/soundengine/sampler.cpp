@@ -323,11 +323,41 @@ extern SampleSound* load_sound(std::string folder) {
 				zone->max_freq = note_to_freq(z.second.get<double>("max_note", 127.0));
 				zone->env = z.second.get<double>("envelope", 0);
 				zone->filter = z.second.get<double>("filter", 0);
-				std::string file = folder + "/" + z.second.get<std::string>("sample", "");
+				//Loop
+				std::string type = z.second.get<std::string>("loop_type");
+				if (type == "NO_LOOP") {
+					zone->loop = LoopType::NO_LOOP;
+				}
+				else if (type == "ATTACK_LOOP") {
+					zone->loop = LoopType::ATTACK_LOOP;
+				}
+				else if (type == "ALWAYS_LOOP") {
+					zone->loop = LoopType::ALWAYS_LOOP;
+				}
+				std::string file;
+				//Sample
+				if (z.second.get_child_optional("sample.name")) {
+					file = folder + "/" + z.second.get<std::string>("sample.name", "");
+					zone->sample.loop_start = z.second.get<std::string>("sample.loop_start", 0);
+					zone->sample.loop_duration = z.second.get<std::string>("sample.loop_duration", 0);
+					zone->sample.loop_crossfade = z.second.get<std::string>("sample.loop_crossfade", 0);
+				}
+				else {
+					file = folder + "/" + z.second.get<std::string>("sample", "");
+				}
 				if (!read_audio_file(zone->sample.sample, file)) {
 					std::cerr << "Couldn't load sample file " << file << std::endl;
 				}
-				std::string sfile = folder + "/" + z.second.get<std::string>("sustain_sample", "");
+				std::string sfile;
+				if (z.second.get_child_optional("sustain_sample.name")) {
+					sfile = folder + "/" + z.second.get<std::string>("sustain_sample.name", "");
+					zone->sustain_sample.loop_start = z.second.get<std::string>("sustain_sample.loop_start", 0);
+					zone->sustain_sample.loop_duration = z.second.get<std::string>("sustain_sample.loop_duration", 0);
+					zone->sustain_sample.loop_crossfade = z.second.get<std::string>("sustain_sample.loop_crossfade", 0);
+				}
+				else {
+					sfile = folder + "/" + z.second.get<std::string>("sustain_sample", "");
+				}
 				if (sfile != folder + "/") {
 					if (!read_audio_file(zone->sustain_sample.sample, sfile)) {
 						std::cerr << "Couldn't load sample file " << sfile << std::endl;
