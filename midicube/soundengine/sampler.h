@@ -8,10 +8,13 @@
 #ifndef MIDICUBE_SOUNDENGINE_SAMPLER_H_
 #define MIDICUBE_SOUNDENGINE_SAMPLER_H_
 
-#include <unordered_map>
 #include "soundengine.h"
 #include "../audiofile.h"
 #include "../envelope.h"
+
+enum LoopType {
+	NO_LOOP, ATTACK_LOOP, ALWAYS_LOOP
+};
 
 struct SampleFilter {
 	FilterType filter_type = FilterType::LP_12;
@@ -24,14 +27,23 @@ struct SampleFilter {
 
 struct SampleEnvelope {
 	ADSREnvelopeData env = {0, 0, 1, 0};
-	double fade_out = 0;
 	double amp_velocity_amount = 0.0;
 	bool sustain_entire_sample = false;
 };
 
-struct SampleZone {
+struct LoopedAudioSample {
 	AudioSample sample;
-	AudioSample sustain_sample;
+	unsigned int loop_start = 0;
+	unsigned int loop_duration = 0;
+	unsigned int loop_crossfade = 0;
+};
+
+struct SampleZone {
+	LoopedAudioSample sample;
+	LoopedAudioSample sustain_sample;
+	LoopType loop = NO_LOOP;
+
+
 	double layer_velocity_amount = 0.0;
 	double freq = 0;
 	double max_freq = 0;
@@ -39,8 +51,8 @@ struct SampleZone {
 	ssize_t env = -1;
 
 	SampleZone () {
-		sample.clear();
-		sustain_sample.clear();
+		sample.sample.clear();
+		sustain_sample.sample.clear();
 	};
 
 };
@@ -58,9 +70,11 @@ struct SampleVelocityLayer {
 };
 
 struct SamplerVoice : public TriggeredNote {
-	bool sustain_sample = false;
+	double time = 0;
+	bool hit_loop = false;
 	double layer_amp = 1;
 	SampleZone* zone = nullptr;
+	LoopedAudioSample* sample = nullptr;
 	SampleEnvelope* env_data = nullptr;
 	SampleFilter* filter = nullptr;
 	LinearADSREnvelope env;
@@ -84,14 +98,30 @@ public:
 
 };
 
+class SamplerProgram : public EngineProgram {
+public:
+	std::string sound_name;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~SamplerProgram() {
+
+	}
+};
+
 class SampleSoundStore {
 private:
-	std::unordered_map<std::string, SampleSound*> samples;
+	std::vector<SampleSound*> samples;
 public:
+
+	SampleSound* get_sound(size_t index);
 
 	SampleSound* get_sound(std::string name);
 
 	void load_sounds(std::string folder);
+
+	std::vector<SampleSound*> get_sounds();
 
 	~SampleSoundStore();
 };
@@ -118,6 +148,14 @@ public:
 	void release_note(SampleInfo& info, unsigned int note);
 
 	std::string get_name();
+
+	ssize_t get_sound_index();
+
+	void set_sound_index(ssize_t index);
+
+	void save_program(EngineProgram **prog);
+
+	void apply_program(EngineProgram *prog);
 
 	~Sampler();
 
