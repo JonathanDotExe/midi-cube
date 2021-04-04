@@ -134,7 +134,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 				//Crossfade
 				else if (note.time > crossfade_end_time) {
 					double diff = note.time - crossfade_end_time;
-					crossfade = diff / loop_crossfade_time;
+					crossfade = 1 - (diff / loop_crossfade_time);
 					l += note.sample->sample.isample(0, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
 					r += note.sample->sample.isample(1, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
 				}
