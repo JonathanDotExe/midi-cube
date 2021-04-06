@@ -5,8 +5,8 @@
  *      Author: jojo
  */
 
-#ifndef MIDICUBE_EFFECT_BITCRUSHER_H_
-#define MIDICUBE_EFFECT_BITCRUSHER_H_
+#ifndef MIDICUBE_EFFECT_CHORUS_H_
+#define MIDICUBE_EFFECT_CHORUS_H_
 
 #include "../audio.h"
 #include "../oscilator.h"
@@ -36,4 +36,4 @@ public:
 	~ChorusEffect();
 };
 
-#endif /* MIDICUBE_EFFECT_BITCRUSHER_H_ */
+#endif /* MIDICUBE_EFFECT_CHORUS_H_ */

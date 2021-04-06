@@ -58,6 +58,7 @@ src = [
 	
 	'midicube/effect/amplifier_simulation.cpp',
 	'midicube/effect/bitcrusher.cpp',
+	'midicube/effect/chorus.cpp',
 	'midicube/effect/effect.cpp',
 	'midicube/effect/rotary_speaker.cpp',
 	'midicube/effect/vocoder.cpp'
