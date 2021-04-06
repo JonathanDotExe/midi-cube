@@ -24,6 +24,32 @@ void InsertEffect::set_effect(Effect *effect) {
 	this->effect = effect;
 }
 
+void InsertEffect::set_effect_index(ssize_t index) {
+	auto builders = device->get_effect_builders();
+	if (index >= 0 && (size_t) index < builders.size()) {
+		set_effect(builders.at(index)->build());
+	}
+	else {
+		set_effect(nullptr);
+	}
+}
+
+ssize_t InsertEffect::get_effect_index() {
+	auto builders = device->get_effect_builders();
+	ssize_t index = -1;
+	for (size_t i = 0; i < builders.size(); ++i) {
+		if (builders[i]->matches(effect)) {
+			index = i;
+			break;
+		}
+	}
+
+	return index;
+}
+
+InsertEffect::~InsertEffect() {
+}
+
 
 void MasterEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	lsample = this->lsample;
@@ -46,11 +72,33 @@ void MasterEffect::set_effect(Effect *effect) {
 	this->effect = effect;
 }
 
-InsertEffect::~InsertEffect() {
+void MasterEffect::set_effect_index(ssize_t index) {
+	auto builders = device->get_effect_builders();
+		if (index >= 0 && (size_t) index < builders.size()) {
+			set_effect(builders.at(index)->build());
+		}
+		else {
+			set_effect(nullptr);
+		}
+}
+
+ssize_t MasterEffect::get_effect_index() {
+	auto builders = device->get_effect_builders();
+	ssize_t index = -1;
+	for (size_t i = 0; i < builders.size(); ++i) {
+		if (builders[i]->matches(effect)) {
+			index = i;
+			break;
+		}
+	}
+
+	return index;
 }
 
 MasterEffect::~MasterEffect() {
 }
+
+
 
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {

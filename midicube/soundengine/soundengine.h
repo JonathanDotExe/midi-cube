@@ -220,6 +220,10 @@ public:
 
 	}
 
+	void set_effect_index(ssize_t index);
+
+	ssize_t get_effect_index();
+
 	void apply(double& lsample, double& rsample, SampleInfo& info);
 
 	void set_effect(Effect *effect = nullptr);
@@ -242,6 +246,10 @@ public:
 	MasterEffect() {
 
 	}
+
+	void set_effect_index(ssize_t index);
+
+	ssize_t get_effect_index();
 
 	void apply(double& lsample, double& rsample, SampleInfo& info);
 
@@ -434,8 +442,8 @@ public:
 
 	~SoundEngineDevice();
 
-	std::vector<EffectBuilder*>* get_effect_builders() {
-		return &effect_builders;
+	std::vector<EffectBuilder*> get_effect_builders() {
+		return effect_builders;
 	}
 };
 
