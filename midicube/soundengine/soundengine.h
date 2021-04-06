@@ -209,6 +209,49 @@ struct SoundEngineScene {
 	ChannelSource source;
 };
 
+class InsertEffect {
+private:
+	Effect* effect = nullptr;
+
+public:
+	SoundEngineDevice* device = nullptr;
+
+	InsertEffect() {
+
+	}
+
+	void apply(double& lsample, double& rsample, SampleInfo& info);
+
+	void set_effect(Effect *effect = nullptr);
+
+	const Effect* get_effect() const;
+
+	~InsertEffect();
+};
+
+class MasterEffect {
+private:
+	Effect* effect = nullptr;
+
+public:
+	SoundEngineDevice* device = nullptr;
+	double lsample = 0;
+	double rsample = 0;
+	size_t next_effect = 0;
+
+	MasterEffect() {
+
+	}
+
+	void apply(double& lsample, double& rsample, SampleInfo& info);
+
+	void set_effect(Effect *effect = nullptr);
+
+	const Effect* get_effect() const;
+
+	~MasterEffect();
+};
+
 class SoundEngineChannel {
 private:
 	SoundEngine* engine = nullptr;

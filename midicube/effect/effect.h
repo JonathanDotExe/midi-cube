@@ -53,48 +53,5 @@ public:
 	}
 };
 
-class InsertEffect {
-private:
-	Effect* effect = nullptr;
-
-public:
-	std::vector<EffectBuilder*>* effect_builders = nullptr;
-
-	InsertEffect() {
-
-	}
-	
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-
-	void set_effect(Effect *effect = nullptr);
-
-	const Effect* get_effect() const;
-	
-	~InsertEffect();
-};
-
-class MasterEffect {
-private:
-	Effect* effect = nullptr;
-
-public:
-	double lsample = 0;
-	double rsample = 0;
-	size_t next_effect = 0;
-
-	std::vector<EffectBuilder*>* effect_builders = nullptr;
-
-	MasterEffect() {
-
-	}
-
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-
-	void set_effect(Effect *effect = nullptr);
-
-	const Effect* get_effect() const;
-
-	~MasterEffect();
-};
 
 #endif /* MIDICUBE_EFFECT_EFFECT_H_ */

@@ -9,6 +9,49 @@
 
 #include <algorithm>
 
+void InsertEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+	if (effect) {
+		effect->apply(lsample, rsample, info);
+	}
+}
+
+const Effect* InsertEffect::get_effect() const {
+	return effect;
+}
+
+void InsertEffect::set_effect(Effect *effect) {
+	delete this->effect;
+	this->effect = effect;
+}
+
+
+void MasterEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+	lsample = this->lsample;
+	rsample = this->rsample;
+
+	if (effect) {
+		effect->apply(lsample, rsample, info);
+	}
+
+	this->lsample = 0;
+	this->rsample = 0;
+}
+
+const Effect* MasterEffect::get_effect() const {
+	return effect;
+}
+
+void MasterEffect::set_effect(Effect *effect) {
+	delete this->effect;
+	this->effect = effect;
+}
+
+InsertEffect::~InsertEffect() {
+}
+
+MasterEffect::~MasterEffect() {
+}
+
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {
 	engine = nullptr;
@@ -18,7 +61,7 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	if (!this->device) {
 		this->device = device;
 		for (size_t i = 0; i < effects.size(); ++i) {
-			effects[i].effect_builders = device->get_effect_builders();
+			effects[i].device = device;
 		}
 	}
 }
@@ -225,7 +268,7 @@ void SoundEngineChannel::set_active(bool active) {
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	metronome.init(0);
 	for (size_t i = 0; i < this->effects.size(); ++i) {
-		effects[i].effect_builders = &this->effect_builders;
+		effects[i].device = this;
 	}
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
