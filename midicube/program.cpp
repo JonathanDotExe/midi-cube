@@ -6,6 +6,7 @@
  */
 
 #include "program.h"
+#include "soundengine/sampler.h"
 #include "soundengine/organ.h"
 #include "soundengine/asynth.h"
 #include <boost/filesystem.hpp>
@@ -77,8 +78,12 @@ Program* load_program(pt::ptree& tree) {
 
 				//Sound engine
 				//FIXME
+				//Sampler
+				if (program->channels[i].engine_index == 0) {
+					program->channels[i].engine_program = new SamplerProgram();
+				}
 				//Organ
-				if (program->channels[i].engine_index == 1) {
+				else if (program->channels[i].engine_index == 1) {
 					program->channels[i].engine_program = new B3OrganProgram();
 				}
 				//Synth

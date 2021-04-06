@@ -103,9 +103,11 @@ private:
 	ViewController* next_view = nullptr;
 	bool request_close = false;
 
+	bool render_sleep = true;
+
 public:
 	MidiCube& cube;
-	Frame(MidiCube& cube, int width, int height, std::string title);
+	Frame(MidiCube& cube, int width, int height, std::string title, bool render_sleep = true);
 
 	void run(ViewController* v);
 

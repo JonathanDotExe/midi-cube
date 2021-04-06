@@ -52,8 +52,8 @@ void SampleSound::get_sample(double freq, double velocity, SamplerVoice& voice, 
 	//Update zone
 	voice.zone = zone;
 	if (voice.zone) {
-		voice.layer_amp = 1 - voice.zone->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel)) * volume;
-		voice.sustain_sample = sustain && voice.zone->sustain_sample.samples.size();
+		voice.layer_amp = (1 - voice.zone->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel))) * volume;
+		voice.sample = (sustain && voice.zone->sustain_sample.sample.samples.size()) ? &voice.zone->sustain_sample : &voice.zone->sample;
 		if (voice.zone->env >= 0 && (size_t) voice.zone->env < envelopes.size()) {
 			voice.env_data = &envelopes[voice.zone->env];
 		}
@@ -71,8 +71,8 @@ SampleSound::~SampleSound() {
 }
 
 //SampleSoundStore
-SampleSound* SampleSoundStore::get_sound(std::string name) {
-	return samples.at(name);
+SampleSound* SampleSoundStore::get_sound(size_t index) {
+	return samples.at(index);
 }
 
 void SampleSoundStore::load_sounds(std::string folder) {
@@ -80,41 +80,73 @@ void SampleSoundStore::load_sounds(std::string folder) {
 		std::string file = f.path().string();
 		SampleSound* s = load_sound(file);
 		if (s) {
-			samples.insert({s->name, s});
+			samples.push_back(s);
 		}
 	}
 }
 
+std::vector<SampleSound*> SampleSoundStore::get_sounds() {
+	return samples;
+}
+
+SampleSound* SampleSoundStore::get_sound(std::string name) {
+	for (auto s : samples) {
+		if (s->name == name) {
+			return s;
+		}
+	}
+	return nullptr;
+}
+
 SampleSoundStore::~SampleSoundStore() {
-	for (std::pair<std::string, SampleSound*> s : samples) {
-		delete s.second;
+	for (auto s : samples) {
+		delete s;
 	}
 }
 
 //Sampler
 Sampler::Sampler() {
-	sample = global_sample_store.get_sound("piano");
+	sample = global_sample_store.get_sound(0);
 }
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	if (note.zone) {
+	if (note.zone && note.sample) {
 		double vol = 1;
 		double vel_amount = 0;
+
+		double l = 0;
+		double r = 0;
+		double crossfade = 1;
 		//Sound
-		double time = (info.time - note.start_time) * note.freq/note.zone->freq;
-		double duration = 0;
-		double l;
-		double r;
-		if (note.sustain_sample) {
-			duration = note.zone->sustain_sample.duration();
-			l = note.zone->sustain_sample.isample(0, time, info.sample_rate);
-			r = note.zone->sustain_sample.isample(1, time, info.sample_rate);
+		//Loop
+		if (note.zone->loop) {
+			double loop_start_time = (double) note.sample->loop_start / note.sample->sample.sample_rate;
+			double loop_duration_time = (double) note.sample->loop_duration / note.sample->sample.sample_rate;
+			double loop_crossfade_time = (double) note.sample->loop_crossfade / note.sample->sample.sample_rate;
+			double loop_end_time = loop_start_time + loop_duration_time;
+			double crossfade_start_time = loop_start_time - loop_crossfade_time;
+			double crossfade_end_time = loop_end_time - loop_crossfade_time;
+			if (note.hit_loop) {
+				//Loop again
+				if (note.time >= loop_end_time) {
+					note.time = loop_start_time + fmod(note.time - loop_start_time, loop_duration_time);
+				}
+				//Crossfade
+				else if (note.time > crossfade_end_time) {
+					double diff = note.time - crossfade_end_time;
+					crossfade = 1 - (diff / loop_crossfade_time);
+					l += note.sample->sample.isample(0, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
+					r += note.sample->sample.isample(1, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
+				}
+			}
+			else if (note.time >= loop_start_time) {
+				note.hit_loop = true;
+			}
 		}
-		else {
-			duration = note.zone->sample.duration();
-			l = note.zone->sample.isample(0, time, info.sample_rate);
-			r = note.zone->sample.isample(1, time, info.sample_rate);
-		}
+
+		l += note.sample->sample.isample(0, note.time, info.sample_rate) * crossfade;
+		r += note.sample->sample.isample(1, note.time, info.sample_rate) * crossfade;
+
 		//Filter
 		if (note.filter) {
 			FilterData filter { note.filter->filter_type };
@@ -138,13 +170,11 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 				vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
 				vel_amount += note.env_data->amp_velocity_amount;
 			}
-			//Fade out
-			if (duration - note.env_data->fade_out < time) {
-				vol *= fmax(0, 1 - (time - duration + note.env_data->fade_out)/note.env_data->fade_out);
-			}
 		}
 		vol *= vel_amount * (note.velocity - 1) + 1;
 		vol *= note.layer_amp;
+
+		note.time += note.freq/note.zone->freq * env.pitch_bend * info.time_step;
 		//Playback
 		lsample += l * vol;
 		rsample += r * vol;
@@ -156,14 +186,32 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 }
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	return note.env_data->sustain_entire_sample ? note.start_time + note.zone->sample.duration() * note.zone->freq/note.freq < info.time : note.env.is_finished();
+	if (note.zone && note.sample) {
+		return note.env_data->sustain_entire_sample ? note.time < note.sample->sample.duration() : note.env.is_finished();
+	}
+	return true;
 }
 
 void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
 	size_t slot = this->note.press_note(info, note, velocity);
 	SamplerVoice& voice = this->note.note[slot];
+	if (this->sample) {
+		this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);
+	}
+	else {
+		voice.zone = nullptr;
+		voice.sample = nullptr;
+		voice.filter = nullptr;
+		voice.env_data = nullptr;
+	}
+	if (voice.zone && voice.zone->loop == LoopType::ALWAYS_LOOP) {
+		voice.time = voice.sample->loop_start;
+	}
+	else {
+		voice.time = 0;
+	}
+	voice.hit_loop = false;
 	voice.env.reset();
-	this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);
 }
 
 void Sampler::release_note(SampleInfo& info, unsigned int note) {
@@ -172,6 +220,47 @@ void Sampler::release_note(SampleInfo& info, unsigned int note) {
 
 std::string Sampler::get_name() {
 	return "Sampler";
+}
+
+ssize_t Sampler::get_sound_index() {
+	auto sounds = global_sample_store.get_sounds();
+	ssize_t index = std::find(sounds.begin(), sounds.end(), sample) - sounds.begin();
+	if (index >= (ssize_t) sounds.size()) {
+		index = -1;
+	}
+	return index;
+}
+
+void Sampler::set_sound_index(ssize_t index) {
+	if (index < 0) {
+		sample = nullptr;
+	}
+	else {
+		sample = global_sample_store.get_sound(index);
+	}
+}
+
+void Sampler::save_program(EngineProgram **prog) {
+	std::cout << "Save" << std::endl;
+	SamplerProgram* p = dynamic_cast<SamplerProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new SamplerProgram();
+	}
+	p->sound_name = this->sample ? this->sample->name : "";
+	*prog = p;
+}
+
+void Sampler::apply_program(EngineProgram *prog) {
+	SamplerProgram* p = dynamic_cast<SamplerProgram*>(prog);
+	//Create new
+	if (p) {
+		sample = global_sample_store.get_sound(p->sound_name);
+	}
+	else {
+		sample = nullptr;
+	}
 }
 
 Sampler::~Sampler() {
@@ -199,7 +288,6 @@ extern SampleSound* load_sound(std::string folder) {
 			env.env.sustain = e.second.get<double>("sustain", 1);
 			env.env.release = e.second.get<double>("release", 0);
 			env.sustain_entire_sample = e.second.get<bool>("sustain_entire_sample", false);
-			env.fade_out = e.second.get<double>("fade_out", 0);
 
 			sound->envelopes.push_back(env);
 		}
@@ -246,13 +334,43 @@ extern SampleSound* load_sound(std::string folder) {
 				zone->max_freq = note_to_freq(z.second.get<double>("max_note", 127.0));
 				zone->env = z.second.get<double>("envelope", 0);
 				zone->filter = z.second.get<double>("filter", 0);
-				std::string file = folder + "/" + z.second.get<std::string>("sample", "");
-				if (!read_audio_file(zone->sample, file)) {
+				//Loop
+				std::string type = z.second.get<std::string>("loop_type", "NO_LOOP");
+				if (type == "NO_LOOP") {
+					zone->loop = LoopType::NO_LOOP;
+				}
+				else if (type == "ATTACK_LOOP") {
+					zone->loop = LoopType::ATTACK_LOOP;
+				}
+				else if (type == "ALWAYS_LOOP") {
+					zone->loop = LoopType::ALWAYS_LOOP;
+				}
+				std::string file;
+				//Sample
+				if (z.second.get_child_optional("sample.name")) {
+					file = folder + "/" + z.second.get<std::string>("sample.name", "");
+					zone->sample.loop_start = z.second.get<unsigned int>("sample.loop_start", 0);
+					zone->sample.loop_duration = z.second.get<unsigned int>("sample.loop_duration", 0);
+					zone->sample.loop_crossfade = z.second.get<unsigned int>("sample.loop_crossfade", 0);
+				}
+				else {
+					file = folder + "/" + z.second.get<std::string>("sample", "");
+				}
+				if (!read_audio_file(zone->sample.sample, file)) {
 					std::cerr << "Couldn't load sample file " << file << std::endl;
 				}
-				std::string sfile = folder + "/" + z.second.get<std::string>("sustain_sample", "");
+				std::string sfile;
+				if (z.second.get_child_optional("sustain_sample.name")) {
+					sfile = folder + "/" + z.second.get<std::string>("sustain_sample.name", "");
+					zone->sustain_sample.loop_start = z.second.get<unsigned int>("sustain_sample.loop_start", 0);
+					zone->sustain_sample.loop_duration = z.second.get<unsigned int>("sustain_sample.loop_duration", 0);
+					zone->sustain_sample.loop_crossfade = z.second.get<unsigned int>("sustain_sample.loop_crossfade", 0);
+				}
+				else {
+					sfile = folder + "/" + z.second.get<std::string>("sustain_sample", "");
+				}
 				if (sfile != folder + "/") {
-					if (!read_audio_file(zone->sustain_sample, sfile)) {
+					if (!read_audio_file(zone->sustain_sample.sample, sfile)) {
 						std::cerr << "Couldn't load sample file " << sfile << std::endl;
 					}
 				}
@@ -282,3 +400,13 @@ void __fix_link_sampler_name__ () {
 	get_engine_name<Sampler>();
 }
 
+//SamplerProgram
+void SamplerProgram::load(boost::property_tree::ptree tree) {
+	sound_name = tree.get("sound_name", "");
+}
+
+boost::property_tree::ptree SamplerProgram::save() {
+	boost::property_tree::ptree tree;
+	tree.put("sound_name", sound_name);
+	return tree;
+}
