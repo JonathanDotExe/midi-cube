@@ -15,7 +15,9 @@
 class Effect {
 public:
 	virtual void apply(double& lsample, double& rsample, SampleInfo& info) = 0;
-	virtual void midi_message(MidiMessage& msg, SampleInfo& info) = 0;
+	virtual void midi_message(MidiMessage& msg, SampleInfo& info) {
+
+	}
 	virtual ~Effect() {
 
 	}

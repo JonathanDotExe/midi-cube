@@ -17,9 +17,11 @@ struct BitCrusherPreset {
 
 class BitCrusherEffect {
 public:
+	BitCrusherPreset preset;
+
 	BitCrusherEffect();
-	void apply(double& lsample, double& rsample, BitCrusherPreset& preset, SampleInfo& info);
-	virtual ~BitCrusherEffect();
+	void apply(double& lsample, double& rsample, SampleInfo& info);
+	~BitCrusherEffect();
 };
 
 #endif /* MIDICUBE_EFFECT_BITCRUSHER_H_ */

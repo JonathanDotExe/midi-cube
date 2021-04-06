@@ -41,7 +41,7 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 	return sample;
 }
 
-void AmplifierSimulationEffect::apply(double &lsample, double &rsample, AmplifierSimulationPreset &preset, SampleInfo &info) {
+void AmplifierSimulationEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 	if (preset.on) {
 		//Gain
 		double gain = preset.boost + 1;

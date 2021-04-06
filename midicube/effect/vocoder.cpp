@@ -17,7 +17,9 @@ VocoderEffect::VocoderEffect() {
 	}
 }
 
-void VocoderEffect::apply(double& lsample, double& rsample, double modulator, VocoderPreset& preset, SampleInfo& info) {
+void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+	double modulator = info.input_sample;
+
 	if (preset.on) {
 		//Calc mix
 		double total_mix = preset.carrier_amp + preset.vocoder_amp + preset.voice_amp;

@@ -16,7 +16,7 @@ RotarySpeakerEffect::RotarySpeakerEffect() {
 	filter_data.cutoff = 800;
 }
 
-void RotarySpeakerEffect::apply(double &lsample, double &rsample, RotarySpeakerPreset &preset, SampleInfo &info) {
+void RotarySpeakerEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 	if (preset.on) {
 		//Sum samples up
 		double sample = (lsample + rsample) / 2.0;

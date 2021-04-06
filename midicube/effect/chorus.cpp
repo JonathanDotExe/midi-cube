@@ -12,7 +12,7 @@ ChorusEffect::ChorusEffect() {
 
 }
 
-void ChorusEffect::apply(double& lsample, double& rsample, ChorusPreset& preset, SampleInfo& info) {
+void ChorusEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	if (preset.on) {
 		double l = ldelay.process();
 		double r = rdelay.process();

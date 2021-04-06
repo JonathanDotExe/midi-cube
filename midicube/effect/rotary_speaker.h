@@ -61,9 +61,11 @@ private:
 	double horn_rotation = 0;
 	double bass_rotation = 0;
 public:
+	RotarySpeakerPreset preset;
+
 	RotarySpeakerEffect();
-	void apply(double& lsample, double& rsample, RotarySpeakerPreset& preset, SampleInfo& info);
-	virtual ~RotarySpeakerEffect();
+	void apply(double& lsample, double& rsample, SampleInfo& info);
+	~RotarySpeakerEffect();
 };
 
 #endif /* MIDICUBE_EFFECT_ROTARY_SPEAKER_H_ */

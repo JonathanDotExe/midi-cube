@@ -43,9 +43,11 @@ private:
 	Filter mfilter;
 	EnvelopeFollower modulator_env{};
 public:
+	VocoderPreset preset;
+
 	VocoderEffect();
 
-	void apply(double& lsample, double& rsample, double modulator, VocoderPreset& preset, SampleInfo& info);
+	void apply(double& lsample, double& rsample, SampleInfo& info);
 
 };
 

@@ -28,9 +28,11 @@ private:
 	DelayBuffer rdelay;
 
 public:
+	ChorusPreset preset;
+
 	ChorusEffect();
-	void apply(double& lsample, double& rsample, ChorusPreset& preset, SampleInfo& info);
-	virtual ~ChorusEffect();
+	void apply(double& lsample, double& rsample, SampleInfo& info);
+	~ChorusEffect();
 };
 
 #endif /* MIDICUBE_EFFECT_BITCRUSHER_H_ */
