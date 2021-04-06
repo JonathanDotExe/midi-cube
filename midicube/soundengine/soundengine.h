@@ -229,11 +229,7 @@ public:
 
 	SoundEngineChannel();
 
-	void init_device(SoundEngineDevice* device) {
-		if (!this->device) {
-			this->device = device;
-		}
-	}
+	void init_device(SoundEngineDevice* device);
 
 	bool send(MidiMessage& message, SampleInfo& info, size_t scene);
 
@@ -366,6 +362,7 @@ class SoundEngineDevice {
 
 private:
 	std::vector<SoundEngineBuilder*> engine_builders;
+	std::vector<EffectBuilder*> effect_builders;
 
 	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
 	LinearADSREnvelope metronome_env;
@@ -394,6 +391,9 @@ public:
 
 	~SoundEngineDevice();
 
+	std::vector<EffectBuilder*>* get_effect_builders() {
+		return &effect_builders;
+	}
 };
 
 

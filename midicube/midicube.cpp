@@ -38,8 +38,6 @@ void MidiCube::init(int out_device, int in_device) {
 	engine.channels[9].scenes[0].active = true;
 	engine.channels[9].set_engine_index(3);
 
-	engine.channels[15].vocoder_preset.on = true;
-
 	//engine.channels[10].bitcrusher_preset.on = true;
 	//engine.channels[10].bitcrusher_preset.bits = 8;
 

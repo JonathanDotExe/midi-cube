@@ -14,6 +14,15 @@ SoundEngineChannel::SoundEngineChannel() {
 	engine = nullptr;
 }
 
+void SoundEngineChannel::init_device(SoundEngineDevice* device) {
+	if (!this->device) {
+		this->device = device;
+		for (size_t i = 0; i < effects.size(); ++i) {
+			effects[i].effect_builders = device->get_effect_builders();
+		}
+	}
+}
+
 void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, size_t scene) {
 	//Properties
 	if (engine) {
@@ -215,6 +224,9 @@ void SoundEngineChannel::set_active(bool active) {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	metronome.init(0);
+	for (size_t i = 0; i < this->effects.size(); ++i) {
+		effects[i].effect_builders = &this->effect_builders;
+	}
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
 		ch.init_device(this);
@@ -347,4 +359,9 @@ SoundEngineDevice::~SoundEngineDevice() {
 		delete engine;
 	}
 	engine_builders.clear();
+	//Delete effects
+	for (EffectBuilder* effect : effect_builders) {
+		delete effect;
+	}
+	effect_builders.clear();
 }
