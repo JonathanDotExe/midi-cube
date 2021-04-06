@@ -382,6 +382,10 @@ void SoundEngineDevice::add_sound_engine(SoundEngineBuilder* engine) {
 	engine_builders.push_back(engine);
 }
 
+void SoundEngineDevice::add_effect(EffectBuilder* effect) {
+	effect_builders.push_back(effect);
+}
+
 bool SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	SoundEngineChannel& ch = this->channels[message.channel];
 	SoundEngine* engine = ch.get_engine();

@@ -11,6 +11,7 @@
 #include "../audio.h"
 #include "../filter.h"
 #include "../synthesis.h"
+#include "effect.h"
 
 #define ROTARY_CUTOFF 800
 
@@ -48,7 +49,7 @@ struct RotarySpeakerPreset {
 	double bass_fast_ramp = 5.5;
 };
 
-class RotarySpeakerEffect {
+class RotarySpeakerEffect : public Effect {
 private:
 	Filter filter;
 	FilterData filter_data;

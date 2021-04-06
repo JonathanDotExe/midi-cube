@@ -10,6 +10,7 @@
 
 #include "../audio.h"
 #include "../oscilator.h"
+#include "effect.h"
 
 struct ChorusPreset {
 	bool on = false;
@@ -21,7 +22,7 @@ struct ChorusPreset {
 	AnalogWaveForm vibrato_waveform = AnalogWaveForm::TRIANGLE_WAVE;
 };
 
-class ChorusEffect {
+class ChorusEffect : public Effect {
 private:
 	AnalogOscilator osc;
 	DelayBuffer ldelay;

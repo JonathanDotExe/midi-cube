@@ -432,6 +432,8 @@ public:
 
 	void add_sound_engine(SoundEngineBuilder* engine);
 
+	void add_effect(EffectBuilder* effect);
+
 	bool send(MidiMessage& message, SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);

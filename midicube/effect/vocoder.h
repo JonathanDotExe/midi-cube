@@ -13,6 +13,7 @@
 #include "../synthesis.h"
 #include "../envelope.h"
 #include "../filter.h"
+#include "effect.h"
 
 #define VOCODER_BAND_COUNT 16
 #define VOCODER_LOW_BAND 120
@@ -37,7 +38,7 @@ struct VocoderBand {
 	EnvelopeFollower env{};
 };
 
-class VocoderEffect {
+class VocoderEffect : public Effect {
 private:
 	std::array<VocoderBand, VOCODER_BAND_COUNT> bands;
 	Filter mfilter;

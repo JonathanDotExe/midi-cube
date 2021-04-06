@@ -9,13 +9,14 @@
 #define MIDICUBE_EFFECT_BITCRUSHER_H_
 
 #include "../audio.h"
+#include "effect.h"
 
 struct BitCrusherPreset {
 	bool on = false;
 	unsigned int bits = 16;
 };
 
-class BitCrusherEffect {
+class BitCrusherEffect : public Effect {
 public:
 	BitCrusherPreset preset;
 
