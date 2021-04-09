@@ -13,9 +13,9 @@
 #include "effect.h"
 
 struct ChorusPreset {
-	bool on = false;
+	bool on = true;
 	double vibrato_rate = 6;
-	double vibrato_depth = 0;
+	double vibrato_depth = 1;
 	double mix = 0.5;
 
 	double delay = 0.015;

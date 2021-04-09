@@ -31,7 +31,7 @@
 #define ROTARY_BASS_FAST_RAMP 5.5
 
 struct RotarySpeakerPreset {
-	bool on = false;
+	bool on = true;
 	bool fast = false;
 
 	double stereo_mix{0.5};

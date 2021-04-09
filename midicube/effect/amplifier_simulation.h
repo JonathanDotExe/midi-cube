@@ -20,7 +20,7 @@ enum DistortionType {
 };
 
 struct AmplifierSimulationPreset {
-	bool on = false;
+	bool on = true;
 	double boost = 0;
 	double drive = 0;
 	double tone = 0.6;

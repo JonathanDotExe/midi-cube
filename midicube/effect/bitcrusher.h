@@ -12,7 +12,7 @@
 #include "effect.h"
 
 struct BitCrusherPreset {
-	bool on = false;
+	bool on = true;
 	unsigned int bits = 16;
 };
 

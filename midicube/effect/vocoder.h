@@ -20,7 +20,7 @@
 #define VOCODER_HIGH_BAND 360
 
 struct VocoderPreset {
-	bool on = false;
+	bool on = true;
 	double modulator_amplification = 30;
 	double vocoder_amplification = 2.5;
 	double vocoder_amp = 0.95;
