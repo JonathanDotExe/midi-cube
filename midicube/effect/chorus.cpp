@@ -34,3 +34,8 @@ ChorusEffect::~ChorusEffect() {
 
 }
 
+template<>
+std::string get_effect_name<ChorusEffect>() {
+	return "Chorus";
+}
+

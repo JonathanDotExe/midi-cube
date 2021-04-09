@@ -64,3 +64,9 @@ void AmplifierSimulationEffect::apply(double &lsample, double &rsample, SampleIn
 AmplifierSimulationEffect::~AmplifierSimulationEffect() {
 
 }
+
+template<>
+std::string get_effect_name<AmplifierSimulationEffect>() {
+	return "Amplifier";
+}
+

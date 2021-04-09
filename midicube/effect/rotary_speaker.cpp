@@ -75,3 +75,7 @@ RotarySpeakerEffect::~RotarySpeakerEffect() {
 	// TODO Auto-generated destructor stub
 }
 
+template<>
+std::string get_effect_name<RotarySpeakerEffect>() {
+	return "Rotary Speaker";
+}

@@ -85,3 +85,8 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		rsample += modulator * modulator_mix;
 	}
 }
+
+template<>
+std::string get_effect_name<VocoderEffect>() {
+	return "Vocoder";
+}

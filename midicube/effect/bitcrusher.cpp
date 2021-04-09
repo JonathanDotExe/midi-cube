@@ -24,3 +24,7 @@ BitCrusherEffect::~BitCrusherEffect() {
 
 }
 
+template<>
+std::string get_effect_name<BitCrusherEffect>() {
+	return "Bit Crusher";
+}
