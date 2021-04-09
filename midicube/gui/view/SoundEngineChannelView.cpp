@@ -29,6 +29,13 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		engine_names.push_back(engine->get_name());
 	}
 
+	//Effects
+	std::vector<std::string> effect_names;
+	effect_names.push_back("None");
+	for (EffectBuilder* effect : frame.cube.engine.get_effect_builders()) {
+		effect_names.push_back(effect->get_name());
+	}
+
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
@@ -69,6 +76,28 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		frame.change_view(new ArpeggiatorView(channel, channel_index));
 	});
 	controls.push_back(arpeggiator);
+	int tmp_y = 260;
+	//Effects
+	for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
+		ComboBox* effect = new ComboBox(0, effect_names, main_font, 18, -1, 10, tmp_y, 300, 60);
+		effect->rect.setFillColor(sf::Color(128, 255, 255));
+		effect->property.bind_function<ssize_t>(std::bind(&InsertEffect::get_effect_index, &channel.effects[i]), std::bind(&InsertEffect::set_effect_index, &channel.effects[i], std::placeholders::_1), handler);
+		controls.push_back(effect);
+		tmp_y += 65;
+	}
+	//Master Effect Send
+	{
+		tmp_y += 5;
+		Label* octave_label = new Label("Master Send", main_font, 18, 10, tmp_y);
+		tmp_y += 30;
+		controls.push_back(octave_label);
+
+		DragBox<int>* master_send = new DragBox<int>(0, -1, SOUND_ENGINE_MASTER_EFFECT_AMOUNT - 1, main_font, 18, 10, tmp_y, 150, 60);
+		tmp_y += 60;
+		master_send->property.bind(channel.master_send, handler);
+		controls.push_back(master_send);
+	}
+
 
 	CheckBox* active = new CheckBox(true, "Active", main_font, 18, 10, frame.get_height() - 95, 40, 40);
 	active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), handler);
@@ -93,7 +122,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		controls.push_back(pan);
 	}
 
-	int tmp_y = 10;
+	tmp_y = 10;
 	//Col 3
 	//Source
 	{
