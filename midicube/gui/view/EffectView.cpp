@@ -122,6 +122,75 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y -= 25;
 		}
 	}
+	//Rotary Speaker
+	else if (dynamic_cast<RotarySpeakerEffect*>(effect) != nullptr) {
+			RotarySpeakerEffect* rotary = dynamic_cast<RotarySpeakerEffect*>(effect);
+
+			//Background
+			bg->rect.setFillColor(sf::Color(0x53, 0x32, 0x00));
+			title->text.setString("Vintage Rotary L120");
+
+			//Rotary
+			{
+				Label* label = new Label("Mode", main_font, 18, tmp_x, tmp_y);
+				label->text.setFillColor(sf::Color::White);
+				controls.push_back(label);
+				tmp_y += 25;
+
+				OrganSwitch* on = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "Rotate", "Stop");
+				on->property.bind(rotary->preset.on, handler);
+				controls.push_back(on);
+
+				tmp_y -= 25;
+				tmp_x += 90;
+			}
+			//Rotary Speed
+			{
+				Label* label = new Label("Speed", main_font, 18, tmp_x, tmp_y);
+				label->text.setFillColor(sf::Color::White);
+				controls.push_back(label);
+				tmp_y += 25;
+
+				OrganSwitch* rotary_speed = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "Fast", "Slow");
+				rotary_speed->property.bind(rotary->preset.fast, handler);
+				controls.push_back(rotary_speed);
+
+				tmp_y -= 25;
+				tmp_x += 90;
+			}
+
+			//Rotary Stereo Mix
+			{
+				Label* label = new Label("Stereo", main_font, 18, tmp_x, tmp_y);
+				label->text.setFillColor(sf::Color::White);
+				controls.push_back(label);
+				tmp_y += 25;
+
+				DragBox<double>* rotary_stereo = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
+				rotary_stereo->property.bind(rotary->preset.stereo_mix, handler);
+				controls.push_back(rotary_stereo);
+
+				tmp_y -= 25;
+				tmp_x += 90;
+			}
+
+			//Rotary Type
+			{
+				Label* label = new Label("Type", main_font, 18, tmp_x, tmp_y);
+				label->text.setFillColor(sf::Color::White);
+				controls.push_back(label);
+				tmp_y += 25;
+
+				OrganSwitch* rotary_type = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "1", "2");
+				rotary_type->property.bind(rotary->preset.type, handler);
+				controls.push_back(rotary_type);
+
+				tmp_y -= 25;
+				tmp_x += 90;
+			}
+
+		}
+
 
 	//Exit Button
 	Button* exit = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
