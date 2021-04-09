@@ -14,8 +14,11 @@
 #include "../../soundengine/soundengine.h"
 
 class EffectView : public ViewController {
+private:
+	Effect* effect = nullptr;
+
 public:
-	EffectView();
+	EffectView(Effect* effect);
 	virtual Scene create(Frame &frame);
 	virtual ~EffectView();
 };
