@@ -466,7 +466,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 				if (op.filter_kb_track) {
 					double cutoff = filter.cutoff;
 					//KB track
-					cutoff *= 1 + ((double) note.note - 36) / 12.0 * op.filter_kb_track;
+					cutoff *= 1 + ((double) note.note - op.filter_kb_track_note) / 12.0 * op.filter_kb_track;
 					filter.cutoff = cutoff;
 				}
 
