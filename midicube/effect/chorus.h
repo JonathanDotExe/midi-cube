@@ -14,8 +14,8 @@
 
 struct ChorusPreset {
 	bool on = true;
-	double vibrato_rate = 6;
-	double vibrato_depth = 1;
+	double vibrato_rate = 2;
+	double vibrato_depth = 0.5;
 	double mix = 0.5;
 
 	double delay = 0.015;
