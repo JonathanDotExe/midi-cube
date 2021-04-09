@@ -12,6 +12,7 @@
 #include "B3OrganView.h"
 #include "AnalogSynthView.h"
 #include "SamplerView.h"
+#include "EffectView.h"
 #include "../../soundengine/organ.h"
 
 SoundEngineChannelView::SoundEngineChannelView(SoundEngineChannel& ch, int channel_index) : channel(ch) {
@@ -79,10 +80,20 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	int tmp_y = 260;
 	//Effects
 	for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
-		ComboBox* effect = new ComboBox(0, effect_names, main_font, 18, -1, 10, tmp_y, 300, 60);
+		//Effect
+		ComboBox* effect = new ComboBox(0, effect_names, main_font, 18, -1, 10, tmp_y, 200, 60);
 		effect->rect.setFillColor(sf::Color(128, 255, 255));
 		effect->property.bind_function<ssize_t>(std::bind(&InsertEffect::get_effect_index, &channel.effects[i]), std::bind(&InsertEffect::set_effect_index, &channel.effects[i], std::placeholders::_1), handler);
 		controls.push_back(effect);
+		//Edit
+		Button* edit_effect = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
+		edit_effect->set_on_click([this, &frame, i]() {
+			Effect* effect = channel.effects[i].get_effect();
+			if (effect) {
+				frame.change_view(new EffectView(effect));
+			}
+		});
+		controls.push_back(edit_effect);
 		tmp_y += 65;
 	}
 	//Master Effect Send

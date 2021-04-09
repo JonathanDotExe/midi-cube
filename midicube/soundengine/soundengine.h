@@ -228,7 +228,7 @@ public:
 
 	void set_effect(Effect *effect = nullptr);
 
-	const Effect* get_effect() const;
+	Effect* get_effect() const;
 
 	~InsertEffect();
 };
@@ -255,7 +255,7 @@ public:
 
 	void set_effect(Effect *effect = nullptr);
 
-	const Effect* get_effect() const;
+	Effect* get_effect() const;
 
 	~MasterEffect();
 };

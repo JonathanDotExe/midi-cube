@@ -15,7 +15,7 @@ void InsertEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	}
 }
 
-const Effect* InsertEffect::get_effect() const {
+Effect* InsertEffect::get_effect() const {
 	return effect;
 }
 
@@ -63,7 +63,7 @@ void MasterEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	this->rsample = 0;
 }
 
-const Effect* MasterEffect::get_effect() const {
+Effect* MasterEffect::get_effect() const {
 	return effect;
 }
 
