@@ -38,8 +38,7 @@ struct ADSREnvelopeData {
 	double sustain;
 	double release;
 
-	double attack_volume = 0;
-	double decay_volume = 1;
+	double peak_volume = 1;
 	double sustain_time = 0;
 	double release_volume = 0;
 };
