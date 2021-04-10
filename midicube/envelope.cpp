@@ -89,28 +89,29 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 	switch (phase) {
 	case ATTACK:
 		step = time_step/data.attack;
-		s = ANALOG_ADSR_WAVE.get_value(time);
+		s = ANALOG_ADSR_WAVE.get_value(time) * data.peak_volume;
 		if (data.attack != 0) {
 			volume += s - last;
 			last = s;
 		}
 		else {
-			volume = 1;
+			volume = data.peak_volume;
 		}
 		last = s;
-		if (volume >= 1) {
-			volume = 1;
+		if (volume >= data.peak_volume) {
+			volume = data.peak_volume;
 			last_vol = volume;
 			phase = DECAY;
 			last = 0;
 			time = 0;
+			step = 0;
 		}
 		break;
 	case DECAY:
 		step = time_step/data.decay;
 		s = ANALOG_ADSR_WAVE.get_value(time);
 		if (data.decay != 0) {
-			volume -= (s - last) * (1 - data.sustain);
+			volume -= (s - last) * (data.peak_volume - data.sustain);
 			last = s;
 		}
 		else {
@@ -124,6 +125,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 			phase = SUSTAIN;
 			last = 0;
 			time = 0;
+			step = 0;
 		}
 		break;
 	case SUSTAIN:
@@ -132,19 +134,20 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		step = time_step/data.release;
 		s = ANALOG_ADSR_WAVE.get_value(time);
 		if (data.release != 0) {
-			volume -= (s - last) * last_vol;
+			volume -= (s - last) * (last_vol - data.release_volume);
 		}
 		else {
 			volume = 0;
 		}
 
 		last = s;
-		if (volume <= 0) {
-			volume = 0;
+		if (volume <= data.release_volume) {
+			volume = data.release_volume;
 			last_vol = volume;
 			phase = FINISHED;
 			last = 0;
 			time = 0;
+			step = 0;
 		}
 		break;
 	case FINISHED:
