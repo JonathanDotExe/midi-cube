@@ -60,7 +60,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 
 	//ADSR
 	adsr_controls(&controls, tmp_x, tmp_y, op.env, handler);
-	tmp_y += 75;
+	tmp_y += 150;
 	//Volume
 	property_mod_controls(&controls, tmp_x, tmp_y, op.volume, handler, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
