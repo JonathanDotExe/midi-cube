@@ -129,6 +129,16 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		}
 		break;
 	case SUSTAIN:
+		if (data.sustain_time > 0) {
+			step = time_step/data.sustain_time;
+		}
+		if (time >= 1) {
+			last_vol = volume;
+			phase = RELEASE;
+			last = 0;
+			time = 0;
+			step = 0;
+		}
 		break;
 	case RELEASE:
 		step = time_step/data.release;
