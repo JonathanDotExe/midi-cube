@@ -439,6 +439,10 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		double volume = apply_modulation(VOLUME_SCALE, op.volume, env_val,
 						lfo_val, controls, note.velocity) * op_part.amp_env.amplitude(op.env, info.time_step,
 						note.pressed, env.sustain);
+		//Octave amp
+		if (op.amp_kb_track) {
+			volume *= fmax(0, fmin(2, 1.0 + ((double) note.note - op.amp_kb_track_note)/12.0 * op.amp_kb_track));
+		}
 		//Frequency modulate others
 		if (modulates) {
 			modulator *= volume;

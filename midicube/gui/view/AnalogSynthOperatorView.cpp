@@ -68,6 +68,27 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 	property_mod_controls(&controls, tmp_x, tmp_y, op.panning, handler, "Panning", &show_amount, &show_source);
 	tmp_y += 75;
 
+	//Octave Amp
+	{
+		Label* title = new Label("Amp KB Track", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, -1, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->property.bind(op.amp_kb_track, handler);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+	//Amp KB Track Center
+	{
+		Label* title = new Label("Amp KB Track Note", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<int>* value = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->property.bind(op.amp_kb_track_note, handler);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+
 	//Col 2
 	tmp_x = 500;
 	tmp_y = 10;
