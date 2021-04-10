@@ -37,13 +37,11 @@ struct ADSREnvelopeData {
 	double decay;
 	double sustain;
 	double release;
-};
 
-struct AtomicADSREnvelopeData {
-	std::atomic<double> attack;
-	std::atomic<double> decay;
-	std::atomic<double> sustain;
-	std::atomic<double> release;
+	double attack_volume = 0;
+	double decay_volume = 1;
+	double sustain_time = 0;
+	double release_volume = 0;
 };
 
 enum ADSREnvelopePhase {
