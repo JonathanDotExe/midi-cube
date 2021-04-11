@@ -440,8 +440,11 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 						lfo_val, controls, note.velocity) * op_part.amp_env.amplitude(op.env, info.time_step,
 						note.pressed, env.sustain);
 		//Octave amp
-		if (op.amp_kb_track) {
-			volume *= fmax(0, fmin(2, 1.0 + ((double) note.note - op.amp_kb_track_note)/12.0 * op.amp_kb_track));
+		if (op.amp_kb_track_upper && note.note > op.amp_kb_track_note) {
+			volume *= fmax(0, fmin(2, 1.0 + ((double) note.note - op.amp_kb_track_note)/12.0 * op.amp_kb_track_upper));
+		}
+		else if (op.amp_kb_track_lower && note.note < op.amp_kb_track_note) {
+			volume *= fmax(0, fmin(2, 1.0 - ((double) note.note - op.amp_kb_track_note)/12.0 * op.amp_kb_track_lower));
 		}
 		//Frequency modulate others
 		if (modulates) {
@@ -814,7 +817,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			op.env = load_adsr(o.second, "env");
 			op.volume = load_prop_mod(o.second, "volume");
 			op.panning = load_prop_mod(o.second, "panning");
-			op.amp_kb_track = o.second.get<double>("amp_kb_track", 0);
+			op.amp_kb_track_upper = o.second.get<double>("amp_kb_track", 0);
 			op.amp_kb_track_note = o.second.get<int>("filter_kb_track", 60);
 
 			op.filter = o.second.get<bool>("filter", false);
@@ -916,7 +919,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		o.add_child("env", save_adsr(op.env));
 		o.add_child("volume", save_prop_mod(op.volume));
 		o.add_child("panning", save_prop_mod(op.panning));
-		o.put("amp_kb_track", op.amp_kb_track);
+		o.put("amp_kb_track", op.amp_kb_track_upper);
 		o.put("amp_kb_track_note", op.amp_kb_track_note);
 
 		o.put("filter", op.filter);
