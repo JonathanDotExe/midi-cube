@@ -317,7 +317,7 @@ Scene EffectView::create(Frame &frame) {
 		title->text.setString("Bit Crusher Lo-Fi");
 		title->text.setFillColor(sf::Color::Green);
 
-		//Chorus
+		//On
 		{
 			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
 			label->text.setFillColor(sf::Color::Green);
@@ -344,6 +344,142 @@ Scene EffectView::create(Frame &frame) {
 					tmp_x, tmp_y, 180, 120);
 			rate->property.bind(bitcrusher->preset.bits, handler);
 			controls.push_back(rate);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+	}
+	//Vocoder
+	else if (dynamic_cast<VocoderEffect*>(effect) != nullptr) {
+		VocoderEffect* vocoder = dynamic_cast<VocoderEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color(0x63, 0x0, 0x85));
+		title->text.setString("Vocoder");
+		title->text.setFillColor(sf::Color::White);
+
+		//On
+		{
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
+					tmp_y, 180, 120);
+			on->property.bind(vocoder->preset.on, handler);
+			controls.push_back(on);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Vocoder Mix
+		{
+			Label *label = new Label("Vocoder Mix", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			rate->property.bind(vocoder->preset.vocoder_amp, handler);
+			controls.push_back(rate);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		//Carrier Mix
+		{
+			Label *label = new Label("Carrier Mix", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			rate->property.bind(vocoder->preset.carrier_amp, handler);
+			controls.push_back(rate);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		//Voice Mix
+		{
+			Label *label = new Label("Modulator Mix", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			rate->property.bind(vocoder->preset.voice_amp, handler);
+			controls.push_back(rate);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mod Highpass
+		{
+			Label *label = new Label("Modulator Highpass", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 21000, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.mod_highpass, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		tmp_x = 10;
+		tmp_y += 160;
+
+		//Gate
+		{
+			Label *label = new Label("Gate", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.gate, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		//Modulator Boost
+		{
+			Label *label = new Label("Modulator Boost", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.modulator_amplification, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Vocoder Boost
+		{
+			Label *label = new Label("Vocoder Boost", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.vocoder_amplification, handler);
+			controls.push_back(value);
 
 			tmp_y -= 25;
 			tmp_x += 200;
