@@ -194,7 +194,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 		DragBox<int>* end_note = new DragBox<int>(0, 0, 127, main_font, 18, 470, tmp_y, 150, 60);
 		tmp_y += 60;
-		end_note->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_start_note, &channel), std::bind(&SoundEngineChannel::set_end_note, &channel, std::placeholders::_1), handler);
+		end_note->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_end_note, &channel), std::bind(&SoundEngineChannel::set_end_note, &channel, std::placeholders::_1), handler);
 		controls.push_back(end_note);
 	}
 

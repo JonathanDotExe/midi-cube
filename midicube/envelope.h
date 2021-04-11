@@ -37,13 +37,10 @@ struct ADSREnvelopeData {
 	double decay;
 	double sustain;
 	double release;
-};
 
-struct AtomicADSREnvelopeData {
-	std::atomic<double> attack;
-	std::atomic<double> decay;
-	std::atomic<double> sustain;
-	std::atomic<double> release;
+	double peak_volume = 1;
+	double sustain_time = 0;
+	double release_volume = 0;
 };
 
 enum ADSREnvelopePhase {
@@ -56,6 +53,7 @@ public:
 	ADSREnvelopePhase phase = FINISHED;
 	double last_vol = 0;
 	double volume = 0;
+	double time = 0;
 
 	double amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain);
 

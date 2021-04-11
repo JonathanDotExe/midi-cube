@@ -439,6 +439,10 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		double volume = apply_modulation(VOLUME_SCALE, op.volume, env_val,
 						lfo_val, controls, note.velocity) * op_part.amp_env.amplitude(op.env, info.time_step,
 						note.pressed, env.sustain);
+		//Octave amp
+		if (op.amp_kb_track) {
+			volume *= fmax(0, fmin(2, 1.0 + ((double) note.note - op.amp_kb_track_note)/12.0 * op.amp_kb_track));
+		}
 		//Frequency modulate others
 		if (modulates) {
 			modulator *= volume;
@@ -466,7 +470,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 				if (op.filter_kb_track) {
 					double cutoff = filter.cutoff;
 					//KB track
-					cutoff *= 1 + ((double) note.note - 36) / 12.0 * op.filter_kb_track;
+					cutoff *= 1 + ((double) note.note - op.filter_kb_track_note) / 12.0 * op.filter_kb_track;
 					filter.cutoff = cutoff;
 				}
 
@@ -695,6 +699,9 @@ static ADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
 	data.decay = tree.get("decay", 0.0);
 	data.sustain = tree.get("sustain", 1.0);
 	data.release = tree.get("release", 0.0005);
+	data.peak_volume = tree.get("peak_volume", 1.0);
+	data.sustain_time = tree.get("sustain_time", 0);
+	data.release_volume = tree.get("release_volume", 0.0);
 
 	return data;
 }
@@ -714,6 +721,9 @@ static boost::property_tree::ptree save_adsr(ADSREnvelopeData data) {
 	tree.put("decay", data.decay);
 	tree.put("sustain", data.sustain);
 	tree.put("release", data.release);
+	tree.put("peak_volume", data.peak_volume);
+	tree.put("sustain_time", data.sustain_time);
+	tree.put("release_volume", data.release_volume);
 	return tree;
 }
 
@@ -804,6 +814,8 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			op.env = load_adsr(o.second, "env");
 			op.volume = load_prop_mod(o.second, "volume");
 			op.panning = load_prop_mod(o.second, "panning");
+			op.amp_kb_track = o.second.get<double>("amp_kb_track", 0);
+			op.amp_kb_track_note = o.second.get<int>("filter_kb_track", 60);
 
 			op.filter = o.second.get<bool>("filter", false);
 			op.pre_filter_drive = o.second.get<bool>("pre_filter_drive", false);
@@ -904,6 +916,8 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		o.add_child("env", save_adsr(op.env));
 		o.add_child("volume", save_prop_mod(op.volume));
 		o.add_child("panning", save_prop_mod(op.panning));
+		o.put("amp_kb_track", op.amp_kb_track);
+		o.put("amp_kb_track_note", op.amp_kb_track_note);
 
 		o.put("filter", op.filter);
 		o.put("pre_filter_drive", op.pre_filter_drive);

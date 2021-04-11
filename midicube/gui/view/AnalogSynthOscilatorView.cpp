@@ -97,7 +97,6 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		show_source->push_back(source);
 	}
 	x += 90;
-
 	return boxes;
 }
 
@@ -156,6 +155,43 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(value);
 	}
 	x += 90;
+
+	x -= 90 * 4;
+	y += 75;
+	x += 90;
+
+	//Decay
+	{
+		Label* title = new Label("Peak", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		value->drag_step = 4;
+		value->property.bind(data.peak_volume, handler);
+		controls->push_back(value);
+	}
+	x += 90;
+	//Sustain
+	{
+		Label* title = new Label("Sustain Time", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 20, main_font, 16, x, y + 15, 80, 40, scale);
+		value->drag_step = 2;
+		value->property.bind(data.sustain_time, handler);
+		controls->push_back(value);
+	}
+	x += 90;
+	//Release
+	{
+		Label* title = new Label("Release Vol.", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		value->drag_step = 4;
+		value->property.bind(data.release_volume, handler);
+		controls->push_back(value);
+	}
 }
 
 Scene AnalogSynthOscilatorView::create(Frame &frame) {
