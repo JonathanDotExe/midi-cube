@@ -63,7 +63,7 @@ Scene MasterEffectView::create(Frame &frame) {
 		Button* edit_effect = new Button("Edit", main_font, 18, x + 5, y + 65, pane_width - 15, 30);
 		edit_effect->set_on_click([this, &frame, i, &effect]() {
 			Effect* eff = effect.get_effect();
-			if (effect) {
+			if (eff) {
 				frame.change_view(new EffectView(eff));
 			}
 		});

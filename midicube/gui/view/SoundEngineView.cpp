@@ -9,6 +9,7 @@
 #include "ProgramView.h"
 #include "SceneView.h"
 #include "SoundEngineChannelView.h"
+#include "MasterEffectView.h"
 
 #include <iostream>
 
@@ -89,22 +90,29 @@ Scene SoundEngineView::create(Frame& frame) {
 	volume->property.bind(engine->volume, handler);
 	controls.push_back(volume);
 
+	//Effects
+	Button* effects = new Button("Effects", main_font, 18, 440, frame.get_height() - 45, 100, 40);
+	effects->set_on_click([&frame]() {
+		frame.change_view(new MasterEffectView());
+	});
+	controls.push_back(effects);
+
 	//Scene
-	Button* scene = new Button("Scenes", main_font, 18, frame.get_width() - 270, frame.get_height() - 40, 100, 40);
+	Button* scene = new Button("Scenes", main_font, 18, frame.get_width() - 275, frame.get_height() - 45, 100, 40);
 	scene->set_on_click([&frame]() {
 		frame.change_view(new SceneView());
 	});
 	controls.push_back(scene);
 
 	//Program Button
-	Button* program = new Button("Programs", main_font, 18, frame.get_width() - 170, frame.get_height() - 40, 100, 40);
+	Button* program = new Button("Programs", main_font, 18, frame.get_width() - 175, frame.get_height() - 45, 100, 40);
 	program->set_on_click([&frame]() {
 		frame.change_view(new ProgramView());
 	});
 	controls.push_back(program);
 
 	//Exit Button
-	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
+	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
 	exit->set_on_click([&frame]() {
 		frame.close();
 	});
