@@ -55,12 +55,12 @@ Scene MasterEffectView::create(Frame &frame) {
 		controls.push_back(title);
 
 		//Effect
-		ComboBox* e = new ComboBox(0, effect_names, main_font, 20, -1, x + 5, y + 30, pane_width - 15, 30);
+		ComboBox* e = new ComboBox(0, effect_names, main_font, 12, -1, x + 5, y + 30, pane_width - 15, 30);
 		e->rect.setFillColor(sf::Color(128, 255, 255));
 		e->property.bind_function<ssize_t>(std::bind(&MasterEffect::get_effect_index, &effect), std::bind(&MasterEffect::set_effect_index, &effect, std::placeholders::_1), handler);
 		controls.push_back(e);
 		//Edit
-		Button* edit_effect = new Button("Edit", main_font, 18, x + 5, y + 65, pane_width - 15, 30);
+		Button* edit_effect = new Button("Edit", main_font, 12, x + 5, y + 65, pane_width - 15, 30);
 		edit_effect->set_on_click([this, &frame, i, &effect]() {
 			Effect* eff = effect.get_effect();
 			if (eff) {
@@ -71,10 +71,10 @@ Scene MasterEffectView::create(Frame &frame) {
 
 		//Master Effect Send
 		{
-			Label* octave_label = new Label("Master Send", main_font, 18, x + 5, y + 105);
+			Label* octave_label = new Label("Master Send", main_font, 12, x + 5, y + 105);
 			controls.push_back(octave_label);
 
-			DragBox<int>* master_send = new DragBox<int>(0, -1, SOUND_ENGINE_MASTER_EFFECT_AMOUNT - 1, main_font, 18, x + 5, y + 125, 150, 60);
+			DragBox<int>* master_send = new DragBox<int>(0, -1, SOUND_ENGINE_MASTER_EFFECT_AMOUNT - 1, main_font, 12, x + 5, y + 125, pane_width - 15, 30);
 			master_send->property.bind(effect.next_effect, handler);
 			controls.push_back(master_send);
 		}
