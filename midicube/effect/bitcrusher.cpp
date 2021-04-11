@@ -14,9 +14,9 @@ BitCrusherEffect::BitCrusherEffect() {
 
 void BitCrusherEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	if (preset.on) {
-		int accuracy = pow(2, preset.bits);
-		lsample = (int) (lsample * accuracy)/((double) accuracy);
-		rsample = (int) (rsample * accuracy)/((double) accuracy);
+		double accuracy = pow(2, preset.bits - 1);
+		lsample = (int) (lsample * accuracy)/(accuracy);
+		rsample = (int) (rsample * accuracy)/(accuracy);
 	}
 }
 

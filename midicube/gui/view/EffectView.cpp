@@ -204,7 +204,6 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 90;
 		}
 	}
-
 	//Chorus
 	else if (dynamic_cast<ChorusEffect*>(effect) != nullptr) {
 		ChorusEffect* chorus = dynamic_cast<ChorusEffect*>(effect);
@@ -304,6 +303,47 @@ Scene EffectView::create(Frame &frame) {
 			ComboBox* waveform = new ComboBox(4, waveforms, main_font, 24, 0, tmp_x , tmp_y, 180, 120);
 			waveform->property.bind(chorus->preset.vibrato_waveform, handler);
 			controls.push_back(waveform);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+	}
+	//Bit Crusher
+	else if (dynamic_cast<BitCrusherEffect*>(effect) != nullptr) {
+		BitCrusherEffect* bitcrusher = dynamic_cast<BitCrusherEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color(0, 0, 0));
+		title->text.setString("Bit Crusher Lo-Fi");
+		title->text.setFillColor(sf::Color::Green);
+
+		//Chorus
+		{
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::Green);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
+					tmp_y, 180, 120);
+			on->property.bind(bitcrusher->preset.on, handler);
+			controls.push_back(on);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Bits
+		{
+			Label *label = new Label("Bits", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::Green);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<int> *rate = new DragBox<int>(16, 1, 32, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			rate->property.bind(bitcrusher->preset.bits, handler);
+			controls.push_back(rate);
 
 			tmp_y -= 25;
 			tmp_x += 200;
