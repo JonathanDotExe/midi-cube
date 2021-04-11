@@ -7,6 +7,7 @@
 
 #include "MasterEffectView.h"
 #include "SoundEngineView.h"
+#include "EffectView.h"
 
 MasterEffectView::MasterEffectView() {
 	// TODO Auto-generated constructor stub
@@ -42,61 +43,42 @@ Scene MasterEffectView::create(Frame &frame) {
 
 		controls.push_back(pane);
 
+		//Effects
+		std::vector<std::string> effect_names;
+		effect_names.push_back("None");
+		for (EffectBuilder* effect : frame.cube.engine.get_effect_builders()) {
+			effect_names.push_back(effect->get_name());
+		}
+
 		//Title
-		Label* title = new Label("Channel " + std::to_string(i + 1), main_font, 16, x + 5, y + 5);
+		Label* title = new Label("Effect " + std::to_string(i + 1), main_font, 16, x + 5, y + 5);
 		controls.push_back(title);
 
-		//Active
-		CheckBox* active = new CheckBox(false, "", main_font, 12, x + pane_width - 30, y + 5, 20, 20);
-		active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), handler);
-		controls.push_back(active);
-		//Engine
-		Button* engine = new Button("Engine", main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
-		engine->rect.setFillColor(sf::Color(0, 180, 255));
-		controls.push_back(engine);
-		engine_buttons[i] = engine;
-		engine->set_on_click([&channel, i, &frame]() {
-			frame.change_view(new SoundEngineChannelView(channel, i));
+		//Effect
+		ComboBox* e = new ComboBox(0, effect_names, main_font, 20, -1, x + 5, y + 30, pane_width - 15, 30);
+		e->rect.setFillColor(sf::Color(128, 255, 255));
+		e->property.bind_function<ssize_t>(std::bind(&MasterEffect::get_effect_index, &effect), std::bind(&MasterEffect::set_effect_index, &effect, std::placeholders::_1), handler);
+		controls.push_back(e);
+		//Edit
+		Button* edit_effect = new Button("Edit", main_font, 18, x + 5, y + 65, pane_width - 15, 30);
+		edit_effect->set_on_click([this, &frame, i, &effect]() {
+			Effect* eff = effect.get_effect();
+			if (effect) {
+				frame.change_view(new EffectView(eff));
+			}
 		});
+		controls.push_back(edit_effect);
 
-		handler.queue_action(new GetFunctionAction<ssize_t, ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), [this, i](ssize_t index) {
-			engine_buttons[i]->update_text(index < 0 ? "None" : engine_names.at(index));
-		}));
+		//Master Effect Send
+		{
+			Label* octave_label = new Label("Master Send", main_font, 18, x + 5, y + 105);
+			controls.push_back(octave_label);
 
-		//Volume
-		Slider* volume = new Slider(0, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);
-		volume->property.bind(channel.volume, handler);
-		controls.push_back(volume);
+			DragBox<int>* master_send = new DragBox<int>(0, -1, SOUND_ENGINE_MASTER_EFFECT_AMOUNT - 1, main_font, 18, x + 5, y + 125, 150, 60);
+			master_send->property.bind(effect.next_effect, handler);
+			controls.push_back(master_send);
+		}
 	}
-
-	//Metronome
-	CheckBox* metronome = new CheckBox(false, "Metronome", main_font, 18, 10, frame.get_height() - 45, 40, 40);
-	metronome->property.bind(engine->play_metronome, handler);
-	controls.push_back(metronome);
-
-	DragBox<int>* bpm = new DragBox<int>(120, 10, 480, main_font, 18, 200, frame.get_height() - 45, 100, 40);
-	bpm->drag_mul = 0.00125;
-	bpm->property.bind_function<unsigned int>(std::bind(&Metronome::get_bpm, &engine->metronome), std::bind(&Metronome::set_bpm, &engine->metronome, std::placeholders::_1), handler);
-	controls.push_back(bpm);
-
-	//Volume
-	DragBox<double>* volume = new DragBox<double>(0, 0, 1, main_font, 18, 330, frame.get_height() - 45, 100, 40);
-	volume->property.bind(engine->volume, handler);
-	controls.push_back(volume);
-
-	//Scene
-	Button* scene = new Button("Scenes", main_font, 18, frame.get_width() - 270, frame.get_height() - 40, 100, 40);
-	scene->set_on_click([&frame]() {
-		frame.change_view(new SceneView());
-	});
-	controls.push_back(scene);
-
-	//Program Button
-	Button* program = new Button("Programs", main_font, 18, frame.get_width() - 170, frame.get_height() - 40, 100, 40);
-	program->set_on_click([&frame]() {
-		frame.change_view(new ProgramView());
-	});
-	controls.push_back(program);
 
 	//Back Button
 	Button* exit = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
