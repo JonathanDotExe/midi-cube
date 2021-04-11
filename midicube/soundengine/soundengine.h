@@ -350,11 +350,36 @@ public:
 	void set_active(bool active = false);
 };
 
+class EffectProgram {
+public:
+	virtual void load(pt::ptree tree) = 0;
+
+	virtual pt::ptree save() = 0;
+
+	virtual ~EffectProgram() {
+
+	}
+};
+
+
+class MasterEffectProgram {
+	ssize_t next_effect = -1;
+	ssize_t effect = -1;
+	EffectProgram* prog = nullptr;
+};
+
+class InsertEffectProgram {
+	ssize_t effect = -1;
+	EffectProgram* prog = nullptr;
+};
+
 struct ChannelProgram {
 	ssize_t engine_index{-1};
 	double volume = 0.5;
 	double panning = 0;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
+	std::array<InsertEffectProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
+	ssize_t send_master = -1;
 
 	unsigned int arpeggiator_bpm = 120;
 	bool arp_on;
@@ -371,6 +396,7 @@ struct Program {
 	std::string name;
 	unsigned int metronome_bpm = 120;
 	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{2, true}};
+	std::array<MasterEffectProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
 };
 
 /*

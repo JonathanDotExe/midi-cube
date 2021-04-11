@@ -51,7 +51,7 @@ Scene MasterEffectView::create(Frame &frame) {
 		}
 
 		//Title
-		Label* title = new Label("Effect " + std::to_string(i + 1), main_font, 16, x + 5, y + 5);
+		Label* title = new Label("Effect " + std::to_string(i), main_font, 16, x + 5, y + 5);
 		controls.push_back(title);
 
 		//Effect
