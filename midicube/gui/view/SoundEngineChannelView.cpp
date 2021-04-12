@@ -87,10 +87,13 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		controls.push_back(effect);
 		//Edit
 		Button* edit_effect = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
+
 		edit_effect->set_on_click([this, &frame, i]() {
 			Effect* effect = channel.effects[i].get_effect();
 			if (effect) {
-				frame.change_view(new EffectView(effect, [this]() { return new SoundEngineChannelView(channel, channel_index); }));
+				SoundEngineChannel& c = channel;
+				int ci = channel_index;
+				frame.change_view(new EffectView(effect, [&c, ci]() { return new SoundEngineChannelView(c, ci); }));
 			}
 		});
 		controls.push_back(edit_effect);
