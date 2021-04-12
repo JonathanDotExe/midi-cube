@@ -15,8 +15,8 @@
 #include "../../effect/rotary_speaker.h"
 #include "../../effect/vocoder.h"
 
-EffectView::EffectView(Effect *e) :
-		effect(e) {
+EffectView::EffectView(Effect *e, std::function<ViewController* ()> b) :
+		effect(e), back(b) {
 
 }
 
@@ -489,8 +489,8 @@ Scene EffectView::create(Frame &frame) {
 	//Exit Button
 	Button *exit = new Button("Back", main_font, 18, frame.get_width() - 70,
 			frame.get_height() - 40, 70, 40);
-	exit->set_on_click([&frame]() {
-		frame.change_view(new SoundEngineView());
+	exit->set_on_click([&frame, this]() {
+		frame.change_view(this->back());
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);

@@ -64,7 +64,7 @@ Scene MasterEffectView::create(Frame &frame) {
 		edit_effect->set_on_click([this, &frame, i, &effect]() {
 			Effect* eff = effect.get_effect();
 			if (eff) {
-				frame.change_view(new EffectView(eff));
+				frame.change_view(new EffectView(eff, []() { return new MasterEffectView(); }));
 			}
 		});
 		controls.push_back(edit_effect);
@@ -82,7 +82,7 @@ Scene MasterEffectView::create(Frame &frame) {
 
 	//Back Button
 	Button* exit = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
-	exit->set_on_click([&frame]() {
+	exit->set_on_click([&frame, this]() {
 		frame.change_view(new SoundEngineView());
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);

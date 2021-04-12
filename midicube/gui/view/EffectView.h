@@ -16,9 +16,10 @@
 class EffectView : public ViewController {
 private:
 	Effect* effect = nullptr;
+	std::function<ViewController* ()> back;
 
 public:
-	EffectView(Effect* effect);
+	EffectView(Effect* effect, std::function<ViewController* ()> b);
 	virtual Scene create(Frame &frame);
 	virtual ~EffectView();
 };

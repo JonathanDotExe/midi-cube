@@ -90,7 +90,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		edit_effect->set_on_click([this, &frame, i]() {
 			Effect* effect = channel.effects[i].get_effect();
 			if (effect) {
-				frame.change_view(new EffectView(effect));
+				frame.change_view(new EffectView(effect, [this]() { return new SoundEngineChannelView(channel, channel_index); }));
 			}
 		});
 		controls.push_back(edit_effect);
