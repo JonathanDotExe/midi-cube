@@ -362,15 +362,21 @@ public:
 };
 
 
-class MasterEffectProgram {
+struct MasterEffectProgram {
 	ssize_t next_effect = -1;
 	ssize_t effect = -1;
 	EffectProgram* prog = nullptr;
+	~MasterEffectProgram() {
+		delete prog;
+	}
 };
 
-class InsertEffectProgram {
+struct InsertEffectProgram {
 	ssize_t effect = -1;
 	EffectProgram* prog = nullptr;
+	~InsertEffectProgram() {
+		delete prog;
+	}
 };
 
 struct ChannelProgram {

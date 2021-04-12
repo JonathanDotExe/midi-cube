@@ -418,6 +418,23 @@ void SoundEngineDevice::apply_program(Program* program) {
 		if (engine) {
 			engine->apply_program(prog.engine_program);
 		}
+		//Effects
+		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
+			InsertEffectProgram& p = prog.effects[i];
+			InsertEffect& effect = ch.effects[i];
+
+			effect.set_effect_index(p.effect);
+			//TODO apply effect program
+		}
+	}
+	//Master Effects
+	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
+		MasterEffectProgram& prog = program->effects[i];
+		MasterEffect& effect = effects[i];
+
+		effect.next_effect = prog.next_effect;
+		effect.set_effect_index(prog.effect);
+		//TODO apply effect program
 	}
 }
 
