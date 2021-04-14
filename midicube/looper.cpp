@@ -8,7 +8,7 @@
 #include "looper.h"
 #include <algorithm>
 
-void Looper::apply(double& lsample, double& rsample, Metronome& metronome, SampleInfo& info) {
+void LooperChannel::apply(double& lsample, double& rsample, Metronome& metronome, SampleInfo& info) {
 	if (preset.on) {
 		if (reset) {
 			lbuffer = {};
@@ -17,7 +17,7 @@ void Looper::apply(double& lsample, double& rsample, Metronome& metronome, Sampl
 		}
 
 		unsigned int bpm = metronome.get_bpm();
-		size_t index = info.sample_time % (preset.bars * info.sample_rate * 4 * 60 / std::max(bpm, (unsigned int) 1)); //Assuming its a 4/4 measure
+		size_t index = info.sample_time % (preset.bars * info.sample_rate * 4 * 60 / std::max(bpm, (unsigned int) 1)); //FIXME Assuming its a 4/4 measure
 
 		if (index < LOOPER_BUFFER_SIZE) {
 			double l = lsample;
