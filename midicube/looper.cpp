@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <algorithm>
 
-void LooperChannel::apply(double lin, double rin, double& lout, double& rout, Metronome& metronome, SampleInfo& info, bool record) {
+void LooperChannel::apply(double& lout, double& rout, Metronome& metronome, SampleInfo& info) {
 	if (preset.on) {
 		if (reset) {
 			lbuffer = {};
@@ -26,11 +26,19 @@ void LooperChannel::apply(double lin, double rin, double& lout, double& rout, Me
 				lout += lbuffer[index];
 				rout += rbuffer[index];
 			}
+		}
+	}
+}
+
+void LooperChannel::record(double lin, double rin, Metronome& metronome, SampleInfo& info) {
+	if (preset.on) {
+		unsigned int bpm = metronome.get_bpm();
+		size_t index = info.sample_time % (preset.bars * info.sample_rate * 4 * 60 / std::max(bpm, (unsigned int) 1)); //FIXME Assuming its a 4/4 measure
+
+		if (index < LOOPER_BUFFER_SIZE) {
 			//Record
-			if (record) {
-				lbuffer[index] += lin;
-				rbuffer[index] += rin;
-			}
+			lbuffer[index] += lin;
+			rbuffer[index] += rin;
 		}
 	}
 }
@@ -39,8 +47,16 @@ void Looper::apply(double& lsample, double& rsample, Metronome& metronome, Sampl
 	if (active) {
 		double l = lsample;
 		double r = rsample;
-		for (size_t i = 0; i < LOOPER_CHANNELS; ++i) {
-			channels[i].apply(l, r, lsample, rsample, metronome, info, (ssize_t) i == record_channel);
+		if (solo_channel >= 0) {
+			channels[record_channel].apply(lsample, rsample, metronome, info);
+		}
+		else {
+			for (size_t i = 0; i < LOOPER_CHANNELS; ++i) {
+				channels[i].apply(lsample, rsample, metronome, info);
+			}
+		}
+		if (record_channel >= 0) {
+			channels[record_channel].record(l, r, metronome, info);
 		}
 	}
 }
