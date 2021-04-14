@@ -12,6 +12,7 @@
 #include "../envelope.h"
 #include "../audio.h"
 #include "../synthesis.h"
+#include "../looper.h"
 #include "../metronome.h"
 #include "../effect/vocoder.h"
 #include "../effect/bitcrusher.h"
@@ -395,6 +396,7 @@ private:
 
 public:
 	Metronome metronome;
+	Looper looper;
 	bool play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	double volume{0.2};

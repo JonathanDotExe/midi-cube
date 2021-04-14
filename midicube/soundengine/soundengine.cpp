@@ -229,6 +229,8 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 		SoundEngineChannel& ch = this->channels[i];
 		ch.process_sample(lsample, rsample, info, metronome, scene);
 	}
+	//Looper
+	looper.apply(lsample, rsample, metronome, info);
 	//Metronome
 	if (play_metronome) {
 		if (metronome.is_beat(info.sample_time, info.sample_rate, 1)) {
