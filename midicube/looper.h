@@ -33,7 +33,7 @@ public:
 	bool play{true};
 	bool reset{false};	//true will invoke a reset next sample
 
-	void apply(double& lsample, double& rsample, Metronome& metronome, SampleInfo& info);
+	void apply(double lin, double rin, double& lout, double& rout, Metronome& metronome, SampleInfo& info, bool record);
 };
 
 class Looper {
