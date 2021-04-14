@@ -30,11 +30,10 @@ Scene LooperView::create(Frame &frame) {
 
 	//Channels
 	int rows = 2;
-	int cols = SOUND_ENGINE_MIDI_CHANNELS / rows;
+	int cols = LOOPER_CHANNELS;
 	int pane_width = (frame.get_width() - 15) / cols;
 	int pane_height = (frame.get_height() - 50 - 5) / rows;
-	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-		SoundEngineChannel& channel = sound_engine.channels[i];
+	for (size_t i = 0; i < LOOPER_CHANNELS; ++i) {
 		//Background pane
 		int x = 10 + pane_width * (i % cols);
 		int y = 10 + pane_height * (i / cols);
@@ -46,15 +45,14 @@ Scene LooperView::create(Frame &frame) {
 		Label* title = new Label("Channel " + std::to_string(i + 1), main_font, 16, x + 5, y + 5);
 		controls.push_back(title);
 
-		//Active
-		CheckBox* active = new CheckBox(false, "", main_font, 12, x + pane_width - 30, y + 5, 20, 20);
-		active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), handler);
+		//Play
+		CheckBox* active = new CheckBox(false, "Play", main_font, 12, x + 5, y + 30, 30, 30);
+		active->property.bind<bool>(sound_engine.looper.channels[i].play, handler);
 		controls.push_back(active);
-
-		//Volume
-		Slider* volume = new Slider(0, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);
-		volume->property.bind(channel.volume, handler);
-		controls.push_back(volume);
+		//Bars
+		DragBox<int>* bars = new DragBox<int>(4, 1, 16, main_font, 12, x + 5, y + 65, pane_width - 15, 30);
+		bars->property.bind<unsigned int>(sound_engine.looper.channels[i].preset.bars, handler);
+		controls.push_back(bars);
 	}
 
 	//Metronome

@@ -10,7 +10,8 @@
 #include <algorithm>
 
 void LooperChannel::apply(double& lout, double& rout, Metronome& metronome, SampleInfo& info) {
-	if (preset.on) {
+	//Play
+	if (play) {
 		if (reset) {
 			lbuffer = {};
 			rbuffer = {};
@@ -21,25 +22,20 @@ void LooperChannel::apply(double& lout, double& rout, Metronome& metronome, Samp
 		size_t index = info.sample_time % (preset.bars * info.sample_rate * 4 * 60 / std::max(bpm, (unsigned int) 1)); //FIXME Assuming its a 4/4 measure
 
 		if (index < LOOPER_BUFFER_SIZE) {
-			//Play
-			if (play) {
-				lout += lbuffer[index];
-				rout += rbuffer[index];
-			}
+			lout += lbuffer[index];
+			rout += rbuffer[index];
 		}
 	}
 }
 
 void LooperChannel::record(double lin, double rin, Metronome& metronome, SampleInfo& info) {
-	if (preset.on) {
-		unsigned int bpm = metronome.get_bpm();
-		size_t index = info.sample_time % (preset.bars * info.sample_rate * 4 * 60 / std::max(bpm, (unsigned int) 1)); //FIXME Assuming its a 4/4 measure
+	unsigned int bpm = metronome.get_bpm();
+	size_t index = info.sample_time % (preset.bars * info.sample_rate * 4 * 60 / std::max(bpm, (unsigned int) 1)); //FIXME Assuming its a 4/4 measure
 
-		if (index < LOOPER_BUFFER_SIZE) {
-			//Record
-			lbuffer[index] += lin;
-			rbuffer[index] += rin;
-		}
+	if (index < LOOPER_BUFFER_SIZE) {
+		//Record
+		lbuffer[index] += lin;
+		rbuffer[index] += rin;
 	}
 }
 

@@ -19,7 +19,6 @@
 
 struct LooperPreset {
 	unsigned int bars{4};
-	bool on{false};
 };
 
 class LooperChannel {
