@@ -43,8 +43,6 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			l *= (1 - fmax(0, panning));
 			r *= (1 - fmax(0, -panning));
 		}
-		//Looper
-		looper.apply(l, r, metronome, info);
 		//Playback
 		lsample += l * volume;
 		rsample += r * volume;

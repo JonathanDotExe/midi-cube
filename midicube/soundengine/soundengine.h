@@ -13,7 +13,6 @@
 #include "../audio.h"
 #include "../synthesis.h"
 #include "../metronome.h"
-#include "../looper.h"
 #include "../effect/vocoder.h"
 #include "../effect/bitcrusher.h"
 #include "voice.h"
@@ -242,7 +241,6 @@ public:
 	double panning = 0;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	Arpeggiator arp;
-	Looper looper;
 
 	//Effects
 	VocoderPreset vocoder_preset;
