@@ -12,6 +12,9 @@
 #include "../engine/control.h"
 
 class LooperView : public ViewController {
+private:
+	std::array<Button*, LOOPER_CHANNELS> records;
+	std::array<Button*, LOOPER_CHANNELS> solos;
 public:
 	LooperView();
 	virtual ~LooperView();

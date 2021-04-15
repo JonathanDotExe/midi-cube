@@ -53,6 +53,18 @@ Scene LooperView::create(Frame &frame) {
 		DragBox<int>* bars = new DragBox<int>(4, 1, 16, main_font, 12, x + 5, y + 65, pane_width - 15, 30);
 		bars->property.bind<unsigned int>(sound_engine.looper.channels[i].preset.bars, handler);
 		controls.push_back(bars);
+		//Record
+		Button* record = new Button("Record", main_font, 12, x + 5, y + 100, pane_width - 15, 30);
+		record->set_on_click([this, &handler, i , &sound_engine]() {
+			handler.queue_action(new SetValueAction<ssize_t, ssize_t>(sound_engine.looper.record_channel, i));
+		});
+		controls.push_back(record);
+		//Solo
+		Button* solo = new Button("Solo", main_font, 12, x + 5, y + 135, pane_width - 15, 30);
+		solo->set_on_click([this, &handler, i , &sound_engine]() {
+			handler.queue_action(new SetValueAction<ssize_t, ssize_t>(sound_engine.looper.solo_channel, i));
+		});
+		controls.push_back(record);
 	}
 
 	//Metronome
