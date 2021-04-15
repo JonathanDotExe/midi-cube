@@ -108,7 +108,7 @@ Scene LooperView::create(Frame &frame) {
 		controls.push_back(solo);
 		solos[i] = solo;
 		//Clear
-		Button* clear = new Button("Solo", main_font, 12, x + 5, y + 170, pane_width - 15, 30);
+		Button* clear = new Button("Clear", main_font, 12, x + 5, y + 170, pane_width - 15, 30);
 		clear->set_on_click([this, &handler, i , &sound_engine]() {
 			handler.queue_action(new SetValueAction<bool, bool>(sound_engine.looper.channels[i].reset, true));
 		});
@@ -129,6 +129,11 @@ Scene LooperView::create(Frame &frame) {
 	DragBox<double>* volume = new DragBox<double>(0, 0, 1, main_font, 18, 330, frame.get_height() - 45, 100, 40);
 	volume->property.bind(sound_engine.volume, handler);
 	controls.push_back(volume);
+
+	//Looper
+	CheckBox* looper = new CheckBox(false, "Looper", main_font, 18, 440, frame.get_height() - 45, 40, 40);
+	looper->property.bind(sound_engine.looper.active, handler);
+	controls.push_back(looper);
 
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
