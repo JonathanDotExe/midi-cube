@@ -107,6 +107,12 @@ Scene LooperView::create(Frame &frame) {
 		});
 		controls.push_back(solo);
 		solos[i] = solo;
+		//Clear
+		Button* clear = new Button("Solo", main_font, 12, x + 5, y + 170, pane_width - 15, 30);
+		clear->set_on_click([this, &handler, i , &sound_engine]() {
+			handler.queue_action(new SetValueAction<bool, bool>(sound_engine.looper.channels[i].reset, true));
+		});
+		controls.push_back(clear);
 	}
 
 	//Metronome
