@@ -14,14 +14,14 @@
 #include "metronome.h"
 
 //16 MB
+#define LOOPER_CHANNELS 8
 #define LOOPER_BUFFER_SIZE 1048576
 
 struct LooperPreset {
-	std::atomic<unsigned int> bars{4};
-	std::atomic<bool> on{false};
+	unsigned int bars{4};
 };
 
-class Looper {
+class LooperChannel {
 private:
 	std::array<double, LOOPER_BUFFER_SIZE> lbuffer = {};
 	std::array<double, LOOPER_BUFFER_SIZE> rbuffer = {};
@@ -29,12 +29,23 @@ private:
 
 public:
 	LooperPreset preset;
-	std::atomic<bool> play{true};
-	std::atomic<bool> record{true};
-	std::atomic<bool> reset{false};	//true will invoke a reset next sample
+	bool play{true};
+	bool reset{false};	//true will invoke a reset next sample
 
-	void apply(double& lsample, double& rsample, Metronome& metronome, SampleInfo& info);
+	void apply(double& lout, double& rout, Metronome& metronome, SampleInfo& info);
+
+	void record(double lin, double rin, Metronome& metronome, SampleInfo& info);
 };
 
+class Looper {
+public:
+	std::array<LooperChannel, LOOPER_CHANNELS> channels;
+	bool active = false;
+	ssize_t record_channel = -1;
+	ssize_t solo_channel = -1;
+
+	void apply(double& lsample, double& rsample, Metronome& metronome, SampleInfo& info);
+
+};
 
 #endif /* MIDICUBE_SOUNDENGINE_LOOPER_H_ */

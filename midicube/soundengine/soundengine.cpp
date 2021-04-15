@@ -43,8 +43,6 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			l *= (1 - fmax(0, panning));
 			r *= (1 - fmax(0, -panning));
 		}
-		//Looper
-		looper.apply(l, r, metronome, info);
 		//Playback
 		lsample += l * volume;
 		rsample += r * volume;
@@ -231,6 +229,8 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 		SoundEngineChannel& ch = this->channels[i];
 		ch.process_sample(lsample, rsample, info, metronome, scene);
 	}
+	//Looper
+	looper.apply(lsample, rsample, metronome, info);
 	//Metronome
 	if (play_metronome) {
 		if (metronome.is_beat(info.sample_time, info.sample_rate, 1)) {

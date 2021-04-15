@@ -12,8 +12,8 @@
 #include "../envelope.h"
 #include "../audio.h"
 #include "../synthesis.h"
-#include "../metronome.h"
 #include "../looper.h"
+#include "../metronome.h"
 #include "../effect/vocoder.h"
 #include "../effect/bitcrusher.h"
 #include "voice.h"
@@ -242,7 +242,6 @@ public:
 	double panning = 0;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	Arpeggiator arp;
-	Looper looper;
 
 	//Effects
 	VocoderPreset vocoder_preset;
@@ -397,6 +396,7 @@ private:
 
 public:
 	Metronome metronome;
+	Looper looper;
 	bool play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	double volume{0.2};
