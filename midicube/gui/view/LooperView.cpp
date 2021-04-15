@@ -56,13 +56,25 @@ Scene LooperView::create(Frame &frame) {
 		//Record
 		Button* record = new Button("Record", main_font, 12, x + 5, y + 100, pane_width - 15, 30);
 		record->set_on_click([this, &handler, i , &sound_engine]() {
-			handler.queue_action(new SetValueAction<ssize_t, ssize_t>(sound_engine.looper.record_channel, i));
+			if (record_index == (ssize_t) i) {
+				record_index = -1;
+			}
+			else {
+				record_index = i;
+			}
+			handler.queue_action(new SetValueAction<ssize_t, ssize_t>(sound_engine.looper.record_channel, record_index));
 		});
 		controls.push_back(record);
 		//Solo
 		Button* solo = new Button("Solo", main_font, 12, x + 5, y + 135, pane_width - 15, 30);
 		solo->set_on_click([this, &handler, i , &sound_engine]() {
-			handler.queue_action(new SetValueAction<ssize_t, ssize_t>(sound_engine.looper.solo_channel, i));
+			if (solo_index == (ssize_t) i) {
+				solo_index = -1;
+			}
+			else {
+				solo_index = i;
+			}
+			handler.queue_action(new SetValueAction<ssize_t, ssize_t>(sound_engine.looper.solo_channel, solo_index));
 		});
 		controls.push_back(record);
 	}

@@ -15,6 +15,8 @@ class LooperView : public ViewController {
 private:
 	std::array<Button*, LOOPER_CHANNELS> records;
 	std::array<Button*, LOOPER_CHANNELS> solos;
+	ssize_t record_index = -1;
+	ssize_t solo_index = -1;
 public:
 	LooperView();
 	virtual ~LooperView();
