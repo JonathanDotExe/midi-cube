@@ -17,8 +17,13 @@ private:
 	std::array<Button*, LOOPER_CHANNELS> solos;
 	ssize_t record_index = -1;
 	ssize_t solo_index = -1;
+	ActionHandler* handler = nullptr;
+	SoundEngineDevice* engine = nullptr;
+	void update_record();
+	void update_solo();
 public:
 	LooperView();
+	virtual void update_properties();
 	virtual ~LooperView();
 	virtual Scene create(Frame &frame);
 };

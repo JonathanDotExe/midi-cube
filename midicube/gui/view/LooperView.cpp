@@ -17,6 +17,32 @@ LooperView::~LooperView() {
 
 }
 
+void LooperView::update_record() {
+	ssize_t i = 0;
+	for (Button* button : records) {
+		if (i == record_index) {
+			button->rect.setFillColor(sf::Color::Red);
+		}
+		else {
+			button->rect.setFillColor(sf::Color(220, 220, 220));
+		}
+		++i;
+	}
+}
+
+void LooperView::update_solo() {
+	ssize_t i = 0;
+	for (Button* button : solos) {
+		if (i == solo_index) {
+			button->rect.setFillColor(sf::Color::Blue);
+		}
+		else {
+			button->rect.setFillColor(sf::Color(220, 220, 220));
+		}
+		++i;
+	}
+}
+
 Scene LooperView::create(Frame &frame) {
 	std::vector<Control*> controls;
 
@@ -63,8 +89,10 @@ Scene LooperView::create(Frame &frame) {
 				record_index = i;
 			}
 			handler.queue_action(new SetValueAction<ssize_t, ssize_t>(sound_engine.looper.record_channel, record_index));
+			update_record();
 		});
 		controls.push_back(record);
+		records[i] = record;
 		//Solo
 		Button* solo = new Button("Solo", main_font, 12, x + 5, y + 135, pane_width - 15, 30);
 		solo->set_on_click([this, &handler, i , &sound_engine]() {
@@ -75,8 +103,10 @@ Scene LooperView::create(Frame &frame) {
 				solo_index = i;
 			}
 			handler.queue_action(new SetValueAction<ssize_t, ssize_t>(sound_engine.looper.solo_channel, solo_index));
+			update_solo();
 		});
-		controls.push_back(record);
+		controls.push_back(solo);
+		solos[i] = solo;
 	}
 
 	//Metronome
@@ -102,6 +132,19 @@ Scene LooperView::create(Frame &frame) {
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);
 
+	this->handler = &handler;
+	this->engine = &sound_engine;
 
 	return {controls};
+}
+
+void LooperView::update_properties() {
+	handler->queue_action(new GetValueAction<ssize_t, ssize_t>(engine->looper.record_channel, [this](ssize_t v) {
+		record_index = v;
+		update_record();
+	}));
+	handler->queue_action(new GetValueAction<ssize_t, ssize_t>(engine->looper.solo_channel, [this](ssize_t v) {
+		solo_index = v;
+		update_solo();
+	}));
 }

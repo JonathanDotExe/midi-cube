@@ -81,6 +81,10 @@ public:
 
 	virtual Scene create(Frame& frame) = 0;
 
+	virtual void update_properties() {
+
+	}
+
 	virtual ~ViewController() {
 
 	}
