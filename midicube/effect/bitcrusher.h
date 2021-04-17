@@ -16,6 +16,19 @@ struct BitCrusherPreset {
 	unsigned int bits = 16;
 };
 
+
+class BitCrusherProgram : public EffectProgram {
+public:
+	BitCrusherPreset preset;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~BitCrusherProgram() {
+
+	}
+};
+
 class BitCrusherEffect : public Effect {
 public:
 	BitCrusherPreset preset;

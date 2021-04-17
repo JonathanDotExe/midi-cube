@@ -19,6 +19,8 @@ enum DistortionType {
 	DIGITAL_DISTORTION, POLYNOMAL_DISTORTION, ARCTAN_DISTORTION
 };
 
+
+
 struct AmplifierSimulationPreset {
 	bool on = true;
 	double boost = 0;
@@ -27,6 +29,17 @@ struct AmplifierSimulationPreset {
 	DistortionType type = ARCTAN_DISTORTION;
 };
 
+class AmplifierSimulationProgram : public EffectProgram {
+public:
+	AmplifierSimulationPreset preset;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~AmplifierSimulationProgram() {
+
+	}
+};
 
 class AmplifierSimulationEffect : public Effect {
 private:

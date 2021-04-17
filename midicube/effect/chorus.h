@@ -22,6 +22,19 @@ struct ChorusPreset {
 	AnalogWaveForm vibrato_waveform = AnalogWaveForm::TRIANGLE_WAVE;
 };
 
+
+class ChorusProgram : public EffectProgram {
+public:
+	ChorusPreset preset;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~ChorusProgram() {
+
+	}
+};
+
 class ChorusEffect : public Effect {
 private:
 	AnalogOscilator osc;

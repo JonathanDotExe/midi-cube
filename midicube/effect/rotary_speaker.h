@@ -49,6 +49,19 @@ struct RotarySpeakerPreset {
 	double bass_fast_ramp = 5.5;
 };
 
+
+class RotarySpeakerProgram : public EffectProgram {
+public:
+	RotarySpeakerPreset preset;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~RotarySpeakerProgram() {
+
+	}
+};
+
 class RotarySpeakerEffect : public Effect {
 private:
 	Filter filter;
