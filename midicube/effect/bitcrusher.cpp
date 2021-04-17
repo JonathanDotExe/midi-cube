@@ -40,3 +40,30 @@ boost::property_tree::ptree BitCrusherProgram::save() {
 	tree.put("bits", preset.bits);
 	return tree;
 }
+
+
+EffectProgram* BitCrusherEffect::create_program() {
+	return new BitCrusherProgram();
+}
+
+void BitCrusherEffect::save_program(EffectProgram **prog) {
+	BitCrusherProgram* p = dynamic_cast<BitCrusherProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new BitCrusherProgram();
+	}
+	p->preset = preset;
+	*prog = p;
+}
+
+void BitCrusherEffect::apply_program(EffectProgram *prog) {
+	BitCrusherProgram* p = dynamic_cast<BitCrusherProgram*>(prog);
+	//Create new
+	if (p) {
+		preset = p->preset;
+	}
+	else {
+		preset = {};
+	}
+}

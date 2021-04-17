@@ -79,6 +79,9 @@ public:
 
 	RotarySpeakerEffect();
 	void apply(double& lsample, double& rsample, SampleInfo& info);
+	EffectProgram* create_program();
+	void save_program(EffectProgram **prog);
+	void apply_program(EffectProgram *prog);
 	~RotarySpeakerEffect();
 };
 

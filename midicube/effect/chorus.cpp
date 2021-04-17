@@ -61,3 +61,29 @@ boost::property_tree::ptree ChorusProgram::save() {
 	return tree;
 }
 
+
+EffectProgram* ChorusEffect::create_program() {
+	return new ChorusProgram();
+}
+
+void ChorusEffect::save_program(EffectProgram **prog) {
+	ChorusProgram* p = dynamic_cast<ChorusProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new ChorusProgram();
+	}
+	p->preset = preset;
+	*prog = p;
+}
+
+void ChorusEffect::apply_program(EffectProgram *prog) {
+	ChorusProgram* p = dynamic_cast<ChorusProgram*>(prog);
+	//Create new
+	if (p) {
+		preset = p->preset;
+	}
+	else {
+		preset = {};
+	}
+}

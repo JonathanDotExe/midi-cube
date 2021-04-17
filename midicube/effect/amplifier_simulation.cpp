@@ -85,3 +85,29 @@ boost::property_tree::ptree AmplifierSimulationProgram::save() {
 	tree.put("tone", preset.tone);
 	return tree;
 }
+
+EffectProgram* AmplifierSimulationEffect::create_program() {
+	return new AmplifierSimulationProgram();
+}
+
+void AmplifierSimulationEffect::save_program(EffectProgram **prog) {
+	AmplifierSimulationProgram* p = dynamic_cast<AmplifierSimulationProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new AmplifierSimulationProgram();
+	}
+	p->preset = preset;
+	*prog = p;
+}
+
+void AmplifierSimulationEffect::apply_program(EffectProgram *prog) {
+	AmplifierSimulationProgram* p = dynamic_cast<AmplifierSimulationProgram*>(prog);
+	//Create new
+	if (p) {
+		preset = p->preset;
+	}
+	else {
+		preset = {};
+	}
+}
