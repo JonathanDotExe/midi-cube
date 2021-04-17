@@ -65,7 +65,8 @@ struct OscilatorEntity {
 struct OperatorEntity {
 	bool audible = true;
 	ADSREnvelopeData env{0.0005, 0, 1, 0.0005};
-	double amp_kb_track = 0;
+	double amp_kb_track_upper = 0;
+	double amp_kb_track_lower = 0;
 	unsigned int amp_kb_track_note = 60;
 
 	PropertyModulation volume = {1};

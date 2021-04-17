@@ -8,6 +8,7 @@
 #include "SoundEngineView.h"
 #include "ProgramView.h"
 #include "SceneView.h"
+#include "LooperView.h"
 #include "SoundEngineChannelView.h"
 #include "MasterEffectView.h"
 
@@ -96,6 +97,13 @@ Scene SoundEngineView::create(Frame& frame) {
 		frame.change_view(new MasterEffectView());
 	});
 	controls.push_back(effects);
+
+	//Looper
+	Button* looper = new Button("Looper", main_font, 18, frame.get_width() - 370, frame.get_height() - 40, 100, 40);
+	looper->set_on_click([&frame]() {
+		frame.change_view(new LooperView());
+	});
+	controls.push_back(looper);
 
 	//Scene
 	Button* scene = new Button("Scenes", main_font, 18, frame.get_width() - 275, frame.get_height() - 45, 100, 40);

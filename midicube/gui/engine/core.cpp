@@ -67,6 +67,7 @@ void Frame::run(ViewController* v) {
 			for (Control* control : controls) {
 				control->update_properties();
 			}
+			view->update_properties();
 			cube.updated = false;
 		}
 		//Execute return actions
@@ -168,6 +169,7 @@ void Frame::switch_view(ViewController* view) {
 		control->update_properties();
 		controls.push_back(control);
 	}
+	view->update_properties();
 	request_redraw();
 }
 
