@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 		ptr.cube->init(out_device, in_device);
 		load_resources();
 		//View
-		Frame frame(*ptr.cube, 1024, 600, "MIDICube - universal MIDI and synthesis workstation");
+		Frame frame(*ptr.cube, 1024, 600, "MIDICube - universal MIDI and synthesis workstation", screen_sleep);
 		//Run frame
 		frame.run(new SoundEngineView());
 	}
