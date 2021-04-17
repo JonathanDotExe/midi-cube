@@ -424,7 +424,9 @@ void SoundEngineDevice::apply_program(Program* program) {
 			InsertEffect& effect = ch.effects[i];
 
 			effect.set_effect_index(p.effect);
-			effect.get_effect()->apply_program(p.prog);
+			if (effect.get_effect()) {
+				effect.get_effect()->apply_program(p.prog);
+			}
 		}
 	}
 	//Master Effects
@@ -434,7 +436,9 @@ void SoundEngineDevice::apply_program(Program* program) {
 
 		effect.next_effect = prog.next_effect;
 		effect.set_effect_index(prog.effect);
-		effect.get_effect()->apply_program(prog.prog);
+		if (effect.get_effect()) {
+			effect.get_effect()->apply_program(prog.prog);
+		}
 	}
 }
 
@@ -464,7 +468,9 @@ void SoundEngineDevice::save_program(Program* program) {
 			InsertEffect& effect = ch.effects[i];
 
 			p.effect = effect.get_effect_index();
-			effect.get_effect()->save_program(&p.prog);
+			if (effect.get_effect()) {
+				effect.get_effect()->save_program(&p.prog);
+			}
 		}
 	}
 	//Master Effects
@@ -474,7 +480,9 @@ void SoundEngineDevice::save_program(Program* program) {
 
 		prog.next_effect = effect.next_effect;
 		prog.effect = effect.get_effect_index();
-		effect.get_effect()->save_program(&prog.prog);
+		if (effect.get_effect()) {
+			effect.get_effect()->save_program(&prog.prog);
+		}
 	}
 }
 

@@ -99,7 +99,7 @@ Scene SoundEngineView::create(Frame& frame) {
 	controls.push_back(effects);
 
 	//Looper
-	Button* looper = new Button("Looper", main_font, 18, frame.get_width() - 370, frame.get_height() - 40, 100, 40);
+	Button* looper = new Button("Looper", main_font, 18, frame.get_width() - 375, frame.get_height() - 45, 100, 40);
 	looper->set_on_click([&frame]() {
 		frame.change_view(new LooperView());
 	});
