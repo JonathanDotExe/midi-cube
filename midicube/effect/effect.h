@@ -12,11 +12,36 @@
 #include "../oscilator.h"
 #include "../midi.h"
 
+#include <boost/property_tree/ptree.hpp>
+
+namespace pt = boost::property_tree;
+
+class EffectProgram {
+public:
+	virtual void load(pt::ptree tree) = 0;
+
+	virtual pt::ptree save() = 0;
+
+	virtual ~EffectProgram() {
+
+	}
+};
+
 class Effect {
 public:
 	virtual void apply(double& lsample, double& rsample, SampleInfo& info) = 0;
 	virtual void midi_message(MidiMessage& msg, SampleInfo& info) {
 
+	}
+	virtual void apply_program(EffectProgram* prog) {
+
+	}
+
+	virtual void save_program(EffectProgram** prog) {
+
+	}
+	virtual EffectProgram* create_program() {
+		return nullptr;
 	}
 	virtual ~Effect() {
 

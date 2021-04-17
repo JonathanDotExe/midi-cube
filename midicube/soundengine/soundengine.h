@@ -349,18 +349,6 @@ public:
 	void set_active(bool active = false);
 };
 
-class EffectProgram {
-public:
-	virtual void load(pt::ptree tree) = 0;
-
-	virtual pt::ptree save() = 0;
-
-	virtual ~EffectProgram() {
-
-	}
-};
-
-
 struct MasterEffectProgram {
 	ssize_t next_effect = -1;
 	ssize_t effect = -1;
