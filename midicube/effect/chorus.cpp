@@ -39,3 +39,25 @@ std::string get_effect_name<ChorusEffect>() {
 	return "Chorus";
 }
 
+void ChorusProgram::load(boost::property_tree::ptree tree) {
+	preset.on = tree.get<bool>("on", true);
+	preset.vibrato_rate = tree.get<double>("vibrato_rate", 2);
+	preset.vibrato_depth = tree.get<double>("vibrato_depth", 0.5);
+	preset.mix = tree.get<double>("mix", 0.5);
+
+	preset.delay = tree.get<double>("delay", 0.015);
+	preset.vibrato_waveform = (AnalogWaveForm) tree.get<unsigned int>("vibrato_waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
+}
+
+boost::property_tree::ptree ChorusProgram::save() {
+	boost::property_tree::ptree tree;
+	tree.put("on", preset.on);
+	tree.put("vibrato_rate", preset.vibrato_rate);
+	tree.put("vibrato_depth", preset.vibrato_depth);
+	tree.put("mix", preset.mix);
+
+	tree.put("delay", preset.delay);
+	tree.put("vibrato_waveform", (unsigned int) preset.vibrato_waveform);
+	return tree;
+}
+

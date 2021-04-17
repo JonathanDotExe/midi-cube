@@ -79,3 +79,23 @@ template<>
 std::string get_effect_name<RotarySpeakerEffect>() {
 	return "Rotary Speaker";
 }
+
+void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
+	preset.on = tree.get<bool>("on", true);
+	preset.fast = tree.get<bool>("fast", false);
+
+	preset.stereo_mix = tree.get<double>("stereo_mix", 0.5);
+	preset.type = tree.get<bool>("type", false);
+}
+
+boost::property_tree::ptree RotarySpeakerProgram::save() {
+	boost::property_tree::ptree tree;
+	tree.put("on", preset.on);
+	tree.put("fast", preset.fast);
+
+	tree.put("stereo_mix", preset.stereo_mix);
+	tree.put("type", preset.type);
+
+	return tree;
+}
+
