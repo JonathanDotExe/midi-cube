@@ -367,7 +367,7 @@ AnalogSynth::AnalogSynth() {
 static inline double apply_modulation(const FixedScale &scale,
 		PropertyModulation &mod, std::array<double, ANALOG_PART_COUNT> &env_val,
 		std::array<double, ANALOG_PART_COUNT> &lfo_val,
-		std::array<double, ANALOG_CONTROL_COUNT> &controls, double velocity) {
+		std::array<double, ANALOG_CONTROL_COUNT> &controls, double velocity, double aftertouch) {
 	double prog = mod.value;
 	prog += env_val[mod.mod_env] * mod.mod_env_amount
 			+ lfo_val[mod.lfo] * mod.lfo_amount
@@ -381,7 +381,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
-		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, controls, note.velocity);
+		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, env_val, lfo_val, controls, note.velocity, aftertouch);
 		env_val[i] = note.parts[i].mod_env.amplitude(mod_env.env, info.time_step, note.pressed, env.sustain)* volume;
 	}
 	//Synthesize
@@ -411,7 +411,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 			//FM
 			freq += fm;
 			double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val,
-					lfo_mod, controls, note.velocity);
+					lfo_mod, controls, note.velocity, aftertouch);
 			if (osc.semi || pitch) {
 				freq = note_to_freq(note.note + osc.semi + pitch);
 			}
@@ -422,13 +422,13 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 
 			//Apply modulation
 			double volume = apply_modulation(VOLUME_SCALE, osc.volume, env_val,
-				lfo_val, controls, note.velocity);
+				lfo_val, controls, note.velocity, aftertouch);
 			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, env_val,
-					lfo_val, controls, note.velocity);
+					lfo_val, controls, note.velocity, aftertouch);
 			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width,
-					env_val, lfo_val, controls, note.velocity);
+					env_val, lfo_val, controls, note.velocity, aftertouch);
 			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE,
-					osc.unison_detune, env_val, lfo_val, controls, note.velocity);
+					osc.unison_detune, env_val, lfo_val, controls, note.velocity, aftertouch);
 
 			AnalogOscilatorSignal sig = part.oscilator.signal(freq, info.time_step, data, bdata, op.audible, modulates);
 			carrier += sig.carrier * volume;
@@ -437,7 +437,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		//Post processing
 		//Volume
 		double volume = apply_modulation(VOLUME_SCALE, op.volume, env_val,
-						lfo_val, controls, note.velocity) * op_part.amp_env.amplitude(op.env, info.time_step,
+						lfo_val, controls, note.velocity, aftertouch) * op_part.amp_env.amplitude(op.env, info.time_step,
 						note.pressed, env.sustain);
 		//Octave amp
 		if (op.amp_kb_track_upper && note.note > op.amp_kb_track_note) {
@@ -465,10 +465,10 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 				FilterData filter { op.filter_type };
 				filter.cutoff = scale_cutoff(apply_modulation(FILTER_CUTOFF_SCALE,
 						op.filter_cutoff, env_val, lfo_val, controls,
-						note.velocity)); //TODO optimize
+						note.velocity, aftertouch)); //TODO optimize
 				filter.resonance = apply_modulation(FILTER_RESONANCE_SCALE,
 						op.filter_resonance, env_val, lfo_val, controls,
-						note.velocity);
+						note.velocity, aftertouch);
 
 				if (op.filter_kb_track) {
 					double cutoff = filter.cutoff;
@@ -482,7 +482,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 			carrier *= volume;
 			//Pan
 			double panning = apply_modulation(PANNING_SCALE, op.panning,
-					env_val, lfo_val, controls, note.velocity);
+					env_val, lfo_val, controls, note.velocity, aftertouch);
 			//Playback
 			lsample += carrier * (1 - fmax(0, panning));
 			rsample += carrier * (1 - fmax(0, -panning));
@@ -582,12 +582,19 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		LFOEntity &lfo = preset.lfos[i];
 		double volume = apply_modulation(VOLUME_SCALE, lfo.volume, env_val,
-				lfo_val, controls, 0);
+				lfo_val, controls, 0, aftertouch);
 		AnalogOscilatorData d = { lfo.waveform };
 		lfos[i].process(lfo.freq, info.time_step, d);
 		lfo_val[i] = lfos[i].carrier(lfo.freq, info.time_step, d) * volume;
 		lfo_mod[i] = lfos[i].modulator(lfo.freq, info.time_step, d) * volume;
 	}
+}
+
+bool AnalogSynth::midi_message(MidiMessage& msg, SampleInfo& info) {
+	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
+		aftertouch = msg.monophonic_aftertouch()/127.0;
+	}
+	return BaseSoundEngine::midi_message(msg, info);
 }
 
 bool AnalogSynth::control_change(unsigned int control, unsigned int value) {

@@ -38,6 +38,7 @@ struct PropertyModulation {
 	double velocity_amount = 0;
 	size_t cc = 1;
 	double cc_amount = 0;
+	double aftertouch_amount = 0;
 };
 
 struct FrequencyModulatotion {
@@ -151,6 +152,7 @@ private:
 	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
 	std::array<double, ANALOG_PART_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
+	double aftertouch = 0;
 
 	bool first_port = true;
 	PortamendoBuffer note_port{0, 0};
@@ -170,6 +172,8 @@ public:
 	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
+
+	bool midi_message(MidiMessage& msg, SampleInfo& info);
 
 	bool control_change(unsigned int control, unsigned int value);
 

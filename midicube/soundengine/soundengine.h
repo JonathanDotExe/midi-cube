@@ -81,7 +81,7 @@ public:
 	std::atomic<bool> sustain{true};
 
 
-	bool midi_message(MidiMessage& msg, SampleInfo& info);
+	virtual bool midi_message(MidiMessage& msg, SampleInfo& info);
 
 	virtual void press_note(SampleInfo& info, unsigned int note, double velocity);
 
