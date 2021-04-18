@@ -68,14 +68,29 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 	//Vel
 	{
 		Label* title = new Label("Vel", main_font, 12, x, y);
+		show_amount->push_back(title);
 		controls->push_back(title);
+
+		Label* at_title = new Label("Aftertouch", main_font, 12, x, y);
+		show_source->push_back(at_title);
+		controls->push_back(at_title);
+
 
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
 		amount->border = 0;
 		amount->property.bind(mod.velocity_amount, handler);
 		controls->push_back(amount);
+		show_amount->push_back(amount);
 		boxes.push_back(amount);
+
+		DragBox<double>* at_amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
+		at_amount->drag_mul /= 2;
+		at_amount->border = 0;
+		at_amount->property.bind(mod.aftertouch_amount, handler);
+		controls->push_back(at_amount);
+		show_source->push_back(at_amount);
+		boxes.push_back(at_amount);
 	}
 	x += 90;
 	//CC
