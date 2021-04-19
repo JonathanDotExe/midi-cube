@@ -107,6 +107,7 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 						const auto& p = s.second.get_child_optional("preset");
 						if (p && program->channels[i].effects[j].effect >= 0 && program->channels[i].effects[j].effect < (ssize_t) builders.size()) {
 							program->channels[i].effects[j].prog = builders.at(program->channels[i].effects[j].effect)->create_program();
+							program->channels[i].effects[j].prog->load(p.get());
 						}
 						++j;
 					}
@@ -129,6 +130,7 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 			const auto& p = s.second.get_child_optional("preset");
 			if (p && program->effects[j].effect >= 0 && program->effects[j].effect < (ssize_t) builders.size()) {
 				program->effects[j].prog = builders.at(program->effects[j].effect)->create_program();
+				program->effects[j].prog->load(p.get());
 			}
 			++j;
 		}
