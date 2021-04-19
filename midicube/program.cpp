@@ -143,9 +143,31 @@ void save_program(Program* program, pt::ptree& tree) {
 			pt::ptree preset = program->channels[i].engine_program->save();
 			c.add_child("preset", preset);
 		}
+		c.put("send_master", program->channels[i].send_master);
+		//Effects
+		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
+			pt::ptree t;
+			InsertEffectProgram& effect = program->channels[i].effects[j];
+			t.put("effect_type", effect.effect);
+			if (effect.prog)  {
+				t.add_child("preset", effect.prog->save());
+			}
+			c.add_child("insert_effects.effect", t);
+		}
 
 
 		tree.add_child("channels.channel", c);
+	}
+	//Effects
+	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
+		pt::ptree t;
+		MasterEffectProgram& effect = program->effects[i];
+		t.put("effect_type", effect.effect);
+		t.put("next_effect", effect.next_effect);
+		if (effect.prog)  {
+			t.add_child("preset", effect.prog->save());
+		}
+		tree.add_child("master_effects.effect", t);
 	}
 }
 
