@@ -94,8 +94,37 @@ Program* load_program(pt::ptree& tree) {
 				if (preset && program->channels[i].engine_program) {
 					program->channels[i].engine_program->load(preset.get());
 				}
+
+				//Effects
+				const auto& effects = c.second.get_child_optional("insert_effects");
+				if (effects) {
+					size_t j = 0;
+					for (pt::ptree::value_type& s : effects.get()) {
+						if (j >= CHANNEL_INSERT_EFFECT_AMOUNT) {
+							break;
+						}
+						program->channels[i].effects[j].effect = s.second.get<ssize_t>("effect_type", -1);
+						//TODO load preset
+						++j;
+					}
+				}
 			}
 			++i;
+		}
+	}
+
+	//Effects
+	const auto& effects = tree.get_child_optional("master_effects");
+	if (effects) {
+		size_t j = 0;
+		for (pt::ptree::value_type& s : effects.get()) {
+			if (j >= SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
+				break;
+			}
+			program->effects[j].effect = s.second.get<ssize_t>("effect_type", -1);
+			program->effects[j].next_effect = s.second.get<ssize_t>("next_effect", -1);
+			//TODO load preset
+			++j;
 		}
 	}
 	return program;
