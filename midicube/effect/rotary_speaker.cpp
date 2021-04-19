@@ -80,6 +80,11 @@ std::string get_effect_name<RotarySpeakerEffect>() {
 	return "Rotary Speaker";
 }
 
+template <>
+EffectProgram* create_effect_program<RotarySpeakerEffect>() {
+	return new RotarySpeakerProgram();
+}
+
 void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 	preset.on = tree.get<bool>("on", true);
 	preset.fast = tree.get<bool>("fast", false);

@@ -40,9 +40,6 @@ public:
 	virtual void save_program(EffectProgram** prog) {
 
 	}
-	virtual EffectProgram* create_program() {
-		return nullptr;
-	}
 	virtual ~Effect() {
 
 	}
@@ -57,6 +54,8 @@ public:
 
 	virtual bool matches(Effect* effect) = 0;
 
+	virtual EffectProgram* create_program() = 0;
+
 	virtual ~EffectBuilder() {
 
 	};
@@ -64,6 +63,11 @@ public:
 
 template <typename T>
 std::string get_effect_name();
+
+template <typename T>
+EffectProgram* create_effect_program() {
+	return nullptr;
+}
 
 template <typename T>
 class TemplateEffectBuilder : public EffectBuilder {
@@ -77,6 +81,10 @@ public:
 
 	bool matches(Effect* effect) {
 		return dynamic_cast<T*>(effect) != nullptr;
+	}
+
+	EffectProgram* create_program() {
+		return create_effect_program<T>();
 	}
 };
 

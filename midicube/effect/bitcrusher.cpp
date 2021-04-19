@@ -42,9 +42,11 @@ boost::property_tree::ptree BitCrusherProgram::save() {
 }
 
 
-EffectProgram* BitCrusherEffect::create_program() {
+template <>
+EffectProgram* create_effect_program<BitCrusherEffect>() {
 	return new BitCrusherProgram();
 }
+
 
 void BitCrusherEffect::save_program(EffectProgram **prog) {
 	BitCrusherProgram* p = dynamic_cast<BitCrusherProgram*>(*prog);

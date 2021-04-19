@@ -39,6 +39,12 @@ std::string get_effect_name<ChorusEffect>() {
 	return "Chorus";
 }
 
+template <>
+EffectProgram* create_effect_program<ChorusEffect>() {
+	return new ChorusProgram();
+}
+
+
 void ChorusProgram::load(boost::property_tree::ptree tree) {
 	preset.on = tree.get<bool>("on", true);
 	preset.vibrato_rate = tree.get<double>("vibrato_rate", 2);

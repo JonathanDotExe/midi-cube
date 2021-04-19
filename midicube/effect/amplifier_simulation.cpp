@@ -86,7 +86,8 @@ boost::property_tree::ptree AmplifierSimulationProgram::save() {
 	return tree;
 }
 
-EffectProgram* AmplifierSimulationEffect::create_program() {
+template <>
+EffectProgram* create_effect_program<AmplifierSimulationEffect>() {
 	return new AmplifierSimulationProgram();
 }
 
