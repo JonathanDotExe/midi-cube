@@ -46,8 +46,9 @@ void MidiCube::init(int out_device, int in_device) {
 		engine.channels[i].scenes[0].source.input = 1;
 	}
 	//Load programs
-	prog_mgr.load_all();
 	prog_mgr.init_user(this);
+	prog_mgr.load_all();
+	prog_mgr.apply_program(0, 0);
 	//Init audio
 	audio_handler.init(out_device, in_device);
 
