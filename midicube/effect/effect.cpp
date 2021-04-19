@@ -5,11 +5,5 @@
  *      Author: jojo
  */
 
-#ifndef MIDICUBE_EFFECT_EFFECT_CPP_
-#define MIDICUBE_EFFECT_EFFECT_CPP_
+#include "effect.h"
 
-
-
-
-
-#endif /* MIDICUBE_EFFECT_EFFECT_CPP_ */

@@ -12,11 +12,11 @@ BitCrusherEffect::BitCrusherEffect() {
 
 }
 
-void BitCrusherEffect::apply(double& lsample, double& rsample, BitCrusherPreset& preset, SampleInfo& info) {
+void BitCrusherEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	if (preset.on) {
-		int accuracy = pow(2, preset.bits);
-		lsample = (int) (lsample * accuracy)/((double) accuracy);
-		rsample = (int) (rsample * accuracy)/((double) accuracy);
+		double accuracy = pow(2, preset.bits - 1);
+		lsample = (int) (lsample * accuracy)/(accuracy);
+		rsample = (int) (rsample * accuracy)/(accuracy);
 	}
 }
 
@@ -24,3 +24,48 @@ BitCrusherEffect::~BitCrusherEffect() {
 
 }
 
+template<>
+std::string get_effect_name<BitCrusherEffect>() {
+	return "Bit Crusher";
+}
+
+void BitCrusherProgram::load(boost::property_tree::ptree tree) {
+	preset.on = tree.get<bool>("on", true);
+	preset.bits = tree.get<unsigned int>("bits", 16);
+}
+
+boost::property_tree::ptree BitCrusherProgram::save() {
+	boost::property_tree::ptree tree;
+	tree.put("on", preset.on);
+	tree.put("bits", preset.bits);
+	return tree;
+}
+
+
+template <>
+EffectProgram* create_effect_program<BitCrusherEffect>() {
+	return new BitCrusherProgram();
+}
+
+
+void BitCrusherEffect::save_program(EffectProgram **prog) {
+	BitCrusherProgram* p = dynamic_cast<BitCrusherProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new BitCrusherProgram();
+	}
+	p->preset = preset;
+	*prog = p;
+}
+
+void BitCrusherEffect::apply_program(EffectProgram *prog) {
+	BitCrusherProgram* p = dynamic_cast<BitCrusherProgram*>(prog);
+	//Create new
+	if (p) {
+		preset = p->preset;
+	}
+	else {
+		preset = {};
+	}
+}

@@ -5,32 +5,51 @@
  *      Author: jojo
  */
 
-#ifndef MIDICUBE_EFFECT_BITCRUSHER_H_
-#define MIDICUBE_EFFECT_BITCRUSHER_H_
+#ifndef MIDICUBE_EFFECT_CHORUS_H_
+#define MIDICUBE_EFFECT_CHORUS_H_
 
 #include "../audio.h"
 #include "../oscilator.h"
+#include "effect.h"
 
 struct ChorusPreset {
-	bool on = false;
-	double vibrato_rate = 6;
-	double vibrato_depth = 0;
+	bool on = true;
+	double vibrato_rate = 2;
+	double vibrato_depth = 0.5;
 	double mix = 0.5;
 
 	double delay = 0.015;
 	AnalogWaveForm vibrato_waveform = AnalogWaveForm::TRIANGLE_WAVE;
 };
 
-class ChorusEffect {
+
+class ChorusProgram : public EffectProgram {
+public:
+	ChorusPreset preset;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~ChorusProgram() {
+
+	}
+};
+
+class ChorusEffect : public Effect {
 private:
 	AnalogOscilator osc;
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;
 
 public:
+	ChorusPreset preset;
+
 	ChorusEffect();
-	void apply(double& lsample, double& rsample, ChorusPreset& preset, SampleInfo& info);
-	virtual ~ChorusEffect();
+	void apply(double& lsample, double& rsample, SampleInfo& info);
+	EffectProgram* create_program();
+	void save_program(EffectProgram **prog);
+	void apply_program(EffectProgram *prog);
+	~ChorusEffect();
 };
 
-#endif /* MIDICUBE_EFFECT_BITCRUSHER_H_ */
+#endif /* MIDICUBE_EFFECT_CHORUS_H_ */

@@ -11,6 +11,7 @@
 #include "../audio.h"
 #include "../filter.h"
 #include "../synthesis.h"
+#include "effect.h"
 
 #define ROTARY_CUTOFF 800
 
@@ -30,7 +31,7 @@
 #define ROTARY_BASS_FAST_RAMP 5.5
 
 struct RotarySpeakerPreset {
-	bool on = false;
+	bool on = true;
 	bool fast = false;
 
 	double stereo_mix{0.5};
@@ -48,7 +49,20 @@ struct RotarySpeakerPreset {
 	double bass_fast_ramp = 5.5;
 };
 
-class RotarySpeakerEffect {
+
+class RotarySpeakerProgram : public EffectProgram {
+public:
+	RotarySpeakerPreset preset;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~RotarySpeakerProgram() {
+
+	}
+};
+
+class RotarySpeakerEffect : public Effect {
 private:
 	Filter filter;
 	FilterData filter_data;
@@ -61,9 +75,14 @@ private:
 	double horn_rotation = 0;
 	double bass_rotation = 0;
 public:
+	RotarySpeakerPreset preset;
+
 	RotarySpeakerEffect();
-	void apply(double& lsample, double& rsample, RotarySpeakerPreset& preset, SampleInfo& info);
-	virtual ~RotarySpeakerEffect();
+	void apply(double& lsample, double& rsample, SampleInfo& info);
+	EffectProgram* create_program();
+	void save_program(EffectProgram **prog);
+	void apply_program(EffectProgram *prog);
+	~RotarySpeakerEffect();
 };
 
 #endif /* MIDICUBE_EFFECT_ROTARY_SPEAKER_H_ */

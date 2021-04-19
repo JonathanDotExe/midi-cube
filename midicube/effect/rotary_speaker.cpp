@@ -16,7 +16,7 @@ RotarySpeakerEffect::RotarySpeakerEffect() {
 	filter_data.cutoff = 800;
 }
 
-void RotarySpeakerEffect::apply(double &lsample, double &rsample, RotarySpeakerPreset &preset, SampleInfo &info) {
+void RotarySpeakerEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 	if (preset.on) {
 		//Sum samples up
 		double sample = (lsample + rsample) / 2.0;
@@ -75,3 +75,58 @@ RotarySpeakerEffect::~RotarySpeakerEffect() {
 	// TODO Auto-generated destructor stub
 }
 
+template<>
+std::string get_effect_name<RotarySpeakerEffect>() {
+	return "Rotary Speaker";
+}
+
+template <>
+EffectProgram* create_effect_program<RotarySpeakerEffect>() {
+	return new RotarySpeakerProgram();
+}
+
+void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
+	preset.on = tree.get<bool>("on", true);
+	preset.fast = tree.get<bool>("fast", false);
+
+	preset.stereo_mix = tree.get<double>("stereo_mix", 0.5);
+	preset.type = tree.get<bool>("type", false);
+}
+
+boost::property_tree::ptree RotarySpeakerProgram::save() {
+	boost::property_tree::ptree tree;
+	tree.put("on", preset.on);
+	tree.put("fast", preset.fast);
+
+	tree.put("stereo_mix", preset.stereo_mix);
+	tree.put("type", preset.type);
+
+	return tree;
+}
+
+
+EffectProgram* RotarySpeakerEffect::create_program() {
+	return new RotarySpeakerProgram();
+}
+
+void RotarySpeakerEffect::save_program(EffectProgram **prog) {
+	RotarySpeakerProgram* p = dynamic_cast<RotarySpeakerProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new RotarySpeakerProgram();
+	}
+	p->preset = preset;
+	*prog = p;
+}
+
+void RotarySpeakerEffect::apply_program(EffectProgram *prog) {
+	RotarySpeakerProgram* p = dynamic_cast<RotarySpeakerProgram*>(prog);
+	//Create new
+	if (p) {
+		preset = p->preset;
+	}
+	else {
+		preset = {};
+	}
+}

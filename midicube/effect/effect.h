@@ -12,10 +12,80 @@
 #include "../oscilator.h"
 #include "../midi.h"
 
+#include <boost/property_tree/ptree.hpp>
+
+namespace pt = boost::property_tree;
+
+class EffectProgram {
+public:
+	virtual void load(pt::ptree tree) = 0;
+
+	virtual pt::ptree save() = 0;
+
+	virtual ~EffectProgram() {
+
+	}
+};
+
 class Effect {
-	void apply(double& lsample, double& rsample, SampleInfo& info) = 0;
-	void midi_message(MidiMessage& msg, SampleInfo& info) = 0;
-	virtual ~Effect();
+public:
+	virtual void apply(double& lsample, double& rsample, SampleInfo& info) = 0;
+	virtual void midi_message(MidiMessage& msg, SampleInfo& info) {
+
+	}
+	virtual void apply_program(EffectProgram* prog) {
+
+	}
+
+	virtual void save_program(EffectProgram** prog) {
+
+	}
+	virtual ~Effect() {
+
+	}
+};
+
+class EffectBuilder {
+public:
+
+	virtual Effect* build() = 0;
+
+	virtual std::string get_name() = 0;
+
+	virtual bool matches(Effect* effect) = 0;
+
+	virtual EffectProgram* create_program() = 0;
+
+	virtual ~EffectBuilder() {
+
+	};
+};
+
+template <typename T>
+std::string get_effect_name();
+
+template <typename T>
+EffectProgram* create_effect_program() {
+	return nullptr;
+}
+
+template <typename T>
+class TemplateEffectBuilder : public EffectBuilder {
+public:
+	inline Effect* build() {
+		return new T();
+	}
+	std::string get_name() {
+		return get_effect_name<T>();
+	}
+
+	bool matches(Effect* effect) {
+		return dynamic_cast<T*>(effect) != nullptr;
+	}
+
+	EffectProgram* create_program() {
+		return create_effect_program<T>();
+	}
 };
 
 

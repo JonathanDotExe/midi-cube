@@ -9,6 +9,7 @@
 #define MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_
 
 #include "../midi.h"
+#include "../effect/effect.h"
 #include "../envelope.h"
 #include "../audio.h"
 #include "../synthesis.h"
@@ -26,6 +27,8 @@
 namespace pt = boost::property_tree;
 
 #define SOUND_ENGINE_SCENE_AMOUNT 8
+#define CHANNEL_INSERT_EFFECT_AMOUNT 2
+#define SOUND_ENGINE_MASTER_EFFECT_AMOUNT 16
 
 class SoundEngineDevice;
 
@@ -183,34 +186,8 @@ EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsam
 	return status;
 }
 
-
-class SoundEngineBank {
-public:
-	virtual SoundEngine& channel(unsigned int channel) = 0;
-
-	virtual std::string get_name() = 0;
-
-	virtual ~SoundEngineBank() {
-
-	};
-};
-
 template <typename T>
 std::string get_engine_name();
-
-template <typename T>
-class TemplateSoundEngineBank : public SoundEngineBank {
-private:
-	std::array<T, SOUND_ENGINE_MIDI_CHANNELS> engines;
-
-public:
-	inline SoundEngine& channel(unsigned int channel) {
-		return engines[channel];
-	}
-	std::string get_name() {
-		return get_engine_name<T>();
-	}
-};
 
 struct ChannelSource {
 	ssize_t input = 1;
@@ -232,6 +209,57 @@ struct SoundEngineScene {
 	ChannelSource source;
 };
 
+class InsertEffect {
+private:
+	Effect* effect = nullptr;
+
+public:
+	SoundEngineDevice* device = nullptr;
+
+	InsertEffect() {
+
+	}
+
+	void set_effect_index(ssize_t index);
+
+	ssize_t get_effect_index();
+
+	void apply(double& lsample, double& rsample, SampleInfo& info);
+
+	void set_effect(Effect *effect = nullptr);
+
+	Effect* get_effect() const;
+
+	~InsertEffect();
+};
+
+class MasterEffect {
+private:
+	Effect* effect = nullptr;
+
+public:
+	SoundEngineDevice* device = nullptr;
+	double lsample = 0;
+	double rsample = 0;
+	size_t next_effect = 0;
+
+	MasterEffect() {
+
+	}
+
+	void set_effect_index(ssize_t index);
+
+	ssize_t get_effect_index();
+
+	void apply(double& lsample, double& rsample, SampleInfo& info);
+
+	void set_effect(Effect *effect = nullptr);
+
+	Effect* get_effect() const;
+
+	~MasterEffect();
+};
+
 class SoundEngineChannel {
 private:
 	SoundEngine* engine = nullptr;
@@ -244,20 +272,14 @@ public:
 	Arpeggiator arp;
 
 	//Effects
-	VocoderPreset vocoder_preset;
-	VocoderEffect vocoder;
-	BitCrusherPreset bitcrusher_preset;
-	BitCrusherEffect bitcrusher;
+	std::array<InsertEffect, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
+	ssize_t master_send = -1;
 
 	EngineStatus status = {};
 
 	SoundEngineChannel();
 
-	void init_device(SoundEngineDevice* device) {
-		if (!this->device) {
-			this->device = device;
-		}
-	}
+	void init_device(SoundEngineDevice* device);
 
 	bool send(MidiMessage& message, SampleInfo& info, size_t scene);
 
@@ -327,11 +349,30 @@ public:
 	void set_active(bool active = false);
 };
 
+struct MasterEffectProgram {
+	ssize_t next_effect = -1;
+	ssize_t effect = -1;
+	EffectProgram* prog = nullptr;
+	~MasterEffectProgram() {
+		delete prog;
+	}
+};
+
+struct InsertEffectProgram {
+	ssize_t effect = -1;
+	EffectProgram* prog = nullptr;
+	~InsertEffectProgram() {
+		delete prog;
+	}
+};
+
 struct ChannelProgram {
 	ssize_t engine_index{-1};
 	double volume = 0.5;
 	double panning = 0;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
+	std::array<InsertEffectProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
+	ssize_t send_master = -1;
 
 	unsigned int arpeggiator_bpm = 120;
 	bool arp_on;
@@ -348,6 +389,7 @@ struct Program {
 	std::string name;
 	unsigned int metronome_bpm = 120;
 	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{2, true}};
+	std::array<MasterEffectProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
 };
 
 /*
@@ -390,6 +432,7 @@ class SoundEngineDevice {
 
 private:
 	std::vector<SoundEngineBuilder*> engine_builders;
+	std::vector<EffectBuilder*> effect_builders;
 
 	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
 	LinearADSREnvelope metronome_env;
@@ -399,6 +442,7 @@ public:
 	Looper looper;
 	bool play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
+	std::array<MasterEffect, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
 	double volume{0.2};
 	std::atomic<size_t> scene{0};
 
@@ -407,6 +451,8 @@ public:
 	std::vector<SoundEngineBuilder*> get_engine_builders();
 
 	void add_sound_engine(SoundEngineBuilder* engine);
+
+	void add_effect(EffectBuilder* effect);
 
 	bool send(MidiMessage& message, SampleInfo& info);
 
@@ -418,6 +464,9 @@ public:
 
 	~SoundEngineDevice();
 
+	std::vector<EffectBuilder*> get_effect_builders() {
+		return effect_builders;
+	}
 };
 
 

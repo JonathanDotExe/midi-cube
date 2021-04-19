@@ -42,6 +42,9 @@ public:
 	MidiCube();
 	void init(int out_device = -1, int in_device = -1);
 	inline void process(double& lsample, double& rsample, SampleInfo& info);
+	std::vector<EffectBuilder*> get_effect_builders() {
+		return engine.get_effect_builders();
+	}
 	std::vector<MidiCubeInput> get_inputs();
 
 	~MidiCube();

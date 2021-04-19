@@ -17,6 +17,7 @@ src = [
 	
 	'midicube/audio.cpp',
 	'midicube/audiofile.cpp',
+	'midicube/binding.cpp',
 	'midicube/data.cpp',
 	'midicube/envelope.cpp',
 	'midicube/filter.cpp',
@@ -49,7 +50,9 @@ src = [
 	'midicube/gui/view/AnalogSynthView.cpp',
 	'midicube/gui/view/ArpeggiatorView.cpp',
 	'midicube/gui/view/B3OrganView.cpp',
+	'midicube/gui/view/EffectView.cpp',
 	'midicube/gui/view/LooperView.cpp',
+	'midicube/gui/view/MasterEffectView.cpp',
 	'midicube/gui/view/ProgramRenameView.cpp',
 	'midicube/gui/view/ProgramView.cpp',
 	'midicube/gui/view/SamplerView.cpp',
@@ -59,6 +62,7 @@ src = [
 	
 	'midicube/effect/amplifier_simulation.cpp',
 	'midicube/effect/bitcrusher.cpp',
+	'midicube/effect/chorus.cpp',
 	'midicube/effect/effect.cpp',
 	'midicube/effect/rotary_speaker.cpp',
 	'midicube/effect/vocoder.cpp'

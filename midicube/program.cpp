@@ -27,7 +27,7 @@ std::string bank_filename(std::string name) {
 	return filename;
 }
 
-Program* load_program(pt::ptree& tree) {
+Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 	Program* program = new Program();
 	program->name = tree.get<std::string>("name", "Init");
 	program->metronome_bpm = tree.get<unsigned int>("metronome_bpm", 120);
@@ -94,8 +94,45 @@ Program* load_program(pt::ptree& tree) {
 				if (preset && program->channels[i].engine_program) {
 					program->channels[i].engine_program->load(preset.get());
 				}
+
+				//Effects
+				const auto& effects = c.second.get_child_optional("insert_effects");
+				if (effects) {
+					size_t j = 0;
+					for (pt::ptree::value_type& s : effects.get()) {
+						if (j >= CHANNEL_INSERT_EFFECT_AMOUNT) {
+							break;
+						}
+						program->channels[i].effects[j].effect = s.second.get<ssize_t>("effect_type", -1);
+						const auto& p = s.second.get_child_optional("preset");
+						if (p && program->channels[i].effects[j].effect >= 0 && program->channels[i].effects[j].effect < (ssize_t) builders.size()) {
+							program->channels[i].effects[j].prog = builders.at(program->channels[i].effects[j].effect)->create_program();
+							program->channels[i].effects[j].prog->load(p.get());
+						}
+						++j;
+					}
+				}
 			}
 			++i;
+		}
+	}
+
+	//Effects
+	const auto& effects = tree.get_child_optional("master_effects");
+	if (effects) {
+		size_t j = 0;
+		for (pt::ptree::value_type& s : effects.get()) {
+			if (j >= SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
+				break;
+			}
+			program->effects[j].effect = s.second.get<ssize_t>("effect_type", -1);
+			program->effects[j].next_effect = s.second.get<ssize_t>("next_effect", -1);
+			const auto& p = s.second.get_child_optional("preset");
+			if (p && program->effects[j].effect >= 0 && program->effects[j].effect < (ssize_t) builders.size()) {
+				program->effects[j].prog = builders.at(program->effects[j].effect)->create_program();
+				program->effects[j].prog->load(p.get());
+			}
+			++j;
 		}
 	}
 	return program;
@@ -143,13 +180,35 @@ void save_program(Program* program, pt::ptree& tree) {
 			pt::ptree preset = program->channels[i].engine_program->save();
 			c.add_child("preset", preset);
 		}
+		c.put("send_master", program->channels[i].send_master);
+		//Effects
+		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
+			pt::ptree t;
+			InsertEffectProgram& effect = program->channels[i].effects[j];
+			t.put("effect_type", effect.effect);
+			if (effect.prog)  {
+				t.add_child("preset", effect.prog->save());
+			}
+			c.add_child("insert_effects.effect", t);
+		}
 
 
 		tree.add_child("channels.channel", c);
 	}
+	//Effects
+	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
+		pt::ptree t;
+		MasterEffectProgram& effect = program->effects[i];
+		t.put("effect_type", effect.effect);
+		t.put("next_effect", effect.next_effect);
+		if (effect.prog)  {
+			t.add_child("preset", effect.prog->save());
+		}
+		tree.add_child("master_effects.effect", t);
+	}
 }
 
-Bank* load_bank(std::string path, std::string filename) {
+Bank* load_bank(std::string path, std::string filename, std::vector<EffectBuilder*> builders) {
 	pt::ptree tree;
 	try {
 		pt::read_xml(path, tree);
@@ -166,7 +225,7 @@ Bank* load_bank(std::string path, std::string filename) {
 	const auto& programs =  tree.get_child_optional("bank.programs");
 	if (programs) {
 		for (pt::ptree::value_type& p : programs.get()) {
-			Program* prog = load_program(p.second);
+			Program* prog = load_program(p.second, builders);
 			bank->programs.push_back(prog);
 		}
 	}
@@ -279,7 +338,7 @@ void ProgramManager::load_all() {
 		std::string file = f.path().string();
 		if (std::regex_match(file, reg)) {
 			std::string name = f.path().stem().string();
-			Bank* bank = load_bank(file, name);
+			Bank* bank = load_bank(file, name, user->get_effect_builders());
 			if (bank) {
 				banks.push_back(bank);
 				std::cout << "Loaded bank " << bank->name << std::endl;

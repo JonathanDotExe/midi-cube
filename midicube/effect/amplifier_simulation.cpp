@@ -41,7 +41,7 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 	return sample;
 }
 
-void AmplifierSimulationEffect::apply(double &lsample, double &rsample, AmplifierSimulationPreset &preset, SampleInfo &info) {
+void AmplifierSimulationEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 	if (preset.on) {
 		//Gain
 		double gain = preset.boost + 1;
@@ -63,4 +63,52 @@ void AmplifierSimulationEffect::apply(double &lsample, double &rsample, Amplifie
 
 AmplifierSimulationEffect::~AmplifierSimulationEffect() {
 
+}
+
+template<>
+std::string get_effect_name<AmplifierSimulationEffect>() {
+	return "Amplifier";
+}
+
+void AmplifierSimulationProgram::load(boost::property_tree::ptree tree) {
+	preset.on = tree.get<bool>("on", true);
+	preset.boost = tree.get<double>("boost", 0);
+	preset.drive = tree.get<double>("drive", 0);
+	preset.tone = tree.get<double>("tone", 0.6);
+}
+
+boost::property_tree::ptree AmplifierSimulationProgram::save() {
+	boost::property_tree::ptree tree;
+	tree.put("on", preset.on);
+	tree.put("boost", preset.boost);
+	tree.put("drive", preset.drive);
+	tree.put("tone", preset.tone);
+	return tree;
+}
+
+template <>
+EffectProgram* create_effect_program<AmplifierSimulationEffect>() {
+	return new AmplifierSimulationProgram();
+}
+
+void AmplifierSimulationEffect::save_program(EffectProgram **prog) {
+	AmplifierSimulationProgram* p = dynamic_cast<AmplifierSimulationProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new AmplifierSimulationProgram();
+	}
+	p->preset = preset;
+	*prog = p;
+}
+
+void AmplifierSimulationEffect::apply_program(EffectProgram *prog) {
+	AmplifierSimulationProgram* p = dynamic_cast<AmplifierSimulationProgram*>(prog);
+	//Create new
+	if (p) {
+		preset = p->preset;
+	}
+	else {
+		preset = {};
+	}
 }

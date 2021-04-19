@@ -9,17 +9,114 @@
 
 #include <algorithm>
 
+void InsertEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+	if (effect) {
+		effect->apply(lsample, rsample, info);
+	}
+}
+
+Effect* InsertEffect::get_effect() const {
+	return effect;
+}
+
+void InsertEffect::set_effect(Effect *effect) {
+	delete this->effect;
+	this->effect = effect;
+}
+
+void InsertEffect::set_effect_index(ssize_t index) {
+	auto builders = device->get_effect_builders();
+	if (index >= 0 && (size_t) index < builders.size()) {
+		set_effect(builders.at(index)->build());
+	}
+	else {
+		set_effect(nullptr);
+	}
+}
+
+ssize_t InsertEffect::get_effect_index() {
+	auto builders = device->get_effect_builders();
+	ssize_t index = -1;
+	for (size_t i = 0; i < builders.size(); ++i) {
+		if (builders[i]->matches(effect)) {
+			index = i;
+			break;
+		}
+	}
+
+	return index;
+}
+
+InsertEffect::~InsertEffect() {
+}
+
+
+void MasterEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+	lsample = this->lsample;
+	rsample = this->rsample;
+
+	if (effect) {
+		effect->apply(lsample, rsample, info);
+	}
+
+	this->lsample = 0;
+	this->rsample = 0;
+}
+
+Effect* MasterEffect::get_effect() const {
+	return effect;
+}
+
+void MasterEffect::set_effect(Effect *effect) {
+	delete this->effect;
+	this->effect = effect;
+}
+
+void MasterEffect::set_effect_index(ssize_t index) {
+	auto builders = device->get_effect_builders();
+		if (index >= 0 && (size_t) index < builders.size()) {
+			set_effect(builders.at(index)->build());
+		}
+		else {
+			set_effect(nullptr);
+		}
+}
+
+ssize_t MasterEffect::get_effect_index() {
+	auto builders = device->get_effect_builders();
+	ssize_t index = -1;
+	for (size_t i = 0; i < builders.size(); ++i) {
+		if (builders[i]->matches(effect)) {
+			index = i;
+			break;
+		}
+	}
+
+	return index;
+}
+
+MasterEffect::~MasterEffect() {
+}
+
+
+
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {
 	engine = nullptr;
 }
 
+void SoundEngineChannel::init_device(SoundEngineDevice* device) {
+	if (!this->device) {
+		this->device = device;
+		for (size_t i = 0; i < effects.size(); ++i) {
+			effects[i].device = device;
+		}
+	}
+}
+
 void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, size_t scene) {
 	//Properties
 	if (engine) {
-		double l = 0;
-		double r = 0;
-
 		SoundEngineScene& s = scenes[scene];
 
 		if (s.active || status.pressed_notes) {
@@ -34,18 +131,18 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				});
 			}
 			//Process
-			status = engine->process_sample(l, r, info);
-			//Vocoder
-			vocoder.apply(l, r, info.input_sample, vocoder_preset, info);
-			//Bit Crusher
-			bitcrusher.apply(l, r, bitcrusher_preset, info);
+			status = engine->process_sample(lsample, rsample, info);
+			//Effects
+			for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
+				effects[i].apply(lsample, rsample, info);
+			}
 			//Pan
-			l *= (1 - fmax(0, panning));
-			r *= (1 - fmax(0, -panning));
+			lsample *= (1 - fmax(0, panning));
+			rsample *= (1 - fmax(0, -panning));
 		}
 		//Playback
-		lsample += l * volume;
-		rsample += r * volume;
+		lsample *= volume;
+		rsample *= volume;
 	}
 }
 
@@ -216,6 +313,9 @@ void SoundEngineChannel::set_active(bool active) {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	metronome.init(0);
+	for (size_t i = 0; i < this->effects.size(); ++i) {
+		effects[i].device = this;
+	}
 	for (size_t i = 0; i < this->channels.size(); ++i) {
 		SoundEngineChannel& ch = this->channels[i];
 		ch.init_device(this);
@@ -225,9 +325,36 @@ SoundEngineDevice::SoundEngineDevice() : metronome(120){
 void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleInfo &info) {
 	//Channels
 	size_t scene = this->scene;
-	for (size_t i = 0; i < this->channels.size(); ++i) {
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		double l = 0;
+		double r = 0;
 		SoundEngineChannel& ch = this->channels[i];
-		ch.process_sample(lsample, rsample, info, metronome, scene);
+		ch.process_sample(l, r, info, metronome, scene);
+
+		if (ch.master_send >= 0 && ch.master_send < SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
+			effects[ch.master_send].lsample += l;
+			effects[ch.master_send].rsample += r;
+		}
+		else {
+			lsample += l;
+			rsample += r;
+		}
+	}
+	//Effects
+	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
+		MasterEffect& effect = effects[i];
+		double l = 0;
+		double r = 0;
+		effect.apply(l, r, info);
+
+		if (effect.next_effect > i && effect.next_effect < SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
+			effects[effect.next_effect].lsample += l;
+			effects[effect.next_effect].rsample += r;
+		}
+		else {
+			lsample += l;
+			rsample += r;
+		}
 	}
 	//Looper
 	looper.apply(lsample, rsample, metronome, info);
@@ -253,6 +380,10 @@ std::vector<SoundEngineBuilder*> SoundEngineDevice::get_engine_builders() {
 
 void SoundEngineDevice::add_sound_engine(SoundEngineBuilder* engine) {
 	engine_builders.push_back(engine);
+}
+
+void SoundEngineDevice::add_effect(EffectBuilder* effect) {
+	effect_builders.push_back(effect);
 }
 
 bool SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
@@ -287,6 +418,27 @@ void SoundEngineDevice::apply_program(Program* program) {
 		if (engine) {
 			engine->apply_program(prog.engine_program);
 		}
+		//Effects
+		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
+			InsertEffectProgram& p = prog.effects[i];
+			InsertEffect& effect = ch.effects[i];
+
+			effect.set_effect_index(p.effect);
+			if (effect.get_effect()) {
+				effect.get_effect()->apply_program(p.prog);
+			}
+		}
+	}
+	//Master Effects
+	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
+		MasterEffectProgram& prog = program->effects[i];
+		MasterEffect& effect = effects[i];
+
+		effect.next_effect = prog.next_effect;
+		effect.set_effect_index(prog.effect);
+		if (effect.get_effect()) {
+			effect.get_effect()->apply_program(prog.prog);
+		}
 	}
 }
 
@@ -310,6 +462,27 @@ void SoundEngineDevice::save_program(Program* program) {
 		if (engine) {
 			engine->save_program(&prog.engine_program);
 		}
+		//Effects
+		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
+			InsertEffectProgram& p = prog.effects[i];
+			InsertEffect& effect = ch.effects[i];
+
+			p.effect = effect.get_effect_index();
+			if (effect.get_effect()) {
+				effect.get_effect()->save_program(&p.prog);
+			}
+		}
+	}
+	//Master Effects
+	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
+		MasterEffectProgram& prog = program->effects[i];
+		MasterEffect& effect = effects[i];
+
+		prog.next_effect = effect.next_effect;
+		prog.effect = effect.get_effect_index();
+		if (effect.get_effect()) {
+			effect.get_effect()->save_program(&prog.prog);
+		}
 	}
 }
 
@@ -323,4 +496,9 @@ SoundEngineDevice::~SoundEngineDevice() {
 		delete engine;
 	}
 	engine_builders.clear();
+	//Delete effects
+	for (EffectBuilder* effect : effect_builders) {
+		delete effect;
+	}
+	effect_builders.clear();
 }

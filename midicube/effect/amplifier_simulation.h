@@ -11,6 +11,7 @@
 #include "../audio.h"
 #include "../filter.h"
 #include "../synthesis.h"
+#include "effect.h"
 
 #define AMP_OVERSAMPLING 2
 
@@ -18,23 +19,42 @@ enum DistortionType {
 	DIGITAL_DISTORTION, POLYNOMAL_DISTORTION, ARCTAN_DISTORTION
 };
 
+
+
 struct AmplifierSimulationPreset {
-	bool on = false;
+	bool on = true;
 	double boost = 0;
 	double drive = 0;
 	double tone = 0.6;
 	DistortionType type = ARCTAN_DISTORTION;
 };
 
-class AmplifierSimulationEffect {
+class AmplifierSimulationProgram : public EffectProgram {
+public:
+	AmplifierSimulationPreset preset;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~AmplifierSimulationProgram() {
+
+	}
+};
+
+class AmplifierSimulationEffect : public Effect {
 private:
 	Filter lfilter;
 	Filter rfilter;
 public:
-	AmplifierSimulationEffect();
-	void apply(double& lsample, double& rsample, AmplifierSimulationPreset& preset, SampleInfo& info);
-	virtual ~AmplifierSimulationEffect();
-};
+	AmplifierSimulationPreset preset;
 
+	EffectProgram* create_program();
+	void save_program(EffectProgram **prog);
+	void apply_program(EffectProgram *prog);
+	AmplifierSimulationEffect();
+	void apply(double& lsample, double& rsample, SampleInfo& info);
+
+	~AmplifierSimulationEffect();
+};
 
 #endif /* MIDICUBE_EFFECT_AMPLIFIER_SIMULATION_H_ */

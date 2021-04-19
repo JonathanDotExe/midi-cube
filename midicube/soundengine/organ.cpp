@@ -196,10 +196,14 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	//Amplifier
 	lsample = sample;
 	rsample = sample;
-	data.amplifier.apply(lsample, rsample, data.preset.amplifier, info);
+	//FIXME
+	data.amplifier.preset = data.preset.amplifier;
+	data.amplifier.apply(lsample, rsample, info);
 
 	//Rotary
-	data.rotary_speaker.apply(lsample, rsample, data.preset.rotary, info);
+	//FIXME
+	data.rotary_speaker.preset = data.preset.rotary;
+	data.rotary_speaker.apply(lsample, rsample, info);
 }
 
 bool B3Organ::control_change(unsigned int control, unsigned int value) {

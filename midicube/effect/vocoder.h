@@ -13,13 +13,14 @@
 #include "../synthesis.h"
 #include "../envelope.h"
 #include "../filter.h"
+#include "effect.h"
 
 #define VOCODER_BAND_COUNT 16
 #define VOCODER_LOW_BAND 120
 #define VOCODER_HIGH_BAND 360
 
 struct VocoderPreset {
-	bool on = false;
+	bool on = true;
 	double modulator_amplification = 30;
 	double vocoder_amplification = 2.5;
 	double vocoder_amp = 0.95;
@@ -37,15 +38,17 @@ struct VocoderBand {
 	EnvelopeFollower env{};
 };
 
-class VocoderEffect {
+class VocoderEffect : public Effect {
 private:
 	std::array<VocoderBand, VOCODER_BAND_COUNT> bands;
 	Filter mfilter;
 	EnvelopeFollower modulator_env{};
 public:
+	VocoderPreset preset;
+
 	VocoderEffect();
 
-	void apply(double& lsample, double& rsample, double modulator, VocoderPreset& preset, SampleInfo& info);
+	void apply(double& lsample, double& rsample, SampleInfo& info);
 
 };
 
