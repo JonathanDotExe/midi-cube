@@ -17,6 +17,7 @@ src = [
 	
 	'midicube/audio.cpp',
 	'midicube/audiofile.cpp',
+	'midicube/binding.cpp',
 	'midicube/data.cpp',
 	'midicube/envelope.cpp',
 	'midicube/filter.cpp',
