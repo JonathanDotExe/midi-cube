@@ -67,11 +67,6 @@ boost::property_tree::ptree ChorusProgram::save() {
 	return tree;
 }
 
-
-EffectProgram* ChorusEffect::create_program() {
-	return new ChorusProgram();
-}
-
 void ChorusEffect::save_program(EffectProgram **prog) {
 	ChorusProgram* p = dynamic_cast<ChorusProgram*>(*prog);
 	//Create new

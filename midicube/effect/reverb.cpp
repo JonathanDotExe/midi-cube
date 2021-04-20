@@ -21,6 +21,9 @@ double AllPassFilter::process(double in, double gain, unsigned int delay) {
 	return out;
 }
 
+ReverbEffect::ReverbEffect() {
+}
+
 void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 	double l = 0;
 	double r = 0;
@@ -38,4 +41,18 @@ void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 	//Mix
 	lsample = lsample * (1 - preset.mix) + l * preset.mix;
 	rsample = rsample * (1 - preset.mix) + r * preset.mix;
+}
+
+void ReverbEffect::save_program(EffectProgram **prog) {
+}
+
+void ReverbEffect::apply_program(EffectProgram *prog) {
+}
+
+ReverbEffect::~ReverbEffect() {
+}
+
+template<>
+std::string get_effect_name<ReverbEffect>() {
+	return "Reverb";
 }

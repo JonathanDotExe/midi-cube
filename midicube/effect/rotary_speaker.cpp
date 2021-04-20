@@ -104,11 +104,6 @@ boost::property_tree::ptree RotarySpeakerProgram::save() {
 	return tree;
 }
 
-
-EffectProgram* RotarySpeakerEffect::create_program() {
-	return new RotarySpeakerProgram();
-}
-
 void RotarySpeakerEffect::save_program(EffectProgram **prog) {
 	RotarySpeakerProgram* p = dynamic_cast<RotarySpeakerProgram*>(*prog);
 	//Create new

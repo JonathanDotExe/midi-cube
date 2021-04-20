@@ -48,7 +48,6 @@ private:
 public:
 	AmplifierSimulationPreset preset;
 
-	EffectProgram* create_program();
 	void save_program(EffectProgram **prog);
 	void apply_program(EffectProgram *prog);
 	AmplifierSimulationEffect();
