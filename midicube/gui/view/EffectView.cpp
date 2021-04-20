@@ -12,6 +12,7 @@
 #include "../../effect/amplifier_simulation.h"
 #include "../../effect/bitcrusher.h"
 #include "../../effect/chorus.h"
+#include "../../effect/reverb.h"
 #include "../../effect/rotary_speaker.h"
 #include "../../effect/vocoder.h"
 
@@ -203,6 +204,76 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y -= 25;
 			tmp_x += 90;
 		}
+	}
+	//Reverb
+	else if (dynamic_cast<ReverbEffect*>(effect) != nullptr) {
+		ReverbEffect* reverb = dynamic_cast<ReverbEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color(80, 200, 255));
+		title->text.setString("Jo-Jo Reverb TM");
+
+		//On
+		{
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
+					tmp_y, 180, 120);
+			on->property.bind(reverb->preset.on, handler);
+			controls.push_back(on);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Delay
+		{
+			Label *label = new Label("Delay", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *delay = new DragBox<double>(0, 0, 2, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			delay->property.bind(reverb->preset.delay, handler);
+			controls.push_back(delay);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Decay
+		{
+			Label *label = new Label("Decay", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *decay = new DragBox<double>(0, 0, 2, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			decay->property.bind(reverb->preset.decay, handler);
+			controls.push_back(decay);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mix
+		{
+			Label *label = new Label("Mix", main_font, 18, tmp_x,
+				tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *mix = new DragBox<double>(0, 0, 1, main_font,
+				24, tmp_x, tmp_y, 180, 120);
+			mix->property.bind(reverb->preset.mix, handler);
+			controls.push_back(mix);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
 	}
 	//Chorus
 	else if (dynamic_cast<ChorusEffect*>(effect) != nullptr) {
