@@ -8,6 +8,8 @@
 
 #include "effect.h"
 
+#include "../synthesis.h"
+
 struct ReverbPreset {
 	bool on = true;
 	double delay = 0.5;
@@ -15,6 +17,16 @@ struct ReverbPreset {
 	double mix = 0.5;
 };
 
+class CombFilter {
+public:
+	DelayBuffer delay;
+
+	double process(double in, double gain, unsigned int delay);
+};
+
+class AllPassFilter {
+public:
+};
 
 class ReverbProgram : public EffectProgram {
 public:
