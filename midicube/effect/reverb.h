@@ -18,14 +18,22 @@ struct ReverbPreset {
 };
 
 class CombFilter {
-public:
+private:
 	DelayBuffer delay;
+
+public:
 
 	double process(double in, double gain, unsigned int delay);
 };
 
 class AllPassFilter {
+private:
+	DelayBuffer indelay;
+	DelayBuffer delay;
+
 public:
+
+	double process(double in, double gain, unsigned int delay);
 };
 
 class ReverbProgram : public EffectProgram {
