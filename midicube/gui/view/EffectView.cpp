@@ -249,7 +249,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *decay = new DragBox<double>(0, 0, 2, main_font, 24,
+			DragBox<double> *decay = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
 			decay->property.bind(reverb->preset.decay, handler);
 			controls.push_back(decay);
@@ -298,7 +298,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *decay = new DragBox<double>(0, 0, 2, main_font, 24,
+			DragBox<double> *decay = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
 			decay->property.bind(reverb->preset.allpass_decay, handler);
 			controls.push_back(decay);

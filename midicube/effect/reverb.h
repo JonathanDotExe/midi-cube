@@ -20,7 +20,7 @@ struct ReverbPreset {
 	double mix = 0.5;
 
 	std::array<double, REVERB_COMB_FILTERS> comb_delay_diff = {0, -0.01173, 0.01931, -0.00797};
-	std::array<double, REVERB_COMB_FILTERS> comb_decay_diff = {0, -0.1313, 0.02743, -0.31};
+	std::array<double, REVERB_COMB_FILTERS> comb_decay_diff = {0, -0.1313, -0.2743, -0.31};
 
 	double allpass_delay = 0.09;
 	double allpass_decay = 0.015;
