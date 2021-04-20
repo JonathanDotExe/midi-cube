@@ -15,8 +15,8 @@ double CombFilter::process(double in, double gain, unsigned int delay) {
 }
 
 double AllPassFilter::process(double in, double gain, unsigned int delay) {
-	double out = in * -gain + this->indelay.process() + this->delay.process();
-	this->indelay.add_sample(in, delay);
+	double out = in + this->indelay.process() + this->delay.process();
+	this->indelay.add_sample(in * -gain, delay);
 	this->delay.add_sample(out * gain, delay);
 	return out;
 }
@@ -36,11 +36,11 @@ void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 		r += rcomb_filters[i].process(rsample, decay, comb_delay);
 	}
 	//All pass filters
-	/*unsigned int allpass_delay = (preset.allpass_delay) * info.sample_rate;
+	unsigned int allpass_delay = (preset.allpass_delay) * info.sample_rate;
 	for (size_t i = 0; i < REVERB_ALLPASS_FILTERS; ++i) {
 		l = lallpass_filters[i].process(l, preset.allpass_decay, allpass_delay);
 		r = rallpass_filters[i].process(r, preset.allpass_decay, allpass_delay);
-	}*/
+	}
 	//Mix
 	lsample = lsample * (1 - preset.mix) + l * preset.mix;
 	rsample = rsample * (1 - preset.mix) + r * preset.mix;

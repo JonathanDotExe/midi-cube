@@ -15,7 +15,7 @@
 
 struct ReverbPreset {
 	bool on = true;
-	double delay = 0.5;
+	double delay = 0.1;
 	double decay = 0.5;
 	double mix = 0.5;
 
