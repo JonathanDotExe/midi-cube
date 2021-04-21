@@ -307,6 +307,21 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 
+		//Stereo
+		{
+			Label *label = new Label("Stereo", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *decay = new DragBox<double>(0, -1, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			decay->property.bind(reverb->preset.stereo, handler);
+			controls.push_back(decay);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
 	}
 	//Chorus
 	else if (dynamic_cast<ChorusEffect*>(effect) != nullptr) {

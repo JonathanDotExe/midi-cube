@@ -15,12 +15,14 @@
 
 struct ReverbPreset {
 	bool on = true;
-	double delay = 0.1;
+	double delay = 0.2;
 	double decay = 0.5;
 	double mix = 0.5;
 
-	double tone = 1;
+	double tone = 0.4;
 	double resonance = 0;
+
+	double stereo = 0;
 };
 
 class CombFilter {
