@@ -7,6 +7,8 @@
 
 #include "reverb.h"
 
+#include <cmath>
+
 double CombFilter::process(double in, double gain, unsigned int delay) {
 	double out = this->delay.process();
 	out += in;
@@ -36,9 +38,7 @@ void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 			l += lcomb_filters[i].process(lsample, decay, comb_delay);
 			r += rcomb_filters[i].process(rsample, decay, comb_delay);
 		}
-		//Mix
-		l = lsample * (1 - preset.mix) + l * preset.mix;
-		r = rsample * (1 - preset.mix) + r * preset.mix;
+
 		//All pass filters
 		unsigned int allpass_delay = (preset.allpass_delay) * info.sample_rate;
 		for (size_t i = 0; i < REVERB_ALLPASS_FILTERS; ++i) {
@@ -46,8 +46,14 @@ void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 			r = rallpass_filters[i].process(r, preset.allpass_decay, allpass_delay);
 		}
 		//Apply
-		lsample = l;
-		rsample = r;
+		l /= 3.0;
+		r /= 3.0;
+		//Mix
+		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+
+		lsample += l * fmin(0.5, preset.mix) * 2;
+		rsample += r * fmin(0.5, preset.mix) * 2;
 	}
 }
 
