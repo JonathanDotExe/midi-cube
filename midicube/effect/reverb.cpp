@@ -91,6 +91,12 @@ std::string get_effect_name<ReverbEffect>() {
 	return "Reverb";
 }
 
+template <>
+EffectProgram* create_effect_program<ReverbEffect>() {
+	return new ReverbProgram();
+}
+
+
 void ReverbProgram::load(boost::property_tree::ptree tree) {
 	preset.on = tree.get<bool>("on", true);
 	preset.delay = tree.get<double>("delay", 0.2);

@@ -94,7 +94,7 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 				if (preset && program->channels[i].engine_program) {
 					program->channels[i].engine_program->load(preset.get());
 				}
-
+				program->channels[i].send_master = c.second.get<ssize_t>("send_master", -1);
 				//Effects
 				const auto& effects = c.second.get_child_optional("insert_effects");
 				if (effects) {
@@ -107,7 +107,9 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 						const auto& p = s.second.get_child_optional("preset");
 						if (p && program->channels[i].effects[j].effect >= 0 && program->channels[i].effects[j].effect < (ssize_t) builders.size()) {
 							program->channels[i].effects[j].prog = builders.at(program->channels[i].effects[j].effect)->create_program();
-							program->channels[i].effects[j].prog->load(p.get());
+							if (program->channels[i].effects[j].prog) {
+								program->channels[i].effects[j].prog->load(p.get());
+							}
 						}
 						++j;
 					}
@@ -130,7 +132,9 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 			const auto& p = s.second.get_child_optional("preset");
 			if (p && program->effects[j].effect >= 0 && program->effects[j].effect < (ssize_t) builders.size()) {
 				program->effects[j].prog = builders.at(program->effects[j].effect)->create_program();
-				program->effects[j].prog->load(p.get());
+				if (program->effects[j].prog) {
+					program->effects[j].prog->load(p.get());
+				}
 			}
 			++j;
 		}
