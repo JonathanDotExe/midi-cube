@@ -86,6 +86,12 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	}
 }
 
+template <>
+EffectProgram* create_effect_program<VocoderEffect>() {
+	return nullptr;
+}
+
+
 template<>
 std::string get_effect_name<VocoderEffect>() {
 	return "Vocoder";

@@ -65,9 +65,7 @@ template <typename T>
 std::string get_effect_name();
 
 template <typename T>
-EffectProgram* create_effect_program() {
-	return nullptr;
-}
+EffectProgram* create_effect_program();
 
 template <typename T>
 class TemplateEffectBuilder : public EffectBuilder {

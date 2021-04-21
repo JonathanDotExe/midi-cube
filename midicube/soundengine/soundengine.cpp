@@ -418,6 +418,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 		if (engine) {
 			engine->apply_program(prog.engine_program);
 		}
+		ch.master_send = prog.send_master;
 		//Effects
 		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 			InsertEffectProgram& p = prog.effects[i];
@@ -462,6 +463,7 @@ void SoundEngineDevice::save_program(Program* program) {
 		if (engine) {
 			engine->save_program(&prog.engine_program);
 		}
+		prog.send_master = ch.master_send;
 		//Effects
 		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 			InsertEffectProgram& p = prog.effects[i];

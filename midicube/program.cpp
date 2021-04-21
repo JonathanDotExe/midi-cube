@@ -132,7 +132,9 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 			const auto& p = s.second.get_child_optional("preset");
 			if (p && program->effects[j].effect >= 0 && program->effects[j].effect < (ssize_t) builders.size()) {
 				program->effects[j].prog = builders.at(program->effects[j].effect)->create_program();
+				std::cout << "Program " << program->effects[j].effect << std::endl;
 				if (program->effects[j].prog) {
+					std::cout << "Load" << std::endl;
 					program->effects[j].prog->load(p.get());
 				}
 			}
