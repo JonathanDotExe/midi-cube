@@ -62,9 +62,25 @@ void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 }
 
 void ReverbEffect::save_program(EffectProgram **prog) {
+	ReverbProgram* p = dynamic_cast<ReverbProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new ReverbProgram();
+	}
+	p->preset = preset;
+	*prog = p;
 }
 
 void ReverbEffect::apply_program(EffectProgram *prog) {
+	ReverbProgram* p = dynamic_cast<ReverbProgram*>(prog);
+	//Create new
+	if (p) {
+		preset = p->preset;
+	}
+	else {
+		preset = {};
+	}
 }
 
 ReverbEffect::~ReverbEffect() {
@@ -73,4 +89,28 @@ ReverbEffect::~ReverbEffect() {
 template<>
 std::string get_effect_name<ReverbEffect>() {
 	return "Reverb";
+}
+
+void ReverbProgram::load(boost::property_tree::ptree tree) {
+	preset.on = tree.get<bool>("on", true);
+	preset.delay = tree.get<double>("delay", 0.2);
+	preset.decay = tree.get<double>("decay", 0.7);
+	preset.mix = tree.get<double>("mix", 0.5);
+
+	preset.tone = tree.get<double>("tone", 0.35);
+	preset.resonance = tree.get<double>("resonance", 0.0);
+	preset.stereo = tree.get<double>("stereo", 0.0);
+}
+
+boost::property_tree::ptree ReverbProgram::save() {
+	boost::property_tree::ptree tree;
+	tree.put("on", preset.on);
+	tree.put("delay", preset.delay);
+	tree.put("decay", preset.decay);
+	tree.put("mix", preset.mix);
+
+	tree.put("tone", preset.tone);
+	tree.put("resonance", preset.resonance);
+	tree.put("stereo", preset.stereo);
+	return tree;
 }

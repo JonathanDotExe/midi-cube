@@ -16,10 +16,10 @@
 struct ReverbPreset {
 	bool on = true;
 	double delay = 0.2;
-	double decay = 0.5;
+	double decay = 0.7;
 	double mix = 0.5;
 
-	double tone = 0.4;
+	double tone = 0.35;
 	double resonance = 0;
 
 	double stereo = 0;
@@ -58,7 +58,6 @@ public:
 
 class ReverbEffect : public Effect {
 private:
-	//TODO filters
 	std::array<CombFilter, 4> lcomb_filters;
 	std::array<CombFilter, 4> rcomb_filters;
 	std::array<AllPassFilter, 2> lallpass_filters;
