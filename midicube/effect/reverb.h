@@ -19,11 +19,8 @@ struct ReverbPreset {
 	double decay = 0.5;
 	double mix = 0.5;
 
-	std::array<double, REVERB_COMB_FILTERS> comb_delay_diff = {0, -0.01173, 0.01931, -0.00797};
-	std::array<double, REVERB_COMB_FILTERS> comb_decay_diff = {0, -0.1313, -0.2743, -0.31};
-
-	double allpass_delay = 0.09;
-	double allpass_decay = 0.015;
+	double tone = 1;
+	double resonance = 0;
 };
 
 class CombFilter {
@@ -64,6 +61,15 @@ private:
 	std::array<CombFilter, 4> rcomb_filters;
 	std::array<AllPassFilter, 2> lallpass_filters;
 	std::array<AllPassFilter, 2> rallpass_filters;
+
+	Filter lfilter;
+	Filter rfilter;
+
+	std::array<double, REVERB_COMB_FILTERS> comb_delay_diff = {0, -0.01173, 0.01931, -0.00797};
+	std::array<double, REVERB_COMB_FILTERS> comb_decay_diff = {0, -0.1313, -0.2743, -0.31};
+
+	double allpass_delay = 0.09;
+	double allpass_decay = 0.015;
 
 public:
 	ReverbPreset preset;

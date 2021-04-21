@@ -277,30 +277,30 @@ Scene EffectView::create(Frame &frame) {
 		tmp_x = 10;
 		tmp_y += 160;
 
-		//Allpass delay
+		//Tone
 		{
-			Label *label = new Label("Allpass Delay", main_font, 18, tmp_x, tmp_y);
+			Label *label = new Label("Tone", main_font, 18, tmp_x, tmp_y);
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *delay = new DragBox<double>(0, 0, 2, main_font, 24,
+			DragBox<double> *delay = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			delay->property.bind(reverb->preset.allpass_delay, handler);
+			delay->property.bind(reverb->preset.tone, handler);
 			controls.push_back(delay);
 
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
 
-		//Allpass decay
+		//Resonance
 		{
-			Label *label = new Label("Allpass Decay", main_font, 18, tmp_x, tmp_y);
+			Label *label = new Label("Resonance", main_font, 18, tmp_x, tmp_y);
 			controls.push_back(label);
 			tmp_y += 25;
 
 			DragBox<double> *decay = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			decay->property.bind(reverb->preset.allpass_decay, handler);
+			decay->property.bind(reverb->preset.resonance, handler);
 			controls.push_back(decay);
 
 			tmp_y -= 25;

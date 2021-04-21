@@ -33,21 +33,25 @@ void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 
 		//Comb filters
 		for (size_t i = 0; i < REVERB_COMB_FILTERS; ++i) {
-			unsigned int comb_delay = (preset.delay + preset.comb_delay_diff[i]) * info.sample_rate;
-			double decay = preset.decay + preset.comb_decay_diff[i];
+			unsigned int comb_delay = (preset.delay + comb_delay_diff[i]) * info.sample_rate;
+			double decay = preset.decay + comb_decay_diff[i];
 			l += lcomb_filters[i].process(lsample, decay, comb_delay);
 			r += rcomb_filters[i].process(rsample, decay, comb_delay);
 		}
 
 		//All pass filters
-		unsigned int allpass_delay = (preset.allpass_delay) * info.sample_rate;
+		unsigned int allpass_delay = (this->allpass_delay) * info.sample_rate;
 		for (size_t i = 0; i < REVERB_ALLPASS_FILTERS; ++i) {
-			l = lallpass_filters[i].process(l, preset.allpass_decay, allpass_delay);
-			r = rallpass_filters[i].process(r, preset.allpass_decay, allpass_delay);
+			l = lallpass_filters[i].process(l, allpass_decay, allpass_delay);
+			r = rallpass_filters[i].process(r, allpass_decay, allpass_delay);
 		}
 		//Apply
 		l /= 3.0;
 		r /= 3.0;
+		//Lowpass
+		FilterData data = {FilterType::LP_12, scale_cutoff(preset.tone), preset.resonance};
+		l = lfilter.apply(data, l, info.time_step);
+		r = lfilter.apply(data, r, info.time_step);
 		//Mix
 		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
 		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
