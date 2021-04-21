@@ -33,8 +33,8 @@ void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 
 		//Comb filters
 		for (size_t i = 0; i < REVERB_COMB_FILTERS; ++i) {
-			unsigned int comb_delay = (preset.delay + comb_delay_diff[i]) * info.sample_rate;
-			double decay = preset.decay + comb_decay_diff[i];
+			unsigned int comb_delay = (preset.delay * comb_delay_mul[i]) * info.sample_rate;
+			double decay = preset.decay * comb_decay_mul[i];
 			l += lcomb_filters[i].process(lsample, decay, comb_delay);
 			r += rcomb_filters[i].process(rsample, decay, comb_delay);
 		}

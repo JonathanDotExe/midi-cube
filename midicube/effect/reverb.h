@@ -65,8 +65,8 @@ private:
 	Filter lfilter;
 	Filter rfilter;
 
-	std::array<double, REVERB_COMB_FILTERS> comb_delay_diff = {0, -0.01173, 0.01931, -0.00797};
-	std::array<double, REVERB_COMB_FILTERS> comb_decay_diff = {0, -0.1313, -0.2743, -0.31};
+	std::array<double, REVERB_COMB_FILTERS> comb_delay_mul = {1, 1.13287, 0.6812463, 0.622141};
+	std::array<double, REVERB_COMB_FILTERS> comb_decay_mul = {0.57962, 0.55271987, 0.981233, 1};
 
 	double allpass_delay = 0.09;
 	double allpass_decay = 0.015;
