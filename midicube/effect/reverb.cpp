@@ -61,8 +61,8 @@ void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 		l = lfilter.apply(data, l, info.time_step);
 		r = lfilter.apply(data, r, info.time_step);
 		//Mix
-		lsample *= (fmax(0, preset.mix - 0.5) * 2);
-		rsample *= (fmax(0, preset.mix - 0.5) * 2);
+		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
 
 		lsample += l * fmin(0.5, preset.mix) * 2;
 		rsample += r * fmin(0.5, preset.mix) * 2;
