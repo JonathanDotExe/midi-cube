@@ -27,8 +27,8 @@ public:
 	T min;
 	T max;
 
-	TemplateControlBinding(T& f, T mn, T mx) : field(f), min(mn), max(mx) {
-
+	TemplateControlBinding(T& f, T mn, T mx, unsigned int cc = 128) : field(f), min(mn), max(mx) {
+		this->cc = cc;
 	}
 
 	void change(unsigned int value);
