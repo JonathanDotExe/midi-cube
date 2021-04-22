@@ -14,8 +14,10 @@
 class ControlBinding {
 public:
 	unsigned int cc = 0;
-	virtual void change(unsigned int value);
-	virtual ~ControlBinding();
+	virtual void change(unsigned int value) = 0;
+	virtual ~ControlBinding() {
+
+	}
 };
 
 template <typename T>
