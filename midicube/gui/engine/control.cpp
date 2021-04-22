@@ -230,6 +230,7 @@ void OrganSwitch::update_properties(){
 	if (property.is_bound()) {
 		property.get([this](bool v) {
 			checked = v;
+			update_position(this->x, this->y, width, height);
 			frame->request_redraw();
 		});
 	}
