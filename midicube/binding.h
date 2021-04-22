@@ -8,6 +8,9 @@
 #ifndef MIDICUBE_BINDING_H_
 #define MIDICUBE_BINDING_H_
 
+#include <vector>
+#include "midi.h"
+
 class ControlBinding {
 public:
 	unsigned int cc = 0;
@@ -30,8 +33,23 @@ public:
 };
 
 class MidiControlHandler {
+private:
+	std::vector<ControlBinding*> bindings;
+	bool locked = false;
 public:
 
+	void register_binding(ControlBinding* b);
+
+	void lock();
+
+	void on_message(MidiMessage msg);
+
+	~MidiControlHandler() {
+		for (auto b : bindings) {
+			delete b;
+		}
+		bindings.clear();
+	}
 };
 
 
