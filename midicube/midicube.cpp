@@ -96,7 +96,8 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 
 inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	SampleInfo info = audio_handler.sample_info();
-	for (size_t i = 0; i < engine.channels.size(); ++i) {
+	//Engines
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelSource& s = engine.channels[i].scenes[engine.scene].source;
 		if (s.input == static_cast<ssize_t>(input) && s.channel == message.channel) {
 			bool pass = true;
@@ -137,6 +138,14 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 				if (engine.send(msg, info)) {
 					updated = true;
 				}
+			}
+		}
+	}
+	//Effects
+	for (auto& e : this->engine.effects) {
+		if (e.get_effect()) {
+			if (e.get_effect()->midi_message(message, info)) {
+				updated = true;
 			}
 		}
 	}

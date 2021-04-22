@@ -33,8 +33,8 @@ public:
 	MidiControlHandler cc;
 
 	virtual void apply(double& lsample, double& rsample, SampleInfo& info) = 0;
-	virtual void midi_message(MidiMessage& msg, SampleInfo& info) {
-		cc.on_message(msg);
+	virtual bool midi_message(MidiMessage& msg, SampleInfo& info) {
+		return cc.on_message(msg);
 	}
 	virtual void apply_program(EffectProgram* prog) {
 

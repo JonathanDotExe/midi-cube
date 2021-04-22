@@ -147,7 +147,15 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 }
 
 bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t scene) {
+	bool updated = false;
 	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
+		for (auto& e : effects) {
+			if (e.get_effect()) {
+				if (e.get_effect()->midi_message(message, info)) {
+					updated = true;
+				}
+			}
+		}
 		if (arp.on) {
 			switch (message.type) {
 			case MessageType::NOTE_ON:
@@ -157,15 +165,15 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t sce
 				arp.note.release_note(info, message.note(), true);
 				break;
 			default:
-				return engine->midi_message(message, info); //FIXME
+				updated = updated && engine->midi_message(message, info); //FIXME
 				break;
 			}
 		}
 		else {
-			return engine->midi_message(message, info);
+			updated = updated && engine->midi_message(message, info);
 		}
 	}
-	return false;
+	return updated;
 }
 
 void SoundEngineChannel::set_engine_index(ssize_t engine_index) {

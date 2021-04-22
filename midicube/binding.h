@@ -50,7 +50,7 @@ public:
 
 	void lock();
 
-	void on_message(MidiMessage msg);
+	bool on_message(MidiMessage msg);
 
 	~MidiControlHandler() {
 		for (auto b : bindings) {
