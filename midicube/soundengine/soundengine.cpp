@@ -165,12 +165,12 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t sce
 				arp.note.release_note(info, message.note(), true);
 				break;
 			default:
-				updated = updated && engine->midi_message(message, info); //FIXME
+				updated = engine->midi_message(message, info) || updated; //FIXME
 				break;
 			}
 		}
 		else {
-			updated = updated && engine->midi_message(message, info);
+			updated = engine->midi_message(message, info) || updated;
 		}
 	}
 	return updated;
