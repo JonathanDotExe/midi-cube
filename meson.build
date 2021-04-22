@@ -66,6 +66,7 @@ src = [
 	'midicube/effect/effect.cpp',
 	'midicube/effect/reverb.cpp',
 	'midicube/effect/rotary_speaker.cpp',
+	'midicube/effect/tremolo.cpp',
 	'midicube/effect/vocoder.cpp'
 ]
 

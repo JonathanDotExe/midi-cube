@@ -18,6 +18,7 @@
 #include "../effect/chorus.h"
 #include "../effect/reverb.h"
 #include "../effect/rotary_speaker.h"
+#include "../effect/tremolo.h"
 #include "../effect/vocoder.h"
 
 extern void fill_sound_engine_device(SoundEngineDevice* device) {
@@ -32,6 +33,7 @@ extern void fill_sound_engine_device(SoundEngineDevice* device) {
 	device->add_effect(new TemplateEffectBuilder<ChorusEffect>());
 	device->add_effect(new TemplateEffectBuilder<BitCrusherEffect>());
 	device->add_effect(new TemplateEffectBuilder<VocoderEffect>());
+	device->add_effect(new TemplateEffectBuilder<TremoloEffect>());
 }
 
 
