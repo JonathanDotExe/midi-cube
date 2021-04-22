@@ -23,9 +23,9 @@ public:
 template <typename T>
 class TemplateControlBinding : public ControlBinding {
 public:
+	T& field;
 	T min;
 	T max;
-	T& field;
 
 	TemplateControlBinding(T& f, T mn, T mx) : field(f), min(mn), max(mx) {
 
@@ -33,6 +33,12 @@ public:
 
 	void change(unsigned int value);
 };
+
+template <typename T>
+void TemplateControlBinding<T>::change(unsigned int value) {
+	field = value/127.0 * (max - min) + min;
+}
+
 
 class MidiControlHandler {
 private:

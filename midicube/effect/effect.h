@@ -11,6 +11,7 @@
 #include "../audio.h"
 #include "../oscilator.h"
 #include "../midi.h"
+#include "../binding.h"
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -29,9 +30,11 @@ public:
 
 class Effect {
 public:
+	MidiControlHandler cc;
+
 	virtual void apply(double& lsample, double& rsample, SampleInfo& info) = 0;
 	virtual void midi_message(MidiMessage& msg, SampleInfo& info) {
-
+		cc.on_message(msg);
 	}
 	virtual void apply_program(EffectProgram* prog) {
 

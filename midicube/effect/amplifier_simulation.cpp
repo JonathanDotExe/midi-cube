@@ -8,7 +8,10 @@
 #include "amplifier_simulation.h"
 
 AmplifierSimulationEffect::AmplifierSimulationEffect() {
-
+	cc.register_binding(new TemplateControlBinding<bool>(preset.on, false, true));
+	cc.register_binding(new TemplateControlBinding<double>(preset.boost, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>(preset.drive, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>(preset.tone, 0, 1));
 }
 
 static double apply_distortion(double sample, double drive, DistortionType type) {

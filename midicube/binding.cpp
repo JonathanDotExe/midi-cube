@@ -7,12 +7,6 @@
 
 #include "binding.h"
 
-template <typename T>
-void TemplateControlBinding<T>::change(unsigned int value) {
-	field = value/127.0 * (max - min) + min;
-}
-
-
 void MidiControlHandler::register_binding(ControlBinding *b) {
 	if (!locked) {
 		bindings.push_back(b);
