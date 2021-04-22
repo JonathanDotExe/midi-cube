@@ -14,6 +14,7 @@
 #include "../../effect/chorus.h"
 #include "../../effect/reverb.h"
 #include "../../effect/rotary_speaker.h"
+#include "../../effect/tremolo.h"
 #include "../../effect/vocoder.h"
 
 EffectView::EffectView(Effect *e, std::function<ViewController* ()> b) :
@@ -599,6 +600,77 @@ Scene EffectView::create(Frame &frame) {
 				tmp_x, tmp_y, 180, 120);
 			value->property.bind(vocoder->preset.vocoder_amplification, handler);
 			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+	}
+	//Tremole
+	else if (dynamic_cast<TremoloEffect*>(effect) != nullptr) {
+		TremoloEffect* tremolo = dynamic_cast<TremoloEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color(0, 180, 60));
+		title->text.setString("Ultra-Tremolo L0L");
+
+		//Tremolo
+		{
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
+				tmp_y, 180, 120);
+			on->property.bind(tremolo->preset.on, handler);
+			controls.push_back(on);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Vibrato Rate
+		{
+			Label *label = new Label("Rate", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rate = new DragBox<double>(0, 0, 8, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			rate->property.bind(tremolo->preset.rate, handler);
+			controls.push_back(rate);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Vibrato Depth
+		{
+			Label *label = new Label("Depth", main_font, 18, tmp_x,
+				tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *depth = new DragBox<double>(0, 0, 1, main_font,
+				24, tmp_x, tmp_y, 180, 120);
+			depth->property.bind(tremolo->preset.depth, handler);
+			controls.push_back(depth);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Waveform
+		{
+			Label *label = new Label("Waveform", main_font, 18, tmp_x,
+				tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle"};
+
+			ComboBox* waveform = new ComboBox(4, waveforms, main_font, 24, 0, tmp_x , tmp_y, 180, 120);
+			waveform->property.bind(tremolo->preset.waveform, handler);
+			controls.push_back(waveform);
 
 			tmp_y -= 25;
 			tmp_x += 200;
