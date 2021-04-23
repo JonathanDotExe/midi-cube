@@ -45,16 +45,6 @@ struct B3OrganPreset {
 	double multi_note_gain{0.8};
 	double click_attack = 0.00025;
 
-	AmplifierSimulationPreset amplifier;
-	unsigned int amp_cc{28};
-	unsigned int amp_boost_cc{35};
-	unsigned int amp_drive_cc{36};
-	unsigned int amp_tone_cc{37};
-
-	RotarySpeakerPreset rotary;
-	unsigned int rotary_cc{22};
-	unsigned int rotary_speed_cc{23};
-
 	bool percussion{false};
 	bool percussion_third_harmonic{true};
 	bool percussion_soft{true};

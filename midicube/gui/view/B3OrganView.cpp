@@ -27,144 +27,8 @@ Scene B3OrganView::create(Frame &frame) {
 
 	//Col 1
 	int tmp_y = 20;
-	//Rotary
-	{
-		Label* label = new Label("Rotary Speaker", main_font, 18, 10, tmp_y);
-		label->text.setFillColor(sf::Color::White);
-		controls.push_back(label);
-		tmp_y += 25;
-
-		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->property.bind(organ.data.preset.rotary_cc, handler);
-		controls.push_back(midi);
-		show_midi.push_back(midi);
-
-		OrganSwitch* rotary = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60);
-		rotary->property.bind(organ.data.preset.rotary.on, handler);
-		hide_midi.push_back(rotary);
-		controls.push_back(rotary);
-
-		tmp_y += 65;
-	}
-	//Rotary Speed
-	{
-		Label* label = new Label("Rotary Speed", main_font, 18, 10, tmp_y);
-		label->text.setFillColor(sf::Color::White);
-		controls.push_back(label);
-		tmp_y += 25;
-
-		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->property.bind(organ.data.preset.rotary_speed_cc, handler);
-		controls.push_back(midi);
-		show_midi.push_back(midi);
-
-		OrganSwitch* rotary_speed = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60, "Fast", "Slow");
-		rotary_speed->property.bind(organ.data.preset.rotary.fast, handler);
-		controls.push_back(rotary_speed);
-		hide_midi.push_back(rotary_speed);
-
-		tmp_y += 75;
-	}
-
-	//Amplifier
-	{
-		Label* label = new Label("Amplifier", main_font, 18, 10, tmp_y);
-		label->text.setFillColor(sf::Color::White);
-		controls.push_back(label);
-		tmp_y += 25;
-
-		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->property.bind(organ.data.preset.amp_cc, handler);
-		controls.push_back(midi);
-		show_midi.push_back(midi);
-
-		OrganSwitch* amplifier = new OrganSwitch(false, main_font, 10, tmp_y, 80, 60);
-		amplifier->property.bind(organ.data.preset.amplifier.on, handler);
-		controls.push_back(amplifier);
-		hide_midi.push_back(amplifier);
-
-		tmp_y += 65;
-	}
-
-	//Amplifier Boost
-	{
-		Label* label = new Label("Amp Boost", main_font, 18, 10, tmp_y);
-		label->text.setFillColor(sf::Color::White);
-		controls.push_back(label);
-		tmp_y += 25;
-
-		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->property.bind(organ.data.preset.amp_boost_cc, handler);
-		controls.push_back(midi);
-		show_midi.push_back(midi);
-
-
-		DragBox<double>* boost = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
-		boost->property.bind(organ.data.preset.amplifier.boost, handler);
-		controls.push_back(boost);
-		hide_midi.push_back(boost);
-
-		tmp_y += 65;
-	}
-
-	//Distortion Amount
-	{
-		Label* overdrive_label = new Label("Amp Drive", main_font, 18, 10, tmp_y);
-		overdrive_label->text.setFillColor(sf::Color::White);
-		controls.push_back(overdrive_label);
-		tmp_y += 25;
-
-		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, 10, tmp_y, 80, 60);
-		midi->property.bind(organ.data.preset.amp_drive_cc, handler);
-		controls.push_back(midi);
-		show_midi.push_back(midi);
-
-		DragBox<double>* overdrive = new DragBox<double>(0, 0, 1, main_font, 16, 10, tmp_y, 80, 60);
-		overdrive->property.bind(organ.data.preset.amplifier.drive, handler);
-		controls.push_back(overdrive);
-		hide_midi.push_back(overdrive);
-
-		tmp_y += 65;
-	}
-
-	//Distortion Type
-	{
-		Label* distortion_type_label = new Label("Distortion Type", main_font, 18, 10, tmp_y);
-		distortion_type_label->text.setFillColor(sf::Color::White);
-		controls.push_back(distortion_type_label);
-		tmp_y += 25;
-
-		ComboBox* distortion_type = new ComboBox(0, {"Digital", "Polynomal", "Arctan"}, main_font, 16, 0, 10, tmp_y, 80, 60);
-		distortion_type->property.bind(organ.data.preset.amplifier.type, handler);
-		controls.push_back(distortion_type);
-
-		tmp_y += 65;
-	}
-
 	//Col 2
-	tmp_y -= 65 + 25;
-	int tmp_x = 180;
-	//Amp Tone
-	{
-		Label* label = new Label("Amp Tone", main_font, 18, tmp_x, tmp_y);
-		label->text.setFillColor(sf::Color::White);
-		controls.push_back(label);
-		tmp_y += 25;
-
-		DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, tmp_x, tmp_y, 80, 60);
-		midi->property.bind(organ.data.preset.amp_tone_cc, handler);
-		controls.push_back(midi);
-		show_midi.push_back(midi);
-
-		DragBox<double>* amp_tone = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		amp_tone->property.bind(organ.data.preset.amplifier.tone, handler);
-		controls.push_back(amp_tone);
-		hide_midi.push_back(amp_tone);
-
-		tmp_y += 65;
-	}
-	tmp_y -= 65 + 25;
-	tmp_x += 100;
+	int tmp_x = 10;
 
 	//Vibrato Mix
 	{
@@ -185,41 +49,6 @@ Scene B3OrganView::create(Frame &frame) {
 
 		tmp_y += 65;
 	}
-	tmp_y -= 65 + 25;
-	tmp_x += 100;
-
-	//Rotary Stereo Mix
-	{
-		Label* label = new Label("Rot. Stereo", main_font, 18, tmp_x, tmp_y);
-		label->text.setFillColor(sf::Color::White);
-		controls.push_back(label);
-		tmp_y += 25;
-
-		DragBox<double>* rotary_stereo = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		rotary_stereo->property.bind(organ.data.preset.rotary.stereo_mix, handler);
-		controls.push_back(rotary_stereo);
-
-		tmp_y += 65;
-	}
-	tmp_y -= 65 + 25;
-	tmp_x += 100;
-
-	//Rotary Type
-	{
-		Label* label = new Label("Rotary Type", main_font, 18, tmp_x, tmp_y);
-		label->text.setFillColor(sf::Color::White);
-		controls.push_back(label);
-		tmp_y += 25;
-
-		OrganSwitch* rotary_type = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "1", "2");
-		rotary_type->property.bind(organ.data.preset.rotary.type, handler);
-		controls.push_back(rotary_type);
-
-		tmp_y += 65;
-	}
-
-	tmp_x += 100;
-	tmp_y -= 65 + 25;
 
 	//Organ Type
 	{
@@ -237,7 +66,6 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 
-	tmp_y -= 65 + 25;
 	//Swell
 	{
 		Label* label = new Label("Swell", main_font, 18, tmp_x, tmp_y);
@@ -253,7 +81,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 
-	tmp_x -= 100 * 4;
+	tmp_x += 175 ;
 	tmp_y -= (65 + 25) * 2 - 25;
 	//Drawbars
 	std::vector<sf::Color> colors = {

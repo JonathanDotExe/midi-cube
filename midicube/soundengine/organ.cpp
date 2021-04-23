@@ -196,14 +196,6 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	//Amplifier
 	lsample = sample;
 	rsample = sample;
-	//FIXME
-	data.amplifier.preset = data.preset.amplifier;
-	data.amplifier.apply(lsample, rsample, info);
-
-	//Rotary
-	//FIXME
-	data.rotary_speaker.preset = data.preset.rotary;
-	data.rotary_speaker.apply(lsample, rsample, info);
 }
 
 bool B3Organ::control_change(unsigned int control, unsigned int value) {
@@ -214,35 +206,6 @@ bool B3Organ::control_change(unsigned int control, unsigned int value) {
 			data.preset.drawbars[i] = round((double) value/127 * ORGAN_DRAWBAR_MAX);
 			change = true;
 		}
-	}
-	//Rotary
-	if (control == data.preset.rotary_cc) {
-		data.preset.rotary.on = value > 0;
-		change = true;
-	}
-	if (control == data.preset.rotary_speed_cc) {
-		data.preset.rotary.fast = value > 0;
-		change = true;
-	}
-	//Amp
-	if (control == data.preset.amp_cc) {
-		data.preset.amplifier.on = value > 0;
-		change = true;
-	}
-	//Boost
-	if (control == data.preset.amp_boost_cc) {
-		data.preset.amplifier.boost = value/127.0;
-		change = true;
-	}
-	//Drive
-	if (control == data.preset.amp_drive_cc) {
-		data.preset.amplifier.drive = value/127.0;
-		change = true;
-	}
-	//Tone
-	if (control == data.preset.amp_tone_cc) {
-		data.preset.amplifier.tone = value/127.0;
-		change = true;
 	}
 	//Percussion
 	if (control == data.preset.percussion_cc) {
@@ -341,30 +304,6 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	preset.harmonic_foldback_volume = tree.get<double>("harmonic_foldback_volume", 1);
 	preset.multi_note_gain = tree.get<double>("multi_note_gain", 0.8);
 
-	//Amplifier
-	preset.amplifier.on = tree.get<bool>("amplifier.on", false);
-	preset.amplifier.boost = tree.get<double>("amplifier.boost", 0);
-	preset.amplifier.drive = tree.get<double>("amplifier.drive", 0);
-	preset.amplifier.tone = tree.get<double>("amplifier.tone", 0.6);
-	preset.amplifier.type = (DistortionType) tree.get<int>("amplifier.distortion_type", DistortionType::ARCTAN_DISTORTION);
-
-	preset.amp_cc = tree.get<unsigned int>("amplifier.on_cc", 28);
-	preset.amp_boost_cc = tree.get<unsigned int>("amplifier.boost_cc", 35);
-	preset.amp_drive_cc = tree.get<unsigned int>("amplifier.drive_cc", 36);
-	preset.amp_tone_cc = tree.get<unsigned int>("amplifier.tone_cc", 37);
-
-	//Rotary
-	preset.rotary.on = tree.get<bool>("rotary.on", false);
-	preset.rotary.fast = tree.get<bool>("rotary.fast", false);
-	preset.rotary.stereo_mix = tree.get<double>("rotary.stereo_mix", 0.5);
-	preset.rotary.type = tree.get<bool>("rotary.type", false);
-
-	preset.rotary_cc = tree.get<unsigned int>("rotary.on_cc", 22);
-	preset.rotary_speed_cc = tree.get<unsigned int>("rotary.speed_cc", 23);
-
-	tree.put("rotary.on_cc", preset.rotary_cc);
-	tree.put("rotary.speed_cc", preset.rotary_speed_cc);
-
 	//Percussion
 	preset.percussion = tree.get<bool>("percussion", false);
 	preset.percussion_third_harmonic = tree.get<bool>("percussion_third_harmonic", true);
@@ -394,27 +333,6 @@ boost::property_tree::ptree B3OrganProgram::save() {
 	//Modeling
 	tree.put("harmonic_foldback_volume", preset.harmonic_foldback_volume);
 	tree.put("multi_note_gain", preset.multi_note_gain);
-
-	//Amplifier
-	tree.put("amplifier.on", preset.amplifier.on);
-	tree.put("amplifier.boost", preset.amplifier.boost);
-	tree.put("amplifier.drive", preset.amplifier.drive);
-	tree.put("amplifier.tone", preset.amplifier.tone);
-	tree.put("amplifier.distortion_type", (int) preset.amplifier.type);
-
-	tree.put("amplifier.on_cc", preset.amp_cc);
-	tree.put("amplifier.boost_cc", preset.amp_boost_cc);
-	tree.put("amplifier.drive_cc", preset.amp_drive_cc);
-	tree.put("amplifier.tone_cc", preset.amp_tone_cc);
-
-	//Rotary
-	tree.put("rotary.on", preset.rotary.on);
-	tree.put("rotary.fast", preset.rotary.fast);
-	tree.put("rotary.stereo_mix", preset.rotary.stereo_mix);
-	tree.put("rotary.type", preset.rotary.type);
-
-	tree.put("rotary.on_cc", preset.rotary_cc);
-	tree.put("rotary.speed_cc", preset.rotary_speed_cc);
 
 	//Percussion
 	tree.put("percussion", preset.percussion);
