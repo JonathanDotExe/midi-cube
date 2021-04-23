@@ -15,6 +15,7 @@ class ControlBinding {
 public:
 	unsigned int cc = 0;
 	virtual void change(unsigned int value) = 0;
+	virtual void* var() = 0;
 	virtual ~ControlBinding() {
 
 	}
@@ -32,6 +33,10 @@ public:
 	}
 
 	void change(unsigned int value);
+
+	void* var() {
+		return &field;
+	}
 };
 
 template <typename T>
@@ -47,6 +52,15 @@ private:
 public:
 
 	void register_binding(ControlBinding* b);
+
+	ControlBinding* get_binding(void* field) {
+		for (auto b : bindings) {
+			if (b->var() == field) {
+				return b;
+			}
+		}
+		return nullptr;
+	}
 
 	void lock();
 

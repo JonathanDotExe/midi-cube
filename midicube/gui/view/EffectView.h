@@ -17,6 +17,7 @@ class EffectView : public ViewController {
 private:
 	Effect* effect = nullptr;
 	std::function<ViewController* ()> back;
+	bool edit_midi = false;
 
 public:
 	EffectView(Effect* effect, std::function<ViewController* ()> b);

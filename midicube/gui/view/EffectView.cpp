@@ -26,10 +26,20 @@ EffectView::~EffectView() {
 
 }
 
+void create_cc_control(MidiControlHandler& m, ActionHandler& handler, void* field, int x, int y, int width, int height, std::vector<Control*> controls, std::vector<Control*> show_midi) {
+	DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, x, y, width, height);
+	midi->property.bind(m.get_binding(field)->cc, handler);
+	controls.push_back(midi);
+	show_midi.push_back(midi);
+}
+
 Scene EffectView::create(Frame &frame) {
 	std::vector<Control*> controls;
 
 	ActionHandler &handler = frame.cube.action_handler;
+
+	std::vector<Control*> hide_midi = {};
+	std::vector<Control*> show_midi = {};
 
 	//Background
 	Pane *bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(),
@@ -677,6 +687,20 @@ Scene EffectView::create(Frame &frame) {
 		}
 	}
 
+	//Edit MIDI Button
+	Button* edit_midi = new Button("Edit MIDI", main_font, 18, frame.get_width() - 320, frame.get_height() - 40, 100, 40);
+	edit_midi->rect.setFillColor(sf::Color::Yellow);
+	edit_midi->set_on_click([show_midi, hide_midi, this]() {
+		this->edit_midi = !this->edit_midi;
+		for (Control* control : show_midi) {
+			control->set_visible(this->edit_midi);
+		}
+		for (Control* control : hide_midi) {
+			control->set_visible(!this->edit_midi);
+		}
+	});
+	controls.push_back(edit_midi);
+
 	//Exit Button
 	Button *exit = new Button("Back", main_font, 18, frame.get_width() - 70,
 			frame.get_height() - 40, 70, 40);
@@ -685,6 +709,14 @@ Scene EffectView::create(Frame &frame) {
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);
+
+	//Hide midi controls
+	for (Control* control : show_midi) {
+		control->set_visible(this->edit_midi);
+	}
+	for (Control* control : hide_midi) {
+		control->set_visible(!this->edit_midi);
+	}
 
 	return {controls};
 }
