@@ -9,7 +9,7 @@
 #include <cmath>
 
 BitCrusherEffect::BitCrusherEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>(preset.on, false, true));
+	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
 }
 
 void BitCrusherEffect::apply(double& lsample, double& rsample, SampleInfo& info) {

@@ -14,6 +14,10 @@
 class ControlBinding {
 public:
 	unsigned int cc = 0;
+	std::string name;
+	ControlBinding(std::string n) : name(n) {
+
+	}
 	virtual void change(unsigned int value) = 0;
 	virtual void* var() = 0;
 	virtual ~ControlBinding() {
@@ -28,7 +32,7 @@ public:
 	T min;
 	T max;
 
-	TemplateControlBinding(T& f, T mn, T mx, unsigned int cc = 128) : field(f), min(mn), max(mx) {
+	TemplateControlBinding(std::string name, T& f, T mn, T mx, unsigned int cc = 128) : ControlBinding(name), field(f), min(mn), max(mx) {
 		this->cc = cc;
 	}
 

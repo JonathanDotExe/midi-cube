@@ -12,8 +12,8 @@ static inline double sound_delay(double rotation, double max_delay, unsigned int
 }
 
 RotarySpeakerEffect::RotarySpeakerEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>(preset.on, false, true, 22));
-	cc.register_binding(new TemplateControlBinding<bool>(preset.fast, false, true, 23));
+	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true, 22));
+	cc.register_binding(new TemplateControlBinding<bool>("fast", preset.fast, false, true, 23));
 
 	filter_data.type = FilterType::LP_24;
 	filter_data.cutoff = 800;
