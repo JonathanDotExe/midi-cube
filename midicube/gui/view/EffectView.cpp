@@ -26,8 +26,8 @@ EffectView::~EffectView() {
 
 }
 
-void create_cc_control(MidiControlHandler& m, ActionHandler& handler, void* field, int x, int y, int width, int height, std::vector<Control*> controls, std::vector<Control*> show_midi) {
-	DragBox<int>* midi = new DragBox<int>(0, 0, 127, main_font, 16, x, y, width, height);
+void create_cc_control(MidiControlHandler& m, ActionHandler& handler, void* field, int x, int y, int width, int height, std::vector<Control*>& controls, std::vector<Control*>& show_midi) {
+	DragBox<int>* midi = new DragBox<int>(0, 0, 128, main_font, 16, x, y, width, height);
 	midi->property.bind(m.get_binding(field)->cc, handler);
 	controls.push_back(midi);
 	show_midi.push_back(midi);
@@ -116,7 +116,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(overdrive);
 			hide_midi.push_back(overdrive);
 
-			create_cc_control(effect->cc, handler, &amp->preset.drive, tmp_x, tmp_y, 180, 120, controls, hide_midi);
+			create_cc_control(effect->cc, handler, &amp->preset.drive, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -179,7 +179,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &rotary->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
+			create_cc_control(effect->cc, handler, &rotary->preset.on, tmp_x, tmp_y, 80, 60, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 90;
@@ -197,7 +197,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(rotary_speed);
 			hide_midi.push_back(rotary_speed);
 
-			create_cc_control(effect->cc, handler, &rotary->preset.fast, tmp_x, tmp_y, 180, 120, controls, show_midi);
+			create_cc_control(effect->cc, handler, &rotary->preset.fast, tmp_x, tmp_y, 80, 60, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 90;
@@ -670,7 +670,7 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 	}
-	//Tremole
+	//Tremolo
 	else if (dynamic_cast<TremoloEffect*>(effect) != nullptr) {
 		TremoloEffect* tremolo = dynamic_cast<TremoloEffect*>(effect);
 
