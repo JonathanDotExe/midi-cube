@@ -51,6 +51,7 @@ EffectProgram* create_effect_program<ChorusEffect>() {
 
 
 void ChorusProgram::load(boost::property_tree::ptree tree) {
+	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
 	preset.vibrato_rate = tree.get<double>("vibrato_rate", 2);
 	preset.vibrato_depth = tree.get<double>("vibrato_depth", 0.5);
@@ -61,7 +62,7 @@ void ChorusProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree ChorusProgram::save() {
-	boost::property_tree::ptree tree;
+	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
 	tree.put("vibrato_rate", preset.vibrato_rate);
 	tree.put("vibrato_depth", preset.vibrato_depth);

@@ -43,6 +43,7 @@ EffectProgram* create_effect_program<TremoloEffect>() {
 
 
 void TremoloProgram::load(boost::property_tree::ptree tree) {
+	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
 	preset.rate = tree.get<double>("rate", 2);
 	preset.depth = tree.get<double>("depth", 0.5);
@@ -50,7 +51,7 @@ void TremoloProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree TremoloProgram::save() {
-	boost::property_tree::ptree tree;
+	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
 	tree.put("rate", preset.rate);
 	tree.put("depth", preset.depth);

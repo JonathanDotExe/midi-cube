@@ -89,6 +89,7 @@ EffectProgram* create_effect_program<RotarySpeakerEffect>() {
 }
 
 void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
+	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
 	preset.fast = tree.get<bool>("fast", false);
 
@@ -97,7 +98,7 @@ void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree RotarySpeakerProgram::save() {
-	boost::property_tree::ptree tree;
+	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
 	tree.put("fast", preset.fast);
 

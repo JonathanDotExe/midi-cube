@@ -30,12 +30,13 @@ std::string get_effect_name<BitCrusherEffect>() {
 }
 
 void BitCrusherProgram::load(boost::property_tree::ptree tree) {
+	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
 	preset.bits = tree.get<unsigned int>("bits", 16);
 }
 
 boost::property_tree::ptree BitCrusherProgram::save() {
-	boost::property_tree::ptree tree;
+	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
 	tree.put("bits", preset.bits);
 	return tree;

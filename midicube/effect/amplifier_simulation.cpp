@@ -74,6 +74,7 @@ std::string get_effect_name<AmplifierSimulationEffect>() {
 }
 
 void AmplifierSimulationProgram::load(boost::property_tree::ptree tree) {
+	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
 	preset.boost = tree.get<double>("boost", 0);
 	preset.drive = tree.get<double>("drive", 0);
@@ -81,7 +82,7 @@ void AmplifierSimulationProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree AmplifierSimulationProgram::save() {
-	boost::property_tree::ptree tree;
+	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
 	tree.put("boost", preset.boost);
 	tree.put("drive", preset.drive);
