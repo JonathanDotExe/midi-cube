@@ -21,6 +21,14 @@ void MidiControlHandler::lock() {
 	locked = true;
 }
 
+std::unordered_map<std::string, unsigned int> MidiControlHandler::get_ccs() {
+	std::unordered_map<std::string, unsigned int> ccs;
+	for (ControlBinding* b : bindings) {
+		ccs.insert(std::pair<std::string, unsigned int>(b->name, b->cc));
+	}
+	return ccs;
+}
+
 bool MidiControlHandler::on_message(MidiMessage msg) {
 	bool updated = false;
 	if (msg.type == MessageType::CONTROL_CHANGE) {
@@ -34,4 +42,14 @@ bool MidiControlHandler::on_message(MidiMessage msg) {
 		}
 	}
 	return updated;
+}
+
+void MidiControlHandler::set_ccs(std::unordered_map<std::string, unsigned int> ccs) {
+	for (auto cc : ccs) {
+		for (ControlBinding* b : bindings) {
+			if (b->name == cc.first) {
+				b->name = cc.second;
+			}
+		}
+	}
 }

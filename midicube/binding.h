@@ -9,6 +9,7 @@
 #define MIDICUBE_BINDING_H_
 
 #include <vector>
+#include <unordered_map>
 #include "midi.h"
 
 class ControlBinding {
@@ -54,6 +55,10 @@ private:
 	std::vector<ControlBinding*> bindings;
 	bool locked = false;
 public:
+
+	void set_ccs(std::unordered_map<std::string, unsigned int> ccs);
+
+	std::unordered_map<std::string, unsigned int> get_ccs();
 
 	void register_binding(ControlBinding* b);
 
