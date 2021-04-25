@@ -308,6 +308,9 @@ Scene EffectView::create(Frame &frame) {
 				24, tmp_x, tmp_y, 180, 120);
 			mix->property.bind(reverb->preset.mix, handler);
 			controls.push_back(mix);
+			hide_midi.push_back(mix);
+
+			create_cc_control(effect->cc, handler, &reverb->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
