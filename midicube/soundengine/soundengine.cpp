@@ -399,7 +399,7 @@ bool SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	//Scene change
 	if (message.type == MessageType::CONTROL_CHANGE) {
 		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
-			if (scene_ccs[i] == message.value()) {
+			if (scene_ccs[i] == message.cc()) {
 				scene = i;
 				updated = true;
 			}
