@@ -590,11 +590,11 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	}
 }
 
-bool AnalogSynth::midi_message(MidiMessage& msg, SampleInfo& info) {
+bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info) {
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 		aftertouch = msg.monophonic_aftertouch()/127.0;
 	}
-	return BaseSoundEngine::midi_message(msg, info);
+	return BaseSoundEngine::midi_message(msg, transpose, info);
 }
 
 bool AnalogSynth::control_change(unsigned int control, unsigned int value) {
@@ -611,8 +611,8 @@ bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 	return !note.pressed && amp_finished(info, note, env);
 }
 
-void AnalogSynth::press_note(SampleInfo& info, unsigned int note, double velocity) {
-	AnalogSynthVoice& voice = this->note.note[this->note.press_note(info, note, velocity)];
+void AnalogSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
+	AnalogSynthVoice& voice = this->note.note[this->note.press_note(info, real_note, note, velocity)];
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();
 	}

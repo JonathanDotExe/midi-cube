@@ -126,7 +126,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 }
 
 void Arpeggiator::press_note(SampleInfo& info, unsigned int note, double velocity) {
-	this->note.press_note(info, note, velocity);
+	this->note.press_note(info, note, note, velocity);
 }
 
 void Arpeggiator::release_note(SampleInfo& info, unsigned int note) {

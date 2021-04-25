@@ -51,11 +51,11 @@ public:
 class SoundEngine {
 
 public:
-	virtual bool midi_message(MidiMessage& msg, SampleInfo& info) = 0;
+	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info) = 0;
 
-	virtual void press_note(SampleInfo& info, unsigned int note, double velocity) = 0;
+	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) = 0;
 
-	virtual void release_note(SampleInfo& info, unsigned int note) = 0;
+	virtual void release_note(SampleInfo& info, unsigned int real_note) = 0;
 
 	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info) = 0;
 
@@ -84,9 +84,9 @@ public:
 	std::atomic<bool> sustain{true};
 
 
-	virtual bool midi_message(MidiMessage& msg, SampleInfo& info);
+	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info);
 
-	virtual void press_note(SampleInfo& info, unsigned int note, double velocity);
+	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity);
 
 	virtual void release_note(SampleInfo& info, unsigned int note);
 
@@ -115,12 +115,12 @@ public:
 
 //BaseSoundEngine
 template<typename V, size_t P>
-bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info) {
+bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, int transpose, SampleInfo& info) {
 	double pitch;
 	bool changed = false;
 	switch (message.type) {
 		case MessageType::NOTE_ON:
-			press_note(info, message.note(), message.velocity()/127.0);
+			press_note(info, message.note(), message.note() + transpose, message.velocity()/127.0);
 			break;
 		case MessageType::NOTE_OFF:
 			release_note(info, message.note());
@@ -152,8 +152,8 @@ bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, SampleInfo& info)
 }
 
 template<typename V, size_t P>
-void BaseSoundEngine<V, P>::press_note(SampleInfo& info, unsigned int note, double velocity) {
-	this->note.press_note(info, note, velocity);
+void BaseSoundEngine<V, P>::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
+	this->note.press_note(info, real_note, note, velocity);
 }
 
 template<typename V, size_t P>

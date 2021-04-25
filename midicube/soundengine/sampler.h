@@ -143,7 +143,7 @@ public:
 
 	bool note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index);
 
-	void press_note(SampleInfo& info, unsigned int note, double velocity);
+	void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity);
 
 	void release_note(SampleInfo& info, unsigned int note);
 

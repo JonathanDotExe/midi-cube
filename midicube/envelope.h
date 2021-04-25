@@ -17,6 +17,7 @@ struct TriggeredNote {
 	double start_time = 0;
 	bool pressed = false;
 	double release_time = 0;
+	unsigned int real_note = 0;
 	unsigned int note = 0;
 	double freq = 0;
 	double velocity = 0;

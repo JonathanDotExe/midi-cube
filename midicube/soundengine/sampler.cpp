@@ -192,8 +192,8 @@ bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnviro
 	return true;
 }
 
-void Sampler::press_note(SampleInfo& info, unsigned int note, double velocity) {
-	size_t slot = this->note.press_note(info, note, velocity);
+void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
+	size_t slot = this->note.press_note(info, real_note, note, velocity);
 	SamplerVoice& voice = this->note.note[slot];
 	if (this->sample) {
 		this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);

@@ -110,9 +110,6 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 				pass = pass && s.start_note <= message.note() && s.end_note >= message.note();
 				/* no break */
 			case MessageType::NOTE_OFF:
-				if (s.octave) {
-					msg.note() += s.octave * 12;
-				}
 				break;
 			case MessageType::CONTROL_CHANGE:
 				pass = s.transfer_cc;
@@ -144,7 +141,7 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	//Effects
 	for (auto& e : this->engine.effects) {
 		if (e.get_effect()) {
-			if (e.get_effect()->midi_message(message, info)) {
+			if (e.get_effect()->midi_message(message, info)) { //FIXME octave wll be ignored here
 				updated = true;
 			}
 		}

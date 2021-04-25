@@ -41,10 +41,11 @@ public:
 		}
 	}
 
-	size_t press_note(SampleInfo& info, unsigned int note, double velocity) {
+	size_t press_note(SampleInfo& info, unsigned int note, unsigned int real_note, double velocity) {
 		size_t slot = next_freq_slot(info);
 		this->note[slot].freq = note_to_freq(note);
 		this->note[slot].velocity = velocity;
+		this->note[slot].real_note = real_note;
 		this->note[slot].note = note;
 		this->note[slot].pressed = true;
 		this->note[slot].start_time = info.time;
@@ -55,10 +56,9 @@ public:
 	}
 
 
-	void release_note(SampleInfo& info, unsigned int note, bool invalidate = false) {
-		double f = note_to_freq(note);
+	void release_note(SampleInfo& info, unsigned int real_note, bool invalidate = false) {
 		for (size_t i = 0; i < P; ++i) {
-			if (this->note[i].freq == f && this->note[i].pressed) {
+			if (this->note[i].real_note == real_note && this->note[i].pressed) {
 				this->note[i].pressed = false;
 				this->note[i].release_time = info.time;
 				if (invalidate) {

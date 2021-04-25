@@ -123,8 +123,8 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			//Arpeggiator
 			if (arp.on) {
 				arp.apply(info,
-				[this](SampleInfo& i, unsigned int note, double velocity) {
-					engine->press_note(i, note, velocity);
+				[this, scene](SampleInfo& i, unsigned int note, double velocity) {
+					engine->press_note(i, note, note + scenes[scene].source.octave, velocity);
 				},
 				[this](SampleInfo& i, unsigned int note) {
 					engine->release_note(i, note);
@@ -159,18 +159,18 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t sce
 		if (arp.on) {
 			switch (message.type) {
 			case MessageType::NOTE_ON:
-				arp.note.press_note(info, message.note(), message.velocity()/127.0);
+				arp.note.press_note(info, message.note(), message.note(), message.velocity()/127.0);
 				break;
 			case MessageType::NOTE_OFF:
 				arp.note.release_note(info, message.note(), true);
 				break;
 			default:
-				updated = engine->midi_message(message, info) || updated; //FIXME
+				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info) || updated; //FIXME
 				break;
 			}
 		}
 		else {
-			updated = engine->midi_message(message, info) || updated;
+			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info) || updated;
 		}
 	}
 	return updated;
