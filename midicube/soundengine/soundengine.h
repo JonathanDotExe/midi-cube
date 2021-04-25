@@ -445,6 +445,7 @@ public:
 	std::array<MasterEffect, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
 	double volume{0.2};
 	std::atomic<size_t> scene{0};
+	std::array<unsigned int, SOUND_ENGINE_SCENE_AMOUNT> scene_ccs = {52, 53, 54, 55, 57, 58, 59, 60};
 
 	SoundEngineDevice();
 
