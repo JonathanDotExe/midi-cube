@@ -45,11 +45,12 @@ bool MidiControlHandler::on_message(MidiMessage msg) {
 }
 
 void MidiControlHandler::set_ccs(std::unordered_map<std::string, unsigned int> ccs) {
-	for (auto cc : ccs) {
-		for (ControlBinding* b : bindings) {
-			if (b->name == cc.first) {
-				b->name = cc.second;
-			}
+	for (ControlBinding* b : bindings) {
+		if (ccs.find(b->name) != ccs.end()) {
+			b->cc = ccs.at(b->name);
+		}
+		else {
+			b->cc = b->default_cc;
 		}
 	}
 }

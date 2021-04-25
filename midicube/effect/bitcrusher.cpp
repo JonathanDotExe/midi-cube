@@ -56,6 +56,7 @@ void BitCrusherEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new BitCrusherProgram();
 	}
+	p->ccs = cc.get_ccs();
 	p->preset = preset;
 	*prog = p;
 }
@@ -64,9 +65,11 @@ void BitCrusherEffect::apply_program(EffectProgram *prog) {
 	BitCrusherProgram* p = dynamic_cast<BitCrusherProgram*>(prog);
 	//Create new
 	if (p) {
+		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
+		cc.set_ccs({});
 		preset = {};
 	}
 }

@@ -15,6 +15,7 @@
 class ControlBinding {
 public:
 	unsigned int cc = 0;
+	unsigned int default_cc = 0;
 	std::string name;
 	ControlBinding(std::string n) : name(n) {
 
@@ -35,6 +36,7 @@ public:
 
 	TemplateControlBinding(std::string name, T& f, T mn, T mx, unsigned int cc = 128) : ControlBinding(name), field(f), min(mn), max(mx) {
 		this->cc = cc;
+		this->default_cc = cc;
 	}
 
 	void change(unsigned int value);

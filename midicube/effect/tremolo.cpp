@@ -66,6 +66,7 @@ void TremoloEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new TremoloProgram();
 	}
+	p->ccs = cc.get_ccs();
 	p->preset = preset;
 	*prog = p;
 }
@@ -74,9 +75,11 @@ void TremoloEffect::apply_program(EffectProgram *prog) {
 	TremoloProgram* p = dynamic_cast<TremoloProgram*>(prog);
 	//Create new
 	if (p) {
+		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
+		cc.set_ccs({});
 		preset = {};
 	}
 }

@@ -115,6 +115,7 @@ void RotarySpeakerEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new RotarySpeakerProgram();
 	}
+	p->ccs = cc.get_ccs();
 	p->preset = preset;
 	*prog = p;
 }
@@ -123,9 +124,11 @@ void RotarySpeakerEffect::apply_program(EffectProgram *prog) {
 	RotarySpeakerProgram* p = dynamic_cast<RotarySpeakerProgram*>(prog);
 	//Create new
 	if (p) {
+		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
+		cc.set_ccs({});
 		preset = {};
 	}
 }

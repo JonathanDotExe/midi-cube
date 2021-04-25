@@ -102,6 +102,7 @@ void AmplifierSimulationEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new AmplifierSimulationProgram();
 	}
+	p->ccs = cc.get_ccs();
 	p->preset = preset;
 	*prog = p;
 }
@@ -110,9 +111,11 @@ void AmplifierSimulationEffect::apply_program(EffectProgram *prog) {
 	AmplifierSimulationProgram* p = dynamic_cast<AmplifierSimulationProgram*>(prog);
 	//Create new
 	if (p) {
+		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
+		cc.set_ccs({});
 		preset = {};
 	}
 }

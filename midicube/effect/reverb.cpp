@@ -76,6 +76,7 @@ void ReverbEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new ReverbProgram();
 	}
+	p->ccs = cc.get_ccs();
 	p->preset = preset;
 	*prog = p;
 }
@@ -84,9 +85,11 @@ void ReverbEffect::apply_program(EffectProgram *prog) {
 	ReverbProgram* p = dynamic_cast<ReverbProgram*>(prog);
 	//Create new
 	if (p) {
+		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
+		cc.set_ccs({});
 		preset = {};
 	}
 }
