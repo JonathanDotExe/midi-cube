@@ -50,15 +50,15 @@ void SampleSound::get_sample(double freq, double velocity, SamplerVoice& voice, 
 		}
 	}
 	//Update zone
-	voice.zone = zone;
-	if (voice.zone) {
-		voice.layer_amp = (1 - voice.zone->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel))) * volume;
-		voice.sample = (sustain && voice.zone->sustain_sample.sample.samples.size()) ? &voice.zone->sustain_sample : &voice.zone->sample;
-		if (voice.zone->env >= 0 && (size_t) voice.zone->env < envelopes.size()) {
-			voice.env_data = &envelopes[voice.zone->env];
+	voice.region = zone;
+	if (voice.region) {
+		voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel))) * volume;
+		voice.sample = (sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample;
+		if (voice.region->env >= 0 && (size_t) voice.region->env < envelopes.size()) {
+			voice.env_data = &envelopes[voice.region->env];
 		}
-		if (voice.zone->filter >= 0 && (size_t) voice.zone->filter < filters.size()) {
-			voice.filter = &filters[voice.zone->filter];
+		if (voice.region->filter >= 0 && (size_t) voice.region->filter < filters.size()) {
+			voice.filter = &filters[voice.region->filter];
 		}
 	}
 }
@@ -110,7 +110,7 @@ Sampler::Sampler() {
 }
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	if (note.zone && note.sample) {
+	if (note.region && note.sample) {
 		double vol = 1;
 		double vel_amount = 0;
 
@@ -119,7 +119,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		double crossfade = 1;
 		//Sound
 		//Loop
-		if (note.zone->loop) {
+		if (note.region->loop) {
 			double loop_start_time = (double) note.sample->loop_start / note.sample->sample.sample_rate;
 			double loop_duration_time = (double) note.sample->loop_duration / note.sample->sample.sample_rate;
 			double loop_crossfade_time = (double) note.sample->loop_crossfade / note.sample->sample.sample_rate;
@@ -174,7 +174,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		vol *= vel_amount * (note.velocity - 1) + 1;
 		vol *= note.layer_amp;
 
-		note.time += note.freq/note.zone->freq * env.pitch_bend * info.time_step;
+		note.time += note.freq/note.region->freq * env.pitch_bend * info.time_step;
 		//Playback
 		lsample += l * vol;
 		rsample += r * vol;
@@ -186,32 +186,31 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 }
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	if (note.zone && note.sample) {
+	if (note.region && note.sample) {
 		return note.env_data->sustain_entire_sample ? note.time < note.sample->sample.duration() : note.env.is_finished();
 	}
 	return true;
 }
 
 void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
-	size_t slot = this->note.press_note(info, real_note, note, velocity);
-	SamplerVoice& voice = this->note.note[slot];
 	if (this->sample) {
-		this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);
+		for (SampleRegion* region : index.velocities[velocity][note]) {
+			size_t slot = this->note.press_note(info, real_note, note, velocity);
+			SamplerVoice& voice = this->note.note[slot];
+			voice.region = region;
+			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity)/(voice.region->max_velocity - voice.region->min_velocity))) * sample->volume;
+			voice.sample = (sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample;
+
+			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
+				voice.time = voice.sample->loop_start;
+			}
+			else {
+				voice.time = 0;
+			}
+			voice.hit_loop = false;
+			voice.env.reset();
+		}
 	}
-	else {
-		voice.zone = nullptr;
-		voice.sample = nullptr;
-		voice.filter = nullptr;
-		voice.env_data = nullptr;
-	}
-	if (voice.zone && voice.zone->loop == LoopType::ALWAYS_LOOP) {
-		voice.time = voice.sample->loop_start;
-	}
-	else {
-		voice.time = 0;
-	}
-	voice.hit_loop = false;
-	voice.env.reset();
 }
 
 void Sampler::release_note(SampleInfo& info, unsigned int note) {

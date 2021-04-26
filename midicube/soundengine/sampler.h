@@ -76,6 +76,7 @@ struct SampleRegion {
 	unsigned int min_note = 0;
 	unsigned int max_note = 127;
 	double freq = 440;
+	double layer_velocity_amount = 0.0;
 
 	LoopedAudioSample sample;
 	LoopedAudioSample sustain_sample;
@@ -89,10 +90,8 @@ struct SamplerVoice : public TriggeredNote {
 	double time = 0;
 	bool hit_loop = false;
 	double layer_amp = 1;
-	SampleZone* zone = nullptr;
+	SampleRegion* region = nullptr;
 	LoopedAudioSample* sample = nullptr;
-	SampleEnvelope* env_data = nullptr;
-	SampleFilter* filter = nullptr;
 	LinearADSREnvelope env;
 	Filter lfilter;
 	Filter rfilter;
