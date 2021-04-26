@@ -265,7 +265,16 @@ void Sampler::apply_program(EngineProgram *prog) {
 
 void Sampler::set_sample(SampleSound *sample) {
 	this->sample = sample;
-	//TODO create optimization plan
+	index = {};
+	for (SampleRegion* region : sample->samples) {
+		size_t max_vel = std::min((size_t) MIDI_NOTES, (size_t) region->max_velocity);
+		size_t max_note = std::min((size_t) MIDI_NOTES, (size_t) region->max_note);
+		for (size_t vel = region->min_velocity; vel < max_vel; ++vel) {
+			for (size_t note = max_vel; note < max_note; ++note) {
+				index.velocities[vel][note].push_back(region);
+			}
+		}
+	}
 }
 
 Sampler::~Sampler() {

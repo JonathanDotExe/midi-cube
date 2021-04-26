@@ -12,6 +12,8 @@
 #include "../audiofile.h"
 #include "../envelope.h"
 
+#define MIDI_NOTES 128
+
 enum LoopType {
 	NO_LOOP, ATTACK_LOOP, ALWAYS_LOOP
 };
@@ -96,13 +98,15 @@ struct SamplerVoice : public TriggeredNote {
 	Filter rfilter;
 };
 
+struct SampleRegionIndex {
+	std::array<std::array<std::vector<SampleRegion*>, MIDI_NOTES>, MIDI_NOTES> velocities;
+};
+
 class SampleSound {
 public:
 	std::string name = "Sample";
 	double volume = 1;
-	std::vector<SampleEnvelope> envelopes = {};
-	std::vector<SampleFilter> filters = {};
-	std::vector<SampleVelocityLayer*> samples = {};
+	std::vector<SampleRegion*> samples = {};
 
 	SampleSound();
 
@@ -148,6 +152,7 @@ class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 
 private:
 	SampleSound* sample;
+	SampleRegionIndex index;
 
 	void set_sample (SampleSound* sample);
 
