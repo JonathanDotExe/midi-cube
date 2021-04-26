@@ -239,6 +239,33 @@ Sampler::~Sampler() {
 	set_sample(nullptr);
 }
 
+void load_region(pt::ptree tree, SampleRegion& region, bool load_sample) {
+	//TODO
+}
+
+void load_groups(pt::ptree tree, std::vector<SampleRegion>& regions, SampleRegion region) {
+	for (auto c : tree) {
+		SampleRegion r = region;
+		pt::ptree t = c.second;
+
+		load_region(tree, r, false);
+
+		//Regions
+		auto rs = t.get_child_optional("regions");
+		if (rs) {
+			for (auto re : rs.get()) {
+				regions.push_back(r);
+				load_region(re.second, regions.at(regions.size() - 1), true);
+			}
+		}
+		//Groups
+		auto groups = t.get_child_optional("groups");
+		if (groups) {
+			load_groups(groups.get(), regions, r);
+		}
+
+	}
+}
 
 extern SampleSound* load_sound(std::string folder) {
 	//Load file
@@ -251,6 +278,8 @@ extern SampleSound* load_sound(std::string folder) {
 		sound = new SampleSound();
 		sound->name = tree.get<std::string>("sound.name", "Sound");
 		sound->volume = tree.get<double>("sound.volume", 1);
+		//Load groups
+
 		//Load Envelopes
 		for (auto e : tree.get_child("sound.envelopes")) {
 			SampleEnvelope env = {};
