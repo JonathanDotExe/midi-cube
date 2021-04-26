@@ -43,7 +43,6 @@ struct SampleZone {
 	LoopedAudioSample sustain_sample;
 	LoopType loop = NO_LOOP;
 
-
 	double layer_velocity_amount = 0.0;
 	double freq = 0;
 	double max_freq = 0;
@@ -67,6 +66,21 @@ struct SampleVelocityLayer {
 		}
 		zones.clear();
 	}
+};
+
+struct SampleRegion {
+	unsigned int min_velocity = 0;
+	unsigned int max_velocity = 127;
+	unsigned int min_note = 0;
+	unsigned int max_note = 127;
+	double freq = 440;
+
+	LoopedAudioSample sample;
+	LoopedAudioSample sustain_sample;
+	LoopType loop = NO_LOOP;
+
+	SampleFilter filter;
+	SampleEnvelope env;
 };
 
 struct SamplerVoice : public TriggeredNote {
