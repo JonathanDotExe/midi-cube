@@ -19,6 +19,7 @@ enum LoopType {
 };
 
 struct SampleFilter {
+	bool on = false;
 	FilterType filter_type = FilterType::LP_12;
 	double filter_cutoff = 1;
 	double filter_resonance = 0;

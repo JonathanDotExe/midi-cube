@@ -148,29 +148,29 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		r += note.sample->sample.isample(1, note.time, info.sample_rate) * crossfade;
 
 		//Filter
-		if (note.filter) {
-			FilterData filter { note.filter->filter_type };
-			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.filter->filter_cutoff + note.filter->filter_velocity_amount * note.velocity))); //TODO optimize
-			filter.resonance = note.filter->filter_resonance;
+		if (note.region->filter.on) {
+			FilterData filter { note.region->filter.filter_type };
+			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.region->filter.filter_cutoff + note.region->filter.filter_velocity_amount * note.velocity))); //TODO optimize
+			filter.resonance = note.region->filter.filter_resonance;
 
-			if (note.filter->filter_kb_track) {
+			if (note.region->filter.filter_kb_track) {
 				double cutoff = filter.cutoff;
 				//KB track
-				cutoff *= 1 + ((double) note.note - 36) / 12.0 * note.filter->filter_kb_track;
+				cutoff *= 1 + ((double) note.note - 36) / 12.0 * note.region->filter.filter_kb_track;
 				filter.cutoff = cutoff;
 			}
 
 			l = note.lfilter.apply(filter, l, info.time_step);
 			r = note.rfilter.apply(filter, r, info.time_step);
 		}
+
 		//Env
-		if (note.env_data) {
-			if (!note.env_data->sustain_entire_sample) {
-				//Volume
-				vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
-				vel_amount += note.env_data->amp_velocity_amount;
-			}
+		if (!note.region->env.sustain_entire_sample) {
+			//Volume
+			vol = note.env.amplitude(note.region->env.env, info.time_step, note.pressed, env.sustain);
+			vel_amount += note.region->env.amp_velocity_amount;
 		}
+
 		vol *= vel_amount * (note.velocity - 1) + 1;
 		vol *= note.layer_amp;
 
@@ -187,7 +187,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.region && note.sample) {
-		return note.env_data->sustain_entire_sample ? note.time < note.sample->sample.duration() : note.env.is_finished();
+		return note.region->env.sustain_entire_sample ? note.time < note.sample->sample.duration() : note.env.is_finished();
 	}
 	return true;
 }
