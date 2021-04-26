@@ -41,36 +41,6 @@ struct LoopedAudioSample {
 	unsigned int loop_crossfade = 0;
 };
 
-struct SampleZone {
-	LoopedAudioSample sample;
-	LoopedAudioSample sustain_sample;
-	LoopType loop = NO_LOOP;
-
-	double layer_velocity_amount = 0.0;
-	double freq = 0;
-	double max_freq = 0;
-	ssize_t filter = -1;
-	ssize_t env = -1;
-
-	SampleZone () {
-		sample.sample.clear();
-		sustain_sample.sample.clear();
-	};
-
-};
-
-struct SampleVelocityLayer {
-	double max_velocity;
-	std::vector<SampleZone*> zones = {};
-
-	~SampleVelocityLayer() {
-		for (SampleZone* zone : zones) {
-			delete zone;
-		}
-		zones.clear();
-	}
-};
-
 struct SampleRegion {
 	unsigned int min_velocity = 0;
 	unsigned int max_velocity = 127;
@@ -85,6 +55,11 @@ struct SampleRegion {
 
 	SampleFilter filter;
 	SampleEnvelope env;
+
+	SampleRegion() {
+		sample.sample.clear();
+		sustain_sample.sample.clear();
+	};
 };
 
 struct SamplerVoice : public TriggeredNote {
@@ -109,8 +84,6 @@ public:
 	std::vector<SampleRegion*> samples = {};
 
 	SampleSound();
-
-	void get_sample(double freq, double velocity, SamplerVoice& voic, bool sustain);
 
 	~SampleSound();
 

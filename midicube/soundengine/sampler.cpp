@@ -22,47 +22,6 @@ SampleSound::SampleSound() {
 
 }
 
-void SampleSound::get_sample(double freq, double velocity, SamplerVoice& voice, bool sustain) {
-	//Find regions
-	double last_vel = 0;
-	double curr_vel = 0;
-	SampleZone* zone = nullptr;
-	const size_t velocity_size = samples.size();
-	if (velocity_size >= 1) {
-		size_t i = 0;
-		for (; i < velocity_size; ++i) {
-			curr_vel = samples[i]->max_velocity;
-			if (velocity <= samples[i]->max_velocity) {
-				break;
-			}
-			last_vel = samples[i]->max_velocity;
-		}
-		SampleVelocityLayer* layer = samples[std::max((ssize_t) 0, (ssize_t) i - 1)];
-		const size_t zones_size = layer->zones.size();
-		if (zones_size >= 1) {
-			size_t j = 0;
-			for (; j < zones_size; ++j) {
-				if (freq <= layer->zones[j]->max_freq) {
-					break;
-				}
-			}
-			zone = layer->zones[std::max((ssize_t) 0, (ssize_t) j - 1)];
-		}
-	}
-	//Update zone
-	voice.region = zone;
-	if (voice.region) {
-		voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel))) * volume;
-		voice.sample = (sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample;
-		if (voice.region->env >= 0 && (size_t) voice.region->env < envelopes.size()) {
-			voice.env_data = &envelopes[voice.region->env];
-		}
-		if (voice.region->filter >= 0 && (size_t) voice.region->filter < filters.size()) {
-			voice.filter = &filters[voice.region->filter];
-		}
-	}
-}
-
 SampleSound::~SampleSound() {
 	for (size_t i = 0; i < samples.size(); ++i) {
 		delete samples[i];
