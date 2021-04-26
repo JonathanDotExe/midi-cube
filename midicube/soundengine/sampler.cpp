@@ -240,7 +240,38 @@ Sampler::~Sampler() {
 }
 
 void load_region(pt::ptree tree, SampleRegion& region, bool load_sample) {
-	//TODO
+	region.env.amp_velocity_amount = tree.get<double>("envelope.velocity_amount", 0);
+	region.env.env.attack = tree.get<double>("envelope.attack", 0);
+	region.env.env.decay = tree.get<double>("envelope.decay", 0);
+	region.env.env.sustain = tree.get<double>("envelope.sustain", 1);
+	region.env.env.release = tree.get<double>("envelope.release", 0);
+	region.env.sustain_entire_sample = tree.get<bool>("envelope.sustain_entire_sample", false);
+
+	region.filter.filter_cutoff = tree.get<double>("filter.cutoff", 1);
+	region.filter.filter_kb_track = tree.get<double>("filter.kb_track", 0);
+	region.filter.filter_kb_track_note = tree.get<unsigned int>("filter.kb_track_note", 36);
+	region.filter.filter_resonance = tree.get<double>("filter.resonance", 0);
+	region.filter.filter_velocity_amount = tree.get<double>("filter.velocity_amount", 0);
+
+	std::string type = tree.get<std::string>("filter.type");
+	if (type == "LP_12") {
+		region.filter.filter_type = FilterType::LP_12;
+	}
+	else if (type == "LP_24") {
+		region.filter.filter_type = FilterType::LP_24;
+	}
+	else if (type == "HP_12") {
+		region.filter.filter_type = FilterType::HP_12;
+	}
+	else if (type == "HP_24") {
+		region.filter.filter_type = FilterType::HP_24;
+	}
+	else if (type == "BP_12") {
+		region.filter.filter_type = FilterType::LP_12;
+	}
+	else if (type == "BP_24") {
+		region.filter.filter_type = FilterType::LP_24;
+	}
 }
 
 void load_groups(pt::ptree tree, std::vector<SampleRegion>& regions, SampleRegion region) {
