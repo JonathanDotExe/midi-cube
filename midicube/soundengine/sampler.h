@@ -149,6 +149,8 @@ class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 private:
 	SampleSound* sample;
 
+	void set_sample (SampleSound* sample);
+
 public:
 
 	Sampler();

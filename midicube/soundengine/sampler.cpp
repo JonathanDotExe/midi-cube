@@ -106,7 +106,7 @@ SampleSoundStore::~SampleSoundStore() {
 
 //Sampler
 Sampler::Sampler() {
-	sample = global_sample_store.get_sound(0);
+	set_sample(global_sample_store.get_sound(0));
 }
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
@@ -233,10 +233,10 @@ ssize_t Sampler::get_sound_index() {
 
 void Sampler::set_sound_index(ssize_t index) {
 	if (index < 0) {
-		sample = nullptr;
+		set_sample(nullptr);
 	}
 	else {
-		sample = global_sample_store.get_sound(index);
+		set_sample(global_sample_store.get_sound(index));
 	}
 }
 
@@ -256,15 +256,20 @@ void Sampler::apply_program(EngineProgram *prog) {
 	SamplerProgram* p = dynamic_cast<SamplerProgram*>(prog);
 	//Create new
 	if (p) {
-		sample = global_sample_store.get_sound(p->sound_name);
+		set_sample(global_sample_store.get_sound(p->sound_name));
 	}
 	else {
-		sample = nullptr;
+		set_sample(nullptr);
 	}
 }
 
+void Sampler::set_sample(SampleSound *sample) {
+	this->sample = sample;
+	//TODO create optimization plan
+}
+
 Sampler::~Sampler() {
-	sample = nullptr;
+	set_sample(nullptr);
 }
 
 
