@@ -320,7 +320,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	 */
 }
 
-void load_groups(pt::ptree tree, std::vector<SampleRegion>& regions, SampleRegion region, std::string folder) {
+void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegion region, std::string folder) {
 	for (auto c : tree) {
 		SampleRegion r = region;
 		pt::ptree t = c.second;
@@ -331,8 +331,8 @@ void load_groups(pt::ptree tree, std::vector<SampleRegion>& regions, SampleRegio
 		auto rs = t.get_child_optional("regions");
 		if (rs) {
 			for (auto re : rs.get()) {
-				regions.push_back(r);
-				load_region(re.second, regions.at(regions.size() - 1), true, folder);
+				regions.push_back(new SampleRegion(r));
+				load_region(re.second, *regions.at(regions.size() - 1), true, folder);
 			}
 		}
 		//Groups
@@ -356,105 +356,9 @@ extern SampleSound* load_sound(std::string folder) {
 		sound->name = tree.get<std::string>("sound.name", "Sound");
 		sound->volume = tree.get<double>("sound.volume", 1);
 		//Load groups
-
-		//Load Envelopes
-		for (auto e : tree.get_child("sound.envelopes")) {
-			SampleEnvelope env = {};
-			env.amp_velocity_amount = e.second.get<double>("velocity_amount", 0);
-			env.env.attack = e.second.get<double>("attack", 0);
-			env.env.decay = e.second.get<double>("decay", 0);
-			env.env.sustain = e.second.get<double>("sustain", 1);
-			env.env.release = e.second.get<double>("release", 0);
-			env.sustain_entire_sample = e.second.get<bool>("sustain_entire_sample", false);
-
-			sound->envelopes.push_back(env);
-		}
-		//Load Filters
-		for (auto f : tree.get_child("sound.filters")) {
-			SampleFilter filter = {};
-			filter.filter_cutoff = f.second.get<double>("cutoff", 1);
-			filter.filter_kb_track = f.second.get<double>("kb_track", 0);
-			filter.filter_kb_track_note = f.second.get<unsigned int>("kb_track_note", 36);
-			filter.filter_resonance = f.second.get<double>("resonance", 0);
-			filter.filter_velocity_amount = f.second.get<double>("velocity_amount", 0);
-
-			std::string type = f.second.get<std::string>("type");
-			if (type == "LP_12") {
-				filter.filter_type = FilterType::LP_12;
-			}
-			else if (type == "LP_24") {
-				filter.filter_type = FilterType::LP_24;
-			}
-			else if (type == "HP_12") {
-				filter.filter_type = FilterType::HP_12;
-			}
-			else if (type == "HP_24") {
-				filter.filter_type = FilterType::HP_24;
-			}
-			else if (type == "BP_12") {
-				filter.filter_type = FilterType::LP_12;
-			}
-			else if (type == "BP_24") {
-				filter.filter_type = FilterType::LP_24;
-			}
-
-			sound->filters.push_back(filter);
-		}
-		//Load velocity layers
-		for (auto r : tree.get_child("sound.velocity_layers")) {
-			SampleVelocityLayer* layer = new SampleVelocityLayer();
-			layer->max_velocity = r.second.get<double>("velocity", 1.0);
-			//Load zones
-			for (auto z : r.second.get_child("zones")) {
-				SampleZone* zone = new SampleZone();
-				zone->freq = note_to_freq(z.second.get<double>("note", 60.0));
-				zone->layer_velocity_amount = z.second.get<double>("layer_velocity_amount", 0);
-				zone->max_freq = note_to_freq(z.second.get<double>("max_note", 127.0));
-				zone->env = z.second.get<double>("envelope", 0);
-				zone->filter = z.second.get<double>("filter", 0);
-				//Loop
-				std::string type = z.second.get<std::string>("loop_type", "NO_LOOP");
-				if (type == "NO_LOOP") {
-					zone->loop = LoopType::NO_LOOP;
-				}
-				else if (type == "ATTACK_LOOP") {
-					zone->loop = LoopType::ATTACK_LOOP;
-				}
-				else if (type == "ALWAYS_LOOP") {
-					zone->loop = LoopType::ALWAYS_LOOP;
-				}
-				std::string file;
-				//Sample
-				if (z.second.get_child_optional("sample.name")) {
-					file = folder + "/" + z.second.get<std::string>("sample.name", "");
-					zone->sample.loop_start = z.second.get<unsigned int>("sample.loop_start", 0);
-					zone->sample.loop_duration = z.second.get<unsigned int>("sample.loop_duration", 0);
-					zone->sample.loop_crossfade = z.second.get<unsigned int>("sample.loop_crossfade", 0);
-				}
-				else {
-					file = folder + "/" + z.second.get<std::string>("sample", "");
-				}
-				if (!read_audio_file(zone->sample.sample, file)) {
-					std::cerr << "Couldn't load sample file " << file << std::endl;
-				}
-				std::string sfile;
-				if (z.second.get_child_optional("sustain_sample.name")) {
-					sfile = folder + "/" + z.second.get<std::string>("sustain_sample.name", "");
-					zone->sustain_sample.loop_start = z.second.get<unsigned int>("sustain_sample.loop_start", 0);
-					zone->sustain_sample.loop_duration = z.second.get<unsigned int>("sustain_sample.loop_duration", 0);
-					zone->sustain_sample.loop_crossfade = z.second.get<unsigned int>("sustain_sample.loop_crossfade", 0);
-				}
-				else {
-					sfile = folder + "/" + z.second.get<std::string>("sustain_sample", "");
-				}
-				if (sfile != folder + "/") {
-					if (!read_audio_file(zone->sustain_sample.sample, sfile)) {
-						std::cerr << "Couldn't load sample file " << sfile << std::endl;
-					}
-				}
-				layer->zones.push_back(zone);
-			}
-			sound->samples.push_back(layer);
+		auto groups = tree.get_child_optional("sound.groups");
+		if (groups) {
+			load_groups(groups.get(), sound->samples, {}, folder);
 		}
 	}
 	catch (pt::xml_parser_error& e) {
