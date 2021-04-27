@@ -239,21 +239,21 @@ Sampler::~Sampler() {
 	set_sample(nullptr);
 }
 
-void load_region(pt::ptree tree, SampleRegion& region, bool load_sample) {
-	region.env.amp_velocity_amount = tree.get<double>("envelope.velocity_amount", 0);
-	region.env.env.attack = tree.get<double>("envelope.attack", 0);
-	region.env.env.decay = tree.get<double>("envelope.decay", 0);
-	region.env.env.sustain = tree.get<double>("envelope.sustain", 1);
-	region.env.env.release = tree.get<double>("envelope.release", 0);
-	region.env.sustain_entire_sample = tree.get<bool>("envelope.sustain_entire_sample", false);
+void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::string folder) {
+	region.env.amp_velocity_amount = tree.get<double>("envelope.velocity_amount", region.env.amp_velocity_amount);
+	region.env.env.attack = tree.get<double>("envelope.attack", region.env.env.attack);
+	region.env.env.decay = tree.get<double>("envelope.decay", region.env.env.decay);
+	region.env.env.sustain = tree.get<double>("envelope.sustain", region.env.env.sustain);
+	region.env.env.release = tree.get<double>("envelope.release", region.env.env.release);
+	region.env.sustain_entire_sample = tree.get<bool>("envelope.sustain_entire_sample", region.env.sustain_entire_sample);
 
-	region.filter.filter_cutoff = tree.get<double>("filter.cutoff", 1);
-	region.filter.filter_kb_track = tree.get<double>("filter.kb_track", 0);
-	region.filter.filter_kb_track_note = tree.get<unsigned int>("filter.kb_track_note", 36);
-	region.filter.filter_resonance = tree.get<double>("filter.resonance", 0);
-	region.filter.filter_velocity_amount = tree.get<double>("filter.velocity_amount", 0);
+	region.filter.filter_cutoff = tree.get<double>("filter.cutoff", region.filter.filter_cutoff);
+	region.filter.filter_kb_track = tree.get<double>("filter.kb_track", region.filter.filter_kb_track);
+	region.filter.filter_kb_track_note = tree.get<unsigned int>("filter.kb_track_note", region.filter.filter_kb_track_note);
+	region.filter.filter_resonance = tree.get<double>("filter.resonance", region.filter.filter_resonance);
+	region.filter.filter_velocity_amount = tree.get<double>("filter.velocity_amount", region.filter.filter_velocity_amount);
 
-	std::string type = tree.get<std::string>("filter.type");
+	std::string type = tree.get<std::string>("filter.type", "");
 	if (type == "LP_12") {
 		region.filter.filter_type = FilterType::LP_12;
 	}
@@ -272,27 +272,73 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample) {
 	else if (type == "BP_24") {
 		region.filter.filter_type = FilterType::LP_24;
 	}
+
+	if (tree.get_child_optional("note")) {
+		region.freq = note_to_freq(tree.get<double>("note", 60));
+	}
+	region.min_note = tree.get<double>("min_note", region.min_note);
+	region.max_note = tree.get<double>("max_note", region.max_note);
+	region.min_velocity = tree.get<double>("min_velocity", region.min_velocity);
+	region.max_velocity = tree.get<double>("max_velocity", region.max_velocity);
+
+	std::string file = "";
+	//Sample
+	file = folder + "/" + tree.get<std::string>("sample.name", "");
+	region.sample.loop_start = tree.get<unsigned int>("sample.loop_start", region.sample.loop_start);
+	region.sample.loop_duration = tree.get<unsigned int>("sample.loop_duration", region.sample.loop_start);
+	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_start);
+
+	if (load_sample && file != "") {
+		if (!read_audio_file(region.sample.sample, file)) {
+			std::cerr << "Couldn't load sample file " << file << std::endl;
+		}
+	}
+
+	//Sustain Sample
+	std::string sfile = folder + "/" + tree.get<std::string>("sustain_sample.name", "");
+	region.sustain_sample.loop_start = tree.get<unsigned int>("sustain_sample.loop_start", region.sustain_sample.loop_start);
+	region.sustain_sample.loop_duration = tree.get<unsigned int>("sustain_sample.loop_duration", region.sustain_sample.loop_start);
+	region.sustain_sample.loop_crossfade = tree.get<unsigned int>("sustain_sample.loop_crossfade", region.sustain_sample.loop_start);
+
+	if (load_sample && sfile != "") {
+		if (!read_audio_file(region.sustain_sample.sample, sfile)) {
+			std::cerr << "Couldn't load sustain sample file " << sfile << std::endl;
+		}
+	}
+
+	/*
+	 	unsigned int min_velocity = 0;
+	unsigned int max_velocity = 127;
+	unsigned int min_note = 0;
+	unsigned int max_note = 127;
+	double freq = 440;
+	double layer_velocity_amount = 0.0;
+
+	LoopedAudioSample sample;
+	LoopedAudioSample sustain_sample;
+	LoopType loop = NO_LOOP;
+	 */
 }
 
-void load_groups(pt::ptree tree, std::vector<SampleRegion>& regions, SampleRegion region) {
+void load_groups(pt::ptree tree, std::vector<SampleRegion>& regions, SampleRegion region, std::string folder) {
 	for (auto c : tree) {
 		SampleRegion r = region;
 		pt::ptree t = c.second;
 
-		load_region(tree, r, false);
+		load_region(tree, r, false, folder);
 
 		//Regions
 		auto rs = t.get_child_optional("regions");
 		if (rs) {
 			for (auto re : rs.get()) {
 				regions.push_back(r);
-				load_region(re.second, regions.at(regions.size() - 1), true);
+				load_region(re.second, regions.at(regions.size() - 1), true, folder);
 			}
 		}
 		//Groups
 		auto groups = t.get_child_optional("groups");
 		if (groups) {
-			load_groups(groups.get(), regions, r);
+			load_groups(groups.get(), regions, r, folder);
 		}
 
 	}
