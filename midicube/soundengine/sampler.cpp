@@ -278,8 +278,8 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	}
 	region.min_note = tree.get<double>("min_note", region.min_note);
 	region.max_note = tree.get<double>("max_note", region.max_note);
-	region.min_velocity = tree.get<double>("min_velocity", region.min_velocity);
-	region.max_velocity = tree.get<double>("max_velocity", region.max_velocity);
+	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity * 127) / 127.0;
+	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity * 127) / 127.0;
 
 	std::string file = "";
 	//Sample
