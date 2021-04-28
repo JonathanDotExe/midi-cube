@@ -395,12 +395,22 @@ void SoundEngineDevice::add_effect(EffectBuilder* effect) {
 }
 
 bool SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
+	bool updated = false;
+	//Scene change
+	if (message.type == MessageType::CONTROL_CHANGE) {
+		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
+			if (scene_ccs[i] == message.control()) {
+				scene = i;
+				updated = true;
+			}
+		}
+	}
 	SoundEngineChannel& ch = this->channels[message.channel];
 	SoundEngine* engine = ch.get_engine();
 	if (engine) {
-		return ch.send(message, info, scene);
+		updated = ch.send(message, info, scene) || updated;
 	}
-	return false;
+	return updated;
 }
 
 

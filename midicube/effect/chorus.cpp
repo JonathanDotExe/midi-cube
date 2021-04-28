@@ -51,6 +51,7 @@ EffectProgram* create_effect_program<ChorusEffect>() {
 
 
 void ChorusProgram::load(boost::property_tree::ptree tree) {
+	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
 	preset.vibrato_rate = tree.get<double>("vibrato_rate", 2);
 	preset.vibrato_depth = tree.get<double>("vibrato_depth", 0.5);
@@ -61,7 +62,7 @@ void ChorusProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree ChorusProgram::save() {
-	boost::property_tree::ptree tree;
+	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
 	tree.put("vibrato_rate", preset.vibrato_rate);
 	tree.put("vibrato_depth", preset.vibrato_depth);
@@ -79,6 +80,7 @@ void ChorusEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new ChorusProgram();
 	}
+	p->ccs = cc.get_ccs();
 	p->preset = preset;
 	*prog = p;
 }
@@ -87,9 +89,11 @@ void ChorusEffect::apply_program(EffectProgram *prog) {
 	ChorusProgram* p = dynamic_cast<ChorusProgram*>(prog);
 	//Create new
 	if (p) {
+		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
+		cc.set_ccs({});
 		preset = {};
 	}
 }

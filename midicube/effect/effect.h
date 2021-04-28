@@ -13,15 +13,34 @@
 #include "../midi.h"
 #include "../binding.h"
 
+#include <unordered_map>
+
 #include <boost/property_tree/ptree.hpp>
 
 namespace pt = boost::property_tree;
 
 class EffectProgram {
 public:
-	virtual void load(pt::ptree tree) = 0;
+	std::unordered_map<std::string, unsigned int> ccs;
 
-	virtual pt::ptree save() = 0;
+	virtual void load(pt::ptree tree) {
+		auto ccs = tree.get_child_optional("ccs");
+		if (ccs) {
+			for (auto c : ccs.get()) {
+				std::string name = c.first;
+				unsigned int cc = c.second.get_value<unsigned int>(128);
+				this->ccs.insert(std::pair<std::string, unsigned int>(name, cc));
+			}
+		}
+	}
+
+	virtual pt::ptree save() {
+		pt::ptree tree;
+		for (auto cc : ccs) {
+			tree.add("ccs." + cc.first, cc.second);
+		}
+		return tree;
+	}
 
 	virtual ~EffectProgram() {
 

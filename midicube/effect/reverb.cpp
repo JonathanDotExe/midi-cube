@@ -76,6 +76,7 @@ void ReverbEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new ReverbProgram();
 	}
+	p->ccs = cc.get_ccs();
 	p->preset = preset;
 	*prog = p;
 }
@@ -84,9 +85,11 @@ void ReverbEffect::apply_program(EffectProgram *prog) {
 	ReverbProgram* p = dynamic_cast<ReverbProgram*>(prog);
 	//Create new
 	if (p) {
+		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
+		cc.set_ccs({});
 		preset = {};
 	}
 }
@@ -106,6 +109,7 @@ EffectProgram* create_effect_program<ReverbEffect>() {
 
 
 void ReverbProgram::load(boost::property_tree::ptree tree) {
+	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
 	preset.delay = tree.get<double>("delay", 0.2);
 	preset.decay = tree.get<double>("decay", 0.7);
@@ -117,7 +121,7 @@ void ReverbProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree ReverbProgram::save() {
-	boost::property_tree::ptree tree;
+	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
 	tree.put("delay", preset.delay);
 	tree.put("decay", preset.decay);
