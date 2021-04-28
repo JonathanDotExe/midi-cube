@@ -157,7 +157,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			size_t slot = this->note.press_note(info, real_note, note, velocity);
 			SamplerVoice& voice = this->note.note[slot];
 			voice.region = region;
-			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity)/(voice.region->max_velocity - voice.region->min_velocity))) * sample->volume;
+			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * sample->volume;
 			voice.sample = (sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample;
 
 			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
@@ -224,12 +224,14 @@ void Sampler::apply_program(EngineProgram *prog) {
 void Sampler::set_sample(SampleSound *sample) {
 	this->sample = sample;
 	index = {};
-	for (SampleRegion* region : sample->samples) {
-		size_t max_vel = std::min((size_t) MIDI_NOTES, (size_t) region->max_velocity);
-		size_t max_note = std::min((size_t) MIDI_NOTES, (size_t) region->max_note);
-		for (size_t vel = region->min_velocity; vel < max_vel; ++vel) {
-			for (size_t note = max_vel; note < max_note; ++note) {
-				index.velocities[vel][note].push_back(region);
+	if (sample) {
+		for (SampleRegion* region : sample->samples) {
+			size_t max_vel = std::min((size_t) MIDI_NOTES, (size_t) region->max_velocity);
+			size_t max_note = std::min((size_t) MIDI_NOTES, (size_t) region->max_note);
+			for (size_t vel = region->min_velocity; vel < max_vel; ++vel) {
+				for (size_t note = region->min_note; note < max_note; ++note) {
+					index.velocities[vel][note].push_back(region);
+				}
 			}
 		}
 	}
@@ -276,48 +278,35 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	if (tree.get_child_optional("note")) {
 		region.freq = note_to_freq(tree.get<double>("note", 60));
 	}
-	region.min_note = tree.get<double>("min_note", region.min_note);
-	region.max_note = tree.get<double>("max_note", region.max_note);
-	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity * 127) / 127.0;
-	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity * 127) / 127.0;
+	region.min_note = tree.get<unsigned int>("min_note", region.min_note);
+	region.max_note = tree.get<unsigned int>("max_note", region.max_note);
+	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity);
+	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity);
 
 	std::string file = "";
 	//Sample
-	file = folder + "/" + tree.get<std::string>("sample.name", "");
+	file = tree.get<std::string>("sample.name", "");
 	region.sample.loop_start = tree.get<unsigned int>("sample.loop_start", region.sample.loop_start);
 	region.sample.loop_duration = tree.get<unsigned int>("sample.loop_duration", region.sample.loop_start);
 	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_start);
 
 	if (load_sample && file != "") {
-		if (!read_audio_file(region.sample.sample, file)) {
-			std::cerr << "Couldn't load sample file " << file << std::endl;
+		if (!read_audio_file(region.sample.sample, folder + "/" + file)) {
+			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
 		}
 	}
 
 	//Sustain Sample
-	std::string sfile = folder + "/" + tree.get<std::string>("sustain_sample.name", "");
+	std::string sfile = tree.get<std::string>("sustain_sample.name", "");
 	region.sustain_sample.loop_start = tree.get<unsigned int>("sustain_sample.loop_start", region.sustain_sample.loop_start);
 	region.sustain_sample.loop_duration = tree.get<unsigned int>("sustain_sample.loop_duration", region.sustain_sample.loop_start);
 	region.sustain_sample.loop_crossfade = tree.get<unsigned int>("sustain_sample.loop_crossfade", region.sustain_sample.loop_start);
 
 	if (load_sample && sfile != "") {
-		if (!read_audio_file(region.sustain_sample.sample, sfile)) {
-			std::cerr << "Couldn't load sustain sample file " << sfile << std::endl;
+		if (!read_audio_file(region.sustain_sample.sample, folder + "/" + sfile)) {
+			std::cerr << "Couldn't load sustain sample file " << folder + "/" + sfile << std::endl;
 		}
 	}
-
-	/*
-	 	unsigned int min_velocity = 0;
-	unsigned int max_velocity = 127;
-	unsigned int min_note = 0;
-	unsigned int max_note = 127;
-	double freq = 440;
-	double layer_velocity_amount = 0.0;
-
-	LoopedAudioSample sample;
-	LoopedAudioSample sustain_sample;
-	LoopType loop = NO_LOOP;
-	 */
 }
 
 void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegion region, std::string folder) {
