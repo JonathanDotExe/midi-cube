@@ -16,13 +16,29 @@ enum ParserMode {
 
 SfzInstrument SfzParser::parse(std::string text) {
 	SfzInstrument instrument;
-	std::cout << text << std::endl;
+	boost::replace_all(text, "\r", "");
 	std::vector<std::string> lines = {};
-	boost::split(lines, text, boost::is_any_of(" "));
+	boost::split(lines, text, boost::is_any_of("\n"));
+
+	std::vector<std::string> tokens = {};
+	//Remove comments
+	for (std::string line : lines) {
+		if (line.rfind("//", 0) != 0) {
+			std::vector<std::string> t = {};
+			boost::split(t, line, boost::is_any_of(" "));
+			for (std::string token : t) {
+				tokens.push_back(token);
+			}
+		}
+	}
 
 	//Parse lines
-	for (std::string token : lines) {
-		std::cout << token << std::endl;
+	for (std::string token : tokens) {
+		boost::trim(token);
+		if (token.size() != 0) {
+			//TODO
+			std::cout << token << std::endl;
+		}
 	}
 
 	return instrument;

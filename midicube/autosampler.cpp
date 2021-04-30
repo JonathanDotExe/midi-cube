@@ -390,7 +390,7 @@ void SfzSampleConverter::convert() {
 	std::string t;
 
 	while (getline(f, t)) {
-		text += t;
+		text += t + "\n";
 	}
 
 	parser.parse(text);
