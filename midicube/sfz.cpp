@@ -16,8 +16,10 @@ enum ParserMode {
 
 SfzInstrument SfzParser::parse(std::string text) {
 	SfzInstrument instrument;
+	boost::replace_all(text, "\n", " ");
+	boost::replace_all(text, "\r", " ");
 	std::vector<std::string> lines = {};
-	boost::split(lines, text, std::regex("/[ |\n]/"));
+	boost::split(lines, text, boost::is_any_of(" "));
 
 	//Parse lines
 	for (std::string token : lines) {

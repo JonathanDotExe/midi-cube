@@ -386,7 +386,7 @@ void SfzSampleConverter::request_params() {
 
 void SfzSampleConverter::convert() {
 	std::fstream f(src);
-	std::string file(std::istream_iterator<char>(f), std::istream_iterator<char>());
+	std::string text((std::istream_iterator<char>(f)), std::istream_iterator<char>());
 
-	parser.parse(file);
+	parser.parse(text);
 }
