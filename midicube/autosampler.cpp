@@ -11,6 +11,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <regex>
+#include <fstream>
+#include <streambuf>
 
 namespace pt = boost::property_tree;
 
@@ -375,3 +377,16 @@ void SampleSoundCreator::generate_sound() {
 	}
 }
 
+void SfzSampleConverter::request_params() {
+	std::cout << "Enter input file path!" << std::endl;
+	std::cin >> src;
+	std::cout << "Enter output file path!" << std::endl;
+	std::cin >> dst;
+}
+
+void SfzSampleConverter::convert() {
+	std::fstream f(src);
+	std::string file(std::istream_iterator<char>(f), std::istream_iterator<char>());
+
+	parser.parse(file);
+}

@@ -17,6 +17,7 @@
 #include <rtaudio/RtAudio.h>
 
 #include "audiofile.h"
+#include "sfz.h"
 
 #define AUTOSAMPLER_CHANNELS 2
 
@@ -93,6 +94,20 @@ public:
 	~SampleSoundCreator() {
 
 	}
+};
+
+class SfzSampleConverter {
+private:
+	SfzParser parser;
+	std::string src;
+	std::string dst;
+
+public:
+
+	void request_params();
+
+	void convert();
+
 };
 
 #endif /* MIDICUBE_AUTOSAMPLER_H_ */
