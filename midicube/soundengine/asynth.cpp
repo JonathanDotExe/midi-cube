@@ -677,7 +677,7 @@ static boost::property_tree::ptree save_prop_mod(PropertyModulation mod) {
 	tree.put("velocity_amount", mod.velocity_amount);
 	tree.put("cc", mod.cc);
 	tree.put("cc_amount", mod.cc_amount);
-	tree.put("aftertpuch_amount", mod.aftertouch_amount);
+	tree.put("aftertouch_amount", mod.aftertouch_amount);
 	return tree;
 }
 

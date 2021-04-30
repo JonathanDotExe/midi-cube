@@ -25,7 +25,7 @@ void ChorusEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		//Delay
 		AnalogOscilatorData data = {preset.vibrato_waveform};
 		osc.process(preset.vibrato_rate, info.time_step, data);
-		double del = (1 + osc.carrier(preset.vibrato_rate, info.time_step, data) * preset.vibrato_depth) * preset.delay * 0.2 * info.sample_rate;
+		double del = (1 + osc.carrier(preset.vibrato_rate, info.time_step, data) * preset.vibrato_depth * 0.2) * preset.delay * info.sample_rate;
 		ldelay.add_isample(lsample, del);
 		rdelay.add_isample(rsample, del);
 
