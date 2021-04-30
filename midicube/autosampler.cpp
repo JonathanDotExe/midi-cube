@@ -386,7 +386,12 @@ void SfzSampleConverter::request_params() {
 
 void SfzSampleConverter::convert() {
 	std::fstream f(src);
-	std::string text((std::istream_iterator<char>(f)), std::istream_iterator<char>());
+	std::string text;
+	std::string t;
+
+	while (getline(f, t)) {
+		text += t;
+	}
 
 	parser.parse(text);
 }
