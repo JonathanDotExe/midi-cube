@@ -826,8 +826,9 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			op.env = load_adsr(o.second, "env");
 			op.volume = load_prop_mod(o.second, "volume");
 			op.panning = load_prop_mod(o.second, "panning");
-			op.amp_kb_track_upper = o.second.get<double>("amp_kb_track", 0);
-			op.amp_kb_track_note = o.second.get<int>("filter_kb_track", 60);
+			op.amp_kb_track_upper = o.second.get<double>("amp_kb_track_upper", 0);
+			op.amp_kb_track_lower = o.second.get<double>("amp_kb_track_lower", 0);
+			op.amp_kb_track_note = o.second.get<int>("amp_kb_track_note", 60);
 
 			op.filter = o.second.get<bool>("filter", false);
 			op.pre_filter_drive = o.second.get<bool>("pre_filter_drive", false);
@@ -836,7 +837,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			op.filter_cutoff = load_prop_mod(o.second, "filter_cutoff");
 			op.filter_resonance = load_prop_mod(o.second, "filter_resonance");
 			op.filter_kb_track = o.second.get<double>("filter_kb_track", 0);
-			op.filter_kb_track_note = o.second.get<int>("filter_kb_track", 36);
+			op.filter_kb_track_note = o.second.get<int>("filter_kb_track_note", 36);
 
 			op.oscilator_count = o.second.get<size_t>("oscilator_count", 1);
 
@@ -928,7 +929,8 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		o.add_child("env", save_adsr(op.env));
 		o.add_child("volume", save_prop_mod(op.volume));
 		o.add_child("panning", save_prop_mod(op.panning));
-		o.put("amp_kb_track", op.amp_kb_track_upper);
+		o.put("amp_kb_track_upper", op.amp_kb_track_upper);
+		o.put("amp_kb_track_lower", op.amp_kb_track_lower);
 		o.put("amp_kb_track_note", op.amp_kb_track_note);
 
 		o.put("filter", op.filter);
