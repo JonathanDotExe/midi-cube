@@ -55,7 +55,7 @@ SfzInstrument SfzParser::parse(std::string text) {
 			//Attribute
 			else {
 				size_t index = token.find("=");
-				if (index >= token.size()) {
+				if (index != std::string::npos) {
 					std::string opcode = token.substr(0, index);
 					std::string value = token.substr(index + 1);
 
