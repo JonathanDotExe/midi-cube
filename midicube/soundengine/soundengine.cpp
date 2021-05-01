@@ -124,7 +124,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			if (arp.on) {
 				arp.apply(info,
 				[this, scene](SampleInfo& i, unsigned int note, double velocity) {
-					engine->press_note(i, note, note + scenes[scene].source.octave, velocity);
+					engine->press_note(i, note, note + scenes[scene].source.octave * 12, velocity);
 				},
 				[this](SampleInfo& i, unsigned int note) {
 					engine->release_note(i, note);
