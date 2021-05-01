@@ -382,6 +382,8 @@ void SfzSampleConverter::request_params() {
 	std::cin >> src;
 	std::cout << "Enter output file path!" << std::endl;
 	std::cin >> dst;
+	std::cout << "Enter the name of created instrument!" << std::endl;
+	std::cin >> name;
 }
 
 void SfzSampleConverter::convert() {
@@ -393,5 +395,29 @@ void SfzSampleConverter::convert() {
 		text += t + "\n";
 	}
 
-	parser.parse(text);
+	SfzInstrument instrument = parser.parse(text);
+	std::cout << "Loaded instrument" << std::endl;
+	pt::ptree tree;
+	//Name
+	tree.put("sound.name", name);
+
+	//Groups
+	for (SfzGroup group : instrument.groups) {
+		pt::ptree g;
+		//Regions
+		for (SfzRegion region : group.regions) {
+			pt::ptree r;
+			//TODO parse opcodes
+			g.add_child("regions.region", r);
+		}
+		tree.add_child("sound.groups.group", g);
+	}
+
+	//Save to file
+	try {
+		pt::write_xml(dst + "/sound.xml", tree);
+	}
+	catch (pt::xml_parser_error& e) {
+		std::cerr << "Couldn't save file!" << std::endl;
+	}
 }

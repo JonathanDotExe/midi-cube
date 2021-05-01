@@ -101,6 +101,7 @@ private:
 	SfzParser parser;
 	std::string src;
 	std::string dst;
+	std::string name;
 
 public:
 
