@@ -81,6 +81,7 @@ struct ArpeggiatorPreset {
 	unsigned int octaves = 1;
 	unsigned int value = 1;
 	bool hold = false;
+	bool repeat_edges = false;
 };
 
 class Arpeggiator {

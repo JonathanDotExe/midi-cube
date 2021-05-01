@@ -110,7 +110,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 					}
 				}
 				//Restart from lowest
-				if (next_index < 0) {
+				if (next_index < 0 || (!preset.repeat_edges && next_index == lowest_index)) {
 					next_note = lowest_note;
 					next_index = lowest_index;
 					second = !second;
@@ -140,7 +140,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 					}
 				}
 				//Restart from highest
-				if (next_index < 0) {
+				if (next_index < 0 || (!preset.repeat_edges && next_index == highest_index)) {
 					next_note = highest_note;
 					next_index = highest_index;
 					second = !second;
@@ -174,7 +174,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 					}
 				}
 				//Restart from highest
-				if (next_index < 0) {
+				if (next_index < 0 || (!preset.repeat_edges && next_index == highest_index)) {
 					next_note = highest_note;
 					next_index = highest_index;
 					second = !second;
@@ -209,7 +209,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 					}
 				}
 				//Restart from lowest
-				if (next_index < 0) {
+				if (next_index < 0 || (!preset.repeat_edges && next_index == lowest_index)) {
 					next_note = lowest_note;
 					next_index = lowest_index;
 					second = !second;
