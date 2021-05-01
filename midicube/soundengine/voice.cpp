@@ -24,7 +24,9 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 	if (restart) {
 		second = false;
 		//Keyboard sync
-		metronome.init(info.sample_time);
+		if (preset.kb_sync) {
+			metronome.init(info.sample_time);
+		}
 	}
 	//Pattern
 	if (metronome.is_beat(info.sample_time, info.sample_rate, preset.value)) {
