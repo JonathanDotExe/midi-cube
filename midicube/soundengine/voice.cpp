@@ -22,6 +22,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 		restart = released;
 	}
 	if (restart) {
+		second = false;
 		//Keyboard sync
 		metronome.init(info.sample_time);
 	}
@@ -87,10 +88,120 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 			}
 			break;
 		case ArpeggiatorPattern::ARP_UP_DOWN:
-			//TODO
+			if (second) {
+				//Down
+				next_note = -1;
+				for (size_t i = 0; i < this->note.note.size(); ++i) {
+					if (this->note.note[i].pressed) {
+						if (this->note.note[i].note < lowest_note) {
+							lowest_note = this->note.note[i].note;
+							lowest_index = i;
+						}
+						//Find next lowest note
+						for (unsigned int o = 0; o < preset.octaves; ++o) {
+							int octave = preset.octaves - o - 1;
+							int n = this->note.note[i].note + octave * 12;
+							if (n > next_note && (n < (int) curr_note || (n == (int) curr_note && note_index > i))) {
+								next_note = n;
+								next_index = i;
+								break;
+							}
+						}
+					}
+				}
+				//Restart from lowest
+				if (next_index < 0) {
+					next_note = lowest_note;
+					next_index = lowest_index;
+					second = !second;
+				}
+			}
+			else {
+				//Up
+				for (size_t i = 0; i < this->note.note.size(); ++i) {
+					if (this->note.note[i].pressed) {
+						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note) {
+							highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
+							highest_index = i;
+						}
+						if (this->note.note[i].note < lowest_note) {
+							lowest_note = this->note.note[i].note;
+							lowest_index = i;
+						}
+						//Find next highest note
+						for (unsigned int octave = 0; octave < preset.octaves; ++octave) {
+							int n = this->note.note[i].note + octave * 12;
+							if (n < next_note && (n > (int) curr_note || (n == (int) curr_note && note_index > i))) {
+								next_note = n;
+								next_index = i;
+								break;
+							}
+						}
+					}
+				}
+				//Restart from highest
+				if (next_index < 0) {
+					next_note = highest_note;
+					next_index = highest_index;
+					second = !second;
+				}
+			}
+			//Restart from lowest
+			if (restart) {
+				next_note = lowest_note;
+				next_index = lowest_index;
+				second = false;
+			}
 			break;
 		case ArpeggiatorPattern::ARP_DOWN_UP:
-			//TODO
+			if (second) {
+				//Up
+				for (size_t i = 0; i < this->note.note.size(); ++i) {
+					if (this->note.note[i].pressed) {
+						if (this->note.note[i].note < lowest_note) {
+							lowest_note = this->note.note[i].note;
+							lowest_index = i;
+						}
+						//Find next highest note
+						for (unsigned int octave = 0; octave < preset.octaves; ++octave) {
+							int n = this->note.note[i].note + octave * 12;
+							if (n < next_note && (n > (int) curr_note || (n == (int) curr_note && note_index > i))) {
+								next_note = n;
+								next_index = i;
+								break;
+							}
+						}
+					}
+				}
+			}
+			else {
+				//Down
+				next_note = -1;
+				for (size_t i = 0; i < this->note.note.size(); ++i) {
+					if (this->note.note[i].pressed) {
+						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note) {
+							highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
+							highest_index = i;
+						}
+						//Find next lowest note
+						for (unsigned int o = 0; o < preset.octaves; ++o) {
+							int octave = preset.octaves - o - 1;
+							int n = this->note.note[i].note + octave * 12;
+							if (n > next_note && (n < (int) curr_note || (n == (int) curr_note && note_index > i))) {
+								next_note = n;
+								next_index = i;
+								break;
+							}
+						}
+					}
+				}
+			}
+			//Restart from highest
+			if (restart) {
+				next_note = highest_note;
+				next_index = highest_index;
+				second = false;
+			}
 			break;
 		case ArpeggiatorPattern::ARP_RANDOM:
 			//Count pressed notes

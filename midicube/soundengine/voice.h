@@ -90,6 +90,7 @@ private:
 	std::size_t data_index = 0;
 	std::size_t note_index = 0;
 	bool restart = true;
+	bool second = false;
 
 public:
 	bool on = false;
