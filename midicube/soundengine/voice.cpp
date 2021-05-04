@@ -42,7 +42,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 		case ArpeggiatorPattern::ARP_UP:
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
 				if (this->note.note[i].pressed) {
-					if (this->note.note[i].note < lowest_note) {
+					if (this->note.note[i].note < lowest_note + preset.play_duplicates) {
 						lowest_note = this->note.note[i].note;
 						lowest_index = i;
 					}
@@ -67,7 +67,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 			next_note = -1;
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
 				if (this->note.note[i].pressed) {
-					if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note) {
+					if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note - preset.play_duplicates) {
 						highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
 						highest_index = i;
 					}
@@ -95,7 +95,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 				next_note = -1;
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
 					if (this->note.note[i].pressed) {
-						if (this->note.note[i].note < lowest_note) {
+						if (this->note.note[i].note < lowest_note + preset.play_duplicates) {
 							lowest_note = this->note.note[i].note;
 							lowest_index = i;
 						}
@@ -122,11 +122,11 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 				//Up
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
 					if (this->note.note[i].pressed) {
-						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note) {
+						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note - preset.play_duplicates) {
 							highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
 							highest_index = i;
 						}
-						if (this->note.note[i].note < lowest_note) {
+						if (this->note.note[i].note < lowest_note + preset.play_duplicates) {
 							lowest_note = this->note.note[i].note;
 							lowest_index = i;
 						}
@@ -160,7 +160,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 				//Up
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
 					if (this->note.note[i].pressed) {
-						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note) {
+						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note - preset.play_duplicates) {
 							highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
 							highest_index = i;
 						}
@@ -187,11 +187,11 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 				next_note = -1;
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
 					if (this->note.note[i].pressed) {
-						if (this->note.note[i].note < lowest_note) {
+						if (this->note.note[i].note < lowest_note + preset.play_duplicates) {
 							lowest_note = this->note.note[i].note;
 							lowest_index = i;
 						}
-						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note) {
+						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note - preset.play_duplicates) {
 							highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
 							highest_index = i;
 						}
