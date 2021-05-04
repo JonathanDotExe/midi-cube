@@ -83,7 +83,7 @@ struct ArpeggiatorPreset {
 	bool hold = false;
 	bool repeat_edges = false;
 	bool kb_sync = true;
-	bool play_duplicates = true;
+	bool play_duplicates = false;
 };
 
 class Arpeggiator {
