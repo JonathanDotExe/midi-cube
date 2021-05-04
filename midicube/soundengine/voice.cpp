@@ -49,7 +49,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 					//Find next highest note
 					for (unsigned int octave = 0; octave < preset.octaves; ++octave) {
 						int n = this->note.note[i].note + octave * 12;
-						if (n < next_note && (n > (int) curr_note || (n == (int) curr_note && note_index > i))) {
+						if ((n < next_note || (n == next_note && i < (size_t) next_index)) && (n > (int) curr_note - preset.play_duplicates)) {
 							next_note = n;
 							next_index = i;
 							break;
@@ -75,7 +75,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 					for (unsigned int o = 0; o < preset.octaves; ++o) {
 						int octave = preset.octaves - o - 1;
 						int n = this->note.note[i].note + octave * 12;
-						if (n > next_note && (n < (int) curr_note || (n == (int) curr_note && note_index > i))) {
+						if ((n > next_note || (n == next_note && i < (size_t) next_index)) && (n < (int) curr_note + preset.play_duplicates)) {
 							next_note = n;
 							next_index = i;
 							break;
@@ -103,7 +103,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 						for (unsigned int o = 0; o < preset.octaves; ++o) {
 							int octave = preset.octaves - o - 1;
 							int n = this->note.note[i].note + octave * 12;
-							if (n > next_note && (n < (int) curr_note || (n == (int) curr_note && note_index > i))) {
+							if ((n > next_note || (n == next_note && i < (size_t) next_index)) && (n < (int) curr_note + preset.play_duplicates)) {
 								next_note = n;
 								next_index = i;
 								break;
@@ -133,7 +133,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 						//Find next highest note
 						for (unsigned int octave = 0; octave < preset.octaves; ++octave) {
 							int n = this->note.note[i].note + octave * 12;
-							if (n < next_note && (n > (int) curr_note || (n == (int) curr_note && note_index > i))) {
+							if ((n < next_note || (n == next_note && i < (size_t) next_index)) && (n > (int) curr_note - preset.play_duplicates)) {
 								next_note = n;
 								next_index = i;
 								break;
@@ -167,7 +167,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 						//Find next highest note
 						for (unsigned int octave = 0; octave < preset.octaves; ++octave) {
 							int n = this->note.note[i].note + octave * 12;
-							if (n < next_note && (n > (int) curr_note || (n == (int) curr_note && note_index > i))) {
+							if ((n < next_note || (n == next_note && i < (size_t) next_index)) && (n > (int) curr_note - preset.play_duplicates)) {
 								next_note = n;
 								next_index = i;
 								break;
@@ -199,10 +199,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 						for (unsigned int o = 0; o < preset.octaves; ++o) {
 							int octave = preset.octaves - o - 1;
 							int n = this->note.note[i].note + octave * 12;
-							if (n > next_note
-									&& (n < (int) curr_note
-											|| (n == (int) curr_note
-													&& note_index > i))) {
+							if ((n > next_note || (n == next_note && i < (size_t) next_index)) && (n < (int) curr_note + preset.play_duplicates)) {
 								next_note = n;
 								next_index = i;
 								break;
