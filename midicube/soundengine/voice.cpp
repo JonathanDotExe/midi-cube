@@ -49,7 +49,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 					//Find next highest note
 					for (unsigned int octave = 0; octave < preset.octaves; ++octave) {
 						int n = this->note.note[i].note + octave * 12;
-						if ((n < next_note || (n == next_note && i < (size_t) next_index)) && (n > (int) curr_note - preset.play_duplicates)) {
+						if ((n < next_note || (n == next_note && i < (size_t) next_index)) && (n > (int) curr_note || (n == curr_note && preset.play_duplicates && i > note_index))) {
 							next_note = n;
 							next_index = i;
 							break;
