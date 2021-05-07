@@ -17,6 +17,7 @@ DelayEffect::DelayEffect() {
 	cc.register_binding(new TemplateControlBinding<double>("right_delay", preset.right_delay, 0, 5));
 	cc.register_binding(new TemplateControlBinding<double>("right_init_delay_offset", preset.right_init_delay_offset, -5, 5));
 	cc.register_binding(new TemplateControlBinding<double>("right_feedback", preset.right_feedback, 0, 1));
+	cc.register_binding(new TemplateControlBinding<bool>("stereo", preset.stereo, false, true));
 }
 
 void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -64,17 +65,27 @@ EffectProgram* create_effect_program<DelayEffect>() {
 void DelayProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
-	preset.mix = tree.get<double>("mix", 0.);
-	preset.left_initial_delay = tree.get<double>("delay", 0.1);
-	preset.left_feedback = tree.get<double>("feedback", 0.2);
+	preset.mix = tree.get<double>("mix", 0.5);
+	preset.left_delay = tree.get<double>("left_delay", 0.1);
+	preset.left_init_delay_offset = tree.get<double>("left_init_delay_offset", 0.0);
+	preset.left_feedback = tree.get<double>("left_feedback", 0.2);
+	preset.right_delay = tree.get<double>("right_delay", 0.1);
+	preset.right_init_delay_offset = tree.get<double>("right_init_delay_offset", 0.0);
+	preset.right_feedback = tree.get<double>("right_feedback", 0.2);
+	preset.on = tree.get<bool>("stereo", false);
 }
 
 boost::property_tree::ptree DelayProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
 	tree.put("mix", preset.mix);
-	tree.put("delay", preset.left_initial_delay);
-	tree.put("feedback", preset.left_feedback);
+	tree.put("left_delay", preset.left_delay);
+	tree.put("left_init_delay_offset", preset.left_init_delay_offset);
+	tree.put("left_feedback", preset.left_feedback);
+	tree.put("right_delay", preset.right_delay);
+	tree.put("right_init_delay_offset", preset.right_init_delay_offset);
+	tree.put("right_feedback", preset.right_feedback);
+	tree.put("stereo", preset.stereo);
 	return tree;
 }
 

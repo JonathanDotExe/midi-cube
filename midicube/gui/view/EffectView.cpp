@@ -788,11 +788,11 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(delay->preset.left_initial_delay, handler);
+			value->property.bind(delay->preset.left_delay, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &delay->preset.left_initial_delay, tmp_x, tmp_y, 180, 120, controls, show_midi);
+			create_cc_control(effect->cc, handler, &delay->preset.left_delay, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
