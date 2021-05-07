@@ -27,19 +27,22 @@ void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 
 		unsigned int left_delay = preset.left_delay * info.sample_rate;
 		unsigned int left_init_delay = fmax(0, preset.left_init_delay_offset + preset.left_delay) * info.sample_rate;
+		double left_feedback = preset.left_feedback;
 		unsigned int right_delay = left_delay;
 		unsigned int right_init_delay = left_init_delay;
+		double right_feedback = left_feedback;
 		if (preset.stereo) {
 			right_delay = preset.right_delay * info.sample_rate;
 			right_init_delay = fmax(0, preset.right_init_delay_offset + preset.right_delay) * info.sample_rate;
+			right_feedback = preset.right_feedback;
 		}
 
 		//Delay
 		ldelay.add_sample(lsample, left_init_delay);
 		rdelay.add_sample(rsample, right_init_delay);
 		//Feedback
-		ldelay.add_sample(lsample, left_delay);
-		rdelay.add_sample(rsample, right_delay);
+		ldelay.add_sample(l * left_feedback, left_delay);
+		rdelay.add_sample(r * right_feedback, right_delay);
 
 		//Mix
 		lsample = lsample * (1 - preset.mix) + l * preset.mix;
