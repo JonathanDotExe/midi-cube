@@ -762,6 +762,10 @@ Scene EffectView::create(Frame &frame) {
 		bg->rect.setFillColor(sf::Color(255, 120, 120));
 		title->text.setString("Delay T5");
 
+		//Left
+		Label *left = new Label("Left", main_font, 24, tmp_x, tmp_y);
+		controls.push_back(left);
+		tmp_y += 30;
 		//On
 		{
 			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
@@ -798,6 +802,25 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 
+		//Init
+		{
+			Label *label = new Label("First Offset", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.left_init_delay_offset, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.left_init_delay_offset,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
 		//Feedback
 		{
 			Label *label = new Label("Feedback", main_font, 18, tmp_x, tmp_y);
@@ -829,6 +852,86 @@ Scene EffectView::create(Frame &frame) {
 			hide_midi.push_back(value);
 
 			create_cc_control(effect->cc, handler, &delay->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		tmp_y += 150;
+		tmp_x -= 200 * 5;
+
+		//Right
+		Label *right = new Label("Right", main_font, 24, tmp_x, tmp_y);
+		controls.push_back(right);
+		tmp_y += 30;
+		//Stereo
+		{
+			Label *label = new Label("Stereo", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *stereo = new OrganSwitch(false, main_font, tmp_x,
+				tmp_y, 180, 120);
+			stereo->property.bind(delay->preset.stereo, handler);
+			controls.push_back(stereo);
+			hide_midi.push_back(stereo);
+
+			create_cc_control(effect->cc, handler, &delay->preset.stereo, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Delay
+		{
+			Label *label = new Label("Delay", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.right_delay, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.right_delay, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Init
+		{
+			Label *label = new Label("First Offset", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.right_init_delay_offset, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.right_init_delay_offset,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Feedback
+		{
+			Label *label = new Label("Feedback", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.right_feedback, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.right_feedback, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
