@@ -112,11 +112,6 @@ struct AnalogSynthPreset {
 	bool mono = false;
 	bool legato = false;
 	double portamendo = 0;
-
-	//Delay effect
-	double delay_time = 0;
-	double delay_feedback = 0;
-	double delay_mix = 0;
 };
 
 struct AnalogSynthPart {

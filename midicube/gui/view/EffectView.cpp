@@ -680,7 +680,7 @@ Scene EffectView::create(Frame &frame) {
 
 		//Background
 		bg->rect.setFillColor(sf::Color(0, 180, 60));
-		title->text.setString("Ultra-Tremolo L0L");
+		title->text.setString("Ultra-Tremolo L07");
 
 		//Tremolo
 		{
@@ -793,6 +793,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
 			value->property.bind(delay->preset.left_delay, handler);
+			value->drag_step = 4;
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
@@ -811,6 +812,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->property.bind(delay->preset.left_init_delay_offset, handler);
+			value->drag_step = 4;
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
@@ -830,6 +832,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
 			value->property.bind(delay->preset.left_feedback, handler);
+			value->drag_step = 4;
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
@@ -891,6 +894,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
 			value->property.bind(delay->preset.right_delay, handler);
+			value->drag_step = 4;
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
@@ -909,6 +913,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->property.bind(delay->preset.right_init_delay_offset, handler);
+			value->drag_step = 4;
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
@@ -928,6 +933,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
 			value->property.bind(delay->preset.right_feedback, handler);
+			value->drag_step = 4;
 			controls.push_back(value);
 			hide_midi.push_back(value);
 

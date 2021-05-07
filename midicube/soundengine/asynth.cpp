@@ -555,26 +555,6 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 		}
 	}
 
-	//Delay lines
-	if (preset.delay_mix) {
-		//Apply delay
-		ldelay.add_isample(lsample, preset.delay_time * info.sample_rate);
-		rdelay.add_isample(rsample, preset.delay_time * info.sample_rate);
-
-		double ldsample = ldelay.process();
-		double rdsample = rdelay.process();
-
-		ldelay.add_sample(ldsample * preset.delay_feedback,
-				preset.delay_time * info.sample_rate - 1);
-		rdelay.add_sample(rdsample * preset.delay_feedback,
-				preset.delay_time * info.sample_rate - 1);
-		//Play delay
-		lsample *= 1 - (fmax(0, preset.delay_mix - 0.5) * 2);
-		rsample *= 1 - (fmax(0, preset.delay_mix - 0.5) * 2);
-
-		lsample += ldsample * fmin(0.5, preset.delay_mix) * 2;
-		rsample += rdsample * fmin(0.5, preset.delay_mix) * 2;
-	}
 	//Move LFOs
 	//TODO move before notes
 	lfo_val = { };
@@ -750,10 +730,6 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	preset.legato = tree.get<bool>("legato", false);
 	preset.portamendo = tree.get<double>("portamendo", 0.0);
 
-	preset.delay_time = tree.get<double>("delay_time", 0.0);
-	preset.delay_feedback = tree.get<double>("delay_feedback", 0.0);
-	preset.delay_mix = tree.get<double>("delay_mix", 0.0);
-
 	//LFOs
 	const auto& lfos = tree.get_child_optional("lfos");
 	if (lfos) {
@@ -871,10 +847,6 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	tree.put("mono", preset.mono);
 	tree.put("legato", preset.legato);
 	tree.put("portamendo", preset.portamendo);
-
-	tree.put("delay_time", preset.delay_time);
-	tree.put("delay_feedback", preset.delay_feedback);
-	tree.put("delay_mix", preset.delay_mix);
 
 	//LFOs
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
