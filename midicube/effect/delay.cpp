@@ -11,8 +11,12 @@
 DelayEffect::DelayEffect() {
 	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
 	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 5));
-	cc.register_binding(new TemplateControlBinding<double>("feedback", preset.feedback, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("left_delay", preset.left_delay, 0, 5));
+	cc.register_binding(new TemplateControlBinding<double>("left_init_delay_offset", preset.left_init_delay_offset, -5, 5));
+	cc.register_binding(new TemplateControlBinding<double>("left_feedback", preset.left_feedback, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("right_delay", preset.right_delay, 0, 5));
+	cc.register_binding(new TemplateControlBinding<double>("right_init_delay_offset", preset.right_init_delay_offset, -5, 5));
+	cc.register_binding(new TemplateControlBinding<double>("right_feedback", preset.right_feedback, 0, 1));
 }
 
 void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -20,9 +24,21 @@ void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		double l = ldelay.process();
 		double r = rdelay.process();
 
+		unsigned int left_delay = preset.left_delay * info.sample_rate;
+		unsigned int left_init_delay = fmax(0, preset.left_init_delay_offset + preset.left_delay) * info.sample_rate;
+		unsigned int right_delay = left_delay;
+		unsigned int right_init_delay = left_init_delay;
+		if (preset.stereo) {
+			right_delay = preset.right_delay * info.sample_rate;
+			right_init_delay = fmax(0, preset.right_init_delay_offset + preset.right_delay) * info.sample_rate;
+		}
+
 		//Delay
-		ldelay.add_sample(lsample + l * preset.feedback, preset.delay * info.sample_rate);
-		rdelay.add_sample(rsample + r * preset.feedback, preset.delay * info.sample_rate);
+		ldelay.add_sample(lsample, left_init_delay);
+		rdelay.add_sample(rsample, right_init_delay);
+		//Feedback
+		ldelay.add_sample(lsample, left_delay);
+		rdelay.add_sample(rsample, right_delay);
 
 		//Mix
 		lsample = lsample * (1 - preset.mix) + l * preset.mix;
@@ -49,16 +65,16 @@ void DelayProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
 	preset.mix = tree.get<double>("mix", 0.);
-	preset.delay = tree.get<double>("delay", 0.1);
-	preset.feedback = tree.get<double>("feedback", 0.2);
+	preset.left_initial_delay = tree.get<double>("delay", 0.1);
+	preset.left_feedback = tree.get<double>("feedback", 0.2);
 }
 
 boost::property_tree::ptree DelayProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
 	tree.put("mix", preset.mix);
-	tree.put("delay", preset.delay);
-	tree.put("feedback", preset.feedback);
+	tree.put("delay", preset.left_initial_delay);
+	tree.put("feedback", preset.left_feedback);
 	return tree;
 }
 

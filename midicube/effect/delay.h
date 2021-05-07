@@ -14,8 +14,13 @@
 
 struct DelayPreset {
 	bool on = true;
-	double delay = 0.1;
-	double feedback = 0.2;
+	double left_init_delay_offset = 0.0;
+	double left_delay = 0.1;
+	double left_feedback = 0.2;
+	double right_init_delay_offset = 0.0;
+	double right_delay = 0.1;
+	double right_feedback = 0.2;
+	bool stereo = false;
 	double mix = 0.5;
 };
 
