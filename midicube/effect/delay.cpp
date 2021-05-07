@@ -10,11 +10,9 @@
 
 DelayEffect::DelayEffect() {
 	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_rate", preset.vibrato_rate, 0, 8));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_depth", preset.vibrato_depth, 0, 1));
 	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
-
-	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 0.03));
+	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 5));
+	cc.register_binding(new TemplateControlBinding<double>("feedback", preset.feedback, 0, 1));
 }
 
 void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -23,11 +21,8 @@ void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		double r = rdelay.process();
 
 		//Delay
-		AnalogOscilatorData data = {preset.vibrato_waveform};
-		osc.process(preset.vibrato_rate, info.time_step, data);
-		double del = (1 + osc.carrier(preset.vibrato_rate, info.time_step, data) * preset.vibrato_depth * 0.2) * preset.delay * info.sample_rate;
-		ldelay.add_isample(lsample, del);
-		rdelay.add_isample(rsample, del);
+		ldelay.add_isample(lsample + l * preset.feedback, preset.delay);
+		rdelay.add_isample(rsample + r * preset.feedback, preset.delay);
 
 		//Mix
 		lsample = lsample * (1 - preset.mix) + l * preset.mix;
@@ -53,23 +48,17 @@ EffectProgram* create_effect_program<DelayEffect>() {
 void DelayProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
-	preset.vibrato_rate = tree.get<double>("vibrato_rate", 2);
-	preset.vibrato_depth = tree.get<double>("vibrato_depth", 0.5);
-	preset.mix = tree.get<double>("mix", 0.5);
-
-	preset.delay = tree.get<double>("delay", 0.015);
-	preset.vibrato_waveform = (AnalogWaveForm) tree.get<unsigned int>("vibrato_waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
+	preset.mix = tree.get<double>("mix", 0.);
+	preset.delay = tree.get<double>("delay", 0.1);
+	preset.feedback = tree.get<double>("feedback", 0.2);
 }
 
 boost::property_tree::ptree DelayProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
-	tree.put("vibrato_rate", preset.vibrato_rate);
-	tree.put("vibrato_depth", preset.vibrato_depth);
 	tree.put("mix", preset.mix);
-
 	tree.put("delay", preset.delay);
-	tree.put("vibrato_waveform", (unsigned int) preset.vibrato_waveform);
+	tree.put("feedback", preset.feedback);
 	return tree;
 }
 
