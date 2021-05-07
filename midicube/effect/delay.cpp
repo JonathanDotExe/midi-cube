@@ -21,8 +21,8 @@ void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		double r = rdelay.process();
 
 		//Delay
-		ldelay.add_isample(lsample + l * preset.feedback, preset.delay);
-		rdelay.add_isample(rsample + r * preset.feedback, preset.delay);
+		ldelay.add_sample(lsample + l * preset.feedback, preset.delay * info.sample_rate);
+		rdelay.add_sample(rsample + r * preset.feedback, preset.delay * info.sample_rate);
 
 		//Mix
 		lsample = lsample * (1 - preset.mix) + l * preset.mix;

@@ -752,6 +752,22 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
+		//Waveform
+		{
+			Label *label = new Label("Waveform", main_font, 18, tmp_x,
+				tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle"};
+
+			ComboBox* waveform = new ComboBox(4, waveforms, main_font, 24, 0, tmp_x , tmp_y, 180, 120);
+			waveform->property.bind(tremolo->preset.waveform, handler);
+			controls.push_back(waveform);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
 	}
 
 	//Edit MIDI Button
