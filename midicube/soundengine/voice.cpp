@@ -17,7 +17,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 	if (!restart) {
 		bool released = true;
 		for (size_t i = 0; i < this->note.note.size() && released; ++i) {
-			released = !this->note.note[i].pressed;
+			released = !this->note.note[i].valid;
 		}
 		restart = released;
 	}
@@ -41,7 +41,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 		switch (preset.pattern) {
 		case ArpeggiatorPattern::ARP_UP:
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
-				if (this->note.note[i].pressed) {
+				if (this->note.note[i].valid) {
 					if (this->note.note[i].note < lowest_note + preset.play_duplicates) {
 						lowest_note = this->note.note[i].note;
 						lowest_index = i;
@@ -66,7 +66,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 		case ArpeggiatorPattern::ARP_DOWN:
 			next_note = -1;
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
-				if (this->note.note[i].pressed) {
+				if (this->note.note[i].valid) {
 					if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note - preset.play_duplicates) {
 						highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
 						highest_index = i;
@@ -94,7 +94,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 				//Down
 				next_note = -1;
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
-					if (this->note.note[i].pressed) {
+					if (this->note.note[i].valid) {
 						if (this->note.note[i].note < lowest_note + preset.play_duplicates) {
 							lowest_note = this->note.note[i].note;
 							lowest_index = i;
@@ -121,7 +121,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 			else {
 				//Up
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
-					if (this->note.note[i].pressed) {
+					if (this->note.note[i].valid) {
 						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note - preset.play_duplicates) {
 							highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
 							highest_index = i;
@@ -159,7 +159,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 			if (second) {
 				//Up
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
-					if (this->note.note[i].pressed) {
+					if (this->note.note[i].valid) {
 						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note - preset.play_duplicates) {
 							highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
 							highest_index = i;
@@ -186,7 +186,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 				//Down
 				next_note = -1;
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
-					if (this->note.note[i].pressed) {
+					if (this->note.note[i].valid) {
 						if (this->note.note[i].note < lowest_note + preset.play_duplicates) {
 							lowest_note = this->note.note[i].note;
 							lowest_index = i;
@@ -222,10 +222,10 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 			}
 			break;
 		case ArpeggiatorPattern::ARP_RANDOM:
-			//Count pressed notes
+			//Count valid notes
 			size_t count = 0;
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
-				count += this->note.note[i].pressed;
+				count += this->note.note[i].valid;
 			}
 			if (count > 0) {
 				size_t next = rand() % count;
@@ -233,7 +233,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 				//Find next note
 				count = 0;
 				for (size_t i = 0; i < this->note.note.size() && count <= next; ++i) {
-					if (this->note.note[i].pressed) {
+					if (this->note.note[i].valid) {
 						next_note = this->note.note[i].note + octave * 12;
 						next_index = i;
 						++count;
@@ -250,16 +250,41 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 			this->note_index = next_index;
 			press(info, curr_note, this->note.note[note_index].velocity);
 			restart = false;
+
+			//Clean held notes
+			if (!preset.hold) {
+				bool released = true;
+				for (size_t i = 0; i < this->note.note.size() && released; ++i) {
+					released = !this->note.note[i].pressed;
+				}
+				if (released) {
+					for (size_t i = 0; i < this->note.note.size(); ++i) {
+						this->note.note[i].valid = false;
+					}
+				}
+			}
 		}
 	}
 }
 
 void Arpeggiator::press_note(SampleInfo& info, unsigned int note, double velocity) {
+	//Clean held notes
+	if (preset.hold) {
+		bool released = true;
+		for (size_t i = 0; i < this->note.note.size() && released; ++i) {
+			released = !this->note.note[i].pressed;
+		}
+		if (released) {
+			for (size_t i = 0; i < this->note.note.size(); ++i) {
+				this->note.note[i].valid = false;
+			}
+		}
+	}
 	this->note.press_note(info, note, note, velocity);
 }
 
 void Arpeggiator::release_note(SampleInfo& info, unsigned int note) {
-	this->note.release_note(info, note, true);
+	this->note.release_note(info, note, !preset.hold);
 }
 
 

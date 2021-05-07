@@ -94,11 +94,11 @@ private:
 	std::size_t note_index = 0;
 	bool restart = true;
 	bool second = false;
+	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
 
 public:
 	bool on = false;
 	ArpeggiatorPreset preset;
-	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
 	Metronome metronome;
 
 	Arpeggiator();
