@@ -12,6 +12,7 @@
 #include "../../effect/amplifier_simulation.h"
 #include "../../effect/bitcrusher.h"
 #include "../../effect/chorus.h"
+#include "../../effect/delay.h"
 #include "../../effect/reverb.h"
 #include "../../effect/rotary_speaker.h"
 #include "../../effect/tremolo.h"
@@ -699,7 +700,7 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 
-		//Vibrato Rate
+		//Rate
 		{
 			Label *label = new Label("Rate", main_font, 18, tmp_x, tmp_y);
 			controls.push_back(label);
@@ -717,7 +718,7 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 
-		//Vibrato Depth
+		//Depth
 		{
 			Label *label = new Label("Depth", main_font, 18, tmp_x,
 				tmp_y);
@@ -752,22 +753,87 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
-		//Waveform
+	}
+	//Delay
+	else if (dynamic_cast<DelayEffect*>(effect) != nullptr) {
+		DelayEffect* delay = dynamic_cast<DelayEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color(255, 120, 120));
+		title->text.setString("Delay T5");
+
+		//On
 		{
-			Label *label = new Label("Waveform", main_font, 18, tmp_x,
-				tmp_y);
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
 			controls.push_back(label);
 			tmp_y += 25;
 
-			std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle"};
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
+				tmp_y, 180, 120);
+			on->property.bind(delay->preset.on, handler);
+			controls.push_back(on);
+			hide_midi.push_back(on);
 
-			ComboBox* waveform = new ComboBox(4, waveforms, main_font, 24, 0, tmp_x , tmp_y, 180, 120);
-			waveform->property.bind(tremolo->preset.waveform, handler);
-			controls.push_back(waveform);
+			create_cc_control(effect->cc, handler, &delay->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
+
+		//Delay
+		{
+			Label *label = new Label("Delay", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.delay, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.delay, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Feedback
+		{
+			Label *label = new Label("Feedback", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.feedback, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.feedback, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mix
+		{
+			Label *label = new Label("Mix", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.mix, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
 	}
 
 	//Edit MIDI Button
