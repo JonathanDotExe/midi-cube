@@ -76,8 +76,8 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		}
 
 		if (vol_sum) {
-			lvocoded /= vol_sum + (1 - vol_sum) * 0.8;
-			rvocoded /= vol_sum + (1 - vol_sum) * 0.8;
+			lvocoded /= vol_sum + (1 - vol_sum) * (1 - preset.compression);
+			rvocoded /= vol_sum + (1 - vol_sum) * (1 - preset.compression);
 		}
 		//Highpass
 		if (preset.mod_highpass) {

@@ -47,6 +47,7 @@ struct VocoderPreset {
 	double carrier_amp = 0;
 	double gate = 0;
 	double mod_highpass = 1200;
+	double compression = 0.2;
 };
 
 struct VocoderBand {
