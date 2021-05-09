@@ -333,8 +333,12 @@ void ProgramManager::save_new_bank() {
 	bank->name = bank_name;
 	bank->filename = bank_filename(bank_name);
 	bank->programs.push_back(new Program{"Init"});
-	//TODO check if already exists
-	banks.push_back(bank);
+	if (std::any_of(banks.begin(), banks.end(), [bank](Bank* b){ return b->filename == bank->filename; })) {
+		delete bank;
+	}
+	else {
+		banks.push_back(bank);
+	}
 }
 
 void ProgramManager::overwrite_bank() {
