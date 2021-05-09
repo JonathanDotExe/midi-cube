@@ -48,6 +48,8 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		rfiltered[0] = bands[0].rfilter.apply(bands[0].filter_data, rsample, info.time_step);
 		mfiltered[0] = bands[0].mfilter.apply(bands[0].filter_data, modulator, info.time_step);
 
+		double vol_sum = 0;
+
 		for (size_t i = 1; i < bands.size(); ++i) {
 			VocoderBand& band = bands[i];
 			//Filter
@@ -66,9 +68,16 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 			band.env.apply(m, info.time_step);
 			double vol = band.env.volume();
 
+			vol_sum += vol;
+
 			//Vocode carrier
 			lvocoded += lf * vol * preset.vocoder_amplification;
 			rvocoded += rf * vol * preset.vocoder_amplification;
+		}
+
+		if (vol_sum) {
+			lvocoded /= vol_sum + (1 - vol_sum) * 0.8;
+			rvocoded /= vol_sum + (1 - vol_sum) * 0.8;
 		}
 		//Highpass
 		if (preset.mod_highpass) {

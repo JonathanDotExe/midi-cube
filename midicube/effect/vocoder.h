@@ -16,8 +16,8 @@
 #include "effect.h"
 
 #define VOCODER_BAND_COUNT 32
-//#define VOCODER_LOW_BAND 120
-//#define VOCODER_HIGH_BAND 360
+#define VOCODER_LOW_BAND 120
+#define VOCODER_HIGH_BAND 360
 
 const std::vector<double> frequencies = {
 		240, 2400,
