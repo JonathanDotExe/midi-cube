@@ -22,12 +22,12 @@
 struct VocoderPreset {
 	bool on = true;
 	double modulator_amplification = 1;
-	double vocoder_amplification = 1;
+	double vocoder_amplification = 30;
 	double vocoder_amp = 0.95;
 	double voice_amp = 0.05;
 	double carrier_amp = 0;
 	double gate = 0;
-	double mod_highpass = 1500;
+	double mod_highpass = 1200;
 };
 
 struct VocoderBand {
