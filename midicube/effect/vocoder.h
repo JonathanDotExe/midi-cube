@@ -15,9 +15,28 @@
 #include "../filter.h"
 #include "effect.h"
 
-#define VOCODER_BAND_COUNT 16
-#define VOCODER_LOW_BAND 120
-#define VOCODER_HIGH_BAND 360
+#define VOCODER_BAND_COUNT 32
+//#define VOCODER_LOW_BAND 120
+//#define VOCODER_HIGH_BAND 360
+
+const std::vector<double> frequencies = {
+		240, 2400,
+		235, 2100,
+		390, 2300,
+		370, 1900,
+		610, 1900,
+		585, 1710,
+		850, 1610,
+		820, 1530,
+		750, 940,
+		700, 760,
+		600, 1170,
+		500, 700,
+		460, 1310,
+		360, 640,
+		300, 1390,
+		250, 595
+};
 
 struct VocoderPreset {
 	bool on = true;
