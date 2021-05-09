@@ -21,8 +21,8 @@
 
 struct VocoderPreset {
 	bool on = true;
-	double modulator_amplification = 30;
-	double vocoder_amplification = 2.5;
+	double modulator_amplification = 1;
+	double vocoder_amplification = 1;
 	double vocoder_amp = 0.95;
 	double voice_amp = 0.05;
 	double carrier_amp = 0;

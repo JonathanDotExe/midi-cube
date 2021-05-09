@@ -376,7 +376,7 @@ void ProgramManager::save_all() {
 	lock();
 	std::vector<std::string> filenames;
 	for (auto b : banks) {
-		while (std::find(filenames.begin(), filenames.end(), b->filename)) {
+		while (std::find(filenames.begin(), filenames.end(), b->filename) != filenames.end()) {
 			b->filename += "_";
 		}
 		save_bank(*b, path + "/" + b->filename + ".xml");
