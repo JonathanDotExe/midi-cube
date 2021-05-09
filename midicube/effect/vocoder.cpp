@@ -68,6 +68,8 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 			band.env.apply(m, info.time_step);
 			double vol = band.env.volume();
 
+			band.port.set(vol, info.time, preset.slope);
+			vol = band.port.get(info.time);
 			vol_sum += vol;
 
 			//Vocode carrier

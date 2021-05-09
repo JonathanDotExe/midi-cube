@@ -47,7 +47,8 @@ struct VocoderPreset {
 	double carrier_amp = 0;
 	double gate = 0;
 	double mod_highpass = 1200;
-	double compression = 0.2;
+	double compression = 0.0;
+	double slope = 0.05;
 };
 
 struct VocoderBand {
@@ -56,6 +57,7 @@ struct VocoderBand {
 	Filter rfilter;
 	Filter mfilter;
 	EnvelopeFollower env{};
+	PortamendoBuffer port{0, 0};
 };
 
 class VocoderEffect : public Effect {
