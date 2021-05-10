@@ -8,13 +8,7 @@
 #include "vocoder.h"
 
 VocoderEffect::VocoderEffect() {
-	//Set up bands
-	for (size_t i = 0; i < bands.size(); ++i) {
-		VocoderBand& band = bands.at(i);
-		band.filter_data.cutoff = /*(VOCODER_HIGH_BAND - VOCODER_LOW_BAND)/VOCODER_BAND_COUNT * i + VOCODER_LOW_BAND*/ frequencies[i];
-		band.filter_data.type = FilterType::BP_12;
-		band.filter_data.resonance = 0.7;
-	}
+
 }
 
 void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -46,7 +40,7 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		for (size_t i = 0; i < bands.size(); ++i) {
 			VocoderBand& band = bands[i];
 
-			FilterData filter_data{FilterType::BP_12, preset.formant_mode ? frequencies[i] : ((preset.max_freq - preset.min_freq)/VOCODER_BAND_COUNT * i + preset.min_freq), preset.resonance};
+			FilterData filter_data{preset.filter_type, preset.formant_mode ? frequencies[i] : ((preset.max_freq - preset.min_freq)/VOCODER_BAND_COUNT * i + preset.min_freq), preset.resonance};
 			//Filter
 			double lf = band.lfilter.apply(filter_data, lsample, info.time_step);
 			double rf = band.rfilter.apply(filter_data, rsample, info.time_step);
@@ -71,7 +65,7 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		}
 		//Highpass
 		if (preset.mod_highpass) {
-			FilterData data = {FilterType::HP_12, preset.mod_highpass};
+			FilterData data = {FilterType::HP_24, preset.mod_highpass};
 			modulator = mfilter.apply(data, modulator, info.time_step);
 		}
 		//Mix
