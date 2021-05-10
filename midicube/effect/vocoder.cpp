@@ -12,7 +12,7 @@ VocoderEffect::VocoderEffect() {
 	for (size_t i = 0; i < bands.size(); ++i) {
 		VocoderBand& band = bands.at(i);
 		band.filter_data.cutoff = /*(VOCODER_HIGH_BAND - VOCODER_LOW_BAND)/VOCODER_BAND_COUNT * i + VOCODER_LOW_BAND*/ frequencies[i];
-		band.filter_data.type = FilterType::BP_24;
+		band.filter_data.type = FilterType::BP_12;
 		band.filter_data.resonance = 0.7;
 	}
 }
@@ -41,28 +41,14 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		double lvocoded = 0;
 		double rvocoded = 0;
 		//Filters
-		std::array<double, VOCODER_BAND_COUNT> lfiltered;
-		std::array<double, VOCODER_BAND_COUNT> rfiltered;
-		std::array<double, VOCODER_BAND_COUNT> mfiltered;
-		lfiltered[0] = bands[0].lfilter.apply(bands[0].filter_data, lsample, info.time_step);
-		rfiltered[0] = bands[0].rfilter.apply(bands[0].filter_data, rsample, info.time_step);
-		mfiltered[0] = bands[0].mfilter.apply(bands[0].filter_data, modulator, info.time_step);
-
 		double vol_sum = 0;
 
-		for (size_t i = 1; i < bands.size(); ++i) {
+		for (size_t i = 0; i < bands.size(); ++i) {
 			VocoderBand& band = bands[i];
 			//Filter
 			double lf = band.lfilter.apply(band.filter_data, lsample, info.time_step);
 			double rf = band.rfilter.apply(band.filter_data, rsample, info.time_step);
 			double m = band.mfilter.apply(band.filter_data, modulator, info.time_step);
-			lfiltered[i] = lf;
-			rfiltered[i] = rf;
-			mfiltered[i] = m;
-
-			lf -= lfiltered[i - 1];
-			rf -= rfiltered[i - 1];
-			m -= mfiltered[i - 1];
 
 			//Modulator amp
 			band.env.apply(m, info.time_step);

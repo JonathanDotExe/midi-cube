@@ -16,8 +16,6 @@
 #include "effect.h"
 
 #define VOCODER_BAND_COUNT 32
-#define VOCODER_LOW_BAND 120
-#define VOCODER_HIGH_BAND 360
 
 const std::vector<double> frequencies = {
 		240, 2400,
@@ -45,10 +43,17 @@ struct VocoderPreset {
 	double vocoder_amp = 0.95;
 	double voice_amp = 0.05;
 	double carrier_amp = 0;
+
 	double gate = 0;
 	double mod_highpass = 1200;
-	double compression = 0.0;
+
+	double compression = 0.2;
 	double slope = 0.0;
+
+	bool formant_mode = true;
+	double min_freq = 120;
+	double max_freq = 360;
+	double resonance = 0.7;
 };
 
 struct VocoderBand {
