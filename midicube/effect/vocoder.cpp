@@ -73,8 +73,8 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 			vol_sum += vol;
 
 			//Vocode carrier
-			lvocoded += lf * vol * preset.vocoder_amplification;
-			rvocoded += rf * vol * preset.vocoder_amplification;
+			lvocoded += lf * vol;
+			rvocoded += rf * vol;
 		}
 
 		if (vol_sum) {
@@ -93,6 +93,9 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		rsample += rvocoded * vocoder_mix;
 		lsample += modulator * modulator_mix;
 		rsample += modulator * modulator_mix;
+
+		lsample *= preset.post_amplification;
+		rsample *= preset.post_amplification;
 	}
 }
 

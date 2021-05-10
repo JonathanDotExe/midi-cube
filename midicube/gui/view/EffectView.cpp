@@ -667,7 +667,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 50, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.vocoder_amplification, handler);
+			value->property.bind(vocoder->preset.post_amplification, handler);
 			controls.push_back(value);
 
 			tmp_y -= 25;
