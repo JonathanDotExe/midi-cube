@@ -57,7 +57,6 @@ struct VocoderPreset {
 };
 
 struct VocoderBand {
-	FilterData filter_data;
 	Filter lfilter;
 	Filter rfilter;
 	Filter mfilter;

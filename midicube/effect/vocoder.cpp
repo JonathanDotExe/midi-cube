@@ -45,10 +45,12 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 
 		for (size_t i = 0; i < bands.size(); ++i) {
 			VocoderBand& band = bands[i];
+
+			FilterData filter_data{FilterType::BP_12, preset.formant_mode ? frequencies[i] : ((preset.max_freq - preset.min_freq)/VOCODER_BAND_COUNT * i + preset.min_freq), preset.resonance};
 			//Filter
-			double lf = band.lfilter.apply(band.filter_data, lsample, info.time_step);
-			double rf = band.rfilter.apply(band.filter_data, rsample, info.time_step);
-			double m = band.mfilter.apply(band.filter_data, modulator, info.time_step);
+			double lf = band.lfilter.apply(filter_data, lsample, info.time_step);
+			double rf = band.rfilter.apply(filter_data, rsample, info.time_step);
+			double m = band.mfilter.apply(filter_data, modulator, info.time_step);
 
 			//Modulator amp
 			band.env.apply(m, info.time_step);
