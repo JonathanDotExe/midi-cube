@@ -665,9 +665,108 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *value = new DragBox<double>(0, 0, 50, main_font, 24,
+			DragBox<double> *value = new DragBox<double>(0, 0, 10, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
 			value->property.bind(vocoder->preset.post_amplification, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Slope
+		{
+			Label *label = new Label("Envelope", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.2, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.slope, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Compression
+		{
+			Label *label = new Label("Normalization", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.compression, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		tmp_x = 10;
+		tmp_y += 160;
+
+		//Formant
+		{
+			Label *label = new Label("Formant Mode", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *formant = new OrganSwitch(true, main_font, tmp_x,
+				tmp_y, 180, 120);
+			formant->property.bind(vocoder->preset.formant_mode, handler);
+			controls.push_back(formant);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Min Freq
+		{
+			Label *label = new Label("Min Frequency", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 21000, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.min_freq, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Max Freq
+		{
+			Label *label = new Label("Max Frequency", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 21000, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.max_freq, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Resonance
+		{
+			Label *label = new Label("Resonance", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.resonance, handler);
 			controls.push_back(value);
 
 			tmp_y -= 25;
