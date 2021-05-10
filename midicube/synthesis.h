@@ -99,7 +99,7 @@ inline extern double noise_wave() {
 class DelayBuffer {
 private:
 	std::array<double, DELAY_BUFFER_SIZE> buffer = {};
-	std::size_t index;
+	std::size_t index = 0;
 
 public:
 
