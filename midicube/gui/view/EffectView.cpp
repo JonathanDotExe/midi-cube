@@ -563,9 +563,9 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 
-		//Vocoder Mix
+		//Modulator Mix
 		{
-			Label *label = new Label("Vocoder Mix", main_font, 18, tmp_x, tmp_y);
+			Label *label = new Label("Modulator Mix", main_font, 18, tmp_x, tmp_y);
 			label->text.setFillColor(sf::Color::White);
 			controls.push_back(label);
 			tmp_y += 25;
@@ -580,7 +580,7 @@ Scene EffectView::create(Frame &frame) {
 		}
 		//Carrier Mix
 		{
-			Label *label = new Label("Carrier Mix", main_font, 18, tmp_x, tmp_y);
+			Label *label = new Label("Mix", main_font, 18, tmp_x, tmp_y);
 			label->text.setFillColor(sf::Color::White);
 			controls.push_back(label);
 			tmp_y += 25;
@@ -588,21 +588,6 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
 			rate->property.bind(vocoder->preset.mix, handler);
-			controls.push_back(rate);
-
-			tmp_y -= 25;
-			tmp_x += 200;
-		}
-		//Voice Mix
-		{
-			Label *label = new Label("Modulator Mix", main_font, 18, tmp_x, tmp_y);
-			label->text.setFillColor(sf::Color::White);
-			controls.push_back(label);
-			tmp_y += 25;
-
-			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
-				tmp_x, tmp_y, 180, 120);
-			rate->property.bind(vocoder->preset.voice_amp, handler);
 			controls.push_back(rate);
 
 			tmp_y -= 25;

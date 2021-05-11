@@ -95,9 +95,8 @@ void VocoderProgram::load(boost::property_tree::ptree tree) {
 	preset.modulator_amplification = tree.get<double>("modulation_amplification", 5);
 	preset.post_amplification = tree.get<double>("post_amplification", 10);
 
-	preset.modulator_mix = tree.get<double>("vocoder_amp", 0.95);
-	preset.voice_amp = tree.get<double>("voice_amp", 0.05);
-	preset.mix = tree.get<double>("carrier_amp", 0);
+	preset.modulator_mix = tree.get<double>("modulator_mix", 0.2);
+	preset.mix = tree.get<double>("mix", 0);
 
 	preset.gate = tree.get<double>("gate", 0);
 	preset.mod_highpass = tree.get<double>("mod_highpass", 1200);
@@ -117,9 +116,8 @@ boost::property_tree::ptree VocoderProgram::save() {
 	tree.put("modulator_amplification", preset.modulator_amplification);
 	tree.put("post_amplification", preset.post_amplification);
 
-	tree.put("vocoder_amp", preset.modulator_mix);
-	tree.put("voice_amp", preset.voice_amp);
-	tree.put("carrier_amp", preset.mix);
+	tree.put("modulator_mix", preset.modulator_mix);
+	tree.put("mix", preset.mix);
 
 	tree.put("gate", preset.gate);
 	tree.put("mod_highpass", preset.mod_highpass);
