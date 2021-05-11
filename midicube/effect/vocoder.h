@@ -47,13 +47,13 @@ struct VocoderPreset {
 	double gate = 0;
 	double mod_highpass = 1200;
 
-	double compression = 0.2;
+	double normalization = 0.2;
 	double slope = 0.0;
 
 	bool formant_mode = true;
 	double min_freq = 120;
 	double max_freq = 360;
-	double resonance = 0.7;
+	double resonance = 0;
 	FilterType filter_type = FilterType::BP_12;
 };
 
@@ -65,6 +65,18 @@ struct VocoderBand {
 	PortamendoBuffer port{0, 0};
 };
 
+class VocoderProgram : public EffectProgram {
+public:
+	VocoderPreset preset;
+
+	virtual void load(boost::property_tree::ptree tree);
+	virtual boost::property_tree::ptree save();
+
+	virtual ~VocoderProgram() {
+
+	}
+};
+
 class VocoderEffect : public Effect {
 private:
 	std::array<VocoderBand, VOCODER_BAND_COUNT> bands;
@@ -73,6 +85,8 @@ private:
 public:
 	VocoderPreset preset;
 
+	void save_program(EffectProgram **prog);
+	void apply_program(EffectProgram *prog);
 	VocoderEffect();
 
 	void apply(double& lsample, double& rsample, SampleInfo& info);

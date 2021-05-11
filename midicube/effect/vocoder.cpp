@@ -60,8 +60,8 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		}
 
 		if (vol_sum) {
-			lvocoded /= vol_sum + (1 - vol_sum) * (1 - preset.compression);
-			rvocoded /= vol_sum + (1 - vol_sum) * (1 - preset.compression);
+			lvocoded /= vol_sum + (1 - vol_sum) * (1 - preset.normalization);
+			rvocoded /= vol_sum + (1 - vol_sum) * (1 - preset.normalization);
 		}
 		//Highpass
 		if (preset.mod_highpass) {
@@ -90,4 +90,87 @@ EffectProgram* create_effect_program<VocoderEffect>() {
 template<>
 std::string get_effect_name<VocoderEffect>() {
 	return "Vocoder";
+}
+
+
+template <>
+EffectProgram* create_effect_program<VocoderEffect>() {
+	return new VocoderProgram();
+}
+
+
+void VocoderProgram::load(boost::property_tree::ptree tree) {
+	EffectProgram::load(tree);
+	preset.on = tree.get<bool>("on", true);
+	preset.modulator_amplification = tree.get<double>("modulation_amplification", 5);
+	preset.post_amplification = tree.get<double>("post_amplification", 10);
+
+	preset.vocoder_amp = tree.get<double>("vocoder_amp", 0.95);
+	preset.voice_amp = tree.get<double>("voice_amp", 0.05);
+	preset.carrier_amp = tree.get<double>("carrier_amp", 0);
+
+	preset.gate = tree.get<double>("gate", 0);
+	preset.mod_highpass = tree.get<double>("mod_highpass", 1200);
+
+	preset.normalization = tree.get<double>("normalization", 0.2);
+	preset.slope = tree.get<double>("slope", 0);
+
+	preset.formant_mode = tree.get<bool>("formant_mode", true);
+	preset.min_freq = tree.get<double>("min_freq", 120);
+	preset.max_freq = tree.get<double>("max_freq", 360);
+	preset.resonance = tree.get<double>("resonance", 0);
+}
+
+boost::property_tree::ptree VocoderProgram::save() {
+	boost::property_tree::ptree tree = EffectProgram::save();
+	tree.put("on", preset.on);
+	tree.put("modulator_amplification", preset.modulator_amplification);
+	tree.put("post_amplification", preset.post_amplification);
+
+	tree.put("vocoder_amp", preset.vocoder_amp);
+	tree.put("voice_amp", preset.voice_amp);
+	tree.put("carrier_amp", preset.carrier_amp);
+
+	tree.put("gate", preset.gate);
+	tree.put("mod_highpass", preset.mod_highpass);
+
+	tree.put("normalization", preset.normalization);
+	tree.put("slope", preset.slope);
+
+	tree.put("formant_mode", preset.formant_mode);
+	tree.put("min_freq", preset.min_freq);
+	tree.put("max_freq", preset.max_freq);
+	tree.put("resonance", preset.resonance);
+	return tree;
+}
+
+void VocoderEffect::save_program(EffectProgram **prog) {
+	VocoderProgram* p = dynamic_cast<VocoderProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new VocoderProgram();
+	}
+	p->ccs = cc.get_ccs();
+	p->preset = preset;
+	*prog = p;
+}
+
+void VocoderEffect::apply_program(EffectProgram *prog) {
+	VocoderProgram* p = dynamic_cast<VocoderProgram*>(prog);
+	//Create new
+	if (p) {
+		cc.set_ccs(p->ccs);
+		preset = p->preset;
+	}
+	else {
+		cc.set_ccs({});
+		preset = {};
+	}
+}
+
+void VocoderEffect::save_program(EffectProgram **prog) {
+}
+
+void VocoderEffect::apply_program(EffectProgram *prog) {
 }
