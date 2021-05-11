@@ -15,16 +15,6 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	double modulator = info.input_sample;
 
 	if (preset.on) {
-		//Calc mix
-		double total_mix = preset.carrier_amp + preset.vocoder_amp + preset.voice_amp;
-		double carrier_mix = 0;
-		double vocoder_mix = 0;
-		double modulator_mix = 0;
-		if (total_mix) {
-			carrier_mix = preset.carrier_amp/total_mix;
-			vocoder_mix = preset.vocoder_amp/total_mix;
-			modulator_mix = preset.voice_amp/total_mix;
-		}
 		//Gate
 		modulator *= preset.modulator_amplification;
 		modulator_env.apply(modulator, info.time_step);
@@ -68,13 +58,19 @@ void VocoderEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 			FilterData data = {FilterType::HP_24, preset.mod_highpass};
 			modulator = mfilter.apply(data, modulator, info.time_step);
 		}
-		//Mix
-		lsample *= carrier_mix;
-		rsample *= carrier_mix;
-		lsample += lvocoded * vocoder_mix;
-		rsample += rvocoded * vocoder_mix;
-		lsample += modulator * modulator_mix;
-		rsample += modulator * modulator_mix;
+		//Modulator Mix
+		lvocoded *= 1 - (fmax(0, preset.modulator_mix - 0.5) * 2);
+		rvocoded *= 1 - (fmax(0, preset.modulator_mix - 0.5) * 2);
+
+		lvocoded += modulator * fmin(0.5, preset.modulator_mix) * 2;
+		rvocoded += modulator * fmin(0.5, preset.modulator_mix) * 2;
+
+		//Carrier Mix
+		lsample *= fmin(0.5, preset.mix) * 2;
+		rsample *= fmin(0.5, preset.mix) * 2;
+
+		lsample += lvocoded * (1 - (fmax(0, preset.mix - 0.5) * 2));
+		rsample += rvocoded * (1 - (fmax(0, preset.mix - 0.5) * 2));
 
 		lsample *= preset.post_amplification;
 		rsample *= preset.post_amplification;
@@ -99,9 +95,9 @@ void VocoderProgram::load(boost::property_tree::ptree tree) {
 	preset.modulator_amplification = tree.get<double>("modulation_amplification", 5);
 	preset.post_amplification = tree.get<double>("post_amplification", 10);
 
-	preset.vocoder_amp = tree.get<double>("vocoder_amp", 0.95);
+	preset.modulator_mix = tree.get<double>("vocoder_amp", 0.95);
 	preset.voice_amp = tree.get<double>("voice_amp", 0.05);
-	preset.carrier_amp = tree.get<double>("carrier_amp", 0);
+	preset.mix = tree.get<double>("carrier_amp", 0);
 
 	preset.gate = tree.get<double>("gate", 0);
 	preset.mod_highpass = tree.get<double>("mod_highpass", 1200);
@@ -121,9 +117,9 @@ boost::property_tree::ptree VocoderProgram::save() {
 	tree.put("modulator_amplification", preset.modulator_amplification);
 	tree.put("post_amplification", preset.post_amplification);
 
-	tree.put("vocoder_amp", preset.vocoder_amp);
+	tree.put("vocoder_amp", preset.modulator_mix);
 	tree.put("voice_amp", preset.voice_amp);
-	tree.put("carrier_amp", preset.carrier_amp);
+	tree.put("carrier_amp", preset.mix);
 
 	tree.put("gate", preset.gate);
 	tree.put("mod_highpass", preset.mod_highpass);

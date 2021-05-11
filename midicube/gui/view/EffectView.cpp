@@ -572,7 +572,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			rate->property.bind(vocoder->preset.vocoder_amp, handler);
+			rate->property.bind(vocoder->preset.modulator_mix, handler);
 			controls.push_back(rate);
 
 			tmp_y -= 25;
@@ -587,7 +587,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			rate->property.bind(vocoder->preset.carrier_amp, handler);
+			rate->property.bind(vocoder->preset.mix, handler);
 			controls.push_back(rate);
 
 			tmp_y -= 25;

@@ -40,9 +40,8 @@ struct VocoderPreset {
 	bool on = true;
 	double modulator_amplification = 5;
 	double post_amplification = 10;
-	double vocoder_amp = 0.95;
-	double voice_amp = 0.05;
-	double carrier_amp = 0;
+	double modulator_mix = 0.2;
+	double mix = 0;
 
 	double gate = 0;
 	double mod_highpass = 1200;
