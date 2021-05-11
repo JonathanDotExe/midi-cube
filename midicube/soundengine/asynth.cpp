@@ -407,15 +407,28 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 			AnalogSynthPart& part = note.parts[i];
 			OscilatorEntity &osc = preset.oscilators[i];
 			//Frequency
-			double freq = note.freq;
-			//FM
-			freq += fm;
-			double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val,
+			double freq = 0;
+			if (osc.fixed_freq) {
+				freq = osc.freq;
+				//FM
+				freq += fm;
+				double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val,
 					lfo_mod, controls, note.velocity, aftertouch);
-			if (osc.semi || pitch) {
-				freq = note_to_freq(note.note + osc.semi + pitch);
+				if (pitch) {
+					freq *= note_to_freq_transpose(pitch);
+				}
 			}
-			freq *= env.pitch_bend * osc.transpose;
+			else {
+				freq = note.freq;
+				double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val,
+					lfo_mod, controls, note.velocity, aftertouch);
+				if (osc.semi || pitch) {
+					freq = note_to_freq(note.note + osc.semi + pitch);
+				}
+				//FM
+				freq += fm;
+				freq *= env.pitch_bend * osc.transpose;
+			}
 
 			AnalogOscilatorData data = { osc.waveform, osc.analog, osc.sync };
 			AnalogOscilatorBankData bdata = { 0.1, osc.unison_amount };

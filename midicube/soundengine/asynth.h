@@ -61,6 +61,9 @@ struct OscilatorEntity {
 	int semi = 0;
 	double transpose = 1;
 	PropertyModulation pitch = {0.5};
+
+	bool fixed_freq = false;
+	double freq = 0;
 };
 
 struct OperatorEntity {
