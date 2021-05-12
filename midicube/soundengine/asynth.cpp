@@ -786,6 +786,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			osc.sync = o.second.get<bool>("sync", false);
 			osc.reset = o.second.get<bool>("reset", false);
 			osc.randomize = o.second.get<bool>("randomize", false);
+			osc.phase = o.second.get<double>("phase", 0);
 			osc.fixed_freq = o.second.get<bool>("fixed_freq", false);
 			osc.note = o.second.get<unsigned int>("note", 60);
 
@@ -895,6 +896,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 			o.put("sync", osc.sync);
 			o.put("reset", osc.reset);
 			o.put("randomize", osc.randomize);
+			o.put("phase", osc.phase);
 			o.put("fixed_freq", osc.fixed_freq);
 			o.put("note", osc.note);
 
