@@ -409,7 +409,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 			//Frequency
 			double freq = 0;
 			if (osc.fixed_freq) {
-				freq = osc.freq;
+				freq = note_to_freq(osc.note);
 				//FM
 				freq += fm;
 				double pitch = apply_modulation(PITCH_SCALE, osc.pitch, env_val,

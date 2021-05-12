@@ -236,6 +236,18 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		waveform->property.bind(osc.waveform, handler);
 		controls.push_back(waveform);
 	}
+	//Fixed Freq
+	{
+		CheckBox* audible = new CheckBox(false, "Fixed", main_font, 16, tmp_x + 160, tmp_y, 40, 40);
+		audible->property.bind(osc.fixed_freq, handler);
+		controls.push_back(audible);
+	}
+	//Note
+	{
+		DragBox<unsigned int>* value = new DragBox<unsigned int>(0, 0, 127, main_font, 16, tmp_x + 320, tmp_y, 80, 40);
+		value->property.bind(osc.note, handler);
+		controls.push_back(value);
+	}
 	tmp_y += 50;
 	//Reset and audible
 	{

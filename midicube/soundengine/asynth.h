@@ -63,7 +63,7 @@ struct OscilatorEntity {
 	PropertyModulation pitch = {0.5};
 
 	bool fixed_freq = false;
-	double freq = 0;
+	unsigned int note = 60;
 };
 
 struct OperatorEntity {
