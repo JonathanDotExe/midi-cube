@@ -711,6 +711,7 @@ static ADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
 	return data;
 }
 
+
 static ADSREnvelopeData load_adsr(boost::property_tree::ptree parent, std::string path) {
 	const auto& val = parent.get_child_optional(path);
 	if (val) {
@@ -731,6 +732,43 @@ static boost::property_tree::ptree save_adsr(ADSREnvelopeData data) {
 	tree.put("release_volume", data.release_volume);
 	return tree;
 }
+
+static FilterEntity load_filter(boost::property_tree::ptree tree) {
+	FilterEntity filter;
+
+	filter.on = tree.get<bool>("on", false);
+	filter.drive = tree.get<bool>("drive", false);
+	filter.drive_amount = tree.get<double>("drive_amount", 0);
+	filter.type = (FilterType) tree.get<int>("type", 0);
+	filter.cutoff = load_prop_mod(tree, "cutoff");
+	filter.resonance = load_prop_mod(tree, "resonance");
+	filter.kb_track = tree.get<double>("kb_track", 0);
+	filter.kb_track_note = tree.get<int>("kb_track_note", 36);
+
+	return filter;
+}
+
+static FilterEntity load_filter(boost::property_tree::ptree parent, std::string path) {
+	const auto& val = parent.get_child_optional(path);
+	if (val) {
+		return load_filter(val.get());
+	}
+	return {};
+}
+
+static boost::property_tree::ptree save_filter(FilterEntity filter) {
+	boost::property_tree::ptree o;
+	o.put("on", filter.on);
+	o.put("drive", filter.drive);
+	o.put("drive_amount", filter.drive_amount);
+	o.put("type", (int) filter.type);
+	o.add_child("cutoff", save_prop_mod(filter.cutoff));
+	o.add_child("resonance", save_prop_mod(filter.resonance));
+	o.put("kb_track", filter.kb_track);
+	o.put("kb_track_note", filter.kb_track_note);
+	return o;
+}
+
 
 void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	preset = {};
