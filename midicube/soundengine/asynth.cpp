@@ -786,6 +786,8 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			osc.sync = o.second.get<bool>("sync", false);
 			osc.reset = o.second.get<bool>("reset", false);
 			osc.randomize = o.second.get<bool>("randomize", false);
+			osc.fixed_freq = o.second.get<bool>("fixed_freq", false);
+			osc.note = o.second.get<unsigned int>("note", 60);
 
 			osc.unison_amount = o.second.get<size_t>("unison_amount", 0);
 			osc.volume = load_prop_mod(o.second, "volume");
@@ -893,6 +895,9 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 			o.put("sync", osc.sync);
 			o.put("reset", osc.reset);
 			o.put("randomize", osc.randomize);
+			o.put("fixed_freq", osc.fixed_freq);
+			o.put("note", osc.note);
+
 
 			o.put("unison_amount", osc.unison_amount);
 			o.add_child("volume", save_prop_mod(osc.volume));
