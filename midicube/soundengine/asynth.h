@@ -67,6 +67,17 @@ struct OscilatorEntity {
 	unsigned int note = 60;
 };
 
+struct FilterEntity {
+	bool on = false;
+	bool drive = false;
+	double drive_amount = 0;
+	FilterType type = FilterType::LP_12;
+	PropertyModulation cutoff = {1};
+	PropertyModulation resonance = {0};
+	double kb_track = 0;
+	unsigned int kb_track_note = 36;
+};
+
 struct OperatorEntity {
 	bool audible = true;
 	ADSREnvelopeData env{0.0005, 0, 1, 0.0005};
@@ -77,14 +88,7 @@ struct OperatorEntity {
 	PropertyModulation volume = {1};
 	PropertyModulation panning = {0.5};
 
-	bool filter = false;
-	bool pre_filter_drive = false;
-	double pre_filter_drive_amount = 0;
-	FilterType filter_type = FilterType::LP_12;
-	PropertyModulation filter_cutoff = {1};
-	PropertyModulation filter_resonance = {0};
-	double filter_kb_track = 0;
-	unsigned int filter_kb_track_note = 36;
+	FilterEntity filter;
 
 	unsigned int oscilator_count = 1;
 	std::array<double, ANALOG_PART_COUNT> fm;

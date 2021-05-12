@@ -469,24 +469,24 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		//Playback
 		if (op.audible) {
 			//Filter
-			if (op.filter) {
+			if (op.filter.on) {
 				//Pre drive
-				if (op.pre_filter_drive) {
-					carrier = atan(carrier * (1.5 + op.pre_filter_drive_amount * 10));
+				if (op.filter.drive) {
+					carrier = atan(carrier * (1.5 + op.filter.drive_amount * 10));
 				}
 
-				FilterData filter { op.filter_type };
+				FilterData filter { op.filter.type };
 				filter.cutoff = scale_cutoff(apply_modulation(FILTER_CUTOFF_SCALE,
-						op.filter_cutoff, env_val, lfo_val, controls,
+						op.filter.cutoff, env_val, lfo_val, controls,
 						note.velocity, aftertouch)); //TODO optimize
 				filter.resonance = apply_modulation(FILTER_RESONANCE_SCALE,
-						op.filter_resonance, env_val, lfo_val, controls,
+						op.filter.resonance, env_val, lfo_val, controls,
 						note.velocity, aftertouch);
 
-				if (op.filter_kb_track) {
+				if (op.filter.kb_track) {
 					double cutoff = filter.cutoff;
 					//KB track
-					cutoff *= 1 + ((double) note.note - op.filter_kb_track_note) / 12.0 * op.filter_kb_track;
+					cutoff *= 1 + ((double) note.note - op.filter.kb_track_note) / 12.0 * op.filter.kb_track;
 					filter.cutoff = cutoff;
 				}
 
@@ -822,14 +822,14 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			op.amp_kb_track_lower = o.second.get<double>("amp_kb_track_lower", 0);
 			op.amp_kb_track_note = o.second.get<int>("amp_kb_track_note", 60);
 
-			op.filter = o.second.get<bool>("filter", false);
-			op.pre_filter_drive = o.second.get<bool>("pre_filter_drive", false);
-			op.pre_filter_drive_amount = o.second.get<double>("pre_filter_drive_amount", 0);
-			op.filter_type = (FilterType) o.second.get<int>("filter_type", 0);
-			op.filter_cutoff = load_prop_mod(o.second, "filter_cutoff");
-			op.filter_resonance = load_prop_mod(o.second, "filter_resonance");
-			op.filter_kb_track = o.second.get<double>("filter_kb_track", 0);
-			op.filter_kb_track_note = o.second.get<int>("filter_kb_track_note", 36);
+			op.filter.on = o.second.get<bool>("filter", false);
+			op.filter.drive = o.second.get<bool>("pre_filter_drive", false);
+			op.filter.drive_amount = o.second.get<double>("pre_filter_drive_amount", 0);
+			op.filter.type = (FilterType) o.second.get<int>("filter_type", 0);
+			op.filter.cutoff = load_prop_mod(o.second, "filter_cutoff");
+			op.filter.resonance = load_prop_mod(o.second, "filter_resonance");
+			op.filter.kb_track = o.second.get<double>("filter_kb_track", 0);
+			op.filter.kb_track_note = o.second.get<int>("filter_kb_track_note", 36);
 
 			op.oscilator_count = o.second.get<size_t>("oscilator_count", 1);
 
@@ -925,14 +925,14 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		o.put("amp_kb_track_lower", op.amp_kb_track_lower);
 		o.put("amp_kb_track_note", op.amp_kb_track_note);
 
-		o.put("filter", op.filter);
-		o.put("pre_filter_drive", op.pre_filter_drive);
-		o.put("pre_filter_drive_amount", op.pre_filter_drive_amount);
-		o.put("filter_type", (int) op.filter_type);
-		o.add_child("filter_cutoff", save_prop_mod(op.filter_cutoff));
-		o.add_child("filter_resonance", save_prop_mod(op.filter_resonance));
-		o.put("filter_kb_track", op.filter_kb_track);
-		o.put("filter_kb_track_note", op.filter_kb_track_note);
+		o.put("filter", op.filter.on);
+		o.put("pre_filter_drive", op.filter.drive);
+		o.put("pre_filter_drive_amount", op.filter.drive_amount);
+		o.put("filter_type", (int) op.filter.type);
+		o.add_child("filter_cutoff", save_prop_mod(op.filter.cutoff));
+		o.add_child("filter_resonance", save_prop_mod(op.filter.resonance));
+		o.put("filter_kb_track", op.filter.kb_track);
+		o.put("filter_kb_track_note", op.filter.kb_track_note);
 
 		o.put("oscilator_count", op.oscilator_count);
 
