@@ -52,6 +52,7 @@ struct OscilatorEntity {
 	bool sync = false;
 	bool reset = false;
 	bool randomize = false;
+	double phase = 0;
 
 	size_t unison_amount = 0;
 	PropertyModulation volume = {1};

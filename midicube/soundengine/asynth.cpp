@@ -617,7 +617,7 @@ void AnalogSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned 
 		for (; j < max; ++j) {
 			OscilatorEntity& osc = preset.oscilators[j];
 			if (osc.reset) {
-				voice.parts[j].oscilator.reset();
+				voice.parts[j].oscilator.reset(osc.phase);
 			} else if (osc.randomize) {
 				voice.parts[j].oscilator.randomize();
 			}

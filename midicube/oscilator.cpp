@@ -167,8 +167,8 @@ double AnalogOscilator::modulator(double freq, double time_step, AnalogOscilator
 }
 
 
-void AnalogOscilator::reset() {
-	rotation = 0;
+void AnalogOscilator::reset(double phase) {
+	rotation = phase;
 }
 
 void AnalogOscilator::randomize() {
