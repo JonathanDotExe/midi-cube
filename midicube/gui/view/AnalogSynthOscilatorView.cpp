@@ -249,11 +249,17 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		controls.push_back(value);
 	}
 	tmp_y += 50;
-	//Reset and audible
+	//Reset
 	{
 		CheckBox* reset = new CheckBox(false, "Reset", main_font, 16, tmp_x, tmp_y, 40, 40);
 		reset->property.bind(osc.reset, handler);
 		controls.push_back(reset);
+	}
+	//Phase
+	{
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x + 160, tmp_y, 80, 40);
+		value->property.bind(osc.phase, handler);
+		controls.push_back(value);
 	}
 	tmp_y += 50;
 	//Randomize and sync
