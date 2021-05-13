@@ -404,7 +404,22 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		else if (opcode.first == "ampeg_release") {
 			tree.put("envelope.release", std::stod(opcode.second));
 		}
-
+		else if (opcode.first == "lokey") {
+			tree.put("min_note", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "hikey") {
+			tree.put("max_note", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "pitch_keycenter") {
+			tree.put("note", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "lovel") {
+			tree.put("min_velocity", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "hivel") {
+			tree.put("max_velocity", std::stoi(opcode.second));
+		}
+		//TODO tune
 		else {
 			std::cout << "Skipping unrecognized opcode " << opcode.first << "="
 					<< opcode.second << std::endl;
