@@ -386,6 +386,18 @@ void SfzSampleConverter::request_params() {
 	std::cin >> name;
 }
 
+static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree) {
+	//Opcodes
+	for (auto opcode : opcodes) {
+		if (opcode.first == "amp_veltrack") {
+			tree.put("envelope.velocity_amount", std::stod(opcode.second)/100.0);
+		} else {
+			std::cout << "Skipping unrecognized opcode " << opcode.first << "="
+					<< opcode.second << std::endl;
+		}
+	}
+}
+
 void SfzSampleConverter::convert() {
 	std::fstream f(src);
 	std::string text;
@@ -404,10 +416,11 @@ void SfzSampleConverter::convert() {
 	//Groups
 	for (SfzGroup group : instrument.groups) {
 		pt::ptree g;
+		parse_opcodes(group.opcodes, g);
 		//Regions
 		for (SfzRegion region : group.regions) {
 			pt::ptree r;
-			//TODO parse opcodes
+			parse_opcodes(region.opcodes, r);
 			g.add_child("regions.region", r);
 		}
 		tree.add_child("sound.groups.group", g);

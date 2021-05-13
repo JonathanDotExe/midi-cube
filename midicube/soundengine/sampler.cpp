@@ -127,7 +127,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		if (!note.region->env.sustain_entire_sample) {
 			//Volume
 			vol = note.env.amplitude(note.region->env.env, info.time_step, note.pressed, env.sustain);
-			vel_amount += note.region->env.amp_velocity_amount;
+			vel_amount += note.region->env.velocity_amount;
 		}
 
 		vol *= vel_amount * (note.velocity - 1) + 1;
@@ -242,7 +242,7 @@ Sampler::~Sampler() {
 }
 
 void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::string folder) {
-	region.env.amp_velocity_amount = tree.get<double>("envelope.velocity_amount", region.env.amp_velocity_amount);
+	region.env.velocity_amount = tree.get<double>("envelope.velocity_amount", region.env.velocity_amount);
 	region.env.env.attack = tree.get<double>("envelope.attack", region.env.env.attack);
 	region.env.env.decay = tree.get<double>("envelope.decay", region.env.env.decay);
 	region.env.env.sustain = tree.get<double>("envelope.sustain", region.env.env.sustain);
