@@ -129,7 +129,7 @@ struct AnalogSynthPart {
 	Filter filter1;
 	Filter filter2;
 	AnalogADSREnvelope amp_env;
-	LinearADSREnvelope mod_env;
+	AnalogADSREnvelope mod_env;
 
 	double fm = 0;
 };
