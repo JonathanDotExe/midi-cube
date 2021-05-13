@@ -88,7 +88,8 @@ struct OperatorEntity {
 	PropertyModulation volume = {1};
 	PropertyModulation panning = {0.5};
 
-	FilterEntity filter;
+	FilterEntity first_filter;
+	FilterEntity second_filter;
 
 	unsigned int oscilator_count = 1;
 	std::array<double, ANALOG_PART_COUNT> fm;
@@ -124,7 +125,8 @@ struct AnalogSynthPreset {
 
 struct AnalogSynthPart {
 	UnisonOscilator<8> oscilator;
-	Filter filter;
+	Filter filter1;
+	Filter filter2;
 	AnalogADSREnvelope amp_env;
 	LinearADSREnvelope mod_env;
 
