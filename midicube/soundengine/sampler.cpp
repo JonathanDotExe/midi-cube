@@ -153,7 +153,7 @@ bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnviro
 
 void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
 	if (this->sample) {
-		for (SampleRegion* region : index.velocities[velocity][note]) {
+		for (SampleRegion* region : index.velocities[velocity * 127][note]) {
 			size_t slot = this->note.press_note(info, real_note, note, velocity);
 			SamplerVoice& voice = this->note.note[slot];
 			voice.region = region;
