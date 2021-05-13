@@ -391,7 +391,21 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 	for (auto opcode : opcodes) {
 		if (opcode.first == "amp_veltrack") {
 			tree.put("envelope.velocity_amount", std::stod(opcode.second)/100.0);
-		} else {
+		}
+		else if (opcode.first == "ampeg_attack") {
+			tree.put("envelope.attack", std::stod(opcode.second));
+		}
+		else if (opcode.first == "ampeg_decay") {
+			tree.put("envelope.decay", std::stod(opcode.second));
+		}
+		else if (opcode.first == "ampeg_sustain") {
+			tree.put("envelope.sustain", std::stod(opcode.second));
+		}
+		else if (opcode.first == "ampeg_release") {
+			tree.put("envelope.release", std::stod(opcode.second));
+		}
+
+		else {
 			std::cout << "Skipping unrecognized opcode " << opcode.first << "="
 					<< opcode.second << std::endl;
 		}
