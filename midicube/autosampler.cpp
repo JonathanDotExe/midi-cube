@@ -419,6 +419,11 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		else if (opcode.first == "hivel") {
 			tree.put("max_velocity", std::stoi(opcode.second));
 		}
+		else if (opcode.first == "sample") {
+			std::string path = opcode.second;
+			boost::replace_all(path, "\r", "");
+			tree.put("sample.name", path);
+		}
 		//TODO tune
 		else {
 			std::cout << "Skipping unrecognized opcode " << opcode.first << "="
@@ -458,6 +463,7 @@ void SfzSampleConverter::convert() {
 	//Save to file
 	try {
 		pt::write_xml(dst + "/sound.xml", tree);
+		std::cout << "Finished converting sound!" << std::endl;
 	}
 	catch (pt::xml_parser_error& e) {
 		std::cerr << "Couldn't save file!" << std::endl;
