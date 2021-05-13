@@ -90,6 +90,7 @@ struct OperatorEntity {
 
 	FilterEntity first_filter;
 	FilterEntity second_filter;
+	bool filter_parallel = false;
 
 	unsigned int oscilator_count = 1;
 	std::array<double, ANALOG_PART_COUNT> fm;

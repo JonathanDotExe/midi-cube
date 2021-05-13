@@ -498,8 +498,16 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		//Playback
 		if (op.audible) {
 			//Filter
-			apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step);
-			apply_filter(op.second_filter, op_part.filter2, carrier, note, info.time_step);
+			if (op.filter_parallel) {
+				double c = carrier;
+				apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step);
+				apply_filter(op.second_filter, op_part.filter2, c, note, info.time_step);
+				carrier += c;
+			}
+			else {
+				apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step);
+				apply_filter(op.second_filter, op_part.filter2, carrier, note, info.time_step);
+			}
 			carrier *= volume;
 			//Pan
 			double panning = apply_modulation(PANNING_SCALE, op.panning,
@@ -977,8 +985,8 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		o.put("amp_kb_track_lower", op.amp_kb_track_lower);
 		o.put("amp_kb_track_note", op.amp_kb_track_note);
 
-		o.put("first_filter", save_filter(op.first_filter));
-		o.put("second_filter", save_filter(op.second_filter));
+		o.add_child("first_filter", save_filter(op.first_filter));
+		o.add_child("second_filter", save_filter(op.second_filter));
 
 		o.put("oscilator_count", op.oscilator_count);
 
