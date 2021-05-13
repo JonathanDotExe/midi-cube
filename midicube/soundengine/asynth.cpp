@@ -376,6 +376,35 @@ static inline double apply_modulation(const FixedScale &scale,
 	return scale.value(prog);
 }
 
+void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step) {
+	//Filter
+	if (filter.on) {
+		//Pre drive
+		if (filter.drive) {
+			carrier = atan(carrier * (1.5 + filter.drive_amount * 10));
+		}
+
+		FilterData data { filter.type };
+		data.cutoff = scale_cutoff(
+				apply_modulation(FILTER_CUTOFF_SCALE, filter.cutoff, env_val,
+						lfo_val, controls, note.velocity, aftertouch)); //TODO optimize
+		data.resonance = apply_modulation(FILTER_RESONANCE_SCALE,
+				filter.resonance, env_val, lfo_val, controls, note.velocity,
+				aftertouch);
+
+		if (filter.kb_track) {
+			double cutoff = data.cutoff;
+			//KB track
+			cutoff *= 1
+					+ ((double) note.note - filter.kb_track_note) / 12.0
+							* filter.kb_track;
+			data.cutoff = cutoff;
+		}
+
+		carrier = f.apply(data, carrier, time_step);
+	}
+}
+
 void AnalogSynth::process_note(double& lsample, double& rsample,
 		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env) {
 	//Mod Envs
@@ -469,29 +498,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		//Playback
 		if (op.audible) {
 			//Filter
-			if (op.filter.on) {
-				//Pre drive
-				if (op.filter.drive) {
-					carrier = atan(carrier * (1.5 + op.filter.drive_amount * 10));
-				}
-
-				FilterData filter { op.filter.type };
-				filter.cutoff = scale_cutoff(apply_modulation(FILTER_CUTOFF_SCALE,
-						op.filter.cutoff, env_val, lfo_val, controls,
-						note.velocity, aftertouch)); //TODO optimize
-				filter.resonance = apply_modulation(FILTER_RESONANCE_SCALE,
-						op.filter.resonance, env_val, lfo_val, controls,
-						note.velocity, aftertouch);
-
-				if (op.filter.kb_track) {
-					double cutoff = filter.cutoff;
-					//KB track
-					cutoff *= 1 + ((double) note.note - op.filter.kb_track_note) / 12.0 * op.filter.kb_track;
-					filter.cutoff = cutoff;
-				}
-
-				carrier = op_part.filter.apply(filter, carrier, info.time_step);
-			}
+			apply_filter(op.filter, op_part.filter, carrier, note, info.time_step);
 			carrier *= volume;
 			//Pan
 			double panning = apply_modulation(PANNING_SCALE, op.panning,

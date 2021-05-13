@@ -167,6 +167,8 @@ private:
 
 	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
 
+	inline void apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step);
+
 public:
 	AnalogSynthPreset preset;
 
