@@ -421,7 +421,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		}
 		else if (opcode.first == "sample") {
 			std::string path = opcode.second;
-			boost::replace_all(path, "\r", "");
+			boost::replace_all(path, "\\", "/");
 			tree.put("sample.name", path);
 		}
 		//TODO tune
