@@ -171,6 +171,14 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 		controls.push_back(value);
 	}
 	tmp_x += 90;
+	tmp_y += 65;
+
+	//Filter Parallel
+	{
+		CheckBox* parallel = new CheckBox(false, "Filter Parallel", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
+		parallel->property.bind(op.filter_parallel, handler);
+		controls.push_back(parallel);
+	}
 
 	//Col 2
 	tmp_x = 500;
@@ -178,6 +186,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 
 	//Filter Section
 	create_filter_view(tmp_x, tmp_y, op.first_filter, controls, show_amount, show_source, handler);
+	tmp_y += 10;
 	create_filter_view(tmp_x, tmp_y, op.second_filter, controls, show_amount, show_source, handler);
 
 	//Edit Sources

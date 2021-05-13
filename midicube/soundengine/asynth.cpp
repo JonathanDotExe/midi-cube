@@ -891,6 +891,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 				op.first_filter.kb_track_note = o.second.get<int>("filter_kb_track_note", 36);
 			}
 
+			op.filter_parallel = o.second.get<bool>("filter_parallel", false);
 			op.oscilator_count = o.second.get<size_t>("oscilator_count", 1);
 
 
@@ -960,7 +961,6 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 			o.put("fixed_freq", osc.fixed_freq);
 			o.put("note", osc.note);
 
-
 			o.put("unison_amount", osc.unison_amount);
 			o.add_child("volume", save_prop_mod(osc.volume));
 			o.add_child("sync_mul", save_prop_mod(osc.sync_mul));
@@ -988,6 +988,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		o.add_child("first_filter", save_filter(op.first_filter));
 		o.add_child("second_filter", save_filter(op.second_filter));
 
+		o.put("filter_parallel", op.filter_parallel);
 		o.put("oscilator_count", op.oscilator_count);
 
 		//FM
