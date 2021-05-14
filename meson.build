@@ -85,7 +85,8 @@ sampler_src = [
 	'autosampler-main.cpp',
 	'midicube/autosampler.cpp',
 	'midicube/audiofile.cpp',
-	'midicube/sfz.cpp'
+	'midicube/sfz.cpp',
+	'midicube/synthesiss.cpp'
 ]
 
 executable('midi-cube-autosampler', sampler_src, dependencies: sampler_deps, link_args: '-latomic')

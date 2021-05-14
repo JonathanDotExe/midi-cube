@@ -6,6 +6,7 @@
  */
 
 #include "autosampler.h"
+#include "synthesis.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>
@@ -418,6 +419,9 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		}
 		else if (opcode.first == "hivel") {
 			tree.put("max_velocity", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "volume") {
+			tree.put("volume", db_to_amp(std::stod(opcode.second)));
 		}
 		else if (opcode.first == "sample") {
 			std::string path = opcode.second;
