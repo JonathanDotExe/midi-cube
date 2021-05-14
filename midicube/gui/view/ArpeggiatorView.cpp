@@ -89,6 +89,21 @@ Scene ArpeggiatorView::create(Frame &frame) {
 		controls.push_back(step);
 	}
 
+	//Col 2
+	tmp_y = 40;
+	CheckBox* kb_sync = new CheckBox(true, "KB Sync", main_font, 18, 330, tmp_y, 40, 40);
+	kb_sync->property.bind(channel.arp.preset.kb_sync, handler);
+	controls.push_back(kb_sync);
+	tmp_y += 50;
+	CheckBox* repeat_edges = new CheckBox(true, "Repeat Edges", main_font, 18, 330, tmp_y, 40, 40);
+	repeat_edges->property.bind(channel.arp.preset.repeat_edges, handler);
+	controls.push_back(repeat_edges);
+	tmp_y += 50;
+	CheckBox* play_duplicates = new CheckBox(true, "Play Duplicates", main_font, 18, 330, tmp_y, 40, 40);
+	play_duplicates->property.bind(channel.arp.preset.play_duplicates, handler);
+	controls.push_back(play_duplicates);
+	tmp_y += 50;
+
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->set_on_click([&frame, this]() {

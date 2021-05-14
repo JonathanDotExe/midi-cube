@@ -9,6 +9,20 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * A touch responsive GUI
 * A web interface or a desktop client that allows uploading new sounds
 
+## How to install
+1. Clone this repository
+2. Make sure to install the dependencies
+		sudo apt install meson ninja-build libsndfile-dev libsfml-dev librtaudio-dev librtmidi-dev libboost-all-dev
+3. Build it using meson (working directory is the clone project)
+		mkdir build
+		meson ./ build
+		cd build
+		meson configure --buildtype release
+		ninja
+4. Create a "data" folder in the folder you run the project in (MIDICube will save it's programs and samples there)
+5. Run the compile "midi-cube" file in the build folder
+
+
 ## Used libraries
 * RtAudio licensed under the RtAudio License which is pretty similar to the MIT License (https://github.com/thestk/rtaudio https://github.com/thestk/rtaudio/blob/master/LICENSE)
 * RtMidi licensed under the RtMidi license which is pretty similar to the MIT license (https://github.com/thestk/rtmidi https://github.com/thestk/rtmidi/blob/master/LICENSE)
@@ -50,6 +64,7 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * https://stackoverflow.com/questions/3055815/dsp-filter-sweep-effect
 * https://www.electronics-tutorials.ws/de/filtern/passiver-tiefpassfilter.html
 * https://medium.com/the-seekers-project/coding-a-basic-reverb-algorithm-part-2-an-introduction-to-audio-programming-4db79dd4e325
+* Format frequencies used for the vocoder (https://en.wikipedia.org/wiki/Formant)
 
 ## Other resources that might be useful in the future
 * Nice forum post about exponential envelopes (https://www.kvraudio.com/forum/viewtopic.php?t=161416)

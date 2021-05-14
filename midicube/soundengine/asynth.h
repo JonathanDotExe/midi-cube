@@ -52,6 +52,7 @@ struct OscilatorEntity {
 	bool sync = false;
 	bool reset = false;
 	bool randomize = false;
+	double phase = 0;
 
 	size_t unison_amount = 0;
 	PropertyModulation volume = {1};
@@ -61,6 +62,20 @@ struct OscilatorEntity {
 	int semi = 0;
 	double transpose = 1;
 	PropertyModulation pitch = {0.5};
+
+	bool fixed_freq = false;
+	unsigned int note = 60;
+};
+
+struct FilterEntity {
+	bool on = false;
+	bool drive = false;
+	double drive_amount = 0;
+	FilterType type = FilterType::LP_12;
+	PropertyModulation cutoff = {1};
+	PropertyModulation resonance = {0};
+	double kb_track = 0;
+	unsigned int kb_track_note = 36;
 };
 
 struct OperatorEntity {
@@ -73,14 +88,9 @@ struct OperatorEntity {
 	PropertyModulation volume = {1};
 	PropertyModulation panning = {0.5};
 
-	bool filter = false;
-	bool pre_filter_drive = false;
-	double pre_filter_drive_amount = 0;
-	FilterType filter_type = FilterType::LP_12;
-	PropertyModulation filter_cutoff = {1};
-	PropertyModulation filter_resonance = {0};
-	double filter_kb_track = 0;
-	unsigned int filter_kb_track_note = 36;
+	FilterEntity first_filter;
+	FilterEntity second_filter;
+	bool filter_parallel = false;
 
 	unsigned int oscilator_count = 1;
 	std::array<double, ANALOG_PART_COUNT> fm;
@@ -112,18 +122,15 @@ struct AnalogSynthPreset {
 	bool mono = false;
 	bool legato = false;
 	double portamendo = 0;
-
-	//Delay effect
-	double delay_time = 0;
-	double delay_feedback = 0;
-	double delay_mix = 0;
 };
 
 struct AnalogSynthPart {
 	UnisonOscilator<8> oscilator;
 	Filter filter;
 	WaveTableADSREnvelope amp_env;
-	LinearADSREnvelope mod_env;
+	WaveTableADSREnvelope mod_env;
+	Filter filter1;
+	Filter filter2;
 
 	double fm = 0;
 };
@@ -163,6 +170,8 @@ private:
 	inline void process_note(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
 
 	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
+
+	inline void apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step);
 
 public:
 	AnalogSynthPreset preset;

@@ -54,7 +54,8 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 		controls.push_back(osc);
 		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
 			int x = tmp_x + j * 85 + 35;
-			DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y, 80, 40);
+			DragBox<double>* value = new DragBox<double>(0, 0, 2, main_font, 16, x, y, 80, 40);
+			value->border = 0;
 			value->property.bind(op.fm.at(j), handler);
 			//Color if feedback
 			if (i >= j) {

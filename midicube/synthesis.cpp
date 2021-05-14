@@ -39,7 +39,7 @@ void DelayBuffer::add_sample(double sample, unsigned int delay, unsigned int rep
 double DelayBuffer::process() {
 	double sample = buffer[index];
 	buffer[index] = 0;
-	index++;
+	++index;
 	index %= buffer.size();
 	return sample;
 }

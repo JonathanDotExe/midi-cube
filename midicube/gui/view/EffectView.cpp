@@ -12,6 +12,7 @@
 #include "../../effect/amplifier_simulation.h"
 #include "../../effect/bitcrusher.h"
 #include "../../effect/chorus.h"
+#include "../../effect/delay.h"
 #include "../../effect/reverb.h"
 #include "../../effect/rotary_speaker.h"
 #include "../../effect/tremolo.h"
@@ -562,37 +563,7 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 
-		//Vocoder Mix
-		{
-			Label *label = new Label("Vocoder Mix", main_font, 18, tmp_x, tmp_y);
-			label->text.setFillColor(sf::Color::White);
-			controls.push_back(label);
-			tmp_y += 25;
-
-			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
-					tmp_x, tmp_y, 180, 120);
-			rate->property.bind(vocoder->preset.vocoder_amp, handler);
-			controls.push_back(rate);
-
-			tmp_y -= 25;
-			tmp_x += 200;
-		}
-		//Carrier Mix
-		{
-			Label *label = new Label("Carrier Mix", main_font, 18, tmp_x, tmp_y);
-			label->text.setFillColor(sf::Color::White);
-			controls.push_back(label);
-			tmp_y += 25;
-
-			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
-				tmp_x, tmp_y, 180, 120);
-			rate->property.bind(vocoder->preset.carrier_amp, handler);
-			controls.push_back(rate);
-
-			tmp_y -= 25;
-			tmp_x += 200;
-		}
-		//Voice Mix
+		//Modulator Mix
 		{
 			Label *label = new Label("Modulator Mix", main_font, 18, tmp_x, tmp_y);
 			label->text.setFillColor(sf::Color::White);
@@ -600,8 +571,23 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y += 25;
 
 			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			rate->property.bind(vocoder->preset.modulator_mix, handler);
+			controls.push_back(rate);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		//Carrier Mix
+		{
+			Label *label = new Label("Mix", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			rate->property.bind(vocoder->preset.voice_amp, handler);
+			rate->property.bind(vocoder->preset.mix, handler);
 			controls.push_back(rate);
 
 			tmp_y -= 25;
@@ -648,7 +634,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+			DragBox<double> *value = new DragBox<double>(0, 0, 10, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
 			value->property.bind(vocoder->preset.modulator_amplification, handler);
 			controls.push_back(value);
@@ -664,9 +650,108 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
+			DragBox<double> *value = new DragBox<double>(0, 0, 10, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.post_amplification, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Slope
+		{
+			Label *label = new Label("Envelope", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.2, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.slope, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Compression
+		{
+			Label *label = new Label("Normalization", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.vocoder_amplification, handler);
+			value->property.bind(vocoder->preset.normalization, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		tmp_x = 10;
+		tmp_y += 160;
+
+		//Formant
+		{
+			Label *label = new Label("Formant Mode", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *formant = new OrganSwitch(true, main_font, tmp_x,
+				tmp_y, 180, 120);
+			formant->property.bind(vocoder->preset.formant_mode, handler);
+			controls.push_back(formant);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Min Freq
+		{
+			Label *label = new Label("Min Frequency", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 21000, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.min_freq, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Max Freq
+		{
+			Label *label = new Label("Max Frequency", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 21000, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.max_freq, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Resonance
+		{
+			Label *label = new Label("Resonance", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(vocoder->preset.resonance, handler);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -679,7 +764,7 @@ Scene EffectView::create(Frame &frame) {
 
 		//Background
 		bg->rect.setFillColor(sf::Color(0, 180, 60));
-		title->text.setString("Ultra-Tremolo L0L");
+		title->text.setString("Ultra-Tremolo L07");
 
 		//Tremolo
 		{
@@ -699,7 +784,7 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 
-		//Vibrato Rate
+		//Rate
 		{
 			Label *label = new Label("Rate", main_font, 18, tmp_x, tmp_y);
 			controls.push_back(label);
@@ -717,7 +802,7 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 
-		//Vibrato Depth
+		//Depth
 		{
 			Label *label = new Label("Depth", main_font, 18, tmp_x,
 				tmp_y);
@@ -752,6 +837,196 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
+	}
+	//Delay
+	else if (dynamic_cast<DelayEffect*>(effect) != nullptr) {
+		DelayEffect* delay = dynamic_cast<DelayEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color(255, 120, 120));
+		title->text.setString("Delay T5");
+
+		//Left
+		Label *left = new Label("Left", main_font, 24, tmp_x, tmp_y);
+		controls.push_back(left);
+		tmp_y += 30;
+		//On
+		{
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
+				tmp_y, 180, 120);
+			on->property.bind(delay->preset.on, handler);
+			controls.push_back(on);
+			hide_midi.push_back(on);
+
+			create_cc_control(effect->cc, handler, &delay->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Delay
+		{
+			Label *label = new Label("Delay", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.left_delay, handler);
+			value->drag_step = 4;
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.left_delay, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Init
+		{
+			Label *label = new Label("First Offset", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.left_init_delay_offset, handler);
+			value->drag_step = 4;
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.left_init_delay_offset,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Feedback
+		{
+			Label *label = new Label("Feedback", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.left_feedback, handler);
+			value->drag_step = 4;
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.left_feedback, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mix
+		{
+			Label *label = new Label("Mix", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.mix, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		tmp_y += 150;
+		tmp_x -= 200 * 5;
+
+		//Right
+		Label *right = new Label("Right", main_font, 24, tmp_x, tmp_y);
+		controls.push_back(right);
+		tmp_y += 30;
+		//Stereo
+		{
+			Label *label = new Label("Stereo", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *stereo = new OrganSwitch(false, main_font, tmp_x,
+				tmp_y, 180, 120);
+			stereo->property.bind(delay->preset.stereo, handler);
+			controls.push_back(stereo);
+			hide_midi.push_back(stereo);
+
+			create_cc_control(effect->cc, handler, &delay->preset.stereo, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Delay
+		{
+			Label *label = new Label("Delay", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.right_delay, handler);
+			value->drag_step = 4;
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.right_delay, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Init
+		{
+			Label *label = new Label("First Offset", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.right_init_delay_offset, handler);
+			value->drag_step = 4;
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.right_init_delay_offset,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Feedback
+		{
+			Label *label = new Label("Feedback", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(delay->preset.right_feedback, handler);
+			value->drag_step = 4;
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &delay->preset.right_feedback, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
 	}
 
 	//Edit MIDI Button

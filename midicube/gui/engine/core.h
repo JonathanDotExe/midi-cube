@@ -9,7 +9,6 @@
 #define MIDICUBE_GUI_ENGINE_CORE_H_
 
 #include <SFML/Graphics.hpp>
-#include <boost/lockfree/spsc_queue.hpp>
 #include <functional>
 #include "../../util.h"
 #include "../../midicube.h"

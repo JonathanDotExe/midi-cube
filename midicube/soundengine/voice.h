@@ -81,6 +81,9 @@ struct ArpeggiatorPreset {
 	unsigned int octaves = 1;
 	unsigned int value = 1;
 	bool hold = false;
+	bool repeat_edges = false;
+	bool kb_sync = true;
+	bool play_duplicates = false;
 };
 
 class Arpeggiator {
@@ -90,11 +93,12 @@ private:
 	std::size_t data_index = 0;
 	std::size_t note_index = 0;
 	bool restart = true;
+	bool second = false;
+	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
 
 public:
 	bool on = false;
 	ArpeggiatorPreset preset;
-	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
 	Metronome metronome;
 
 	Arpeggiator();

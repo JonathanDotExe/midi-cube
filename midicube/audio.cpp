@@ -41,7 +41,7 @@ void AudioHandler::init(int out_device, int in_device) {
 	//Set up input
 	RtAudio::StreamParameters input_params;
 	input_params.deviceId = in_device >= 0 ? in_device : audio.getDefaultInputDevice();
-	input_params.nChannels = 2;
+	input_params.nChannels = 1;
 	input_params.firstChannel = 0;
 
 	sample_rate = 44100;

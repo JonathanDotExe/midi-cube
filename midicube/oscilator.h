@@ -69,7 +69,7 @@ public:
 	double carrier(double freq, double time_step, AnalogOscilatorData& data);
 	double modulator(double freq, double time_step, AnalogOscilatorData& data);
 	void randomize();
-	void reset();
+	void reset(double phase = 0);
 	~AnalogOscilator();
 };
 
@@ -133,9 +133,9 @@ public:
 		}
 	}
 
-	void reset() {
+	void reset(double phase = 0) {
 		for (size_t i = 0; i < U; ++i) {
-			oscillators[i].reset();
+			oscillators[i].reset(phase);
 		}
 	}
 
