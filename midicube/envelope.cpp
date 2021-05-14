@@ -10,6 +10,25 @@
 #include <cmath>
 #include <iostream>
 
+
+double analog_adsr_wave(double prog) {
+	return pow(prog, 2.0/3.0);
+}
+
+double linear_adsr_wave(double prog) {
+	return prog;
+}
+
+double exponential_adsr_wave(double prog) {
+	double val = prog >= 1 ? 1 : (1 - pow(pow(M_E, -8/44100.0), prog * 44100));
+	return val;
+}
+
+
+WaveTable<2> LINEAR_ADSR_WAVE(linear_adsr_wave);
+WaveTable<1024> ANALOG_ADSR_WAVE(analog_adsr_wave);
+WaveTable<44101> EXPONENTIAL_ADSR_WAVE(exponential_adsr_wave);
+
 //ADSREnvelope
 double LinearADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
 	//Goto release phase
@@ -76,14 +95,8 @@ double LinearADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 	return volume;
 }
 
-double analog_adsr_wave(double prog) {
-	return pow(prog, 2.0/3.0);
-}
-
-WaveTable<1024> ANALOG_ADSR_WAVE(analog_adsr_wave);
-
 //AnalogADSREnvelope
-double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
+double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
 	double step = 0;
 	double s = 0;
 	//Goto release phase
@@ -116,7 +129,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		break;
 	case DECAY:
 		step = time_step/data.decay;
-		s = ANALOG_ADSR_WAVE.get_value(time);
+		s = EXPONENTIAL_ADSR_WAVE.get_value(time);
 		if (data.decay != 0) {
 			volume -= (s - last) * (data.peak_volume - data.sustain);
 			last = s;
@@ -149,7 +162,7 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		break;
 	case RELEASE:
 		step = time_step/data.release;
-		s = ANALOG_ADSR_WAVE.get_value(time);
+		s = EXPONENTIAL_ADSR_WAVE.get_value(time);
 		if (data.release != 0) {
 			volume -= (s - last) * (last_vol - data.release_volume);
 		}
