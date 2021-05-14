@@ -48,6 +48,7 @@ struct SampleRegion {
 	unsigned int max_note = 127;
 	double freq = note_to_freq(60);
 	double layer_velocity_amount = 0.0;
+	double volume = 1;
 
 	LoopedAudioSample sample;
 	LoopedAudioSample sustain_sample;

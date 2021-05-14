@@ -157,7 +157,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			size_t slot = this->note.press_note(info, real_note, note, velocity);
 			SamplerVoice& voice = this->note.note[slot];
 			voice.region = region;
-			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * sample->volume;
+			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume * sample->volume;
 			voice.sample = (sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample;
 
 			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
@@ -282,6 +282,8 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.max_note = tree.get<unsigned int>("max_note", region.max_note);
 	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity);
 	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity);
+
+	region.volume = tree.get<double>("volume", region.volume);
 
 	std::string file = "";
 	//Sample
