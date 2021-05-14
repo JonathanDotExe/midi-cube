@@ -314,7 +314,7 @@ void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegi
 		SampleRegion r = region;
 		pt::ptree t = c.second;
 
-		load_region(tree, r, false, folder);
+		load_region(t, r, false, folder);
 
 		//Regions
 		auto rs = t.get_child_optional("regions");
