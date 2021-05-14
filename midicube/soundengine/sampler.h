@@ -68,7 +68,7 @@ struct SamplerVoice : public TriggeredNote {
 	double layer_amp = 1;
 	SampleRegion* region = nullptr;
 	LoopedAudioSample* sample = nullptr;
-	LinearADSREnvelope env;
+	AnalogADSREnvelope env;
 	Filter lfilter;
 	Filter rfilter;
 };

@@ -97,10 +97,9 @@ double AnalogADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 	switch (phase) {
 	case ATTACK:
 		step = time_step/data.attack;
-		s = ANALOG_ADSR_WAVE.get_value(time) * data.peak_volume;
 		if (data.attack != 0) {
-			volume += s - last;
-			last = s;
+			volume += data.peak_volume * step;
+			last = volume;
 		}
 		else {
 			volume = data.peak_volume;
@@ -192,5 +191,3 @@ void EnvelopeFollower::apply(double signal, double time_step) {
 double EnvelopeFollower::volume() {
 	return value;
 }
-
-
