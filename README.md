@@ -68,3 +68,4 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 
 ## Other resources that might be useful in the future
 * Nice forum post about exponential envelopes (https://www.kvraudio.com/forum/viewtopic.php?t=161416)
+* Good envelope shape (https://sfzformat.com/opcodes/ampeg_attack)

@@ -22,47 +22,6 @@ SampleSound::SampleSound() {
 
 }
 
-void SampleSound::get_sample(double freq, double velocity, SamplerVoice& voice, bool sustain) {
-	//Find regions
-	double last_vel = 0;
-	double curr_vel = 0;
-	SampleZone* zone = nullptr;
-	const size_t velocity_size = samples.size();
-	if (velocity_size >= 1) {
-		size_t i = 0;
-		for (; i < velocity_size; ++i) {
-			curr_vel = samples[i]->max_velocity;
-			if (velocity <= samples[i]->max_velocity) {
-				break;
-			}
-			last_vel = samples[i]->max_velocity;
-		}
-		SampleVelocityLayer* layer = samples[std::max((ssize_t) 0, (ssize_t) i - 1)];
-		const size_t zones_size = layer->zones.size();
-		if (zones_size >= 1) {
-			size_t j = 0;
-			for (; j < zones_size; ++j) {
-				if (freq <= layer->zones[j]->max_freq) {
-					break;
-				}
-			}
-			zone = layer->zones[std::max((ssize_t) 0, (ssize_t) j - 1)];
-		}
-	}
-	//Update zone
-	voice.zone = zone;
-	if (voice.zone) {
-		voice.layer_amp = (1 - voice.zone->layer_velocity_amount * (1 - (velocity - last_vel)/(curr_vel - last_vel))) * volume;
-		voice.sample = (sustain && voice.zone->sustain_sample.sample.samples.size()) ? &voice.zone->sustain_sample : &voice.zone->sample;
-		if (voice.zone->env >= 0 && (size_t) voice.zone->env < envelopes.size()) {
-			voice.env_data = &envelopes[voice.zone->env];
-		}
-		if (voice.zone->filter >= 0 && (size_t) voice.zone->filter < filters.size()) {
-			voice.filter = &filters[voice.zone->filter];
-		}
-	}
-}
-
 SampleSound::~SampleSound() {
 	for (size_t i = 0; i < samples.size(); ++i) {
 		delete samples[i];
@@ -106,11 +65,11 @@ SampleSoundStore::~SampleSoundStore() {
 
 //Sampler
 Sampler::Sampler() {
-	sample = global_sample_store.get_sound(0);
+	set_sample(global_sample_store.get_sound(0));
 }
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	if (note.zone && note.sample) {
+	if (note.region && note.sample) {
 		double vol = 1;
 		double vel_amount = 0;
 
@@ -119,7 +78,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		double crossfade = 1;
 		//Sound
 		//Loop
-		if (note.zone->loop) {
+		if (note.region->loop) {
 			double loop_start_time = (double) note.sample->loop_start / note.sample->sample.sample_rate;
 			double loop_duration_time = (double) note.sample->loop_duration / note.sample->sample.sample_rate;
 			double loop_crossfade_time = (double) note.sample->loop_crossfade / note.sample->sample.sample_rate;
@@ -144,40 +103,44 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 			}
 		}
 
-		l += note.sample->sample.isample(0, note.time, info.sample_rate) * crossfade;
-		r += note.sample->sample.isample(1, note.time, info.sample_rate) * crossfade;
+		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
+			l += note.sample->sample.isample(0, note.time, info.sample_rate) * crossfade;
+			r += note.sample->sample.isample(1, note.time, info.sample_rate) * crossfade;
+		}
 
 		//Filter
-		if (note.filter) {
-			FilterData filter { note.filter->filter_type };
-			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.filter->filter_cutoff + note.filter->filter_velocity_amount * note.velocity))); //TODO optimize
-			filter.resonance = note.filter->filter_resonance;
+		if (note.region->filter.on) {
+			FilterData filter { note.region->filter.filter_type };
+			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.region->filter.filter_cutoff + note.region->filter.filter_velocity_amount * note.velocity))); //TODO optimize
+			filter.resonance = note.region->filter.filter_resonance;
 
-			if (note.filter->filter_kb_track) {
+			if (note.region->filter.filter_kb_track) {
 				double cutoff = filter.cutoff;
 				//KB track
-				cutoff *= 1 + ((double) note.note - 36) / 12.0 * note.filter->filter_kb_track;
+				cutoff *= 1 + ((double) note.note - 36) / 12.0 * note.region->filter.filter_kb_track;
 				filter.cutoff = cutoff;
 			}
 
 			l = note.lfilter.apply(filter, l, info.time_step);
 			r = note.rfilter.apply(filter, r, info.time_step);
 		}
+
 		//Env
-		if (note.env_data) {
-			if (!note.env_data->sustain_entire_sample) {
-				//Volume
-				vol = note.env.amplitude(note.env_data->env, info.time_step, note.pressed, env.sustain);
-				vel_amount += note.env_data->amp_velocity_amount;
-			}
+		if (!note.region->env.sustain_entire_sample) {
+			//Volume
+			vol = note.env.amplitude(note.region->env.env, info.time_step, note.pressed, env.sustain);
+			vel_amount += note.region->env.velocity_amount;
 		}
+
 		vol *= vel_amount * (note.velocity - 1) + 1;
 		vol *= note.layer_amp;
 
-		note.time += note.freq/note.zone->freq * env.pitch_bend * info.time_step;
+		note.time += note.freq/note.region->freq * env.pitch_bend * info.time_step;
 		//Playback
-		lsample += l * vol;
-		rsample += r * vol;
+		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
+			lsample += l * vol;
+			rsample += r * vol;
+		}
 	}
 	else {
 		ADSREnvelopeData data = {0, 0, 0, 0};
@@ -186,32 +149,31 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 }
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
-	if (note.zone && note.sample) {
-		return note.env_data->sustain_entire_sample ? note.time < note.sample->sample.duration() : note.env.is_finished();
+	if (note.region && note.sample) {
+		return note.region->env.sustain_entire_sample ? note.time < note.sample->sample.duration() : note.env.is_finished();
 	}
 	return true;
 }
 
 void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
-	size_t slot = this->note.press_note(info, real_note, note, velocity);
-	SamplerVoice& voice = this->note.note[slot];
 	if (this->sample) {
-		this->sample->get_sample(voice.freq, voice.velocity, voice, environment.sustain);
+		for (SampleRegion* region : index.velocities[velocity * 127][note]) {
+			size_t slot = this->note.press_note(info, real_note, note, velocity);
+			SamplerVoice& voice = this->note.note[slot];
+			voice.region = region;
+			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume * sample->volume;
+			voice.sample = (sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample;
+
+			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
+				voice.time = voice.sample->loop_start;
+			}
+			else {
+				voice.time = 0;
+			}
+			voice.hit_loop = false;
+			voice.env.reset();
+		}
 	}
-	else {
-		voice.zone = nullptr;
-		voice.sample = nullptr;
-		voice.filter = nullptr;
-		voice.env_data = nullptr;
-	}
-	if (voice.zone && voice.zone->loop == LoopType::ALWAYS_LOOP) {
-		voice.time = voice.sample->loop_start;
-	}
-	else {
-		voice.time = 0;
-	}
-	voice.hit_loop = false;
-	voice.env.reset();
 }
 
 void Sampler::release_note(SampleInfo& info, unsigned int note) {
@@ -233,10 +195,10 @@ ssize_t Sampler::get_sound_index() {
 
 void Sampler::set_sound_index(ssize_t index) {
 	if (index < 0) {
-		sample = nullptr;
+		set_sample(nullptr);
 	}
 	else {
-		sample = global_sample_store.get_sound(index);
+		set_sample(global_sample_store.get_sound(index));
 	}
 }
 
@@ -256,17 +218,134 @@ void Sampler::apply_program(EngineProgram *prog) {
 	SamplerProgram* p = dynamic_cast<SamplerProgram*>(prog);
 	//Create new
 	if (p) {
-		sample = global_sample_store.get_sound(p->sound_name);
+		set_sample(global_sample_store.get_sound(p->sound_name));
 	}
 	else {
-		sample = nullptr;
+		set_sample(nullptr);
+	}
+}
+
+void Sampler::set_sample(SampleSound *sample) {
+	this->sample = sample;
+	index = {};
+	if (sample) {
+		for (SampleRegion* region : sample->samples) {
+			size_t max_vel = std::min((size_t) MIDI_NOTES, (size_t) region->max_velocity);
+			size_t max_note = std::min((size_t) MIDI_NOTES, (size_t) region->max_note);
+			for (size_t vel = region->min_velocity; vel <= max_vel; ++vel) {
+				for (size_t note = region->min_note; note <= max_note; ++note) {
+					index.velocities[vel][note].push_back(region);
+				}
+			}
+		}
 	}
 }
 
 Sampler::~Sampler() {
-	sample = nullptr;
+	set_sample(nullptr);
 }
 
+void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::string folder) {
+	region.env.velocity_amount = tree.get<double>("envelope.velocity_amount", region.env.velocity_amount);
+	region.env.env.attack = tree.get<double>("envelope.attack", region.env.env.attack);
+	region.env.env.decay = tree.get<double>("envelope.decay", region.env.env.decay);
+	region.env.env.sustain = tree.get<double>("envelope.sustain", region.env.env.sustain);
+	region.env.env.release = tree.get<double>("envelope.release", region.env.env.release);
+	region.env.sustain_entire_sample = tree.get<bool>("envelope.sustain_entire_sample", region.env.sustain_entire_sample);
+
+	region.filter.filter_cutoff = tree.get<double>("filter.cutoff", region.filter.filter_cutoff);
+	region.filter.filter_kb_track = tree.get<double>("filter.kb_track", region.filter.filter_kb_track);
+	region.filter.filter_kb_track_note = tree.get<unsigned int>("filter.kb_track_note", region.filter.filter_kb_track_note);
+	region.filter.filter_resonance = tree.get<double>("filter.resonance", region.filter.filter_resonance);
+	region.filter.filter_velocity_amount = tree.get<double>("filter.velocity_amount", region.filter.filter_velocity_amount);
+
+	std::string type = tree.get<std::string>("filter.type", "");
+	if (type == "LP_12") {
+		region.filter.filter_type = FilterType::LP_12;
+	}
+	else if (type == "LP_24") {
+		region.filter.filter_type = FilterType::LP_24;
+	}
+	else if (type == "HP_12") {
+		region.filter.filter_type = FilterType::HP_12;
+	}
+	else if (type == "HP_24") {
+		region.filter.filter_type = FilterType::HP_24;
+	}
+	else if (type == "BP_12") {
+		region.filter.filter_type = FilterType::LP_12;
+	}
+	else if (type == "BP_24") {
+		region.filter.filter_type = FilterType::LP_24;
+	}
+
+	if (tree.get_child_optional("note")) {
+		region.freq = note_to_freq(tree.get<double>("note", 60));
+	}
+	region.min_note = tree.get<unsigned int>("min_note", region.min_note);
+	region.max_note = tree.get<unsigned int>("max_note", region.max_note);
+	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity);
+	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity);
+
+	region.volume = tree.get<double>("volume", region.volume);
+
+	std::string trigger = tree.get<std::string>("trigger", "");
+	if (trigger == "attack") {
+		region.trigger = TriggerType::ATTACK_TRIGGER;
+	}
+	else if (trigger == "release") {
+		region.trigger = TriggerType::RELEASE_TRIGGER;
+	}
+
+	std::string file = "";
+	//Sample
+	file = tree.get<std::string>("sample.name", "");
+	region.sample.loop_start = tree.get<unsigned int>("sample.loop_start", region.sample.loop_start);
+	region.sample.loop_duration = tree.get<unsigned int>("sample.loop_duration", region.sample.loop_start);
+	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_start);
+
+	if (load_sample && file != "") {
+		if (!read_audio_file(region.sample.sample, folder + "/" + file)) {
+			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
+		}
+	}
+
+	//Sustain Sample
+	std::string sfile = tree.get<std::string>("sustain_sample.name", "");
+	region.sustain_sample.loop_start = tree.get<unsigned int>("sustain_sample.loop_start", region.sustain_sample.loop_start);
+	region.sustain_sample.loop_duration = tree.get<unsigned int>("sustain_sample.loop_duration", region.sustain_sample.loop_start);
+	region.sustain_sample.loop_crossfade = tree.get<unsigned int>("sustain_sample.loop_crossfade", region.sustain_sample.loop_start);
+
+	if (load_sample && sfile != "") {
+		if (!read_audio_file(region.sustain_sample.sample, folder + "/" + sfile)) {
+			std::cerr << "Couldn't load sustain sample file " << folder + "/" + sfile << std::endl;
+		}
+	}
+}
+
+void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegion region, std::string folder) {
+	for (auto c : tree) {
+		SampleRegion r = region;
+		pt::ptree t = c.second;
+
+		load_region(t, r, false, folder);
+
+		//Regions
+		auto rs = t.get_child_optional("regions");
+		if (rs) {
+			for (auto re : rs.get()) {
+				regions.push_back(new SampleRegion(r));
+				load_region(re.second, *regions.at(regions.size() - 1), true, folder);
+			}
+		}
+		//Groups
+		auto groups = t.get_child_optional("groups");
+		if (groups) {
+			load_groups(groups.get(), regions, r, folder);
+		}
+
+	}
+}
 
 extern SampleSound* load_sound(std::string folder) {
 	//Load file
@@ -279,104 +358,10 @@ extern SampleSound* load_sound(std::string folder) {
 		sound = new SampleSound();
 		sound->name = tree.get<std::string>("sound.name", "Sound");
 		sound->volume = tree.get<double>("sound.volume", 1);
-		//Load Envelopes
-		for (auto e : tree.get_child("sound.envelopes")) {
-			SampleEnvelope env = {};
-			env.amp_velocity_amount = e.second.get<double>("velocity_amount", 0);
-			env.env.attack = e.second.get<double>("attack", 0);
-			env.env.decay = e.second.get<double>("decay", 0);
-			env.env.sustain = e.second.get<double>("sustain", 1);
-			env.env.release = e.second.get<double>("release", 0);
-			env.sustain_entire_sample = e.second.get<bool>("sustain_entire_sample", false);
-
-			sound->envelopes.push_back(env);
-		}
-		//Load Filters
-		for (auto f : tree.get_child("sound.filters")) {
-			SampleFilter filter = {};
-			filter.filter_cutoff = f.second.get<double>("cutoff", 1);
-			filter.filter_kb_track = f.second.get<double>("kb_track", 0);
-			filter.filter_kb_track_note = f.second.get<unsigned int>("kb_track_note", 36);
-			filter.filter_resonance = f.second.get<double>("resonance", 0);
-			filter.filter_velocity_amount = f.second.get<double>("velocity_amount", 0);
-
-			std::string type = f.second.get<std::string>("type");
-			if (type == "LP_12") {
-				filter.filter_type = FilterType::LP_12;
-			}
-			else if (type == "LP_24") {
-				filter.filter_type = FilterType::LP_24;
-			}
-			else if (type == "HP_12") {
-				filter.filter_type = FilterType::HP_12;
-			}
-			else if (type == "HP_24") {
-				filter.filter_type = FilterType::HP_24;
-			}
-			else if (type == "BP_12") {
-				filter.filter_type = FilterType::LP_12;
-			}
-			else if (type == "BP_24") {
-				filter.filter_type = FilterType::LP_24;
-			}
-
-			sound->filters.push_back(filter);
-		}
-		//Load velocity layers
-		for (auto r : tree.get_child("sound.velocity_layers")) {
-			SampleVelocityLayer* layer = new SampleVelocityLayer();
-			layer->max_velocity = r.second.get<double>("velocity", 1.0);
-			//Load zones
-			for (auto z : r.second.get_child("zones")) {
-				SampleZone* zone = new SampleZone();
-				zone->freq = note_to_freq(z.second.get<double>("note", 60.0));
-				zone->layer_velocity_amount = z.second.get<double>("layer_velocity_amount", 0);
-				zone->max_freq = note_to_freq(z.second.get<double>("max_note", 127.0));
-				zone->env = z.second.get<double>("envelope", 0);
-				zone->filter = z.second.get<double>("filter", 0);
-				//Loop
-				std::string type = z.second.get<std::string>("loop_type", "NO_LOOP");
-				if (type == "NO_LOOP") {
-					zone->loop = LoopType::NO_LOOP;
-				}
-				else if (type == "ATTACK_LOOP") {
-					zone->loop = LoopType::ATTACK_LOOP;
-				}
-				else if (type == "ALWAYS_LOOP") {
-					zone->loop = LoopType::ALWAYS_LOOP;
-				}
-				std::string file;
-				//Sample
-				if (z.second.get_child_optional("sample.name")) {
-					file = folder + "/" + z.second.get<std::string>("sample.name", "");
-					zone->sample.loop_start = z.second.get<unsigned int>("sample.loop_start", 0);
-					zone->sample.loop_duration = z.second.get<unsigned int>("sample.loop_duration", 0);
-					zone->sample.loop_crossfade = z.second.get<unsigned int>("sample.loop_crossfade", 0);
-				}
-				else {
-					file = folder + "/" + z.second.get<std::string>("sample", "");
-				}
-				if (!read_audio_file(zone->sample.sample, file)) {
-					std::cerr << "Couldn't load sample file " << file << std::endl;
-				}
-				std::string sfile;
-				if (z.second.get_child_optional("sustain_sample.name")) {
-					sfile = folder + "/" + z.second.get<std::string>("sustain_sample.name", "");
-					zone->sustain_sample.loop_start = z.second.get<unsigned int>("sustain_sample.loop_start", 0);
-					zone->sustain_sample.loop_duration = z.second.get<unsigned int>("sustain_sample.loop_duration", 0);
-					zone->sustain_sample.loop_crossfade = z.second.get<unsigned int>("sustain_sample.loop_crossfade", 0);
-				}
-				else {
-					sfile = folder + "/" + z.second.get<std::string>("sustain_sample", "");
-				}
-				if (sfile != folder + "/") {
-					if (!read_audio_file(zone->sustain_sample.sample, sfile)) {
-						std::cerr << "Couldn't load sample file " << sfile << std::endl;
-					}
-				}
-				layer->zones.push_back(zone);
-			}
-			sound->samples.push_back(layer);
+		//Load groups
+		auto groups = tree.get_child_optional("sound.groups");
+		if (groups) {
+			load_groups(groups.get(), sound->samples, {}, folder);
 		}
 	}
 	catch (pt::xml_parser_error& e) {

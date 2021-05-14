@@ -12,6 +12,7 @@
 
 #include <array>
 #include "filter.h"
+#include "wavetable.h"
 
 struct TriggeredNote {
 	double start_time = 0;
@@ -69,7 +70,8 @@ public:
 	}
 };
 
-class AnalogADSREnvelope {
+
+class WaveTableADSREnvelope {
 
 public:
 	ADSREnvelopePhase phase = FINISHED;

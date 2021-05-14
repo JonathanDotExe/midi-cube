@@ -27,6 +27,7 @@ src = [
 	'midicube/midicube.cpp',
 	'midicube/program.cpp',
 	'midicube/oscilator.cpp',
+	'midicube/sfz.cpp',
 	'midicube/synthesis.cpp',
 	'midicube/util.cpp',
 	'midicube/wavetable.cpp',
@@ -84,7 +85,9 @@ sampler_deps = [
 sampler_src = [
 	'autosampler-main.cpp',
 	'midicube/autosampler.cpp',
-	'midicube/audiofile.cpp'
+	'midicube/audiofile.cpp',
+	'midicube/sfz.cpp',
+	'midicube/synthesis.cpp'
 ]
 
 executable('midi-cube-autosampler', sampler_src, dependencies: sampler_deps, link_args: '-latomic')

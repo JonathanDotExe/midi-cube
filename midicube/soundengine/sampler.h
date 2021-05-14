@@ -12,11 +12,18 @@
 #include "../audiofile.h"
 #include "../envelope.h"
 
+#define MIDI_NOTES 128
+
 enum LoopType {
 	NO_LOOP, ATTACK_LOOP, ALWAYS_LOOP
 };
 
+enum TriggerType {
+	ATTACK_TRIGGER, RELEASE_TRIGGER
+};
+
 struct SampleFilter {
+	bool on = false;
 	FilterType filter_type = FilterType::LP_12;
 	double filter_cutoff = 1;
 	double filter_resonance = 0;
@@ -27,7 +34,7 @@ struct SampleFilter {
 
 struct SampleEnvelope {
 	ADSREnvelopeData env = {0, 0, 1, 0};
-	double amp_velocity_amount = 0.0;
+	double velocity_amount = 0.0;
 	bool sustain_entire_sample = false;
 };
 
@@ -38,61 +45,52 @@ struct LoopedAudioSample {
 	unsigned int loop_crossfade = 0;
 };
 
-struct SampleZone {
+struct SampleRegion {
+	unsigned int min_velocity = 0;
+	unsigned int max_velocity = 127;
+	unsigned int min_note = 0;
+	unsigned int max_note = 127;
+	double freq = note_to_freq(60);
+	double layer_velocity_amount = 0.0;
+	double volume = 1;
+
 	LoopedAudioSample sample;
 	LoopedAudioSample sustain_sample;
 	LoopType loop = NO_LOOP;
 
+	SampleFilter filter;
+	SampleEnvelope env;
 
-	double layer_velocity_amount = 0.0;
-	double freq = 0;
-	double max_freq = 0;
-	ssize_t filter = -1;
-	ssize_t env = -1;
+	TriggerType trigger = TriggerType::ATTACK_TRIGGER;
 
-	SampleZone () {
+	SampleRegion() {
 		sample.sample.clear();
 		sustain_sample.sample.clear();
 	};
-
-};
-
-struct SampleVelocityLayer {
-	double max_velocity;
-	std::vector<SampleZone*> zones = {};
-
-	~SampleVelocityLayer() {
-		for (SampleZone* zone : zones) {
-			delete zone;
-		}
-		zones.clear();
-	}
 };
 
 struct SamplerVoice : public TriggeredNote {
 	double time = 0;
 	bool hit_loop = false;
 	double layer_amp = 1;
-	SampleZone* zone = nullptr;
+	SampleRegion* region = nullptr;
 	LoopedAudioSample* sample = nullptr;
-	SampleEnvelope* env_data = nullptr;
-	SampleFilter* filter = nullptr;
-	LinearADSREnvelope env;
+	WaveTableADSREnvelope env;
 	Filter lfilter;
 	Filter rfilter;
+};
+
+struct SampleRegionIndex {
+	std::array<std::array<std::vector<SampleRegion*>, MIDI_NOTES>, MIDI_NOTES> velocities;
 };
 
 class SampleSound {
 public:
 	std::string name = "Sample";
 	double volume = 1;
-	std::vector<SampleEnvelope> envelopes = {};
-	std::vector<SampleFilter> filters = {};
-	std::vector<SampleVelocityLayer*> samples = {};
+	std::vector<SampleRegion*> samples = {};
 
 	SampleSound();
-
-	void get_sample(double freq, double velocity, SamplerVoice& voic, bool sustain);
 
 	~SampleSound();
 
@@ -134,6 +132,9 @@ class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 
 private:
 	SampleSound* sample;
+	SampleRegionIndex index;
+
+	void set_sample (SampleSound* sample);
 
 public:
 

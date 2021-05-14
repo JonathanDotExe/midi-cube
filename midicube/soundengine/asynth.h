@@ -126,10 +126,11 @@ struct AnalogSynthPreset {
 
 struct AnalogSynthPart {
 	UnisonOscilator<8> oscilator;
+	Filter filter;
+	WaveTableADSREnvelope amp_env;
+	WaveTableADSREnvelope mod_env;
 	Filter filter1;
 	Filter filter2;
-	AnalogADSREnvelope amp_env;
-	AnalogADSREnvelope mod_env;
 
 	double fm = 0;
 };

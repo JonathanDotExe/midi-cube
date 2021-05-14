@@ -6,11 +6,14 @@
  */
 
 #include "autosampler.h"
+#include "synthesis.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <regex>
+#include <fstream>
+#include <streambuf>
 
 namespace pt = boost::property_tree;
 
@@ -375,3 +378,98 @@ void SampleSoundCreator::generate_sound() {
 	}
 }
 
+void SfzSampleConverter::request_params() {
+	std::cout << "Enter input file path!" << std::endl;
+	std::cin >> src;
+	std::cout << "Enter output file path!" << std::endl;
+	std::cin >> dst;
+	std::cout << "Enter the name of created instrument!" << std::endl;
+	std::cin >> name;
+}
+
+static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree) {
+	//Opcodes
+	for (auto opcode : opcodes) {
+		if (opcode.first == "amp_veltrack") {
+			tree.put("envelope.velocity_amount", std::stod(opcode.second)/100.0);
+		}
+		else if (opcode.first == "ampeg_attack") {
+			tree.put("envelope.attack", std::stod(opcode.second));
+		}
+		else if (opcode.first == "ampeg_decay") {
+			tree.put("envelope.decay", std::stod(opcode.second));
+		}
+		else if (opcode.first == "ampeg_sustain") {
+			tree.put("envelope.sustain", std::stod(opcode.second));
+		}
+		else if (opcode.first == "ampeg_release") {
+			tree.put("envelope.release", std::stod(opcode.second));
+		}
+		else if (opcode.first == "lokey") {
+			tree.put("min_note", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "hikey") {
+			tree.put("max_note", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "pitch_keycenter") {
+			tree.put("note", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "lovel") {
+			tree.put("min_velocity", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "hivel") {
+			tree.put("max_velocity", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "volume") {
+			tree.put("volume", db_to_amp(std::stod(opcode.second)));
+		}
+		else if (opcode.first == "sample") {
+			std::string path = opcode.second;
+			boost::replace_all(path, "\\", "/");
+			tree.put("sample.name", path);
+		}
+		//TODO tune
+		else {
+			std::cout << "Skipping unrecognized opcode " << opcode.first << "="
+					<< opcode.second << std::endl;
+		}
+	}
+}
+
+void SfzSampleConverter::convert() {
+	std::fstream f(src);
+	std::string text;
+	std::string t;
+
+	while (getline(f, t)) {
+		text += t + "\n";
+	}
+
+	SfzInstrument instrument = parser.parse(text);
+	std::cout << "Loaded instrument" << std::endl;
+	pt::ptree tree;
+	//Name
+	tree.put("sound.name", name);
+
+	//Groups
+	for (SfzGroup group : instrument.groups) {
+		pt::ptree g;
+		parse_opcodes(group.opcodes, g);
+		//Regions
+		for (SfzRegion region : group.regions) {
+			pt::ptree r;
+			parse_opcodes(region.opcodes, r);
+			g.add_child("regions.region", r);
+		}
+		tree.add_child("sound.groups.group", g);
+	}
+
+	//Save to file
+	try {
+		pt::write_xml(dst + "/sound.xml", tree);
+		std::cout << "Finished converting sound!" << std::endl;
+	}
+	catch (pt::xml_parser_error& e) {
+		std::cerr << "Couldn't save file!" << std::endl;
+	}
+}
