@@ -18,6 +18,10 @@ enum LoopType {
 	NO_LOOP, ATTACK_LOOP, ALWAYS_LOOP
 };
 
+enum TriggerType {
+	ATTACK_TRIGGER, RELEASE_TRIGGER
+};
+
 struct SampleFilter {
 	bool on = false;
 	FilterType filter_type = FilterType::LP_12;
@@ -56,6 +60,8 @@ struct SampleRegion {
 
 	SampleFilter filter;
 	SampleEnvelope env;
+
+	TriggerType trigger = TriggerType::ATTACK_TRIGGER;
 
 	SampleRegion() {
 		sample.sample.clear();

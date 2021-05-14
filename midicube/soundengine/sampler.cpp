@@ -103,8 +103,10 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 			}
 		}
 
-		l += note.sample->sample.isample(0, note.time, info.sample_rate) * crossfade;
-		r += note.sample->sample.isample(1, note.time, info.sample_rate) * crossfade;
+		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
+			l += note.sample->sample.isample(0, note.time, info.sample_rate) * crossfade;
+			r += note.sample->sample.isample(1, note.time, info.sample_rate) * crossfade;
+		}
 
 		//Filter
 		if (note.region->filter.on) {
@@ -135,8 +137,10 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 
 		note.time += note.freq/note.region->freq * env.pitch_bend * info.time_step;
 		//Playback
-		lsample += l * vol;
-		rsample += r * vol;
+		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
+			lsample += l * vol;
+			rsample += r * vol;
+		}
 	}
 	else {
 		ADSREnvelopeData data = {0, 0, 0, 0};
@@ -284,6 +288,14 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity);
 
 	region.volume = tree.get<double>("volume", region.volume);
+
+	std::string trigger = tree.get<std::string>("trigger", "");
+	if (trigger == "attack") {
+		region.trigger = TriggerType::ATTACK_TRIGGER;
+	}
+	else if (trigger == "release") {
+		region.trigger = TriggerType::RELEASE_TRIGGER;
+	}
 
 	std::string file = "";
 	//Sample
