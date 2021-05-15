@@ -128,7 +128,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		step = time_step/data.attack;
 		s = wavetable_adsr(time, data.attack_shape);
 		if (data.attack != 0) {
-			volume += (s - last) * step;
+			volume += (s - last);
 			last = s;
 		}
 		else {
