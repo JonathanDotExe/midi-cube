@@ -720,6 +720,11 @@ static ADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
 	data.decay = tree.get("decay", 0.0);
 	data.sustain = tree.get("sustain", 1.0);
 	data.release = tree.get("release", 0.0005);
+
+	data.attack_shape = tree.get<unsigned int>("attack_shape", 0);
+	data.decay_shape = tree.get<unsigned int>("decay_shape", 1);
+	data.release_shape = tree.get<unsigned int>("release_shape", 1);
+
 	data.peak_volume = tree.get("peak_volume", 1.0);
 	data.sustain_time = tree.get("sustain_time", 0);
 	data.release_volume = tree.get("release_volume", 0.0);
@@ -743,6 +748,11 @@ static boost::property_tree::ptree save_adsr(ADSREnvelopeData data) {
 	tree.put("decay", data.decay);
 	tree.put("sustain", data.sustain);
 	tree.put("release", data.release);
+
+	tree.put("attack_shape", (unsigned int) data.attack_shape);
+	tree.put("decay_shape", (unsigned int) data.decay_shape);
+	tree.put("release_shape", (unsigned int) data.release_shape);
+
 	tree.put("peak_volume", data.peak_volume);
 	tree.put("sustain_time", data.sustain_time);
 	tree.put("release_volume", data.release_volume);
