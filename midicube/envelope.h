@@ -34,11 +34,21 @@ struct KeyboardEnvironment {
 	double pitch_bend = 1;
 };
 
+enum ADSREnvelopeShape {
+	LINEAR_ADSR,
+	ANALOG_ADSR,
+	EXPONENTIAL_ADSR
+};
+
 struct ADSREnvelopeData {
 	double attack;
 	double decay;
 	double sustain;
 	double release;
+
+	ADSREnvelopeShape attack_shape = ADSREnvelopeShape::LINEAR_ADSR;
+	ADSREnvelopeShape decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
+	ADSREnvelopeShape release_shape = ADSREnvelopeShape::ANALOG_ADSR;
 
 	double peak_volume = 1;
 	double sustain_time = 0;
@@ -48,6 +58,7 @@ struct ADSREnvelopeData {
 enum ADSREnvelopePhase {
 	ATTACK, DECAY, SUSTAIN, RELEASE, FINISHED
 };
+
 
 class LinearADSREnvelope {
 
