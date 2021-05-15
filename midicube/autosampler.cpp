@@ -426,8 +426,14 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		else if (opcode.first == "pitch_keytrack") {
 			tree.put("pitch_keytrack", std::stod(opcode.second)/100.0);
 		}
+		else if (opcode.first == "rt_decay") {
+			tree.put("release_decay", db_to_amp(-std::stod(opcode.second)));
+		}
 		else if (opcode.first == "trigger") {
 			tree.put("trigger", opcode.second);
+			if (opcode.second != "attack") {
+				tree.put("envelope.sustain_entire_sample", true);
+			}
 		}
 		else if (opcode.first == "sample") {
 			std::string path = opcode.second;

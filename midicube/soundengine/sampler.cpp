@@ -136,8 +136,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		vol *= note.layer_amp;
 
 		//Release
-		if (note.region->trigger == TriggerType::RELEASE_TRIGGER) {
-			vol *= pow(note.region->release_decay, note.release_time);
+		if (note.region->trigger == TriggerType::RELEASE_TRIGGER && !note.pressed) {
+			vol *= pow(note.region->release_decay, note.release_time - note.start_time);
 		}
 
 		//Playback
