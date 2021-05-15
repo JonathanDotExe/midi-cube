@@ -29,6 +29,22 @@ WaveTable<2> LINEAR_ADSR_WAVE(linear_adsr_wave);
 WaveTable<1024> ANALOG_ADSR_WAVE(analog_adsr_wave);
 WaveTable<44101> EXPONENTIAL_ADSR_WAVE(exponential_adsr_wave);
 
+inline double wavetable_adsr(double prog, ADSREnvelopeShape shape) {
+	double val = 0;
+	switch (shape) {
+	case ADSREnvelopeShape::LINEAR_ADSR:
+		val = prog;
+		break;
+	case ADSREnvelopeShape::ANALOG_ADSR:
+		val = ANALOG_ADSR_WAVE.get_value(prog);
+		break;
+	case ADSREnvelopeShape::EXPONENTIAL_ADSR:
+		val = EXPONENTIAL_ADSR_WAVE.get_value(prog);
+		break;
+	}
+	return val;
+}
+
 //ADSREnvelope
 double LinearADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
 	//Goto release phase
@@ -110,9 +126,10 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 	switch (phase) {
 	case ATTACK:
 		step = time_step/data.attack;
+		s = wavetable_adsr(time, data.attack_shape);
 		if (data.attack != 0) {
-			volume += data.peak_volume * step;
-			last = volume;
+			volume += (s - last) * step;
+			last = s;
 		}
 		else {
 			volume = data.peak_volume;
@@ -129,7 +146,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		break;
 	case DECAY:
 		step = time_step/data.decay;
-		s = EXPONENTIAL_ADSR_WAVE.get_value(time);
+		s = wavetable_adsr(time, data.decay_shape);
 		if (data.decay != 0) {
 			volume -= (s - last) * (data.peak_volume - data.sustain);
 			last = s;
@@ -162,7 +179,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		break;
 	case RELEASE:
 		step = time_step/data.release;
-		s = EXPONENTIAL_ADSR_WAVE.get_value(time);
+		s = wavetable_adsr(time, data.release_shape);
 		if (data.release != 0) {
 			volume -= (s - last) * (last_vol - data.release_volume);
 		}
