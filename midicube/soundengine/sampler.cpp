@@ -138,8 +138,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
 			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack);
-			note.time += freq * env.pitch_bend * info.time_step;
-
+			note.time += freq/note_to_freq(note.region->note) * env.pitch_bend * info.time_step;
 			lsample += l * vol;
 			rsample += r * vol;
 		}
