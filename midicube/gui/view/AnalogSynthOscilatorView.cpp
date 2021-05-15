@@ -207,6 +207,42 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		value->property.bind(data.release_volume, handler);
 		controls->push_back(value);
 	}
+	x += 90;
+	x -= 90 * 4;
+	y += 75;
+
+	std::vector<std::string> shapes = {"LIN", "ANL", "EXP"};
+	//Attack shape
+	{
+		Label* title = new Label("Attack Shape", main_font, 12, x, y);
+		controls->push_back(title);
+
+		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x , y + 15, 80, 40);
+		shape->property.bind(data.attack_shape, handler);
+		controls->push_back(shape);
+	}
+	x += 90;
+	//Decay shape
+	{
+		Label* title = new Label("Decay Shape", main_font, 12, x, y);
+		controls->push_back(title);
+
+		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
+		shape->property.bind(data.decay_shape, handler);
+		controls->push_back(shape);
+	}
+	x += 90;
+	x += 90;
+	//Release shape
+	{
+		Label* title = new Label("Release Shape", main_font, 12, x, y);
+		controls->push_back(title);
+
+		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
+		shape->property.bind(data.release_shape, handler);
+		controls->push_back(shape);
+	}
+	x += 90;
 }
 
 Scene AnalogSynthOscilatorView::create(Frame &frame) {
