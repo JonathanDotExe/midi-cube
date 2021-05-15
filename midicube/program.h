@@ -91,6 +91,7 @@ public:
 	}
 	//Mutex has to be locked by user
 	void apply_program(size_t bank, size_t program);
+	void apply_program_direct(size_t bank, size_t program);
 	//Mutex has to be locked by user
 	void delete_program();
 	//Mutex has to be locked by user
@@ -107,7 +108,6 @@ public:
 		lock();
 		if (!this->user) {
 			this->user = user;
-			apply_program(curr_bank, curr_program);
 			success = true;
 		}
 		unlock();

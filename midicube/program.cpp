@@ -271,17 +271,22 @@ ProgramManager::ProgramManager(std::string path, ActionHandler& h) : handler(h) 
 
 void ProgramManager::apply_program(size_t bank, size_t program) {
 	handler.queue_action(new FunctionAction([this, bank, program]() {
-		lock();
-		Bank* b = get_bank(bank);
-		Program* prog = b->programs.at(program);
-		user->apply_program(prog);
-		curr_bank = bank;
-		curr_program = program;
-		program_name = prog->name;
-		bank_name = b->name;
-		unlock();
+		apply_program_direct(bank, program);
 	}));
 }
+
+void ProgramManager::apply_program_direct(size_t bank, size_t program) {
+	lock();
+	Bank* b = get_bank(bank);
+	Program* prog = b->programs.at(program);
+	user->apply_program(prog);
+	curr_bank = bank;
+	curr_program = program;
+	program_name = prog->name;
+	bank_name = b->name;
+	unlock();
+}
+
 
 void ProgramManager::delete_program() {
 	handler.queue_action(new FunctionAction([this]() {

@@ -48,9 +48,7 @@ void MidiCube::init(int out_device, int in_device) {
 	//Load programs
 	prog_mgr.init_user(this);
 	prog_mgr.load_all();
-	prog_mgr.apply_program(0, 0);
-	//Init audio
-	audio_handler.init(out_device, in_device);
+	prog_mgr.apply_program_direct(0, 0);
 
 	//MIDI Inputs
 	//Input-Devices
@@ -72,6 +70,8 @@ void MidiCube::init(int out_device, int in_device) {
 		}
 	}
 	srand(time(NULL));
+	//Init audio
+	audio_handler.init(out_device, in_device);
 }
 
 void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
