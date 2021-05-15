@@ -135,6 +135,11 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		vol *= vel_amount * (note.velocity - 1) + 1;
 		vol *= note.layer_amp;
 
+		//Release
+		if (note.region->trigger == TriggerType::RELEASE_TRIGGER) {
+			vol *= pow(note.region->release_decay, note.release_time);
+		}
+
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
 			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack);
@@ -259,6 +264,9 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.filter.filter_kb_track_note = tree.get<unsigned int>("filter.kb_track_note", region.filter.filter_kb_track_note);
 	region.filter.filter_resonance = tree.get<double>("filter.resonance", region.filter.filter_resonance);
 	region.filter.filter_velocity_amount = tree.get<double>("filter.velocity_amount", region.filter.filter_velocity_amount);
+
+	region.pitch_keytrack = tree.get<double>("pitch_keytrack", region.pitch_keytrack);
+	region.release_decay = tree.get<double>("release_decay", region.release_decay);
 
 	std::string type = tree.get<std::string>("filter.type", "");
 	if (type == "LP_12") {

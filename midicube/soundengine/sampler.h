@@ -54,6 +54,7 @@ struct SampleRegion {
 	double layer_velocity_amount = 0.0;
 	double volume = 1;
 	double pitch_keytrack = 1;
+	double release_decay = 1;
 
 	LoopedAudioSample sample;
 	LoopedAudioSample sustain_sample;
