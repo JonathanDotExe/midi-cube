@@ -721,9 +721,9 @@ static ADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
 	data.sustain = tree.get("sustain", 1.0);
 	data.release = tree.get("release", 0.0005);
 
-	data.attack_shape = tree.get<unsigned int>("attack_shape", 0);
-	data.decay_shape = tree.get<unsigned int>("decay_shape", 1);
-	data.release_shape = tree.get<unsigned int>("release_shape", 1);
+	data.attack_shape = (ADSREnvelopeShape) tree.get<unsigned int>("attack_shape", 0);
+	data.decay_shape = (ADSREnvelopeShape) tree.get<unsigned int>("decay_shape", 1);
+	data.release_shape = (ADSREnvelopeShape) tree.get<unsigned int>("release_shape", 1);
 
 	data.peak_volume = tree.get("peak_volume", 1.0);
 	data.sustain_time = tree.get("sustain_time", 0);

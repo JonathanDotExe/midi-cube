@@ -282,7 +282,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	}
 
 	if (tree.get_child_optional("note")) {
-		region.freq = note_to_freq(tree.get<double>("note", 60));
+		region.note = tree.get<double>("note", 60);
 	}
 	region.min_note = tree.get<unsigned int>("min_note", region.min_note);
 	region.max_note = tree.get<unsigned int>("max_note", region.max_note);
