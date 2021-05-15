@@ -35,7 +35,7 @@ struct WAVFormat {
 struct AudioSample {
 	unsigned int sample_rate;
 	unsigned int channels;
-	std::vector<double> samples;
+	std::vector<float> samples;
 
 	double duration () {
 		return sample_rate > 0 ? samples.size()/channels / (double) sample_rate : 0;
