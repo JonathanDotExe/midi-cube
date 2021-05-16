@@ -442,8 +442,21 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		}
 		else if (opcode.first == "loop_mode") {
 			if (opcode.second == "one_shot") {
-
+				tree.put("envelope.sustain_entire_sample", true);
+				tree.put("loop_type", "no_loop");
 			}
+			else if (opcode.second == "no_loop") {
+				tree.put("loop_type", "no_loop");
+			}
+			else if (opcode.second == "loop_continuous") {
+				tree.put("loop_type", "attack_loop");
+			}
+		}
+		else if (opcode.first == "loop_start") {
+			tree.put("loop_start", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "loop_end") {
+			tree.put("loop_end", std::stoi(opcode.second));
 		}
 		//TODO tune
 		else {
