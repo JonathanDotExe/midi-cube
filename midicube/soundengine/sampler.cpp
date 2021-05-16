@@ -156,7 +156,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.region && note.sample) {
-		return note.region->env.sustain_entire_sample ? note.time < note.sample->sample.duration() : note.env.is_finished();
+		return note.region->env.sustain_entire_sample ? note.time > note.sample->sample.duration() : note.env.is_finished();
 	}
 	return true;
 }
@@ -209,7 +209,6 @@ void Sampler::set_sound_index(ssize_t index) {
 }
 
 void Sampler::save_program(EngineProgram **prog) {
-	std::cout << "Save" << std::endl;
 	SamplerProgram* p = dynamic_cast<SamplerProgram*>(*prog);
 	//Create new
 	if (!p) {
