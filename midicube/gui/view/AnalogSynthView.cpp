@@ -126,6 +126,19 @@ Scene AnalogSynthView::create(Frame &frame) {
 	tmp_x = 10;
 	tmp_y += 75;
 
+	///Smooth Aftertouch
+	{
+		Label* title = new Label("Smooth Aftertouch", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->drag_mul /= 5;
+		value->property.bind(synth.preset.smooth_aftertouch, handler);
+		controls.push_back(value);
+	}
+	tmp_x = 10;
+	tmp_y += 75;
+
 	Button* fm = new Button("FM Algorithm", main_font, 14, tmp_x, tmp_y,  pane_width - 15, 30);
 	fm->rect.setFillColor(sf::Color(0, 180, 255));
 	fm->set_on_click([&frame, this]{
