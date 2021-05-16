@@ -122,8 +122,6 @@ public:
 			}
 			ndet *= ndetune;
 		}
-		signal.carrier /= size;
-		signal.modulator /= size;
 		return signal;
 	}
 
