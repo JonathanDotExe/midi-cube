@@ -376,7 +376,7 @@ static inline double apply_modulation(const FixedScale &scale,
 	return scale.value(prog);
 }
 
-void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step) {
+void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double aftertouch) {
 	//Filter
 	if (filter.on) {
 		//Pre drive
@@ -407,6 +407,7 @@ void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, 
 
 void AnalogSynth::process_note(double& lsample, double& rsample,
 		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env) {
+	double aftertouch = this->aftertouch.get(info.time);
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
@@ -500,13 +501,13 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 			//Filter
 			if (op.filter_parallel) {
 				double c = carrier;
-				apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step);
-				apply_filter(op.second_filter, op_part.filter2, c, note, info.time_step);
+				apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step, aftertouch);
+				apply_filter(op.second_filter, op_part.filter2, c, note, info.time_step, aftertouch);
 				carrier += c;
 			}
 			else {
-				apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step);
-				apply_filter(op.second_filter, op_part.filter2, carrier, note, info.time_step);
+				apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step, aftertouch);
+				apply_filter(op.second_filter, op_part.filter2, carrier, note, info.time_step, aftertouch);
 			}
 			carrier *= volume;
 			//Pan
@@ -529,6 +530,7 @@ void AnalogSynth::process_note_sample(
 
 void AnalogSynth::process_sample(double& lsample, double& rsample,
 		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
+	double aftertouch = this->aftertouch.get(info.time);
 	//Mono
 	if (preset.mono) {
 		if (status.pressed_notes) {
@@ -601,7 +603,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 
 bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info) {
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
-		aftertouch = msg.monophonic_aftertouch()/127.0;
+		aftertouch.set(msg.monophonic_aftertouch()/127.0, info.time, preset.smooth_aftertouch);
 	}
 	return BaseSoundEngine::midi_message(msg, transpose, info);
 }

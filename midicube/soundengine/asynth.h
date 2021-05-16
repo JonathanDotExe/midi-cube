@@ -122,6 +122,8 @@ struct AnalogSynthPreset {
 	bool mono = false;
 	bool legato = false;
 	double portamendo = 0;
+
+	double smooth_aftertouch = 0;
 };
 
 struct AnalogSynthPart {
@@ -159,7 +161,7 @@ private:
 	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
 	std::array<double, ANALOG_PART_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
-	double aftertouch = 0;
+	PortamendoBuffer aftertouch{0, 0};
 
 	bool first_port = true;
 	PortamendoBuffer note_port{0, 0};
@@ -171,7 +173,7 @@ private:
 
 	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
 
-	inline void apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step);
+	inline void apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double aftertouch);
 
 public:
 	AnalogSynthPreset preset;
