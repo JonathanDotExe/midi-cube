@@ -809,6 +809,8 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	preset.legato = tree.get<bool>("legato", false);
 	preset.portamendo = tree.get<double>("portamendo", 0.0);
 
+	preset.smooth_aftertouch = tree.get<double>("smooth_aftertouch", 0.0);
+
 	//LFOs
 	const auto& lfos = tree.get_child_optional("lfos");
 	if (lfos) {
@@ -936,6 +938,8 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	tree.put("mono", preset.mono);
 	tree.put("legato", preset.legato);
 	tree.put("portamendo", preset.portamendo);
+
+	tree.put("smooth_aftertouch", preset.smooth_aftertouch);
 
 	//LFOs
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
