@@ -80,9 +80,9 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		//Loop
 		if (note.region->loop != NO_LOOP) {
 			double loop_start_time = (double) note.sample->loop_start / note.sample->sample.sample_rate;
-			double loop_duration_time = (double) note.sample->loop_duration / note.sample->sample.sample_rate;
 			double loop_crossfade_time = (double) note.sample->loop_crossfade / note.sample->sample.sample_rate;
-			double loop_end_time = loop_start_time + loop_duration_time;
+			double loop_end_time = (double) note.sample->loop_end / note.sample->sample.sample_rate;
+			double loop_duration_time = loop_end_time - loop_start_time;
 			double crossfade_start_time = loop_start_time - loop_crossfade_time;
 			double crossfade_end_time = loop_end_time - loop_crossfade_time;
 			if (note.hit_loop) {
@@ -321,7 +321,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	}
 
 	region.sample.loop_start = tree.get<unsigned int>("sample.loop_start", region.sample.loop_start);
-	region.sample.loop_duration = tree.get<unsigned int>("sample.loop_duration", region.sample.loop_duration);
+	region.sample.loop_end = tree.get<unsigned int>("sample.loop_end", region.sample.loop_end);
 	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_crossfade);
 
 	if (load_sample && file != "") {
@@ -333,7 +333,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	//Sustain Sample
 	std::string sfile = tree.get<std::string>("sustain_sample.name", "");
 	region.sustain_sample.loop_start = tree.get<unsigned int>("sustain_sample.loop_start", region.sustain_sample.loop_start);
-	region.sustain_sample.loop_duration = tree.get<unsigned int>("sustain_sample.loop_duration", region.sustain_sample.loop_start);
+	region.sustain_sample.loop_end = tree.get<unsigned int>("sustain_sample.loop_end", region.sustain_sample.loop_end);
 	region.sustain_sample.loop_crossfade = tree.get<unsigned int>("sustain_sample.loop_crossfade", region.sustain_sample.loop_start);
 
 	if (load_sample && sfile != "") {
