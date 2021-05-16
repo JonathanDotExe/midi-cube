@@ -78,7 +78,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		double crossfade = 1;
 		//Sound
 		//Loop
-		if (note.region->loop) {
+		if (note.region->loop != NO_LOOP) {
 			double loop_start_time = (double) note.sample->loop_start / note.sample->sample.sample_rate;
 			double loop_duration_time = (double) note.sample->loop_duration / note.sample->sample.sample_rate;
 			double loop_crossfade_time = (double) note.sample->loop_crossfade / note.sample->sample.sample_rate;
@@ -308,9 +308,21 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	std::string file = "";
 	//Sample
 	file = tree.get<std::string>("sample.name", "");
+
+	std::string loop = tree.get<std::string>("loop_type", "");
+	if (loop == "no_loop") {
+		region.loop = LoopType::NO_LOOP;
+	}
+	else if (loop == "attack_loop") {
+		region.loop = LoopType::ATTACK_LOOP;
+	}
+	else if (loop == "always_loop") {
+		region.loop = LoopType::ALWAYS_LOOP;
+	}
+
 	region.sample.loop_start = tree.get<unsigned int>("sample.loop_start", region.sample.loop_start);
-	region.sample.loop_duration = tree.get<unsigned int>("sample.loop_duration", region.sample.loop_start);
-	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_start);
+	region.sample.loop_duration = tree.get<unsigned int>("sample.loop_duration", region.sample.loop_duration);
+	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_crossfade);
 
 	if (load_sample && file != "") {
 		if (!read_audio_file(region.sample.sample, folder + "/" + file)) {

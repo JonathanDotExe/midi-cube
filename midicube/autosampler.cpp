@@ -440,6 +440,11 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			boost::replace_all(path, "\\", "/");
 			tree.put("sample.name", path);
 		}
+		else if (opcode.first == "loop_mode") {
+			if (opcode.second == "one_shot") {
+
+			}
+		}
 		//TODO tune
 		else {
 			std::cout << "Skipping unrecognized opcode " << opcode.first << "="
