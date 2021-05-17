@@ -30,8 +30,11 @@ void ChorusEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		rdelay.add_isample(rsample, del);
 
 		//Mix
-		lsample = lsample * (1 - preset.mix) + l * preset.mix;
-		rsample = rsample * (1 - preset.mix) + r * preset.mix;
+		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+
+		lsample += l * fmin(0.5, preset.mix) * 2;
+		rsample += r * fmin(0.5, preset.mix) * 2;
 	}
 }
 
