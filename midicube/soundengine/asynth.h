@@ -123,7 +123,8 @@ struct AnalogSynthPreset {
 	bool legato = false;
 	double portamendo = 0;
 
-	double smooth_aftertouch = 0;
+	double aftertouch_attack = 0;
+	double aftertouch_decay = 0;
 };
 
 struct AnalogSynthPart {

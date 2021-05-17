@@ -603,7 +603,13 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 
 bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info) {
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
-		aftertouch.set(msg.monophonic_aftertouch()/127.0, info.time, preset.smooth_aftertouch);
+		double at = msg.monophonic_aftertouch()/127.0;
+		if (at > aftertouch.get(info.time)) {
+			aftertouch.set(at, info.time, preset.aftertouch_attack);
+		}
+		else {
+			aftertouch.set(at, info.time, preset.aftertouch_decay);
+		}
 	}
 	return BaseSoundEngine::midi_message(msg, transpose, info);
 }
@@ -809,7 +815,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	preset.legato = tree.get<bool>("legato", false);
 	preset.portamendo = tree.get<double>("portamendo", 0.0);
 
-	preset.smooth_aftertouch = tree.get<double>("smooth_aftertouch", 0.0);
+	preset.aftertouch_attack = tree.get<double>("smooth_aftertouch", 0.0);
 
 	//LFOs
 	const auto& lfos = tree.get_child_optional("lfos");
@@ -939,7 +945,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	tree.put("legato", preset.legato);
 	tree.put("portamendo", preset.portamendo);
 
-	tree.put("smooth_aftertouch", preset.smooth_aftertouch);
+	tree.put("smooth_aftertouch", preset.aftertouch_attack);
 
 	//LFOs
 	for (size_t i = 0; i < preset.lfo_count; ++i) {

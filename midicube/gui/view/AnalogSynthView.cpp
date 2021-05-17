@@ -133,7 +133,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul /= 5;
-		value->property.bind(synth.preset.smooth_aftertouch, handler);
+		value->property.bind(synth.preset.aftertouch_attack, handler);
 		controls.push_back(value);
 	}
 	tmp_x = 10;
