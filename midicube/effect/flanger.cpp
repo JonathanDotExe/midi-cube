@@ -27,8 +27,8 @@ void FlangerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		AnalogOscilatorData data = {preset.vibrato_waveform};
 		osc.process(preset.vibrato_rate, info.time_step, data);
 		double del = (1 + osc.carrier(preset.vibrato_rate, info.time_step, data) * preset.vibrato_depth * 0.2) * preset.delay * info.sample_rate;
-		ldelay.add_isample(lsample, del);
-		rdelay.add_isample(rsample, del);
+		ldelay.add_isample(lsample + l * preset.feedback, del);
+		rdelay.add_isample(rsample + r * preset.feedback, del);
 
 		//Mix
 		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
