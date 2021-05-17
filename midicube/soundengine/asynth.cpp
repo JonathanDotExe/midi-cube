@@ -608,7 +608,7 @@ bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info
 			aftertouch.set(at, info.time, preset.aftertouch_attack);
 		}
 		else {
-			aftertouch.set(at, info.time, preset.aftertouch_decay);
+			aftertouch.set(at, info.time, preset.aftertouch_release);
 		}
 	}
 	return BaseSoundEngine::midi_message(msg, transpose, info);

@@ -128,13 +128,24 @@ Scene AnalogSynthView::create(Frame &frame) {
 
 	///Smooth Aftertouch
 	{
-		Label* title = new Label("Smooth Aftertouch", main_font, 12, tmp_x, tmp_y);
+		Label* title = new Label("Aftertouch Attack", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul /= 5;
 		value->property.bind(synth.preset.aftertouch_attack, handler);
 		controls.push_back(value);
+		tmp_x += 120;
+	}
+	{
+		Label* title = new Label("Aftertouch Release", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->drag_mul /= 5;
+		value->property.bind(synth.preset.aftertouch_release, handler);
+		controls.push_back(value);
+		tmp_x += 120;
 	}
 	tmp_x = 10;
 	tmp_y += 75;
