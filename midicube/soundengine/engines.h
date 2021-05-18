@@ -17,6 +17,7 @@
 #include "../effect/bitcrusher.h"
 #include "../effect/chorus.h"
 #include "../effect/delay.h"
+#include "../effect/flanger.h"
 #include "../effect/reverb.h"
 #include "../effect/rotary_speaker.h"
 #include "../effect/tremolo.h"
@@ -36,6 +37,7 @@ extern void fill_sound_engine_device(SoundEngineDevice* device) {
 	device->add_effect(new TemplateEffectBuilder<VocoderEffect>());
 	device->add_effect(new TemplateEffectBuilder<TremoloEffect>());
 	device->add_effect(new TemplateEffectBuilder<DelayEffect>());
+	device->add_effect(new TemplateEffectBuilder<FlangerEffect>());
 }
 
 

@@ -1034,8 +1034,8 @@ Scene EffectView::create(Frame &frame) {
 		FlangerEffect *flanger = dynamic_cast<FlangerEffect*>(effect);
 
 		//Background
-		bg->rect.setFillColor(sf::Color(0, 180, 255));
-		title->text.setString("Mega Flanger MC-5");
+		bg->rect.setFillColor(sf::Color(0x63, 0x0, 0x85));
+		title->text.setString("Orbit Flanger FC-6");
 
 		//Flanger
 		{
