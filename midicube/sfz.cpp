@@ -10,6 +10,28 @@
 #include <regex>
 #include <iostream>
 
+const std::vector<std::string> notes{"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "h"};
+
+unsigned int text_to_note(std::string text) {
+	unsigned int note = 0;
+	boost::to_lower(text);
+
+	size_t i = 0;
+	std::string key = "";
+	//Note values
+	for (std::string n : notes) {
+		if (text.rfind(n, 0) == 0) {
+			note = i;
+			key = n;
+		}
+		++i;
+	}
+	//Octave
+	note += 12 * (std::stoi(text.substr(key.size())) + 1);
+
+	return note;
+}
+
 enum ParserMode {
 	NONE, GLOBAL, GROUP, REGION
 };
@@ -21,19 +43,6 @@ SfzInstrument SfzParser::parse(std::string text) {
 	boost::split(lines, text, boost::is_any_of("\n"));
 
 	std::vector<std::string> tokens = {};
-	//Defines
-	size_t i = 0;
-	for (std::string line : lines) {
-		if (line) {
-			std::vector<std::string> t = {};
-			boost::split(t, line, boost::is_any_of(" "));
-			//Define found
-			if (t.size()) {
-
-			}
-		}
-		++i;
-	}
 	//Remove comments
 	size_t i = 0;
 	for (std::string line : lines) {
