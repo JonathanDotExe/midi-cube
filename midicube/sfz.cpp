@@ -12,22 +12,29 @@
 
 const std::vector<std::string> notes{"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "h"};
 
-unsigned int text_to_note(std::string text) {
+unsigned int parse_sfz_note(std::string text) {
 	unsigned int note = 0;
 	boost::to_lower(text);
 
 	size_t i = 0;
 	std::string key = "";
+	bool found = false;
 	//Note values
 	for (std::string n : notes) {
 		if (text.rfind(n, 0) == 0) {
 			note = i;
 			key = n;
+			found = true;
 		}
 		++i;
 	}
-	//Octave
-	note += 12 * (std::stoi(text.substr(key.size())) + 1);
+	if (found) {
+		//Octave
+		note += 12 * (std::stoi(text.substr(key.size())) + 1);
+	}
+	else {
+		note = std::stoi(text);
+	}
 
 	return note;
 }

@@ -23,6 +23,7 @@ struct SfzInstrument {
 	std::vector<SfzGroup> groups;
 };
 
+unsigned int parse_sfz_note(std::string text);
 
 class SfzParser {
 

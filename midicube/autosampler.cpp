@@ -406,13 +406,13 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			tree.put("envelope.release", std::stod(opcode.second));
 		}
 		else if (opcode.first == "lokey") {
-			tree.put("min_note", std::stoi(opcode.second));
+			tree.put("min_note", parse_sfz_note(opcode.second));
 		}
 		else if (opcode.first == "hikey") {
-			tree.put("max_note", std::stoi(opcode.second));
+			tree.put("max_note", parse_sfz_note(opcode.second));
 		}
 		else if (opcode.first == "pitch_keycenter") {
-			tree.put("note", std::stoi(opcode.second));
+			tree.put("note", parse_sfz_note(opcode.second));
 		}
 		else if (opcode.first == "lovel") {
 			tree.put("min_velocity", std::stoi(opcode.second));
