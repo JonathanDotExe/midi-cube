@@ -21,15 +21,40 @@ SfzInstrument SfzParser::parse(std::string text) {
 	boost::split(lines, text, boost::is_any_of("\n"));
 
 	std::vector<std::string> tokens = {};
+	//Defines
+	size_t i = 0;
+	for (std::string line : lines) {
+		if (line) {
+			std::vector<std::string> t = {};
+			boost::split(t, line, boost::is_any_of(" "));
+			//Define found
+			if (t.size()) {
+
+			}
+		}
+		++i;
+	}
 	//Remove comments
+	size_t i = 0;
 	for (std::string line : lines) {
 		if (line.rfind("//", 0) != 0) {
 			std::vector<std::string> t = {};
 			boost::split(t, line, boost::is_any_of(" "));
-			for (std::string token : t) {
-				tokens.push_back(token);
+			//Define
+			if (t.size() >= 3 && t[0] == "#define") {
+				//Replace
+				for (size_t j = i + 1; j < lines.size(); ++j) {
+					boost::replace_all(lines[j], t[1], t[2]);
+				}
+			}
+			else {
+				//Add tokens
+				for (std::string token : t) {
+					tokens.push_back(token);
+				}
 			}
 		}
+		++i;
 	}
 
 	//Parse lines
