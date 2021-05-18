@@ -13,6 +13,7 @@
 #include "../../effect/bitcrusher.h"
 #include "../../effect/chorus.h"
 #include "../../effect/delay.h"
+#include "../../effect/flanger.h"
 #include "../../effect/reverb.h"
 #include "../../effect/rotary_speaker.h"
 #include "../../effect/tremolo.h"
@@ -1027,6 +1028,149 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 
+	}
+	//Chorus
+	else if (dynamic_cast<FlangerEffect*>(effect) != nullptr) {
+		FlangerEffect *flanger = dynamic_cast<FlangerEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color(0, 180, 255));
+		title->text.setString("Mega Flanger MC-5");
+
+		//Flanger
+		{
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
+					180, 120);
+			on->property.bind(flanger->preset.on, handler);
+			controls.push_back(on);
+			hide_midi.push_back(on);
+
+			create_cc_control(effect->cc, handler, &flanger->preset.on, tmp_x,
+					tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Vibrato Rate
+		{
+			Label *label = new Label("Vibrato Rate", main_font, 18, tmp_x,
+					tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rate = new DragBox<double>(0, 0, 8, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			rate->property.bind(flanger->preset.vibrato_rate, handler);
+			controls.push_back(rate);
+			hide_midi.push_back(rate);
+
+			create_cc_control(effect->cc, handler, &flanger->preset.vibrato_rate,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Vibrato Depth
+		{
+			Label *label = new Label("Vibrato Depth", main_font, 18, tmp_x,
+					tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *depth = new DragBox<double>(0, 0, 1, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			depth->property.bind(flanger->preset.vibrato_depth, handler);
+			controls.push_back(depth);
+			hide_midi.push_back(depth);
+
+			create_cc_control(effect->cc, handler,
+					&flanger->preset.vibrato_depth, tmp_x, tmp_y, 180, 120,
+					controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mix
+		{
+			Label *label = new Label("Mix", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *mix = new DragBox<double>(0, 0, 1, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			mix->property.bind(flanger->preset.mix, handler);
+			controls.push_back(mix);
+			hide_midi.push_back(mix);
+
+			create_cc_control(effect->cc, handler, &flanger->preset.mix, tmp_x,
+					tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		tmp_x = 10;
+		tmp_y += 160;
+
+		//Delay
+		{
+			Label *label = new Label("Delay", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0.0, 0.02,
+					main_font, 24, tmp_x, tmp_y, 180, 120);
+			value->property.bind(flanger->preset.delay, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &flanger->preset.delay, tmp_x,
+					tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		//Waveform
+		{
+			Label *label = new Label("Waveform", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			std::vector<std::string> waveforms = { "Sine", "Saw Down", "Saw Up",
+					"Square", "Triangle" };
+
+			ComboBox *waveform = new ComboBox(4, waveforms, main_font, 24, 0,
+					tmp_x, tmp_y, 180, 120);
+			waveform->property.bind(flanger->preset.vibrato_waveform, handler);
+			controls.push_back(waveform);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		//Feedack
+		{
+			Label *label = new Label("Feedback", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0.0, 1,
+					main_font, 24, tmp_x, tmp_y, 180, 120);
+			value->property.bind(flanger->preset.feedback, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &flanger->preset.feedback, tmp_x,
+					tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
 	}
 
 	//Edit MIDI Button
