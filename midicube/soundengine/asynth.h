@@ -203,25 +203,5 @@ public:
 
 };
 
-enum SynthFactoryPreset {
-	SQUASHY_BASS,
-	UNISON_SAWS,
-	POLY_SWEEP,
-	SPOOKY_SINE,
-	LUSH_LEAD,
-	PULSE_BASS,
-	DELAY_CHORDS,
-	STRONG_PAD,
-	CLEAN_SAW,
-	FM_BASS,
-	FM_E_PIANO,
-	BRASS_PAD,
-	FM_KALIMBA,
-	SYNTH_BRASS,
-	BELL_LEAD
-};
-
-void apply_preset(SynthFactoryPreset type, AnalogSynthPreset& preset);
-
 
 #endif /* MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_ */
