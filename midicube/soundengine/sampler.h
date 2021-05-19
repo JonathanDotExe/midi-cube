@@ -128,7 +128,7 @@ public:
 
 extern SampleSoundStore global_sample_store;
 
-#define SAMPLER_POLYPHONY 64
+#define SAMPLER_POLYPHONY 128
 
 class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 

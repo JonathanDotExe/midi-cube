@@ -21,13 +21,34 @@ template<typename V, size_t P>
 class VoiceManager {
 private:
 	size_t next_freq_slot(SampleInfo& info) {
+		bool release = false;
+		size_t longest_index = 0;
+		double longest_time = info.time + 1;
 		for (size_t i = 0; i < P; ++i) {
 			if (!note[i].valid) {
 				return i;
 			}
+			else {
+				if (!note[i].pressed) {
+					if (release) {
+						if (longest_time > note[i].release_time) {
+							longest_time = note[i].release_time;
+							longest_index = i;
+						}
+					}
+					else {
+						release = true;
+						longest_time = note[i].release_time;
+						longest_index = i;
+					}
+				}
+				else if (!release && longest_time > note[i].start_time) {
+					longest_time = note[i].start_time;
+					longest_index = i;
+				}
+			}
 		}
-		//TODO return longest used slot
-		return 0;
+		return longest_index;
 	}
 
 public:
