@@ -46,7 +46,7 @@ inline double factor_to_cutoff(double cutoff, double time_step) {
 }
 
 enum FilterType {
-	LP_12, LP_24, HP_12, HP_24, BP_12, BP_24
+	LP_12, LP_24, HP_12, HP_24, BP_12, BP_24, LP_6, HP_6
 };
 
 struct FilterData {

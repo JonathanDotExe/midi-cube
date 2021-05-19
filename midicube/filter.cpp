@@ -22,6 +22,7 @@ const double FOUR_POLE_FACTOR = 1.0/sqrt(pow(2, 1/4.0) - 1);
 double Filter::apply (FilterData& data, double sample, double time_step) {
 	switch (data.type) {
 	//Low pass algorithm
+	case FilterType::LP_6:
 	case FilterType::LP_12:
 	case FilterType::LP_24:
 	case FilterType::BP_12:
@@ -45,6 +46,8 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 
 		//Values
 		switch (data.type) {
+		case FilterType::LP_6:
+			return pole1;
 		case FilterType::LP_12:
 			return pole2;
 		case FilterType::LP_24:
@@ -59,6 +62,7 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 	}
 		break;
 	//High pass algorithm
+	case FilterType::HP_6:
 	case FilterType::HP_12:
 	case FilterType::HP_24:
 	{
@@ -85,6 +89,8 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 		last_pole4 = pole3;
 
 		switch (data.type) {
+		case FilterType::HP_6:
+			return pole1;
 		case FilterType::HP_12:
 			return pole2;
 		case FilterType::HP_24:

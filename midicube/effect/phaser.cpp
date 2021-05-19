@@ -26,7 +26,7 @@ void PhaserEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		double cutoff = fmax(fmin(preset.center_cutoff + carrier * preset.lfo_depth, 1), 0);
 
 		//Allpass
-		FilterData filter{FilterType::LP_12, scale_cutoff(cutoff), 0};
+		FilterData filter{FilterType::LP_6, scale_cutoff(cutoff), 0};
 		double l = lsample;
 		double r = rsample;
 		for (size_t i = 0; i < PHASER_ALLPASS_AMOUNT; ++i) {

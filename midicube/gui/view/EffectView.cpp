@@ -1178,7 +1178,7 @@ Scene EffectView::create(Frame &frame) {
 		PhaserEffect* phaser = dynamic_cast<PhaserEffect*>(effect);
 
 		//Background
-		bg->rect.setFillColor(sf::Color(0, 180, 255));
+		bg->rect.setFillColor(sf::Color(0xE9, 0xBD, 0x72));
 		title->text.setString("Vibe Phase V9");
 
 		//Phaser
