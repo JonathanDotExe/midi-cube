@@ -19,15 +19,16 @@ PhaserEffect::PhaserEffect() {
 
 void PhaserEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	if (preset.on) {
-		double l = ldelay.process();
-		double r = rdelay.process();
-
-		//Delay
+		//Cutoff
 		AnalogOscilatorData data = {preset.vibrato_waveform};
-		osc.process(preset.vibrato_rate, info.time_step, data);
-		double del = (1 + osc.carrier(preset.vibrato_rate, info.time_step, data) * preset.vibrato_depth * 0.2) * preset.delay * info.sample_rate;
-		ldelay.add_isample(lsample, del);
-		rdelay.add_isample(rsample, del);
+		osc.process(preset.lfo_rate, info.time_step, data);
+		double carrier = osc.carrier(preset.lfo_rate, info.time_step, data);
+		double cutoff = fmax(fmin(preset.center_cutoff + carrier * preset.lfo_depth, 1), 0);
+
+		//Allpass
+		FilterData filter{FilterType::LP_12, scale_cutoff(cutoff), 0};
+		double l = 2 * lfilter.apply(filter, lsample, info.time_step) - lsample;
+		double r = 2 * rfilter.apply(filter, lsample, info.time_step) - rsample;
 
 		//Mix
 		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);

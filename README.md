@@ -64,7 +64,8 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * https://stackoverflow.com/questions/3055815/dsp-filter-sweep-effect
 * https://www.electronics-tutorials.ws/de/filtern/passiver-tiefpassfilter.html
 * https://medium.com/the-seekers-project/coding-a-basic-reverb-algorithm-part-2-an-introduction-to-audio-programming-4db79dd4e325
-* Format frequencies used for the vocoder (https://en.wikipedia.org/wiki/Formant)
+* Format frequencies used for the vocoder (https://en.wikipedia.org/wiki/Formant
+* Reddit thread about phasers (https://www.reddit.com/r/DSP/comments/2o2pf6/implementing_guitar_phaser_effect/cmjc70p/)
 
 ## Other resources that might be useful in the future
 * Nice forum post about exponential envelopes (https://www.kvraudio.com/forum/viewtopic.php?t=161416)
