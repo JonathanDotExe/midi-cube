@@ -14,6 +14,7 @@
 #include "../../effect/chorus.h"
 #include "../../effect/delay.h"
 #include "../../effect/flanger.h"
+#include "../../effect/phaser.h"
 #include "../../effect/reverb.h"
 #include "../../effect/rotary_speaker.h"
 #include "../../effect/tremolo.h"
@@ -1029,7 +1030,7 @@ Scene EffectView::create(Frame &frame) {
 		}
 
 	}
-	//Chorus
+	//Flanger
 	else if (dynamic_cast<FlangerEffect*>(effect) != nullptr) {
 		FlangerEffect *flanger = dynamic_cast<FlangerEffect*>(effect);
 
@@ -1153,7 +1154,7 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
-		//Feedack
+		//Feeddack
 		{
 			Label *label = new Label("Feedback", main_font, 18, tmp_x, tmp_y);
 			controls.push_back(label);
@@ -1167,6 +1168,125 @@ Scene EffectView::create(Frame &frame) {
 
 			create_cc_control(effect->cc, handler, &flanger->preset.feedback, tmp_x,
 					tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+	}
+	//Phaser
+	else if (dynamic_cast<PhaserEffect*>(effect) != nullptr) {
+		PhaserEffect* phaser = dynamic_cast<PhaserEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color(0, 180, 255));
+		title->text.setString("Vibe Phase V9");
+
+		//Phaser
+		{
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
+					tmp_y, 180, 120);
+			on->property.bind(phaser->preset.on, handler);
+			controls.push_back(on);
+			hide_midi.push_back(on);
+
+			create_cc_control(effect->cc, handler, &phaser->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Vibrato Rate
+		{
+			Label *label = new Label("Rate", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rate = new DragBox<double>(0, 0, 8, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			rate->property.bind(phaser->preset.lfo_rate, handler);
+			controls.push_back(rate);
+			hide_midi.push_back(rate);
+
+			create_cc_control(effect->cc, handler, &phaser->preset.lfo_rate, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Vibrato Depth
+		{
+			Label *label = new Label("Depth", main_font, 18, tmp_x,
+					tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *depth = new DragBox<double>(0, 0, 1, main_font,
+					24, tmp_x, tmp_y, 180, 120);
+			depth->property.bind(phaser->preset.lfo_depth, handler);
+			controls.push_back(depth);
+			hide_midi.push_back(depth);
+
+			create_cc_control(effect->cc, handler, &phaser->preset.lfo_depth, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mix
+		{
+			Label *label = new Label("Mix", main_font, 18, tmp_x,
+				tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *mix = new DragBox<double>(0, 0, 1, main_font,
+				24, tmp_x, tmp_y, 180, 120);
+			mix->property.bind(phaser->preset.mix, handler);
+			controls.push_back(mix);
+			hide_midi.push_back(mix);
+
+			create_cc_control(effect->cc, handler, &phaser->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		tmp_x = 10;
+		tmp_y += 160;
+
+		//Delay
+		{
+			Label *label = new Label("Cutoff", main_font, 18, tmp_x,
+				tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0.0, 1, main_font,
+				24, tmp_x, tmp_y, 180, 120);
+			value->property.bind(phaser->preset.center_cutoff, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &phaser->preset.center_cutoff, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		//Waveform
+		{
+			Label *label = new Label("Waveform", main_font, 18, tmp_x,
+				tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle"};
+
+			ComboBox* waveform = new ComboBox(4, waveforms, main_font, 24, 0, tmp_x , tmp_y, 180, 120);
+			waveform->property.bind(phaser->preset.vibrato_waveform, handler);
+			controls.push_back(waveform);
 
 			tmp_y -= 25;
 			tmp_x += 200;
