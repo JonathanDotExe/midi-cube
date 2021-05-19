@@ -135,11 +135,6 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		vol *= vel_amount * (note.velocity - 1) + 1;
 		vol *= note.layer_amp;
 
-		//Release
-		if (note.region->trigger == TriggerType::RELEASE_TRIGGER && !note.pressed) {
-			vol *= pow(note.region->release_decay, note.release_time - note.start_time);
-		}
-
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
 			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack);
@@ -156,7 +151,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.region && note.sample) {
-		return note.region->env.sustain_entire_sample ? note.time > note.sample->sample.duration() : note.env.is_finished();
+		return note.time > note.sample->sample.duration() || (!note.region->env.sustain_entire_sample && note.env.is_finished()) || note.layer_amp <= 0.0005;
 	}
 	return true;
 }
@@ -183,7 +178,16 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 }
 
 void Sampler::release_note(SampleInfo& info, unsigned int note) {
-	BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY>::release_note(info, note);
+	for (size_t i = 0; i < SAMPLER_POLYPHONY; ++i) {
+		if (this->note.note[i].real_note == note && this->note.note[i].pressed) {
+			this->note.note[i].pressed = false;
+			this->note.note[i].release_time = info.time;
+			if (this->note.note[i].region->trigger == TriggerType::RELEASE_TRIGGER) {
+				this->note.note[i].layer_amp *= pow(this->note.note[i].region->release_decay, this->note.note[i].release_time - this->note.note[i].start_time);
+			}
+		}
+	}
+//	BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY>::release_note(info, note);
 }
 
 std::string Sampler::get_name() {
