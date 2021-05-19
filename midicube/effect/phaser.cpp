@@ -10,11 +10,11 @@
 
 PhaserEffect::PhaserEffect() {
 	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_rate", preset.vibrato_rate, 0, 8));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_depth", preset.vibrato_depth, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("lfo_rate", preset.lfo_rate, 0, 8));
+	cc.register_binding(new TemplateControlBinding<double>("lfo_depth", preset.lfo_depth, 0, 1));
 	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
 
-	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 0.03));
+	cc.register_binding(new TemplateControlBinding<double>("center_cutoff", preset.center_cutoff, 0, 1));
 }
 
 void PhaserEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -56,22 +56,22 @@ EffectProgram* create_effect_program<PhaserEffect>() {
 void PhaserProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
-	preset.vibrato_rate = tree.get<double>("vibrato_rate", 2);
-	preset.vibrato_depth = tree.get<double>("vibrato_depth", 0.5);
+	preset.lfo_rate = tree.get<double>("lfo_rate", 1);
+	preset.lfo_depth = tree.get<double>("lfo_depth", 0.25);
 	preset.mix = tree.get<double>("mix", 0.5);
 
-	preset.delay = tree.get<double>("delay", 0.015);
+	preset.center_cutoff = tree.get<double>("center_cutoff", 0.5);
 	preset.vibrato_waveform = (AnalogWaveForm) tree.get<unsigned int>("vibrato_waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
 }
 
 boost::property_tree::ptree PhaserProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
-	tree.put("vibrato_rate", preset.vibrato_rate);
-	tree.put("vibrato_depth", preset.vibrato_depth);
+	tree.put("lfo_rate", preset.lfo_rate);
+	tree.put("lfo_depth", preset.lfo_depth);
 	tree.put("mix", preset.mix);
 
-	tree.put("delay", preset.delay);
+	tree.put("center_cutoff", preset.center_cutoff);
 	tree.put("vibrato_waveform", (unsigned int) preset.vibrato_waveform);
 	return tree;
 }
