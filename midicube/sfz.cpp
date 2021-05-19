@@ -10,7 +10,7 @@
 #include <regex>
 #include <iostream>
 
-const std::vector<std::string> notes{"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "h"};
+const std::vector<std::string> notes{"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
 
 unsigned int parse_sfz_note(std::string text) {
 	unsigned int note = 0;

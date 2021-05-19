@@ -33,7 +33,7 @@ struct SampleFilter {
 };
 
 struct SampleEnvelope {
-	ADSREnvelopeData env = {0, 0, 1, 0, LINEAR_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR};
+	ADSREnvelopeData env = {0, 0, 1, 0.001, LINEAR_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR};
 	double velocity_amount = 0.0;
 	bool sustain_entire_sample = false;
 };
