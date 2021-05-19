@@ -27,8 +27,12 @@ void PhaserEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 
 		//Allpass
 		FilterData filter{FilterType::LP_12, scale_cutoff(cutoff), 0};
-		double l = 2 * lfilter.apply(filter, lsample, info.time_step) - lsample;
-		double r = 2 * rfilter.apply(filter, lsample, info.time_step) - rsample;
+		double l = lsample;
+		double r = rsample;
+		for (size_t i = 0; i < PHASER_ALLPASS_AMOUNT; ++i) {
+			l = 2 * lfilter[i].apply(filter, l, info.time_step) - l;
+			r = 2 * rfilter[i].apply(filter, r, info.time_step) - r;
+		}
 
 		//Mix
 		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);

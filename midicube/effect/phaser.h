@@ -12,6 +12,8 @@
 #include "../oscilator.h"
 #include "effect.h"
 
+#define PHASER_ALLPASS_AMOUNT 4
+
 struct PhaserPreset {
 	bool on = true;
 	double center_cutoff = 0.5;
@@ -37,8 +39,8 @@ public:
 class PhaserEffect : public Effect {
 private:
 	AnalogOscilator osc;
-	Filter lfilter;
-	Filter rfilter;
+	std::array<Filter, 4> lfilter;
+	std::array<Filter, 4> rfilter;
 
 public:
 	PhaserPreset preset;
