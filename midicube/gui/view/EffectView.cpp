@@ -19,6 +19,7 @@
 #include "../../effect/rotary_speaker.h"
 #include "../../effect/tremolo.h"
 #include "../../effect/vocoder.h"
+#include "../../effect/wahwah.h"
 
 EffectView::EffectView(Effect *e, std::function<ViewController* ()> b) :
 		effect(e), back(b) {
@@ -1287,6 +1288,146 @@ Scene EffectView::create(Frame &frame) {
 			ComboBox* waveform = new ComboBox(4, waveforms, main_font, 24, 0, tmp_x , tmp_y, 180, 120);
 			waveform->property.bind(phaser->preset.vibrato_waveform, handler);
 			controls.push_back(waveform);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+	}
+	//WahWah
+	else if (dynamic_cast<WahWahEffect*>(effect) != nullptr) {
+		WahWahEffect* wahwah = dynamic_cast<WahWahEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color(0x53, 0x32, 0x00));
+		title->text.setString("Funky Wah AW-5");
+
+		//Wah Wah
+		{
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
+					tmp_y, 180, 120);
+			on->property.bind(wahwah->preset.on, handler);
+			controls.push_back(on);
+			hide_midi.push_back(on);
+
+			create_cc_control(effect->cc, handler, &wahwah->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Auto Wah
+		{
+			Label *label = new Label("Auto Wah", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
+					180, 120);
+			on->property.bind(wahwah->preset.auto_wah, handler);
+			controls.push_back(on);
+			hide_midi.push_back(on);
+
+			create_cc_control(effect->cc, handler, &wahwah->preset.auto_wah, tmp_x,
+					tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Cutoff
+		{
+			Label *label = new Label("Cutoff", main_font, 18, tmp_x, tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rate = new DragBox<double>(0, 0, 8, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			rate->property.bind(wahwah->preset.cutoff, handler);
+			controls.push_back(rate);
+			hide_midi.push_back(rate);
+
+			create_cc_control(effect->cc, handler, &wahwah->preset.cutoff, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Resonance
+		{
+			Label *label = new Label("Resonance", main_font, 18, tmp_x,
+					tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *depth = new DragBox<double>(0, 0, 1, main_font,
+					24, tmp_x, tmp_y, 180, 120);
+			depth->property.bind(wahwah->preset.resonance, handler);
+			controls.push_back(depth);
+			hide_midi.push_back(depth);
+
+			create_cc_control(effect->cc, handler, &wahwah->preset.resonance, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mix
+		{
+			Label *label = new Label("Mix", main_font, 18, tmp_x,
+				tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *mix = new DragBox<double>(0, 0, 1, main_font,
+				24, tmp_x, tmp_y, 180, 120);
+			mix->property.bind(wahwah->preset.mix, handler);
+			controls.push_back(mix);
+			hide_midi.push_back(mix);
+
+			create_cc_control(effect->cc, handler, &wahwah->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		tmp_x = 10;
+		tmp_y += 160;
+
+		//Amount
+		{
+			Label *label = new Label("Amount", main_font, 18, tmp_x,
+				tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0.0, 1, main_font,
+				24, tmp_x, tmp_y, 180, 120);
+			value->property.bind(wahwah->preset.amount, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &wahwah->preset.amount, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		//Pedal
+		{
+			Label *label = new Label("Pedal", main_font, 18, tmp_x,
+				tmp_y);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0.0, 1, main_font,
+				24, tmp_x, tmp_y, 180, 120);
+			value->property.bind(wahwah->pedal, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &wahwah->pedal, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;

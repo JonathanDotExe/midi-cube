@@ -23,6 +23,7 @@
 #include "../effect/rotary_speaker.h"
 #include "../effect/tremolo.h"
 #include "../effect/vocoder.h"
+#include "../effect/wahwah.h"
 
 extern void fill_sound_engine_device(SoundEngineDevice* device) {
 	device->add_sound_engine(new TemplateSoundEngineBuilder<Sampler>());
@@ -40,6 +41,7 @@ extern void fill_sound_engine_device(SoundEngineDevice* device) {
 	device->add_effect(new TemplateEffectBuilder<DelayEffect>());
 	device->add_effect(new TemplateEffectBuilder<FlangerEffect>());
 	device->add_effect(new TemplateEffectBuilder<PhaserEffect>());
+	device->add_effect(new TemplateEffectBuilder<WahWahEffect>());
 }
 
 
