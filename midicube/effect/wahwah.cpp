@@ -12,17 +12,19 @@ WahWahEffect::WahWahEffect() {
 	cc.register_binding(
 			new TemplateControlBinding<bool>("on", preset.on, false, true));
 	cc.register_binding(
-			new TemplateControlBinding<double>("lfo_rate", preset.lfo_rate, 0,
-					8));
+				new TemplateControlBinding<bool>("auto_wah", preset.auto_wah, false, true));
 	cc.register_binding(
-			new TemplateControlBinding<double>("lfo_depth", preset.lfo_depth, 0,
+			new TemplateControlBinding<double>("cutoff", preset.cutoff, 0,
+					1));
+	cc.register_binding(
+			new TemplateControlBinding<double>("resonance", preset.resonance, 0,
 					1));
 	cc.register_binding(
 			new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
 
 	cc.register_binding(
-			new TemplateControlBinding<double>("center_cutoff",
-					preset.center_cutoff, 0, 1));
+			new TemplateControlBinding<double>("amount",
+					preset.amount, 0, 1));
 }
 
 void WahWahEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
@@ -68,24 +70,22 @@ EffectProgram* create_effect_program<WahWahEffect>() {
 void WahWahProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
-	preset.lfo_rate = tree.get<double>("lfo_rate", 1);
-	preset.lfo_depth = tree.get<double>("lfo_depth", 0.25);
-	preset.mix = tree.get<double>("mix", 0.5);
-
-	preset.center_cutoff = tree.get<double>("center_cutoff", 0.5);
-	preset.vibrato_waveform = (AnalogWaveForm) tree.get<unsigned int>(
-			"vibrato_waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
+	preset.auto_wah = tree.get<bool>("auto_wah", true);
+	preset.mix = tree.get<double>("mix", 1);
+	preset.cutoff = tree.get<double>("cutoff", 0.2);
+	preset.resonance = tree.get<double>("resonance", 0.5);
+	preset.amount = tree.get<double>("amount", 0.5);
 }
 
 boost::property_tree::ptree WahWahProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
-	tree.put("lfo_rate", preset.lfo_rate);
-	tree.put("lfo_depth", preset.lfo_depth);
+	tree.put("auto_wah", preset.auto_wah);
 	tree.put("mix", preset.mix);
 
-	tree.put("center_cutoff", preset.center_cutoff);
-	tree.put("vibrato_waveform", (unsigned int) preset.vibrato_waveform);
+	tree.put("cutoff", preset.cutoff);
+	tree.put("resonance", preset.resonance);
+	tree.put("amount", preset.amount);
 	return tree;
 }
 
