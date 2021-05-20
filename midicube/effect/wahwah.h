@@ -38,9 +38,11 @@ public:
 
 class WahWahEffect : public Effect {
 private:
-	AnalogOscilator osc;
 	Filter lfilter;
 	Filter rfilter;
+	EnvelopeFollower lenv;
+	EnvelopeFollower renv;
+	double pedal = 0;
 
 public:
 	WahWahPreset preset;

@@ -25,24 +25,34 @@ WahWahEffect::WahWahEffect() {
 	cc.register_binding(
 			new TemplateControlBinding<double>("amount",
 					preset.amount, 0, 1));
+
+	cc.register_binding(
+				new TemplateControlBinding<double>("pedal",
+						pedal, 0, 1, 11));
 }
 
 void WahWahEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 	if (preset.on) {
 		//Cutoff
-		AnalogOscilatorData data = { preset.vibrato_waveform };
-		osc.process(preset.lfo_rate, info.time_step, data);
-		double carrier = osc.carrier(preset.lfo_rate, info.time_step, data);
-		double cutoff = fmax(
-				fmin(preset.center_cutoff + carrier * preset.lfo_depth, 1), 0);
+		FilterData ldata;
+		FilterData rdata;
 
-		//Allpass
-		FilterData filter { FilterType::LP_6, scale_cutoff(cutoff), 0 };
-		double l = lsample;
-		double r = rsample;
+		double amount = fmin(1 - preset.cutoff, preset.amount);
+		if (preset.auto_wah) {
+			lenv.apply(lsample, info.time_step);
+			renv.apply(rsample, info.time_step);
 
-		l = lfilter.apply(filter, l, info.time_step);
-		r = rfilter.apply(filter, r, info.time_step);
+			ldata = {FilterType::LP_24, scale_cutoff(preset.cutoff + lenv.volume() * amount)};
+			rdata = {FilterType::LP_24, scale_cutoff(preset.cutoff + renv.volume() * amount)};
+		}
+		else {
+			ldata = {FilterType::LP_24, scale_cutoff(preset.cutoff + pedal * amount)};
+			rdata = ldata;
+		}
+
+		//Filter
+		double l = lfilter.apply(ldata, l, info.time_step);
+		double r = rfilter.apply(rdata, r, info.time_step);
 
 		//Mix
 		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
