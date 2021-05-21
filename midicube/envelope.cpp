@@ -63,6 +63,15 @@ double LinearADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 		if (volume >= data.peak_volume) {
 			volume = data.peak_volume;
 			last_vol = volume;
+			phase = ATTACK_HOLD;
+		}
+		break;
+	case ATTACK_HOLD:
+		if (data.sustain_time > 0) {
+			time += time_step/data.attack_hold;
+		}
+		if (time >= 1) {
+			last_vol = volume;
 			phase = DECAY;
 		}
 		break;
@@ -137,6 +146,18 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		last = s;
 		if (volume >= data.peak_volume) {
 			volume = data.peak_volume;
+			last_vol = volume;
+			phase = ATTACK_HOLD;
+			last = 0;
+			time = 0;
+			step = 0;
+		}
+		break;
+	case ATTACK_HOLD:
+		if (data.sustain_time > 0) {
+			time += time_step/data.attack_hold;
+		}
+		if (time >= 1) {
 			last_vol = volume;
 			phase = DECAY;
 			last = 0;
