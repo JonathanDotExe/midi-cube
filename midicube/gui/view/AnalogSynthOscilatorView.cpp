@@ -173,6 +173,17 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 
 	x -= 90 * 4;
 	y += 75;
+
+	//Attack Hold
+	{
+		Label* title = new Label("Attack Hold", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0.0, 5, main_font, 16, x, y + 15, 80, 40, scale);
+		value->drag_step = 4;
+		value->property.bind(data.attack_hold, handler);
+		controls->push_back(value);
+	}
 	x += 90;
 
 	//Decay
