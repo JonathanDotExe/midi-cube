@@ -18,13 +18,19 @@ bool read_audio_file(AudioSample& audio, std::string fname) {
 	//Open
 	SNDFILE* file = nullptr;
 	SF_INFO info;
+	SF_INSTRUMENT loop;
 	bool success = true;
 
 	file = sf_open(fname.c_str(), SFM_READ, &info);
+	sf_command(file, SFC_GET_INSTRUMENT, &loop, sizeof(loop));
 
 	//Info
 	audio.channels = info.channels;
 	audio.sample_rate = info.samplerate;
+	if (loop.loop_count > 0) {
+		audio.loop_start = loop.loops[0].start;
+		audio.loop_end = loop.loops[0].end;
+	}
 
 	//Read
 	if (file != nullptr) {
