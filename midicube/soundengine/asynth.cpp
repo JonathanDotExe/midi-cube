@@ -474,6 +474,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 
 	preset.aftertouch_attack = tree.get<double>("aftertouch_attack", 0.0);
 	preset.aftertouch_release = tree.get<double>("aftertouch_release", 0.0);
+	preset.max_aftertouch = tree.get<bool>("max_aftertouch", false);
 
 	//LFOs
 	const auto& lfos = tree.get_child_optional("lfos");
@@ -605,6 +606,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 
 	tree.put("aftertouch_attack", preset.aftertouch_attack);
 	tree.put("aftertouch_release", preset.aftertouch_release);
+	tree.put("max_aftertouch", preset.max_aftertouch);
 
 	//LFOs
 	for (size_t i = 0; i < preset.lfo_count; ++i) {

@@ -147,6 +147,14 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(value);
 		tmp_x += 120;
 	}
+	//Max Aftertouch
+	{
+		CheckBox* mono = new CheckBox(false, "Max Aftertouch", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
+		mono->property.bind(synth.preset.max_aftertouch, handler);
+		controls.push_back(mono);
+	}
+	tmp_x += 120;
+
 	tmp_x = 10;
 	tmp_y += 75;
 
