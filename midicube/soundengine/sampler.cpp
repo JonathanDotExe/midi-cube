@@ -332,6 +332,10 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 		if (!read_audio_file(region.sample.sample, folder + "/" + file)) {
 			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
 		}
+		if (region.sample.loop_start == 0 && region.sample.loop_end == 0) {
+			region.sample.loop_start = region.sample.sample.loop_start;
+			region.sample.loop_end = region.sample.sample.loop_end;
+		}
 	}
 
 	//Sustain Sample
@@ -343,6 +347,10 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	if (load_sample && sfile != "") {
 		if (!read_audio_file(region.sustain_sample.sample, folder + "/" + sfile)) {
 			std::cerr << "Couldn't load sustain sample file " << folder + "/" + sfile << std::endl;
+		}
+		if (region.sustain_sample.loop_start == 0 && region.sustain_sample.loop_end == 0) {
+			region.sustain_sample.loop_start = region.sustain_sample.sample.loop_start;
+			region.sustain_sample.loop_end = region.sustain_sample.sample.loop_end;
 		}
 	}
 }
