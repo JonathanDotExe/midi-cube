@@ -42,10 +42,10 @@ private:
 	Filter rfilter;
 	EnvelopeFollower lenv;
 	EnvelopeFollower renv;
-	double pedal = 0;
 
 public:
 	WahWahPreset preset;
+	double pedal = 0;
 
 	WahWahEffect();
 	void apply(double& lsample, double& rsample, SampleInfo& info);

@@ -71,7 +71,8 @@ src = [
 	'midicube/effect/reverb.cpp',
 	'midicube/effect/rotary_speaker.cpp',
 	'midicube/effect/tremolo.cpp',
-	'midicube/effect/vocoder.cpp'
+	'midicube/effect/vocoder.cpp',
+	'midicube/effect/wahwah.cpp'
 ]
 
 executable('midi-cube', src, dependencies: deps, link_args: '-latomic')

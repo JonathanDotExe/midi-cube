@@ -51,8 +51,8 @@ void WahWahEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 		}
 
 		//Filter
-		double l = lfilter.apply(ldata, l, info.time_step);
-		double r = rfilter.apply(rdata, r, info.time_step);
+		double l = lfilter.apply(ldata, lsample, info.time_step);
+		double r = rfilter.apply(rdata, rsample, info.time_step);
 
 		//Mix
 		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
