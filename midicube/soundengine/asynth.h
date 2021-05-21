@@ -125,6 +125,7 @@ struct AnalogSynthPreset {
 
 	double aftertouch_attack = 0;
 	double aftertouch_release = 0;
+	bool max_aftertouch = false;
 };
 
 struct AnalogSynthPart {
@@ -140,6 +141,7 @@ struct AnalogSynthPart {
 
 struct AnalogSynthVoice : public TriggeredNote {
 	std::array<AnalogSynthPart, ANALOG_PART_COUNT> parts;
+	double max_aftertouch = 0;
 };
 
 class AnalogSynthProgram : public EngineProgram {

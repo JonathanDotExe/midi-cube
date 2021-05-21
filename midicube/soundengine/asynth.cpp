@@ -59,6 +59,12 @@ void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, 
 void AnalogSynth::process_note(double& lsample, double& rsample,
 		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env) {
 	double aftertouch = this->aftertouch.get(info.time);
+	if (preset.max_aftertouch) {
+		if (aftertouch > note.max_aftertouch) {
+			note.max_aftertouch = aftertouch;
+		}
+		aftertouch = note.max_aftertouch;
+	}
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
