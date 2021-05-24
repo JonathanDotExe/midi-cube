@@ -163,6 +163,7 @@ private:
 	std::array<AnalogOscilator, ANALOG_PART_COUNT> lfos;
 	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
 	std::array<double, ANALOG_PART_COUNT> lfo_mod = {};
+	std::array<double, ANALOG_PART_COUNT> lfo_vol = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
 	PortamendoBuffer aftertouch{0, 0};
 
@@ -177,6 +178,8 @@ private:
 	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
 
 	inline void apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double aftertouch);
+
+	inline double apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch);
 
 public:
 	AnalogSynthPreset preset;
