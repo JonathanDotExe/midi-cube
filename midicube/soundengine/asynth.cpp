@@ -24,7 +24,7 @@ inline double AnalogSynth::apply_modulation(const FixedScale &scale, PropertyMod
 	return scale.value(prog);
 }
 
-void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double aftertouch) {
+void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double velocity, double aftertouch) {
 	//Filter
 	if (filter.on) {
 		//Pre drive
@@ -34,8 +34,8 @@ void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, 
 
 		FilterData data { filter.type };
 		data.cutoff = scale_cutoff(
-				apply_modulation(FILTER_CUTOFF_SCALE, filter.cutoff, note.velocity, aftertouch)); //TODO optimize
-		data.resonance = apply_modulation(FILTER_RESONANCE_SCALE, filter.resonance, note.velocity,
+				apply_modulation(FILTER_CUTOFF_SCALE, filter.cutoff, velocity, aftertouch)); //TODO optimize
+		data.resonance = apply_modulation(FILTER_RESONANCE_SCALE, filter.resonance, velocity,
 				aftertouch);
 
 		if (filter.kb_track) {
@@ -53,23 +53,32 @@ void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, 
 
 void AnalogSynth::process_note(double& lsample, double& rsample,
 		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env) {
+	//Aftertouch
 	double aftertouch = this->aftertouch.get(info.time);
-	if (preset.max_aftertouch) {
+	double velocity = note.velocity;
+
+	if (aftertouch) {
 		if (aftertouch > note.max_aftertouch) {
 			note.max_aftertouch = aftertouch;
 		}
-		aftertouch = note.max_aftertouch;
+		if (preset.max_aftertouch) {
+			aftertouch = note.max_aftertouch;
+		}
+		if (preset.velocity_aftertouch_amount) {
+			velocity = fmin(1, note.velocity + note.max_aftertouch * preset.velocity_aftertouch_amount);
+		}
 	}
+
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
-		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, note.velocity, aftertouch);
+		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, velocity, aftertouch);
 		env_val[i] = note.parts[i].mod_env.amplitude(mod_env.env, info.time_step, note.pressed, env.sustain)* volume;
 	}
 	//LFOs
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
-		lfo_vol[i] = apply_modulation(VOLUME_SCALE, preset.lfos[i].volume, note.velocity, aftertouch);
+		lfo_vol[i] = apply_modulation(VOLUME_SCALE, preset.lfos[i].volume, velocity, aftertouch);
 	}
 	//Synthesize
 	size_t i = 0;
@@ -99,14 +108,14 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 				freq = note_to_freq(osc.note);
 				//FM
 				freq += fm;
-				double pitch = apply_modulation(PITCH_SCALE, osc.pitch, note.velocity, aftertouch);
+				double pitch = apply_modulation(PITCH_SCALE, osc.pitch, velocity, aftertouch);
 				if (pitch) {
 					freq *= note_to_freq_transpose(pitch);
 				}
 			}
 			else {
 				freq = note.freq;
-				double pitch = apply_modulation(PITCH_SCALE, osc.pitch, note.velocity, aftertouch);
+				double pitch = apply_modulation(PITCH_SCALE, osc.pitch, velocity, aftertouch);
 				if (osc.semi || pitch) {
 					freq = note_to_freq(note.note + osc.semi + pitch);
 				}
@@ -119,10 +128,10 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 			AnalogOscilatorBankData bdata = { 0.1, osc.unison_amount };
 
 			//Apply modulation
-			double volume = apply_modulation(VOLUME_SCALE, osc.volume, note.velocity, aftertouch);
-			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, note.velocity, aftertouch);
-			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, note.velocity, aftertouch);
-			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, note.velocity, aftertouch);
+			double volume = apply_modulation(VOLUME_SCALE, osc.volume, velocity, aftertouch);
+			data.sync_mul = apply_modulation(SYNC_SCALE, osc.sync_mul, velocity, aftertouch);
+			data.pulse_width = apply_modulation(PULSE_WIDTH_SCALE, osc.pulse_width, velocity, aftertouch);
+			bdata.unison_detune = apply_modulation(UNISON_DETUNE_SCALE, osc.unison_detune, velocity, aftertouch);
 
 			AnalogOscilatorSignal sig = part.oscilator.signal(freq, info.time_step, data, bdata, op.audible, modulates);
 			carrier += sig.carrier * volume;
@@ -130,7 +139,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		}
 		//Post processing
 		//Volume
-		double volume = apply_modulation(VOLUME_SCALE, op.volume, note.velocity, aftertouch) * op_part.amp_env.amplitude(op.env, info.time_step,
+		double volume = apply_modulation(VOLUME_SCALE, op.volume, velocity, aftertouch) * op_part.amp_env.amplitude(op.env, info.time_step,
 						note.pressed, env.sustain);
 		//Octave amp
 		if (op.amp_kb_track_upper && note.note > op.amp_kb_track_note) {
@@ -151,17 +160,17 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 			//Filter
 			if (op.filter_parallel) {
 				double c = carrier;
-				apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step, aftertouch);
-				apply_filter(op.second_filter, op_part.filter2, c, note, info.time_step, aftertouch);
+				apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step, velocity, aftertouch);
+				apply_filter(op.second_filter, op_part.filter2, c, note, info.time_step, velocity, aftertouch);
 				carrier += c;
 			}
 			else {
-				apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step, aftertouch);
-				apply_filter(op.second_filter, op_part.filter2, carrier, note, info.time_step, aftertouch);
+				apply_filter(op.first_filter, op_part.filter1, carrier, note, info.time_step, velocity, aftertouch);
+				apply_filter(op.second_filter, op_part.filter2, carrier, note, info.time_step, velocity, aftertouch);
 			}
 			carrier *= volume;
 			//Pan
-			double panning = apply_modulation(PANNING_SCALE, op.panning, note.velocity, aftertouch);
+			double panning = apply_modulation(PANNING_SCALE, op.panning, velocity, aftertouch);
 			//Playback
 			lsample += carrier * (1 - fmax(0, panning));
 			rsample += carrier * (1 - fmax(0, -panning));

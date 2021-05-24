@@ -126,6 +126,7 @@ struct AnalogSynthPreset {
 	double aftertouch_attack = 0;
 	double aftertouch_release = 0;
 	bool max_aftertouch = false;
+	double velocity_aftertouch_amount = 0;
 };
 
 struct AnalogSynthPart {
@@ -177,7 +178,7 @@ private:
 
 	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
 
-	inline void apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double aftertouch);
+	inline void apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double velocity, double aftertouch);
 
 	inline double apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch);
 
