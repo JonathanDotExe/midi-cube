@@ -260,6 +260,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.env.env.decay = tree.get<double>("envelope.decay", region.env.env.decay);
 	region.env.env.sustain = tree.get<double>("envelope.sustain", region.env.env.sustain);
 	region.env.env.release = tree.get<double>("envelope.release", region.env.env.release);
+	region.env.env.attack = tree.get<double>("envelope.attack_hold", region.env.env.attack_hold);
 	region.env.sustain_entire_sample = tree.get<bool>("envelope.sustain_entire_sample", region.env.sustain_entire_sample);
 
 	region.filter.filter_cutoff = tree.get<double>("filter.cutoff", region.filter.filter_cutoff);

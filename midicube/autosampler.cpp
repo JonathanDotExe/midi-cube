@@ -458,6 +458,9 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		else if (opcode.first == "loop_end") {
 			tree.put("loop_end", std::stoi(opcode.second));
 		}
+		else if (opcode.first == "ampeg_hold") {
+			tree.put("envelope.attack_hold", std::stod(opcode.second));
+		}
 		//TODO tune
 		else {
 			std::cout << "Skipping unrecognized opcode " << opcode.first << "="
