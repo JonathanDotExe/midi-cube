@@ -287,6 +287,7 @@ bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 
 void AnalogSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
 	AnalogSynthVoice& voice = this->note.note[this->note.press_note(info, real_note, note, velocity)];
+	voice.aftertouch = 0;
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();
 	}
