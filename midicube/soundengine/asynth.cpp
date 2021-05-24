@@ -77,7 +77,6 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 	}
 	//LFOs
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
-		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
 		lfo_vol[i] = apply_modulation(VOLUME_SCALE, preset.lfos[i].volume, velocity, aftertouch);
 	}
 	//Synthesize
@@ -188,7 +187,6 @@ void AnalogSynth::process_note_sample(
 
 void AnalogSynth::process_sample(double& lsample, double& rsample,
 		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
-	double aftertouch = this->aftertouch.get(info.time);
 	//Mono
 	if (preset.mono) {
 		if (status.pressed_notes) {
@@ -477,6 +475,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	preset.aftertouch_attack = tree.get<double>("aftertouch_attack", 0.0);
 	preset.aftertouch_release = tree.get<double>("aftertouch_release", 0.0);
 	preset.max_aftertouch = tree.get<bool>("max_aftertouch", false);
+	preset.velocity_aftertouch_amount = tree.get<double>("velocity_aftertouch_amount", 0.0);
 
 	//LFOs
 	const auto& lfos = tree.get_child_optional("lfos");
@@ -609,6 +608,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	tree.put("aftertouch_attack", preset.aftertouch_attack);
 	tree.put("aftertouch_release", preset.aftertouch_release);
 	tree.put("max_aftertouch", preset.max_aftertouch);
+	tree.put("velocity_aftertouch_amount", preset.velocity_aftertouch_amount);
 
 	//LFOs
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
