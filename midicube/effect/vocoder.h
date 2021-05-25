@@ -53,7 +53,7 @@ struct VocoderPreset {
 	double min_freq = 120;
 	double max_freq = 360;
 	double resonance = 0;
-	FilterType filter_type = FilterType::BP_12;
+	FilterType filter_type = FilterType::LP_12_BP;
 };
 
 struct VocoderBand {

@@ -285,11 +285,20 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	else if (type == "HP_24") {
 		region.filter.filter_type = FilterType::HP_24;
 	}
-	else if (type == "BP_12") {
-		region.filter.filter_type = FilterType::LP_12;
+	else if (type == "LP_12_BP") {
+		region.filter.filter_type = FilterType::LP_12_BP;
 	}
-	else if (type == "BP_24") {
-		region.filter.filter_type = FilterType::LP_24;
+	else if (type == "LP_24_BP") {
+		region.filter.filter_type = FilterType::LP_24_BP;
+	}
+	else if (type == "LP_6") {
+		region.filter.filter_type = FilterType::LP_6;
+	}
+	else if (type == "HP_6") {
+		region.filter.filter_type = FilterType::HP_6;
+	}
+	else if (type == "BP_12") {
+		region.filter.filter_type = FilterType::BP_12;
 	}
 
 	if (tree.get_child_optional("note")) {

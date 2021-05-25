@@ -13,6 +13,7 @@
 
 const double TWO_POLE_FACTOR = 1.0/sqrt(pow(2, 1/2.0) - 1);
 const double FOUR_POLE_FACTOR = 1.0/sqrt(pow(2, 1/4.0) - 1);
+const double BP_12_BOOST = db_to_amp(3);
 
 /**
  * To convert frequency into filter cutoff use time_step/(rc+time_step)
@@ -25,12 +26,15 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 	case FilterType::LP_6:
 	case FilterType::LP_12:
 	case FilterType::LP_24:
-	case FilterType::BP_12:
-	case FilterType::BP_24:
+	case FilterType::LP_12_BP:
+	case FilterType::LP_24_BP:
 	{
 		//Cutoff
 		double factor = 1;
-		if (data.type % 2 == 0) {
+		if (data.type == LP_6) {
+			factor = 1;
+		}
+		else if (data.type % 2 == 0) {
 			factor = TWO_POLE_FACTOR;
 		}
 		else {
@@ -52,9 +56,9 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 			return pole2;
 		case FilterType::LP_24:
 			return pole4;
-		case FilterType::BP_12:
+		case FilterType::LP_12_BP:
 			return pole1 - pole2;
-		case FilterType::BP_24:
+		case FilterType::LP_24_BP:
 			return pole1 - pole4;
 		default:
 			break;
@@ -68,7 +72,10 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 	{
 		//Cutoff
 		double factor = 1;
-		if (data.type % 2 == 0) {
+		if (data.type == HP_6) {
+			factor = 1;
+		}
+		else if (data.type % 2 == 0) {
 			factor = TWO_POLE_FACTOR;
 		}
 		else {
@@ -100,6 +107,23 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 		}
 	}
 		break;
+	case BP_12:
+		//Cutoff
+		double factor = TWO_POLE_FACTOR;
+		double cutoff = cutoff_to_factor(data.cutoff * factor, time_step);
+		double feedback = data.resonance + data.resonance/(1 - cutoff);
+		//Update lowpass buffer
+		pole1 += cutoff * (sample - pole1 + feedback * (pole1 - pole2));
+		pole2 += cutoff * (pole1 - pole2);
+		//Update highpass buffer
+		pole3 = cutoff * (pole2 - last_pole3 + pole3);
+		pole4 = cutoff * (pole3 - last_pole4 + pole4);
+
+		last_pole3 = pole2;
+		last_pole4 = pole3;
+
+		//Values
+		return pole4 * BP_12_BOOST;
 	}
 
 	return sample;
