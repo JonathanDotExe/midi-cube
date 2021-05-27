@@ -41,6 +41,8 @@ class EqualizerEffect : public Effect {
 private:
 	Filter llowfilter;
 	Filter rlowfilter;
+	Filter llow_midfilter;
+	Filter rlow_midfilter;
 	Filter lmidfilter;
 	Filter rmidfilter;
 	Filter lhighfilter;

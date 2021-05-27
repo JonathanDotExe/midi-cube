@@ -11,33 +11,41 @@
 EqualizerEffect::EqualizerEffect() {
 	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
 	cc.register_binding(new TemplateControlBinding<double>("low_freq", preset.low_freq, 20, 400));
-	cc.register_binding(new TemplateControlBinding<double>("low_gain", preset.low_gain, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("low_gain", preset.low_gain, -15, 15));
 	cc.register_binding(new TemplateControlBinding<double>("low_mid_freq", preset.low_mid_freq, 100, 1000));
-	cc.register_binding(new TemplateControlBinding<double>("low_mid_gain", preset.low_mid_gain, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("low_mid_gain", preset.low_mid_gain, -15, 15));
 	cc.register_binding(new TemplateControlBinding<double>("mid_freq", preset.mid_freq, 200, 8000));
-	cc.register_binding(new TemplateControlBinding<double>("mid_gain", preset.mid_gain, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("mid_gain", preset.mid_gain, -15, 15));
 	cc.register_binding(new TemplateControlBinding<double>("high_freq", preset.high_freq, 1000, 20000));
-	cc.register_binding(new TemplateControlBinding<double>("high_gain", preset.high_gain, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("high_gain", preset.high_gain, -15, 15));
 }
 
 void EqualizerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	if (preset.on) {
-		double l = ldelay.process();
-		double r = rdelay.process();
+		//Filters
+		FilterData lowdata = {FilterType::LP_24, preset.low_freq};
+		FilterData low_middata = {FilterType::BP_12, preset.low_mid_freq};
+		FilterData middata = {FilterType::BP_12, preset.mid_freq};
+		FilterData highdata = {FilterType::HP_24, preset.high_freq};
 
-		//Delay
-		AnalogOscilatorData data = {preset.vibrato_waveform};
-		osc.process(preset.vibrato_rate, info.time_step, data);
-		double del = (1 + osc.carrier(preset.vibrato_rate, info.time_step, data) * preset.vibrato_depth * 0.2) * preset.delay * info.sample_rate;
-		ldelay.add_isample(lsample, del);
-		rdelay.add_isample(rsample, del);
+		double llow = llowfilter.apply(lowdata, lsample, info.time_step);
+		double rlow = rlowfilter.apply(lowdata, rsample, info.time_step);
+		double llow_mid = llow_midfilter.apply(low_middata, lsample, info.time_step);
+		double rlow_mid = rlow_midfilter.apply(low_middata, rsample, info.time_step);
+		double lmid = lmidfilter.apply(middata, lsample, info.time_step);
+		double rmid = rmidfilter.apply(middata, rsample, info.time_step);
+		double lhigh = lhighfilter.apply(highdata, lsample, info.time_step);
+		double rhigh = rhighfilter.apply(highdata, rsample, info.time_step);
 
-		//Mix
-		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		//Gains
+		double low_gain = db_to_amp(preset.low_gain) - 1;
+		double low_mid_gain = db_to_amp(preset.low_mid_gain) - 1;
+		double mid_gain = db_to_amp(preset.mid_gain) - 1;
+		double high_gain = db_to_amp(preset.high_gain) - 1;
 
-		lsample += l * fmin(0.5, preset.mix) * 2;
-		rsample += r * fmin(0.5, preset.mix) * 2;
+		//Apply
+		lsample += llow * low_gain + llow_mid * low_mid_gain + lmid * mid_gain + lhigh * high_gain;
+		rsample += rlow * low_gain + rlow_mid * low_mid_gain + rmid * mid_gain + rhigh * high_gain;
 	}
 }
 
