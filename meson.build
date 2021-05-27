@@ -66,6 +66,7 @@ src = [
 	'midicube/effect/chorus.cpp',
 	'midicube/effect/delay.cpp',
 	'midicube/effect/effect.cpp',
+	'midicube/effect/equalizer.cpp',
 	'midicube/effect/flanger.cpp',
 	'midicube/effect/phaser.cpp',
 	'midicube/effect/reverb.cpp',

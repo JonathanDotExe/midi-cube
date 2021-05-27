@@ -42,11 +42,11 @@ void WahWahEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 			lenv.apply(lsample, info.time_step);
 			renv.apply(rsample, info.time_step);
 
-			ldata = {FilterType::LP_24, scale_cutoff(preset.cutoff + lenv.volume() * amount)};
-			rdata = {FilterType::LP_24, scale_cutoff(preset.cutoff + renv.volume() * amount)};
+			ldata = {FilterType::LP_6, scale_cutoff(preset.cutoff + lenv.volume() * amount), preset.resonance};
+			rdata = {FilterType::LP_6, scale_cutoff(preset.cutoff + renv.volume() * amount), preset.resonance};
 		}
 		else {
-			ldata = {FilterType::LP_24, scale_cutoff(preset.cutoff + pedal * amount)};
+			ldata = {FilterType::LP_6, scale_cutoff(preset.cutoff + pedal * amount), preset.resonance};
 			rdata = ldata;
 		}
 

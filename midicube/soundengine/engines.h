@@ -17,6 +17,7 @@
 #include "../effect/bitcrusher.h"
 #include "../effect/chorus.h"
 #include "../effect/delay.h"
+#include "../effect/equalizer.h"
 #include "../effect/flanger.h"
 #include "../effect/phaser.h"
 #include "../effect/reverb.h"
@@ -42,6 +43,7 @@ extern void fill_sound_engine_device(SoundEngineDevice* device) {
 	device->add_effect(new TemplateEffectBuilder<FlangerEffect>());
 	device->add_effect(new TemplateEffectBuilder<PhaserEffect>());
 	device->add_effect(new TemplateEffectBuilder<WahWahEffect>());
+	device->add_effect(new TemplateEffectBuilder<EqualizerEffect>());
 }
 
 
