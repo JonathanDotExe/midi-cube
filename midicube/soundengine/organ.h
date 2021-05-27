@@ -92,6 +92,7 @@ class B3OrganTonewheel {
 public:
 	double rotation = 0;
 	double volume = 0;
+	double compress_volume = 0;
 	double process(SampleInfo& info, double freq, OrganType type);
 };
 
@@ -128,7 +129,7 @@ private:
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbar_notes;
 	std::array<B3OrganTonewheelData, ORGAN_TONEWHEEL_AMOUNT> tonewheel_data;
 
-	void trigger_tonewheel(int tonewheel, double vol, SampleInfo& info, TriggeredNote& note);
+	void trigger_tonewheel(int tonewheel, double vol, SampleInfo& info, TriggeredNote& note, double compress_volume);
 
 public:
 	B3OrganData data;

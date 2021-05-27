@@ -37,7 +37,7 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 		break;
 	case DistortionType::ARCTAN_DISTORTION:
 	{
-		sample = atan(sample * (drive * 4));
+		sample = atan(sample * (1 + drive * 4));
 	}
 		break;
 	}

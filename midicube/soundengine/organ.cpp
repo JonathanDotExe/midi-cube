@@ -16,6 +16,7 @@ double B3OrganTonewheel::process(SampleInfo& info, double freq, OrganType type) 
 	double volume = this->volume;
 	rotation += freq * info.time_step;
 	this->volume = 0;
+	this->compress_volume = 0;
 	//Signal
 	if (volume) {
 		if (type == ORGAN_TYPE_B3) {
@@ -78,7 +79,7 @@ B3Organ::B3Organ() {
 	}
 }
 
-void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, TriggeredNote& note) {
+void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, TriggeredNote& note, double compress_volume) {
 	bool vol_mul = 1;
 	while (tonewheel < 0) {
 		tonewheel += 12;
@@ -96,6 +97,7 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, 
 		else {
 			data.tonewheels[tonewheel].volume += volume * vol_mul * fmax(0, 1 - (info.time - note.release_time - tonewheel_data[tonewheel].release_delay)/data.preset.click_attack);
 		}
+		data.tonewheels[tonewheel].compress_volume += compress_volume;
 	}
 }
 
@@ -104,7 +106,8 @@ void B3Organ::process_note_sample(double& lsample, double& rsample, SampleInfo &
 	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
 		int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
-		trigger_tonewheel(tonewheel, data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount, info, note);
+		double vol = data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
+		trigger_tonewheel(tonewheel, vol, info, note, vol);
 	}
 	//Percussion
 	double decay = data.preset.percussion_fast_decay ? data.preset.percussion_fast_decay_time : data.preset.percussion_slow_decay_time;
@@ -113,7 +116,7 @@ void B3Organ::process_note_sample(double& lsample, double& rsample, SampleInfo &
 		vol /= drawbar_amount;
 		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12) - ORGAN_LOWEST_TONEWHEEL_NOTE;
 
-		trigger_tonewheel(tonewheel, vol, info, note);
+		trigger_tonewheel(tonewheel, vol, info, note, 0);
 	}
 }
 
@@ -147,7 +150,7 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	double sample = 0;
 	double volume = 0;
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
-		volume += data.tonewheels[i].volume * tonewheel_data[i].volume;
+		volume += data.tonewheels[i].compress_volume;
 		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend, data.preset.type) * tonewheel_data[i].volume;
 	}
 	sample *= swell;
