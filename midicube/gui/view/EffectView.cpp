@@ -96,11 +96,11 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *boost = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			boost->property.bind(amp->preset.boost, handler);
+			boost->property.bind(amp->preset.post_gain, handler);
 			controls.push_back(boost);
 			hide_midi.push_back(boost);
 
-			create_cc_control(effect->cc, handler, &amp->preset.boost, tmp_x, tmp_y, 180, 120, controls, show_midi);
+			create_cc_control(effect->cc, handler, &amp->preset.post_gain, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;

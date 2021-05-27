@@ -23,7 +23,7 @@ enum DistortionType {
 
 struct AmplifierSimulationPreset {
 	bool on = true;
-	double boost = 0;
+	double post_gain = 0;
 	double drive = 0;
 	double tone = 0.6;
 	DistortionType type = ARCTAN_DISTORTION;

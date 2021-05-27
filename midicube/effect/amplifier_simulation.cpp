@@ -9,7 +9,7 @@
 
 AmplifierSimulationEffect::AmplifierSimulationEffect() {
 	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true, 28));
-	cc.register_binding(new TemplateControlBinding<double>("boost", preset.boost, 0, 1, 35));
+	cc.register_binding(new TemplateControlBinding<double>("post_gain", preset.post_gain, 0, 1, 35));
 	cc.register_binding(new TemplateControlBinding<double>("drive", preset.drive, 0, 1, 36));
 	cc.register_binding(new TemplateControlBinding<double>("tone", preset.tone, 0, 1, 37));
 }
@@ -37,7 +37,7 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 		break;
 	case DistortionType::ARCTAN_DISTORTION:
 	{
-		sample = atan(sample * (1.5 + drive * 2));
+		sample = atan(sample * (drive * 4));
 	}
 		break;
 	}
@@ -46,11 +46,6 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 
 void AmplifierSimulationEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 	if (preset.on) {
-		//Gain
-		double gain = preset.boost + 1;
-		lsample *= gain;
-		rsample *= gain;
-
 		//Distortion
 		lsample = apply_distortion(lsample, preset.drive, preset.type);
 		rsample = apply_distortion(rsample, preset.drive, preset.type);
@@ -61,6 +56,11 @@ void AmplifierSimulationEffect::apply(double &lsample, double &rsample, SampleIn
 		data.cutoff = 200 + preset.tone * 20000;
 		lsample = lfilter.apply(data, lsample, info.time_step);
 		rsample = rfilter.apply(data, rsample, info.time_step);
+
+		//Gain
+		double gain = preset.post_gain + 1;
+		lsample *= gain;
+		rsample *= gain;
 	}
 }
 
@@ -76,7 +76,7 @@ std::string get_effect_name<AmplifierSimulationEffect>() {
 void AmplifierSimulationProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
-	preset.boost = tree.get<double>("boost", 0);
+	preset.post_gain = tree.get<double>("post_gain", 0);
 	preset.drive = tree.get<double>("drive", 0);
 	preset.tone = tree.get<double>("tone", 0.6);
 }
@@ -84,7 +84,7 @@ void AmplifierSimulationProgram::load(boost::property_tree::ptree tree) {
 boost::property_tree::ptree AmplifierSimulationProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
-	tree.put("boost", preset.boost);
+	tree.put("post_gain", preset.post_gain);
 	tree.put("drive", preset.drive);
 	tree.put("tone", preset.tone);
 	return tree;
