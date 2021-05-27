@@ -10,11 +10,14 @@
 
 EqualizerEffect::EqualizerEffect() {
 	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_rate", preset.vibrato_rate, 0, 8));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_depth", preset.vibrato_depth, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
-
-	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 0.03));
+	cc.register_binding(new TemplateControlBinding<double>("low_freq", preset.low_freq, 20, 400));
+	cc.register_binding(new TemplateControlBinding<double>("low_gain", preset.low_gain, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("low_mid_freq", preset.low_mid_freq, 100, 1000));
+	cc.register_binding(new TemplateControlBinding<double>("low_mid_gain", preset.low_mid_gain, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("mid_freq", preset.mid_freq, 200, 8000));
+	cc.register_binding(new TemplateControlBinding<double>("mid_gain", preset.mid_gain, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("high_freq", preset.high_freq, 1000, 20000));
+	cc.register_binding(new TemplateControlBinding<double>("high_gain", preset.high_gain, 0, 1));
 }
 
 void EqualizerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -56,23 +59,27 @@ EffectProgram* create_effect_program<EqualizerEffect>() {
 void EqualizerProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
-	preset.vibrato_rate = tree.get<double>("vibrato_rate", 2);
-	preset.vibrato_depth = tree.get<double>("vibrato_depth", 0.5);
-	preset.mix = tree.get<double>("mix", 0.5);
-
-	preset.delay = tree.get<double>("delay", 0.015);
-	preset.vibrato_waveform = (AnalogWaveForm) tree.get<unsigned int>("vibrato_waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
+	preset.low_freq = tree.get<double>("low_freq", 100);
+	preset.low_gain = tree.get<double>("low_gain", 0);
+	preset.low_mid_freq = tree.get<double>("low_mid_freq", 400);
+	preset.low_mid_gain = tree.get<double>("low_mid_gain", 0);
+	preset.mid_freq = tree.get<double>("mid_freq", 1000);
+	preset.mid_gain = tree.get<double>("mid_gain", 0);
+	preset.high_freq = tree.get<double>("high_freq", 400);
+	preset.high_gain = tree.get<double>("high_gain", 0);
 }
 
 boost::property_tree::ptree EqualizerProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
-	tree.put("vibrato_rate", preset.vibrato_rate);
-	tree.put("vibrato_depth", preset.vibrato_depth);
-	tree.put("mix", preset.mix);
-
-	tree.put("delay", preset.delay);
-	tree.put("vibrato_waveform", (unsigned int) preset.vibrato_waveform);
+	tree.put("low_freq", preset.low_freq);
+	tree.put("low_gain", preset.low_gain);
+	tree.put("low_mid_freq", preset.low_mid_freq);
+	tree.put("low_mid_gain", preset.low_mid_gain);
+	tree.put("mid_freq", preset.mid_freq);
+	tree.put("mid_gain", preset.mid_gain);
+	tree.put("high_freq", preset.high_freq);
+	tree.put("high_gain", preset.high_gain);
 	return tree;
 }
 

@@ -13,12 +13,15 @@
 #include "effect.h"
 
 struct EqualizerPreset {
+	bool on = true;
 	double low_freq = 100;
-	double low_boost = 0;
+	double low_gain = 0;
+	double low_mid_freq = 400;
+	double low_mid_gain = 0;
 	double mid_freq = 1000;
-	double mid_boost = 0;
-	double high_freq = 8000;
-	double high_boost = 0;
+	double mid_gain = 0;
+	double high_freq = 4000;
+	double high_gain = 0;
 };
 
 
