@@ -1463,6 +1463,16 @@ Scene EffectView::create(Frame &frame) {
 			tmp_x += 200;
 		}
 
+		DragBoxScale<double> db_scale;
+		db_scale.value = [](double prog, double min, double max) {
+			double db = (max - min) * prog + min;
+			return db_to_amp(db);
+		};
+		db_scale.progress = [](double val, double min, double max) {
+			double db = amp_to_db(val);
+			return (db - min)/(max - min);
+		};
+
 		//Low Gain
 		{
 			Label *label = new Label("Low Gain", main_font, 18, tmp_x, tmp_y);

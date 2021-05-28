@@ -21,6 +21,11 @@ inline extern double db_to_amp(double db) {
 	return pow(10, db/10);
 }
 
+inline extern double amp_to_db(double amp) {
+	return log(amp)/log(10) * 10;
+}
+
+
 inline extern double note_to_freq_transpose (double tnote) {
 	return pow(2, (tnote)/12.0);
 }
