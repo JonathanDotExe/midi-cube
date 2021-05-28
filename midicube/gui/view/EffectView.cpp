@@ -13,6 +13,7 @@
 #include "../../effect/bitcrusher.h"
 #include "../../effect/chorus.h"
 #include "../../effect/delay.h"
+#include "../../effect/equalizer.h"
 #include "../../effect/flanger.h"
 #include "../../effect/phaser.h"
 #include "../../effect/reverb.h"
@@ -1428,6 +1429,202 @@ Scene EffectView::create(Frame &frame) {
 			hide_midi.push_back(value);
 
 			create_cc_control(effect->cc, handler, &wahwah->pedal, tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+	}
+	//Equalizer
+	else if (dynamic_cast<EqualizerEffect*>(effect) != nullptr) {
+		EqualizerEffect *equalizer = dynamic_cast<EqualizerEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color::Black);
+		title->text.setString("4-Band EQ");
+		title->text.setFillColor(sf::Color::White);
+
+		//On
+		{
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
+					180, 120);
+			on->property.bind(equalizer->preset.on, handler);
+			controls.push_back(on);
+			hide_midi.push_back(on);
+
+			create_cc_control(effect->cc, handler, &equalizer->preset.on, tmp_x,
+					tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Low Gain
+		{
+			Label *label = new Label("Low Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -15, 15, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(equalizer->preset.low_gain, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &equalizer->preset.low_gain,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Low Mid Gain
+		{
+			Label *label = new Label("Low Mid Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -15, 15, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(equalizer->preset.low_mid_gain, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &equalizer->preset.low_mid_gain,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mid Gain
+		{
+			Label *label = new Label("Mid Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -15, 15, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(equalizer->preset.mid_gain, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &equalizer->preset.mid_gain,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//High Gain
+		{
+			Label *label = new Label("High Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -15, 15, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(equalizer->preset.high_gain, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &equalizer->preset.high_gain,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		tmp_y += 160;
+		tmp_x -= 200 * 4;
+
+		//Low Freq
+		{
+			Label *label = new Label("Low Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 20, 400, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(equalizer->preset.low_freq, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &equalizer->preset.low_freq,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Low Mid Freq
+		{
+			Label *label = new Label("Low Mid Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 100, 1000, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(equalizer->preset.low_mid_freq, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &equalizer->preset.low_mid_freq,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mid Freq
+		{
+			Label *label = new Label("Mid Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 200, 8000, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(equalizer->preset.mid_freq, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &equalizer->preset.mid_freq,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//High Freq
+		{
+			Label *label = new Label("High Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 1000, 20000, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(equalizer->preset.high_freq, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &equalizer->preset.high_freq,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
