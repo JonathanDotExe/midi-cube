@@ -85,6 +85,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 			double loop_duration_time = loop_end_time - loop_start_time;
 			double crossfade_start_time = loop_start_time - loop_crossfade_time;
 			double crossfade_end_time = loop_end_time - loop_crossfade_time;
+
 			if (note.hit_loop) {
 				//Loop again
 				if (note.time >= loop_end_time) {
@@ -151,7 +152,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.region && note.sample) {
-		return note.time > note.sample->sample.duration() || (!note.region->env.sustain_entire_sample && note.env.is_finished()) || note.layer_amp <= 0.0005;
+		return (note.region->loop == NO_LOOP && note.time > note.sample->sample.duration()) || (!note.region->env.sustain_entire_sample && note.env.is_finished()) || note.layer_amp <= 0.0005;
 	}
 	return true;
 }
@@ -346,6 +347,9 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 			region.sample.loop_start = region.sample.sample.loop_start;
 			region.sample.loop_end = region.sample.sample.loop_end;
 		}
+		if (region.sample.loop_end < region.sample.loop_start) {
+			region.sample.loop_end = region.sample.sample.samples.size()/region.sample.sample.channels;
+		}
 	}
 
 	//Sustain Sample
@@ -361,6 +365,9 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 		if (region.sustain_sample.loop_start == 0 && region.sustain_sample.loop_end == 0) {
 			region.sustain_sample.loop_start = region.sustain_sample.sample.loop_start;
 			region.sustain_sample.loop_end = region.sustain_sample.sample.loop_end;
+		}
+		if (region.sustain_sample.loop_end < region.sustain_sample.loop_start) {
+			region.sustain_sample.loop_end = region.sustain_sample.sample.samples.size()/region.sustain_sample.sample.channels;
 		}
 	}
 }
