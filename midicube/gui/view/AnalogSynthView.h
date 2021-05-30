@@ -17,9 +17,16 @@ private:
 	AnalogSynth& synth;
 	SoundEngineChannel& channel;
 	int channel_index;
+	std::array<size_t, ANALOG_PART_COUNT> part_sizes = {1, 1, 1, 1, 1, 1, 1, 1};
+	std::array<Button*, ANALOG_PART_COUNT> operators;
+	Frame* frame = nullptr;
+
+	void position_operators();
+
 public:
 	AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int channel_index);
 	virtual Scene create(Frame &frame);
+	virtual void update_properties();
 	virtual ~AnalogSynthView();
 };
 

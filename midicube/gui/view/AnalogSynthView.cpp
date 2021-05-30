@@ -18,6 +18,7 @@ AnalogSynthView::AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int chan
 }
 
 Scene AnalogSynthView::create(Frame &frame) {
+	this->frame = &frame;
 	std::vector<Control*> controls;
 
 	ActionHandler& handler = frame.cube.action_handler;
@@ -37,6 +38,11 @@ Scene AnalogSynthView::create(Frame &frame) {
 		Pane* pane = new Pane(sf::Color(120, 120, 120), x, y, pane_width - 5, pane_height - 5);
 
 		controls.push_back(pane);
+	}
+
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+		int x = 10 + pane_width * (i % cols);
+		int y = 10;
 
 		//Title
 		Label* title = new Label("Part " + std::to_string(i + 1), main_font, 16, x + 5, y + 5);
@@ -50,11 +56,12 @@ Scene AnalogSynthView::create(Frame &frame) {
 		});
 		controls.push_back(osc);
 		//Operator
-		Button* op = new Button("Operator", main_font, 14, x + 5, y + 70,  pane_width - 15, 30);
+		Button* op = new Button("Operator", main_font, 14, x + 5, y + 70, pane_width - 15, 30);
 		op->rect.setFillColor(sf::Color(0, 180, 255));
 		op->set_on_click([&frame, this, i]{
 			frame.change_view(new AnalogSynthOperatorView(synth, channel, channel_index, i));
 		});
+		operators[i] = op;
 		controls.push_back(op);
 		//Modulators
 		Button* mod = new Button("Modulation", main_font, 14, x + 5, y + 110,  pane_width - 15, 30);
@@ -186,6 +193,28 @@ Scene AnalogSynthView::create(Frame &frame) {
 	controls.push_back(back);
 
 	return {controls};
+}
+
+void AnalogSynthView::update_properties() {
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+		frame->cube.action_handler.queue_action(new GetValueAction<unsigned int, unsigned int>(synth.preset.operators[i].oscilator_count, [i, this](size_t size) {
+			part_sizes[i] = size;
+			position_operators();
+		}));
+	}
+}
+
+void AnalogSynthView::position_operators() {
+	int cols = ANALOG_PART_COUNT;
+	int pane_width = (frame->get_width() - 15) / cols; //FIXME
+	size_t pos = 0;
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+		int x = 10 + pane_width * pos;
+		int y = 10;
+		Button* op = operators[i];
+		op->update_position(x + 5, y + 70, pane_width - 15, 30);
+		pos += part_sizes[i];
+	}
 }
 
 AnalogSynthView::~AnalogSynthView() {
