@@ -61,12 +61,12 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		if (aftertouch > note.max_aftertouch) {
 			note.max_aftertouch = aftertouch;
 		}
-		if (preset.max_aftertouch) {
-			aftertouch = note.max_aftertouch;
-		}
-		if (preset.velocity_aftertouch_amount) {
-			velocity = fmin(1, note.velocity + note.max_aftertouch * preset.velocity_aftertouch_amount);
-		}
+	}
+	if (preset.max_aftertouch) {
+		aftertouch = note.max_aftertouch;
+	}
+	if (preset.velocity_aftertouch_amount) {
+		velocity = fmin(1, note.velocity + note.max_aftertouch * preset.velocity_aftertouch_amount);
 	}
 
 	//Mod Envs
