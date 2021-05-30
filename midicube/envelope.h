@@ -58,6 +58,8 @@ struct ADSREnvelopeData {
 	double decay_volume = 1;
 	double sustain_time = 0;
 	double release_volume = 0;
+
+	bool pedal_catch = false;
 };
 
 enum ADSREnvelopePhase {

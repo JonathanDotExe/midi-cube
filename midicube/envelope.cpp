@@ -268,7 +268,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		break;
 	}
 
-	if (!sustain || phase != ADSREnvelopePhase::RELEASE) {
+	if (!sustain || phase != ADSREnvelopePhase::RELEASE || !data.pedal_catch) {
 		time += step;
 	}
 

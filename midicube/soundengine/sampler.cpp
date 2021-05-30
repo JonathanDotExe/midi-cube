@@ -256,6 +256,7 @@ Sampler::~Sampler() {
 }
 
 void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::string folder) {
+	region.env.env.pedal_catch = true;
 	region.env.velocity_amount = tree.get<double>("envelope.velocity_amount", region.env.velocity_amount);
 	region.env.env.attack = tree.get<double>("envelope.attack", region.env.env.attack);
 	region.env.env.decay = tree.get<double>("envelope.decay", region.env.env.decay);
