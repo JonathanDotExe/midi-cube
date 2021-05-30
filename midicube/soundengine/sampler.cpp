@@ -130,8 +130,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		if (!note.region->env.sustain_entire_sample) {
 			//Volume
 			vol = note.env.amplitude(note.region->env.env, info.time_step, note.pressed, env.sustain);
-			vel_amount += note.region->env.velocity_amount;
 		}
+		vel_amount += note.region->env.velocity_amount;
 
 		vol *= vel_amount * (note.velocity - 1) + 1;
 		vol *= note.layer_amp;
@@ -406,11 +406,15 @@ extern SampleSound* load_sound(std::string folder) {
 		//Parse
 		sound = new SampleSound();
 		sound->name = tree.get<std::string>("sound.name", "Sound");
-		sound->volume = tree.get<double>("sound.volume", 1);
+		sound->volume = tree.get<double>("sound.master_volume", 1);
+		SampleRegion master;
+		if (tree.get_child_optional("sound")) {
+			load_region(tree.get_child("sound"), master, false, folder);
+		}
 		//Load groups
 		auto groups = tree.get_child_optional("sound.groups");
 		if (groups) {
-			load_groups(groups.get(), sound->samples, {}, folder);
+			load_groups(groups.get(), sound->samples, master, folder);
 		}
 	}
 	catch (pt::xml_parser_error& e) {
