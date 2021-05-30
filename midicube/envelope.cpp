@@ -71,16 +71,31 @@ double LinearADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 			time += time_step/data.attack_hold;
 		}
 		else {
-			phase = DECAY;
+			phase = PRE_DECAY;
 		}
 		if (time >= 1) {
 			last_vol = volume;
+			phase = PRE_DECAY;
+		}
+		break;
+	case PRE_DECAY:
+		if (data.pre_decay != 0) {
+			volume -= time_step/data.pre_decay * (data.peak_volume - data.decay_volume);
+		}
+		else {
+			volume = data.decay_volume;
+		}
+
+		if (volume <= data.decay_volume) {
+			volume = data.decay_volume;
+			last_vol = volume;
+			time = 0;
 			phase = DECAY;
 		}
 		break;
 	case DECAY:
 		if (data.decay != 0) {
-			volume -= time_step/data.decay * (data.peak_volume - data.sustain);
+			volume -= time_step/data.decay * (data.decay_volume - data.sustain);
 		}
 		else {
 			volume = data.sustain;
@@ -161,9 +176,30 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 			time += time_step/data.attack_hold;
 		}
 		else {
-			phase = DECAY;
+			phase = PRE_DECAY;
 		}
 		if (time >= 1) {
+			last_vol = volume;
+			phase = PRE_DECAY;
+			last = 0;
+			time = 0;
+			step = 0;
+		}
+		break;
+	case PRE_DECAY:
+		step = time_step/data.pre_decay;
+		s = wavetable_adsr(time, data.pre_decay_shape);
+		if (data.pre_decay != 0) {
+			volume -= (s - last) * (data.peak_volume - data.decay_volume);
+			last = s;
+		}
+		else {
+			volume = data.decay_volume;
+		}
+
+		last = s;
+		if (volume <= data.decay_volume) {
+			volume = data.decay_volume;
 			last_vol = volume;
 			phase = DECAY;
 			last = 0;
@@ -175,7 +211,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		step = time_step/data.decay;
 		s = wavetable_adsr(time, data.decay_shape);
 		if (data.decay != 0) {
-			volume -= (s - last) * (data.peak_volume - data.sustain);
+			volume -= (s - last) * (data.decay_volume - data.sustain);
 			last = s;
 		}
 		else {

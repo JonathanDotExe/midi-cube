@@ -47,17 +47,21 @@ struct ADSREnvelopeData {
 	double release;
 
 	ADSREnvelopeShape attack_shape = ADSREnvelopeShape::LINEAR_ADSR;
+	ADSREnvelopeShape pre_decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
 	ADSREnvelopeShape decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
 	ADSREnvelopeShape release_shape = ADSREnvelopeShape::ANALOG_ADSR;
 
+	double pre_decay = 0;
+
 	double attack_hold = 0;
 	double peak_volume = 1;
+	double decay_volume = 1;
 	double sustain_time = 0;
 	double release_volume = 0;
 };
 
 enum ADSREnvelopePhase {
-	ATTACK, ATTACK_HOLD, DECAY, SUSTAIN, RELEASE, FINISHED
+	ATTACK, ATTACK_HOLD, PRE_DECAY, DECAY, SUSTAIN, RELEASE, FINISHED
 };
 
 
