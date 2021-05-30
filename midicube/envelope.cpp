@@ -160,9 +160,10 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		}
 		else {
 			volume = data.peak_volume;
+			time = 1;
 		}
 		last = s;
-		if (volume >= data.peak_volume) {
+		if (time >= 1) {
 			volume = data.peak_volume;
 			last_vol = volume;
 			phase = ATTACK_HOLD;
@@ -176,7 +177,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 			time += time_step/data.attack_hold;
 		}
 		else {
-			phase = PRE_DECAY;
+			time = 1;
 		}
 		if (time >= 1) {
 			last_vol = volume;
@@ -195,10 +196,11 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		}
 		else {
 			volume = data.decay_volume;
+			time = 1;
 		}
 
 		last = s;
-		if (volume <= data.decay_volume) {
+		if (time >= 1) {
 			volume = data.decay_volume;
 			last_vol = volume;
 			phase = DECAY;
@@ -216,10 +218,11 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		}
 		else {
 			volume = data.sustain;
+			time = 1;
 		}
 
 		last = s;
-		if (volume <= data.sustain) {
+		if (time >= 1) {
 			volume = data.sustain;
 			last_vol = volume;
 			phase = SUSTAIN;
@@ -248,10 +251,11 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		}
 		else {
 			volume = 0;
+			time = 1;
 		}
 
 		last = s;
-		if (volume <= data.release_volume) {
+		if (time >= 1) {
 			volume = data.release_volume;
 			last_vol = volume;
 			phase = FINISHED;
