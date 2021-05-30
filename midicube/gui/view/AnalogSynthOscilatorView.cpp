@@ -139,6 +139,17 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 	x += 90;
 	//Decay
 	{
+		Label* title = new Label("Pre Decay", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 10, main_font, 16, x, y + 15, 80, 40, scale);
+		value->drag_step = 4;
+		value->property.bind(data.pre_decay, handler);
+		controls->push_back(value);
+	}
+	x += 90;
+	//Decay
+	{
 		Label* title = new Label("Decay", main_font, 12, x, y);
 		controls->push_back(title);
 
@@ -171,7 +182,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 	}
 	x += 90;
 
-	x -= 90 * 4;
+	x -= 90 * 5;
 	y += 75;
 
 	//Attack Hold
@@ -186,7 +197,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 	}
 	x += 90;
 
-	//Decay
+	//Pre Decay
 	{
 		Label* title = new Label("Peak", main_font, 12, x, y);
 		controls->push_back(title);
@@ -194,6 +205,18 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
 		value->drag_step = 4;
 		value->property.bind(data.peak_volume, handler);
+		controls->push_back(value);
+	}
+	x += 90;
+
+	//Decay
+	{
+		Label* title = new Label("Decay", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
+		value->drag_step = 4;
+		value->property.bind(data.decay_volume, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -219,7 +242,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(value);
 	}
 	x += 90;
-	x -= 90 * 4;
+	x -= 90 * 5;
 	y += 75;
 
 	std::vector<std::string> shapes = {"LIN", "ANL", "EXP"};
@@ -230,6 +253,16 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x , y + 15, 80, 40);
 		shape->property.bind(data.attack_shape, handler);
+		controls->push_back(shape);
+	}
+	x += 90;
+	//Pre Decay shape
+	{
+		Label* title = new Label("Pre Decay Shape", main_font, 12, x, y);
+		controls->push_back(title);
+
+		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
+		shape->property.bind(data.pre_decay_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
