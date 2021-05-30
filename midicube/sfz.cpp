@@ -10,27 +10,60 @@
 #include <regex>
 #include <iostream>
 
-const std::vector<std::string> notes{"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
-
 unsigned int parse_sfz_note(std::string text) {
 	unsigned int note = 0;
 	boost::to_lower(text);
 
-	size_t i = 0;
-	std::string key = "";
-	bool found = false;
-	//Note values
-	for (std::string n : notes) {
-		if (text.rfind(n, 0) == 0) {
-			note = i;
-			key = n;
-			found = true;
-		}
-		++i;
+	size_t len = 1;
+	bool found = true;
+	if (text.rfind("c", 0) == 0) {
+		note = 0;
 	}
+	else if (text.rfind("c#", 0) == 0 || text.rfind("db", 0) == 0) {
+		len = 2;
+		note = 1;
+	}
+	else if (text.rfind("d", 0) == 0) {
+		note = 2;
+	}
+	else if (text.rfind("d#", 0) == 0 || text.rfind("eb", 0) == 0) {
+		len = 2;
+		note = 3;
+	}
+	else if (text.rfind("e", 0) == 0) {
+		note = 4;
+	}
+	else if (text.rfind("f", 0) == 0) {
+		note = 5;
+	}
+	else if (text.rfind("f#", 0) == 0 || text.rfind("gb", 0) == 0) {
+		len = 2;
+		note = 6;
+	}
+	else if (text.rfind("g", 0) == 0) {
+		note = 7;
+	}
+	else if (text.rfind("g#", 0) == 0 || text.rfind("ab", 0) == 0) {
+		len = 2;
+		note = 8;
+	}
+	else if (text.rfind("a", 0) == 0) {
+		note = 9;
+	}
+	else if (text.rfind("a#", 0) == 0 || text.rfind("bb", 0) == 0) {
+		len = 2;
+		note = 10;
+	}
+	else if (text.rfind("b", 0) == 0) {
+		note = 11;
+	}
+	else {
+		found = false;
+	}
+
 	if (found) {
 		//Octave
-		note += 12 * (std::stoi(text.substr(key.size())) + 1);
+		note += 12 * (std::stoi(text.substr(len)) + 1);
 	}
 	else {
 		note = std::stoi(text);
