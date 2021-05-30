@@ -191,7 +191,6 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0.0, 5, main_font, 16, x, y + 15, 80, 40, scale);
-		value->drag_step = 4;
 		value->property.bind(data.attack_hold, handler);
 		controls->push_back(value);
 	}
@@ -203,7 +202,6 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
-		value->drag_step = 4;
 		value->property.bind(data.peak_volume, handler);
 		controls->push_back(value);
 	}
@@ -215,7 +213,6 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
-		value->drag_step = 4;
 		value->property.bind(data.decay_volume, handler);
 		controls->push_back(value);
 	}
@@ -237,7 +234,6 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
-		value->drag_step = 4;
 		value->property.bind(data.release_volume, handler);
 		controls->push_back(value);
 	}
@@ -258,7 +254,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 	x += 90;
 	//Pre Decay shape
 	{
-		Label* title = new Label("Pre Decay Shape", main_font, 12, x, y);
+		Label* title = new Label("PDecay Shape", main_font, 12, x, y);
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
@@ -276,6 +272,16 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(shape);
 	}
 	x += 90;
+	//Hold
+	{
+		Label* title = new Label("Hold", main_font, 12, x, y);
+		controls->push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 10, main_font, 16, x, y + 15, 80, 40, scale);
+		value->drag_step = 4;
+		value->property.bind(data.hold, handler);
+		controls->push_back(value);
+	}
 	x += 90;
 	//Release shape
 	{

@@ -171,6 +171,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		else {
 			time = 1;
 		}
+		volume = 0;
 		if (time >= 1) {
 			last_vol = volume;
 			phase = ATTACK;

@@ -83,9 +83,10 @@ public:
 	}
 
 	inline void reset () {
-		phase = ATTACK;
+		phase = HOLD;
 		volume = 0;
 		last_vol = 0;
+		time = 0;
 	}
 };
 
@@ -106,7 +107,7 @@ public:
 	}
 
 	inline void reset () {
-		phase = ATTACK;
+		phase = HOLD;
 		time = 0;
 		last_vol = 0;
 		volume = 0;
