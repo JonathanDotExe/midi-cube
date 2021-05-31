@@ -30,23 +30,25 @@ void AnalogOscilator::process(double freq, double time_step, AnalogOscilatorData
 		pulse_width = data.pulse_width;
 	}
 	//Sync
-	if (sync_next) {
+	/*if (sync_next) {
 		sync_next = false;
 		rotation = fmod(rotation, data.sync_mul);
 	}
 	else if (data.sync && rotation + step >= data.sync_mul) {
-			sync_next = true;
+		sync_next = true;
+		sync_phase = (data.sync_mul) - (long int) (data.sync_mul);
+		if (sync_phase == 0) {
+			sync_phase = 1;
+		}
+	}*/
+	if (data.sync && rotation >= data.sync_mul) {
+		rotation = fmod(rotation, data.sync_mul);
 	}
 }
 
 double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorData& data) {
 	double phase = rotation - (long int) rotation;
-	double sync_phase = 1;
 	if (data.sync) {
-		sync_phase = (data.sync_mul) - (long int) (data.sync_mul);
-		if (sync_phase == 0) {
-			sync_phase = 1;
-		}
 		freq *= data.sync_mul;
 	}
 	double step = freq * time_step;
@@ -59,9 +61,9 @@ double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorDa
 			signal = sine_wave(phase);
 			if (data.analog && data.sync) {
 				double blep_amt = 0;
-				if (sync_next || rotation < step) {
+				/*if (sync_next || rotation < step) {
 					blep_amt = -sine_wave(sync_phase)/2;
-				}
+				}*/
 				signal += polyblep(phase, step) * blep_amt;
 			}
 			break;
@@ -69,9 +71,9 @@ double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorDa
 			signal = saw_wave_down(phase);
 			if (data.analog) {
 				double blep_amt = 1;
-				if (sync_next || rotation < step) {
+				/*if (sync_next || rotation < step) {
 					blep_amt = -saw_wave_down(sync_phase);
-				}
+				}*/
 				signal += polyblep(phase, step) * blep_amt;
 			}
 			break;
@@ -79,9 +81,9 @@ double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorDa
 			signal = saw_wave_up(phase);
 			if (data.analog) {
 				double blep_amt = 1;
-				if (sync_next || rotation < step) {
+				/*if (sync_next || rotation < step) {
 					blep_amt = saw_wave_up(sync_phase);
-				}
+				}*/
 				signal -= polyblep(phase, step) * blep_amt;
 			}
 			break;
@@ -90,10 +92,10 @@ double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorDa
 			if (data.analog) {
 				double blep_amt1 = 1;
 				double blep_amt2 = 1;
-				if (sync_next || rotation < step) {
+				/*if (sync_next || rotation < step) {
 					blep_amt1 = -square_wave(sync_phase, pulse_width);
 					blep_amt2 = -blep_amt1;
-				}
+				}*/
 				signal += polyblep(phase, step) * blep_amt1;
 				double protation = rotation + (1 - pulse_width);
 				signal -= polyblep(protation - (long int) protation, step) * blep_amt2;
@@ -104,10 +106,10 @@ double AnalogOscilator::carrier(double freq, double time_step, AnalogOscilatorDa
 			if (data.analog) {
 				double blep_amt1 = 1;
 				double blep_amt2 = 1;
-				if (sync_next || rotation < step) {
+				/*if (sync_next || rotation < step) {
 					blep_amt1 = -triangle_wave(sync_phase, pulse_width);
 					blep_amt2 = -blep_amt1;
-				}
+				}*/
 				double mul1;
 				double mul2;
 				if (phase < pulse_width) {
