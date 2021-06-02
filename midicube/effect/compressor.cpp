@@ -19,22 +19,30 @@ CompressorEffect::CompressorEffect() {
 
 void CompressorEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	if (preset.on) {
-		double l = ldelay.process();
-		double r = rdelay.process();
+		//Get volume
+		lenv.apply(lsample, info.time_step);
+		renv.apply(rsample, info.time_step);
+		double lv = lenv.volume();
+		double rv = renv.volume();
 
-		//Delay
-		AnalogOscilatorData data = {preset.vibrato_waveform};
-		osc.process(preset.vibrato_rate, info.time_step, data);
-		double del = (1 + osc.carrier(preset.vibrato_rate, info.time_step, data) * preset.vibrato_depth * 0.2) * preset.delay * info.sample_rate;
-		ldelay.add_isample(lsample, del);
-		rdelay.add_isample(rsample, del);
+		double lcomp = 1;
+		double rcomp = 1;
 
-		//Mix
-		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		//Compress
+		if (lv > preset.treshold) {
+			//TODO
+		}
+		if (rv > preset.treshold) {
+			//TODO
+		}
 
-		lsample += l * fmin(0.5, preset.mix) * 2;
-		rsample += r * fmin(0.5, preset.mix) * 2;
+		//Volume
+		lvol.set(lcomp, info.time, lcomp < 1 ? preset.attack : preset.release);
+		rvol.set(rcomp, info.time, rcomp < 1 ? preset.attack : preset.release);
+
+		//Apply
+		lsample *= lvol.get(info.time);
+		rsample *= rvol.get(info.time);
 	}
 }
 
