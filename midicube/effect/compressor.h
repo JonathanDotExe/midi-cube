@@ -14,11 +14,11 @@
 
 struct CompressorPreset {
 	bool on = true;
-	double treshold = 0.2;
+	double threshold = 0.2;
 	double ratio = 4;
 	double attack = 0.1;
 	double release = 0.1;
-	double makeup_gain = 0;
+	double makeup_gain = 1;
 };
 
 

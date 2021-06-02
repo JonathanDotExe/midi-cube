@@ -12,6 +12,7 @@
 #include "../../effect/amplifier_simulation.h"
 #include "../../effect/bitcrusher.h"
 #include "../../effect/chorus.h"
+#include "../../effect/compressor.h"
 #include "../../effect/delay.h"
 #include "../../effect/equalizer.h"
 #include "../../effect/flanger.h"
@@ -1636,6 +1637,136 @@ Scene EffectView::create(Frame &frame) {
 			create_cc_control(effect->cc, handler, &equalizer->preset.high_freq,
 					tmp_x, tmp_y, 180, 120, controls, show_midi);
 
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+	}
+	//Compressor
+	else if (dynamic_cast<CompressorEffect*>(effect) != nullptr) {
+		CompressorEffect *compressor = dynamic_cast<CompressorEffect*>(effect);
+
+		//Background
+		bg->rect.setFillColor(sf::Color::Black);
+		title->text.setString("Power Compressor 7C");
+		title->text.setFillColor(sf::Color::White);
+
+		//On
+		{
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
+					180, 120);
+			on->property.bind(compressor->preset.on, handler);
+			controls.push_back(on);
+			hide_midi.push_back(on);
+
+			create_cc_control(effect->cc, handler, &compressor->preset.on, tmp_x,
+					tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Threshold
+		{
+			Label *label = new Label("Threshold", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 2, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(compressor->preset.threshold, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &compressor->preset.threshold,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Ratio
+		{
+			Label *label = new Label("Ratio", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(1, 1, 15, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->property.bind(compressor->preset.ratio, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &compressor->preset.ratio,
+				tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		tmp_y += 160;
+		tmp_x -= 200 * 3;
+		//Attack
+		{
+			Label *label = new Label("Mid Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(compressor->preset.attack, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &compressor->preset.attack,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Release
+		{
+			Label *label = new Label("Release", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(compressor->preset.release, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &compressor->preset.release,
+					tmp_x, tmp_y, 180, 120, controls, show_midi);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+		//Makeup Gain
+		{
+			Label *label = new Label("Makeup Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
+				tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(compressor->preset.makeup_gain, handler);
+			controls.push_back(value);
+			hide_midi.push_back(value);
+
+			create_cc_control(effect->cc, handler, &compressor->preset.makeup_gain,
+				tmp_x, tmp_y, 180, 120, controls, show_midi);
 			tmp_y -= 25;
 			tmp_x += 200;
 		}

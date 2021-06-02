@@ -64,6 +64,7 @@ src = [
 	'midicube/effect/amplifier_simulation.cpp',
 	'midicube/effect/bitcrusher.cpp',
 	'midicube/effect/chorus.cpp',
+	'midicube/effect/compressor.cpp',
 	'midicube/effect/delay.cpp',
 	'midicube/effect/effect.cpp',
 	'midicube/effect/equalizer.cpp',
