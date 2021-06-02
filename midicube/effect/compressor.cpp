@@ -30,12 +30,12 @@ void CompressorEffect::apply(double& lsample, double& rsample, SampleInfo& info)
 
 		//Compress
 		double lslope = preset.release;
-		if (lv > preset.threshold) {
+		if (lv > preset.threshold && preset.threshold) {
 			lslope = preset.attack;
 			lcomp = pow(lv/preset.threshold, 1/preset.ratio) * preset.threshold / lv;
 		}
 		double rslope = preset.release;
-		if (rv > preset.threshold) {
+		if (rv > preset.threshold && preset.threshold) {
 			rslope = preset.attack;
 			rcomp = pow(rv/preset.threshold, 1/preset.ratio) * preset.threshold / rv;
 		}
