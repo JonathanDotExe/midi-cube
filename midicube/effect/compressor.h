@@ -36,9 +36,8 @@ public:
 
 class CompressorEffect : public Effect {
 private:
-	AnalogOscilator osc;
-	DelayBuffer ldelay;
-	DelayBuffer rdelay;
+	EnvelopeFollower lenv;
+	EnvelopeFollower renv;
 
 public:
 	CompressorPreset preset;

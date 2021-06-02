@@ -10,11 +10,11 @@
 
 CompressorEffect::CompressorEffect() {
 	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_rate", preset.vibrato_rate, 0, 8));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_depth", preset.vibrato_depth, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
-
-	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 0.03));
+	cc.register_binding(new TemplateControlBinding<double>("treshold", preset.treshold, 0, 2));
+	cc.register_binding(new TemplateControlBinding<double>("ratio", preset.ratio, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("attack", preset.attack, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("release", preset.release, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("makeup_gain", preset.makeup_gain, 0, 5));
 }
 
 void CompressorEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -56,23 +56,22 @@ EffectProgram* create_effect_program<CompressorEffect>() {
 void CompressorProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
-	preset.vibrato_rate = tree.get<double>("vibrato_rate", 2);
-	preset.vibrato_depth = tree.get<double>("vibrato_depth", 0.5);
-	preset.mix = tree.get<double>("mix", 0.5);
+	preset.treshold = tree.get<double>("treshold", 0.2);
+	preset.ratio = tree.get<double>("ratio", 4);
+	preset.attack = tree.get<double>("attack", 0.1);
+	preset.release = tree.get<double>("release", 0.1);
+	preset.makeup_gain = tree.get<double>("makeup_gain", 0);
 
-	preset.delay = tree.get<double>("delay", 0.015);
-	preset.vibrato_waveform = (AnalogWaveForm) tree.get<unsigned int>("vibrato_waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
 }
 
 boost::property_tree::ptree CompressorProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
 	tree.put("on", preset.on);
-	tree.put("vibrato_rate", preset.vibrato_rate);
-	tree.put("vibrato_depth", preset.vibrato_depth);
-	tree.put("mix", preset.mix);
-
-	tree.put("delay", preset.delay);
-	tree.put("vibrato_waveform", (unsigned int) preset.vibrato_waveform);
+	tree.put("treshold", preset.treshold);
+	tree.put("ratio", preset.ratio);
+	tree.put("attack", preset.attack);
+	tree.put("release", preset.release);
+	tree.put("makeup_gain", preset.makeup_gain);
 	return tree;
 }
 
