@@ -29,16 +29,20 @@ void CompressorEffect::apply(double& lsample, double& rsample, SampleInfo& info)
 		double rcomp = 1;
 
 		//Compress
+		double lslope = preset.release;
 		if (lv > preset.treshold) {
-			//TODO
+			lslope = preset.attack;
+			lcomp = pow(lv/preset.treshold, 1/preset.ratio) * preset.treshold / lv;
 		}
+		double rslope = preset.release;
 		if (rv > preset.treshold) {
-			//TODO
+			rslope = preset.attack;
+			rcomp = pow(rv/preset.treshold, 1/preset.ratio) * preset.treshold / rv;
 		}
 
 		//Volume
-		lvol.set(lcomp, info.time, lcomp < 1 ? preset.attack : preset.release);
-		rvol.set(rcomp, info.time, rcomp < 1 ? preset.attack : preset.release);
+		lvol.set(lcomp, info.time, lslope);
+		rvol.set(rcomp, info.time, rslope);
 
 		//Apply
 		lsample *= lvol.get(info.time);
