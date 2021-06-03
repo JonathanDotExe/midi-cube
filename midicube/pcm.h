@@ -12,9 +12,10 @@
 
 struct PCMWaveFormZone {
 	AudioSample sample;
+	double freq = 440;
 	unsigned int max_note = 127;
-	unsigned int loop_start = 0;
-	unsigned int loop_end = 0;
+	double loop_start = 0;
+	double loop_end = 0;
 };
 
 struct PCMWaveForm {
@@ -22,6 +23,20 @@ struct PCMWaveForm {
 	std::vector<PCMWaveFormZone> zones;
 };
 
+struct PCMOscilatorData {
+	PCMWaveFormZone* zone = nullptr;
+};
+
+class PCMOscilator {
+private:
+	double time = 0;
+
+public:
+	PCMOscilator();
+	double process(double freq, double time_step, PCMOscilatorData& data);
+	void reset();
+	~PCMOscilator();
+};
 
 
 #endif /* MIDICUBE_PCM_H_ */
