@@ -78,7 +78,7 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 				program->channels[i].arpeggiator.kb_sync = c.second.get<bool>("arpeggiator.kb_sync", true);
 				program->channels[i].arpeggiator.repeat_edges = c.second.get<bool>("arpeggiator.repeat_edges", false);
 				program->channels[i].arpeggiator.play_duplicates = c.second.get<bool>("arpeggiator.play_duplicates", false);
-
+				program->channels[i].arpeggiator.master_sync = c.second.get<bool>("arpeggiator.master_sync", false);
 
 				//Sound engine
 				//FIXME

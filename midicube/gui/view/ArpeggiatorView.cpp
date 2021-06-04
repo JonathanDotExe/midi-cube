@@ -103,6 +103,10 @@ Scene ArpeggiatorView::create(Frame &frame) {
 	play_duplicates->property.bind(channel.arp.preset.play_duplicates, handler);
 	controls.push_back(play_duplicates);
 	tmp_y += 50;
+	CheckBox* master_sync = new CheckBox(true, "Master Sync", main_font, 18, 330, tmp_y, 40, 40);
+	master_sync->property.bind(channel.arp.preset.master_sync, handler);
+	controls.push_back(master_sync);
+	tmp_y += 50;
 
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
