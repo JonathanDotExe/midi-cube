@@ -396,6 +396,24 @@ void SoundEngineDevice::add_effect(EffectBuilder* effect) {
 
 bool SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	bool updated = false;
+	//Time change
+	if (message.type == MessageType::SYSEX && message.channel == 8) {
+		clock_beat_count++;
+		if (clock_beat_count >= 24) {
+			clock_beat_count = 0;
+			double delta = info.time - last_beat_time;
+			unsigned int old_bpm = metronome.get_bpm();
+			if (delta) {
+				unsigned int bpm = round(60.0/24.0/delta);
+				metronome.set_bpm(bpm);
+				metronome.init(info.time);
+				if (bpm != old_bpm) {
+					updated = true;
+				}
+			}
+		}
+		last_beat_time = info.time;
+	}
 	//Scene change
 	if (message.type == MessageType::CONTROL_CHANGE) {
 		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {

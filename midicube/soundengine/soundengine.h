@@ -437,6 +437,9 @@ private:
 	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
 	LinearADSREnvelope metronome_env;
 
+	size_t clock_beat_count = 0;
+	double last_beat_time = 0;
+
 public:
 	Metronome metronome;
 	Looper looper;
