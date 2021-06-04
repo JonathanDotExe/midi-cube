@@ -12,7 +12,7 @@ Arpeggiator::Arpeggiator() {
 
 }
 
-void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release) {
+void Arpeggiator::apply(SampleInfo& info, Metronome& master, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release) {
 	//Reset if no keys are pressed
 	if (!restart) {
 		bool released = true;
@@ -29,7 +29,7 @@ void Arpeggiator::apply(SampleInfo& info, std::function<void(SampleInfo&, unsign
 		}
 	}
 	//Pattern
-	if (metronome.is_beat(info.sample_time, info.sample_rate, preset.value)) {
+	if (preset.master_sync ? master.is_beat(info.sample_time, info.sample_rate, preset.value) : metronome.is_beat(info.sample_time, info.sample_rate, preset.value)) {
 		int next_note = 128;
 		long int next_index = -1;
 

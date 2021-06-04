@@ -122,7 +122,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 		if (s.active || status.pressed_notes) {
 			//Arpeggiator
 			if (arp.on) {
-				arp.apply(info,
+				arp.apply(info, device->metronome,
 				[this, scene](SampleInfo& i, unsigned int note, double velocity) {
 					engine->press_note(i, note, note + scenes[scene].source.octave * 12, velocity);
 				},

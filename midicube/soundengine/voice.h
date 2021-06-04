@@ -105,6 +105,7 @@ struct ArpeggiatorPreset {
 	bool repeat_edges = false;
 	bool kb_sync = true;
 	bool play_duplicates = false;
+	bool master_sync = false;
 };
 
 class Arpeggiator {
@@ -124,7 +125,7 @@ public:
 
 	Arpeggiator();
 
-	void apply(SampleInfo& info, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release);
+	void apply(SampleInfo& info, Metronome& master, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release);
 
 	void press_note(SampleInfo& info, unsigned int note, double velocity);
 
