@@ -323,6 +323,20 @@ void ProgramManager::save_new_program() {
 	}));
 }
 
+void ProgramManager::save_init_program() {
+	handler.queue_action(new FunctionAction([this]() {
+		lock();
+		Bank* bank = get_curr_bank();
+		Program* prog = new Program();
+		prog->name = program_name;
+
+		user->apply_program(prog);
+		bank->programs.push_back(prog);
+		curr_program = bank->programs.size() - 1;
+		unlock();
+	}));
+}
+
 void ProgramManager::overwrite_program() {
 	handler.queue_action(new FunctionAction([this]() {
 		lock();

@@ -114,8 +114,23 @@ Scene ProgramView::create(Frame &frame) {
 		});
 		controls.push_back(new_prog);
 
+		//New
+		Button* init_prog = new Button("New Init", main_font, 18, 335, frame.get_height() - 40, 100, 40);
+		init_prog->set_on_click([&frame, prog_mgr]() {
+			prog_mgr->lock();
+			std::string name = prog_mgr->program_name;
+			prog_mgr->unlock();
+			frame.change_view(new ProgramRenameView(name, [prog_mgr](std::string name) {
+				prog_mgr->lock();
+				prog_mgr->program_name = name;
+				prog_mgr->save_init_program();
+				prog_mgr->unlock();
+			}));
+		});
+		controls.push_back(init_prog);
+
 		//Delete
-		Button* del = new Button("Delete", main_font, 18, 335, frame.get_height() - 40, 100, 40);
+		Button* del = new Button("Delete", main_font, 18, 440, frame.get_height() - 40, 100, 40);
 		del->set_on_click([&frame, prog_mgr, this]() {
 			prog_mgr->lock();
 			prog_mgr->delete_program();

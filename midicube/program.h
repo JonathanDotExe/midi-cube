@@ -97,6 +97,8 @@ public:
 	//Mutex has to be locked by user
 	void save_new_program();
 	//Mutex has to be locked by user
+	void save_init_program();
+	//Mutex has to be locked by user
 	void overwrite_program();
 	//Mutex has to be locked by user
 	void save_new_bank();
