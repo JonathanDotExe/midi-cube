@@ -318,6 +318,7 @@ void ProgramManager::save_new_program() {
 
 		user->save_program(prog);
 		bank->programs.push_back(prog);
+		curr_program = bank->programs.size() - 1;
 		unlock();
 	}));
 }
