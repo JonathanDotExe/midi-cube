@@ -21,8 +21,8 @@ Scene ProgramView::create(Frame &frame) {
 
 	prog_mgr->lock();
 	{
-		int rows = 4;
-		int cols = 8;
+		int rows = PROGRAM_VIEW_ROWS;
+		int cols = PROGRAM_VIEW_COLS;
 
 		//Adjust values
 		bank = std::min(std::max((size_t) 0, (size_t) bank), (size_t) prog_mgr->bank_count() - 1);

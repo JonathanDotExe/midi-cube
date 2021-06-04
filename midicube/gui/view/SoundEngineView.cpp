@@ -115,7 +115,11 @@ Scene SoundEngineView::create(Frame& frame) {
 	//Program Button
 	Button* program = new Button("Programs", main_font, 18, frame.get_width() - 175, frame.get_height() - 45, 100, 40);
 	program->set_on_click([&frame]() {
-		frame.change_view(new ProgramView());
+		frame.cube.prog_mgr.lock();
+		size_t bank = frame.cube.prog_mgr.get_curr_bank_index();
+		size_t page = frame.cube.prog_mgr.get_curr_program_index()/(PROGRAM_VIEW_ROWS * PROGRAM_VIEW_COLS);
+		frame.cube.prog_mgr.unlock();
+		frame.change_view(new ProgramView(bank, page));
 	});
 	controls.push_back(program);
 

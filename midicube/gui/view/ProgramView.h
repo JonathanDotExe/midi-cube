@@ -14,6 +14,10 @@
 #include "../../midicube.h"
 #include "../../soundengine/soundengine.h"
 
+#define PROGRAM_VIEW_ROWS 4
+#define PROGRAM_VIEW_COLS 8
+
+
 class ProgramView : public ViewController {
 private:
 	size_t bank = 0;
