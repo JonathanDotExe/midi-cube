@@ -398,6 +398,7 @@ bool SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 	bool updated = false;
 	//Time change
 	if (message.type == MessageType::SYSEX && message.channel == 8) {
+		std::cout << "Clock" << std::endl;
 		clock_beat_count++;
 		if (clock_beat_count >= 24) {
 			clock_beat_count = 0;
@@ -406,6 +407,7 @@ bool SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
 			if (delta) {
 				unsigned int bpm = round(60.0/24.0/delta);
 				metronome.set_bpm(bpm);
+				std::cout << delta << std::endl;
 				metronome.init(info.time);
 				if (bpm != old_bpm) {
 					updated = true;

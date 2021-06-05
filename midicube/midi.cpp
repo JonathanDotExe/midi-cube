@@ -113,7 +113,7 @@ void MidiInput::open(unsigned int port) {
 	MidiHandler::open(port);
 	std::cout << "Registering callback" << std::endl;
 	try {
-		midiin.ignoreTypes(true, true, true);
+		midiin.ignoreTypes(false, false, false);
 	}
 	catch (RtMidiError& error) {
 		throw MidiException(error.what());

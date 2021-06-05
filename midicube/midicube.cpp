@@ -96,6 +96,7 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 
 inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	SampleInfo info = audio_handler.sample_info();
+	std::cout << message.type << "/" << message.channel << std::endl;
 	//Engines
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelSource& s = engine.channels[i].scenes[engine.scene].source;
@@ -141,7 +142,7 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	//Effects
 	for (auto& e : this->engine.effects) {
 		if (e.get_effect()) {
-			if (e.get_effect()->midi_message(message, info)) { //FIXME octave wll be ignored here
+			if (e.get_effect()->midi_message(message, info)) { //FIXME octave will be ignored here
 				updated = true;
 			}
 		}
