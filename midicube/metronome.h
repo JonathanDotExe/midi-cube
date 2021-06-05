@@ -24,7 +24,7 @@ public:
 
 	bool is_beat(unsigned int time, unsigned int sample_rate, int value);
 
-	unsigned int last_beat(unsigned int time, unsigned int sample_rate, int value);
+	double last_beat(unsigned int time, unsigned int sample_rate, int value);
 
 	void set_bpm(unsigned int bpm);
 

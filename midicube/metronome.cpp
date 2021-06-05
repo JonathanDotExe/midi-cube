@@ -6,6 +6,8 @@
  */
 #include "metronome.h"
 
+#include "math.h"
+
 Metronome::Metronome(int bpm) {
 	this->bpm = bpm;
 	this->start_time = 0;
@@ -19,15 +21,15 @@ bool Metronome::is_beat(unsigned int time, unsigned int sample_rate, int value) 
 	if (!bpm) {
 		return time - start_time == 0;
 	}
-	unsigned int step = 60 * sample_rate/(value * bpm);
-	return (time - start_time) % step == 0;
+	double step = 60.0 * sample_rate/(value * bpm);
+	return fmod((time - start_time), step) < 1;
 }
 
-unsigned int Metronome::last_beat(unsigned int time, unsigned int sample_rate, int value) {
+double Metronome::last_beat(unsigned int time, unsigned int sample_rate, int value) {
 	if (!bpm) {
 		return 0;
 	}
-	unsigned int step = 60 * sample_rate/(value * bpm);
+	double step = 60.0 * sample_rate/(value * bpm);
 	return ((time - start_time) / step) * step + start_time;
 }
 

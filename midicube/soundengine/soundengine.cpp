@@ -503,20 +503,26 @@ bool SoundEngineDevice::send_engine(MidiMessage &message, SampleInfo &info) {
 	//Time change
 	if (message.type == MessageType::SYSEX) {
 		if (message.channel == 8) {
-			clock_beat_count++;
 			double delta = info.time - first_beat_time;
 			unsigned int old_bpm = metronome.get_bpm();
 			if (delta) {
-				unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
-				metronome.set_bpm(bpm);
-				if (bpm != old_bpm) {
-					updated = true;
+				if (clock_beat_count && clock_beat_count % 96 == 0) {
+					unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
+					metronome.set_bpm(bpm);
+					if (bpm != old_bpm) {
+						updated = true;
+					}
+					metronome.init(first_beat_time);
 				}
 			}
+			clock_beat_count++;
 		}
 		else if (message.channel == 0x0A) {
 			first_beat_time = info.time;
 			clock_beat_count = 0;
+			metronome.init(info.time);
+		}
+		else if (message.channel == 0x0B) {
 			metronome.init(info.time);
 		}
 	}
