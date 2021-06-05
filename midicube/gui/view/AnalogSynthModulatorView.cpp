@@ -84,6 +84,35 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 	property_mod_controls(&controls, tmp_x, tmp_y, lfo.volume, handler, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
+	//Master Sync
+	{
+		CheckBox* value = new CheckBox(false, "Master Sync", main_font, 16, tmp_x, tmp_y, 40, 40);
+		value->property.bind(lfo.sync_master, handler);
+		controls.push_back(value);
+	}
+	tmp_x += 160;
+	//Clock Value
+	{
+		Label* title = new Label("Clock Value", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<int>* value = new DragBox<int>(0, -32, 32, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->drag_mul *= 0.5;
+		value->property.bind(lfo.clock_value, handler);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+	//Sync Phase
+	{
+		Label* title = new Label("Sync Phase", main_font, 12, tmp_x, tmp_y);
+		controls.push_back(title);
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 50, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		value->property.bind(lfo.sync_phase, handler);
+		controls.push_back(value);
+	}
+	tmp_x += 90;
+
 	//Edit Sources
 	Button* edit = new Button("Edit Sources", main_font, 18, frame.get_width() - 70 - 120, frame.get_height() - 40, 120, 40);
 	edit->rect.setFillColor(sf::Color::Yellow);

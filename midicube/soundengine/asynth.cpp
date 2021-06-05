@@ -257,11 +257,11 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 				value = 1.0/(-fmin(lfo.clock_value, -1));
 			}
 			freq = metronome.get_bpm()/60.0 * value;
-			if (metronome.is_beat(info.time, info.sample_rate, value)) {
+			if (metronome.is_beat(info.sample_time, info.sample_rate, value)) {
 				lfos[i].reset(lfo.sync_phase);
 			}
 		}
-		lfos[i].process(lfo.freq, info.time_step, d);
+		lfos[i].process(freq, info.time_step, d);
 		lfo_val[i] = lfos[i].carrier(lfo.freq, info.time_step, d);
 		lfo_mod[i] = lfos[i].modulator(lfo.freq, info.time_step, d);
 	}
