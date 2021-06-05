@@ -107,7 +107,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 		Label* title = new Label("Sync Phase", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 50, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->property.bind(lfo.sync_phase, handler);
 		controls.push_back(value);
 	}

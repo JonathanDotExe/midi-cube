@@ -507,6 +507,9 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			}
 			preset.lfos[i].volume = load_prop_mod(lfo.second, "volume");
 			preset.lfos[i].freq = lfo.second.get<double>("freq", 1);
+			preset.lfos[i].sync_master = lfo.second.get<bool>("sync_master", false);
+			preset.lfos[i].clock_value = lfo.second.get<int>("clock_value", 1);
+			preset.lfos[i].sync_phase = lfo.second.get<double>("sync_phase", 0);
 			preset.lfos[i].waveform = (AnalogWaveForm) lfo.second.get<int>("waveform", 0);
 			++i;
 		}
@@ -635,6 +638,9 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		boost::property_tree::ptree lfo;
 		lfo.add_child("volume", save_prop_mod(preset.lfos[i].volume));
 		lfo.put("freq", preset.lfos[i].freq);
+		lfo.put("sync_master", preset.lfos[i].sync_master);
+		lfo.put("clock_value", preset.lfos[i].clock_value);
+		lfo.put("sync_phase", preset.lfos[i].sync_phase);
 		lfo.put("waveform", (int) preset.lfos[i].waveform);
 
 		tree.add_child("lfos.lfo", lfo);
