@@ -106,6 +106,8 @@ struct ModEnvelopeEntity {
 struct LFOEntity {
 	PropertyModulation volume = {1};
 	double freq = 1;
+	bool sync_master = false;
+	double clock_value = 1;
 	AnalogWaveForm waveform = AnalogWaveForm::SINE_WAVE;
 };
 
@@ -189,7 +191,7 @@ public:
 
 	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, Metronome& metronome);
 
 	bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info);
 

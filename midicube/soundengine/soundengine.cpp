@@ -131,7 +131,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				});
 			}
 			//Process
-			status = engine->process_sample(lsample, rsample, info);
+			status = engine->process_sample(lsample, rsample, info, metronome);
 			//Effects
 			for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 				effects[i].apply(lsample, rsample, info);

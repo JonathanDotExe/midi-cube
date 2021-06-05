@@ -186,7 +186,7 @@ void AnalogSynth::process_note_sample(
 }
 
 void AnalogSynth::process_sample(double& lsample, double& rsample,
-		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
+		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status, Metronome& metronome) {
 	//Mono
 	if (preset.mono) {
 		if (status.pressed_notes) {
