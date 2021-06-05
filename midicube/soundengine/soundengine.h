@@ -438,7 +438,7 @@ private:
 	LinearADSREnvelope metronome_env;
 
 	size_t clock_beat_count = 0;
-	double last_beat_time = 0;
+	double first_beat_time = 0;
 
 public:
 	Metronome metronome;
@@ -459,6 +459,8 @@ public:
 	void add_effect(EffectBuilder* effect);
 
 	bool send(MidiMessage& message, SampleInfo& info);
+
+	bool send_engine(MidiMessage& message, SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
