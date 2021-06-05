@@ -17,7 +17,7 @@ void Metronome::init (unsigned int time) {
 	this->start_time = time;
 }
 
-bool Metronome::is_beat(unsigned int time, unsigned int sample_rate, int value) {
+bool Metronome::is_beat(unsigned int time, unsigned int sample_rate, double value) {
 	if (!bpm) {
 		return time - start_time == 0;
 	}
@@ -25,7 +25,7 @@ bool Metronome::is_beat(unsigned int time, unsigned int sample_rate, int value) 
 	return fmod((time - start_time), step) < 1;
 }
 
-double Metronome::last_beat(unsigned int time, unsigned int sample_rate, int value) {
+double Metronome::last_beat(unsigned int time, unsigned int sample_rate, double value) {
 	if (!bpm) {
 		return 0;
 	}

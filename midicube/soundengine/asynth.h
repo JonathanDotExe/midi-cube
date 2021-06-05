@@ -107,7 +107,8 @@ struct LFOEntity {
 	PropertyModulation volume = {1};
 	double freq = 1;
 	bool sync_master = false;
-	double clock_value = 1;
+	int clock_value = 1;
+	double sync_phase = 0;
 	AnalogWaveForm waveform = AnalogWaveForm::SINE_WAVE;
 };
 

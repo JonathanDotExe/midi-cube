@@ -249,6 +249,18 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		LFOEntity &lfo = preset.lfos[i];
 		AnalogOscilatorData d = { lfo.waveform };
+		double freq = lfo.freq;
+		//Sync
+		if (lfo.sync_master) {
+			double value = lfo.clock_value;
+			if (lfo.clock_value <= 0) {
+				value = 1.0/(-fmin(lfo.clock_value, -1));
+			}
+			freq = metronome.get_bpm()/60.0 * value;
+			if (metronome.is_beat(info.time, info.sample_rate, value)) {
+				lfos[i].reset(lfo.sync_phase);
+			}
+		}
 		lfos[i].process(lfo.freq, info.time_step, d);
 		lfo_val[i] = lfos[i].carrier(lfo.freq, info.time_step, d);
 		lfo_mod[i] = lfos[i].modulator(lfo.freq, info.time_step, d);

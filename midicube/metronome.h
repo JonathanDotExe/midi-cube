@@ -22,9 +22,9 @@ public:
 
 	void init (unsigned int time);
 
-	bool is_beat(unsigned int time, unsigned int sample_rate, int value);
+	bool is_beat(unsigned int time, unsigned int sample_rate, double value);
 
-	double last_beat(unsigned int time, unsigned int sample_rate, int value);
+	double last_beat(unsigned int time, unsigned int sample_rate, double value);
 
 	void set_bpm(unsigned int bpm);
 
