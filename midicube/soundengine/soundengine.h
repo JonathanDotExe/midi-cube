@@ -435,7 +435,7 @@ private:
 	std::vector<EffectBuilder*> effect_builders;
 
 	ADSREnvelopeData metronome_env_data{0.0005, 0.02, 0, 0};
-	LinearADSREnvelope metronome_env;
+	WaveTableADSREnvelope metronome_env;
 
 	size_t clock_beat_count = 0;
 	double first_beat_time = 0;

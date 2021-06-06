@@ -67,30 +67,6 @@ enum ADSREnvelopePhase {
 	HOLD, ATTACK, ATTACK_HOLD, PRE_DECAY, DECAY, SUSTAIN, RELEASE, FINISHED
 };
 
-
-class LinearADSREnvelope {
-
-public:
-	ADSREnvelopePhase phase = FINISHED;
-	double last_vol = 0;
-	double volume = 0;
-	double time = 0;
-
-	double amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain);
-
-	inline bool is_finished() {
-		return phase == FINISHED;
-	}
-
-	inline void reset () {
-		phase = HOLD;
-		volume = 0;
-		last_vol = 0;
-		time = 0;
-	}
-};
-
-
 class WaveTableADSREnvelope {
 
 public:
