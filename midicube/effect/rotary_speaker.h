@@ -15,15 +15,16 @@
 
 #define ROTARY_CUTOFF 800
 
+/*
 #define ROTARY_HORN_SLOW_FREQUENCY 0.83333333333333
 #define ROTARY_HORN_FAST_FREQUENCY 6.66666666666667
 #define ROTARY_BASS_SLOW_FREQUENCY 0.66666666666667
-#define ROTARY_BASS_FAST_FREQUENCY 5.66666666666667
+#define ROTARY_BASS_FAST_FREQUENCY 5.66666666666667*/
 
-/*#define ROTARY_HORN_SLOW_FREQUENCY 2
+#define ROTARY_HORN_SLOW_FREQUENCY 2
 #define ROTARY_HORN_FAST_FREQUENCY 8.3
 #define ROTARY_BASS_SLOW_FREQUENCY 0.25
-#define ROTARY_BASS_FAST_FREQUENCY 5*/
+#define ROTARY_BASS_FAST_FREQUENCY 5
 
 #define ROTARY_HORN_SLOW_RAMP 1.6
 #define ROTARY_HORN_FAST_RAMP 1.0
@@ -34,19 +35,19 @@ struct RotarySpeakerPreset {
 	bool on = true;
 	bool fast = false;
 
-	double stereo_mix{0.5};
+	double stereo_mix{0.7};
 	bool type{false};
 	double max_delay{0.0005};
 
-	double horn_slow_frequency = 0.83333333333333;
-	double horn_fast_frequency = 6.66666666666667;
-	double bass_slow_frequency = 0.66666666666667;
-	double bass_fast_frequency = 5.66666666666667;
+	double horn_slow_frequency = ROTARY_HORN_SLOW_FREQUENCY;
+	double horn_fast_frequency = ROTARY_HORN_FAST_FREQUENCY;
+	double bass_slow_frequency = ROTARY_BASS_SLOW_FREQUENCY;
+	double bass_fast_frequency = ROTARY_BASS_FAST_FREQUENCY;
 
-	double horn_slow_ramp = 1.6;
-	double horn_fast_ramp = 1.0;
-	double bass_slow_ramp = 5.5;
-	double bass_fast_ramp = 5.5;
+	double horn_slow_ramp = ROTARY_HORN_SLOW_RAMP;
+	double horn_fast_ramp = ROTARY_HORN_FAST_RAMP;
+	double bass_slow_ramp = ROTARY_BASS_SLOW_RAMP;
+	double bass_fast_ramp = ROTARY_BASS_FAST_RAMP;
 };
 
 

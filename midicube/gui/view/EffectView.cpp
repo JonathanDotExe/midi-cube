@@ -240,6 +240,186 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y -= 25;
 			tmp_x += 90;
 		}
+
+		//Rotary Max Delay
+		{
+			Label *label = new Label("Delay", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rotary_stereo = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			rotary_stereo->property.bind(rotary->preset.max_delay, handler);
+			controls.push_back(rotary_stereo);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		tmp_y += 100;
+
+		//Horn Slow Freq
+		{
+			Label *label = new Label("Horn Slow Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.horn_slow_frequency, handler);
+			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		//Horn Slow Freq
+		{
+			Label *label = new Label("Horn Slow Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.horn_slow_frequency, handler);
+			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		//Horn Fast Freq
+		{
+			Label *label = new Label("Horn Fast Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.horn_fast_frequency, handler);
+			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		//Bass Slow Freq
+		{
+			Label *label = new Label("Bass Slow Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.bass_slow_frequency, handler);
+			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		//Bass Fast Freq
+		{
+			Label *label = new Label("Bass Fast Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.bass_fast_frequency, handler);
+			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		tmp_y += 100;
+
+		//Horn Slow Ramp
+		{
+			Label *label = new Label("Horn Slow Ramp", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.horn_slow_ramp, handler);
+			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		//Horn Slow Ramp
+		{
+			Label *label = new Label("Horn Slow Ramp", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.horn_slow_ramp, handler);
+			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		//Horn Fast Ramp
+		{
+			Label *label = new Label("Horn Fast Ramp", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.horn_fast_ramp, handler);
+			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		//Bass Slow Ramp
+		{
+			Label *label = new Label("Bass Slow Ramp", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.bass_slow_ramp, handler);
+			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		//Bass Fast Ramp
+		{
+			Label *label = new Label("Bass Fast Ramp", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 0.002,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.bass_fast_ramp, handler);
+			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
 	}
 	//Reverb
 	else if (dynamic_cast<ReverbEffect*>(effect) != nullptr) {

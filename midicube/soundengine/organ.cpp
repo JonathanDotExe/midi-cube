@@ -74,7 +74,7 @@ B3Organ::B3Organ() {
 	//Tonewheel volumes
 	const size_t start_tw = 72;
 	for (size_t i = 0; i < tonewheel_data.size() - start_tw; ++i) {
-		double curr_vol = db_to_amp((-2 * ((int) i/12 + 1)));
+		double curr_vol = db_to_amp((-1.5 * ((int) i/12 + 1)));
 		tonewheel_data[i + start_tw].volume = curr_vol;
 	}
 }
@@ -306,7 +306,7 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	//Modeling
 	preset.harmonic_foldback_volume = tree.get<double>("harmonic_foldback_volume", 1);
 	preset.multi_note_gain = tree.get<double>("multi_note_gain", 1);
-	preset.click_attack = tree.get<double>("click_attack", 0.00005);
+	preset.click_attack = tree.get<double>("click_attack", 0.000005);
 	preset.high_gain_reduction = tree.get<double>("high_gain_reduction", 1);
 
 	//Percussion
