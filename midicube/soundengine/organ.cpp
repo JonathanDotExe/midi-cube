@@ -306,7 +306,7 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	//Modeling
 	preset.harmonic_foldback_volume = tree.get<double>("harmonic_foldback_volume", 1);
 	preset.multi_note_gain = tree.get<double>("multi_note_gain", 1);
-	preset.click_attack = tree.get<double>("click_attack", 0.00025);
+	preset.click_attack = tree.get<double>("click_attack", 0.00005);
 	preset.high_gain_reduction = tree.get<double>("high_gain_reduction", 1);
 
 	//Percussion

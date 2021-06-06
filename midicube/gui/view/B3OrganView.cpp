@@ -66,6 +66,35 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 65;
 	}
 
+	//Click Attack
+	{
+		Label* label = new Label("Click Attack", main_font, 18, tmp_x, tmp_y);
+		label->text.setFillColor(sf::Color::White);
+		controls.push_back(label);
+		tmp_y += 25;
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 0.0005, main_font, 16, tmp_x, tmp_y, 80, 60);
+		value->drag_step = 2;
+		value->property.bind(organ.data.preset.click_attack, handler);
+		controls.push_back(value);
+
+		tmp_y += 65;
+	}
+	//High Gain REduction
+	{
+		Label* label = new Label("High Gain Reduction", main_font, 18, tmp_x, tmp_y);
+		label->text.setFillColor(sf::Color::White);
+		controls.push_back(label);
+		tmp_y += 25;
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
+		value->property.bind(organ.data.preset.high_gain_reduction, handler);
+		controls.push_back(value);
+
+		tmp_y += 65;
+	}
+
+
 	//Swell
 	{
 		Label* label = new Label("Swell", main_font, 18, tmp_x, tmp_y);
