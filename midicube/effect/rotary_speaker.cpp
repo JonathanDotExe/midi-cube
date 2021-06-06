@@ -100,8 +100,21 @@ void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 	preset.on = tree.get<bool>("on", true);
 	preset.fast = tree.get<bool>("fast", false);
 
-	preset.stereo_mix = tree.get<double>("stereo_mix", 0.5);
+	preset.stereo_mix = tree.get<double>("stereo_mix", 0.7);
 	preset.type = tree.get<bool>("type", false);
+	preset.max_delay = tree.get<double>("max_delay", 0.0005);
+	preset.min_amplitude = tree.get<double>("min_amplitude", 0.5);
+	preset.mix = tree.get<double>("mix", 1);
+
+	preset.horn_slow_frequency = tree.get<double>("horn_slow_frequency", ROTARY_HORN_SLOW_FREQUENCY);
+	preset.horn_fast_frequency = tree.get<double>("horn_fast_frequency", ROTARY_HORN_FAST_FREQUENCY);
+	preset.bass_slow_frequency = tree.get<double>("bass_slow_frequency", ROTARY_BASS_SLOW_FREQUENCY);
+	preset.bass_fast_frequency = tree.get<double>("bass_fast_frequency", ROTARY_BASS_FAST_FREQUENCY);
+
+	preset.horn_slow_ramp = tree.get<double>("horn_slow_ramp", ROTARY_HORN_SLOW_RAMP);
+	preset.horn_fast_ramp = tree.get<double>("horn_fast_ramp", ROTARY_HORN_FAST_RAMP);
+	preset.bass_slow_ramp = tree.get<double>("bass_slow_ramp", ROTARY_BASS_SLOW_RAMP);
+	preset.bass_fast_ramp = tree.get<double>("bass_fast_ramp", ROTARY_BASS_FAST_RAMP);
 }
 
 boost::property_tree::ptree RotarySpeakerProgram::save() {
@@ -111,6 +124,19 @@ boost::property_tree::ptree RotarySpeakerProgram::save() {
 
 	tree.put("stereo_mix", preset.stereo_mix);
 	tree.put("type", preset.type);
+	tree.put("max_delay", preset.max_delay);
+	tree.put("min_amplitude", preset.min_amplitude);
+	tree.put("mix", preset.mix);
+
+	tree.put("horn_slow_frequency", preset.horn_slow_frequency);
+	tree.put("horn_fast_frequency", preset.horn_fast_frequency);
+	tree.put("bass_slow_frequency", preset.horn_slow_frequency);
+	tree.put("bass_fast_frequency", preset.bass_fast_frequency);
+
+	tree.put("horn_slow_ramp", preset.horn_slow_ramp);
+	tree.put("horn_fast_ramp", preset.horn_fast_ramp);
+	tree.put("bass_slow_ramp", preset.horn_slow_ramp);
+	tree.put("bass_fast_ramp", preset.bass_fast_ramp);
 
 	return tree;
 }
