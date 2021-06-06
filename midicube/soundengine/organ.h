@@ -42,7 +42,8 @@ struct B3OrganPreset {
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbars;
 	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
 	double harmonic_foldback_volume{1};
-	double multi_note_gain{0.8};
+	double multi_note_gain{1};
+	double high_gain_reduction = 1;
 	double click_attack = 0.00025;
 
 	bool percussion{false};

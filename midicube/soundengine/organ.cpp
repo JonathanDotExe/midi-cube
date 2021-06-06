@@ -151,7 +151,7 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	double volume = 0;
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
 		volume += data.tonewheels[i].compress_volume;
-		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend, data.preset.type) * tonewheel_data[i].volume;
+		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend, data.preset.type) * (1 + (tonewheel_data[i].volume - 1) * data.preset.high_gain_reduction);
 	}
 	sample *= swell;
 	//Compress
@@ -305,7 +305,9 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 
 	//Modeling
 	preset.harmonic_foldback_volume = tree.get<double>("harmonic_foldback_volume", 1);
-	preset.multi_note_gain = tree.get<double>("multi_note_gain", 0.8);
+	preset.multi_note_gain = tree.get<double>("multi_note_gain", 1);
+	preset.click_attack = tree.get<double>("click_attack", 0.00025);
+	preset.high_gain_reduction = tree.get<double>("high_gain_reduction", 1);
 
 	//Percussion
 	preset.percussion = tree.get<bool>("percussion", false);
@@ -336,6 +338,8 @@ boost::property_tree::ptree B3OrganProgram::save() {
 	//Modeling
 	tree.put("harmonic_foldback_volume", preset.harmonic_foldback_volume);
 	tree.put("multi_note_gain", preset.multi_note_gain);
+	tree.put("click_attack", preset.click_attack);
+	tree.put("high_gain_reduction", preset.high_gain_reduction);
 
 	//Percussion
 	tree.put("percussion", preset.percussion);
