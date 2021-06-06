@@ -41,10 +41,10 @@ void RotarySpeakerEffect::apply(double &lsample, double &rsample, SampleInfo &in
 		double bass_rot = sin(freq_to_radians(bass_rotation));
 
 		//Process
-		left_delay.add_isample(horn_sample * (0.5 + horn_rot * 0.5), lhorn_delay);
-		left_delay.add_isample(bass_sample * (0.5 + bass_rot * 0.5), lbass_delay);
-		right_delay.add_isample(horn_sample * (0.5 - horn_rot * 0.5), rhorn_delay);
-		right_delay.add_isample(bass_sample * (0.5 - bass_rot * 0.5), rbass_delay);
+		left_delay.add_isample(horn_sample * ((1 - preset.min_amplitude) + (0.5 + horn_rot * 0.5) * preset.min_amplitude), lhorn_delay);
+		left_delay.add_isample(bass_sample * ((1 - preset.min_amplitude) + (0.5 + bass_rot * 0.5) * preset.min_amplitude), lbass_delay);
+		right_delay.add_isample(horn_sample * ((1 - preset.min_amplitude) + (0.5 - horn_rot * 0.5) * preset.min_amplitude), rhorn_delay);
+		right_delay.add_isample(bass_sample * ((1 - preset.min_amplitude) + (0.5 - bass_rot * 0.5) * preset.min_amplitude), rbass_delay);
 
 		//Play delay
 		double l = left_delay.process();

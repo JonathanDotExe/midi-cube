@@ -257,6 +257,21 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y -= 25;
 			tmp_x += 90;
 		}
+		//Rotary Min Amplitude
+		{
+			Label *label = new Label("Amplitude", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rotary_stereo = new DragBox<double>(0, 0, 1,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			rotary_stereo->property.bind(rotary->preset.min_amplitude, handler);
+			controls.push_back(rotary_stereo);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
 		//Mix
 		{
 			Label *label = new Label("Mix", main_font, 18, tmp_x, tmp_y);
