@@ -207,13 +207,15 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 				for (size_t i = 0; i < preset.mod_env_count; ++i) {
 					if (!preset.legato || mono_voice.parts[i].mod_env.phase >= RELEASE) {
 						//Mod env
-						mono_voice.parts[i].mod_env.phase = ATTACK;
+						mono_voice.parts[i].mod_env.phase = HOLD;
+						mono_voice.parts[i].amp_env.time = 0;
+						mono_voice.parts[i].amp_env.last = 0;
 					}
 				}
 				for (size_t i = 0; i < preset.op_count; ++i) {
 					if (!preset.legato || mono_voice.parts[i].amp_env.phase >= RELEASE) {
 						//Amp env
-						mono_voice.parts[i].amp_env.phase = ATTACK;
+						mono_voice.parts[i].amp_env.phase = HOLD;
 						mono_voice.parts[i].amp_env.time = 0;
 						mono_voice.parts[i].amp_env.last = 0;
 					}

@@ -151,6 +151,11 @@ double LinearADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, b
 	return volume;
 }
 
+template<typename T>
+T signum(T t) {
+	return (t > 0) - (t < 0);
+}
+
 //AnalogADSREnvelope
 double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step, bool pressed, bool sustain) {
 	double step = 0;
@@ -163,6 +168,8 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		time = 0;
 	}
 
+	double vol_before = volume;
+
 	switch (phase) {
 	case HOLD:
 		if (data.hold > 0) {
@@ -171,7 +178,6 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		else {
 			time = 1;
 		}
-		volume = 0;
 		if (time >= 1) {
 			last_vol = volume;
 			phase = ATTACK;
@@ -192,7 +198,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 			time = 1;
 		}
 		last = s;
-		if (time >= 1) {
+		if (volume == data.peak_volume || (signum(data.peak_volume - volume) != signum(data.peak_volume - vol_before))) {
 			volume = data.peak_volume;
 			last_vol = volume;
 			phase = ATTACK_HOLD;
@@ -229,7 +235,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		}
 
 		last = s;
-		if (time >= 1) {
+		if (volume == data.decay || (signum(data.decay_volume - volume) != signum(data.decay_volume - vol_before))) {
 			volume = data.decay_volume;
 			last_vol = volume;
 			phase = DECAY;
@@ -251,7 +257,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		}
 
 		last = s;
-		if (time >= 1) {
+		if (volume == data.sustain || (signum(data.sustain - volume) != signum(data.sustain - vol_before))) {
 			volume = data.sustain;
 			last_vol = volume;
 			phase = SUSTAIN;
@@ -284,7 +290,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		}
 
 		last = s;
-		if (time >= 1) {
+		if (volume == data.release_volume || (signum(data.release_volume - volume) != signum(data.release_volume - vol_before))) {
 			volume = data.release_volume;
 			last_vol = volume;
 			phase = FINISHED;
