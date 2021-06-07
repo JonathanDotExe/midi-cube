@@ -129,7 +129,7 @@ double WaveTableADSREnvelope::amplitude(ADSREnvelopeData& data, double time_step
 		}
 
 		last = s;
-		if (volume == data.decay || (signum(data.decay_volume - volume) != signum(data.decay_volume - vol_before))) {
+		if (volume == data.decay_volume || (signum(data.decay_volume - volume) != signum(data.decay_volume - vol_before))) {
 			volume = data.decay_volume;
 			last_vol = volume;
 			phase = DECAY;
