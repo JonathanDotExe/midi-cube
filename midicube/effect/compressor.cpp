@@ -28,16 +28,18 @@ void CompressorEffect::apply(double& lsample, double& rsample, SampleInfo& info)
 		double lcomp = 1;
 		double rcomp = 1;
 
+		double threshold = db_to_amp(preset.threshold);
+
 		//Compress
 		double lslope = preset.release;
-		if (lv > preset.threshold && preset.threshold) {
+		if (lv > threshold) {
 			lslope = preset.attack;
-			lcomp = pow(lv/preset.threshold, 1/preset.ratio) * preset.threshold / lv;
+			lcomp = pow(lv/threshold, 1/preset.ratio) * threshold / lv;
 		}
 		double rslope = preset.release;
-		if (rv > preset.threshold && preset.threshold) {
+		if (rv > threshold) {
 			rslope = preset.attack;
-			rcomp = pow(rv/preset.threshold, 1/preset.ratio) * preset.threshold / rv;
+			rcomp = pow(rv/threshold, 1/preset.ratio) * threshold / rv;
 		}
 
 		//Volume
@@ -68,7 +70,7 @@ EffectProgram* create_effect_program<CompressorEffect>() {
 void CompressorProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
 	preset.on = tree.get<bool>("on", true);
-	preset.threshold = tree.get<double>("threshold", 0.2);
+	preset.threshold = tree.get<double>("threshold", -20);
 	preset.ratio = tree.get<double>("ratio", 4);
 	preset.attack = tree.get<double>("attack", 0.1);
 	preset.release = tree.get<double>("release", 0.1);

@@ -1858,7 +1858,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *value = new DragBox<double>(0, 0, 2, main_font, 24,
+			DragBox<double> *value = new DragBox<double>(0, -50, 0, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->property.bind(compressor->preset.threshold, handler);
 			controls.push_back(value);

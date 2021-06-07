@@ -14,7 +14,7 @@
 
 struct CompressorPreset {
 	bool on = true;
-	double threshold = 0.2;
+	double threshold = -20;
 	double ratio = 4;
 	double attack = 0.1;
 	double release = 0.1;
