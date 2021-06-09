@@ -13,6 +13,7 @@
 #include <array>
 #include "filter.h"
 #include "wavetable.h"
+#include "metronome.h"
 
 struct TriggeredNote {
 	double start_time = 0;
@@ -89,6 +90,26 @@ public:
 		volume = 0;
 		last = 0;
 	}
+};
+
+struct MotionSeqeuncerEntry {
+	double beats;
+	double vol;
+	ADSREnvelopeShape shape;
+};
+
+template<size_t N>
+struct MotionSeqeuncerData {
+	std::array<MotionSeqeuncerEntry, N> entries;
+};
+
+template<size_t N>
+class MotionSequencer {
+
+public:
+
+	double amplitude(MotionSeqeuncerData<N>& data, Metronome& metronome, double time_step);
+
 };
 
 class EnvelopeFollower {
