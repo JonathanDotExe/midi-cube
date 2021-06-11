@@ -93,13 +93,14 @@ public:
 };
 
 struct MotionSeqeuncerEntry {
-	double beats;
+	unsigned int beats;
 	double vol;
 	ADSREnvelopeShape shape;
 };
 
 template<size_t N>
-struct MotionSeqeuncerData {
+struct MotionSeqeuncerPreset {
+	unsigned int value = 1;
 	std::array<MotionSeqeuncerEntry, N> entries;
 };
 
@@ -108,7 +109,7 @@ class MotionSequencer {
 
 public:
 
-	double amplitude(MotionSeqeuncerData<N>& data, Metronome& metronome, double time_step);
+	double amplitude(MotionSeqeuncerPreset<N>& preset, Metronome& metronome, SampleInfo& info);
 
 };
 
@@ -123,5 +124,36 @@ public:
 	double volume();
 };
 
+template<size_t N>
+double MotionSequencer<N>::amplitude(MotionSeqeuncerPreset<N> &preset,
+		Metronome &metronome, SampleInfo& info) {
+	//Find beat
+	double value = preset.clock_value;
+	if (preset.clock_value <= 0) {
+		value = 1.0/(-fmin(preset.clock_value, -1));
+	}
+	double beat = metronome.beats(info.time, info.sample_rate, value);
+	//Count beats
+	unsigned int count = 0;
+	for (size_t i = 0; i < N; ++i) {
+		count++;
+	}
+
+	beat = fmod(beat, count);
+	unsigned int curr_beat = 0;
+	double vol = 0;
+	//Value
+	for (size_t i = 0; i < N; ++i) {
+		//Current beat
+		if (curr_beat >= (unsigned int) beat) {
+			size_t next_index = (i + 1) % N;
+			double prog = (beat - curr_beat)/preset.entries[next_index].beats;
+			vol = (1 - prog) * preset.entries[i].vol + preset.entries[i].vol * prog;
+			break;
+		}
+		curr_beat += preset.entries[i].beats;
+	}
+	return vol;
+}
 
 #endif /* MIDICUBE_ENVELOPE_H_ */
