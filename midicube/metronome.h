@@ -28,6 +28,8 @@ public:
 
 	void set_bpm(unsigned int bpm);
 
+	double beats(unsigned int time, unsigned int sample_rate, double value);
+
 	unsigned int get_bpm();
 
 };

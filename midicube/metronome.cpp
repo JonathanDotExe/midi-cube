@@ -40,3 +40,8 @@ void Metronome::set_bpm(unsigned int bpm) {
 unsigned int Metronome::get_bpm() {
 	return bpm;
 }
+
+double Metronome::beats(unsigned int time, unsigned int sample_rate, double value) {
+	double step = 60.0 * sample_rate/(value * bpm);
+	return (time - start_time)/step;
+}
