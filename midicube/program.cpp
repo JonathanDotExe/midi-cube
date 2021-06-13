@@ -36,9 +36,20 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 	if (motion_sequencers) {
 		size_t i = 0;
 		for (pt::ptree::value_type& m : motion_sequencers.get()) {
-			if (i < program->channels.size()) {
-
+			if (i < program->motion_sequencers.size()) {
+				program->motion_sequencers[i].clock_value = m.second.get("clock_value", 1);
+				const auto& steps = m.second.get_child_optional("steps");
+				size_t j = 0;
+				for (pt::ptree::value_type& s : steps.get()) {
+					if (j < program->motion_sequencers[i].entries.size()) {
+						program->motion_sequencers[i].entries[j].beats = s.second.get("beats", 1);
+						program->motion_sequencers[i].entries[j].value = s.second.get("value", 0.0);
+						program->motion_sequencers[i].entries[j].shape = (ADSREnvelopeShape) s.second.get("shape", 0);
+					}
+					j++;
+				}
 			}
+			++i;
 		}
 	}
 	//Channels

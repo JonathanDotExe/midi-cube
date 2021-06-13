@@ -93,9 +93,9 @@ public:
 };
 
 struct MotionSeqeuncerEntry {
-	unsigned int beats;
-	double vol;
-	ADSREnvelopeShape shape;
+	unsigned int beats = 1;
+	double value = 0;
+	ADSREnvelopeShape shape = ADSREnvelopeShape::LINEAR_ADSR;
 };
 
 template<size_t N>
@@ -148,7 +148,7 @@ double MotionSequencer<N>::amplitude(MotionSeqeuncerPreset<N> &preset,
 		if (curr_beat >= (unsigned int) beat) {
 			size_t next_index = (i + 1) % N;
 			double prog = (beat - curr_beat)/preset.entries[next_index].beats;
-			vol = (1 - prog) * preset.entries[i].vol + preset.entries[i].vol * prog;
+			vol = (1 - prog) * preset.entries[i].value + preset.entries[i].value * prog;
 			break;
 		}
 		curr_beat += preset.entries[i].beats;
