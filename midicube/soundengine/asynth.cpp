@@ -186,7 +186,7 @@ void AnalogSynth::process_note_sample(
 }
 
 void AnalogSynth::process_sample(double& lsample, double& rsample,
-		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status, Metronome& metronome) {
+		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status, SoundEngineDevice& device) {
 	//Mono
 	if (preset.mono) {
 		if (status.pressed_notes) {
@@ -251,7 +251,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		LFOEntity &lfo = preset.lfos[i];
 		if (lfo.motion_sequencer) {
-			lfo_val[i] = motion_sequencers[i].amplitude(preset.motion_sequencers[i], metronome, info);;
+			lfo_val[i] = motion_sequencers[i].amplitude(preset.motion_sequencers[i], device.metronome, info);;
 			lfo_mod[i] = 0; //TODO
 		}
 		else {
@@ -263,8 +263,8 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 				if (lfo.clock_value <= 0) {
 					value = 1.0/(-fmin(lfo.clock_value, -1));
 				}
-				freq = metronome.get_bpm()/60.0 * value;
-				if (metronome.is_beat(info.sample_time, info.sample_rate, value)) {
+				freq = device.metronome.get_bpm()/60.0 * value;
+				if (device.metronome.is_beat(info.sample_time, info.sample_rate, value)) {
 					lfos[i].reset(lfo.sync_phase);
 				}
 			}

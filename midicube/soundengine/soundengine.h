@@ -57,7 +57,7 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int real_note) = 0;
 
-	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome) = 0;
+	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, SoundEngineDevice& device) = 0;
 
 	virtual void apply_program(EngineProgram* prog) {
 
@@ -90,12 +90,12 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int note);
 
-	EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome);
+	EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, SoundEngineDevice& device);
 
 	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) = 0;
 
 
-	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, Metronome& metronome) {
+	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineDevice& device) {
 
 	};
 
@@ -162,7 +162,7 @@ void BaseSoundEngine<V, P>::release_note(SampleInfo& info, unsigned int note) {
 }
 
 template<typename V, size_t P>
-EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome) {
+EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info, SoundEngineDevice& device) {
 	EngineStatus status = {0, 0};
 	//Notes
 	for (size_t i = 0; i < P; ++i) {
@@ -181,7 +181,7 @@ EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsam
 		}
 	}
 	//Static sample
-	process_sample(lsample, rsample, info, environment, status, metronome);
+	process_sample(lsample, rsample, info, environment, status, device);
 
 	return status;
 }
