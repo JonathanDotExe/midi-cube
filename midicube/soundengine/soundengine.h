@@ -24,6 +24,10 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#define MOTION_SEQUENCER_AMOUNT 4
+#define MOTION_SEQUENCER_LENGTH 16
+
+
 namespace pt = boost::property_tree;
 
 #define SOUND_ENGINE_SCENE_AMOUNT 8
@@ -390,6 +394,7 @@ struct Program {
 	unsigned int metronome_bpm = 120;
 	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{2, true}};
 	std::array<MasterEffectProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
+	std::array<MotionSeqeuncerPreset<MOTION_SEQUENCER_LENGTH>, MOTION_SEQUENCER_AMOUNT> motion_sequencers;
 };
 
 /*
@@ -428,8 +433,6 @@ public:
 	}
 };
 
-#define MOTION_SEQUENCER_AMOUNT 4
-#define MOTION_SEQUENCER_LENGTH 16
 
 class SoundEngineDevice {
 

@@ -519,6 +519,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			preset.lfos[i].clock_value = lfo.second.get<int>("clock_value", 1);
 			preset.lfos[i].sync_phase = lfo.second.get<double>("sync_phase", 0);
 			preset.lfos[i].waveform = (AnalogWaveForm) lfo.second.get<int>("waveform", 0);
+			preset.lfos[i].motion_sequencer = lfo.second.get<int>("motion_sequencer", -1);
 			++i;
 		}
 	}
@@ -650,6 +651,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		lfo.put("clock_value", preset.lfos[i].clock_value);
 		lfo.put("sync_phase", preset.lfos[i].sync_phase);
 		lfo.put("waveform", (int) preset.lfos[i].waveform);
+		lfo.put("motion_sequencer", preset.lfos[i].motion_sequencer);
 
 		tree.add_child("lfos.lfo", lfo);
 	}

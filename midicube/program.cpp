@@ -31,6 +31,16 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 	Program* program = new Program();
 	program->name = tree.get<std::string>("name", "Init");
 	program->metronome_bpm = tree.get<unsigned int>("metronome_bpm", 120);
+	//Motion Sequencers
+	const auto& motion_sequencers = tree.get_child_optional("motion_seqeuncers");
+	if (motion_sequencers) {
+		size_t i = 0;
+		for (pt::ptree::value_type& m : motion_sequencers.get()) {
+			if (i < program->channels.size()) {
+
+			}
+		}
+	}
 	//Channels
 	const auto& channels = tree.get_child_optional("channels");
 	if (channels) {
