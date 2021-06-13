@@ -148,7 +148,7 @@ double MotionSequencer<N>::amplitude(MotionSeqeuncerPreset<N> &preset,
 		if (curr_beat >= (unsigned int) beat) {
 			size_t next_index = (i + 1) % N;
 			double prog = (beat - curr_beat)/preset.entries[next_index].beats;
-			vol = (1 - prog) * preset.entries[i].value + preset.entries[i].value * prog;
+			vol = (1 - prog) * preset.entries[i].value + preset.entries[i].value * prog; //TODO shape
 			break;
 		}
 		curr_beat += preset.entries[i].beats;

@@ -172,6 +172,19 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 void save_program(Program* program, pt::ptree& tree) {
 	tree.put("name", program->name);
 	tree.put("metronome_bpm", program->metronome_bpm);
+	//Motion Sequencers
+	for (size_t i = 0; i < program->motion_sequencers.size(); ++i) {
+		pt::ptree m;
+		m.put("clock_value", program->motion_sequencers[i].clock_value);
+		for (size_t j = 0; j < program->motion_sequencers[i].entries.size(); ++j) {
+			pt::ptree s;
+			s.put("beats", program->motion_sequencers[i].entries[j].beats);
+			s.put("shape", (int) program->motion_sequencers[i].entries[j].shape);
+			s.put("value", program->motion_sequencers[i].entries[j].value);
+			m.add_child("entry", s);
+		}
+		tree.add_child("entries", m);
+	}
 	//Channels
 	for (size_t i = 0; i < program->channels.size(); ++i) {
 		pt::ptree c;
