@@ -26,7 +26,7 @@ const FixedScale PITCH_SCALE(-2, {}, 2);
 const FixedScale PANNING_SCALE(-1, {}, 1);
 
 #define ANALOG_SYNTH_POLYPHONY 30
-
+#define ASYNTH_MOTION_SEQUENCER_LENGTH 16
 
 
 struct PropertyModulation {
@@ -110,6 +110,7 @@ struct LFOEntity {
 	int clock_value = 1;
 	double sync_phase = 0;
 	AnalogWaveForm waveform = AnalogWaveForm::SINE_WAVE;
+	bool motion_sequencer = false;
 };
 
 struct AnalogSynthPreset {
@@ -130,6 +131,9 @@ struct AnalogSynthPreset {
 	double aftertouch_release = 0;
 	bool max_aftertouch = false;
 	double velocity_aftertouch_amount = 0;
+
+	bool motion_sequencer_on = false;
+	MotionSeqeuncerPreset<ASYNTH_MOTION_SEQUENCER_LENGTH> motion_sequencer;
 };
 
 struct AnalogSynthPart {
@@ -170,6 +174,8 @@ private:
 	std::array<double, ANALOG_PART_COUNT> lfo_vol = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
 	PortamendoBuffer aftertouch{0, 0};
+	MotionSequencer<ASYNTH_MOTION_SEQUENCER_LENGTH> motion_sequencer;
+	double motion_sequenver_value = 0;
 
 	bool first_port = true;
 	PortamendoBuffer note_port{0, 0};

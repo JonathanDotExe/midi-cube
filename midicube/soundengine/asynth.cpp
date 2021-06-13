@@ -244,28 +244,38 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 		}
 	}
 
+	//Motion sequencer
+	if (preset.motion_sequencer_on) {
+		motion_sequenver_value = motion_sequencer.amplitude(preset.motion_sequencer, metronome, info);
+	}
 	//Move LFOs
 	//TODO move before notes
 	lfo_val = { };
 	lfo_mod = { };
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		LFOEntity &lfo = preset.lfos[i];
-		AnalogOscilatorData d = { lfo.waveform };
-		double freq = lfo.freq;
-		//Sync
-		if (lfo.sync_master) {
-			double value = lfo.clock_value;
-			if (lfo.clock_value <= 0) {
-				value = 1.0/(-fmin(lfo.clock_value, -1));
-			}
-			freq = metronome.get_bpm()/60.0 * value;
-			if (metronome.is_beat(info.sample_time, info.sample_rate, value)) {
-				lfos[i].reset(lfo.sync_phase);
-			}
+		if (lfo.motion_sequencer) {
+			lfo_val[i] = motion_sequenver_value;
+			lfo_mod[i] = 0; //TODO
 		}
-		lfos[i].process(freq, info.time_step, d);
-		lfo_val[i] = lfos[i].carrier(lfo.freq, info.time_step, d);
-		lfo_mod[i] = lfos[i].modulator(lfo.freq, info.time_step, d);
+		else {
+			AnalogOscilatorData d = { lfo.waveform };
+			double freq = lfo.freq;
+			//Sync
+			if (lfo.sync_master) {
+				double value = lfo.clock_value;
+				if (lfo.clock_value <= 0) {
+					value = 1.0/(-fmin(lfo.clock_value, -1));
+				}
+				freq = metronome.get_bpm()/60.0 * value;
+				if (metronome.is_beat(info.sample_time, info.sample_rate, value)) {
+					lfos[i].reset(lfo.sync_phase);
+				}
+			}
+			lfos[i].process(freq, info.time_step, d);
+			lfo_val[i] = lfos[i].carrier(lfo.freq, info.time_step, d);
+			lfo_mod[i] = lfos[i].modulator(lfo.freq, info.time_step, d);
+		}
 	}
 }
 
