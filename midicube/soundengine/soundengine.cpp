@@ -331,6 +331,12 @@ SoundEngineDevice::SoundEngineDevice() : metronome(120){
 }
 
 void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleInfo &info) {
+	//Motion Sequencer
+	size_t motion_sequencer_amount = std::min(this->motion_sequencer_amount, (size_t) MOTION_SEQUENCER_AMOUNT);
+	for (size_t i = 0; i < motion_sequencer_amount; ++i) {
+		motion_sequencer_values[i] = motion_sequencers[i].amplitude(motion_sequencer_presets[i], metronome, info);
+	}
+
 	//Channels
 	size_t scene = this->scene;
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
