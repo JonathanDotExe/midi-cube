@@ -115,6 +115,7 @@ struct LFOEntity {
 
 struct AnalogSynthPreset {
 	std::array<LFOEntity, ANALOG_PART_COUNT> lfos;
+	std::array<MotionSeqeuncerPreset<ASYNTH_MOTION_SEQUENCER_LENGTH>, ANALOG_PART_COUNT> motion_sequencers;
 	std::array<ModEnvelopeEntity, ANALOG_PART_COUNT> mod_envs;
 	std::array<OscilatorEntity, ANALOG_PART_COUNT> oscilators;
 	std::array<OperatorEntity, ANALOG_PART_COUNT> operators;
@@ -131,9 +132,6 @@ struct AnalogSynthPreset {
 	double aftertouch_release = 0;
 	bool max_aftertouch = false;
 	double velocity_aftertouch_amount = 0;
-
-	bool motion_sequencer_on = false;
-	MotionSeqeuncerPreset<ASYNTH_MOTION_SEQUENCER_LENGTH> motion_sequencer;
 };
 
 struct AnalogSynthPart {
@@ -169,13 +167,12 @@ class AnalogSynth : public BaseSoundEngine<AnalogSynthVoice, ANALOG_SYNTH_POLYPH
 private:
 	std::array<double, ANALOG_PART_COUNT> env_val = {};
 	std::array<AnalogOscilator, ANALOG_PART_COUNT> lfos;
+	std::array<MotionSequencer<ASYNTH_MOTION_SEQUENCER_LENGTH>, ANALOG_PART_COUNT> motion_sequencers;
 	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
 	std::array<double, ANALOG_PART_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_PART_COUNT> lfo_vol = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
 	PortamendoBuffer aftertouch{0, 0};
-	MotionSequencer<ASYNTH_MOTION_SEQUENCER_LENGTH> motion_sequencer;
-	double motion_sequenver_value = 0;
 
 	bool first_port = true;
 	PortamendoBuffer note_port{0, 0};

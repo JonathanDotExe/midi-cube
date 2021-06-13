@@ -100,7 +100,7 @@ struct MotionSeqeuncerEntry {
 
 template<size_t N>
 struct MotionSeqeuncerPreset {
-	unsigned int value = 1;
+	unsigned int clock_value = 1;
 	std::array<MotionSeqeuncerEntry, N> entries;
 };
 

@@ -244,10 +244,6 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 		}
 	}
 
-	//Motion sequencer
-	if (preset.motion_sequencer_on) {
-		motion_sequenver_value = motion_sequencer.amplitude(preset.motion_sequencer, metronome, info);
-	}
 	//Move LFOs
 	//TODO move before notes
 	lfo_val = { };
@@ -255,7 +251,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		LFOEntity &lfo = preset.lfos[i];
 		if (lfo.motion_sequencer) {
-			lfo_val[i] = motion_sequenver_value;
+			lfo_val[i] = motion_sequencers[i].amplitude(preset.motion_sequencers[i], metronome, info);;
 			lfo_mod[i] = 0; //TODO
 		}
 		else {
