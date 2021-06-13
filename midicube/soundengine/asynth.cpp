@@ -250,8 +250,8 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	lfo_mod = { };
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		LFOEntity &lfo = preset.lfos[i];
-		if (lfo.motion_sequencer) {
-			lfo_val[i] = motion_sequencers[i].amplitude(preset.motion_sequencers[i], device.metronome, info);;
+		if (lfo.motion_sequencer >= 0 && lfo.motion_sequencer < MOTION_SEQUENCER_AMOUNT) {
+			lfo_val[i] = device.motion_sequencer_values[lfo.motion_sequencer];
 			lfo_mod[i] = 0; //TODO
 		}
 		else {

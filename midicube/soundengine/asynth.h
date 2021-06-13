@@ -110,12 +110,11 @@ struct LFOEntity {
 	int clock_value = 1;
 	double sync_phase = 0;
 	AnalogWaveForm waveform = AnalogWaveForm::SINE_WAVE;
-	bool motion_sequencer = false;
+	int motion_sequencer = -1;
 };
 
 struct AnalogSynthPreset {
 	std::array<LFOEntity, ANALOG_PART_COUNT> lfos;
-	std::array<MotionSeqeuncerPreset<ASYNTH_MOTION_SEQUENCER_LENGTH>, ANALOG_PART_COUNT> motion_sequencers;
 	std::array<ModEnvelopeEntity, ANALOG_PART_COUNT> mod_envs;
 	std::array<OscilatorEntity, ANALOG_PART_COUNT> oscilators;
 	std::array<OperatorEntity, ANALOG_PART_COUNT> operators;
@@ -167,7 +166,6 @@ class AnalogSynth : public BaseSoundEngine<AnalogSynthVoice, ANALOG_SYNTH_POLYPH
 private:
 	std::array<double, ANALOG_PART_COUNT> env_val = {};
 	std::array<AnalogOscilator, ANALOG_PART_COUNT> lfos;
-	std::array<MotionSequencer<ASYNTH_MOTION_SEQUENCER_LENGTH>, ANALOG_PART_COUNT> motion_sequencers;
 	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
 	std::array<double, ANALOG_PART_COUNT> lfo_mod = {};
 	std::array<double, ANALOG_PART_COUNT> lfo_vol = {};
