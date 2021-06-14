@@ -11,6 +11,7 @@
 #include "LooperView.h"
 #include "SoundEngineChannelView.h"
 #include "MasterEffectView.h"
+#include "MotionSequencerView.h"
 
 #include <iostream>
 
@@ -97,6 +98,13 @@ Scene SoundEngineView::create(Frame& frame) {
 		frame.change_view(new MasterEffectView());
 	});
 	controls.push_back(effects);
+
+	//Looper
+	Button* looper = new Button("Mo. Seq.", main_font, 18, frame.get_width() - 475, frame.get_height() - 45, 100, 40);
+	looper->set_on_click([&frame]() {
+		frame.change_view(new MotionSequencerView());
+	});
+	controls.push_back(looper);
 
 	//Looper
 	Button* looper = new Button("Looper", main_font, 18, frame.get_width() - 375, frame.get_height() - 45, 100, 40);
