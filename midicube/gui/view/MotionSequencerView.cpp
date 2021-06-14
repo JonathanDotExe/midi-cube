@@ -29,6 +29,7 @@ Scene MotionSequencerView::create(Frame &frame) {
 
 
 
+
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
 	exit->set_on_click([&frame]() {
