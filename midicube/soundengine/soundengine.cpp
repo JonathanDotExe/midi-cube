@@ -455,7 +455,82 @@ inline bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleIn
 			MidiSource& source = sources[i];
 			if (source.device == static_cast<ssize_t>(i)) {
 				if (message.type == MessageType::SYSEX) {
-
+					if (message.channel == 8) {
+						double delta = info.time - first_beat_time;
+						unsigned int old_bpm = metronome.get_bpm();
+						if (delta) {
+							if (clock_beat_count && clock_beat_count % 96 == 0) {
+								unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
+								metronome.set_bpm(bpm);
+								if (bpm != old_bpm) {
+									updated = true;
+								}
+								metronome.init(first_beat_time);
+							}
+						}
+						clock_beat_count++;
+					}
+					else if (message.channel == 0x0A) {
+						first_beat_time = info.time;
+						clock_beat_count = 0;
+						metronome.init(info.time);
+					}
+					else if (message.channel == 0x0B) {
+						metronome.init(info.time);
+					}
+				}
+				else if (source.channel < 0 || source.channel == message.channel) {
+					switch (message.type) {
+					case MessageType::CONTROL_CHANGE:
+						//TODO global cc an pitch bend
+						/* no break */
+					case MessageType::PROGRAM_CHANGE:
+						/* no break */
+					case MessageType::PITCH_BEND:
+						//Channels
+						for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+							ChannelSource& s = channels[i].scenes[scene].source;
+							if (s.input >= 0) {
+								MidiSource& source = sources[s.input];
+								if (source.device == static_cast<ssize_t>(input)) {
+									bool pass = true;
+									switch (message.type) {
+									case MessageType::CONTROL_CHANGE:
+										pass = s.transfer_cc;
+										break;
+									case MessageType::PROGRAM_CHANGE:
+										pass = s.transfer_prog_change;
+										break;
+									case MessageType::PITCH_BEND:
+										pass = s.transfer_pitch_bend;
+										break;
+									default:
+										break;
+									}
+									//Apply binding
+									if (pass) {
+										//Send
+										SoundEngineChannel& ch = this->channels[i];
+										SoundEngine* engine = ch.get_engine();
+										if (engine) {
+											updated = ch.send(message, info, scene) || updated;
+										}
+									}
+								}
+							}
+						}
+						//Effects
+						for (auto& e : effects) {
+							if (e.get_effect()) {
+								if (e.get_effect()->midi_message(message, info)) {
+									updated = true;
+								}
+							}
+						}
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		}
@@ -463,18 +538,6 @@ inline bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleIn
 	case MessageType::INVALID:
 		break;
 	}
-	//Effects
-	for (auto& e : this->engine.effects) {
-		if (e.get_effect()) {
-			if (e.get_effect()->midi_message(message, info)) { //FIXME octave will be ignored here
-				updated = true;
-			}
-		}
-	}
-
-
-	bool updated = false;
-
 
 	return updated;
 }
@@ -576,29 +639,7 @@ bool SoundEngineDevice::send_engine(MidiMessage &message, SampleInfo &info) {
 	bool updated = false;
 	//Time change
 	if (message.type == MessageType::SYSEX) {
-		if (message.channel == 8) {
-			double delta = info.time - first_beat_time;
-			unsigned int old_bpm = metronome.get_bpm();
-			if (delta) {
-				if (clock_beat_count && clock_beat_count % 96 == 0) {
-					unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
-					metronome.set_bpm(bpm);
-					if (bpm != old_bpm) {
-						updated = true;
-					}
-					metronome.init(first_beat_time);
-				}
-			}
-			clock_beat_count++;
-		}
-		else if (message.channel == 0x0A) {
-			first_beat_time = info.time;
-			clock_beat_count = 0;
-			metronome.init(info.time);
-		}
-		else if (message.channel == 0x0B) {
-			metronome.init(info.time);
-		}
+
 	}
 	//Scene change
 	if (message.type == MessageType::CONTROL_CHANGE) {
