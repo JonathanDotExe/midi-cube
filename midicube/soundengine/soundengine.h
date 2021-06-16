@@ -435,7 +435,7 @@ public:
 
 
 struct MidiSource {
-	int device = -1;
+	ssize_t device = -1;
 	int channel = 0;
 	bool transfer_cc = false;
 	bool transfer_pitch_bend = false;
@@ -481,7 +481,7 @@ public:
 
 	void add_effect(EffectBuilder* effect);
 
-	bool send(MidiMessage& message, SampleInfo& info);
+	inline bool send(MidiMessage& message, size_t input, SampleInfo& info);
 
 	bool send_engine(MidiMessage& message, SampleInfo& info);
 

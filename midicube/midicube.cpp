@@ -96,58 +96,8 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 
 inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	SampleInfo info = audio_handler.sample_info();
-	if (engine.send_engine(message, info)) {
+	if (engine.send(message, info)) {
 		updated = true;
-	}
-	//Engines
-	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-		ChannelSource& s = engine.channels[i].scenes[engine.scene].source;
-		if (s.input == static_cast<ssize_t>(input) && s.channel == message.channel) {
-			bool pass = true;
-			MidiMessage msg = message;
-			switch (message.type) {
-			case MessageType::NOTE_ON:
-				pass = s.start_velocity <= message.velocity() && s.end_velocity >= message.velocity();
-				/* no break */
-			case MessageType::POLYPHONIC_AFTERTOUCH:
-				pass = pass && s.start_note <= message.note() && s.end_note >= message.note();
-				/* no break */
-			case MessageType::NOTE_OFF:
-				break;
-			case MessageType::CONTROL_CHANGE:
-				pass = s.transfer_cc;
-				break;
-			case MessageType::PROGRAM_CHANGE:
-				pass = s.transfer_prog_change;
-				break;
-			case MessageType::MONOPHONIC_AFTERTOUCH:
-				pass = s.transfer_channel_aftertouch;
-				break;
-			case MessageType::PITCH_BEND:
-				pass = s.transfer_pitch_bend;
-				break;
-			case MessageType::SYSEX:
-				pass = s.transfer_other;
-				break;
-			case MessageType::INVALID:
-				pass = false;
-			}
-			//Apply binding
-			if (pass) {
-				msg.channel = i;
-				if (engine.send(msg, info)) {
-					updated = true;
-				}
-			}
-		}
-	}
-	//Effects
-	for (auto& e : this->engine.effects) {
-		if (e.get_effect()) {
-			if (e.get_effect()->midi_message(message, info)) { //FIXME octave will be ignored here
-				updated = true;
-			}
-		}
 	}
 }
 
