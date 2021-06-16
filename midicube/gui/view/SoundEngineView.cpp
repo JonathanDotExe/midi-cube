@@ -100,11 +100,11 @@ Scene SoundEngineView::create(Frame& frame) {
 	controls.push_back(effects);
 
 	//Looper
-	Button* looper = new Button("Mo. Seq.", main_font, 18, frame.get_width() - 475, frame.get_height() - 45, 100, 40);
-	looper->set_on_click([&frame]() {
+	Button* mo_seq = new Button("Mo. Seq.", main_font, 18, frame.get_width() - 475, frame.get_height() - 45, 100, 40);
+	mo_seq->set_on_click([&frame]() {
 		frame.change_view(new MotionSequencerView());
 	});
-	controls.push_back(looper);
+	controls.push_back(mo_seq);
 
 	//Looper
 	Button* looper = new Button("Looper", main_font, 18, frame.get_width() - 375, frame.get_height() - 45, 100, 40);
