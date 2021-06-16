@@ -486,8 +486,6 @@ public:
 
 	inline bool send(MidiMessage& message, size_t input, SampleInfo& info);
 
-	bool send_engine(MidiMessage& message, SampleInfo& info);
-
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
 	void apply_program(Program* program);

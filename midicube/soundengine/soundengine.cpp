@@ -489,6 +489,13 @@ inline bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleIn
 					switch (message.type) {
 					case MessageType::CONTROL_CHANGE:
 						ccs[message.control()] = message.value()/127.0;
+
+						for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
+							if (scene_ccs[i] == message.control()) {
+								scene = i;
+								updated = true;
+							}
+						}
 						/* no break */
 					case MessageType::PROGRAM_CHANGE:
 					case MessageType::PITCH_BEND:
@@ -639,24 +646,6 @@ void SoundEngineDevice::save_program(Program* program) {
 			effect.get_effect()->save_program(&prog.prog);
 		}
 	}
-}
-
-bool SoundEngineDevice::send_engine(MidiMessage &message, SampleInfo &info) {
-	bool updated = false;
-	//Time change
-	if (message.type == MessageType::SYSEX) {
-
-	}
-	//Scene change
-	if (message.type == MessageType::CONTROL_CHANGE) {
-		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
-			if (scene_ccs[i] == message.control()) {
-				scene = i;
-				updated = true;
-			}
-		}
-	}
-	return updated;
 }
 
 SoundEngineDevice::~SoundEngineDevice() {
