@@ -96,7 +96,7 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 
 inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	SampleInfo info = audio_handler.sample_info();
-	if (engine.send(message, info)) {
+	if (engine.send(message, input, info)) {
 		updated = true;
 	}
 }

@@ -403,13 +403,12 @@ void SoundEngineDevice::add_effect(EffectBuilder* effect) {
 inline bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleInfo& info) {
 	size_t scene = this->scene;
 	bool updated = false;
-	bool pass = true;
 
 	switch (message.type) {
 	case MessageType::MONOPHONIC_AFTERTOUCH:
 		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 			MidiSource& source = sources[i];
-			if (source.device == input && (source.channel < 0 || source.channel == message.channel)) {
+			if (source.device == static_cast<ssize_t>(input) && (source.channel < 0 || static_cast<unsigned int>(source.channel) == message.channel)) {
 				aftertouch[i] = message.monophonic_aftertouch()/127.0;
 			}
 		}
@@ -422,7 +421,7 @@ inline bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleIn
 			ChannelSource& s = channels[i].scenes[scene].source;
 			if (s.input >= 0) {
 				MidiSource& source = sources[s.input];
-				if (source.device == static_cast<ssize_t>(input) && source.channel == message.channel) {
+				if (source.device == static_cast<ssize_t>(input) && (source.channel < 0 || static_cast<unsigned int>(source.channel) == message.channel)) {
 					bool pass = true;
 
 					switch (message.type) {
@@ -485,7 +484,7 @@ inline bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleIn
 						metronome.init(info.time);
 					}
 				}
-				else if (source.channel < 0 || source.channel == message.channel) {
+				else if (source.channel < 0 || (source.channel < 0 || static_cast<unsigned int>(source.channel) == message.channel)) {
 					switch (message.type) {
 					case MessageType::CONTROL_CHANGE:
 						ccs[message.control()] = message.value()/127.0;
