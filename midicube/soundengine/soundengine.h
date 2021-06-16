@@ -460,6 +460,9 @@ private:
 
 public:
 	std::array<MidiSource, SOUND_ENGINE_MIDI_CHANNELS> sources;
+	std::array<double, MIDI_CONTROL_COUNT> ccs;
+	std::array<double, SOUND_ENGINE_MIDI_CHANNELS> aftertouch;
+
 	Metronome metronome;
 	Looper looper;
 	bool play_metronome{false};

@@ -406,9 +406,15 @@ inline bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleIn
 	bool pass = true;
 
 	switch (message.type) {
-	case MessageType::POLYPHONIC_AFTERTOUCH:
 	case MessageType::MONOPHONIC_AFTERTOUCH:
-		//TODO set global aftertouch
+		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+			MidiSource& source = sources[i];
+			if (source.device == input && (source.channel < 0 || source.channel == message.channel)) {
+				aftertouch[i] = message.monophonic_aftertouch()/127.0;
+			}
+		}
+		/* no break */
+	case MessageType::POLYPHONIC_AFTERTOUCH:
 	case MessageType::NOTE_ON:
 	case MessageType::NOTE_OFF:
 		//Notes
@@ -482,11 +488,11 @@ inline bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleIn
 				else if (source.channel < 0 || source.channel == message.channel) {
 					switch (message.type) {
 					case MessageType::CONTROL_CHANGE:
-						//TODO global cc an pitch bend
+						ccs[message.control()] = message.value()/127.0;
 						/* no break */
 					case MessageType::PROGRAM_CHANGE:
-						/* no break */
 					case MessageType::PITCH_BEND:
+						//TODO global pitch bend
 						//Channels
 						for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 							ChannelSource& s = channels[i].scenes[scene].source;
