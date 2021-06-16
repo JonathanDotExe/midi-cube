@@ -434,6 +434,16 @@ public:
 };
 
 
+struct MidiSource {
+	int device = -1;
+	int channel = 0;
+	bool transfer_cc = false;
+	bool transfer_pitch_bend = false;
+	bool transfer_prog_change = false;
+	bool clock_in = false;
+};
+
+
 class SoundEngineDevice {
 
 private:
@@ -449,6 +459,7 @@ private:
 	double first_beat_time = 0;
 
 public:
+	std::array<MidiSource, SOUND_ENGINE_MIDI_CHANNELS> sources;
 	Metronome metronome;
 	Looper looper;
 	bool play_metronome{false};

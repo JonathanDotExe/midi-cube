@@ -14,7 +14,6 @@
 #include "soundengine/soundengine.h"
 #include <mutex>
 
-
 struct MidiCubeInput {
 	MidiInput* in = nullptr;
 	std::string name = "";
