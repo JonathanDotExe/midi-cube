@@ -558,6 +558,7 @@ inline bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleIn
 void SoundEngineDevice::apply_program(Program* program) {
 	//Global
 	metronome.set_bpm(program->metronome_bpm);
+	motion_sequencer_presets = program->motion_sequencers;
 	scene = 0;
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
@@ -605,6 +606,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 void SoundEngineDevice::save_program(Program* program) {
 	//Global
 	program->metronome_bpm = metronome.get_bpm();
+	program->motion_sequencers = motion_sequencer_presets;
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelProgram& prog = program->channels[i];

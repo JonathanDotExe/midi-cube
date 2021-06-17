@@ -17,7 +17,7 @@ Scene MotionSequencerView::create(Frame &frame) {
 
 	std::vector<Control*> controls;
 
-	ActionHandler& handler = frame.cube.action_handler;
+	//ActionHandler& handler = frame.cube.action_handler;
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -25,7 +25,7 @@ Scene MotionSequencerView::create(Frame &frame) {
 	Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() + 10);
 	controls.push_back(pane);
 
-	SoundEngineDevice& sound_engine = frame.cube.engine;
+	//SoundEngineDevice& sound_engine = frame.cube.engine;
 
 
 
