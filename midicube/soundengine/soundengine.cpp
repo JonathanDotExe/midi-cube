@@ -400,7 +400,7 @@ void SoundEngineDevice::add_effect(EffectBuilder* effect) {
 	effect_builders.push_back(effect);
 }
 
-inline bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleInfo& info) {
+bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleInfo& info) {
 	size_t scene = this->scene;
 	bool updated = false;
 

@@ -484,7 +484,7 @@ public:
 
 	void add_effect(EffectBuilder* effect);
 
-	inline bool send(MidiMessage& message, size_t input, SampleInfo& info);
+	bool send(MidiMessage& message, size_t input, SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
