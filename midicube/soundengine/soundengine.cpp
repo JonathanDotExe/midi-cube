@@ -213,14 +213,6 @@ SoundEngineChannel::~SoundEngineChannel() {
 	engine = nullptr;
 }
 
-unsigned int SoundEngineChannel::get_source_channel() const {
-	return scenes[device->scene].source.channel;
-}
-
-void SoundEngineChannel::set_source_channel(unsigned int channel) {
-	scenes[device->scene].source.channel = channel;
-}
-
 unsigned int SoundEngineChannel::get_end_note() const {
 	return scenes[device->scene].source.end_note;
 }

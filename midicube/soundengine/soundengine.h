@@ -195,7 +195,6 @@ std::string get_engine_name();
 
 struct ChannelSource {
 	ssize_t input = 1;
-	unsigned int channel = 0;
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
 	unsigned int start_velocity = 0;
@@ -298,10 +297,6 @@ public:
 	ssize_t get_engine_index();
 
 	~SoundEngineChannel();
-
-	unsigned int get_source_channel() const;
-
-	void set_source_channel(unsigned int channel = 0);
 
 	unsigned int get_end_note() const;
 
