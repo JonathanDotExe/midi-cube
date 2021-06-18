@@ -6,6 +6,7 @@
  */
 
 #include "SourceView.h"
+#include "SoundEngineView.h"
 
 SourceView::SourceView() {
 
@@ -14,7 +15,7 @@ SourceView::SourceView() {
 Scene SourceView::create(Frame &frame) {
 	std::vector<Control*> controls;
 
-	//ActionHandler& handler = frame.cube.action_handler;
+	ActionHandler& handler = frame.cube.action_handler;
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -22,7 +23,64 @@ Scene SourceView::create(Frame &frame) {
 
 	SoundEngineDevice& sound_engine = frame.cube.engine;
 
+	//Channels
+	int rows = 2;
+	int cols = SOUND_ENGINE_MIDI_CHANNELS / rows;
+	int pane_width = (frame.get_width() - 15) / cols;
+	int pane_height = (frame.get_height() - 50 - 5) / rows;
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		MidiSource& source = sound_engine.sources[i];
+		//Background pane
+		int x = 10 + pane_width * (i % cols);
+		int y = 10 + pane_height * (i / cols);
+		Pane* pane = new Pane(sf::Color(120, 120, 120), x, y, pane_width - 5, pane_height - 5);
+		controls.push_back(pane);
 
+		//Title
+		Label* title = new Label("Source " + std::to_string(i), main_font, 16, x + 5, y + 5);
+		controls.push_back(title);
+		y += 25;
+
+		//Device
+		{
+			DragBox<int>* value = new DragBox<int>(0, -1, SOUND_ENGINE_MIDI_CHANNELS - 1, main_font, 12, x + 5, y, pane_width/2 - 5, 30);
+			value->property.bind(source.device, handler);
+			controls.push_back(value);
+		}
+		//Channel
+		{
+			DragBox<int>* value = new DragBox<int>(0, -1, SOUND_ENGINE_MIDI_CHANNELS - 1, main_font, 12, x + pane_width/2 - 5, y, pane_width/2 - 5, 30);
+			value->property.bind(source.channel, handler);
+			controls.push_back(value);
+		}
+		y += 40;
+		//CC
+		{
+			CheckBox* value = new CheckBox(true, "CC", main_font, 12, x + 5, y, 30, 30);
+			value->property.bind(source.transfer_cc, handler);
+			controls.push_back(value);
+		}
+		//Pitch Bend
+		{
+			CheckBox* value = new CheckBox(true, "PB", main_font, 12, x + pane_width/2, y, 30, 30);
+			value->property.bind(source.transfer_pitch_bend, handler);
+			controls.push_back(value);
+		}
+		y += 40;
+		//Program
+		{
+			CheckBox* value = new CheckBox(true, "Prog", main_font, 12, x + 5, y, 30, 30);
+			value->property.bind(source.transfer_prog_change, handler);
+			controls.push_back(value);
+		}
+		//Clock
+		{
+			CheckBox* value = new CheckBox(true, "Clock", main_font, 12, x + pane_width/2, y, 30, 30);
+			value->property.bind(source.clock_in, handler);
+			controls.push_back(value);
+		}
+		y += 40;
+	}
 
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
