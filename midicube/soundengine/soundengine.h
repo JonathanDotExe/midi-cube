@@ -454,7 +454,6 @@ private:
 	double first_beat_time = 0;
 
 public:
-	std::array<MidiSource, SOUND_ENGINE_MIDI_CHANNELS> sources;
 	std::array<double, MIDI_CONTROL_COUNT> ccs;
 	std::array<double, SOUND_ENGINE_MIDI_CHANNELS> aftertouch;
 
