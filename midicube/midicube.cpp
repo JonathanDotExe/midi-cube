@@ -99,7 +99,21 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	for (size_t i = 0; i < used_sources; ++i) {
 		MidiSource& source = sources[i];
 		if (source.device == input && (source.channel < 0 || static_cast<unsigned int>(source.channel) == message.channel)) {
-			if (engine.send(message, i, info)) {
+			//Filter
+			bool pass = true;
+			switch (message.type) {
+			case CONTROL_CHANGE:
+				pass = source.transfer_cc;
+				break;
+			case PROGRAM_CHANGE:
+				pass = source.transfer_prog_change;
+				break;
+			case PITCH_BEND:
+				pass = source.transfer_pitch_bend;
+				break;
+			}
+			//Type
+			if (pass && engine.send(message, i, source, info)) {
 				updated = true;
 			}
 		}

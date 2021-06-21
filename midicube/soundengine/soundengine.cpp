@@ -392,155 +392,99 @@ void SoundEngineDevice::add_effect(EffectBuilder* effect) {
 	effect_builders.push_back(effect);
 }
 
-bool SoundEngineDevice::send(MidiMessage &message, size_t input, SampleInfo& info) {
+bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& source, SampleInfo& info) {
 	size_t scene = this->scene;
 	bool updated = false;
 
+	//Global values
 	switch (message.type) {
 	case MessageType::MONOPHONIC_AFTERTOUCH:
-		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-			MidiSource& source = sources[i];
-			if (source.device == static_cast<ssize_t>(input) && (source.channel < 0 || static_cast<unsigned int>(source.channel) == message.channel)) {
-				aftertouch[i] = message.monophonic_aftertouch()/127.0;
-			}
-		}
-		/* no break */
+		//TODO aftertouch in sound engine channel
+		break;
 	case MessageType::POLYPHONIC_AFTERTOUCH:
+		break;
 	case MessageType::NOTE_ON:
+		break;
 	case MessageType::NOTE_OFF:
-		//Notes
-		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-			ChannelSource& s = channels[i].scenes[scene].source;
-			if (s.input >= 0) {
-				MidiSource& source = sources[s.input];
-				if (source.device == static_cast<ssize_t>(input) && (source.channel < 0 || static_cast<unsigned int>(source.channel) == message.channel)) {
-					bool pass = true;
-
-					switch (message.type) {
-					case MessageType::NOTE_ON:
-						pass = s.start_velocity <= message.velocity() && s.end_velocity >= message.velocity();
-						/* no break */
-					case MessageType::POLYPHONIC_AFTERTOUCH:
-						pass = pass && s.start_note <= message.note() && s.end_note >= message.note();
-						/* no break */
-					case MessageType::NOTE_OFF:
-						break;
-					case MessageType::MONOPHONIC_AFTERTOUCH:
-						pass = s.transfer_channel_aftertouch;
-						break;
-					default:
-						break;
-					}
-					//Apply binding
-					if (pass) {
-						//Send
-						SoundEngineChannel& ch = this->channels[i];
-						SoundEngine* engine = ch.get_engine();
-						if (engine) {
-							updated = ch.send(message, info, scene) || updated;
-						}
-					}
-				}
+		break;
+	case MessageType::CONTROL_CHANGE:
+		ccs[message.control()] = message.value()/127.0;
+		//Update scene
+		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
+			if (scene_ccs[i] == message.control()) {
+				scene = i;
+				updated = true;
 			}
 		}
 		break;
-	case MessageType::CONTROL_CHANGE:
 	case MessageType::PROGRAM_CHANGE:
+		break;
 	case MessageType::PITCH_BEND:
+		//TODO
+		break;
 	case MessageType::SYSEX:
-		for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-			MidiSource& source = sources[i];
-			if (source.device == static_cast<ssize_t>(i)) {
-				if (message.type == MessageType::SYSEX) {
-					if (message.channel == 8) {
-						double delta = info.time - first_beat_time;
-						unsigned int old_bpm = metronome.get_bpm();
-						if (delta) {
-							if (clock_beat_count && clock_beat_count % 96 == 0) {
-								unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
-								metronome.set_bpm(bpm);
-								if (bpm != old_bpm) {
-									updated = true;
-								}
-								metronome.init(first_beat_time);
-							}
+		//Clock
+		if (source.clock_in) {
+			if (message.channel == 8) {
+				double delta = info.time - first_beat_time;
+				unsigned int old_bpm = metronome.get_bpm();
+				if (delta) {
+					if (clock_beat_count && clock_beat_count % 96 == 0) {
+						unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
+						metronome.set_bpm(bpm);
+						if (bpm != old_bpm) {
+							updated = true;
 						}
-						clock_beat_count++;
-					}
-					else if (message.channel == 0x0A) {
-						first_beat_time = info.time;
-						clock_beat_count = 0;
-						metronome.init(info.time);
-					}
-					else if (message.channel == 0x0B) {
-						metronome.init(info.time);
+						metronome.init(first_beat_time);
 					}
 				}
-				else if (source.channel < 0 || (source.channel < 0 || static_cast<unsigned int>(source.channel) == message.channel)) {
-					switch (message.type) {
-					case MessageType::CONTROL_CHANGE:
-						ccs[message.control()] = message.value()/127.0;
-
-						for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
-							if (scene_ccs[i] == message.control()) {
-								scene = i;
-								updated = true;
-							}
-						}
-						/* no break */
-					case MessageType::PROGRAM_CHANGE:
-					case MessageType::PITCH_BEND:
-						//TODO global pitch bend
-						//Channels
-						for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-							ChannelSource& s = channels[i].scenes[scene].source;
-							if (s.input >= 0) {
-								MidiSource& source = sources[s.input];
-								if (source.device == static_cast<ssize_t>(input)) {
-									bool pass = true;
-									switch (message.type) {
-									case MessageType::CONTROL_CHANGE:
-										pass = s.transfer_cc;
-										break;
-									case MessageType::PROGRAM_CHANGE:
-										pass = s.transfer_prog_change;
-										break;
-									case MessageType::PITCH_BEND:
-										pass = s.transfer_pitch_bend;
-										break;
-									default:
-										break;
-									}
-									//Apply binding
-									if (pass) {
-										//Send
-										SoundEngineChannel& ch = this->channels[i];
-										SoundEngine* engine = ch.get_engine();
-										if (engine) {
-											updated = ch.send(message, info, scene) || updated;
-										}
-									}
-								}
-							}
-						}
-						//Effects
-						for (auto& e : effects) {
-							if (e.get_effect()) {
-								if (e.get_effect()->midi_message(message, info)) {
-									updated = true;
-								}
-							}
-						}
-						break;
-					default:
-						break;
-					}
-				}
+				clock_beat_count++;
+			}
+			else if (message.channel == 0x0A) {
+				first_beat_time = info.time;
+				clock_beat_count = 0;
+				metronome.init(info.time);
+			}
+			else if (message.channel == 0x0B) {
+				metronome.init(info.time);
 			}
 		}
 		break;
 	case MessageType::INVALID:
 		break;
+	}
+
+	//Channels
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		SoundEngineChannel& channel = channels[i];
+		ChannelSource& s = channel.scenes[scene].source;
+		bool pass = false;
+		switch (message.type) {
+		case MessageType::NOTE_OFF:
+		case MessageType::POLYPHONIC_AFTERTOUCH:
+			pass = message.note() >= s.start_note && message.note() <= s.end_note;
+			/* no break */
+		case MessageType::NOTE_ON:
+			pass = pass && message.velocity() >= s.start_velocity && message.velocity() <= s.end_velocity;
+			break;
+		case MessageType::MONOPHONIC_AFTERTOUCH:
+			pass = s.transfer_channel_aftertouch;
+			break;
+		case MessageType::CONTROL_CHANGE:
+			pass = s.transfer_cc;	//FIXME global ccs are updated anyways
+			break;
+		case MessageType::PROGRAM_CHANGE:
+			pass = s.transfer_prog_change;
+			break;
+		case MessageType::PITCH_BEND:
+			pass = s.transfer_pitch_bend;
+			break;
+		case MessageType::SYSEX:
+			pass = s.transfer_other; //TODO remove probably
+			break;
+		case MessageType::INVALID:
+			break;
+		}
 	}
 
 	return updated;
