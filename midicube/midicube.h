@@ -28,11 +28,12 @@ class MidiCube : public ProgramUser {
 private:
 	AudioHandler audio_handler;
 	std::vector<MidiCubeInput> inputs;
-	std::array<MidiSource, SOUND_ENGINE_MIDI_CHANNELS> sources;
-	size_t used_sources = 1;
 
 	inline void process_midi(MidiMessage& message, size_t input);
 public:
+	std::array<MidiSource, SOUND_ENGINE_MIDI_CHANNELS> sources;
+	size_t used_sources = 1;
+
 	ProgramManager prog_mgr;
 	SoundEngineDevice engine;
 	ActionHandler action_handler;
