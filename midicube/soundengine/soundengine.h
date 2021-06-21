@@ -431,11 +431,11 @@ public:
 
 
 struct MidiSource {
-	ssize_t device = -1;
+	ssize_t device = 1;
 	int channel = 0;
-	bool transfer_cc = false;
-	bool transfer_pitch_bend = false;
-	bool transfer_prog_change = false;
+	bool transfer_cc = true;
+	bool transfer_pitch_bend = true;
+	bool transfer_prog_change = true;
 	bool clock_in = false;
 };
 

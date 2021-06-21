@@ -37,19 +37,26 @@ Scene SourceView::create(Frame &frame) {
 		//Title
 		Label* title = new Label("Source " + std::to_string(i), main_font, 16, x + 5, y + 5);
 		controls.push_back(title);
-		y += 25;
+		y += 30;
 
 		//Device
 		{
 			DragBox<int>* value = new DragBox<int>(0, -1, SOUND_ENGINE_MIDI_CHANNELS - 1, main_font, 12, x + 5, y, pane_width/2 - 5, 30);
 			value->property.bind(source.device, handler);
 			controls.push_back(value);
+
+			Label* label = new Label("Device", main_font, 12, x + 5 + pane_width/2, y + 5);
+			controls.push_back(label);
 		}
+		y += 40;
 		//Channel
 		{
-			DragBox<int>* value = new DragBox<int>(0, -1, SOUND_ENGINE_MIDI_CHANNELS - 1, main_font, 12, x + pane_width/2 - 5, y, pane_width/2 - 5, 30);
+			DragBox<int>* value = new DragBox<int>(0, -1, SOUND_ENGINE_MIDI_CHANNELS - 1, main_font, 12, x + 5, y, pane_width/2 - 5, 30);
 			value->property.bind(source.channel, handler);
 			controls.push_back(value);
+
+			Label* label = new Label("Channel", main_font, 12, x + 5 + pane_width/2, y + 5);
+			controls.push_back(label);
 		}
 		y += 40;
 		//CC
@@ -58,22 +65,24 @@ Scene SourceView::create(Frame &frame) {
 			value->property.bind(source.transfer_cc, handler);
 			controls.push_back(value);
 		}
+		y += 40;
 		//Pitch Bend
 		{
-			CheckBox* value = new CheckBox(true, "PB", main_font, 12, x + pane_width/2, y, 30, 30);
+			CheckBox* value = new CheckBox(true, "Pitch Bend", main_font, 12, x + 5, y, 30, 30);
 			value->property.bind(source.transfer_pitch_bend, handler);
 			controls.push_back(value);
 		}
 		y += 40;
 		//Program
 		{
-			CheckBox* value = new CheckBox(true, "Prog", main_font, 12, x + 5, y, 30, 30);
+			CheckBox* value = new CheckBox(true, "Program", main_font, 12, x + 5, y, 30, 30);
 			value->property.bind(source.transfer_prog_change, handler);
 			controls.push_back(value);
 		}
+		y += 40;
 		//Clock
 		{
-			CheckBox* value = new CheckBox(true, "Clock", main_font, 12, x + pane_width/2, y, 30, 30);
+			CheckBox* value = new CheckBox(true, "Clock In", main_font, 12, x + 5, y, 30, 30);
 			value->property.bind(source.clock_in, handler);
 			controls.push_back(value);
 		}
@@ -81,7 +90,7 @@ Scene SourceView::create(Frame &frame) {
 	}
 
 	//Exit Button
-	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
+	Button* exit = new Button("Back", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
 	exit->set_on_click([&frame]() {
 		frame.change_view(new SoundEngineView());
 	});
