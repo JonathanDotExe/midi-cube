@@ -61,7 +61,7 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int real_note) = 0;
 
-	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, SoundEngineDevice& device) = 0;
+	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, SoundEngineDevice& device, KeyboardEnvironment env) = 0;
 
 	virtual void apply_program(EngineProgram* prog) {
 
@@ -81,12 +81,9 @@ template<typename V, size_t P>
 class BaseSoundEngine : public SoundEngine {
 protected:
 	VoiceManager<V, P> note;
-	KeyboardEnvironment environment;
 
 public:
-	std::atomic<unsigned int> sustain_control{64};
-	std::atomic<bool> sustain{true};
-
+	unsigned int sustain_control{64};
 
 	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info);
 
@@ -287,7 +284,7 @@ public:
 
 	bool send(MidiMessage& message, SampleInfo& info, size_t scene);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, size_t scene);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, KeyboardEnvironment& env, size_t scene);
 
 	SoundEngine* get_engine();
 

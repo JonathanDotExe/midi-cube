@@ -164,7 +164,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			SamplerVoice& voice = this->note.note[slot];
 			voice.region = region;
 			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume * sample->volume;
-			voice.sample = (sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample;
+			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
 			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
 				voice.time = voice.sample->loop_start;

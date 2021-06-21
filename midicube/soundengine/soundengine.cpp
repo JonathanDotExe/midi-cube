@@ -114,7 +114,7 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	}
 }
 
-void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, size_t scene) {
+void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, KeyboardEnvironment env, size_t scene) {
 	//Properties
 	if (engine) {
 		SoundEngineScene& s = scenes[scene];
