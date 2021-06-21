@@ -279,6 +279,7 @@ public:
 	ssize_t master_send = -1;
 
 	EngineStatus status = {};
+	double aftertouch = 0;
 
 	SoundEngineChannel();
 
@@ -455,7 +456,6 @@ private:
 
 public:
 	std::array<double, MIDI_CONTROL_COUNT> ccs;
-	std::array<double, SOUND_ENGINE_MIDI_CHANNELS> aftertouch;
 
 	Metronome metronome;
 	Looper looper;
