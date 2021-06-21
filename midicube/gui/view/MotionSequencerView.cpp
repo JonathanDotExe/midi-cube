@@ -6,7 +6,7 @@
  */
 
 #include "MotionSequencerView.h"
-#include "SoundEngineView.h"
+#include "MasterEffectView.h"
 
 MotionSequencerView::MotionSequencerView() {
 	// TODO Auto-generated constructor stub
@@ -29,11 +29,16 @@ Scene MotionSequencerView::create(Frame &frame) {
 
 
 
-
+	//Motion Seq
+	Button* mo_seq = new Button("Mo. Seq.", main_font, 18, frame.get_width() - 175, frame.get_height() - 45, 100, 40);
+		mo_seq->set_on_click([&frame]() {
+		frame.change_view(new MotionSequencerView());
+	});
+	controls.push_back(mo_seq);
 	//Exit Button
-	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
+	Button* exit = new Button("Back", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
 	exit->set_on_click([&frame]() {
-		frame.change_view(new SoundEngineView());
+		frame.change_view(new MasterEffectView());
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);

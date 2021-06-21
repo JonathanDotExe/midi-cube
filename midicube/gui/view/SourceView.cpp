@@ -21,15 +21,13 @@ Scene SourceView::create(Frame &frame) {
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
 
-	SoundEngineDevice& sound_engine = frame.cube.engine;
-
 	//Channels
 	int rows = 2;
 	int cols = SOUND_ENGINE_MIDI_CHANNELS / rows;
 	int pane_width = (frame.get_width() - 15) / cols;
 	int pane_height = (frame.get_height() - 50 - 5) / rows;
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
-		MidiSource& source = sound_engine.sources[i];
+		MidiSource& source = frame.cube.sources[i];
 		//Background pane
 		int x = 10 + pane_width * (i % cols);
 		int y = 10 + pane_height * (i / cols);
