@@ -12,6 +12,7 @@
 #include "SoundEngineChannelView.h"
 #include "MasterEffectView.h"
 #include "MotionSequencerView.h"
+#include "SourceView.h"
 
 #include <iostream>
 
@@ -99,12 +100,12 @@ Scene SoundEngineView::create(Frame& frame) {
 	});
 	controls.push_back(effects);
 
-	//Looper
-	Button* mo_seq = new Button("Mo. Seq.", main_font, 18, frame.get_width() - 475, frame.get_height() - 45, 100, 40);
-	mo_seq->set_on_click([&frame]() {
-		frame.change_view(new MotionSequencerView());
+	//Sources
+	Button* sources = new Button("Sources", main_font, 18, frame.get_width() - 475, frame.get_height() - 45, 100, 40);
+	sources->set_on_click([&frame]() {
+		frame.change_view(new SourceView());
 	});
-	controls.push_back(mo_seq);
+	controls.push_back(sources);
 
 	//Looper
 	Button* looper = new Button("Looper", main_font, 18, frame.get_width() - 375, frame.get_height() - 45, 100, 40);

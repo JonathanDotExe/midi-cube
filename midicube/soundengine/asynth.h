@@ -191,11 +191,11 @@ public:
 
 	AnalogSynth();
 
-	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
+	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineDevice& device);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, ChannelInfo& channel, EngineStatus& status, SoundEngineDevice& device);
 
-	bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info);
+	bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env);
 
 	bool control_change(unsigned int control, unsigned int value);
 

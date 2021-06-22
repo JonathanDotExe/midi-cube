@@ -14,6 +14,7 @@
 #include <functional>
 
 #define SOUND_ENGINE_MIDI_CHANNELS 16
+#define MIDI_CONTROL_COUNT 128
 
 #define NOTE_OFF_BIT 0x8
 #define NOTE_ON_BIT 0x9

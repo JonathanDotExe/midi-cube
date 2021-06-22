@@ -14,7 +14,6 @@
 #include "soundengine/soundengine.h"
 #include <mutex>
 
-
 struct MidiCubeInput {
 	MidiInput* in = nullptr;
 	std::string name = "";
@@ -32,6 +31,9 @@ private:
 
 	inline void process_midi(MidiMessage& message, size_t input);
 public:
+	std::array<MidiSource, SOUND_ENGINE_MIDI_CHANNELS> sources;
+	size_t used_sources = 1;
+
 	ProgramManager prog_mgr;
 	SoundEngineDevice engine;
 	ActionHandler action_handler;

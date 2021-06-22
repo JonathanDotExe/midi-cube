@@ -150,18 +150,6 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		tmp_y += 60;
 		controls.push_back(source);
 	}
-	//Channel
-	{
-		tmp_y += 5;
-		Label* channel_label = new Label("Channel", main_font, 18, 470, tmp_y);
-		tmp_y += 30;
-		controls.push_back(channel_label);
-
-		DragBox<int>* input_channel = new DragBox<int>(0, 0, 15, main_font, 18, 470, tmp_y, 150, 60);
-		input_channel->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_source_channel, &channel), std::bind(&SoundEngineChannel::set_source_channel, &channel, std::placeholders::_1), handler);
-		tmp_y += 60;
-		controls.push_back(input_channel);
-	}
 	//Octave
 	{
 		tmp_y += 5;

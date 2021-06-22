@@ -36,6 +36,10 @@ namespace pt = boost::property_tree;
 
 class SoundEngineDevice;
 
+struct ChannelInfo {
+	double aftertouch = 0;
+};
+
 struct EngineStatus {
 	size_t pressed_notes = 0;
 	size_t latest_note_index = 0;
@@ -55,13 +59,13 @@ public:
 class SoundEngine {
 
 public:
-	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info) = 0;
+	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env) = 0;
 
 	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) = 0;
 
 	virtual void release_note(SampleInfo& info, unsigned int real_note) = 0;
 
-	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, SoundEngineDevice& device) = 0;
+	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, ChannelInfo& channel, SoundEngineDevice& device) = 0;
 
 	virtual void apply_program(EngineProgram* prog) {
 
@@ -81,25 +85,20 @@ template<typename V, size_t P>
 class BaseSoundEngine : public SoundEngine {
 protected:
 	VoiceManager<V, P> note;
-	KeyboardEnvironment environment;
 
 public:
-	std::atomic<unsigned int> sustain_control{64};
-	std::atomic<bool> sustain{true};
-
-
-	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info);
+	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env);
 
 	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity);
 
 	virtual void release_note(SampleInfo& info, unsigned int note);
 
-	EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, SoundEngineDevice& device);
+	EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, ChannelInfo& channel, SoundEngineDevice& device);
 
-	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) = 0;
+	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, V& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index) = 0;
 
 
-	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineDevice& device) {
+	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, ChannelInfo& channel, SoundEngineDevice& device) {
 
 	};
 
@@ -119,8 +118,7 @@ public:
 
 //BaseSoundEngine
 template<typename V, size_t P>
-bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, int transpose, SampleInfo& info) {
-	double pitch;
+bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, int transpose, SampleInfo& info, KeyboardEnvironment& env) {
 	bool changed = false;
 	switch (message.type) {
 		case MessageType::NOTE_ON:
@@ -131,23 +129,6 @@ bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, int transpose, Sa
 			break;
 		case MessageType::CONTROL_CHANGE:
 			changed = control_change(message.control(), message.value());
-			//Sustain
-			if (message.control() == sustain_control) {
-				bool new_sustain = message.value() != 0;
-				if (new_sustain != environment.sustain) {
-					if (new_sustain) {
-						environment.sustain_time = info.time;
-					}
-					else {
-						environment.sustain_release_time = info.time;
-					}
-					environment.sustain = new_sustain;
-				}
-			}
-			break;
-		case MessageType::PITCH_BEND:
-			pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
-			environment.pitch_bend = note_to_freq_transpose(pitch);
 			break;
 		default:
 			break;
@@ -166,18 +147,18 @@ void BaseSoundEngine<V, P>::release_note(SampleInfo& info, unsigned int note) {
 }
 
 template<typename V, size_t P>
-EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info, SoundEngineDevice& device) {
+EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, ChannelInfo& channel, SoundEngineDevice& device) {
 	EngineStatus status = {0, 0};
 	//Notes
 	for (size_t i = 0; i < P; ++i) {
 		if (note.note[i].valid) {
-			if (note_finished(info, note.note[i], environment, i)) {
+			if (note_finished(info, note.note[i], env, i)) {
 				note.note[i].valid = false;
 			}
 			else {
 				++status.pressed_notes; //TODO might cause problems in the future
-				note.note[i].phase_shift += (environment.pitch_bend - 1) * info.time_step;
-				process_note_sample(lsample, rsample, info, note.note[i], environment, i);
+				note.note[i].phase_shift += (env.pitch_bend - 1) * info.time_step;
+				process_note_sample(lsample, rsample, info, note.note[i], env, channel, i);
 				if (!status.pressed_notes || note.note[status.latest_note_index].start_time < note.note[i].start_time) {
 					status.latest_note_index = i;
 				}
@@ -185,7 +166,7 @@ EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsam
 		}
 	}
 	//Static sample
-	process_sample(lsample, rsample, info, environment, status, device);
+	process_sample(lsample, rsample, info, env, status, channel, device);
 
 	return status;
 }
@@ -195,7 +176,6 @@ std::string get_engine_name();
 
 struct ChannelSource {
 	ssize_t input = 1;
-	unsigned int channel = 0;
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
 	unsigned int start_velocity = 0;
@@ -280,14 +260,15 @@ public:
 	ssize_t master_send = -1;
 
 	EngineStatus status = {};
+	ChannelInfo info;
 
 	SoundEngineChannel();
 
 	void init_device(SoundEngineDevice* device);
 
-	bool send(MidiMessage& message, SampleInfo& info, size_t scene);
+	bool send(MidiMessage& message, SampleInfo& info, KeyboardEnvironment& env, size_t scene);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, size_t scene);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, KeyboardEnvironment& env, size_t scene);
 
 	SoundEngine* get_engine();
 
@@ -298,10 +279,6 @@ public:
 	ssize_t get_engine_index();
 
 	~SoundEngineChannel();
-
-	unsigned int get_source_channel() const;
-
-	void set_source_channel(unsigned int channel = 0);
 
 	unsigned int get_end_note() const;
 
@@ -434,6 +411,16 @@ public:
 };
 
 
+struct MidiSource {
+	ssize_t device = 1;
+	int channel = 0;
+	bool transfer_cc = true;
+	bool transfer_pitch_bend = true;
+	bool transfer_prog_change = true;
+	bool clock_in = false;
+};
+
+
 class SoundEngineDevice {
 
 private:
@@ -449,6 +436,8 @@ private:
 	double first_beat_time = 0;
 
 public:
+	KeyboardEnvironment env;
+
 	Metronome metronome;
 	Looper looper;
 	bool play_metronome{false};
@@ -462,6 +451,8 @@ public:
 	std::array<MotionSeqeuncerPreset<MOTION_SEQUENCER_LENGTH>, MOTION_SEQUENCER_AMOUNT> motion_sequencer_presets;
 	std::array<double, MOTION_SEQUENCER_AMOUNT> motion_sequencer_values = {};
 
+	unsigned int sustain_control{64};
+
 	SoundEngineDevice();
 
 	std::vector<SoundEngineBuilder*> get_engine_builders();
@@ -470,9 +461,7 @@ public:
 
 	void add_effect(EffectBuilder* effect);
 
-	bool send(MidiMessage& message, SampleInfo& info);
-
-	bool send_engine(MidiMessage& message, SampleInfo& info);
+	bool send(MidiMessage& message, size_t input, MidiSource& source, SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 

@@ -179,14 +179,14 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 
 void AnalogSynth::process_note_sample(
 		double& lsample, double& rsample, SampleInfo &info,
-		AnalogSynthVoice &note, KeyboardEnvironment &env, size_t note_index) {
+		AnalogSynthVoice &note, KeyboardEnvironment &env, ChannelInfo& channel, size_t note_index) {
 	if (!preset.mono) {
 		process_note(lsample, rsample, info, note, env);
 	}
 }
 
 void AnalogSynth::process_sample(double& lsample, double& rsample,
-		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status, SoundEngineDevice& device) {
+		SampleInfo &info, KeyboardEnvironment &env, ChannelInfo& channel, EngineStatus &status, SoundEngineDevice& device) {
 	//Mono
 	if (preset.mono) {
 		if (status.pressed_notes) {
@@ -275,7 +275,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	}
 }
 
-bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info) {
+bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env) {
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 		double at = msg.monophonic_aftertouch()/127.0;
 		if (at > aftertouch.get(info.time)) {
@@ -285,7 +285,7 @@ bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info
 			aftertouch.set(at, info.time, preset.aftertouch_release);
 		}
 	}
-	return BaseSoundEngine::midi_message(msg, transpose, info);
+	return BaseSoundEngine::midi_message(msg, transpose, info, env);
 }
 
 bool AnalogSynth::control_change(unsigned int control, unsigned int value) {

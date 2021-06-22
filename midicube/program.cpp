@@ -70,7 +70,6 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 						program->channels[i].scenes[j].active = s.second.get<bool>("active", false);
 						//Source
 						program->channels[i].scenes[j].source.input = s.second.get<ssize_t>("source.input", 1);
-						program->channels[i].scenes[j].source.channel = s.second.get<unsigned int>("source.channel", 0);
 						program->channels[i].scenes[j].source.start_note = s.second.get<unsigned int>("source.start_note", 0);
 						program->channels[i].scenes[j].source.end_note = s.second.get<unsigned int>("source.end_note", 127);
 						program->channels[i].scenes[j].source.start_velocity = s.second.get<unsigned int>("source.start_velocity", 0);
@@ -196,7 +195,6 @@ void save_program(Program* program, pt::ptree& tree) {
 			s.put("active", program->channels[i].scenes[j].active);
 			//Source
 			s.put("source.input", program->channels[i].scenes[j].source.input);
-			s.put("source.channel", program->channels[i].scenes[j].source.channel);
 			s.put("source.start_note", program->channels[i].scenes[j].source.start_note);
 			s.put("source.end_note", program->channels[i].scenes[j].source.end_note);
 			s.put("source.start_velocity", program->channels[i].scenes[j].source.start_velocity);

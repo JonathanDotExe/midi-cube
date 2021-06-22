@@ -114,7 +114,7 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	}
 }
 
-void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, size_t scene) {
+void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, KeyboardEnvironment& env, size_t scene) {
 	//Properties
 	if (engine) {
 		SoundEngineScene& s = scenes[scene];
@@ -131,7 +131,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				});
 			}
 			//Process
-			status = engine->process_sample(lsample, rsample, info, *device);
+			status = engine->process_sample(lsample, rsample, info, env, this->info, *device);
 			//Effects
 			for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 				effects[i].apply(lsample, rsample, info);
@@ -146,9 +146,10 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	}
 }
 
-bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t scene) {
+bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, KeyboardEnvironment& env, size_t scene) {
 	bool updated = false;
 	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
+		//Effects
 		for (auto& e : effects) {
 			if (e.get_effect()) {
 				if (e.get_effect()->midi_message(message, info)) {
@@ -156,6 +157,11 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t sce
 				}
 			}
 		}
+		//Aftertouch
+		if (message.type == MessageType::MONOPHONIC_AFTERTOUCH) {
+			this->info.aftertouch = message.monophonic_aftertouch()/127.0;
+		}
+		//Note
 		if (arp.on) {
 			switch (message.type) {
 			case MessageType::NOTE_ON:
@@ -165,12 +171,12 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t sce
 				arp.release_note(info, message.note());
 				break;
 			default:
-				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info) || updated; //FIXME
+				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env) || updated;
 				break;
 			}
 		}
 		else {
-			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info) || updated;
+			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env) || updated;
 		}
 	}
 	return updated;
@@ -211,14 +217,6 @@ void SoundEngineChannel::set_engine(SoundEngine* engine) {
 SoundEngineChannel::~SoundEngineChannel() {
 	delete engine;
 	engine = nullptr;
-}
-
-unsigned int SoundEngineChannel::get_source_channel() const {
-	return scenes[device->scene].source.channel;
-}
-
-void SoundEngineChannel::set_source_channel(unsigned int channel) {
-	scenes[device->scene].source.channel = channel;
 }
 
 unsigned int SoundEngineChannel::get_end_note() const {
@@ -343,7 +341,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 		double l = 0;
 		double r = 0;
 		SoundEngineChannel& ch = this->channels[i];
-		ch.process_sample(l, r, info, metronome, scene);
+		ch.process_sample(l, r, info, metronome, env, scene);
 
 		if (ch.master_send >= 0 && ch.master_send < SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
 			effects[ch.master_send].lsample += l;
@@ -400,14 +398,120 @@ void SoundEngineDevice::add_effect(EffectBuilder* effect) {
 	effect_builders.push_back(effect);
 }
 
-bool SoundEngineDevice::send(MidiMessage &message, SampleInfo& info) {
+bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& source, SampleInfo& info) {
+	size_t scene = this->scene;
 	bool updated = false;
+	double pitch;
 
-	SoundEngineChannel& ch = this->channels[message.channel];
-	SoundEngine* engine = ch.get_engine();
-	if (engine) {
-		updated = ch.send(message, info, scene) || updated;
+	//Global values
+	switch (message.type) {
+	case MessageType::MONOPHONIC_AFTERTOUCH:
+		break;
+	case MessageType::POLYPHONIC_AFTERTOUCH:
+		break;
+	case MessageType::NOTE_ON:
+		break;
+	case MessageType::NOTE_OFF:
+		break;
+	case MessageType::CONTROL_CHANGE:
+		env.ccs[message.control()] = message.value()/127.0;
+		//Sustain
+		if (message.control() == sustain_control) {
+			bool new_sustain = message.value() != 0;
+			if (new_sustain != env.sustain) {
+				if (new_sustain) {
+					env.sustain_time = info.time;
+				}
+				else {
+					env.sustain_release_time = info.time;
+				}
+				env.sustain = new_sustain;
+			}
+		}
+		//Update scene
+		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
+			if (scene_ccs[i] == message.control()) {
+				scene = i;
+				updated = true;
+			}
+		}
+		break;
+	case MessageType::PROGRAM_CHANGE:
+		break;
+	case MessageType::PITCH_BEND:
+		pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
+		env.pitch_bend = note_to_freq_transpose(pitch);
+		break;
+	case MessageType::SYSEX:
+		//Clock
+		if (source.clock_in) {
+			if (message.channel == 8) {
+				double delta = info.time - first_beat_time;
+				unsigned int old_bpm = metronome.get_bpm();
+				if (delta) {
+					if (clock_beat_count && clock_beat_count % 96 == 0) {
+						unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
+						metronome.set_bpm(bpm);
+						if (bpm != old_bpm) {
+							updated = true;
+						}
+						metronome.init(first_beat_time);
+					}
+				}
+				clock_beat_count++;
+			}
+			else if (message.channel == 0x0A) {
+				first_beat_time = info.time;
+				clock_beat_count = 0;
+				metronome.init(info.time);
+			}
+			else if (message.channel == 0x0B) {
+				metronome.init(info.time);
+			}
+		}
+		break;
+	case MessageType::INVALID:
+		break;
 	}
+
+	//Channels
+	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
+		SoundEngineChannel& channel = channels[i];
+		ChannelSource& s = channel.scenes[scene].source;
+		//Flter
+		bool pass = false;
+		switch (message.type) {
+		case MessageType::NOTE_OFF:
+		case MessageType::POLYPHONIC_AFTERTOUCH:
+			pass = message.note() >= s.start_note && message.note() <= s.end_note;
+			/* no break */
+		case MessageType::NOTE_ON:
+			pass = pass && message.velocity() >= s.start_velocity && message.velocity() <= s.end_velocity;
+			break;
+		case MessageType::MONOPHONIC_AFTERTOUCH:
+			pass = s.transfer_channel_aftertouch;
+			break;
+		case MessageType::CONTROL_CHANGE:
+			pass = s.transfer_cc;	//FIXME global ccs are updated anyways
+			break;
+		case MessageType::PROGRAM_CHANGE:
+			pass = s.transfer_prog_change;
+			break;
+		case MessageType::PITCH_BEND:
+			pass = s.transfer_pitch_bend;
+			break;
+		case MessageType::SYSEX:
+			pass = s.transfer_other; //TODO remove probably
+			break;
+		case MessageType::INVALID:
+			break;
+		}
+		//Send
+		if (channel.send(message, info, env, scene)) {
+			updated = true;
+		}
+	}
+
 	return updated;
 }
 
@@ -504,46 +608,6 @@ void SoundEngineDevice::save_program(Program* program) {
 			effect.get_effect()->save_program(&prog.prog);
 		}
 	}
-}
-
-bool SoundEngineDevice::send_engine(MidiMessage &message, SampleInfo &info) {
-	bool updated = false;
-	//Time change
-	if (message.type == MessageType::SYSEX) {
-		if (message.channel == 8) {
-			double delta = info.time - first_beat_time;
-			unsigned int old_bpm = metronome.get_bpm();
-			if (delta) {
-				if (clock_beat_count && clock_beat_count % 96 == 0) {
-					unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
-					metronome.set_bpm(bpm);
-					if (bpm != old_bpm) {
-						updated = true;
-					}
-					metronome.init(first_beat_time);
-				}
-			}
-			clock_beat_count++;
-		}
-		else if (message.channel == 0x0A) {
-			first_beat_time = info.time;
-			clock_beat_count = 0;
-			metronome.init(info.time);
-		}
-		else if (message.channel == 0x0B) {
-			metronome.init(info.time);
-		}
-	}
-	//Scene change
-	if (message.type == MessageType::CONTROL_CHANGE) {
-		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
-			if (scene_ccs[i] == message.control()) {
-				scene = i;
-				updated = true;
-			}
-		}
-	}
-	return updated;
 }
 
 SoundEngineDevice::~SoundEngineDevice() {

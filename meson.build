@@ -61,6 +61,7 @@ src = [
 	'midicube/gui/view/SceneView.cpp',
 	'midicube/gui/view/SoundEngineChannelView.cpp',
 	'midicube/gui/view/SoundEngineView.cpp',
+	'midicube/gui/view/SourceView.cpp',
 	
 	'midicube/effect/amplifier_simulation.cpp',
 	'midicube/effect/bitcrusher.cpp',
