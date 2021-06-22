@@ -275,7 +275,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	}
 }
 
-bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info) {
+bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env) {
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 		double at = msg.monophonic_aftertouch()/127.0;
 		if (at > aftertouch.get(info.time)) {
@@ -285,7 +285,7 @@ bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info
 			aftertouch.set(at, info.time, preset.aftertouch_release);
 		}
 	}
-	return BaseSoundEngine::midi_message(msg, transpose, info);
+	return BaseSoundEngine::midi_message(msg, transpose, info, env);
 }
 
 bool AnalogSynth::control_change(unsigned int control, unsigned int value) {

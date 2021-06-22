@@ -195,7 +195,7 @@ public:
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineDevice& device);
 
-	bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info);
+	bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env);
 
 	bool control_change(unsigned int control, unsigned int value);
 

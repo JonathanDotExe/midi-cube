@@ -114,7 +114,7 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	}
 }
 
-void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, KeyboardEnvironment env, size_t scene) {
+void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, KeyboardEnvironment& env, size_t scene) {
 	//Properties
 	if (engine) {
 		SoundEngineScene& s = scenes[scene];
@@ -131,7 +131,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				});
 			}
 			//Process
-			status = engine->process_sample(lsample, rsample, info, *device);
+			status = engine->process_sample(lsample, rsample, info, env, *device);
 			//Effects
 			for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 				effects[i].apply(lsample, rsample, info);
@@ -341,7 +341,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 		double l = 0;
 		double r = 0;
 		SoundEngineChannel& ch = this->channels[i];
-		ch.process_sample(l, r, info, metronome, scene);
+		ch.process_sample(l, r, info, metronome, env, scene);
 
 		if (ch.master_send >= 0 && ch.master_send < SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
 			effects[ch.master_send].lsample += l;
@@ -415,6 +415,19 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 		break;
 	case MessageType::CONTROL_CHANGE:
 		ccs[message.control()] = message.value()/127.0;
+		//Sustain
+		if (message.control() == sustain_control) {
+			bool new_sustain = message.value() != 0;
+			if (new_sustain != env.sustain) {
+				if (new_sustain) {
+					env.sustain_time = info.time;
+				}
+				else {
+					env.sustain_release_time = info.time;
+				}
+				env.sustain = new_sustain;
+			}
+		}
 		//Update scene
 		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
 			if (scene_ccs[i] == message.control()) {
@@ -426,7 +439,8 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	case MessageType::PROGRAM_CHANGE:
 		break;
 	case MessageType::PITCH_BEND:
-		//TODO
+		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
+		env.pitch_bend = note_to_freq_transpose(pitch);
 		break;
 	case MessageType::SYSEX:
 		//Clock
