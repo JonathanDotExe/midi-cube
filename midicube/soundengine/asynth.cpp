@@ -179,14 +179,14 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 
 void AnalogSynth::process_note_sample(
 		double& lsample, double& rsample, SampleInfo &info,
-		AnalogSynthVoice &note, KeyboardEnvironment &env, size_t note_index) {
+		AnalogSynthVoice &note, KeyboardEnvironment &env, ChannelInfo& channel, size_t note_index) {
 	if (!preset.mono) {
 		process_note(lsample, rsample, info, note, env);
 	}
 }
 
 void AnalogSynth::process_sample(double& lsample, double& rsample,
-		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status, SoundEngineDevice& device) {
+		SampleInfo &info, KeyboardEnvironment &env, ChannelInfo& channel, EngineStatus &status, SoundEngineDevice& device) {
 	//Mono
 	if (preset.mono) {
 		if (status.pressed_notes) {

@@ -36,6 +36,10 @@ namespace pt = boost::property_tree;
 
 class SoundEngineDevice;
 
+struct ChannelInfo {
+	double aftertouch = 0;
+};
+
 struct EngineStatus {
 	size_t pressed_notes = 0;
 	size_t latest_note_index = 0;
@@ -61,7 +65,7 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int real_note) = 0;
 
-	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, SoundEngineDevice& device) = 0;
+	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, ChannelInfo& channel, SoundEngineDevice& device) = 0;
 
 	virtual void apply_program(EngineProgram* prog) {
 
@@ -89,12 +93,12 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int note);
 
-	EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, SoundEngineDevice& device);
+	EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, ChannelInfo& channel, SoundEngineDevice& device);
 
-	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) = 0;
+	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, V& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index) = 0;
 
 
-	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, SoundEngineDevice& device) {
+	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, ChannelInfo& channel, SoundEngineDevice& device) {
 
 	};
 
@@ -143,7 +147,7 @@ void BaseSoundEngine<V, P>::release_note(SampleInfo& info, unsigned int note) {
 }
 
 template<typename V, size_t P>
-EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, SoundEngineDevice& device) {
+EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, ChannelInfo& channel, SoundEngineDevice& device) {
 	EngineStatus status = {0, 0};
 	//Notes
 	for (size_t i = 0; i < P; ++i) {
@@ -154,7 +158,7 @@ EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsam
 			else {
 				++status.pressed_notes; //TODO might cause problems in the future
 				note.note[i].phase_shift += (env.pitch_bend - 1) * info.time_step;
-				process_note_sample(lsample, rsample, info, note.note[i], env, i);
+				process_note_sample(lsample, rsample, info, note.note[i], env, channel, i);
 				if (!status.pressed_notes || note.note[status.latest_note_index].start_time < note.note[i].start_time) {
 					status.latest_note_index = i;
 				}
@@ -162,7 +166,7 @@ EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsam
 		}
 	}
 	//Static sample
-	process_sample(lsample, rsample, info, env, status, device);
+	process_sample(lsample, rsample, info, env, status, channel, device);
 
 	return status;
 }
@@ -256,7 +260,7 @@ public:
 	ssize_t master_send = -1;
 
 	EngineStatus status = {};
-	double aftertouch = 0;
+	ChannelInfo info;
 
 	SoundEngineChannel();
 
@@ -432,7 +436,6 @@ private:
 	double first_beat_time = 0;
 
 public:
-	std::array<double, MIDI_CONTROL_COUNT> ccs;
 	KeyboardEnvironment env;
 
 	Metronome metronome;

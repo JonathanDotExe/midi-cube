@@ -131,7 +131,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				});
 			}
 			//Process
-			status = engine->process_sample(lsample, rsample, info, env, *device);
+			status = engine->process_sample(lsample, rsample, info, env, this->info, *device);
 			//Effects
 			for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 				effects[i].apply(lsample, rsample, info);
@@ -159,7 +159,7 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, KeyboardEn
 		}
 		//Aftertouch
 		if (message.type == MessageType::MONOPHONIC_AFTERTOUCH) {
-			aftertouch = message.monophonic_aftertouch()/127.0;
+			this->info.aftertouch = message.monophonic_aftertouch()/127.0;
 		}
 		//Note
 		if (arp.on) {
@@ -406,7 +406,6 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	//Global values
 	switch (message.type) {
 	case MessageType::MONOPHONIC_AFTERTOUCH:
-		//TODO aftertouch in sound engine channel
 		break;
 	case MessageType::POLYPHONIC_AFTERTOUCH:
 		break;
@@ -415,7 +414,7 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	case MessageType::NOTE_OFF:
 		break;
 	case MessageType::CONTROL_CHANGE:
-		ccs[message.control()] = message.value()/127.0;
+		env.ccs[message.control()] = message.value()/127.0;
 		//Sustain
 		if (message.control() == sustain_control) {
 			bool new_sustain = message.value() != 0;

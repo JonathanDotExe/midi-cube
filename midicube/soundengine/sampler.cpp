@@ -68,7 +68,7 @@ Sampler::Sampler() {
 	set_sample(global_sample_store.get_sound(0));
 }
 
-void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
+void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index) {
 	if (note.region && note.sample) {
 		double vol = 1;
 		double vel_amount = 0;

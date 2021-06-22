@@ -11,6 +11,7 @@
 #define ENVELOPE_FOLLOWER_BUFFER_SIZE 44100
 
 #include <array>
+#include "midi.h"
 #include "filter.h"
 #include "wavetable.h"
 #include "metronome.h"
@@ -33,6 +34,7 @@ struct KeyboardEnvironment {
 	double sustain_time = 0;
 	double sustain_release_time = 0;
 	double pitch_bend = 1;
+	std::array<double, MIDI_CONTROL_COUNT> ccs;
 };
 
 enum ADSREnvelopeShape {
