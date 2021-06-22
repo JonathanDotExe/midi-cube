@@ -146,7 +146,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	}
 }
 
-bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t scene) {
+bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, KeyboardEnvironment& env, size_t scene) {
 	bool updated = false;
 	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
 		//Effects
@@ -171,12 +171,12 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, size_t sce
 				arp.release_note(info, message.note());
 				break;
 			default:
-				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info) || updated; //FIXME
+				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env) || updated;
 				break;
 			}
 		}
 		else {
-			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info) || updated;
+			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env) || updated;
 		}
 	}
 	return updated;
@@ -401,6 +401,7 @@ void SoundEngineDevice::add_effect(EffectBuilder* effect) {
 bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& source, SampleInfo& info) {
 	size_t scene = this->scene;
 	bool updated = false;
+	double pitch;
 
 	//Global values
 	switch (message.type) {
@@ -439,7 +440,7 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	case MessageType::PROGRAM_CHANGE:
 		break;
 	case MessageType::PITCH_BEND:
-		double pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
+		pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
 		env.pitch_bend = note_to_freq_transpose(pitch);
 		break;
 	case MessageType::SYSEX:
@@ -507,7 +508,7 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 			break;
 		}
 		//Send
-		if (channel.send(message, info, scene)) {
+		if (channel.send(message, info, env, scene)) {
 			updated = true;
 		}
 	}

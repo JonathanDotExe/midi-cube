@@ -55,13 +55,13 @@ public:
 class SoundEngine {
 
 public:
-	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info) = 0;
+	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env) = 0;
 
 	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) = 0;
 
 	virtual void release_note(SampleInfo& info, unsigned int real_note) = 0;
 
-	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment env, SoundEngineDevice& device) = 0;
+	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, SoundEngineDevice& device) = 0;
 
 	virtual void apply_program(EngineProgram* prog) {
 
@@ -262,7 +262,7 @@ public:
 
 	void init_device(SoundEngineDevice* device);
 
-	bool send(MidiMessage& message, SampleInfo& info, size_t scene);
+	bool send(MidiMessage& message, SampleInfo& info, KeyboardEnvironment& env, size_t scene);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, KeyboardEnvironment& env, size_t scene);
 
