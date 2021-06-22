@@ -89,6 +89,16 @@ Scene SourceView::create(Frame &frame) {
 		y += 40;
 	}
 
+	//Channel
+	{
+		DragBox<int>* value = new DragBox<int>(0, 0, SOUND_ENGINE_MIDI_CHANNELS - 1, main_font, 18, 5, frame.get_height() - 45, 60, 40);
+		value->property.bind(frame.cube.used_sources, handler);
+		controls.push_back(value);
+
+		Label* label = new Label("Sources", main_font, 18, 70, frame.get_height() - 37);
+		controls.push_back(label);
+	}
+
 	//Exit Button
 	Button* exit = new Button("Back", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
 	exit->set_on_click([&frame]() {
