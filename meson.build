@@ -5,6 +5,7 @@ deps = [
 	dependency('rtaudio'),
 	dependency('rtmidi'),
 	dependency('sndfile'),
+	dependency('portaudio'),
 	dependency('sfml-system'),
 	dependency('sfml-window'),
 	dependency('sfml-graphics'),
