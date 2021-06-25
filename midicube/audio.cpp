@@ -19,14 +19,19 @@ int g_process(const void* input_buffer, void* output_buffer, long unsigned int b
 }
 
 void AudioHandler::init(int out_device, int in_device) {
-	const size_t device_count = Pa_GetDeviceCount();
-	if ((int) device_count <= std::max(std::max(out_device, in_device), 0)) {
-		throw AudioException("No audio devices detected");
+	PaError err;
+	err = Pa_Initialize();
+	if (err != paNoError) {
+		throw AudioException(Pa_GetErrorText(err));
 	}
+	const size_t device_count = Pa_GetDeviceCount();
 	//List devices
 	for (size_t i = 0; i < device_count; ++i) {
 		const PaDeviceInfo* info = Pa_GetDeviceInfo(i);
 		std::cout << i << ": " << info->name << " " << info->maxOutputChannels << " outs " << info->maxInputChannels<< " ins" << std::endl;
+	}
+	if ((int) device_count <= std::max(std::max(out_device, in_device), 0)) {
+		throw AudioException("No audio devices detected");
 	}
 
 	//Set up output
@@ -36,6 +41,7 @@ void AudioHandler::init(int out_device, int in_device) {
 	const PaDeviceInfo* out_info = Pa_GetDeviceInfo(params.device);
 	params.suggestedLatency = out_info->defaultLowOutputLatency;
 	params.channelCount = 2;
+	params.hostApiSpecificStreamInfo = nullptr;
 
 	//Set up input
 	PaStreamParameters input_params;
@@ -44,6 +50,7 @@ void AudioHandler::init(int out_device, int in_device) {
 	const PaDeviceInfo* in_info = Pa_GetDeviceInfo(input_params.device);
 	input_params.suggestedLatency = in_info->defaultLowInputLatency;
 	input_params.channelCount = 1;
+	input_params.hostApiSpecificStreamInfo = nullptr;
 
 	sample_rate = 44100;
 	time_step = 1.0/sample_rate;
@@ -60,15 +67,14 @@ void AudioHandler::init(int out_device, int in_device) {
 		std::cout << "Using no input device" << std::endl;
 	}
 
-	if (Pa_Initialize() != paNoError) {
-		throw AudioException("Couldn't init portaudio");
+	err = Pa_OpenStream(&stream, input ? &input_params : nullptr, &params, sample_rate, buffer_size, paClipOff, &g_process, this);
+	if (err != paNoError) {
+		throw AudioException(Pa_GetErrorText(err));
 	}
-	if (Pa_OpenStream(&stream, input ? &input_params : nullptr, &params, sample_rate, buffer_size, 0, &g_process, this) != paNoError) {
-		throw AudioException("Couldn't open stream");
-	}
-	PaAlsa_EnableRealtimeScheduling(&stream, 90);
-	if (Pa_StartStream(&stream) != paNoError) {
-		throw AudioException("Couldn't start stream");
+	//PaAlsa_EnableRealtimeScheduling(&stream, 90);
+	err = Pa_StartStream(&stream);
+	if (err != paNoError) {
+		throw AudioException(Pa_GetErrorText(err));
 	}
 
 	sample_rate = Pa_GetStreamInfo(stream)->sampleRate;
