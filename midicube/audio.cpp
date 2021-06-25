@@ -13,9 +13,9 @@
 #define _countof(arr) (sizeof(arr)/sizeof(arr[0]))
 #endif
 
-int g_process(void* output_buffer, void* input_buffer, unsigned int buffer_size, double time, RtAudioStreamStatus status, void* arg) {
+int g_process(const void* input_buffer, void* output_buffer, long unsigned int buffer_size, const PaStreamCallbackTimeInfo* time, PaStreamCallbackFlags status, void* arg) {
 	AudioHandler* handler = (AudioHandler*) arg;
-	return handler->process((double*) output_buffer, (double*) input_buffer, buffer_size, time);
+	return handler->process((const float*) output_buffer, (float*) input_buffer, buffer_size);
 }
 
 void AudioHandler::init(int out_device, int in_device) {
@@ -25,21 +25,23 @@ void AudioHandler::init(int out_device, int in_device) {
 	}
 	//List devices
 	for (size_t i = 0; i < device_count; ++i) {
-		PaDeviceInfo* info = Pa_GetDeviceInfo(i);
+		const PaDeviceInfo* info = Pa_GetDeviceInfo(i);
 		std::cout << i << ": " << info->name << " " << info->maxOutputChannels << " outs " << info->maxInputChannels<< " ins" << std::endl;
 	}
 
 	//Set up output
 	PaStreamParameters params;
 	params.device = out_device >= 0 ? out_device : Pa_GetDefaultOutputDevice();
-	PaDeviceInfo* out_info = Pa_GetDeviceInfo(params.device);
+	params.sampleFormat = paFloat32;
+	const PaDeviceInfo* out_info = Pa_GetDeviceInfo(params.device);
 	params.suggestedLatency = out_info->defaultLowOutputLatency;
 	params.channelCount = 2;
 
 	//Set up input
 	PaStreamParameters input_params;
 	input_params.device = in_device >= 0 ? in_device : Pa_GetDefaultInputDevice();
-	PaDeviceInfo* in_info = Pa_GetDeviceInfo(input_params.device);
+	input_params.sampleFormat = paFloat32;
+	const PaDeviceInfo* in_info = Pa_GetDeviceInfo(input_params.device);
 	input_params.suggestedLatency = in_info->defaultLowInputLatency;
 	input_params.channelCount = 1;
 
@@ -74,7 +76,7 @@ void AudioHandler::init(int out_device, int in_device) {
 	std::cout << "Opened audio stream Sample Rate: " << sample_rate << " Hz ... Buffer Size: " << buffer_size << std::endl;
 };
 
-int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned int buffer_size, double t) {
+int AudioHandler::process(const float* input_buffer, float* output_buffer, unsigned int buffer_size) {
 	SampleInfo info;
 	//Compute each sample
 	for (size_t i = 0; i < buffer_size; ++i) {

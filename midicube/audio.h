@@ -67,7 +67,7 @@ public:
 
 	void close();
 
-	int process(double* output_buffer, double* input_buffer, unsigned int buffer_size, double time);
+	int process(const float* output_buffer, float* input_buffer, unsigned int buffer_size);
 
 	SampleInfo sample_info();
 

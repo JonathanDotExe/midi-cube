@@ -2,10 +2,9 @@ project('midi-cube', 'cpp', default_options: ['cpp_std=c++17'])
 cxx = meson.get_compiler('cpp')
 
 deps = [
-	dependency('rtaudio'),
 	dependency('rtmidi'),
 	dependency('sndfile'),
-	dependency('portaudio'),
+	dependency('portaudio-2.0'),
 	dependency('sfml-system'),
 	dependency('sfml-window'),
 	dependency('sfml-graphics'),
