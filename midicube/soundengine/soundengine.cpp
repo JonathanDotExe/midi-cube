@@ -479,7 +479,7 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 		SoundEngineChannel& channel = channels[i];
 		ChannelSource& s = channel.scenes[scene].source;
 		//Flter
-		bool pass = false;
+		bool pass = true;
 		switch (message.type) {
 		case MessageType::NOTE_OFF:
 		case MessageType::POLYPHONIC_AFTERTOUCH:
