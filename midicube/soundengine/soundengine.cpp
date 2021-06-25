@@ -507,7 +507,7 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 			break;
 		}
 		//Send
-		if (channel.send(message, info, env, scene)) {
+		if (pass && channel.send(message, info, env, scene)) {
 			updated = true;
 		}
 	}
