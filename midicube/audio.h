@@ -39,7 +39,7 @@ struct SampleInfo {
 class AudioHandler {
 
 private:
-	PaStream *stream = nullptr;
+	PaStream *stream = NULL;
 	bool input = false;
 	void* user_data = nullptr;
 	void (* get_sample) (double&, double&, SampleInfo&, void*) = nullptr;

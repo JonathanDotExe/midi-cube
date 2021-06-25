@@ -19,10 +19,10 @@ int g_process(const void* input_buffer, void* output_buffer, long unsigned int b
 }
 
 void AudioHandler::init(int out_device, int in_device) {
-	PaError err;
-	err = Pa_Initialize();
-	if (err != paNoError) {
-		throw AudioException(Pa_GetErrorText(err));
+	PaError paerr;
+	paerr = Pa_Initialize();
+	if (paerr != paNoError) {
+		throw AudioException(Pa_GetErrorText(paerr));
 	}
 	const size_t device_count = Pa_GetDeviceCount();
 	//List devices
@@ -41,7 +41,7 @@ void AudioHandler::init(int out_device, int in_device) {
 	const PaDeviceInfo* out_info = Pa_GetDeviceInfo(params.device);
 	params.suggestedLatency = out_info->defaultLowOutputLatency;
 	params.channelCount = 2;
-	params.hostApiSpecificStreamInfo = nullptr;
+	params.hostApiSpecificStreamInfo = NULL;
 
 	//Set up input
 	PaStreamParameters input_params;
@@ -50,7 +50,7 @@ void AudioHandler::init(int out_device, int in_device) {
 	const PaDeviceInfo* in_info = Pa_GetDeviceInfo(input_params.device);
 	input_params.suggestedLatency = in_info->defaultLowInputLatency;
 	input_params.channelCount = 1;
-	input_params.hostApiSpecificStreamInfo = nullptr;
+	input_params.hostApiSpecificStreamInfo = NULL;
 
 	sample_rate = 44100;
 	time_step = 1.0/sample_rate;
@@ -67,17 +67,17 @@ void AudioHandler::init(int out_device, int in_device) {
 		std::cout << "Using no input device" << std::endl;
 	}
 
-	err = Pa_OpenStream(&stream, input ? &input_params : nullptr, &params, sample_rate, buffer_size, paClipOff, &g_process, this);
-	if (err != paNoError) {
-		throw AudioException(Pa_GetErrorText(err));
+	paerr = Pa_OpenStream(&this->stream, NULL, &params, sample_rate, buffer_size, paClipOff, &g_process, this);
+	if (paerr != paNoError) {
+		throw AudioException(Pa_GetErrorText(paerr));
 	}
-	//PaAlsa_EnableRealtimeScheduling(&stream, 90);
-	err = Pa_StartStream(&stream);
-	if (err != paNoError) {
-		throw AudioException(Pa_GetErrorText(err));
+	PaAlsa_EnableRealtimeScheduling(stream, 90);
+	paerr = Pa_StartStream(this->stream);
+	if (paerr != paNoError) {
+		throw AudioException(Pa_GetErrorText(paerr));
 	}
 
-	sample_rate = Pa_GetStreamInfo(stream)->sampleRate;
+	sample_rate = Pa_GetStreamInfo(this->stream)->sampleRate;
 	time_step = 1.0/sample_rate;
 	std::cout << "Opened audio stream Sample Rate: " << sample_rate << " Hz ... Buffer Size: " << buffer_size << std::endl;
 };
