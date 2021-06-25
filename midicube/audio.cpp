@@ -15,7 +15,7 @@
 
 int g_process(const void* input_buffer, void* output_buffer, long unsigned int buffer_size, const PaStreamCallbackTimeInfo* time, PaStreamCallbackFlags status, void* arg) {
 	AudioHandler* handler = (AudioHandler*) arg;
-	return handler->process((const float*) output_buffer, (float*) input_buffer, buffer_size);
+	return handler->process((const float*) input_buffer, (float*) output_buffer, buffer_size);
 }
 
 void AudioHandler::init(int out_device, int in_device) {
@@ -67,7 +67,7 @@ void AudioHandler::init(int out_device, int in_device) {
 		std::cout << "Using no input device" << std::endl;
 	}
 
-	paerr = Pa_OpenStream(&this->stream, NULL, &params, sample_rate, buffer_size, paClipOff, &g_process, this);
+	paerr = Pa_OpenStream(&this->stream, input ? &input_params : NULL, &params, sample_rate, buffer_size, paClipOff, &g_process, this);
 	if (paerr != paNoError) {
 		throw AudioException(Pa_GetErrorText(paerr));
 	}
