@@ -54,7 +54,7 @@ void AudioHandler::init(int out_device, int in_device) {
 
 	sample_rate = 44100;
 	time_step = 1.0/sample_rate;
-	buffer_size = 256;
+	buffer_size = 64;
 
 	input = in_device >= 0;
 
@@ -100,7 +100,7 @@ int AudioHandler::process(const float* input_buffer, float* output_buffer, unsig
 		this->time += time_step;
 		++sample_time;
 	}
-	return 0;
+	return paContinue;
 };
 
 void AudioHandler::close() {
