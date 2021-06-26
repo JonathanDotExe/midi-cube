@@ -478,7 +478,7 @@ void SfzSampleConverter::convert() {
 		text += t + "\n";
 	}
 
-	SfzInstrument instrument = parser.parse(text);
+	SfzInstrument instrument = parser.parse(text, dst);
 	std::cout << "Loaded instrument" << std::endl;
 	pt::ptree tree;
 	//Name

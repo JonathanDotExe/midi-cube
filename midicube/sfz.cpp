@@ -9,6 +9,8 @@
 #include <boost/algorithm/string.hpp>
 #include <regex>
 #include <iostream>
+#include <fstream>
+#include <streambuf>
 
 unsigned int parse_sfz_note(std::string text) {
 	unsigned int note = 0;
@@ -76,7 +78,7 @@ enum ParserMode {
 	NONE, GLOBAL, GROUP, REGION
 };
 
-SfzInstrument SfzParser::parse(std::string text) {
+SfzInstrument SfzParser::parse(std::string text, std::string path) {
 	SfzInstrument instrument;
 	boost::replace_all(text, "\r", "");
 	std::vector<std::string> lines = {};
@@ -97,6 +99,22 @@ SfzInstrument SfzParser::parse(std::string text) {
 			//Define
 			if (t.size() >= 3 && t[0] == "#define") {
 				defines[t[1]] = t[2];
+			}
+			//Include
+			else if (t.size() >= 2 && t[0] == "#include") {
+				std::string file = t[1];
+				for (size_t i = 2; i < t.size(); ++i) {
+					file += " " + t[i];
+				}
+				boost::replace_all(file, "\"", "");
+
+				//Load file
+				std::string filename = path + "/" + file;
+				std::fstream f(filename);
+				std::string t;
+				while (getline(f, t)) {
+					lines.insert(lines.begin() + i + 1, t);
+				}
 			}
 			else {
 				//Add tokens
