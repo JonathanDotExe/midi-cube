@@ -481,13 +481,13 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 		//Flter
 		bool pass = true;
 		switch (message.type) {
+		case MessageType::NOTE_OFF:
+			break;
 		case MessageType::POLYPHONIC_AFTERTOUCH:
 			pass = message.note() >= s.start_note && message.note() <= s.end_note;
 			/* no break */
 		case MessageType::NOTE_ON:
 			pass = pass && message.velocity() >= s.start_velocity && message.velocity() <= s.end_velocity;
-			/* no break */
-		case MessageType::NOTE_OFF:
 			break;
 		case MessageType::MONOPHONIC_AFTERTOUCH:
 			pass = s.transfer_channel_aftertouch;
