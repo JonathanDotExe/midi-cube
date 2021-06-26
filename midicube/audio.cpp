@@ -67,7 +67,7 @@ void AudioHandler::init(int out_device, int in_device) {
 		std::cout << "Using no input device" << std::endl;
 	}
 
-	paerr = Pa_OpenStream(&this->stream, input ? &input_params : NULL, &params, sample_rate, buffer_size, paClipOff, &g_process, this);
+	paerr = Pa_OpenStream(&this->stream, input ? &input_params : NULL, &params, sample_rate, buffer_size, paNoFlag, &g_process, this);
 	if (paerr != paNoError) {
 		throw AudioException(Pa_GetErrorText(paerr));
 	}
