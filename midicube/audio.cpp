@@ -28,7 +28,7 @@ void AudioHandler::init(int out_device, int in_device) {
 	//List devices
 	for (size_t i = 0; i < device_count; ++i) {
 		const PaDeviceInfo* info = Pa_GetDeviceInfo(i);
-		std::cout << i << ": " << info->name << " " << info->maxOutputChannels << " outs " << info->maxInputChannels<< " ins" << std::endl;
+		std::cout << i << ": " << info->name << " " << info->maxOutputChannels << " outs " << info->maxInputChannels<< " ins " << Pa_GetHostApiInfo(info->hostApi)->name << std::endl;
 	}
 	if ((int) device_count <= std::max(std::max(out_device, in_device), 0)) {
 		throw AudioException("No audio devices detected");
