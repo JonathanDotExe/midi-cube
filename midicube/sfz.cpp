@@ -83,18 +83,20 @@ SfzInstrument SfzParser::parse(std::string text) {
 	boost::split(lines, text, boost::is_any_of("\n"));
 
 	std::vector<std::string> tokens = {};
+	std::unordered_map<std::string, std::string> defines;
 	//Remove comments
 	size_t i = 0;
 	for (std::string line : lines) {
 		if (line.rfind("//", 0) != 0) {
+			//Apply defines
+			for (auto pair : defines) {
+				boost::replace_all(line, pair.first, pair.second);
+			}
 			std::vector<std::string> t = {};
 			boost::split(t, line, boost::is_any_of(" "));
 			//Define
 			if (t.size() >= 3 && t[0] == "#define") {
-				//Replace
-				for (size_t j = i + 1; j < lines.size(); ++j) {
-					boost::replace_all(lines[j], t[1], t[2]);
-				}
+				defines[t[1]] = t[2];
 			}
 			else {
 				//Add tokens
