@@ -20,6 +20,7 @@ Scene SceneView::create(Frame &frame) {
 	controls.push_back(bg);
 
 	this->engine = &frame.cube.engine;
+	this->handler = &frame.cube.action_handler;
 
 	//Scenes
 	int rows = 2;
@@ -32,17 +33,10 @@ Scene SceneView::create(Frame &frame) {
 		int y = 10 + pane_height * (i / cols);
 		//Engine
 		Button* scene = new Button("Scene " + std::to_string(i + 1), main_font, 32, x, y,  pane_width - 5, pane_height - 5);
-		if (this->engine->scene == i) {
-			scene->rect.setFillColor(sf::Color(0, 180, 255));
-		}
-		else {
-			scene->rect.setFillColor(sf::Color(200, 200, 200));
-		}
 		scene->set_on_click([&frame, this, i]() {
 			//Change scene
-			scenes[this->engine->scene]->rect.setFillColor(sf::Color(200, 200, 200));
-			this->engine->scene = i;
-			scenes[i]->rect.setFillColor(sf::Color(0, 180, 255));
+			handler->queue_action(new SetValueAction<size_t, size_t>(this->engine->scene, i));
+			this->update_properties();
 		});
 
 		scenes[i] = scene;
@@ -65,4 +59,17 @@ Scene SceneView::create(Frame &frame) {
 
 SceneView::~SceneView() {
 
+}
+
+void SceneView::update_properties() {
+	handler->queue_action(new GetValueAction<size_t, size_t>(this->engine->scene, [this](size_t s) {
+		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
+			if (s == i) {
+				scenes[i]->rect.setFillColor(sf::Color(0, 180, 255));
+			}
+			else {
+				scenes[i]->rect.setFillColor(sf::Color(200, 200, 200));
+			}
+		}
+	}));
 }
