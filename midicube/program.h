@@ -64,6 +64,18 @@ enum ProgramManagerProperty {
 	pProgramManagerProgram,
 };
 
+struct ProgramManagerInfo {
+	size_t curr_bank = 0;
+	size_t curr_program = 0;
+	size_t bank_count = 0;
+	size_t curr_program_count = 0;
+	std::string bank_name = "";
+	std::string program_name = "";
+	std::string curr_bank_name = "";
+	std::string curr_program_name = "";
+	std::vector<std::string> program_names = {};
+};
+
 class ProgramManager {
 private:
 	std::string path;
@@ -79,7 +91,7 @@ public:
 
 	ProgramManager(std::string path, ActionHandler& h);
 
-	//Mutex has to be locked by user
+	//Audio thread only
 	size_t bank_count() {
 		return banks.size();
 	}
@@ -96,6 +108,22 @@ public:
 	//Audio thread only
 	void overwrite_bank();
 
+	ProgramManagerInfo get_info() {
+		ProgramManagerInfo info;
+		info.curr_bank = curr_bank;
+		info.curr_program = curr_program;
+		info.bank_count = banks.size();
+		info.curr_program_count = get_curr_bank()->programs.size();
+		info.bank_name = bank_name;
+		info.program_name = program_name;
+		info.curr_bank_name = get_curr_bank()->name;
+		info.curr_program_name = get_curr_bank()->programs.at(curr_program)->name;
+		for (Program* program : get_curr_bank()->programs) {
+			info.program_names.push_back(program->name);
+		}
+		return info;
+	}
+
 	//On intializiation
 	bool init_user(ProgramUser* user) {
 		bool success = false;
@@ -105,19 +133,19 @@ public:
 		}
 		return success;
 	}
-	//Mutex has to be locked by user
+	//Audio thread only
 	Bank* get_bank(size_t bank) {
 		return banks.at(bank);
 	}
-	//Mutex has to be locked by user
+	//Audio thread only
 	Bank* get_curr_bank() {
 		return get_bank(curr_bank);
 	}
-	//Mutex has to be locked by user
+	//Audio thread only
 	size_t get_curr_bank_index() {
 		return curr_bank;
 	}
-	//Mutex has to be locked by user
+	//Audio thread only
 	size_t get_curr_program_index() {
 		return curr_program;
 	}
