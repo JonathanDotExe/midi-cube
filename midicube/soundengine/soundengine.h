@@ -190,6 +190,8 @@ struct ChannelSource {
 
 struct SoundEngineScene {
 	bool active = false;
+	bool sustain = true;
+	bool pitch_bend = true;
 	ChannelSource source;
 };
 

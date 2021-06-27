@@ -114,17 +114,25 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	}
 }
 
-void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, KeyboardEnvironment& env, size_t scene) {
+void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, KeyboardEnvironment& e, size_t scene) {
 	//Properties
 	if (engine) {
 		SoundEngineScene& s = scenes[scene];
+		//Pitch and Sustain
+		KeyboardEnvironment env = e;
+		if (!s.sustain) {
+			env.sustain = false;
+		}
+		if (!s.pitch_bend) {
+			env.pitch_bend = 1;
+		}
 
 		if (s.active || status.pressed_notes) {
 			//Arpeggiator
 			if (arp.on) {
 				arp.apply(info, device->metronome,
-				[this, scene](SampleInfo& i, unsigned int note, double velocity) {
-					engine->press_note(i, note, note + scenes[scene].source.octave * 12, velocity);
+				[this, s](SampleInfo& i, unsigned int note, double velocity) {
+					engine->press_note(i, note, note + s.source.octave * 12, velocity);
 				},
 				[this](SampleInfo& i, unsigned int note) {
 					engine->release_note(i, note);
