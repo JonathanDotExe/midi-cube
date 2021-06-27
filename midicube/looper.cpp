@@ -43,15 +43,15 @@ void Looper::apply(double& lsample, double& rsample, Metronome& metronome, Sampl
 	if (active) {
 		double l = lsample;
 		double r = rsample;
-		if (solo_channel >= 0) {
-			channels[record_channel].apply(lsample, rsample, metronome, info);
+		if (solo_channel >= 0 && solo_channel < LOOPER_CHANNELS) {
+			channels[solo_channel].apply(lsample, rsample, metronome, info);
 		}
 		else {
 			for (size_t i = 0; i < LOOPER_CHANNELS; ++i) {
 				channels[i].apply(lsample, rsample, metronome, info);
 			}
 		}
-		if (record_channel >= 0) {
+		if (record_channel >= 0 && record_channel < LOOPER_CHANNELS) {
 			channels[record_channel].record(l, r, metronome, info);
 		}
 	}
