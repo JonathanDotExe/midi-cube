@@ -72,47 +72,37 @@ private:
 	std::vector<Bank*> banks;
 	ActionHandler& handler;
 	ProgramUser* user = nullptr;
-	std::mutex mutex;
 
 public:
 	std::string bank_name = "";
 	std::string program_name = "";
 
 	ProgramManager(std::string path, ActionHandler& h);
-	inline void lock() {
-		mutex.lock();
-	}
-	inline void unlock() {
-		mutex.unlock();
-	}
+
 	//Mutex has to be locked by user
 	size_t bank_count() {
 		return banks.size();
 	}
-	//Mutex has to be locked by user
+
 	void apply_program(size_t bank, size_t program);
+	//Audio thread only
 	void apply_program_direct(size_t bank, size_t program);
-	//Mutex has to be locked by user
 	void delete_program();
-	//Mutex has to be locked by user
 	void save_new_program();
-	//Mutex has to be locked by user
 	void save_init_program();
-	//Mutex has to be locked by user
 	void overwrite_program();
-	//Mutex has to be locked by user
+	//Audio thread only
 	void save_new_bank();
-	//Mutex has to be locked by user
+	//Audio thread only
 	void overwrite_bank();
 
+	//On intializiation
 	bool init_user(ProgramUser* user) {
 		bool success = false;
-		lock();
 		if (!this->user) {
 			this->user = user;
 			success = true;
 		}
-		unlock();
 		return success;
 	}
 	//Mutex has to be locked by user

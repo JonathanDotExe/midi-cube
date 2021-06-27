@@ -18,6 +18,7 @@ MidiCube::MidiCube() : prog_mgr("./data/programs", action_handler) {
 }
 
 void MidiCube::init(int out_device, int in_device) {
+	std::cout << "Loading samples" << std::endl;
 	global_sample_store.load_sounds("./data/samples");
 	//Sound Engines
 	fill_sound_engine_device(&engine);
@@ -45,12 +46,14 @@ void MidiCube::init(int out_device, int in_device) {
 		engine.channels[i].scenes[0].source.input = 1;
 	}
 	//Load programs
+	std::cout << "Loading programs" << std::endl;
 	prog_mgr.init_user(this);
 	prog_mgr.load_all();
 	prog_mgr.apply_program_direct(0, 0);
 
 	//MIDI Inputs
 	//Input-Devices
+	std::cout << "Initializing " << std::endl;
 	MidiInput input_dummy;
 	size_t n_ports = input_dummy.available_ports();
 	for (size_t i = 0; i < n_ports; ++i) {
@@ -123,13 +126,12 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 }
 
 MidiCube::~MidiCube() {
-	//Load programs
-	prog_mgr.save_all();
 	audio_handler.close();
 	for (MidiCubeInput in : inputs) {
 		delete in.in;
 	}
 	inputs.clear();
+	prog_mgr.save_all();
 }
 
 void MidiCube::save_program(Program *prog) {

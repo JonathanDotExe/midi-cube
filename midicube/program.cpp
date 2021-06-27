@@ -312,7 +312,6 @@ void ProgramManager::apply_program(size_t bank, size_t program) {
 }
 
 void ProgramManager::apply_program_direct(size_t bank, size_t program) {
-	lock();
 	Bank* b = get_bank(bank);
 	Program* prog = b->programs.at(program);
 	user->apply_program(prog);
@@ -320,13 +319,11 @@ void ProgramManager::apply_program_direct(size_t bank, size_t program) {
 	curr_program = program;
 	program_name = prog->name;
 	bank_name = b->name;
-	unlock();
 }
 
 
 void ProgramManager::delete_program() {
 	handler.queue_action(new FunctionAction([this]() {
-		lock();
 		//Delete
 		Bank* bank = get_curr_bank();
 		bank->programs.erase(bank->programs.begin() + curr_program);
@@ -341,13 +338,11 @@ void ProgramManager::delete_program() {
 		Program* prog = bank->programs.at(curr_program);
 		user->apply_program(prog);
 		program_name = prog->name;
-		unlock();
 	}));
 }
 
 void ProgramManager::save_new_program() {
 	handler.queue_action(new FunctionAction([this]() {
-		lock();
 		Bank* bank = get_curr_bank();
 		Program* prog = new Program();
 		prog->name = program_name;
@@ -355,13 +350,11 @@ void ProgramManager::save_new_program() {
 		user->save_program(prog);
 		bank->programs.push_back(prog);
 		curr_program = bank->programs.size() - 1;
-		unlock();
 	}));
 }
 
 void ProgramManager::save_init_program() {
 	handler.queue_action(new FunctionAction([this]() {
-		lock();
 		Bank* bank = get_curr_bank();
 		Program* prog = new Program();
 		prog->name = program_name;
@@ -369,18 +362,15 @@ void ProgramManager::save_init_program() {
 		user->apply_program(prog);
 		bank->programs.push_back(prog);
 		curr_program = bank->programs.size() - 1;
-		unlock();
 	}));
 }
 
 void ProgramManager::overwrite_program() {
 	handler.queue_action(new FunctionAction([this]() {
-		lock();
 		Program* prog = get_bank(curr_bank)->programs.at(curr_program);
 
 		prog->name = program_name;
 		user->save_program(prog);
-		unlock();
 	}));
 }
 
@@ -404,7 +394,6 @@ void ProgramManager::overwrite_bank() {
 }
 
 void ProgramManager::load_all() {
-	lock();
 	boost::filesystem::create_directory(path);
 	std::regex reg(".*\\.xml");
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
@@ -425,11 +414,9 @@ void ProgramManager::load_all() {
 		bank->programs.push_back(new Program{"Init"});
 		banks.push_back(bank);
 	}
-	unlock();
 }
 
 void ProgramManager::save_all() {
-	lock();
 	std::vector<std::string> filenames;
 	for (auto b : banks) {
 		while (std::find(filenames.begin(), filenames.end(), b->filename) != filenames.end()) {
@@ -438,15 +425,12 @@ void ProgramManager::save_all() {
 		save_bank(*b, path + "/" + b->filename + ".xml");
 		filenames.push_back(b->filename);
 	}
-	unlock();
 }
 
 ProgramManager::~ProgramManager() {
-	lock();
 	for (auto b : banks) {
 		delete b;
 	}
 	banks.clear();
-	unlock();
 }
 
