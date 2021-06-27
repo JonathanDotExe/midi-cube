@@ -205,7 +205,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Pitch
 	{
 		tmp_y += 20;
-		CheckBox* pitch = new CheckBox(true, "Pitch", main_font, 18, 630, tmp_y, 40, 40);
+		CheckBox* pitch = new CheckBox(true, "Bender", main_font, 18, 630, tmp_y, 40, 40);
 		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_pitch_bend, &channel), std::bind(&SoundEngineChannel::set_transfer_pitch_bend, &channel, std::placeholders::_1), handler);
 		tmp_y += 40;
 		controls.push_back(pitch);
@@ -223,7 +223,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Aftertouch
 	{
 		tmp_y += 5;
-		CheckBox* cc = new CheckBox(true, "Aftertouch", main_font, 18, 780, tmp_y, 40, 40);
+		CheckBox* cc = new CheckBox(true, "Aftertouch", main_font, 18, 790, tmp_y, 40, 40);
 		cc->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_channel_aftertouch, &channel), std::bind(&SoundEngineChannel::set_transfer_channel_aftertouch, &channel, std::placeholders::_1), handler);
 		tmp_y += 40;
 		controls.push_back(cc);
@@ -231,10 +231,28 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Other
 	{
 		tmp_y += 20;
-		CheckBox* pitch = new CheckBox(true, "Other", main_font, 18, 780, tmp_y, 40, 40);
+		CheckBox* pitch = new CheckBox(true, "Other", main_font, 18, 790, tmp_y, 40, 40);
 		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_other, &channel), std::bind(&SoundEngineChannel::set_transfer_other, &channel, std::placeholders::_1), handler);
 		tmp_y += 40;
 		controls.push_back(pitch);
+	}
+
+	//Sustain
+	{
+		tmp_y += 20;
+		CheckBox* sustain = new CheckBox(true, "Sustain", main_font, 18, 790, tmp_y, 40, 40);
+		sustain->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_sustain, &channel), std::bind(&SoundEngineChannel::set_sustain, &channel, std::placeholders::_1), handler);
+		tmp_y += 40;
+		controls.push_back(sustain);
+	}
+
+	//Pitch Bend
+	{
+		tmp_y += 20;
+		CheckBox* pitch_bend = new CheckBox(true, "Pitch Bend", main_font, 18, 790, tmp_y, 40, 40);
+		pitch_bend->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_pitch_bend, &channel), std::bind(&SoundEngineChannel::set_pitch_bend, &channel, std::placeholders::_1), handler);
+		tmp_y += 40;
+		controls.push_back(pitch_bend);
 	}
 
 	tmp_y = zone_y;

@@ -327,6 +327,14 @@ public:
 
 	void set_transfer_prog_change(bool transferProgChange = true);
 
+	bool is_sustain() const;
+
+	void set_sustain(bool sustain = true);
+
+	bool is_pitch_bend() const;
+
+	void set_pitch_bend(bool pitch_bend = true);
+
 	bool is_active() const;
 
 	void set_active(bool active = false);

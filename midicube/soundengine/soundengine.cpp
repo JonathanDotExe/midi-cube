@@ -635,3 +635,19 @@ SoundEngineDevice::~SoundEngineDevice() {
 	}
 	effect_builders.clear();
 }
+
+bool SoundEngineChannel::is_sustain() const {
+	return scenes[device->scene].sustain;
+}
+
+void SoundEngineChannel::set_sustain(bool sustain) {
+	scenes[device->scene].sustain = sustain;
+}
+
+bool SoundEngineChannel::is_pitch_bend() const {
+	return scenes[device->scene].pitch_bend;
+}
+
+void SoundEngineChannel::set_pitch_bend(bool pitch_bend) {
+	scenes[device->scene].pitch_bend = pitch_bend;
+}
