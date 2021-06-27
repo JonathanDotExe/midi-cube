@@ -95,8 +95,9 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 
 inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	SampleInfo info = audio_handler.sample_info();
+	size_t s = std::min((size_t) SOUND_ENGINE_MIDI_CHANNELS, used_sources);
 	//Sources
-	for (size_t i = 0; i < used_sources; ++i) {
+	for (size_t i = 0; i < s; ++i) {
 		MidiSource& source = sources[i];
 		if (source.device >= 0 && static_cast<unsigned int>(source.device) == input && (source.channel < 0 || static_cast<unsigned int>(source.channel) == message.channel)) {
 			//Filter

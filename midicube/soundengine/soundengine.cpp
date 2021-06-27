@@ -407,7 +407,6 @@ void SoundEngineDevice::add_effect(EffectBuilder* effect) {
 }
 
 bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& source, SampleInfo& info) {
-	size_t scene = this->scene;
 	bool updated = false;
 	double pitch;
 
@@ -596,9 +595,9 @@ void SoundEngineDevice::save_program(Program* program) {
 		}
 		prog.send_master = ch.master_send;
 		//Effects
-		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
-			InsertEffectProgram& p = prog.effects[i];
-			InsertEffect& effect = ch.effects[i];
+		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
+			InsertEffectProgram& p = prog.effects[j];
+			InsertEffect& effect = ch.effects[j];
 
 			p.effect = effect.get_effect_index();
 			if (effect.get_effect()) {
