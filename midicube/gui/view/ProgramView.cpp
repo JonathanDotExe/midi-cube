@@ -17,16 +17,17 @@ ProgramView::ProgramView(size_t bank, size_t page) {
 Scene ProgramView::create(Frame &frame) {
 	std::vector<Control*> controls;
 
-	ActionHandler& handler = frame.cube.action_handler;
 	ProgramManager* prog_mgr = &frame.cube.prog_mgr;
 
-	handler.queue_action(new GetFunctionAction<ProgramManagerInfo, ProgramManagerInfo>(std::bind(&ProgramManager::get_info, prog_mgr), [&frame, this, prog_mgr](ProgramManagerInfo info) {
+	prog_mgr->lock();
+	{
 		int rows = PROGRAM_VIEW_ROWS;
 		int cols = PROGRAM_VIEW_COLS;
 
 		//Adjust values
-		bank = std::min(std::max((size_t) 0, (size_t) bank), (size_t) info.bank_count - 1);
-		page = std::min(std::max((size_t) 0, (size_t) page), (size_t) ceil((double) info.curr_program_count/(rows * cols)));
+		bank = std::min(std::max((size_t) 0, (size_t) bank), (size_t) prog_mgr->bank_count() - 1);
+		Bank* bank = prog_mgr->get_bank(this->bank);
+		page = std::min(std::max((size_t) 0, (size_t) page), (size_t) ceil((double) bank->programs.size()/(rows * cols)));
 
 		//Background
 		Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -37,7 +38,7 @@ Scene ProgramView::create(Frame &frame) {
 
 
 		//Title
-		Label* title = new Label(info.curr_bank_name + " - Page " + std::to_string(page + 1), main_font, 24, 10, 10);
+		Label* title = new Label(bank->name + " - Page " + std::to_string(page + 1), main_font, 24, 10, 10);
 		controls.push_back(title);
 
 		//Programs
@@ -45,9 +46,9 @@ Scene ProgramView::create(Frame &frame) {
 		int pane_height = pane_width;
 
 		const size_t start = page * rows * cols;
-		const size_t size = std::min((size_t) (info.curr_program_count - start), (size_t) (rows * cols));
+		const size_t size = std::min((size_t) (bank->programs.size() - start), (size_t) (rows * cols));
 		for (size_t i = 0; i < size; ++i) {
-			//Program* prog = bank->programs[start + i];
+			Program* prog = bank->programs[start + i];
 
 			int x = 10 + pane_width * (i % cols);
 			int y = 50 + pane_height * (i / cols);
@@ -62,7 +63,9 @@ Scene ProgramView::create(Frame &frame) {
 			}
 			controls.push_back(button);
 			button->set_on_click([i, start, prog_mgr, &frame, this]() {
+				prog_mgr->lock();
 				prog_mgr->apply_program(this->bank, start + i);
+				prog_mgr->unlock();
 				frame.change_view(new ProgramView(this->bank, page));
 			});
 		}
@@ -190,8 +193,8 @@ Scene ProgramView::create(Frame &frame) {
 		});
 		back->rect.setFillColor(sf::Color::Yellow);
 		controls.push_back(back);
-	}));
-
+	}
+	prog_mgr->unlock();
 
 	return {controls};
 }
