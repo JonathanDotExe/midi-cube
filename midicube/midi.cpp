@@ -101,7 +101,10 @@ MidiHandler::~MidiHandler() {
 MidiInput::MidiInput() : MidiHandler::MidiHandler(), midiin(
 	#ifdef MIDICUBE_USE_JACK
 		RtMidi::Api::UNIX_JACK
+	#else
+		RtMidi::Api::UNSPECIFIED
 	#endif
+	, "RtMidi Client", 256
 ) {
 }
 

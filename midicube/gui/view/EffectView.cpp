@@ -40,6 +40,7 @@ void create_cc_control(MidiControlHandler& m, ActionHandler& handler, void* fiel
 }
 
 Scene EffectView::create(Frame &frame) {
+	frame.cube.lock.lock();
 	std::vector<Control*> controls;
 
 	ActionHandler &handler = frame.cube.action_handler;
@@ -1984,5 +1985,6 @@ Scene EffectView::create(Frame &frame) {
 		control->set_visible(!this->edit_midi);
 	}
 
+	frame.cube.lock.unlock();
 	return {controls};
 }
