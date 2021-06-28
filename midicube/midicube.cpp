@@ -76,21 +76,22 @@ void MidiCube::init(int out_device, int in_device) {
 }
 
 void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
-	lock.lock(); //TODO use try_lock
-	//Lock actions
-	action_handler.execute_realtime_actions();
-	//Messages
-	size_t i = 0;
-	for (MidiCubeInput in : inputs) {
-		MidiMessage msg;
-		while (in.in->read(&msg)) {
-			process_midi(msg, i);
+	if (lock.try_lock()) {
+		//Lock actions
+		action_handler.execute_realtime_actions();
+		//Messages
+		size_t i = 0;
+		for (MidiCubeInput in : inputs) {
+			MidiMessage msg;
+			while (in.in->read(&msg)) {
+				process_midi(msg, i);
+			}
+			++i;
 		}
-		++i;
+		//Process
+		engine.process_sample(lsample, rsample, info);
+		lock.unlock();
 	}
-	//Process
-	engine.process_sample(lsample, rsample, info);
-	lock.unlock();
 }
 
 std::vector<MidiCubeInput> MidiCube::get_inputs() {
