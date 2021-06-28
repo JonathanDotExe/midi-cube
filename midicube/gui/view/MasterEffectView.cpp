@@ -62,10 +62,12 @@ Scene MasterEffectView::create(Frame &frame) {
 		//Edit
 		Button* edit_effect = new Button("Edit", main_font, 12, x + 5, y + 65, pane_width - 15, 30);
 		edit_effect->set_on_click([this, &frame, i, &effect]() {
+			frame.cube.lock.lock();
 			Effect* eff = effect.get_effect();
 			if (eff) {
 				frame.change_view(new EffectView(eff, []() { return new MasterEffectView(); }));
 			}
+			frame.cube.lock.unlock();
 		});
 		controls.push_back(edit_effect);
 

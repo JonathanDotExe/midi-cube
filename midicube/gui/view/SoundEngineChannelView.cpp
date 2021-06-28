@@ -62,11 +62,13 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		ssize_t engine_index = channel.get_engine_index();
 		if (engine_index >= 0) {
 			std::string name = frame.cube.engine.get_engine_builders().at(engine_index)->get_name();
+			frame.cube.lock.lock();
 			SoundEngine& en = *channel.get_engine();
 			ViewController* view = create_view_for_engine(name, en, channel, channel_index);
 			if (view) {
 				frame.change_view(view);
 			}
+			frame.cube.lock.unlock();
 		}
 	});
 	controls.push_back(edit_engine);
