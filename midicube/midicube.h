@@ -12,7 +12,7 @@
 #include "program.h"
 #include "data.h"
 #include "soundengine/soundengine.h"
-#include <mutex>
+#include <boost/smart_ptr/detail/spinlock.hpp>
 
 struct MidiCubeInput {
 	MidiInput* in = nullptr;
@@ -38,6 +38,8 @@ public:
 	SoundEngineDevice engine;
 	ActionHandler action_handler;
 	std::atomic<bool> updated{false};
+
+	boost::detail::spinlock lock;
 
 	virtual void save_program(Program *prog);
 	virtual void apply_program(Program *prog);

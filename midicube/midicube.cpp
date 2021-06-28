@@ -18,6 +18,7 @@ MidiCube::MidiCube() : prog_mgr("./data/programs", action_handler) {
 }
 
 void MidiCube::init(int out_device, int in_device) {
+	lock.lock();
 	global_sample_store.load_sounds("./data/samples");
 	//Sound Engines
 	fill_sound_engine_device(&engine);
@@ -71,9 +72,11 @@ void MidiCube::init(int out_device, int in_device) {
 	srand(time(NULL));
 	//Init audio
 	audio_handler.init(out_device, in_device);
+	lock.unlock();
 }
 
 void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
+	lock.lock(); //TODO use try_lock
 	//Lock actions
 	action_handler.execute_realtime_actions();
 	//Messages
@@ -87,6 +90,7 @@ void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 	}
 	//Process
 	engine.process_sample(lsample, rsample, info);
+	lock.unlock();
 }
 
 std::vector<MidiCubeInput> MidiCube::get_inputs() {
@@ -124,6 +128,7 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 }
 
 MidiCube::~MidiCube() {
+	lock.lock();
 	//Load programs
 	prog_mgr.save_all();
 	audio_handler.close();
@@ -131,6 +136,7 @@ MidiCube::~MidiCube() {
 		delete in.in;
 	}
 	inputs.clear();
+	lock.unlock();
 }
 
 void MidiCube::save_program(Program *prog) {
