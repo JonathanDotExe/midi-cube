@@ -12,6 +12,7 @@
 #include <functional>
 #include <iostream>
 #include "boost/lockfree/spsc_queue.hpp"
+#include <boost/smart_ptr/detail/spinlock.hpp>
 
 
 class Action {
@@ -202,6 +203,20 @@ public:
 		};
 		set_func = [set, &handler](T t) {
 			handler.queue_action(new SetFunctionAction<E, T>(set, t));
+		};
+	}
+
+	template <typename E>
+	void bind_function(std::function<E ()> get, std::function<void (E)> set, boost::detail::spinlock& lock) {
+		get_func = [get, &lock](std::function<void (T)> callback) {
+			lock.lock();
+			callback(get());
+			lock.unlock();
+		};
+		set_func = [set, &lock](T t) {
+			lock.lock();
+			set(t);
+			lock.unlock();
 		};
 	}
 

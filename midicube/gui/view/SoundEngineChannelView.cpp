@@ -52,7 +52,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Engine
 	ComboBox* engine = new ComboBox(0, engine_names, main_font, 24, -1, 10, 45, 300, 80);
 	engine->rect.setFillColor(sf::Color(0, 180, 255));
-	engine->property.bind_function<ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), std::bind(&SoundEngineChannel::set_engine_index, &channel, std::placeholders::_1), handler);
+	engine->property.bind_function<ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), std::bind(&SoundEngineChannel::set_engine_index, &channel, std::placeholders::_1), frame.cube.lock);
 	controls.push_back(engine);
 
 	//Edit
@@ -83,7 +83,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		//Effect
 		ComboBox* effect = new ComboBox(0, effect_names, main_font, 18, -1, 10, tmp_y, 200, 60);
 		effect->rect.setFillColor(sf::Color(128, 255, 255));
-		effect->property.bind_function<ssize_t>(std::bind(&InsertEffect::get_effect_index, &channel.effects[i]), std::bind(&InsertEffect::set_effect_index, &channel.effects[i], std::placeholders::_1), handler);
+		effect->property.bind_function<ssize_t>(std::bind(&InsertEffect::get_effect_index, &channel.effects[i]), std::bind(&InsertEffect::set_effect_index, &channel.effects[i], std::placeholders::_1), frame.cube.lock);
 		controls.push_back(effect);
 		//Edit
 		Button* edit_effect = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
