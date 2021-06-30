@@ -365,6 +365,7 @@ struct ChannelProgram {
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	std::array<InsertEffectProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t send_master = -1;
+	size_t polyphony_limit = 0;
 
 	unsigned int arpeggiator_bpm = 120;
 	bool arp_on;

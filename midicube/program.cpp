@@ -60,6 +60,7 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 			if (i < program->channels.size()) {
 				//Channel
 				program->channels[i].engine_index = c.second.get<ssize_t>("engine", -1);
+				program->channels[i].polyphony_limit = c.second.get<size_t>("polyphony_limit", 0);
 				const auto& scenes = c.second.get_child_optional("scenes");
 				if (scenes) {
 					size_t j = 0;
@@ -191,6 +192,7 @@ void save_program(Program* program, pt::ptree& tree) {
 		pt::ptree c;
 		//Channel
 		c.put("engine", program->channels[i].engine_index);
+		c.put("polyphony_limit", program->channels[i].polyphony_limit);
 		for (size_t j = 0; j < SOUND_ENGINE_SCENE_AMOUNT; ++j) {
 			pt::ptree s;
 

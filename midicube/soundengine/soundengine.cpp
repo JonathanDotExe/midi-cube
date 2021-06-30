@@ -541,6 +541,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ch.arp.on = prog.arp_on;
 		ch.arp.metronome.set_bpm(prog.arpeggiator_bpm);
 		ch.arp.preset = prog.arpeggiator;
+		ch.polyphony_limit = prog.polyphony_limit;
 
 		//Engine
 		SoundEngine* engine = ch.get_engine();
@@ -587,6 +588,7 @@ void SoundEngineDevice::save_program(Program* program) {
 		prog.arp_on = ch.arp.on;
 		prog.arpeggiator_bpm = ch.arp.metronome.get_bpm();
 		prog.arpeggiator = ch.arp.preset;
+		prog.polyphony_limit = ch.polyphony_limit;
 
 		//Engine
 		SoundEngine* engine = ch.get_engine();
