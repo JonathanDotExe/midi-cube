@@ -157,10 +157,10 @@ bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnviro
 	return true;
 }
 
-void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
+void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) {
 	if (this->sample) {
 		for (SampleRegion* region : index.velocities[velocity * 127][note]) {
-			size_t slot = this->note.press_note(info, real_note, note, velocity);
+			size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
 			SamplerVoice& voice = this->note.note[slot];
 			voice.region = region;
 			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume * sample->volume;

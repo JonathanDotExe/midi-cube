@@ -132,7 +132,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			if (arp.on) {
 				arp.apply(info, device->metronome,
 				[this, s](SampleInfo& i, unsigned int note, double velocity) {
-					engine->press_note(i, note, note + s.source.octave * 12, velocity);
+					engine->press_note(i, note, note + s.source.octave * 12, velocity, polyphony_limit);
 				},
 				[this](SampleInfo& i, unsigned int note) {
 					engine->release_note(i, note);
@@ -179,12 +179,12 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, KeyboardEn
 				arp.release_note(info, message.note());
 				break;
 			default:
-				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env) || updated;
+				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env, polyphony_limit) || updated;
 				break;
 			}
 		}
 		else {
-			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env) || updated;
+			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env, polyphony_limit) || updated;
 		}
 	}
 	return updated;

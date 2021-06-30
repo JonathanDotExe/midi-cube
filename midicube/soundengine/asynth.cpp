@@ -275,7 +275,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	}
 }
 
-bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env) {
+bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) {
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 		double at = msg.monophonic_aftertouch()/127.0;
 		if (at > aftertouch.get(info.time)) {
@@ -285,7 +285,7 @@ bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info
 			aftertouch.set(at, info.time, preset.aftertouch_release);
 		}
 	}
-	return BaseSoundEngine::midi_message(msg, transpose, info, env);
+	return BaseSoundEngine::midi_message(msg, transpose, info, env, polyphony_limit);
 }
 
 bool AnalogSynth::control_change(unsigned int control, unsigned int value) {
@@ -302,8 +302,8 @@ bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 	return !note.pressed && amp_finished(info, note, env);
 }
 
-void AnalogSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
-	AnalogSynthVoice& voice = this->note.note[this->note.press_note(info, real_note, note, velocity)];
+void AnalogSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) {
+	AnalogSynthVoice& voice = this->note.note[this->note.press_note(info, real_note, note, velocity, polyphony_limit)];
 	voice.aftertouch = 0;
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();

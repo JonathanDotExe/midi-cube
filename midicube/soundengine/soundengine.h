@@ -59,9 +59,9 @@ public:
 class SoundEngine {
 
 public:
-	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env) = 0;
+	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) = 0;
 
-	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) = 0;
+	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) = 0;
 
 	virtual void release_note(SampleInfo& info, unsigned int real_note) = 0;
 
@@ -87,9 +87,9 @@ protected:
 	VoiceManager<V, P> note;
 
 public:
-	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env);
+	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit);
 
-	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity);
+	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit);
 
 	virtual void release_note(SampleInfo& info, unsigned int note);
 
@@ -118,11 +118,11 @@ public:
 
 //BaseSoundEngine
 template<typename V, size_t P>
-bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, int transpose, SampleInfo& info, KeyboardEnvironment& env) {
+bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) {
 	bool changed = false;
 	switch (message.type) {
 		case MessageType::NOTE_ON:
-			press_note(info, message.note(), message.note() + transpose, message.velocity()/127.0);
+			press_note(info, message.note(), message.note() + transpose, message.velocity()/127.0, polyphony_limit);
 			break;
 		case MessageType::NOTE_OFF:
 			release_note(info, message.note());
@@ -137,8 +137,8 @@ bool BaseSoundEngine<V, P>::midi_message(MidiMessage& message, int transpose, Sa
 }
 
 template<typename V, size_t P>
-void BaseSoundEngine<V, P>::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
-	this->note.press_note(info, real_note, note, velocity);
+void BaseSoundEngine<V, P>::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) {
+	this->note.press_note(info, real_note, note, velocity, polyphony_limit);
 }
 
 template<typename V, size_t P>
@@ -263,6 +263,7 @@ public:
 
 	EngineStatus status = {};
 	ChannelInfo info;
+	size_t polyphony_limit = 0;
 
 	SoundEngineChannel();
 
