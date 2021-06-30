@@ -114,6 +114,21 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		controls.push_back(master_send);
 	}
 
+	tmp_y -= 95;
+
+	//Polyphony
+	{
+		tmp_y += 5;
+		Label* octave_label = new Label("Polyphony", main_font, 18, 170, tmp_y);
+		tmp_y += 30;
+		controls.push_back(octave_label);
+
+		DragBox<int>* polyphony = new DragBox<int>(0, 0, 256, main_font, 18, 170, tmp_y, 150, 60);
+		tmp_y += 60;
+		polyphony->property.bind(channel.polyphony_limit, handler);
+		controls.push_back(polyphony);
+	}
+
 
 	CheckBox* active = new CheckBox(true, "Active", main_font, 18, 10, frame.get_height() - 95, 40, 40);
 	active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), handler);
