@@ -11,22 +11,22 @@
 EqualizerEffect::EqualizerEffect() {
 	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
 	cc.register_binding(new TemplateControlBinding<double>("low_freq", preset.low_freq, 20, 400));
-	cc.register_binding(new TemplateControlBinding<double>("low_gain", preset.low_gain, -15, 15));
+	cc.register_binding(new TemplateControlBinding<double>("low_gain", preset.low_gain, -1, 1));
 	cc.register_binding(new TemplateControlBinding<double>("low_mid_freq", preset.low_mid_freq, 100, 1000));
-	cc.register_binding(new TemplateControlBinding<double>("low_mid_gain", preset.low_mid_gain, -15, 15));
+	cc.register_binding(new TemplateControlBinding<double>("low_mid_gain", preset.low_mid_gain, -1, 1));
 	cc.register_binding(new TemplateControlBinding<double>("mid_freq", preset.mid_freq, 200, 8000));
-	cc.register_binding(new TemplateControlBinding<double>("mid_gain", preset.mid_gain, -15, 15));
+	cc.register_binding(new TemplateControlBinding<double>("mid_gain", preset.mid_gain, -1, 1));
 	cc.register_binding(new TemplateControlBinding<double>("high_freq", preset.high_freq, 1000, 20000));
-	cc.register_binding(new TemplateControlBinding<double>("high_gain", preset.high_gain, -15, 15));
+	cc.register_binding(new TemplateControlBinding<double>("high_gain", preset.high_gain, -1, 1));
 }
 
 void EqualizerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	if (preset.on) {
 		//Filters
-		FilterData lowdata = {FilterType::LP_12, preset.low_freq};
+		FilterData lowdata = {FilterType::LP_6, preset.low_freq};
 		FilterData low_middata = {FilterType::BP_12, preset.low_mid_freq};
 		FilterData middata = {FilterType::BP_12, preset.mid_freq};
-		FilterData highdata = {FilterType::HP_12, preset.high_freq};
+		FilterData highdata = {FilterType::HP_6, preset.high_freq};
 
 		double llow = llowfilter.apply(lowdata, lsample, info.time_step);
 		double rlow = rlowfilter.apply(lowdata, rsample, info.time_step);
@@ -37,15 +37,9 @@ void EqualizerEffect::apply(double& lsample, double& rsample, SampleInfo& info) 
 		double lhigh = lhighfilter.apply(highdata, lsample, info.time_step);
 		double rhigh = rhighfilter.apply(highdata, rsample, info.time_step);
 
-		//Gains
-		double low_gain = db_to_amp(preset.low_gain) - 1;
-		double low_mid_gain = db_to_amp(preset.low_mid_gain) - 1;
-		double mid_gain = db_to_amp(preset.mid_gain) - 1;
-		double high_gain = db_to_amp(preset.high_gain) - 1;
-
 		//Apply
-		lsample += llow * low_gain + llow_mid * low_mid_gain + lmid * mid_gain + lhigh * high_gain;
-		rsample += rlow * low_gain + rlow_mid * low_mid_gain + rmid * mid_gain + rhigh * high_gain;
+		lsample += llow * preset.low_gain + llow_mid * preset.low_mid_gain + lmid * preset.mid_gain + lhigh * preset.high_gain;
+		rsample += rlow * preset.low_gain + rlow_mid * preset.low_mid_gain + rmid * preset.mid_gain + rhigh * preset.high_gain;
 	}
 }
 

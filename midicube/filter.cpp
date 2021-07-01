@@ -111,13 +111,14 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 		//Cutoff
 		double factor = TWO_POLE_FACTOR;
 		double cutoff = cutoff_to_factor(data.cutoff * factor, time_step);
+		double hp_cutoff = cutoff_to_highpass_factor(data.cutoff * factor, time_step);
 		double feedback = data.resonance + data.resonance/(1 - cutoff);
 		//Update lowpass buffer
 		pole1 += cutoff * (sample - pole1 + feedback * (pole1 - pole2));
 		pole2 += cutoff * (pole1 - pole2);
 		//Update highpass buffer
-		pole3 = cutoff * (pole2 - last_pole3 + pole3);
-		pole4 = cutoff * (pole3 - last_pole4 + pole4);
+		pole3 = hp_cutoff * (pole2 - last_pole3 + pole3);
+		pole4 = hp_cutoff * (pole3 - last_pole4 + pole4);
 
 		last_pole3 = pole2;
 		last_pole4 = pole3;
