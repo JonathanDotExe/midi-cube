@@ -16,7 +16,9 @@ void Arpeggiator::apply(SampleInfo& info, Metronome& master, std::function<void(
 	//Clean sustained notes
 	if (!preset.hold && preset.sustain && !sustain) {
 		for (size_t i = 0; i < this->note.note.size(); ++i) {
-			this->note.note[i].valid = false;
+			if (!this->note.note[i].pressed) {
+				this->note.note[i].valid = false;
+			}
 		}
 	}
 	//Reset if no keys are pressed
@@ -258,7 +260,7 @@ void Arpeggiator::apply(SampleInfo& info, Metronome& master, std::function<void(
 			restart = false;
 
 			//Clean held notes
-			if (!preset.hold) {
+			if (!preset.hold && !(sustain || preset.sustain)) {
 				bool released = true;
 				for (size_t i = 0; i < this->note.note.size() && released; ++i) {
 					released = !this->note.note[i].pressed;
@@ -290,7 +292,7 @@ void Arpeggiator::press_note(SampleInfo& info, unsigned int note, double velocit
 }
 
 void Arpeggiator::release_note(SampleInfo& info, unsigned int note, bool sustain) {
-	this->note.release_note(info, note, !(preset.hold || (sustain && preset.sustain)));
+	this->note.release_note(info, note, !preset.hold && (!sustain || !preset.sustain));
 }
 
 
