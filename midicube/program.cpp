@@ -102,6 +102,7 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 				program->channels[i].arpeggiator.repeat_edges = c.second.get<bool>("arpeggiator.repeat_edges", false);
 				program->channels[i].arpeggiator.play_duplicates = c.second.get<bool>("arpeggiator.play_duplicates", false);
 				program->channels[i].arpeggiator.master_sync = c.second.get<bool>("arpeggiator.master_sync", false);
+				program->channels[i].arpeggiator.sustain = c.second.get<bool>("arpeggiator.sustain", false);
 
 				//Sound engine
 				//FIXME
@@ -226,6 +227,8 @@ void save_program(Program* program, pt::ptree& tree) {
 		c.put("arpeggiator.kb_sync", program->channels[i].arpeggiator.kb_sync);
 		c.put("arpeggiator.repeat_edges", program->channels[i].arpeggiator.repeat_edges);
 		c.put("arpeggiator.play_duplicates", program->channels[i].arpeggiator.play_duplicates);
+		c.put("arpeggiator.master_sync", program->channels[i].arpeggiator.master_sync);
+		c.put("arpeggiator.sustain", program->channels[i].arpeggiator.sustain);
 		//Sound Engine
 		if (program->channels[i].engine_program) {
 			pt::ptree preset = program->channels[i].engine_program->save();

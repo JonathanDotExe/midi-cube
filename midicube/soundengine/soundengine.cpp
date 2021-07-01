@@ -136,7 +136,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				},
 				[this](SampleInfo& i, unsigned int note) {
 					engine->release_note(i, note);
-				}, env.sustain);
+				}, e.sustain);
 			}
 			//Process
 			status = engine->process_sample(lsample, rsample, info, env, this->info, *device);
