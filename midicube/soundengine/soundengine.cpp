@@ -173,10 +173,10 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, KeyboardEn
 		if (arp.on) {
 			switch (message.type) {
 			case MessageType::NOTE_ON:
-				arp.press_note(info, message.note(), message.velocity()/127.0);
+				arp.press_note(info, message.note(), message.velocity()/127.0, env.sustain);
 				break;
 			case MessageType::NOTE_OFF:
-				arp.release_note(info, message.note());
+				arp.release_note(info, message.note(), env.sustain);
 				break;
 			default:
 				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env, polyphony_limit) || updated;

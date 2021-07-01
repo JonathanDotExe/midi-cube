@@ -54,12 +54,12 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 		break;
 	case DistortionType::CUBIC_DISTORTION:
 	{
-		sample = cubic_distortion(sample * (1 + drive * 4));
+		sample = cubic_distortion(sample * (0.3 + drive * 4.5));
 	}
 	break;
 	case DistortionType::FUZZ_DISTORTION:
 	{
-		sample = cubic_distortion(cubic_distortion(cubic_distortion(sample * (1 + drive * 4))));
+		sample = cubic_distortion(cubic_distortion(cubic_distortion(sample * (0.3 + drive * 2)))) / 3.0;
 	}
 	break;
 	}

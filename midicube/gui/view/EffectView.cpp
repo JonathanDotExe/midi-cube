@@ -138,7 +138,7 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y += 25;
 
 			ComboBox *distortion_type = new ComboBox(0, { "Digital",
-					"Polynomal", "Arctan" }, main_font, 24, 0, tmp_x, tmp_y,
+					"Polynomal", "Arctan", "Cubic", "Fuzz" }, main_font, 24, 0, tmp_x, tmp_y,
 					180, 120);
 			distortion_type->property.bind(amp->preset.type, handler);
 			controls.push_back(distortion_type);
