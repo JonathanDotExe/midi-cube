@@ -23,10 +23,10 @@ EqualizerEffect::EqualizerEffect() {
 void EqualizerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	if (preset.on) {
 		//Filters
-		FilterData lowdata = {FilterType::LP_12, preset.low_freq};
+		FilterData lowdata = {FilterType::LP_6, preset.low_freq};
 		FilterData low_middata = {FilterType::BP_12, preset.low_mid_freq};
 		FilterData middata = {FilterType::BP_12, preset.mid_freq};
-		FilterData highdata = {FilterType::HP_12, preset.high_freq};
+		FilterData highdata = {FilterType::HP_6, preset.high_freq};
 
 		double llow = llowfilter.apply(lowdata, lsample, info.time_step);
 		double rlow = rlowfilter.apply(lowdata, rsample, info.time_step);
