@@ -14,6 +14,18 @@ AmplifierSimulationEffect::AmplifierSimulationEffect() {
 	cc.register_binding(new TemplateControlBinding<double>("tone", preset.tone, 0, 1, 37));
 }
 
+static inline double cubic_distortion(double sample) {
+	if (sample < 0) {
+		double t = sample + 1;
+		sample = t * t * t - 1;
+	}
+	else {
+		double t = sample - 1;
+		sample = t * t * t + 1;
+	}
+	return sample;
+}
+
 static double apply_distortion(double sample, double drive, DistortionType type) {
 	switch (type) {
 	/*case DistortionType::TUBE_AMP_DISTORTION:
@@ -40,6 +52,16 @@ static double apply_distortion(double sample, double drive, DistortionType type)
 		sample = atan(sample * (1 + drive * 4));
 	}
 		break;
+	case DistortionType::CUBIC_DISTORTION:
+	{
+		sample = cubic_distortion(sample * (1 + drive * 4));
+	}
+	break;
+	case DistortionType::FUZZ_DISTORTION:
+	{
+		sample = cubic_distortion(cubic_distortion(cubic_distortion(sample * (1 + drive * 4))));
+	}
+	break;
 	}
 	return sample;
 }
