@@ -18,7 +18,6 @@ MidiCube::MidiCube() : prog_mgr("./data/programs", action_handler) {
 }
 
 void MidiCube::init(int out_device, int in_device) {
-	lock.lock();
 	global_sample_store.load_sounds("./data/samples");
 	//Sound Engines
 	fill_sound_engine_device(&engine);
@@ -72,7 +71,6 @@ void MidiCube::init(int out_device, int in_device) {
 	srand(time(NULL));
 	//Init audio
 	audio_handler.init(out_device, in_device);
-	lock.unlock();
 }
 
 void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
