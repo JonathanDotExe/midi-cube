@@ -471,14 +471,14 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 
 void SfzSampleConverter::convert() {
 	std::fstream f(src);
-	std::string text;
+	std::vector<std::string> lines;
 	std::string t;
 
-	while (getline(f, t)) {
-		text += t + "\n";
+	while (std::getline(f, t)) {
+		lines.push_back(t);
 	}
 
-	SfzInstrument instrument = parser.parse(text, dst);
+	SfzInstrument instrument = parser.parse(lines, dst);
 	std::cout << "Loaded instrument" << std::endl;
 	pt::ptree tree;
 	//Name

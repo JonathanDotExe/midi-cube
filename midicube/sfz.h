@@ -29,7 +29,7 @@ class SfzParser {
 
 public:
 
-	SfzInstrument parse(std::string text, std::string path);
+	SfzInstrument parse(std::vector<std::string> lines, std::string path);
 
 	~SfzParser() {
 

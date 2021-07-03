@@ -78,17 +78,14 @@ enum ParserMode {
 	NONE, GLOBAL, GROUP, REGION
 };
 
-SfzInstrument SfzParser::parse(std::string text, std::string path) {
+SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path) {
 	SfzInstrument instrument;
-	boost::replace_all(text, "\r", "");
-	std::vector<std::string> lines = {};
-	boost::split(lines, text, boost::is_any_of("\n"));
 
 	std::vector<std::string> tokens = {};
 	std::unordered_map<std::string, std::string> defines;
 	//Remove comments
-	size_t i = 0;
-	for (std::string line : lines) {
+	for (size_t i = 0; i < lines.size(); ++i) {
+		std::string line = lines[i];
 		if (line.rfind("//", 0) != 0) {
 			//Apply defines
 			for (auto pair : defines) {
@@ -99,12 +96,14 @@ SfzInstrument SfzParser::parse(std::string text, std::string path) {
 			//Define
 			if (t.size() >= 3 && t[0] == "#define") {
 				defines[t[1]] = t[2];
+				std::cout << "define " << t[1] << " " << t[2] << std::endl;
 			}
 			//Include
 			else if (t.size() >= 2 && t[0] == "#include") {
+				std::cout << "include" << std::endl;
 				std::string file = t[1];
-				for (size_t i = 2; i < t.size(); ++i) {
-					file += " " + t[i];
+				for (size_t j = 2; j < t.size(); ++j) {
+					file += " " + t[j];
 				}
 				boost::replace_all(file, "\"", "");
 
@@ -112,6 +111,7 @@ SfzInstrument SfzParser::parse(std::string text, std::string path) {
 				std::string filename = path + "/" + file;
 				std::fstream f(filename);
 				std::string t;
+				std::cout << filename << std::endl;
 				while (getline(f, t)) {
 					lines.insert(lines.begin() + i + 1, t);
 				}
@@ -123,7 +123,6 @@ SfzInstrument SfzParser::parse(std::string text, std::string path) {
 				}
 			}
 		}
-		++i;
 	}
 
 	//Parse lines
