@@ -23,7 +23,7 @@ private:
 	size_t next_freq_slot(SampleInfo& info, size_t polyphony_limit = 0) {
 		size_t size = P;
 		if (polyphony_limit > 0) {
-			polyphony_limit = std::min(polyphony_limit, P);
+			size = std::min(polyphony_limit, P);
 		}
 		bool release = false;
 		size_t longest_index = 0;
