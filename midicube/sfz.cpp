@@ -88,15 +88,17 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 		std::string line = lines[i];
 		if (line.rfind("//", 0) != 0) {
 			//Apply defines
-			for (auto pair : defines) {
-				boost::replace_all(line, pair.first, pair.second);
+			if (line.rfind("#define ", 0) != 0) {
+				for (auto pair : defines) {
+					boost::replace_all(line, pair.first, pair.second);
+				}
 			}
+
 			std::vector<std::string> t = {};
 			boost::split(t, line, boost::is_any_of(" "));
 			//Define
 			if (t.size() >= 3 && t[0] == "#define") {
 				defines[t[1]] = t[2];
-				std::cout << "define " << t[1] << " " << t[2] << std::endl;
 			}
 			//Include
 			else if (t.size() >= 2 && t[0] == "#include") {
@@ -111,15 +113,32 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 				std::string filename = path + "/" + file;
 				std::fstream f(filename);
 				std::string t;
-				std::cout << filename << std::endl;
 				while (getline(f, t)) {
 					lines.insert(lines.begin() + i + 1, t);
 				}
 			}
 			else {
+				bool chain = false;
+				std::string ts = "";
 				//Add tokens
 				for (std::string token : t) {
-					tokens.push_back(token);
+					size_t index = token.find("=");
+					if (index != std::string::npos) {
+						if (chain) {
+							tokens.push_back(ts);
+							ts = "";
+						}
+						chain = true;
+					}
+					if (chain) {
+						ts += token;
+					}
+					else {
+						tokens.push_back(token);
+					}
+				}
+				if (chain) {
+					tokens.push_back(ts);
 				}
 			}
 		}
