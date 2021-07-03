@@ -489,8 +489,10 @@ void SfzSampleConverter::convert() {
 	SfzInstrument instrument = parser.parse(lines, dst);
 	std::cout << "Loaded instrument" << std::endl;
 	pt::ptree tree;
+	pt::ptree sound;
 	//Name
-	tree.put("sound.name", name);
+	sound.put("name", name);
+	parse_opcodes(instrument.global, sound);
 
 	//Groups
 	for (SfzGroup group : instrument.groups) {
@@ -502,8 +504,9 @@ void SfzSampleConverter::convert() {
 			parse_opcodes(region.opcodes, r);
 			g.add_child("regions.region", r);
 		}
-		tree.add_child("sound.groups.group", g);
+		sound.add_child("groups.group", g);
 	}
+	tree.add_child("sound", sound);
 
 	//Save to file
 	try {
