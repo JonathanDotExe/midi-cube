@@ -421,7 +421,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		else if (opcode.first == "hivel") {
 			tree.put("max_velocity", std::stoi(opcode.second));
 		}
-		else if (opcode.first == "volume") {
+		else if (opcode.first == "volume" || opcode.first == "group_volume") {
 			tree.put("volume", db_to_amp(std::stod(opcode.second)));
 		}
 		else if (opcode.first == "pitch_keytrack") {

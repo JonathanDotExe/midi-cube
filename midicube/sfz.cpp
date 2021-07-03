@@ -129,9 +129,10 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 							ts = "";
 						}
 						chain = true;
-					}
-					if (chain) {
 						ts += token;
+					}
+					else if (chain) {
+						ts += " " + token;
 					}
 					else {
 						tokens.push_back(token);
