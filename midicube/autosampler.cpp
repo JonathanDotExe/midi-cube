@@ -7,6 +7,7 @@
 
 #include "autosampler.h"
 #include "synthesis.h"
+#include "filter.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>
@@ -460,6 +461,10 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		}
 		else if (opcode.first == "ampeg_hold") {
 			tree.put("envelope.attack_hold", std::stod(opcode.second));
+		}
+		//Filter
+		else if (opcode.first == "cutoff") {
+			tree.put("filter.cutoff", invert_scale_cutoff(std::stod(opcode.second)));
 		}
 		//TODO tune
 		else {

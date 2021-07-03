@@ -22,6 +22,10 @@ inline double scale_cutoff(double prog) {
 	return pow(FILTER_MAX, FILTER_PROGRESS_START + FILTER_PROGRESS_REST * prog);
 }
 
+inline double invert_scale_cutoff(double cutoff) {
+	return (log(cutoff)/log(FILTER_MAX) - FILTER_PROGRESS_START)/FILTER_PROGRESS_REST;
+}
+
 inline double cutoff_to_rc(double cutoff) {
 	return 1.0/(2 * M_PI * cutoff);
 }

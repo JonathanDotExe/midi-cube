@@ -92,7 +92,9 @@ sampler_deps = [
 sampler_src = [
 	'autosampler-main.cpp',
 	'midicube/autosampler.cpp',
+	'midicube/audio.cpp',
 	'midicube/audiofile.cpp',
+	'midicube/filter.cpp',
 	'midicube/sfz.cpp',
 	'midicube/synthesis.cpp'
 ]
