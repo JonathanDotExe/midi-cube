@@ -167,10 +167,10 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
 			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
-				voice.time = voice.sample->loop_start;
+				voice.time = (double) voice.sample->loop_start/voice.sample->sample.sample_rate;
 			}
 			else {
-				voice.time = 0;
+				voice.time = (double) voice.sample->start/voice.sample->sample.sample_rate;;
 			}
 			voice.hit_loop = false;
 			voice.env.reset();
@@ -336,6 +336,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 		region.loop = LoopType::ALWAYS_LOOP;
 	}
 
+	region.sample.start = tree.get<unsigned int>("sample.start", region.sample.start);
 	region.sample.loop_start = tree.get<unsigned int>("sample.loop_start", region.sample.loop_start);
 	region.sample.loop_end = tree.get<unsigned int>("sample.loop_end", region.sample.loop_end);
 	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_crossfade);
@@ -355,6 +356,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 
 	//Sustain Sample
 	std::string sfile = tree.get<std::string>("sustain_sample.name", "");
+	region.sustain_sample.start = tree.get<unsigned int>("sustain_sample.start", region.sustain_sample.start);
 	region.sustain_sample.loop_start = tree.get<unsigned int>("sustain_sample.loop_start", region.sustain_sample.loop_start);
 	region.sustain_sample.loop_end = tree.get<unsigned int>("sustain_sample.loop_end", region.sustain_sample.loop_end);
 	region.sustain_sample.loop_crossfade = tree.get<unsigned int>("sustain_sample.loop_crossfade", region.sustain_sample.loop_start);

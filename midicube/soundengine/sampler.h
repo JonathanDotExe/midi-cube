@@ -40,6 +40,7 @@ struct SampleEnvelope {
 
 struct LoopedAudioSample {
 	AudioSample sample;
+	unsigned int start = 0;
 	unsigned int loop_start = 0;
 	unsigned int loop_end = 0;
 	unsigned int loop_crossfade = 0;

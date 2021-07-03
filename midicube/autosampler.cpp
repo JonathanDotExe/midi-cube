@@ -454,10 +454,13 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			}
 		}
 		else if (opcode.first == "loop_start") {
-			tree.put("loop_start", std::stoi(opcode.second));
+			tree.put("sample.loop_start", std::stoi(opcode.second));
 		}
 		else if (opcode.first == "loop_end") {
-			tree.put("loop_end", std::stoi(opcode.second));
+			tree.put("sample.loop_end", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "offset") {
+			tree.put("sample.start", std::stoi(opcode.second));
 		}
 		else if (opcode.first == "ampeg_hold") {
 			tree.put("envelope.attack_hold", std::stod(opcode.second));
