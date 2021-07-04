@@ -13,6 +13,7 @@
 #include <string>
 #include <cmath>
 #include <iostream>
+#include <array>
 
 
 struct WAVHeader {
@@ -76,6 +77,29 @@ struct AudioSample {
 		samples.clear();
 	}
 };
+
+#define STREAM_AUDIO_CHUNK_SIZE 65536
+
+struct StreamedAudioSample {
+	unsigned int sample_rate = 1;
+	unsigned int channels = 1;
+	unsigned int loop_start = 0;
+	unsigned int loop_end = 0;
+	unsigned int total_size = 0;
+	std::array<float, STREAM_AUDIO_CHUNK_SIZE> samples;
+
+	double total_duration () {
+		return total_size / (double) channels / sample_rate;
+	}
+
+	void clear () {
+		sample_rate = 0;
+		channels = 0;
+		total_size = 0;
+		samples = {};
+	}
+};
+
 
 bool read_audio_file(AudioSample& audio, std::string fname);
 

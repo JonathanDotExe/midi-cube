@@ -34,11 +34,11 @@ bool read_audio_file(AudioSample& audio, std::string fname) {
 
 	//Read
 	if (file != nullptr) {
-		double buffer[1024];
+		float buffer[1024];
 		sf_count_t size = _countof(buffer);
 		sf_count_t count;
 		do {
-			count = sf_read_double(file, buffer, size);
+			count = sf_read_float(file, buffer, size);
 			for (sf_count_t i = 0; i < count; i++) {
 				audio.samples.push_back(buffer[i]);
 			}
