@@ -80,17 +80,19 @@ struct BufferEntry {
 	boost::detail::spinlock lock;
 };
 
-template<typename T, size_t N>
+template<typename T>
 class MultiBuffer {
 private:
-	std::array<BufferEntry<T>, N> buffer;
+	BufferEntry<T>* buffer;
 
 public:
+	const size_t buffer_amount;
 	const size_t size;
 
-	MultiBuffer(size_t s) : size(s) {
-		for (size_t i = 0; i < N; ++i) {
-			buffer[i] = new T[s];
+	MultiBuffer(size_t s, size_t n) : size(s), buffer_amount(n) {
+		buffer = new BufferEntry<T>[buffer_amount];
+		for (size_t i = 0; i < buffer_amount; ++i) {
+			buffer[i].buffer = new T[size];
 		}
 	}
 
@@ -102,10 +104,12 @@ public:
 		return buffer[n].lock;
 	}
 
+	inline
+
 	~MultiBuffer() {
-		for (size_t i = 0; i < N; ++i) {
-			delete buffer[i];
-			buffer[i] = nullptr;
+		for (size_t i = 0; i < buffer_amount; ++i) {
+			delete buffer[i].buffer;
+			buffer[i].buffer = nullptr;
 		}
 	}
 
