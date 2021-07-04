@@ -42,7 +42,7 @@ void Button::draw(sf::RenderWindow& window, bool selected) {
 	window.draw(text);
 }
 
-void Button::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+void Button::on_mouse_action() {
 	if (on_click) {
 		on_click();
 	}
@@ -132,14 +132,12 @@ void CheckBox::draw(sf::RenderWindow& window, bool selected) {
 	window.draw(text);
 }
 
-void CheckBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
-	if (button == sf::Mouse::Left) {
-		checked = !checked;
-		if (property.is_bound()) {
-			property.set(checked);
-		}
-		frame->request_redraw();
+void CheckBox::on_mouse_action() {
+	checked = !checked;
+	if (property.is_bound()) {
+		property.set(checked);
 	}
+	frame->request_redraw();
 }
 
 void CheckBox::update_properties() {
@@ -165,7 +163,7 @@ void ComboBox::draw(sf::RenderWindow& window, bool selected) {
 	window.draw(text);
 }
 
-void ComboBox::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+void ComboBox::on_mouse_action() {
 	index++;
 	if (index >= (int) values.size()) {
 		index = 0;
@@ -216,14 +214,12 @@ void OrganSwitch::draw(sf::RenderWindow& window, bool selected) {
 	window.draw(off_text);
 }
 
-void OrganSwitch::on_mouse_released(int x, int y, sf::Mouse::Button button) {
-	if (button == sf::Mouse::Left) {
-		checked = !checked;
-		if (property.is_bound()) {
-			property.set(checked);
-		}
-		update_position(this->x, this->y, width, height);
+void OrganSwitch::on_mouse_action() {
+	checked = !checked;
+	if (property.is_bound()) {
+		property.set(checked);
 	}
+	update_position(this->x, this->y, width, height);
 }
 
 void OrganSwitch::update_properties(){
