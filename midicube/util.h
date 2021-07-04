@@ -10,6 +10,7 @@
 
 #include <array>
 #include <vector>
+#include <boost/smart_ptr/detail/spinlock.hpp>
 
 
 template<class T, std::size_t N> class CircularBuffer {
@@ -71,6 +72,43 @@ public:
 	FixedScale(double start, std::vector<ScaleItem>items, double end);
 	double value(double progress) const;
 	double progress(double value) const;
+};
+
+template<typename T>
+struct BufferEntry {
+	T* buffer;
+	boost::detail::spinlock lock;
+};
+
+template<typename T, size_t N>
+class MultiBuffer {
+private:
+	std::array<BufferEntry<T>, N> buffer;
+
+public:
+	const size_t size;
+
+	MultiBuffer(size_t s) : size(s) {
+		for (size_t i = 0; i < N; ++i) {
+			buffer[i] = new T[s];
+		}
+	}
+
+	inline T& operator [](size_t n, size_t elem) {
+		return buffer[n].buffer[elem];
+	}
+
+	inline boost::detail::spinlock& operator [](size_t n) {
+		return buffer[n].lock;
+	}
+
+	~MultiBuffer() {
+		for (size_t i = 0; i < N; ++i) {
+			delete buffer[i];
+			buffer[i] = nullptr;
+		}
+	}
+
 };
 
 #endif /* MIDICUBE_UTIL_H_ */
