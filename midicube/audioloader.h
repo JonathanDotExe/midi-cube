@@ -9,17 +9,27 @@
 #define MIDICUBE_AUDIOLOADER_H_
 
 #include "util.h"
-
+#include "audiofile.h"
+#include "boost/lockfree/spsc_queue.hpp"
 
 struct LoadRequest {
-	Multi
-
+	MultiBuffer<float>* buffer;
+	size_t buffer_index;
+	StreamedAudioSample* sample;
+	size_t block;
 };
 
 class StreamedAudioLoader {
 private:
+	boost::lockfree::spsc_queue<LoadRequest> requests;
+	std::atomic<bool> running = true;
 
+public:
 
+	//Audio Thread
+	void queue_request(LoadRequest request);
+	void run();
+	void stop();
 
 };
 
