@@ -404,6 +404,8 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	tmp_y += 75;
 	//Pitch
 	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, osc.pitch, handler, "Pitch", &show_amount, &show_source)) {
+		c->border = 0.5;
+		c->drag_mul /= 2;
 		c->to_string = [](double val) {
 			return std::to_string(val >= 0 ? PITCH_SCALE.value(val) : -PITCH_SCALE.value(-val));
 		};
