@@ -39,11 +39,12 @@ void StreamedAudioLoader::run() {
 
 			//Read
 			if (file != nullptr) {
-				if (sf_seek(file, req.sample->frames * req.block, SEEK_SET) != -1) {
+				size_t frames = req.buffer->size;
+				if (sf_seek(file, frames * req.block, SF_SEEK_SET) != -1) {
 					float* buffer = (*req.buffer)[req.buffer_index].buffer;
 					(*req.buffer)[req.buffer_index].lock.lock();
 					//memset((void *) buffer, 0, size * sizeof(buffer[0]));
-					sf_readf_float(file, buffer, req.sample->frames);
+					sf_readf_float(file, buffer, frames);	//It must be externally ensured that all the frames fit in the buffer
 					(*req.buffer)[req.buffer_index].lock.unlock();
 				}
 			}

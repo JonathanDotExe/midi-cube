@@ -81,27 +81,27 @@ struct AudioSample {
 #define STREAM_AUDIO_CHUNK_SIZE 131072
 
 struct StreamedAudioSample {
-	size_t frames = 1;
 	unsigned int sample_rate = 1;
 	unsigned int channels = 1;
 	unsigned int loop_start = 0;
 	unsigned int loop_end = 0;
 	unsigned int total_size = 0;
 	std::string path;
-	std::array<float, STREAM_AUDIO_CHUNK_SIZE> samples;
+	std::array<float, STREAM_AUDIO_CHUNK_SIZE> samples = {};
 
 	double total_duration () {
-		return total_size / (double) channels / sample_rate;
+		return total_size / sample_rate;
 	}
 
 	void clear () {
-		sample_rate = 0;
-		channels = 0;
+		sample_rate = 1;
+		channels = 1;
 		total_size = 0;
 		samples = {};
 	}
 };
 
+bool read__stream_audio_file(StreamedAudioSample& audio, std::string fname);
 
 bool read_audio_file(AudioSample& audio, std::string fname);
 
