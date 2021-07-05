@@ -26,10 +26,19 @@ private:
 
 public:
 
+	StreamedAudioLoader() : requests(1024) {
+
+	}
+
 	//Audio Thread
 	void queue_request(LoadRequest request);
 	void run();
 	void stop();
+	void start();
+
+	~StreamedAudioLoader() {
+		stop();
+	}
 
 };
 

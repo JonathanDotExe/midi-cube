@@ -100,4 +100,4 @@ sampler_src = [
 	'midicube/synthesis.cpp'
 ]
 
-executable('midi-cube-autosampler', sampler_src, dependencies: sampler_deps, link_args: '-latomic')
+executable('midi-cube-autosampler', sampler_src, dependencies: sampler_deps, link_args: '-latomic -lpthread')

@@ -49,6 +49,9 @@ void MidiCube::init(int out_device, int in_device) {
 	prog_mgr.load_all();
 	prog_mgr.apply_program_direct(0, 0);
 
+	//Init stream loader
+	audio_loader.start();
+
 	//MIDI Inputs
 	//Input-Devices
 	MidiInput input_dummy;
@@ -135,6 +138,7 @@ MidiCube::~MidiCube() {
 		delete in.in;
 	}
 	inputs.clear();
+	audio_loader.start();
 	lock.unlock();
 }
 

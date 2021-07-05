@@ -11,6 +11,9 @@
 #include <sndfile.h>
 #include <sndfile.hh>
 #include <cstring>
+#include <thread>
+#include <chrono>
+
 
 
 #ifndef _countof
@@ -22,7 +25,9 @@ void StreamedAudioLoader::queue_request(LoadRequest request) {
 }
 
 void StreamedAudioLoader::run() {
-	while(running) {
+	using namespace std::chrono_literals;
+
+	while (running) {
 		LoadRequest req;
 		if (requests.pop(req)) {
 			//Assumes that file doesn't change over usage
@@ -51,7 +56,14 @@ void StreamedAudioLoader::run() {
 				file = nullptr;
 			}
 		}
+		else {
+			std::this_thread::sleep_for(1ms);
+		}
 	}
+}
+
+void StreamedAudioLoader::start() {
+	std::thread thread([this]() { run(); });
 }
 
 void StreamedAudioLoader::stop() {
