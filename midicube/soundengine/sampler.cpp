@@ -152,7 +152,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.region && note.sample) {
-		return (note.region->loop == NO_LOOP && note.time > note.sample->sample.duration()) || (!note.region->env.sustain_entire_sample && note.env.is_finished()) || note.layer_amp <= 0.0005;
+		return (note.region->loop == NO_LOOP && note.time > note.sample->sample.total_duration()) || (!note.region->env.sustain_entire_sample && note.env.is_finished()) || note.layer_amp <= 0.0005;
 	}
 	return true;
 }
@@ -342,7 +342,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_crossfade);
 
 	if (load_sample && file != "") {
-		if (!read_audio_file(region.sample.sample, folder + "/" + file)) {
+		if (!read_stream_audio_file(region.sample.sample, folder + "/" + file)) {
 			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
 		}
 		if (region.sample.loop_start == 0 && region.sample.loop_end == 0) {
@@ -362,7 +362,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.sustain_sample.loop_crossfade = tree.get<unsigned int>("sustain_sample.loop_crossfade", region.sustain_sample.loop_start);
 
 	if (load_sample && sfile != "") {
-		if (!read_audio_file(region.sustain_sample.sample, folder + "/" + sfile)) {
+		if (!read_stream_audio_file(region.sustain_sample.sample, folder + "/" + sfile)) {
 			std::cerr << "Couldn't load sustain sample file " << folder + "/" + sfile << std::endl;
 		}
 		if (region.sustain_sample.loop_start == 0 && region.sustain_sample.loop_end == 0) {

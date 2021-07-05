@@ -101,7 +101,7 @@ struct StreamedAudioSample {
 	}
 };
 
-bool read__stream_audio_file(StreamedAudioSample& audio, std::string fname);
+bool read_stream_audio_file(StreamedAudioSample& audio, std::string fname);
 
 bool read_audio_file(AudioSample& audio, std::string fname);
 

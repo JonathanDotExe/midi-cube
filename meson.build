@@ -8,6 +8,7 @@ deps = [
 	dependency('sfml-system'),
 	dependency('sfml-window'),
 	dependency('sfml-graphics'),
+	cxx.find_library('pthread'),
 	cxx.find_library('boost_system'),
 	cxx.find_library('boost_filesystem')
 ]
@@ -100,4 +101,4 @@ sampler_src = [
 	'midicube/synthesis.cpp'
 ]
 
-executable('midi-cube-autosampler', sampler_src, dependencies: sampler_deps, link_args: '-latomic -lpthread')
+executable('midi-cube-autosampler', sampler_src, dependencies: sampler_deps, link_args: '-latomic')

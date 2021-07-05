@@ -39,7 +39,7 @@ struct SampleEnvelope {
 };
 
 struct LoopedAudioSample {
-	AudioSample sample;
+	StreamedAudioSample sample;
 	unsigned int start = 0;
 	unsigned int loop_start = 0;
 	unsigned int loop_end = 0;
