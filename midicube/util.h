@@ -96,15 +96,9 @@ public:
 		}
 	}
 
-	inline T& operator [](size_t n, size_t elem) {
-		return buffer[n].buffer[elem];
+	inline BufferEntry<T>& operator [](size_t n) {
+		return *buffer[n];
 	}
-
-	inline boost::detail::spinlock& operator [](size_t n) {
-		return buffer[n].lock;
-	}
-
-	inline
 
 	~MultiBuffer() {
 		for (size_t i = 0; i < buffer_amount; ++i) {

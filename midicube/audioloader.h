@@ -22,7 +22,7 @@ struct LoadRequest {
 class StreamedAudioLoader {
 private:
 	boost::lockfree::spsc_queue<LoadRequest> requests;
-	std::atomic<bool> running = true;
+	std::atomic<bool> running{true};
 
 public:
 

@@ -78,11 +78,7 @@ struct AudioSample {
 	}
 };
 
-#define STREAM_AUDIO_CHUNK_SIZE 65536
-struct StereoSample {
-	float left;
-	float right;
-};
+#define STREAM_AUDIO_CHUNK_SIZE 131072
 
 struct StreamedAudioSample {
 	unsigned int sample_rate = 1;
@@ -91,7 +87,7 @@ struct StreamedAudioSample {
 	unsigned int loop_end = 0;
 	unsigned int total_size = 0;
 	std::string path;
-	std::array<StereoSample, STREAM_AUDIO_CHUNK_SIZE> samples;
+	std::array<float, STREAM_AUDIO_CHUNK_SIZE> samples;
 
 	double total_duration () {
 		return total_size / (double) channels / sample_rate;
