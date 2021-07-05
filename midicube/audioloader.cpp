@@ -25,6 +25,7 @@ void StreamedAudioLoader::run() {
 	while(running) {
 		LoadRequest req;
 		if (requests.pop(req)) {
+			//Assumes that file doesn't change over usage
 			//Open
 			SNDFILE* file = nullptr;
 			SF_INFO info;
@@ -33,13 +34,16 @@ void StreamedAudioLoader::run() {
 
 			//Read
 			if (file != nullptr) {
-				sf_count_t size = req.buffer->size;
-				float* buffer = (*req.buffer)[req.buffer_index].buffer;
-				memset((void *) buffer, 0, size * sizeof(buffer[0]));
-				sf_read_float(file, buffer, size);
+				if (sf_seek(file, req.sample->frames * req.block, SEEK_SET) != -1) {
+					float* buffer = (*req.buffer)[req.buffer_index].buffer;
+					(*req.buffer)[req.buffer_index].lock.lock();
+					//memset((void *) buffer, 0, size * sizeof(buffer[0]));
+					sf_readf_float(file, buffer, req.sample->frames);
+					(*req.buffer)[req.buffer_index].lock.unlock();
+				}
 			}
 			else {
-				std::cerr << "Couldn't open sound file " << req.sample->path << ": " << sf_strerror(NULL) << std::endl;
+				std::cerr << "Couldn't open sound file " << req.sample->path << ": " << sf_strerror(file) << std::endl;
 			}
 
 			if (file != nullptr) {

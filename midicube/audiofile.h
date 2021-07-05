@@ -81,6 +81,7 @@ struct AudioSample {
 #define STREAM_AUDIO_CHUNK_SIZE 131072
 
 struct StreamedAudioSample {
+	size_t frames = 1;
 	unsigned int sample_rate = 1;
 	unsigned int channels = 1;
 	unsigned int loop_start = 0;

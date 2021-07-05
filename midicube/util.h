@@ -97,7 +97,7 @@ public:
 	}
 
 	inline BufferEntry<T>& operator [](size_t n) {
-		return *buffer[n];
+		return buffer[n];
 	}
 
 	~MultiBuffer() {
