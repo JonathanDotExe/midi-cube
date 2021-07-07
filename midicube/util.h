@@ -76,6 +76,7 @@ public:
 
 template<typename T>
 struct BufferEntry {
+	unsigned int content_id = 0;
 	T* buffer;
 	boost::detail::spinlock lock;
 };

@@ -32,31 +32,34 @@ void StreamedAudioLoader::run() {
 	while (running) {
 		LoadRequest req;
 		if (requests.pop(req)) {
-			//Assumes that file doesn't change over usage
-			//Open
-			SNDFILE* file = nullptr;
-			SF_INFO info;
+			(*req.buffer)[req.buffer_index].lock.lock();
+			if ((*req.buffer)[req.buffer_index].content_id != req.block) {
+				//Assumes that file doesn't change over usage
+				//Open
+				SNDFILE* file = nullptr;
+				SF_INFO info;
 
-			file = sf_open(req.sample->path.c_str(), SFM_READ, &info);
+				file = sf_open(req.sample->path.c_str(), SFM_READ, &info);
 
-			//Read
-			if (file != nullptr) {
-				size_t frames = req.buffer->size;
-				if (sf_seek(file, frames * req.block, SF_SEEK_SET) != -1) {
-					float* buffer = (*req.buffer)[req.buffer_index].buffer;
-					(*req.buffer)[req.buffer_index].lock.lock();
-					//memset((void *) buffer, 0, size * sizeof(buffer[0]));
-					sf_readf_float(file, buffer, frames);	//It must be externally ensured that all the frames fit in the buffer
-					(*req.buffer)[req.buffer_index].lock.unlock();
+				//Read
+				if (file != nullptr) {
+					size_t frames = req.buffer->size;
+					if (sf_seek(file, frames * req.block, SF_SEEK_SET) != -1) {
+						float* buffer = (*req.buffer)[req.buffer_index].buffer;
+						//memset((void *) buffer, 0, size * sizeof(buffer[0]));
+						sf_readf_float(file, buffer, frames);	//It must be externally ensured that all the frames fit in the buffer
+						(*req.buffer)[req.buffer_index].content_id = req.block;
+					}
 				}
-			}
-			else {
-				std::cerr << "Couldn't open sound file " << req.sample->path << ": " << sf_strerror(file) << std::endl;
-			}
+				else {
+					std::cerr << "Couldn't open sound file " << req.sample->path << ": " << sf_strerror(file) << std::endl;
+				}
 
-			if (file != nullptr) {
-				sf_close(file);
-				file = nullptr;
+				if (file != nullptr) {
+					sf_close(file);
+					file = nullptr;
+				}
+				(*req.buffer)[req.buffer_index].lock.unlock();
 			}
 		}
 		else {
