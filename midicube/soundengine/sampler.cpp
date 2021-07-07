@@ -68,6 +68,18 @@ Sampler::Sampler() {
 	set_sample(global_sample_store.get_sound(0));
 }
 
+inline size_t find_floor_block(double time, unsigned int sample_rate, size_t size) {
+	return floor(time * sample_rate) / size;
+}
+
+inline size_t find_ceil_block(double time, unsigned int sample_rate, size_t size) {
+	return ceil(time * sample_rate) / size;
+}
+
+inline size_t find_buffer_index(size_t block, size_t block_count) {
+	return (block - 1) % block_count;
+}
+
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index) {
 	if (note.region && note.sample) {
 		double vol = 1;
@@ -93,10 +105,11 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 				}
 				//Crossfade
 				else if (note.time > crossfade_end_time) {
-					double diff = note.time - crossfade_end_time;
+					//TODO
+					/*double diff = note.time - crossfade_end_time;
 					crossfade = 1 - (diff / loop_crossfade_time);
 					l += note.sample->sample.isample(0, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
-					r += note.sample->sample.isample(1, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
+					r += note.sample->sample.isample(1, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);*/
 				}
 			}
 			else if (note.time >= loop_start_time) {
@@ -105,8 +118,29 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		}
 
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
+			const unsigned int sample_rate = note.sample->sample.sample_rate;
+			const unsigned int channels = note.sample->sample.channels;
+			const size_t size = STREAM_AUDIO_CHUNK_SIZE / channels;
+			size_t floor_block = find_floor_block(note.time, sample_rate, size);
+			size_t ceil_block = find_ceil_block(note.time, sample_rate, size);
+
+			size_t floor_index = floor(note.time * note.sample->sample.sample_rate) % size;
+			size_t ceil_index = ceil(note.time * note.sample->sample.sample_rate) % size;
+
+			double floor_sample = 0;
+			double ceil_sample = 0;
+
+			if (floor_block == 0) {
+				floor_sample = note.sample->sample.samples
+			}
+
 			l += note.sample->sample.isample(0, note.time, info.sample_rate) * crossfade;
 			r += note.sample->sample.isample(1, note.time, info.sample_rate) * crossfade;
+
+
+
+			note.floor_block = floor_block;
+			note.ceil_block = floor_block;
 		}
 
 		//Filter
@@ -162,6 +196,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 		for (SampleRegion* region : index.velocities[velocity * 127][note]) {
 			size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
 			SamplerVoice& voice = this->note.note[slot];
+			voice.current_buffer = 0;
 			voice.region = region;
 			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume * sample->volume;
 			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME

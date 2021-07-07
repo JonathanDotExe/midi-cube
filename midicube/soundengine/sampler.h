@@ -82,7 +82,10 @@ struct SamplerVoice : public TriggeredNote {
 	WaveTableADSREnvelope env;
 	Filter lfilter;
 	Filter rfilter;
-	MultiBuffer<float> buffer{STREAM_AUDIO_CHUNK_SIZE, 3};
+	MultiBuffer<float> buffer{STREAM_AUDIO_CHUNK_SIZE, 4};
+	size_t current_buffer = 0;
+	size_t floor_block = 0;
+	size_t ceil_block = 0;
 };
 
 struct SampleRegionIndex {
