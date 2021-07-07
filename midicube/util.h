@@ -89,7 +89,7 @@ public:
 	const size_t buffer_amount;
 	const size_t size;
 
-	MultiBuffer(size_t s, size_t n) : size(s), buffer_amount(n) {
+	MultiBuffer(size_t s, size_t n) : buffer_amount(n), size(s) {
 		buffer = new BufferEntry<T>[buffer_amount];
 		for (size_t i = 0; i < buffer_amount; ++i) {
 			buffer[i].buffer = new T[size];

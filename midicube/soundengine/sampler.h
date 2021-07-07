@@ -11,6 +11,7 @@
 #include "soundengine.h"
 #include "../audiofile.h"
 #include "../envelope.h"
+#include "../util.h"
 
 #define MIDI_NOTES 128
 
@@ -81,6 +82,7 @@ struct SamplerVoice : public TriggeredNote {
 	WaveTableADSREnvelope env;
 	Filter lfilter;
 	Filter rfilter;
+	MultiBuffer<float> buffer{STREAM_AUDIO_CHUNK_SIZE, 3};
 };
 
 struct SampleRegionIndex {
