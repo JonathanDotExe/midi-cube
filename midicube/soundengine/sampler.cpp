@@ -170,8 +170,24 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 			l += (lfloor_sample * (1 - prog) + lceil_sample * prog) * crossfade;
 			r += (rfloor_sample * (1 - prog) + rceil_sample * prog) * crossfade;
 
-			note.floor_block = floor_block;
-			note.ceil_block = floor_block;
+			/*if (floor_block != note.floor_block) {
+				note.floor_block = floor_block;
+				LoadRequest req;
+				req.block = floor_block;
+				req.buffer = &note.buffer;
+				req.buffer_index = find_buffer_index(floor_block, note.buffer.buffer_amount);
+				req.sample = note.sample;
+				global_audio_loader.queue_request(req);
+			}*/
+			if (ceil_block != note.ceil_block) {
+				note.ceil_block = ceil_block;
+				LoadRequest req;
+				req.block = ceil_block;
+				req.buffer = &note.buffer;
+				req.buffer_index = find_buffer_index(ceil_block, note.buffer.buffer_amount);
+				req.sample = note.sample;
+				global_audio_loader.queue_request(req);
+			}
 		}
 
 		//Filter
@@ -240,6 +256,13 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			}
 			voice.hit_loop = false;
 			voice.env.reset();
+			//Load sample
+			LoadRequest req;
+			req.block = 1;
+			req.buffer = &voice.buffer;
+			req.buffer_index = find_buffer_index(1, voice.buffer.buffer_amount);
+			req.sample = voice.sample;
+			global_audio_loader.queue_request(req);
 		}
 	}
 }

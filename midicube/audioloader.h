@@ -12,6 +12,7 @@
 #include "audiofile.h"
 #include "boost/lockfree/spsc_queue.hpp"
 
+
 struct LoadRequest {
 	MultiBuffer<float>* buffer;
 	size_t buffer_index;
@@ -42,6 +43,6 @@ public:
 
 };
 
-
+extern StreamedAudioLoader global_audio_loader; //FIXME
 
 #endif /* MIDICUBE_AUDIOLOADER_H_ */

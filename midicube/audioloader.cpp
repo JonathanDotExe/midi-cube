@@ -20,6 +20,8 @@
 #define _countof(arr) (sizeof(arr)/sizeof(arr[0]))
 #endif
 
+StreamedAudioLoader global_audio_loader;
+
 void StreamedAudioLoader::queue_request(LoadRequest request) {
 	requests.push(request);
 }

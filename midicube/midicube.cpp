@@ -9,7 +9,6 @@
 #include "soundengine/engines.h"
 #include <iostream>
 
-StreamedAudioLoader global_audio_loader;
 
 static void process_func(double& lsample, double& rsample, SampleInfo& info, void* user_data) {
 	((MidiCube*) user_data)->process(lsample, rsample, info);

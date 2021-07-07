@@ -12,6 +12,7 @@
 #include "../audiofile.h"
 #include "../envelope.h"
 #include "../util.h"
+#include "../audioloader.h"
 
 #define MIDI_NOTES 128
 
