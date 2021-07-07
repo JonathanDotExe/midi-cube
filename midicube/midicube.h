@@ -15,7 +15,7 @@
 #include "audioloader.h"
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
-StreamedAudioLoader global_audio_loader; //FIXME
+extern StreamedAudioLoader global_audio_loader; //FIXME
 
 struct MidiCubeInput {
 	MidiInput* in = nullptr;

@@ -124,20 +124,51 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 			size_t floor_block = find_floor_block(note.time, sample_rate, size);
 			size_t ceil_block = find_ceil_block(note.time, sample_rate, size);
 
-			size_t floor_index = floor(note.time * note.sample->sample.sample_rate) % size;
-			size_t ceil_index = ceil(note.time * note.sample->sample.sample_rate) % size;
+			size_t f = (size_t) floor(note.time * sample_rate);
+			size_t c = (size_t) ceil(note.time * sample_rate);
+			double prog = note.time * sample_rate / (c - f);
 
-			double floor_sample = 0;
-			double ceil_sample = 0;
+			size_t floor_index = f % size;
+			size_t ceil_index = c % size;
 
+			double lfloor_sample = 0;
+			double rfloor_sample = 0;
+			double lceil_sample = 0;
+			double rceil_sample = 0;
+
+			//Floor
 			if (floor_block == 0) {
-				floor_sample = note.sample->sample.samples
+				lfloor_sample = note.sample->sample.samples[floor_index * channels];
+				rfloor_sample = note.sample->sample.samples[floor_index * channels + 1];
+			}
+			else {
+				BufferEntry<float>& buffer = note.buffer[find_buffer_index(floor_block, note.buffer.buffer_amount)];
+				if (buffer.lock.try_lock()) {
+					lfloor_sample = buffer.buffer[floor_index * channels];
+					rfloor_sample = buffer.buffer[floor_index * channels + 1];
+					buffer.lock.unlock();
+				}
+			}
+			//Ceil
+			if (ceil_block == floor_block && ceil_index == floor_index) {
+				lceil_sample = lfloor_sample;
+				rceil_sample = rfloor_sample;
+			}
+			else if (ceil_block == 0) {
+				lceil_sample = note.sample->sample.samples[ceil_index * channels];
+				rceil_sample = note.sample->sample.samples[ceil_index * channels + 1];
+			}
+			else {
+				BufferEntry<float>& buffer = note.buffer[find_buffer_index(ceil_block, note.buffer.buffer_amount)];
+				if (buffer.lock.try_lock()) {
+					lceil_sample = buffer.buffer[ceil_index * channels];
+					rceil_sample = buffer.buffer[ceil_index * channels + 1];
+					buffer.lock.unlock();
+				}
 			}
 
-			l += note.sample->sample.isample(0, note.time, info.sample_rate) * crossfade;
-			r += note.sample->sample.isample(1, note.time, info.sample_rate) * crossfade;
-
-
+			l += (lfloor_sample * (1 - prog) + lceil_sample * prog) * crossfade;
+			r += (rfloor_sample * (1 - prog) + rceil_sample * prog) * crossfade;
 
 			note.floor_block = floor_block;
 			note.ceil_block = floor_block;
