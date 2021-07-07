@@ -59,6 +59,10 @@ public:
 
 	}
 
+	virtual void on_mouse_action() {
+
+	}
+
 	virtual ~Control() {
 
 	}

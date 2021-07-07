@@ -78,7 +78,7 @@ public:
 
 	virtual void draw(sf::RenderWindow& window, bool selected);
 
-	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+	virtual void on_mouse_action();
 
 	void update_text(std::string text);
 
@@ -300,7 +300,7 @@ public:
 
 	virtual void draw(sf::RenderWindow& window, bool selected);
 
-	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+	virtual void on_mouse_action();
 
 	virtual void update_properties();
 
@@ -344,7 +344,7 @@ public:
 
 	virtual void draw(sf::RenderWindow& window, bool selected);
 
-	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+	virtual void on_mouse_action();
 
 	virtual void update_properties();
 
@@ -498,7 +498,7 @@ public:
 
 	virtual void draw(sf::RenderWindow& window, bool selected);
 
-	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+	virtual void on_mouse_action();
 
 	SELECTABLE
 
