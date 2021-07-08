@@ -248,6 +248,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			voice.current_buffer = 0;
 			voice.region = region;
 			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume * sample->volume;
+			bool reset_buffer = &voice.region->sample != voice.sample;
 			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
 			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
@@ -258,6 +259,15 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			}
 			voice.hit_loop = false;
 			voice.env.reset();
+			//Reset buffers
+			if (reset_buffer) {
+				for (size_t i = 0; i < voice.buffer.buffer_amount; ++i) {
+					voice.buffer[i].content_id = 0;
+				}
+				for (size_t i = 0; i < voice.crossfade_buffer.buffer_amount; ++i) {
+					voice.crossfade_buffer[i].content_id = 0;
+				}
+			}
 			//Load sample
 			LoadRequest req;
 			req.block = 1;
