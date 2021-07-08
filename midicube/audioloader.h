@@ -10,7 +10,7 @@
 
 #include "util.h"
 #include "audiofile.h"
-#include "boost/lockfree/spsc_queue.hpp"
+#include "boost/lockfree/queue.hpp"
 
 
 struct LoadRequest {
@@ -22,7 +22,7 @@ struct LoadRequest {
 
 class StreamedAudioLoader {
 private:
-	boost::lockfree::spsc_queue<LoadRequest> requests;
+	boost::lockfree::queue<LoadRequest> requests;
 	std::atomic<bool> running{true};
 
 public:

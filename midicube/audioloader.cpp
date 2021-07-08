@@ -69,7 +69,9 @@ void StreamedAudioLoader::run() {
 }
 
 void StreamedAudioLoader::start() {
-	std::thread thread([this]() { run(); });
+	for (size_t i = 0; i < 4; ++i) {
+		std::thread thread([this]() { run(); });
+	}
 }
 
 void StreamedAudioLoader::stop() {
