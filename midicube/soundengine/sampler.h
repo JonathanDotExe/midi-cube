@@ -84,6 +84,7 @@ struct SamplerVoice : public TriggeredNote {
 	Filter lfilter;
 	Filter rfilter;
 	MultiBuffer<float> buffer{STREAM_AUDIO_CHUNK_SIZE, 4};
+	MultiBuffer<float> crossfade_buffer{STREAM_AUDIO_CHUNK_SIZE, 4};
 	size_t current_buffer = 0;
 	size_t floor_block = 0;
 	size_t ceil_block = 0;

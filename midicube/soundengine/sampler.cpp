@@ -80,6 +80,79 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 	return (block - 1) % block_count;
 }
 
+inline void process_stream_sample(double& lsample, double& rsample, double time, MultiBuffer<float>& b, SamplerVoice& note, double mul) {
+	const unsigned int sample_rate = note.sample->sample.sample_rate;
+	const unsigned int channels = note.sample->sample.channels;
+	const size_t size = STREAM_AUDIO_CHUNK_SIZE / channels;
+	size_t floor_block = find_floor_block(time, sample_rate, size);
+	size_t ceil_block = find_ceil_block(time, sample_rate, size);
+
+	size_t f = (size_t) floor(time * sample_rate);
+	size_t c = (size_t) ceil(time * sample_rate);
+	double prog = time * sample_rate / (c - f);
+
+	size_t floor_index = f % size;
+	size_t ceil_index = c % size;
+
+	double lfloor_sample = 0;
+	double rfloor_sample = 0;
+	double lceil_sample = 0;
+	double rceil_sample = 0;
+
+	//Floor
+	if (floor_block == 0) {
+		lfloor_sample = note.sample->sample.samples[floor_index * channels];
+		rfloor_sample = note.sample->sample.samples[floor_index * channels + 1];
+	}
+	else {
+		BufferEntry<float>& buffer = b[find_buffer_index(floor_block, b.buffer_amount)];
+		if (buffer.lock.try_lock()) {
+			lfloor_sample = buffer.buffer[floor_index * channels];
+			rfloor_sample = buffer.buffer[floor_index * channels + 1];
+			buffer.lock.unlock();
+		}
+	}
+	//Ceil
+	if (ceil_block == floor_block && ceil_index == floor_index) {
+		lceil_sample = lfloor_sample;
+		rceil_sample = rfloor_sample;
+	}
+	else if (ceil_block == 0) {
+		lceil_sample = note.sample->sample.samples[ceil_index * channels];
+		rceil_sample = note.sample->sample.samples[ceil_index * channels + 1];
+	}
+	else {
+		BufferEntry<float>& buffer = b[find_buffer_index(ceil_block, b.buffer_amount)];
+		if (buffer.lock.try_lock()) {
+			lceil_sample = buffer.buffer[ceil_index * channels];
+			rceil_sample = buffer.buffer[ceil_index * channels + 1];
+			buffer.lock.unlock();
+		}
+	}
+
+	lsample += (lfloor_sample * (1 - prog) + lceil_sample * prog) * mul;
+	rsample += (rfloor_sample * (1 - prog) + rceil_sample * prog) * mul;
+
+	/*if (floor_block != note.floor_block) {
+		note.floor_block = floor_block;
+		LoadRequest req;
+		req.block = floor_block;
+		req.buffer = &b;
+		req.buffer_index = find_buffer_index(floor_block, b.buffer_amount);
+		req.sample = note.sample;
+		global_audio_loader.queue_request(req);
+	}*/
+	if (ceil_block != note.ceil_block) {
+		note.ceil_block = ceil_block;
+		LoadRequest req;
+		req.block = ceil_block;
+		req.buffer = &b;
+		req.buffer_index = find_buffer_index(ceil_block, b.buffer_amount);
+		req.sample = note.sample;
+		global_audio_loader.queue_request(req);
+	}
+}
+
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index) {
 	if (note.region && note.sample) {
 		double vol = 1;
@@ -105,11 +178,9 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 				}
 				//Crossfade
 				else if (note.time > crossfade_end_time) {
-					//TODO
-					/*double diff = note.time - crossfade_end_time;
+					double diff = note.time - crossfade_end_time;
 					crossfade = 1 - (diff / loop_crossfade_time);
-					l += note.sample->sample.isample(0, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
-					r += note.sample->sample.isample(1, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);*/
+					process_stream_sample(l, r, crossfade_start_time + diff, note.buffer, note, (1 - crossfade));
 				}
 			}
 			else if (note.time >= loop_start_time) {
@@ -118,76 +189,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		}
 
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
-			const unsigned int sample_rate = note.sample->sample.sample_rate;
-			const unsigned int channels = note.sample->sample.channels;
-			const size_t size = STREAM_AUDIO_CHUNK_SIZE / channels;
-			size_t floor_block = find_floor_block(note.time, sample_rate, size);
-			size_t ceil_block = find_ceil_block(note.time, sample_rate, size);
-
-			size_t f = (size_t) floor(note.time * sample_rate);
-			size_t c = (size_t) ceil(note.time * sample_rate);
-			double prog = note.time * sample_rate / (c - f);
-
-			size_t floor_index = f % size;
-			size_t ceil_index = c % size;
-
-			double lfloor_sample = 0;
-			double rfloor_sample = 0;
-			double lceil_sample = 0;
-			double rceil_sample = 0;
-
-			//Floor
-			if (floor_block == 0) {
-				lfloor_sample = note.sample->sample.samples[floor_index * channels];
-				rfloor_sample = note.sample->sample.samples[floor_index * channels + 1];
-			}
-			else {
-				BufferEntry<float>& buffer = note.buffer[find_buffer_index(floor_block, note.buffer.buffer_amount)];
-				if (buffer.lock.try_lock()) {
-					lfloor_sample = buffer.buffer[floor_index * channels];
-					rfloor_sample = buffer.buffer[floor_index * channels + 1];
-					buffer.lock.unlock();
-				}
-			}
-			//Ceil
-			if (ceil_block == floor_block && ceil_index == floor_index) {
-				lceil_sample = lfloor_sample;
-				rceil_sample = rfloor_sample;
-			}
-			else if (ceil_block == 0) {
-				lceil_sample = note.sample->sample.samples[ceil_index * channels];
-				rceil_sample = note.sample->sample.samples[ceil_index * channels + 1];
-			}
-			else {
-				BufferEntry<float>& buffer = note.buffer[find_buffer_index(ceil_block, note.buffer.buffer_amount)];
-				if (buffer.lock.try_lock()) {
-					lceil_sample = buffer.buffer[ceil_index * channels];
-					rceil_sample = buffer.buffer[ceil_index * channels + 1];
-					buffer.lock.unlock();
-				}
-			}
-
-			l += (lfloor_sample * (1 - prog) + lceil_sample * prog) * crossfade;
-			r += (rfloor_sample * (1 - prog) + rceil_sample * prog) * crossfade;
-
-			/*if (floor_block != note.floor_block) {
-				note.floor_block = floor_block;
-				LoadRequest req;
-				req.block = floor_block;
-				req.buffer = &note.buffer;
-				req.buffer_index = find_buffer_index(floor_block, note.buffer.buffer_amount);
-				req.sample = note.sample;
-				global_audio_loader.queue_request(req);
-			}*/
-			if (ceil_block != note.ceil_block) {
-				note.ceil_block = ceil_block;
-				LoadRequest req;
-				req.block = ceil_block;
-				req.buffer = &note.buffer;
-				req.buffer_index = find_buffer_index(ceil_block, note.buffer.buffer_amount);
-				req.sample = note.sample;
-				global_audio_loader.queue_request(req);
-			}
+			process_stream_sample(l, r, note.time, note.buffer, note, crossfade);
 		}
 
 		//Filter
