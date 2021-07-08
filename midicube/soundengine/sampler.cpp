@@ -148,7 +148,7 @@ inline void process_stream_sample(double& lsample, double& rsample, double time,
 		req.block = ceil_block;
 		req.buffer = &b;
 		req.buffer_index = find_buffer_index(ceil_block, b.buffer_amount);
-		req.sample = note.sample;
+		req.sample = &note.sample->sample;
 		global_audio_loader.queue_request(req);
 	}
 }
@@ -273,7 +273,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			req.block = 1;
 			req.buffer = &voice.buffer;
 			req.buffer_index = find_buffer_index(1, voice.buffer.buffer_amount);
-			req.sample = voice.sample;
+			req.sample = &voice.sample->sample;
 			global_audio_loader.queue_request(req);
 		}
 	}

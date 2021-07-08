@@ -11,6 +11,7 @@
 #include "util.h"
 #include "audiofile.h"
 #include "boost/lockfree/queue.hpp"
+#include <thread>
 
 
 struct LoadRequest {
@@ -24,6 +25,7 @@ class StreamedAudioLoader {
 private:
 	boost::lockfree::queue<LoadRequest> requests;
 	std::atomic<bool> running{true};
+	std::array<std::thread, 4> worker;
 
 public:
 

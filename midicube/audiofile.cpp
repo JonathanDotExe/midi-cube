@@ -36,7 +36,7 @@ bool read_stream_audio_file(StreamedAudioSample& audio, std::string fname) {
 	if (file != nullptr) {
 		//File size
 		int size = sf_seek(file, 0, SF_SEEK_END);
-		if (size != -1 && sf_seek(file, 0, SF_SEEK_SET)) {
+		if (size != -1 && sf_seek(file, 0, SF_SEEK_SET) != -1) {
 			audio.total_size = size;
 
 			//Preload first block

@@ -11,7 +11,6 @@
 #include <sndfile.h>
 #include <sndfile.hh>
 #include <cstring>
-#include <thread>
 #include <chrono>
 
 
@@ -71,6 +70,7 @@ void StreamedAudioLoader::run() {
 void StreamedAudioLoader::start() {
 	for (size_t i = 0; i < 4; ++i) {
 		std::thread thread([this]() { run(); });
+		thread.detach();
 	}
 }
 
