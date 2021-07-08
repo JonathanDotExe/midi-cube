@@ -45,7 +45,7 @@ void StreamedAudioLoader::run() {
 
 				//Read
 				if (file != nullptr) {
-					size_t frames = req.buffer->size;
+					const size_t frames = req.buffer->size / req.sample->channels;
 					if (sf_seek(file, frames * req.block, SF_SEEK_SET) != -1) {
 						float* buffer = (*req.buffer)[req.buffer_index].buffer;
 						//memset((void *) buffer, 0, size * sizeof(buffer[0]));
