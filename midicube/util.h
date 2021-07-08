@@ -10,6 +10,7 @@
 
 #include <array>
 #include <vector>
+#include <mutex>
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
 
@@ -78,7 +79,7 @@ template<typename T>
 struct BufferEntry {
 	unsigned int content_id = 0;
 	T* buffer;
-	boost::detail::spinlock lock;
+	std::mutex lock;
 };
 
 template<typename T>

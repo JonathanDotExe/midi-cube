@@ -27,6 +27,7 @@ bool read_stream_audio_file(StreamedAudioSample& audio, std::string fname) {
 	//Info
 	audio.channels = info.channels;
 	audio.sample_rate = info.samplerate;
+	audio.path = fname;
 	if (loop.loop_count > 0) {
 		audio.loop_start = loop.loops[0].start;
 		audio.loop_end = loop.loops[0].end;

@@ -262,10 +262,14 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			//Reset buffers
 			if (reset_buffer) {
 				for (size_t i = 0; i < voice.buffer.buffer_amount; ++i) {
+					voice.buffer[i].lock.lock();
 					voice.buffer[i].content_id = 0;
+					voice.buffer[i].lock.unlock();
 				}
 				for (size_t i = 0; i < voice.crossfade_buffer.buffer_amount; ++i) {
+					voice.crossfade_buffer[i].lock.lock();
 					voice.crossfade_buffer[i].content_id = 0;
+					voice.crossfade_buffer[i].lock.unlock();
 				}
 			}
 			//Load sample

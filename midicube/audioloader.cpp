@@ -23,15 +23,18 @@ StreamedAudioLoader global_audio_loader;
 
 void StreamedAudioLoader::queue_request(LoadRequest request) {
 	requests.push(request);
+	std::cout << "Requested loading block " << request.block << " in " << request.buffer_index << " of " << request.sample->path << std::endl;
 }
 
 void StreamedAudioLoader::run() {
 	using namespace std::chrono_literals;
-
+	std::cout << "Started loading thread" << std::endl;
 	while (running) {
 		LoadRequest req;
 		if (requests.pop(req)) {
+			std::cout << "Popping request" << std::endl;
 			(*req.buffer)[req.buffer_index].lock.lock();
+			std::cout << "Started loading block" << std::endl;
 			if ((*req.buffer)[req.buffer_index].content_id != req.block) {
 				//Assumes that file doesn't change over usage
 				//Open
@@ -59,6 +62,7 @@ void StreamedAudioLoader::run() {
 					file = nullptr;
 				}
 				(*req.buffer)[req.buffer_index].lock.unlock();
+				std::cout << "Loaded block " << req.block << " in " << req.buffer_index << " of " << req.sample->path << std::endl;
 			}
 		}
 		else {
