@@ -14,6 +14,7 @@
 #include <cmath>
 #include <iostream>
 #include <array>
+#include <mutex>
 
 
 struct WAVHeader {
@@ -87,7 +88,10 @@ struct StreamedAudioSample {
 	unsigned int loop_end = 0;
 	unsigned int total_size = 0;
 	std::string path;
-	std::array<float, STREAM_AUDIO_CHUNK_SIZE> samples = {};
+	std::array<float, STREAM_AUDIO_CHUNK_SIZE> head_samples = {};
+	std::mutex lock; //FIXME use spinlock
+	bool loaded = false;
+	std::vector<float> samples;
 
 	double total_duration () {
 		return total_size / sample_rate;
@@ -98,6 +102,32 @@ struct StreamedAudioSample {
 		channels = 1;
 		total_size = 0;
 		samples = {};
+	}
+
+	double isample(unsigned int channel, double time, unsigned int sample_rate) {
+		if (channels > 0) {
+			channel %= channels;
+			double index = time * sample_rate;
+			std::size_t index1 = (std::size_t) floor(index)  * channels + channel;
+			std::size_t index2 = (std::size_t) ceil(index) * channels + channel;
+			double sample1 = 0;
+			double sample2 = 0;
+			if (index2 > head_samples.size()) {
+				if (lock.try_lock()) {
+					sample1 = index1 < samples.size() ? samples[index1] : 0;
+					sample2 = index2 < samples.size() ? samples[index2] : 0;
+				}
+			}
+			else {
+				sample1 = index1 < head_samples.size() ? head_samples[index1] : 0;
+				sample2 = index2 < head_samples.size() ? head_samples[index2] : 0;
+			}
+			double prog = 1 - index + floor(index);
+			return sample1 * prog + sample2 * (1 - prog);
+		}
+		else {
+			return 0;
+		}
 	}
 };
 
