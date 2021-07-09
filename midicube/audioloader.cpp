@@ -39,39 +39,17 @@ void StreamedAudioPool::run() {
 		if (requests.pop(req)) {
 			//Assumes that files don't change
 			//Open
-			SNDFILE* file = nullptr;
-			SF_INFO info;
-			SF_INSTRUMENT loop;
 			bool success = true;
 
-			file = sf_open(req.sample->path.c_str(), SFM_READ, &info);
-
-			//Read
-			if (file != nullptr) {
-				req.sample->lock.lock();
-				if (!req.sample->loaded) {
-					float buffer[1024];
-					sf_count_t size = _countof(buffer);
-					sf_count_t count;
-					do {
-						count = sf_read_float(file, buffer, size);
-						for (sf_count_t i = 0; i < count; i++) {
-							req.sample->samples.push_back(buffer[i]);
-						}
-					} while (count >= size);
-					req.sample->loaded = true;
-				}
-				req.sample->lock.unlock();
+			req.sample->lock.lock();
+			if (!req.sample->loaded) {
+				SndfileHandle file(req.sample->path);
+				req.sample->samples.clear();
+				req.sample->samples.reserve(file.frames());
+				file.read(&req.sample->samples[0], file.frames());
+				req.sample->loaded = true;
 			}
-			else {
-				std::cerr << "Couldn't open sound file " << req.sample->path << ": " << sf_strerror(NULL) << std::endl;
-				success = false;
-			}
-
-			if (file != nullptr) {
-				sf_close(file);
-				file = nullptr;
-			}
+			req.sample->lock.unlock();
 		}
 		else {
 			std::this_thread::sleep_for(1ms);
