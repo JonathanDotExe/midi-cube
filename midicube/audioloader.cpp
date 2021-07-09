@@ -39,8 +39,6 @@ void StreamedAudioPool::run() {
 		if (requests.pop(req)) {
 			//Assumes that files don't change
 			//Open
-			bool success = true;
-
 			req.sample->lock.lock();
 			if (!req.sample->loaded) {
 				SndfileHandle file(req.sample->path);

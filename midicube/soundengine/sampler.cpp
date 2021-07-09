@@ -81,8 +81,8 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 }
 
 inline void process_stream_sample(double& lsample, double& rsample, double time, MultiBuffer<float>& b, SamplerVoice& note, double mul) {
-	const unsigned int sample_rate = note.sample->sample.sample_rate;
-	const unsigned int channels = note.sample->sample.channels;
+	const unsigned int sample_rate = note.sample->sample->sample_rate;
+	const unsigned int channels = note.sample->sample->channels;
 	const size_t size = STREAM_AUDIO_CHUNK_SIZE / channels;
 	size_t floor_block = find_floor_block(time, sample_rate, size);
 	size_t ceil_block = find_ceil_block(time, sample_rate, size);
@@ -101,8 +101,8 @@ inline void process_stream_sample(double& lsample, double& rsample, double time,
 
 	//Floor
 	if (floor_block == 0) {
-		lfloor_sample = note.sample->sample.samples[floor_index * channels];
-		rfloor_sample = note.sample->sample.samples[floor_index * channels + 1];
+		lfloor_sample = note.sample->sample->samples[floor_index * channels];
+		rfloor_sample = note.sample->sample->samples[floor_index * channels + 1];
 	}
 	else {
 		BufferEntry<float>& buffer = b[find_buffer_index(floor_block, b.buffer_amount)];
@@ -118,8 +118,8 @@ inline void process_stream_sample(double& lsample, double& rsample, double time,
 		rceil_sample = rfloor_sample;
 	}
 	else if (ceil_block == 0) {
-		lceil_sample = note.sample->sample.samples[ceil_index * channels];
-		rceil_sample = note.sample->sample.samples[ceil_index * channels + 1];
+		lceil_sample = note.sample->sample->samples[ceil_index * channels];
+		rceil_sample = note.sample->sample->samples[ceil_index * channels + 1];
 	}
 	else {
 		BufferEntry<float>& buffer = b[find_buffer_index(ceil_block, b.buffer_amount)];
@@ -164,9 +164,9 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		//Sound
 		//Loop
 		if (note.region->loop != NO_LOOP) {
-			double loop_start_time = (double) note.sample->loop_start / note.sample->sample.sample_rate;
-			double loop_crossfade_time = (double) note.sample->loop_crossfade / note.sample->sample.sample_rate;
-			double loop_end_time = (double) note.sample->loop_end / note.sample->sample.sample_rate;
+			double loop_start_time = (double) note.sample->loop_start / note.sample->sample->sample_rate;
+			double loop_crossfade_time = (double) note.sample->loop_crossfade / note.sample->sample->sample_rate;
+			double loop_end_time = (double) note.sample->loop_end / note.sample->sample->sample_rate;
 			double loop_duration_time = loop_end_time - loop_start_time;
 			double crossfade_start_time = loop_start_time - loop_crossfade_time;
 			double crossfade_end_time = loop_end_time - loop_crossfade_time;

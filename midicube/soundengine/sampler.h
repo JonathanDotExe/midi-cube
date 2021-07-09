@@ -41,7 +41,7 @@ struct SampleEnvelope {
 };
 
 struct LoopedAudioSample {
-	StreamedAudioSample sample;
+	StreamedAudioSample* sample = nullptr;
 	unsigned int start = 0;
 	unsigned int loop_start = 0;
 	unsigned int loop_end = 0;
@@ -69,8 +69,7 @@ struct SampleRegion {
 	TriggerType trigger = TriggerType::ATTACK_TRIGGER;
 
 	SampleRegion() {
-		sample.sample.clear();
-		sustain_sample.sample.clear();
+
 	};
 };
 
@@ -122,6 +121,7 @@ class SampleSoundStore {
 private:
 	std::vector<SampleSound*> samples;
 public:
+	StreamedAudioPool pool;
 
 	SampleSound* get_sound(size_t index);
 
