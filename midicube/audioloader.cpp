@@ -15,6 +15,7 @@
 
 
 
+
 #ifndef _countof
 #define _countof(arr) (sizeof(arr)/sizeof(arr[0]))
 #endif
@@ -80,4 +81,72 @@ void StreamedAudioLoader::start() {
 
 void StreamedAudioLoader::stop() {
 	running = false;
+}
+
+StreamedAudioSample* StreamedAudioPool::load_sample(std::string fname) {
+	samples.push_back({});
+	StreamedAudioSample& sample = samples[samples.size() - 1];
+	read_stream_audio_file(sample, fname);
+	return sample;
+}
+
+void StreamedAudioPool::queue_request(LoadRequest request) {
+	requests.push(request);
+}
+
+void StreamedAudioPool::run() {
+	//TODO
+	using namespace std::chrono_literals;
+	std::cout << "Started loading thread" << std::endl;
+	while (running) {
+		LoadRequest req;
+		if (requests.pop(req)) {
+			std::cout << "Popping request" << std::endl;
+			(*req.buffer)[req.buffer_index].lock.lock();
+			std::cout << "Started loading block" << std::endl;
+			if ((*req.buffer)[req.buffer_index].content_id != req.block) {
+				//Assumes that file doesn't change over usage
+				//Open
+				SNDFILE* file = nullptr;
+				SF_INFO info;
+
+				file = sf_open(req.sample->path.c_str(), SFM_READ, &info);
+
+				//Read
+				if (file != nullptr) {
+					const size_t frames = req.buffer->size / req.sample->channels;
+					if (sf_seek(file, frames * req.block, SF_SEEK_SET) != -1) {
+						float* buffer = (*req.buffer)[req.buffer_index].buffer;
+						//memset((void *) buffer, 0, size * sizeof(buffer[0]));
+						sf_readf_float(file, buffer, frames);	//It must be externally ensured that all the frames fit in the buffer
+						(*req.buffer)[req.buffer_index].content_id = req.block;
+					}
+				}
+				else {
+					std::cerr << "Couldn't open sound file " << req.sample->path << ": " << sf_strerror(file) << std::endl;
+				}
+
+				if (file != nullptr) {
+					sf_close(file);
+					file = nullptr;
+				}
+				(*req.buffer)[req.buffer_index].lock.unlock();
+				std::cout << "Loaded block " << req.block << " in " << req.buffer_index << " of " << req.sample->path << std::endl;
+			}
+		}
+		else {
+			std::this_thread::sleep_for(1ms);
+		}
+	}
+}
+
+void StreamedAudioPool::stop() {
+	running = false;
+}
+
+void StreamedAudioPool::start() {
+	for (size_t i = 0; i < 4; ++i) {
+		std::thread thread([this]() { run(); });
+		thread.detach();
+	}
 }

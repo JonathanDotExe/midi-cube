@@ -47,4 +47,24 @@ public:
 
 extern StreamedAudioLoader global_audio_loader; //FIXME
 
+class StreamedAudioPool {
+private:
+	std::vector<StreamedAudioSample> samples;
+	boost::lockfree::queue<LoadRequest> requests;
+	std::atomic<bool> running{true};
+	std::array<std::thread, 4> worker;
+
+public:
+
+	StreamedAudioSample* load_sample(std::string fname);
+	void queue_request(LoadRequest request);
+	void run();
+	void stop();
+	void start();
+
+	~StreamedAudioPool() {
+		stop();
+	}
+};
+
 #endif /* MIDICUBE_AUDIOLOADER_H_ */
