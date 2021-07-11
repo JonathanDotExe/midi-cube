@@ -56,14 +56,14 @@ void StreamedAudioPool::run(bool gc) {
 				//Garbage collect
 				unsigned int time = TIME_NOW();
 				gc_index %= samples.size();
-				StreamedAudioSample& sample = samples[gc_index];
-				if (sample.lock.try_lock()) {
-					if (sample.last_used + 20000 < time) {
+				StreamedAudioSample* sample = samples[gc_index];
+				if (sample->lock.try_lock()) {
+					if (sample->last_used + 20000 < time) {
 						//Delete
-						sample.samples.clear();
-						sample.loaded = false;
+						sample->samples.clear();
+						sample->loaded = false;
 					}
-					sample.lock.unlock();
+					sample->lock.unlock();
 				}
 				++gc_index;
 			}

@@ -45,7 +45,7 @@ bool read_stream_audio_file(StreamedAudioSample& audio, std::string fname) {
 			sf_count_t count;
 			count = sf_read_float(file, buffer, STREAM_AUDIO_CHUNK_SIZE);
 			for (sf_count_t i = 0; i < count; i++) {
-				audio.samples[i] = buffer[i];
+				audio.head_samples[i] = buffer[i];
 			}
 		}
 		else {

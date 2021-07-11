@@ -361,8 +361,8 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_crossfade);
 
 	if (load_sample && file != "") {
-		StreamedAudioSample* sample = pool.load_sample(file);
-		if (!sample) {
+		region.sample.sample = pool.load_sample(folder + "/" + file);
+		if (!region.sample.sample) {
 			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
 		}
 		if (region.sample.loop_start == 0 && region.sample.loop_end == 0) {
@@ -382,8 +382,8 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.sustain_sample.loop_crossfade = tree.get<unsigned int>("sustain_sample.loop_crossfade", region.sustain_sample.loop_start);
 
 	if (load_sample && sfile != "") {
-		StreamedAudioSample* sample = pool.load_sample(sfile);
-		if (!sample) {
+		region.sustain_sample.sample = pool.load_sample(folder + "/" + sfile);
+		if (region.sustain_sample.sample) {
 			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
 		}
 		if (region.sustain_sample.loop_start == 0 && region.sample.loop_end == 0) {

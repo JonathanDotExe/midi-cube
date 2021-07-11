@@ -28,6 +28,10 @@ private:
 
 public:
 
+	StreamedAudioPool() : requests(1024) {
+
+	}
+
 	StreamedAudioSample* load_sample(std::string fname);
 	void queue_request(LoadRequest request);
 	void run(bool gc);
