@@ -28,6 +28,7 @@ StreamedAudioSample* StreamedAudioPool::load_sample(std::string fname) {
 }
 
 void StreamedAudioPool::queue_request(LoadRequest request) {
+	std::cout << "Queued request " << request.sample->path << std::endl;
 	requests.push(request);
 }
 
@@ -37,6 +38,7 @@ void StreamedAudioPool::run(bool gc) {
 	while (running) {
 		LoadRequest req;
 		if (requests.pop(req)) {
+			std::cout << "Popped request " << req.sample->path << std::endl;
 			//Assumes that files don't change
 			//Open
 			req.sample->lock.lock();
@@ -49,6 +51,7 @@ void StreamedAudioPool::run(bool gc) {
 				req.sample->loaded = true;
 			}
 			req.sample->lock.unlock();
+			std::cout << "Loaded " << req.sample->path << std::endl;
 		}
 		else {
 			std::this_thread::sleep_for(1ms);
@@ -58,10 +61,11 @@ void StreamedAudioPool::run(bool gc) {
 				gc_index %= samples.size();
 				StreamedAudioSample* sample = samples[gc_index];
 				if (sample->lock.try_lock()) {
-					if (sample->last_used + 20000 < time) {
+					if (sample->loaded && sample->last_used + 20000 < time) {
 						//Delete
 						sample->samples.clear();
 						sample->loaded = false;
+						std::cout << "Garbage collected " << sample->path << std::endl;
 					}
 					sample->lock.unlock();
 				}

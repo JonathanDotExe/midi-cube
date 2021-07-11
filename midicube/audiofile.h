@@ -101,7 +101,7 @@ struct StreamedAudioSample {
 	StreamedAudioSample(StreamedAudioSample& copy) = delete;
 
 	double total_duration () {
-		return total_size / sample_rate;
+		return (double) total_size / sample_rate;
 	}
 
 	void clear () {

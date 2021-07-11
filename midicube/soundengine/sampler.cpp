@@ -117,8 +117,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		}
 
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
-			lsample += note.sample->sample->isample(0, note.time, info.sample_rate) * crossfade;
-			rsample += note.sample->sample->isample(1, note.time, info.sample_rate) * crossfade;
+			l += note.sample->sample->isample(0, note.time, info.sample_rate) * crossfade;
+			r += note.sample->sample->isample(1, note.time, info.sample_rate) * crossfade;
 		}
 
 		//Filter
