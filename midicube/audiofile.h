@@ -15,8 +15,10 @@
 #include <iostream>
 #include <array>
 #include <mutex>
+#include <chrono>
 #include "util.h"
 
+#define TIME_NOW() (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())).count()
 
 struct WAVHeader {
 	char chunkID[4];
@@ -122,6 +124,7 @@ struct StreamedAudioSample {
 			double sample2 = 0;
 			if (index2 >= head_samples.size()) {
 				if (lock.try_lock()) {
+					last_used = TIME_NOW();
 					sample1 = index1 < samples.size() ? samples[index1] : 0;
 					sample2 = index2 < samples.size() ? samples[index2] : 0;
 					lock.unlock();
