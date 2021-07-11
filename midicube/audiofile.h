@@ -119,7 +119,7 @@ struct StreamedAudioSample {
 			std::size_t index2 = (std::size_t) ceil(index) * channels + channel;
 			double sample1 = 0;
 			double sample2 = 0;
-			if (index2 > head_samples.size()) {
+			if (index2 >= head_samples.size()) {
 				if (lock.try_lock()) {
 					sample1 = index1 < samples.size() ? samples[index1] : 0;
 					sample2 = index2 < samples.size() ? samples[index2] : 0;
