@@ -80,60 +80,6 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 	return (block - 1) % block_count;
 }
 
-inline void process_stream_sample(double& lsample, double& rsample, double time, MultiBuffer<float>& b, SamplerVoice& note, double mul) {
-	const unsigned int sample_rate = note.sample->sample->sample_rate;
-	const unsigned int channels = note.sample->sample->channels;
-	const size_t size = STREAM_AUDIO_CHUNK_SIZE / channels;
-	size_t floor_block = find_floor_block(time, sample_rate, size);
-	size_t ceil_block = find_ceil_block(time, sample_rate, size);
-
-	size_t f = (size_t) floor(time * sample_rate);
-	size_t c = (size_t) ceil(time * sample_rate);
-	double prog = time * sample_rate / (c - f);
-
-	size_t floor_index = f % size;
-	size_t ceil_index = c % size;
-
-	double lfloor_sample = 0;
-	double rfloor_sample = 0;
-	double lceil_sample = 0;
-	double rceil_sample = 0;
-
-	//Floor
-	if (floor_block == 0) {
-		lfloor_sample = note.sample->sample->samples[floor_index * channels];
-		rfloor_sample = note.sample->sample->samples[floor_index * channels + 1];
-	}
-	else {
-		BufferEntry<float>& buffer = b[find_buffer_index(floor_block, b.buffer_amount)];
-		if (buffer.lock.try_lock()) {
-			lfloor_sample = buffer.buffer[floor_index * channels];
-			rfloor_sample = buffer.buffer[floor_index * channels + 1];
-			buffer.lock.unlock();
-		}
-	}
-	//Ceil
-	if (ceil_block == floor_block && ceil_index == floor_index) {
-		lceil_sample = lfloor_sample;
-		rceil_sample = rfloor_sample;
-	}
-	else if (ceil_block == 0) {
-		lceil_sample = note.sample->sample->samples[ceil_index * channels];
-		rceil_sample = note.sample->sample->samples[ceil_index * channels + 1];
-	}
-	else {
-		BufferEntry<float>& buffer = b[find_buffer_index(ceil_block, b.buffer_amount)];
-		if (buffer.lock.try_lock()) {
-			lceil_sample = buffer.buffer[ceil_index * channels];
-			rceil_sample = buffer.buffer[ceil_index * channels + 1];
-			buffer.lock.unlock();
-		}
-	}
-
-	lsample += (lfloor_sample * (1 - prog) + lceil_sample * prog) * mul;
-	rsample += (rfloor_sample * (1 - prog) + rceil_sample * prog) * mul;
-}
-
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index) {
 	if (note.region && note.sample) {
 		double vol = 1;
@@ -161,7 +107,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 				else if (note.time > crossfade_end_time) {
 					double diff = note.time - crossfade_end_time;
 					crossfade = 1 - (diff / loop_crossfade_time);
-					process_stream_sample(l, r, crossfade_start_time + diff, note.buffer, note, (1 - crossfade));
+					lsample += note.sample->sample->isample(0, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
+					rsample += note.sample->sample->isample(1, crossfade_start_time + diff, info.sample_rate) * (1 - crossfade);
 				}
 			}
 			else if (note.time >= loop_start_time) {
@@ -170,7 +117,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		}
 
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
-			process_stream_sample(l, r, note.time, note.buffer, note, crossfade);
+			lsample += note.sample->sample->isample(0, note.time, info.sample_rate) * crossfade;
+			rsample += note.sample->sample->isample(1, note.time, info.sample_rate) * crossfade;
 		}
 
 		//Filter
@@ -229,9 +177,9 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			voice.current_buffer = 0;
 			voice.region = region;
 			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume * sample->volume;
-			bool reset_buffer = &voice.region->sample != voice.sample;
 			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
+			//TODO preload at start time
 			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
 				voice.time = (double) voice.sample->loop_start/voice.sample->sample->sample_rate;
 			}
@@ -240,19 +188,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			}
 			voice.hit_loop = false;
 			voice.env.reset();
-			//Reset buffers
-			if (reset_buffer) {
-				for (size_t i = 0; i < voice.buffer.buffer_amount; ++i) {
-					voice.buffer[i].lock.lock();
-					voice.buffer[i].content_id = 0;
-					voice.buffer[i].lock.unlock();
-				}
-				for (size_t i = 0; i < voice.crossfade_buffer.buffer_amount; ++i) {
-					voice.crossfade_buffer[i].lock.lock();
-					voice.crossfade_buffer[i].content_id = 0;
-					voice.crossfade_buffer[i].lock.unlock();
-				}
-			}
+
 			//Load sample
 			LoadRequest req;
 			req.sample = voice.sample->sample;
