@@ -91,6 +91,7 @@ struct StreamedAudioSample {
 	std::array<float, STREAM_AUDIO_CHUNK_SIZE> head_samples = {};
 	std::mutex lock; //FIXME use spinlock
 	bool loaded = false;
+	unsigned int last_used = 0;
 	std::vector<float> samples;
 
 	StreamedAudioSample() {
@@ -122,6 +123,7 @@ struct StreamedAudioSample {
 				if (lock.try_lock()) {
 					sample1 = index1 < samples.size() ? samples[index1] : 0;
 					sample2 = index2 < samples.size() ? samples[index2] : 0;
+					lock.unlock();
 				}
 			}
 			else {

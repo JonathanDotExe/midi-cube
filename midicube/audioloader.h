@@ -24,12 +24,13 @@ private:
 	boost::lockfree::queue<LoadRequest> requests;
 	std::atomic<bool> running{true};
 	std::array<std::thread, 4> worker;
+	size_t gc_index = 0;
 
 public:
 
 	StreamedAudioSample* load_sample(std::string fname);
 	void queue_request(LoadRequest request);
-	void run();
+	void run(bool gc);
 	void stop();
 	void start();
 
