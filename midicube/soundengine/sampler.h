@@ -11,6 +11,8 @@
 #include "soundengine.h"
 #include "../audiofile.h"
 #include "../envelope.h"
+#include "../util.h"
+#include "../audioloader.h"
 
 #define MIDI_NOTES 128
 
@@ -39,7 +41,7 @@ struct SampleEnvelope {
 };
 
 struct LoopedAudioSample {
-	AudioSample sample;
+	StreamedAudioSample* sample = nullptr;
 	unsigned int start = 0;
 	unsigned int loop_start = 0;
 	unsigned int loop_end = 0;
@@ -67,8 +69,7 @@ struct SampleRegion {
 	TriggerType trigger = TriggerType::ATTACK_TRIGGER;
 
 	SampleRegion() {
-		sample.sample.clear();
-		sustain_sample.sample.clear();
+
 	};
 };
 
@@ -81,6 +82,9 @@ struct SamplerVoice : public TriggeredNote {
 	WaveTableADSREnvelope env;
 	Filter lfilter;
 	Filter rfilter;
+	size_t current_buffer = 0;
+	size_t floor_block = 0;
+	size_t ceil_block = 0;
 };
 
 struct SampleRegionIndex {
@@ -115,6 +119,7 @@ class SampleSoundStore {
 private:
 	std::vector<SampleSound*> samples;
 public:
+	StreamedAudioPool pool;
 
 	SampleSound* get_sound(size_t index);
 
@@ -165,7 +170,7 @@ public:
 
 };
 
-extern SampleSound* load_sound(std::string folder);
+extern SampleSound* load_sound(std::string folder, StreamedAudioPool& pool);
 
 extern void save_sound(std::string file);
 
