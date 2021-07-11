@@ -51,7 +51,7 @@ void MidiCube::init(int out_device, int in_device) {
 	prog_mgr.apply_program_direct(0, 0);
 
 	//Init stream loader
-	global_audio_loader.start();
+	global_sample_store.pool.start();
 
 	//MIDI Inputs
 	//Input-Devices
@@ -139,7 +139,7 @@ MidiCube::~MidiCube() {
 		delete in.in;
 	}
 	inputs.clear();
-	global_audio_loader.stop();
+	global_sample_store.pool.stop();
 	lock.unlock();
 }
 
