@@ -93,6 +93,12 @@ struct StreamedAudioSample {
 	bool loaded = false;
 	std::vector<float> samples;
 
+	StreamedAudioSample() {
+
+	}
+
+	StreamedAudioSample(StreamedAudioSample& copy) = delete;
+
 	double total_duration () {
 		return total_size / sample_rate;
 	}

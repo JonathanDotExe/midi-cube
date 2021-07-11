@@ -172,7 +172,7 @@ public:
 
 };
 
-extern SampleSound* load_sound(std::string folder);
+extern SampleSound* load_sound(std::string folder, StreamedAudioPool& pool);
 
 extern void save_sound(std::string file);
 

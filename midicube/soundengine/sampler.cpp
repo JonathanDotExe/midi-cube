@@ -37,7 +37,7 @@ SampleSound* SampleSoundStore::get_sound(size_t index) {
 void SampleSoundStore::load_sounds(std::string folder) {
 	for (const auto& f : boost::filesystem::directory_iterator(folder)) {
 		std::string file = f.path().string();
-		SampleSound* s = load_sound(file);
+		SampleSound* s = load_sound(file, pool);
 		if (s) {
 			samples.push_back(s);
 		}
@@ -132,25 +132,6 @@ inline void process_stream_sample(double& lsample, double& rsample, double time,
 
 	lsample += (lfloor_sample * (1 - prog) + lceil_sample * prog) * mul;
 	rsample += (rfloor_sample * (1 - prog) + rceil_sample * prog) * mul;
-
-	/*if (floor_block != note.floor_block) {
-		note.floor_block = floor_block;
-		LoadRequest req;
-		req.block = floor_block;
-		req.buffer = &b;
-		req.buffer_index = find_buffer_index(floor_block, b.buffer_amount);
-		req.sample = note.sample;
-		global_audio_loader.queue_request(req);
-	}*/
-	if (ceil_block != note.ceil_block) {
-		note.ceil_block = ceil_block;
-		LoadRequest req;
-		req.block = ceil_block;
-		req.buffer = &b;
-		req.buffer_index = find_buffer_index(ceil_block, b.buffer_amount);
-		req.sample = &note.sample->sample;
-		global_audio_loader.queue_request(req);
-	}
 }
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index) {
@@ -235,7 +216,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 
 bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.region && note.sample) {
-		return (note.region->loop == NO_LOOP && note.time > note.sample->sample.total_duration()) || (!note.region->env.sustain_entire_sample && note.env.is_finished()) || note.layer_amp <= 0.0005;
+		return (note.region->loop == NO_LOOP && note.time > note.sample->sample->total_duration()) || (!note.region->env.sustain_entire_sample && note.env.is_finished()) || note.layer_amp <= 0.0005;
 	}
 	return true;
 }
@@ -252,10 +233,10 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
 			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
-				voice.time = (double) voice.sample->loop_start/voice.sample->sample.sample_rate;
+				voice.time = (double) voice.sample->loop_start/voice.sample->sample->sample_rate;
 			}
 			else {
-				voice.time = (double) voice.sample->start/voice.sample->sample.sample_rate;;
+				voice.time = (double) voice.sample->start/voice.sample->sample->sample_rate;
 			}
 			voice.hit_loop = false;
 			voice.env.reset();
@@ -274,11 +255,8 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			}
 			//Load sample
 			LoadRequest req;
-			req.block = 1;
-			req.buffer = &voice.buffer;
-			req.buffer_index = find_buffer_index(1, voice.buffer.buffer_amount);
-			req.sample = &voice.sample->sample;
-			global_audio_loader.queue_request(req);
+			req.sample = voice.sample->sample;
+			global_sample_store.pool.queue_request(req);
 		}
 	}
 }
@@ -360,7 +338,7 @@ Sampler::~Sampler() {
 	set_sample(nullptr);
 }
 
-void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::string folder) {
+void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::string folder, StreamedAudioPool& pool) {
 	region.env.env.pedal_catch = true;
 	region.env.velocity_amount = tree.get<double>("envelope.velocity_amount", region.env.velocity_amount);
 	region.env.env.attack = tree.get<double>("envelope.attack", region.env.env.attack);
@@ -447,15 +425,16 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_crossfade);
 
 	if (load_sample && file != "") {
-		if (!read_stream_audio_file(region.sample.sample, folder + "/" + file)) {
+		StreamedAudioSample* sample = pool.load_sample(file);
+		if (!sample) {
 			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
 		}
 		if (region.sample.loop_start == 0 && region.sample.loop_end == 0) {
-			region.sample.loop_start = region.sample.sample.loop_start;
-			region.sample.loop_end = region.sample.sample.loop_end;
+			region.sample.loop_start = region.sample.sample->loop_start;
+			region.sample.loop_end = region.sample.sample->loop_end;
 		}
 		if (region.sample.loop_end < region.sample.loop_start) {
-			region.sample.loop_end = region.sample.sample.samples.size()/region.sample.sample.channels;
+			region.sample.loop_end = region.sample.sample->total_size/region.sample.sample->channels;
 		}
 	}
 
@@ -467,44 +446,45 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.sustain_sample.loop_crossfade = tree.get<unsigned int>("sustain_sample.loop_crossfade", region.sustain_sample.loop_start);
 
 	if (load_sample && sfile != "") {
-		if (!read_stream_audio_file(region.sustain_sample.sample, folder + "/" + sfile)) {
-			std::cerr << "Couldn't load sustain sample file " << folder + "/" + sfile << std::endl;
+		StreamedAudioSample* sample = pool.load_sample(sfile);
+		if (!sample) {
+			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
 		}
-		if (region.sustain_sample.loop_start == 0 && region.sustain_sample.loop_end == 0) {
-			region.sustain_sample.loop_start = region.sustain_sample.sample.loop_start;
-			region.sustain_sample.loop_end = region.sustain_sample.sample.loop_end;
+		if (region.sustain_sample.loop_start == 0 && region.sample.loop_end == 0) {
+			region.sustain_sample.loop_start = region.sample.sample->loop_start;
+			region.sustain_sample.loop_end = region.sample.sample->loop_end;
 		}
 		if (region.sustain_sample.loop_end < region.sustain_sample.loop_start) {
-			region.sustain_sample.loop_end = region.sustain_sample.sample.samples.size()/region.sustain_sample.sample.channels;
+			region.sustain_sample.loop_end = region.sustain_sample.sample->total_size/region.sustain_sample.sample->channels;
 		}
 	}
 }
 
-void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegion region, std::string folder) {
+void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegion region, std::string folder, StreamedAudioPool& pool) {
 	for (auto c : tree) {
 		SampleRegion r = region;
 		pt::ptree t = c.second;
 
-		load_region(t, r, false, folder);
+		load_region(t, r, false, folder, pool);
 
 		//Regions
 		auto rs = t.get_child_optional("regions");
 		if (rs) {
 			for (auto re : rs.get()) {
 				regions.push_back(new SampleRegion(r));
-				load_region(re.second, *regions.at(regions.size() - 1), true, folder);
+				load_region(re.second, *regions.at(regions.size() - 1), true, folder, pool);
 			}
 		}
 		//Groups
 		auto groups = t.get_child_optional("groups");
 		if (groups) {
-			load_groups(groups.get(), regions, r, folder);
+			load_groups(groups.get(), regions, r, folder, pool);
 		}
 
 	}
 }
 
-extern SampleSound* load_sound(std::string folder) {
+extern SampleSound* load_sound(std::string folder, StreamedAudioPool& pool) {
 	//Load file
 	pt::ptree tree;
 	SampleSound* sound = nullptr;
@@ -517,12 +497,12 @@ extern SampleSound* load_sound(std::string folder) {
 		sound->volume = tree.get<double>("sound.master_volume", 1);
 		SampleRegion master;
 		if (tree.get_child_optional("sound")) {
-			load_region(tree.get_child("sound"), master, false, folder);
+			load_region(tree.get_child("sound"), master, false, folder, pool);
 		}
 		//Load groups
 		auto groups = tree.get_child_optional("sound.groups");
 		if (groups) {
-			load_groups(groups.get(), sound->samples, master, folder);
+			load_groups(groups.get(), sound->samples, master, folder, pool);
 		}
 	}
 	catch (pt::xml_parser_error& e) {

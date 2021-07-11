@@ -20,7 +20,7 @@ struct LoadRequest {
 
 class StreamedAudioPool {
 private:
-	std::vector<StreamedAudioSample> samples;
+	std::vector<StreamedAudioSample*> samples;
 	boost::lockfree::queue<LoadRequest> requests;
 	std::atomic<bool> running{true};
 	std::array<std::thread, 4> worker;
@@ -35,6 +35,10 @@ public:
 
 	~StreamedAudioPool() {
 		stop();
+		for (StreamedAudioSample* sample : samples) {
+			delete sample;
+		}
+		samples.clear();
 	}
 };
 

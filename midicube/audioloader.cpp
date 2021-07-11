@@ -21,9 +21,9 @@
 #endif
 
 StreamedAudioSample* StreamedAudioPool::load_sample(std::string fname) {
-	samples.push_back({});
-	StreamedAudioSample& sample = samples[samples.size() - 1];
-	read_stream_audio_file(sample, fname);
+	StreamedAudioSample* sample = new StreamedAudioSample();
+	read_stream_audio_file(*sample, fname);
+	samples.push_back(sample);
 	return sample;
 }
 
