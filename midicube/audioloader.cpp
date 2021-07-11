@@ -53,7 +53,6 @@ void StreamedAudioPool::run(bool gc) {
 			std::cout << "Loaded " << req.sample->path << std::endl;
 		}
 		else {
-			std::this_thread::sleep_for(1ms);
 			if (gc) {
 				//Garbage collect
 				unsigned int time = TIME_NOW();
@@ -70,6 +69,7 @@ void StreamedAudioPool::run(bool gc) {
 				}
 				++gc_index;
 			}
+			std::this_thread::sleep_for(1ms);
 		}
 	}
 }

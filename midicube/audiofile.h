@@ -15,6 +15,7 @@
 #include <iostream>
 #include <array>
 #include <mutex>
+#include "util.h"
 
 
 struct WAVHeader {
@@ -89,7 +90,7 @@ struct StreamedAudioSample {
 	unsigned int total_size = 0;
 	std::string path;
 	std::array<float, STREAM_AUDIO_CHUNK_SIZE> head_samples = {};
-	std::mutex lock; //FIXME use spinlock
+	SpinLock lock;
 	bool loaded = false;
 	unsigned int last_used = 0;
 	std::vector<float> samples;

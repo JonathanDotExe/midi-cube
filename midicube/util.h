@@ -12,6 +12,8 @@
 #include <vector>
 #include <mutex>
 #include <boost/smart_ptr/detail/spinlock.hpp>
+#include <thread>
+#include <chrono>
 
 
 template<class T, std::size_t N> class CircularBuffer {
@@ -107,6 +109,40 @@ public:
 			delete buffer[i].buffer;
 			buffer[i].buffer = nullptr;
 		}
+	}
+
+};
+
+using namespace std::chrono_literals;
+
+//Based on https://stackoverflow.com/a/29195378
+class SpinLock {
+private:
+	std::atomic_flag flag = ATOMIC_FLAG_INIT;
+
+public:
+
+	SpinLock() {
+
+	}
+
+	SpinLock(SpinLock& lock) = delete;
+
+
+	inline void lock() {
+		while (flag.test_and_set(std::memory_order_acquire)) {
+#ifdef __GNUC__
+			asm volatile("pause\n": : :"memory");
+#endif
+		}
+	}
+
+	inline bool try_lock() {
+		return !flag.test_and_set(std::memory_order_acquire);
+	}
+
+	inline void unlock() {
+		flag.clear(std::memory_order_acquire);
 	}
 
 };
