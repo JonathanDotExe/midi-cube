@@ -481,6 +481,15 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 		break;
 	}
 
+	//Effects
+	for (auto& e : effects) {
+		if (e.get_effect()) {
+			if (e.get_effect()->midi_message(message, info)) {
+				updated = true;
+			}
+		}
+	}
+
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = channels[i];
