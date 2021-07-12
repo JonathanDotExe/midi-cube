@@ -13,12 +13,7 @@
 #include <string>
 #include <cmath>
 #include <iostream>
-#include <array>
-#include <mutex>
-#include <chrono>
-#include "util.h"
 
-#define TIME_NOW() (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())).count()
 
 struct WAVHeader {
 	char chunkID[4];
@@ -81,69 +76,6 @@ struct AudioSample {
 		samples.clear();
 	}
 };
-
-#define STREAM_AUDIO_CHUNK_SIZE 131072
-
-struct StreamedAudioSample {
-	unsigned int sample_rate = 1;
-	unsigned int channels = 1;
-	unsigned int loop_start = 0;
-	unsigned int loop_end = 0;
-	unsigned int total_size = 0;
-	std::string path;
-	std::array<float, STREAM_AUDIO_CHUNK_SIZE> head_samples = {};
-	SpinLock lock;
-	bool loaded = false;
-	unsigned int last_used = 0;
-	std::vector<float> samples;
-
-	StreamedAudioSample() {
-
-	}
-
-	StreamedAudioSample(StreamedAudioSample& copy) = delete;
-
-	double total_duration () {
-		return (double) total_size / sample_rate;
-	}
-
-	void clear () {
-		sample_rate = 1;
-		channels = 1;
-		total_size = 0;
-		samples = {};
-	}
-
-	double isample(unsigned int channel, double time, unsigned int sample_rate) {
-		if (channels > 0) {
-			channel %= channels;
-			double index = time * sample_rate;
-			std::size_t index1 = (std::size_t) floor(index)  * channels + channel;
-			std::size_t index2 = (std::size_t) ceil(index) * channels + channel;
-			double sample1 = 0;
-			double sample2 = 0;
-			if (index2 >= head_samples.size()) {
-				if (lock.try_lock()) {
-					last_used = TIME_NOW();
-					sample1 = index1 < samples.size() ? samples[index1] : 0;
-					sample2 = index2 < samples.size() ? samples[index2] : 0;
-					lock.unlock();
-				}
-			}
-			else {
-				sample1 = index1 < head_samples.size() ? head_samples[index1] : 0;
-				sample2 = index2 < head_samples.size() ? head_samples[index2] : 0;
-			}
-			double prog = 1 - index + floor(index);
-			return sample1 * prog + sample2 * (1 - prog);
-		}
-		else {
-			return 0;
-		}
-	}
-};
-
-bool read_stream_audio_file(StreamedAudioSample& audio, std::string fname);
 
 bool read_audio_file(AudioSample& audio, std::string fname);
 

@@ -58,9 +58,6 @@ public:
 
 class SoundEngine {
 
-private:
-
-
 public:
 	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) = 0;
 

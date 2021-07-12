@@ -12,7 +12,6 @@
 #include "program.h"
 #include "data.h"
 #include "soundengine/soundengine.h"
-#include "audioloader.h"
 #include <boost/smart_ptr/detail/spinlock.hpp>
 
 struct MidiCubeInput {
@@ -38,7 +37,6 @@ public:
 	ProgramManager prog_mgr;
 	SoundEngineDevice engine;
 	ActionHandler action_handler;
-
 	std::atomic<bool> updated{false};
 
 	boost::detail::spinlock lock;

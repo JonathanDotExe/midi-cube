@@ -5,8 +5,6 @@
  *      Author: jojo
  */
 
-#ifndef MIDICUBE_EFFECT_REVERB_H_
-#define MIDICUBE_EFFECT_REVERB_H_
 
 #include "effect.h"
 
@@ -83,5 +81,3 @@ public:
 	void apply_program(EffectProgram *prog);
 	~ReverbEffect();
 };
-
-#endif /* MIDICUBE_EFFECT_REVERB_H_ */

@@ -8,7 +8,6 @@ deps = [
 	dependency('sfml-system'),
 	dependency('sfml-window'),
 	dependency('sfml-graphics'),
-	cxx.find_library('pthread'),
 	cxx.find_library('boost_system'),
 	cxx.find_library('boost_filesystem')
 ]
@@ -18,7 +17,6 @@ src = [
 	
 	'midicube/audio.cpp',
 	'midicube/audiofile.cpp',
-	'midicube/audioloader.cpp',
 	'midicube/binding.cpp',
 	'midicube/data.cpp',
 	'midicube/envelope.cpp',

@@ -10,10 +10,6 @@
 
 #include <array>
 #include <vector>
-#include <mutex>
-#include <boost/smart_ptr/detail/spinlock.hpp>
-#include <thread>
-#include <chrono>
 
 
 template<class T, std::size_t N> class CircularBuffer {
@@ -75,76 +71,6 @@ public:
 	FixedScale(double start, std::vector<ScaleItem>items, double end);
 	double value(double progress) const;
 	double progress(double value) const;
-};
-
-template<typename T>
-struct BufferEntry {
-	unsigned int content_id = 0;
-	T* buffer;
-	std::mutex lock;
-};
-
-template<typename T>
-class MultiBuffer {
-private:
-	BufferEntry<T>* buffer;
-
-public:
-	const size_t buffer_amount;
-	const size_t size;
-
-	MultiBuffer(size_t s, size_t n) : buffer_amount(n), size(s) {
-		buffer = new BufferEntry<T>[buffer_amount];
-		for (size_t i = 0; i < buffer_amount; ++i) {
-			buffer[i].buffer = new T[size];
-		}
-	}
-
-	inline BufferEntry<T>& operator [](size_t n) {
-		return buffer[n];
-	}
-
-	~MultiBuffer() {
-		for (size_t i = 0; i < buffer_amount; ++i) {
-			delete buffer[i].buffer;
-			buffer[i].buffer = nullptr;
-		}
-	}
-
-};
-
-using namespace std::chrono_literals;
-
-//Based on https://stackoverflow.com/a/29195378
-class SpinLock {
-private:
-	std::atomic_flag flag = ATOMIC_FLAG_INIT;
-
-public:
-
-	SpinLock() {
-
-	}
-
-	SpinLock(SpinLock& lock) = delete;
-
-
-	inline void lock() {
-		while (flag.test_and_set(std::memory_order_acquire)) {
-#ifdef __GNUC__
-			asm volatile("pause\n": : :"memory");
-#endif
-		}
-	}
-
-	inline bool try_lock() {
-		return !flag.test_and_set(std::memory_order_acquire);
-	}
-
-	inline void unlock() {
-		flag.clear(std::memory_order_acquire);
-	}
-
 };
 
 #endif /* MIDICUBE_UTIL_H_ */
