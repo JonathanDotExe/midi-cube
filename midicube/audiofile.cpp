@@ -56,6 +56,9 @@ bool read_stream_audio_file(StreamedAudioSample& audio, std::string fname) {
 		sf_close(file);
 		file = nullptr;
 	}
+
+	//Open file for late use
+	audio.file = SndfileHandle(fname);
 	return success;
 }
 
