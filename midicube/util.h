@@ -14,6 +14,7 @@
 #include <boost/smart_ptr/detail/spinlock.hpp>
 #include <thread>
 #include <chrono>
+#include <emmintrin.h>
 
 
 template<class T, std::size_t N> class CircularBuffer {
@@ -115,7 +116,7 @@ public:
 
 using namespace std::chrono_literals;
 
-//Based on https://stackoverflow.com/a/29195378
+//Based on https://timur.audio/using-locks-in-real-time-audio-processing-safely
 class SpinLock {
 private:
 	std::atomic_flag flag = ATOMIC_FLAG_INIT;
@@ -131,9 +132,39 @@ public:
 
 	inline void lock() {
 		while (flag.test_and_set(std::memory_order_acquire)) {
-#ifdef __GNUC__
-			asm volatile("pause\n": : :"memory");
-#endif
+			//Spin
+			for (int i = 0; i < 5; ++i) {
+				if (try_lock()) {
+					return;
+				}
+			}
+			//Spin with pause
+			for (int i = 0; i < 10; ++i) {
+				if (try_lock()) {
+					return;
+				}
+				_mm_pause();
+			}
+			//Spin with yield
+			while (true) {
+				for(int i = 0; i < 3000; ++i) {
+					if (try_lock()) {
+						return;
+					}
+
+					_mm_pause();
+					_mm_pause();
+					_mm_pause();
+					_mm_pause();
+					_mm_pause();
+					_mm_pause();
+					_mm_pause();
+					_mm_pause();
+					_mm_pause();
+					_mm_pause();
+				}
+				std::this_thread::yield();
+			}
 		}
 	}
 

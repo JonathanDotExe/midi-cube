@@ -23,7 +23,6 @@ private:
 	std::vector<StreamedAudioSample*> samples;
 	boost::lockfree::queue<LoadRequest> requests;
 	std::atomic<bool> running{true};
-	std::array<std::thread, 4> worker;
 	size_t gc_index = 0;
 
 public:

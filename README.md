@@ -67,6 +67,7 @@ A MIDI-Workstation written in C++. Intendend to both work on Single-Chip-Devices
 * Format frequencies used for the vocoder (https://en.wikipedia.org/wiki/Formant
 * Reddit thread about phasers (https://www.reddit.com/r/DSP/comments/2o2pf6/implementing_guitar_phaser_effect/cmjc70p/)
 * Fuzz distortion algorithm (http://www.portaudio.com/docs/v19-doxydocs/pa__fuzz_8c.html)
+* SpinLock (https://timur.audio/using-locks-in-real-time-audio-processing-safely)
 
 ## Other resources that might be useful in the future
 * Nice forum post about exponential envelopes (https://www.kvraudio.com/forum/viewtopic.php?t=161416)
