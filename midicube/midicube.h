@@ -13,7 +13,7 @@
 #include "data.h"
 #include "soundengine/soundengine.h"
 #include "audioloader.h"
-#include <boost/smart_ptr/detail/spinlock.hpp>
+#include "util.h"
 
 struct MidiCubeInput {
 	MidiInput* in = nullptr;
@@ -41,7 +41,7 @@ public:
 
 	std::atomic<bool> updated{false};
 
-	boost::detail::spinlock lock;
+	SpinLock lock;
 
 	virtual void save_program(Program *prog);
 	virtual void apply_program(Program *prog);
