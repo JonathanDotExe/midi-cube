@@ -14,7 +14,10 @@
 #define _countof(arr) (sizeof(arr)/sizeof(arr[0]))
 #endif
 
+size_t count = 0;
+
 bool read_stream_audio_file(StreamedAudioSample& audio, std::string fname) {
+	count++;
 	//Open
 	SNDFILE* file = nullptr;
 	SF_INFO info;
@@ -57,8 +60,6 @@ bool read_stream_audio_file(StreamedAudioSample& audio, std::string fname) {
 		file = nullptr;
 	}
 
-	//Open file for late use
-	audio.file = SndfileHandle(fname);
 	return success;
 }
 

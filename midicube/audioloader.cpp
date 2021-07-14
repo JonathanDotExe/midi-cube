@@ -26,7 +26,6 @@ StreamedAudioSample* StreamedAudioPool::load_sample(std::string fname) {
 }
 
 void StreamedAudioPool::queue_request(LoadRequest request) {
-	std::cout << "Request " << request.sample->path << std::endl;
 	requests.push(request);
 }
 
@@ -40,10 +39,9 @@ void StreamedAudioPool::run(bool gc) {
 			req.sample->lock.lock();
 			req.sample->last_used = TIME_NOW();
 			if (!req.sample->loaded) {
-				std::cout << "Loading " << req.sample->path << std::endl;
-				req.sample->file.seek(0, SF_SEEK_SET);
+				SndfileHandle file(req.sample->path);
 				req.sample->samples = std::vector<float>(req.sample->total_size * req.sample->channels, 0);
-				req.sample->file.read(&req.sample->samples[0], req.sample->samples.size());
+				file.read(&req.sample->samples[0], req.sample->samples.size());
 				req.sample->loaded = true;
 			}
 			req.sample->lock.unlock();

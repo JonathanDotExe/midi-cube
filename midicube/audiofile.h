@@ -17,7 +17,7 @@
 #include <mutex>
 #include <chrono>
 #include "util.h"
-#include "sndfile.hh"
+#include "sndfile.h"
 
 #define TIME_NOW() (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())).count()
 
@@ -97,7 +97,6 @@ struct StreamedAudioSample {
 	bool loaded = false;
 	unsigned int last_used = 0;
 	std::vector<float> samples;
-	SndfileHandle file;
 
 	StreamedAudioSample() {
 
