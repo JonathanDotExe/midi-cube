@@ -131,40 +131,38 @@ public:
 
 
 	inline void lock() {
-		while (flag.test_and_set(std::memory_order_acquire)) {
-			//Spin
-			for (int i = 0; i < 5; ++i) {
-				if (try_lock()) {
-					return;
-				}
+		//Spin
+		for (int i = 0; i < 5; ++i) {
+			if (try_lock()) {
+				return;
 			}
-			//Spin with pause
-			for (int i = 0; i < 10; ++i) {
+		}
+		//Spin with pause
+		for (int i = 0; i < 10; ++i) {
+			if (try_lock()) {
+				return;
+			}
+			_mm_pause();
+		}
+		//Spin with yield
+		while (true) {
+			for(int i = 0; i < 3000; ++i) {
 				if (try_lock()) {
 					return;
 				}
+
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
 				_mm_pause();
 			}
-			//Spin with yield
-			while (true) {
-				for(int i = 0; i < 3000; ++i) {
-					if (try_lock()) {
-						return;
-					}
-
-					_mm_pause();
-					_mm_pause();
-					_mm_pause();
-					_mm_pause();
-					_mm_pause();
-					_mm_pause();
-					_mm_pause();
-					_mm_pause();
-					_mm_pause();
-					_mm_pause();
-				}
-				std::this_thread::yield();
-			}
+			std::this_thread::yield();
 		}
 	}
 
