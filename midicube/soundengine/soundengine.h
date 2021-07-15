@@ -284,9 +284,9 @@ public:
 
 	void init_device(SoundEngineDevice* device);
 
-	bool send(MidiMessage& message, SampleInfo& info, KeyboardEnvironment& env, size_t scene);
+	bool send(MidiMessage& message, SampleInfo& info);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, Metronome& metronome, KeyboardEnvironment& env, size_t scene);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
 	SoundEngine* get_engine();
 
