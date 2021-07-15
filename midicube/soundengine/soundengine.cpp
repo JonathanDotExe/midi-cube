@@ -220,6 +220,9 @@ SoundEngine* SoundEngineChannel::get_engine() {
 void SoundEngineChannel::set_engine(SoundEngine* engine) {
 	delete this->engine;
 	this->engine = engine;
+	if (engine) {
+		engine->init(this);
+	}
 }
 
 SoundEngineChannel::~SoundEngineChannel() {
@@ -327,13 +330,7 @@ void SoundEngineChannel::set_active(bool active) {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	metronome.init(0);
-	for (size_t i = 0; i < this->effects.size(); ++i) {
-		effects[i].device = this;
-	}
-	for (size_t i = 0; i < this->channels.size(); ++i) {
-		SoundEngineChannel& ch = this->channels[i];
-		ch.init_device(this);
-	}
+
 }
 
 void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleInfo &info) {
@@ -660,4 +657,20 @@ bool SoundEngineChannel::is_pitch_bend() const {
 
 void SoundEngineChannel::set_pitch_bend(bool pitch_bend) {
 	scenes[device->scene].pitch_bend = pitch_bend;
+}
+
+void SoundEngineDevice::init(MidiCube *cube) {
+	if (this->cube) {
+		throw "MidiCube already initialized";
+	}
+	else {
+		this->cube = cube;
+		for (size_t i = 0; i < this->effects.size(); ++i) {
+			effects[i].device = this;
+		}
+		for (size_t i = 0; i < this->channels.size(); ++i) {
+			SoundEngineChannel& ch = this->channels[i];
+			ch.init_device(this);
+		}
+	}
 }

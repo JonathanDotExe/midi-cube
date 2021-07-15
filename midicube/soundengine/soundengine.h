@@ -34,7 +34,9 @@ namespace pt = boost::property_tree;
 #define CHANNEL_INSERT_EFFECT_AMOUNT 2
 #define SOUND_ENGINE_MASTER_EFFECT_AMOUNT 16
 
+class MidiCube;
 class SoundEngineDevice;
+class SoundEngineChannel;
 
 struct ChannelInfo {
 	double aftertouch = 0;
@@ -60,8 +62,18 @@ class SoundEngine {
 
 private:
 
+	SoundEngineChannel* channel = nullptr;
 
 public:
+	void init(SoundEngineChannel* channel) {
+		if (this->channel) {
+			throw "Channel already initialized";
+		}
+		else {
+			this->channel = channel;
+		}
+	}
+
 	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) = 0;
 
 	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) = 0;
@@ -450,6 +462,8 @@ private:
 	size_t clock_beat_count = 0;
 	double first_beat_time = 0;
 
+	MidiCube* cube = nullptr;
+
 public:
 	KeyboardEnvironment env;
 
@@ -469,6 +483,8 @@ public:
 	unsigned int sustain_control{64};
 
 	SoundEngineDevice();
+
+	void init(MidiCube* cube);
 
 	std::vector<SoundEngineBuilder*> get_engine_builders();
 
