@@ -9,6 +9,16 @@
 
 #include <algorithm>
 
+void SoundEngine::init(SoundEngineChannel* channel) {
+	if (this->channel && this->device) {
+		throw "Channel already initialized";
+	}
+	else {
+		this->channel = channel;
+		this->device = channel->get_device();
+	}
+}
+
 void InsertEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	if (effect) {
 		effect->apply(lsample, rsample, info);
@@ -140,7 +150,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				}, device->env.sustain);
 			}
 			//Process
-			status = engine->process_sample(lsample, rsample, info, env, this->info, *device);
+			status = engine->process_sample(lsample, rsample, info, env);
 			//Effects
 			for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 				effects[i].apply(lsample, rsample, info);
@@ -343,7 +353,6 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 	}
 
 	//Channels
-	size_t scene = this->scene;
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		double l = 0;
 		double r = 0;

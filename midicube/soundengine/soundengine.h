@@ -60,19 +60,13 @@ public:
 
 class SoundEngine {
 
-private:
+protected:
 
 	SoundEngineChannel* channel = nullptr;
+	SoundEngineDevice* device = nullptr;
 
 public:
-	void init(SoundEngineChannel* channel) {
-		if (this->channel) {
-			throw "Channel already initialized";
-		}
-		else {
-			this->channel = channel;
-		}
-	}
+	void init(SoundEngineChannel* channel);
 
 	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) = 0;
 
@@ -80,7 +74,7 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int real_note) = 0;
 
-	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, ChannelInfo& channel, SoundEngineDevice& device) = 0;
+	virtual EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env) = 0;
 
 	virtual void apply_program(EngineProgram* prog) {
 
@@ -108,12 +102,12 @@ public:
 
 	virtual void release_note(SampleInfo& info, unsigned int note);
 
-	EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, ChannelInfo& channel, SoundEngineDevice& device);
+	EngineStatus process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env);
 
-	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, V& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index) = 0;
+	virtual void process_note_sample(double& lsample, double& rsample, SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) = 0;
 
 
-	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, ChannelInfo& channel, SoundEngineDevice& device) {
+	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 
 	};
 
@@ -162,7 +156,7 @@ void BaseSoundEngine<V, P>::release_note(SampleInfo& info, unsigned int note) {
 }
 
 template<typename V, size_t P>
-EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, ChannelInfo& channel, SoundEngineDevice& device) {
+EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env) {
 	EngineStatus status = {0, 0};
 	//Notes
 	for (size_t i = 0; i < P; ++i) {
@@ -173,7 +167,7 @@ EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsam
 			else {
 				++status.pressed_notes; //TODO might cause problems in the future
 				note.note[i].phase_shift += (env.pitch_bend - 1) * info.time_step;
-				process_note_sample(lsample, rsample, info, note.note[i], env, channel, i);
+				process_note_sample(lsample, rsample, info, note.note[i], env, i);
 				if (!status.pressed_notes || note.note[status.latest_note_index].start_time < note.note[i].start_time) {
 					status.latest_note_index = i;
 				}
@@ -181,7 +175,7 @@ EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsam
 		}
 	}
 	//Static sample
-	process_sample(lsample, rsample, info, env, status, channel, device);
+	process_sample(lsample, rsample, info, env, status);
 
 	return status;
 }
@@ -354,6 +348,12 @@ public:
 	bool is_active() const;
 
 	void set_active(bool active = false);
+
+	SoundEngineDevice* get_device() const {
+		return device;
+	}
+
+
 };
 
 struct MasterEffectProgram {

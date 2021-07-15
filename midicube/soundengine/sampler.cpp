@@ -80,7 +80,7 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 	return (block - 1) % block_count;
 }
 
-void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index) {
+void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.region && note.sample) {
 		double vol = 1;
 		double vel_amount = 0;
