@@ -465,6 +465,7 @@ private:
 	MidiCube* cube = nullptr;
 
 public:
+	MidiBindingHandler binding_handler;
 	KeyboardEnvironment env;
 
 	Metronome metronome;

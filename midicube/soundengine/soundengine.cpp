@@ -450,6 +450,8 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 				updated = true;
 			}
 		}
+		//Binding handler
+		updated = binding_handler.on_cc(message.control(), message.value()/127.0) || updated;
 		break;
 	case MessageType::PROGRAM_CHANGE:
 		break;

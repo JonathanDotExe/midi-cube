@@ -115,6 +115,21 @@ public:
 		}
 	}
 
+	bool on_cc(unsigned int control, double value) {
+		bool updated = false;
+		if (control < MIDI_CONTROL_COUNT) {
+			for (BindableValue* val : persistent[control]) {
+				val->change_persistent(value);
+				updated = true;
+			}
+			for (BindableValue* val : temp[control]) {
+				val->change_temp(value);
+				updated = true;
+			}
+		}
+		return updated;
+	}
+
 };
 
 class ControlBinding {
