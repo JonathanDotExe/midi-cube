@@ -14,6 +14,11 @@
 #include <algorithm>
 #include "midi.h"
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
+namespace pt = boost::property_tree;
+
 class BindableValue {
 
 public:
@@ -42,7 +47,7 @@ private:
 	T total_min;
 	T total_max;
 
-	T temp_minchange = 1;
+	T temp_change = 1;
 
 	double cc_val = 0;
 
@@ -80,6 +85,27 @@ public:
 	void change_temp(double val) {
 		cc_val = val;
 		recalc_temp();
+	}
+
+	void load(boost::property_tree::ptree tree) {
+		persistent_value = tree.get("value", persistent_value);
+		temp_change = tree.get("temp_change", temp_change);
+		persistent_cc = tree.get("persistent_cc", persistent_cc);
+		temp_cc = tree.get("temp_cc", temp_cc);
+		cc_val = 0;
+		recalc_temp();
+	}
+
+	boost::property_tree::ptree save() {
+		boost::property_tree::ptree tree;
+
+		tree.put("value", persistent_value);
+		tree.put("temp_change", temp_change);
+		tree.put("persistent_cc", persistent_cc);
+		tree.put("temp_cc", temp_cc);
+
+
+		return tree;
 	}
 
 };
