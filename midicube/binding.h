@@ -9,11 +9,32 @@
 #define MIDICUBE_BINDING_H_
 
 #include <vector>
+#include <array>
 #include <unordered_map>
+#include <algorithm>
 #include "midi.h"
 
-template<typename T>
 class BindableValue {
+
+public:
+
+	//Don't edit
+	unsigned int persistent_cc = 128;
+	//Don't edit
+	unsigned int temp_cc = 128;
+
+	virtual void change_persistent(double val) = 0;
+
+	virtual void change_temp(double val) = 0;
+
+	virtual ~BindableValue() {
+
+	}
+
+};
+
+template<typename T>
+class TemplateBindableValue : public BindableValue {
 private:
 	T persistent_value;
 	T temp_value;
@@ -31,10 +52,7 @@ private:
 
 public:
 
-	unsigned int persistent_cc = 128;
-	unsigned int temp_cc = 128;
-
-	BindableValue(T val = 0, T min = 0, T max = 0) {
+	TemplateBindableValue(T val = 0, T min = 0, T max = 0) {
 		this->persistent_value = val;
 		this->total_min = min;
 		this->total_max = max;
@@ -42,7 +60,7 @@ public:
 
 	inline T& operator=(const T& other) {
 		persistent_value = other;
-		temp_value = other;
+		recalc_temp();
 		return persistent_value;
 	}
 
@@ -54,20 +72,47 @@ public:
 		return persistent_value;
 	}
 
-	bool control_change(unsigned int control, double val) {
-		bool changed = false;
-		if (control == persistent_cc) {
-			persistent_value = total_min + (total_max - total_min) * val;
-			changed = true;
+	void change_persistent(double val) {
+		persistent_value = total_min + (total_max - total_min);
+		recalc_temp();
+	}
+
+	void change_temp(double val) {
+		cc_val = val;
+		recalc_temp();
+	}
+
+};
+
+class MidiBindingHandler {
+private:
+	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> persistent;
+	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> temp;
+
+public:
+
+	void bind(BindableValue* value, unsigned int persistent_cc, unsigned int temp_cc) {
+		//Unbind
+		if (value->persistent_cc < MIDI_CONTROL_COUNT) {
+			std::vector<BindableValue*>& vec = persistent[value->persistent_cc];
+			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
 		}
-		if (control == temp_cc) {
-			cc_val = val;
-			changed = true;
+		if (value->temp_cc < MIDI_CONTROL_COUNT) {
+			std::vector<BindableValue*>& vec = temp[value->temp_cc];
+			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
 		}
-		if (changed) {
-			recalc_temp();
+		//Update
+		value->persistent_cc = persistent_cc;
+		value->temp_cc = temp_cc;
+		//Bind
+		if (value->persistent_cc < MIDI_CONTROL_COUNT) {
+			std::vector<BindableValue*>& vec = persistent[value->persistent_cc];
+			vec.push_back(value);
 		}
-		return changed;
+		if (value->temp_cc < MIDI_CONTROL_COUNT) {
+			std::vector<BindableValue*>& vec = temp[value->temp_cc];
+			vec.push_back(value);
+		}
 	}
 
 };
