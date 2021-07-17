@@ -38,6 +38,7 @@ public:
 
 };
 
+//TODO boundary checks
 template<typename T>
 class BindableTemplateValue : public BindableValue {
 private:
@@ -87,13 +88,32 @@ public:
 		recalc_temp();
 	}
 
-	void load(boost::property_tree::ptree tree) {
+	void load(boost::property_tree::ptree& parent, std::string path, T def) {
+		auto tree = parent.get_child_optional(path);
+		if (tree && tree.get().get_child_optional("value")) {
+			load(tree.get());
+		}
+		else {
+			persistent_value = parent.get<T>(path, def);
+			temp_change = 0;
+			persistent_cc = 128;
+			temp_cc = 128;
+			cc_val = 0;
+			recalc_temp();
+		}
+	}
+
+	void load(boost::property_tree::ptree& tree) {
 		persistent_value = tree.get("value", persistent_value);
 		temp_change = tree.get("temp_change", temp_change);
 		persistent_cc = tree.get("persistent_cc", persistent_cc);
 		temp_cc = tree.get("temp_cc", temp_cc);
 		cc_val = 0;
 		recalc_temp();
+	}
+
+	void save(boost::property_tree::ptree& tree, std::string path) {
+		tree.add_child(path, save());
 	}
 
 	boost::property_tree::ptree save() {
