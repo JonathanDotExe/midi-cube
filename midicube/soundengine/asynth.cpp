@@ -449,7 +449,7 @@ static boost::property_tree::ptree save_adsr(BindableADSREnvelopeData& data) {
 
 	data.attack_hold.save(tree, "attack_hold");
 	data.peak_volume.save(tree, "peak_volume");
-	data.peak_volume.save(tree, "sustain_time");
+	data.sustain_time.save(tree, "sustain_time");
 	data.release_volume.save(tree, "release_volume");
 	return tree;
 }

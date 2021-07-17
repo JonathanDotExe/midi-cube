@@ -48,7 +48,7 @@ private:
 	T total_min;
 	T total_max;
 
-	T temp_change = 1;
+	T temp_change = 0;
 
 	double cc_val = 0;
 
@@ -62,6 +62,7 @@ public:
 		this->persistent_value = val;
 		this->total_min = min;
 		this->total_max = max;
+		recalc_temp();
 	}
 
 	inline T& operator=(const T& other) {
