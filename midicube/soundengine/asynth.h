@@ -28,9 +28,54 @@ const FixedScale PANNING_SCALE(-1, {}, 1);
 #define ANALOG_SYNTH_POLYPHONY 30
 #define ASYNTH_MOTION_SEQUENCER_LENGTH 16
 
+struct BindableADSREnvelopeData {
+	BindableTemplateValue<double> attack{0.0005, 0.0005, 5};
+	BindableTemplateValue<double> decay{0, 0, 10};
+	BindableTemplateValue<double> sustain{1, 0, 1};
+	BindableTemplateValue<double> release{0.0005, 0.0005, 10};
+
+	ADSREnvelopeShape attack_shape = ADSREnvelopeShape::LINEAR_ADSR;
+	ADSREnvelopeShape pre_decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
+	ADSREnvelopeShape decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
+	ADSREnvelopeShape release_shape = ADSREnvelopeShape::ANALOG_ADSR;
+
+	BindableTemplateValue<double> hold{0, 0, 10};
+	BindableTemplateValue<double> pre_decay{0, 0, 10};
+
+	BindableTemplateValue<double> attack_hold{0, 0, 5};
+	BindableTemplateValue<double> peak_volume{1, 0, 1};
+	BindableTemplateValue<double> decay_volume{1, 0, 1};
+	BindableTemplateValue<double> sustain_time{0, 0, 20};
+	BindableTemplateValue<double> release_volume{0, 0, 1};
+
+	bool pedal_catch = false;
+
+	operator ADSREnvelopeData() const {
+		ADSREnvelopeData env;
+		env.attack = attack.get_temp();
+		env.decay = decay.get_temp();
+		env.sustain = sustain.get_temp();
+		env.release = release.get_temp();
+
+		env.attack_shape = attack_shape;
+		env.pre_decay_shape = pre_decay_shape;
+		env.decay_shape = decay_shape;
+		env.release_shape = release_shape;
+
+		env.hold = hold.get_temp();
+		env.pre_decay =  pre_decay.get_temp();
+
+		env.attack_hold = attack_hold.get_temp();
+		env.peak_volume = peak_volume.get_temp();
+		env.decay_volume = decay_volume.get_temp();
+		env.sustain_time = sustain_time.get_temp();
+		env.release_volume = release_volume.get_temp();
+		return env;
+	}
+};
 
 struct PropertyModulation {
-	double value = 0;
+	BindableTemplateValue<double> value{0, 0, 1};
 	size_t mod_env = 0;
 	double mod_env_amount = 0;
 	size_t lfo = 0;
@@ -74,7 +119,7 @@ struct FilterEntity {
 	FilterType type = FilterType::LP_12;
 	PropertyModulation cutoff = {1};
 	PropertyModulation resonance = {0};
-	double kb_track = 0;
+	BindableTemplateValue<double> kb_track{0, 0, 1};
 	unsigned int kb_track_note = 36;
 };
 
@@ -100,15 +145,15 @@ struct OperatorEntity {
 
 struct ModEnvelopeEntity {
 	PropertyModulation volume = {1};
-	ADSREnvelopeData env{0.0005, 0, 1, 0.0005};
+	BindableADSREnvelopeData env{0.0005, 0, 1, 0.0005};
 };
 
 struct LFOEntity {
 	PropertyModulation volume = {1};
-	TemplateBindableValue<double> freq{1, 0, 50};
+	BindableTemplateValue<double> freq{1, 0, 50};
 	bool sync_master = false;
-	TemplateBindableValue<int> clock_value{1, -32, 32};
-	double sync_phase = 0;
+	int clock_value{1, -32, 32};
+	double sync_phase{0, 0, 1};
 	AnalogWaveForm waveform = AnalogWaveForm::SINE_WAVE;
 	int motion_sequencer = -1;
 };
@@ -125,7 +170,7 @@ struct AnalogSynthPreset {
 
 	bool mono = false;
 	bool legato = false;
-	double portamendo = 0;
+	BindableTemplateValue<double> portamendo = 0;
 
 	double aftertouch_attack = 0;
 	double aftertouch_release = 0;

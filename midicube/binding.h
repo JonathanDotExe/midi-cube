@@ -39,7 +39,7 @@ public:
 };
 
 template<typename T>
-class TemplateBindableValue : public BindableValue {
+class BindableTemplateValue : public BindableValue {
 private:
 	T persistent_value;
 	T temp_value;
@@ -57,7 +57,7 @@ private:
 
 public:
 
-	TemplateBindableValue(T val = 0, T min = 0, T max = 0) {
+	BindableTemplateValue(T val = 0, T min = 0, T max = 0) {
 		this->persistent_value = val;
 		this->total_min = min;
 		this->total_max = max;
@@ -70,11 +70,11 @@ public:
 	}
 
 	inline operator T() const {
-		return temp_value;
+		return persistent_value;
 	}
 
-	inline const T get_persistent() const {
-		return persistent_value;
+	inline const T get_temp() const {
+		return temp_value;
 	}
 
 	void change_persistent(double val) {
@@ -129,11 +129,11 @@ public:
 	}
 
 	inline operator bool() const {
-		return temp_value;
+		return persistent_value;
 	}
 
-	inline const bool get_persistent() const {
-		return persistent_value;
+	inline const bool get_temp() const {
+		return temp_value;
 	}
 
 	void change_persistent(double val) {
