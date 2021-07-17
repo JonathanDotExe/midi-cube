@@ -125,7 +125,7 @@ struct FilterEntity {
 
 struct OperatorEntity {
 	bool audible = true;
-	ADSREnvelopeData env{0.0005, 0, 1, 0.0005};
+	BindableADSREnvelopeData env{0.0005, 0, 1, 0.0005};
 	double amp_kb_track_upper = 0;
 	double amp_kb_track_lower = 0;
 	unsigned int amp_kb_track_note = 60;
@@ -152,8 +152,8 @@ struct LFOEntity {
 	PropertyModulation volume = {1};
 	BindableTemplateValue<double> freq{1, 0, 50};
 	bool sync_master = false;
-	int clock_value{1, -32, 32};
-	double sync_phase{0, 0, 1};
+	int clock_value = 1;
+	double sync_phase = 0;
 	AnalogWaveForm waveform = AnalogWaveForm::SINE_WAVE;
 	int motion_sequencer = -1;
 };

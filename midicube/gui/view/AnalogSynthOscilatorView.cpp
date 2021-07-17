@@ -116,7 +116,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 }
 
 
-void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeData& data, ActionHandler& handler) {
+void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREnvelopeData& data, ActionHandler& handler) {
 	DragBoxScale<double> scale = {
 			[](double progress, double min, double max) {
 				progress *= progress;
