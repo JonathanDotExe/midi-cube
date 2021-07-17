@@ -110,6 +110,54 @@ public:
 
 };
 
+class BindableBooleanValue : public BindableValue {
+private:
+	bool persistent_value;
+	bool temp_value;
+
+public:
+
+	BindableBooleanValue(bool val = false) {
+		this->persistent_value = val;
+		this->temp_value = val;
+	}
+
+	inline bool operator=(const bool other) {
+		persistent_value = other;
+		temp_value = other;
+		return persistent_value;
+	}
+
+	inline operator bool() const {
+		return temp_value;
+	}
+
+	inline const bool get_persistent() const {
+		return persistent_value;
+	}
+
+	void change_persistent(double val) {
+		persistent_value = val > 0;
+		temp_value = persistent_value;
+	}
+
+	void change_temp(double val) {
+		temp_value = val > 0;
+	}
+
+	void load(boost::property_tree::ptree tree) {
+		persistent_value = tree.get("value", persistent_value);
+	}
+
+	boost::property_tree::ptree save() {
+		boost::property_tree::ptree tree;
+		tree.put("value", persistent_value);
+
+		return tree;
+	}
+
+};
+
 class MidiBindingHandler {
 private:
 	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> persistent;

@@ -105,9 +105,9 @@ struct ModEnvelopeEntity {
 
 struct LFOEntity {
 	PropertyModulation volume = {1};
-	double freq = 1;
+	TemplateBindableValue<double> freq{1, 0, 50};
 	bool sync_master = false;
-	int clock_value = 1;
+	TemplateBindableValue<int> clock_value{1, -32, 32};
 	double sync_phase = 0;
 	AnalogWaveForm waveform = AnalogWaveForm::SINE_WAVE;
 	int motion_sequencer = -1;
