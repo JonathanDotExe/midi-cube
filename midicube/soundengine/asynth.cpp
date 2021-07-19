@@ -12,7 +12,7 @@
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
 AnalogSynth::AnalogSynth() {
-	preset.portamendo = 0.2;
+
 }
 
 inline double AnalogSynth::apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ANALOG_PART_COUNT>& lfo_val) {
@@ -377,7 +377,7 @@ static boost::property_tree::ptree save_prop_mod(PropertyModulation mod) {
 
 
 static PropertyModulation load_prop_mod(boost::property_tree::ptree tree) {
-	PropertyModulation mod;
+	PropertyModulation mod{0};
 	mod.value.load(tree, "value", 0);
 	mod.mod_env = tree.get<size_t>("mod_env", 0);
 	mod.mod_env_amount = tree.get<double>("mod_env_amount", 0);
@@ -395,7 +395,7 @@ static PropertyModulation load_prop_mod(boost::property_tree::ptree parent, std:
 	if (val) {
 		return load_prop_mod(val.get());
 	}
-	return {};
+	return {0};
 }
 
 static BindableADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {

@@ -58,7 +58,7 @@ private:
 
 public:
 
-	BindableTemplateValue(T val = 0, T min = 0, T max = 0) {
+	BindableTemplateValue(T val, T min, T max) {
 		this->persistent_value = val;
 		this->total_min = min;
 		this->total_max = max;
@@ -68,7 +68,6 @@ public:
 	inline T& operator=(const T& other) {
 		persistent_value = other;
 		recalc_temp();
-		std::cout << "Assignment" << std::endl;
 		return persistent_value;
 	}
 

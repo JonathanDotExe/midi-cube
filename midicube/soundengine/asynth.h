@@ -50,6 +50,14 @@ struct BindableADSREnvelopeData {
 
 	bool pedal_catch = false;
 
+	BindableADSREnvelopeData(double attack = 0.0005, double decay = 0, double sustain = 1, double release = 0.0005) {
+		this->attack = attack;
+		this->sustain = sustain;
+		this->decay = decay;
+		this->release = release;
+	}
+
+
 	operator ADSREnvelopeData() const {
 		ADSREnvelopeData env;
 		env.attack = attack.get_temp();
@@ -84,6 +92,10 @@ struct PropertyModulation {
 	size_t cc = 1;
 	double cc_amount = 0;
 	double aftertouch_amount = 0;
+
+	PropertyModulation(double val) {
+		value = val;
+	}
 };
 
 struct FrequencyModulatotion {
