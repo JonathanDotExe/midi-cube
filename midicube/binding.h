@@ -68,6 +68,7 @@ public:
 	inline T& operator=(const T& other) {
 		persistent_value = other;
 		recalc_temp();
+		std::cout << "Assignment" << std::endl;
 		return persistent_value;
 	}
 

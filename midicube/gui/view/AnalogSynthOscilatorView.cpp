@@ -248,7 +248,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x , y + 15, 80, 40);
-		shape->property.bind(data.attack_shape, handler);
+		shape->property.bind_cast(data.attack_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -258,7 +258,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
-		shape->property.bind(data.pre_decay_shape, handler);
+		shape->property.bind_cast(data.pre_decay_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -268,7 +268,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
-		shape->property.bind(data.decay_shape, handler);
+		shape->property.bind_cast(data.decay_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -289,7 +289,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
-		shape->property.bind(data.release_shape, handler);
+		shape->property.bind_cast(data.release_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -319,7 +319,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
-		waveform->property.bind(osc.waveform, handler);
+		waveform->property.bind_cast(osc.waveform, handler);
 		controls.push_back(waveform);
 	}
 	//Fixed Freq

@@ -59,7 +59,7 @@ Scene B3OrganView::create(Frame &frame) {
 		tmp_y += 25;
 
 		ComboBox* organ_type = new ComboBox(0, {"B3", "Transistor"}, main_font, 16, 0, tmp_x, tmp_y, 80, 60);
-				organ_type->property.bind(organ.data.preset.type, handler);
+				organ_type->property.bind_cast(organ.data.preset.type, handler);
 				controls.push_back(organ_type);
 		hide_midi.push_back(organ_type);
 
