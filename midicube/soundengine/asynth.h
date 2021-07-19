@@ -182,7 +182,7 @@ struct AnalogSynthPreset {
 
 	bool mono = false;
 	bool legato = false;
-	BindableTemplateValue<double> portamendo = 0;
+	BindableTemplateValue<double> portamendo{0, 0, 10};
 
 	double aftertouch_attack = 0;
 	double aftertouch_release = 0;
