@@ -261,8 +261,8 @@ private:
 	SoundEngineDevice* device = nullptr;
 
 public:
-	double volume = 0.5;
-	double panning = 0;
+	BindableTemplateValue<double> volume{0.5, 0, 1};
+	BindableTemplateValue<double> panning{0, -1, 1};
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	Arpeggiator arp;
 
