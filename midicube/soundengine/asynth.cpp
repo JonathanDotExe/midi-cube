@@ -179,21 +179,21 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 
 void AnalogSynth::process_note_sample(
 		double& lsample, double& rsample, SampleInfo &info,
-		AnalogSynthVoice &note, KeyboardEnvironment &env, ChannelInfo& channel, size_t note_index) {
+		AnalogSynthVoice &note, KeyboardEnvironment &env, size_t note_index) {
 	if (!preset.mono) {
 		process_note(lsample, rsample, info, note, env);
 	}
 }
 
 void AnalogSynth::process_sample(double& lsample, double& rsample,
-		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status, ChannelInfo& channel, SoundEngineDevice& device) {
+		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
 	//Mono
 	if (preset.mono) {
 		if (status.pressed_notes) {
 			AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
-				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * abs((int) voice.note - mono_voice.note) / 50.0);
+				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * std::abs((double) ((int) voice.note) - mono_voice.note) / 50.0);
 
 			}
 			if (!preset.legato || !mono_voice.valid) {
@@ -251,7 +251,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		LFOEntity &lfo = preset.lfos[i];
 		if (lfo.motion_sequencer >= 0 && lfo.motion_sequencer < MOTION_SEQUENCER_AMOUNT) {
-			lfo_val[i] = device.motion_sequencer_values[lfo.motion_sequencer];
+			lfo_val[i] = device->motion_sequencer_values[lfo.motion_sequencer];
 			lfo_mod[i] = 0; //TODO
 		}
 		else {
@@ -263,8 +263,8 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 				if (lfo.clock_value <= 0) {
 					value = 1.0/(-fmin(lfo.clock_value, -1));
 				}
-				freq = device.metronome.get_bpm()/60.0 * value;
-				if (device.metronome.is_beat(info.sample_time, info.sample_rate, value)) {
+				freq = device->metronome.get_bpm()/60.0 * value;
+				if (device->metronome.is_beat(info.sample_time, info.sample_rate, value)) {
 					lfos[i].reset(lfo.sync_phase);
 				}
 			}
@@ -275,7 +275,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	}
 }
 
-bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env) {
+bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) {
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 		double at = msg.monophonic_aftertouch()/127.0;
 		if (at > aftertouch.get(info.time)) {
@@ -285,7 +285,7 @@ bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info
 			aftertouch.set(at, info.time, preset.aftertouch_release);
 		}
 	}
-	return BaseSoundEngine::midi_message(msg, transpose, info, env);
+	return BaseSoundEngine::midi_message(msg, transpose, info, env, polyphony_limit);
 }
 
 bool AnalogSynth::control_change(unsigned int control, unsigned int value) {
@@ -302,8 +302,8 @@ bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 	return !note.pressed && amp_finished(info, note, env);
 }
 
-void AnalogSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
-	AnalogSynthVoice& voice = this->note.note[this->note.press_note(info, real_note, note, velocity)];
+void AnalogSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) {
+	AnalogSynthVoice& voice = this->note.note[this->note.press_note(info, real_note, note, velocity, polyphony_limit)];
 	voice.aftertouch = 0;
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();

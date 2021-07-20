@@ -191,17 +191,17 @@ public:
 
 	AnalogSynth();
 
-	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, ChannelInfo& channel, size_t note_index);
+	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status, ChannelInfo& channel, SoundEngineDevice& device);
+	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
 
-	bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env);
+	bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit);
 
 	bool control_change(unsigned int control, unsigned int value);
 
 	bool note_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 	
-	void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity);
+	void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit);
 
 	void release_note(SampleInfo& info, unsigned int note);
 

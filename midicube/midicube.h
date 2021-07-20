@@ -12,7 +12,8 @@
 #include "program.h"
 #include "data.h"
 #include "soundengine/soundengine.h"
-#include <mutex>
+#include "audioloader.h"
+#include "util.h"
 
 struct MidiCubeInput {
 	MidiInput* in = nullptr;
@@ -37,7 +38,10 @@ public:
 	ProgramManager prog_mgr;
 	SoundEngineDevice engine;
 	ActionHandler action_handler;
+
 	std::atomic<bool> updated{false};
+
+	SpinLock lock;
 
 	virtual void save_program(Program *prog);
 	virtual void apply_program(Program *prog);

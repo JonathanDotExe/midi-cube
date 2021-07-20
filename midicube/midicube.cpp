@@ -9,6 +9,7 @@
 #include "soundengine/engines.h"
 #include <iostream>
 
+
 static void process_func(double& lsample, double& rsample, SampleInfo& info, void* user_data) {
 	((MidiCube*) user_data)->process(lsample, rsample, info);
 }
@@ -18,6 +19,7 @@ MidiCube::MidiCube() : prog_mgr("./data/programs", action_handler) {
 }
 
 void MidiCube::init(int out_device, int in_device) {
+	engine.init(this);
 	global_sample_store.load_sounds("./data/samples");
 	//Sound Engines
 	fill_sound_engine_device(&engine);
@@ -49,6 +51,9 @@ void MidiCube::init(int out_device, int in_device) {
 	prog_mgr.load_all();
 	prog_mgr.apply_program_direct(0, 0);
 
+	//Init stream loader
+	global_sample_store.pool.start();
+
 	//MIDI Inputs
 	//Input-Devices
 	MidiInput input_dummy;
@@ -74,19 +79,22 @@ void MidiCube::init(int out_device, int in_device) {
 }
 
 void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
-	//Lock actions
-	action_handler.execute_realtime_actions();
-	//Messages
-	size_t i = 0;
-	for (MidiCubeInput in : inputs) {
-		MidiMessage msg;
-		while (in.in->read(&msg)) {
-			process_midi(msg, i);
+	if (lock.try_lock()) {
+		//Lock actions
+		action_handler.execute_realtime_actions();
+		//Messages
+		size_t i = 0;
+		for (MidiCubeInput in : inputs) {
+			MidiMessage msg;
+			while (in.in->read(&msg)) {
+				process_midi(msg, i);
+			}
+			++i;
 		}
-		++i;
+		//Process
+		engine.process_sample(lsample, rsample, info);
+		lock.unlock();
 	}
-	//Process
-	engine.process_sample(lsample, rsample, info);
 }
 
 std::vector<MidiCubeInput> MidiCube::get_inputs() {
@@ -95,8 +103,9 @@ std::vector<MidiCubeInput> MidiCube::get_inputs() {
 
 inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	SampleInfo info = audio_handler.sample_info();
+	size_t s = std::min((size_t) SOUND_ENGINE_MIDI_CHANNELS, used_sources);
 	//Sources
-	for (size_t i = 0; i < used_sources; ++i) {
+	for (size_t i = 0; i < s; ++i) {
 		MidiSource& source = sources[i];
 		if (source.device >= 0 && static_cast<unsigned int>(source.device) == input && (source.channel < 0 || static_cast<unsigned int>(source.channel) == message.channel)) {
 			//Filter
@@ -123,6 +132,7 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 }
 
 MidiCube::~MidiCube() {
+	lock.lock();
 	//Load programs
 	prog_mgr.save_all();
 	audio_handler.close();
@@ -130,6 +140,8 @@ MidiCube::~MidiCube() {
 		delete in.in;
 	}
 	inputs.clear();
+	global_sample_store.pool.stop();
+	lock.unlock();
 }
 
 void MidiCube::save_program(Program *prog) {

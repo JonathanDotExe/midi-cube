@@ -40,6 +40,7 @@ void create_cc_control(MidiControlHandler& m, ActionHandler& handler, void* fiel
 }
 
 Scene EffectView::create(Frame &frame) {
+	frame.cube.lock.lock();
 	std::vector<Control*> controls;
 
 	ActionHandler &handler = frame.cube.action_handler;
@@ -137,7 +138,7 @@ Scene EffectView::create(Frame &frame) {
 			tmp_y += 25;
 
 			ComboBox *distortion_type = new ComboBox(0, { "Digital",
-					"Polynomal", "Arctan" }, main_font, 24, 0, tmp_x, tmp_y,
+					"Polynomal", "Arctan", "Cubic", "Fuzz" }, main_font, 24, 0, tmp_x, tmp_y,
 					180, 120);
 			distortion_type->property.bind(amp->preset.type, handler);
 			controls.push_back(distortion_type);
@@ -1662,7 +1663,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *value = new DragBox<double>(0, -15, 15, main_font, 24,
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->border = 0;
 			value->property.bind(equalizer->preset.low_gain, handler);
@@ -1683,7 +1684,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *value = new DragBox<double>(0, -15, 15, main_font, 24,
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->border = 0;
 			value->property.bind(equalizer->preset.low_mid_gain, handler);
@@ -1704,7 +1705,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *value = new DragBox<double>(0, -15, 15, main_font, 24,
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->border = 0;
 			value->property.bind(equalizer->preset.mid_gain, handler);
@@ -1725,7 +1726,7 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *value = new DragBox<double>(0, -15, 15, main_font, 24,
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->border = 0;
 			value->property.bind(equalizer->preset.high_gain, handler);
@@ -1984,5 +1985,6 @@ Scene EffectView::create(Frame &frame) {
 		control->set_visible(!this->edit_midi);
 	}
 
+	frame.cube.lock.unlock();
 	return {controls};
 }

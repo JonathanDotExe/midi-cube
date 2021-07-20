@@ -20,11 +20,15 @@
 template<typename V, size_t P>
 class VoiceManager {
 private:
-	size_t next_freq_slot(SampleInfo& info) {
+	size_t next_freq_slot(SampleInfo& info, size_t polyphony_limit = 0) {
+		size_t size = P;
+		if (polyphony_limit > 0) {
+			size = std::min(polyphony_limit, P);
+		}
 		bool release = false;
 		size_t longest_index = 0;
 		double longest_time = info.time + 1;
-		for (size_t i = 0; i < P; ++i) {
+		for (size_t i = 0; i < size; ++i) {
 			if (!note[i].valid) {
 				return i;
 			}
@@ -62,8 +66,8 @@ public:
 		}
 	}
 
-	size_t press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity) {
-		size_t slot = next_freq_slot(info);
+	size_t press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit = 0) {
+		size_t slot = next_freq_slot(info, polyphony_limit);
 		this->note[slot].freq = note_to_freq(note);
 		this->note[slot].velocity = velocity;
 		this->note[slot].real_note = real_note;
@@ -106,6 +110,7 @@ struct ArpeggiatorPreset {
 	bool kb_sync = true;
 	bool play_duplicates = false;
 	bool master_sync = false;
+	bool sustain = false;
 };
 
 class Arpeggiator {
@@ -125,11 +130,11 @@ public:
 
 	Arpeggiator();
 
-	void apply(SampleInfo& info, Metronome& master, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release);
+	void apply(SampleInfo& info, Metronome& master, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release, bool sustain);
 
-	void press_note(SampleInfo& info, unsigned int note, double velocity);
+	void press_note(SampleInfo& info, unsigned int note, double velocity, bool sustain);
 
-	void release_note(SampleInfo& info, unsigned int note);
+	void release_note(SampleInfo& info, unsigned int note, bool sustain);
 
 };
 

@@ -52,7 +52,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Engine
 	ComboBox* engine = new ComboBox(0, engine_names, main_font, 24, -1, 10, 45, 300, 80);
 	engine->rect.setFillColor(sf::Color(0, 180, 255));
-	engine->property.bind_function<ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), std::bind(&SoundEngineChannel::set_engine_index, &channel, std::placeholders::_1), handler);
+	engine->property.bind_function<ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), std::bind(&SoundEngineChannel::set_engine_index, &channel, std::placeholders::_1), frame.cube.lock);
 	controls.push_back(engine);
 
 	//Edit
@@ -62,11 +62,13 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		ssize_t engine_index = channel.get_engine_index();
 		if (engine_index >= 0) {
 			std::string name = frame.cube.engine.get_engine_builders().at(engine_index)->get_name();
+			frame.cube.lock.lock();
 			SoundEngine& en = *channel.get_engine();
 			ViewController* view = create_view_for_engine(name, en, channel, channel_index);
 			if (view) {
 				frame.change_view(view);
 			}
+			frame.cube.lock.unlock();
 		}
 	});
 	controls.push_back(edit_engine);
@@ -83,7 +85,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		//Effect
 		ComboBox* effect = new ComboBox(0, effect_names, main_font, 18, -1, 10, tmp_y, 200, 60);
 		effect->rect.setFillColor(sf::Color(128, 255, 255));
-		effect->property.bind_function<ssize_t>(std::bind(&InsertEffect::get_effect_index, &channel.effects[i]), std::bind(&InsertEffect::set_effect_index, &channel.effects[i], std::placeholders::_1), handler);
+		effect->property.bind_function<ssize_t>(std::bind(&InsertEffect::get_effect_index, &channel.effects[i]), std::bind(&InsertEffect::set_effect_index, &channel.effects[i], std::placeholders::_1), frame.cube.lock);
 		controls.push_back(effect);
 		//Edit
 		Button* edit_effect = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
@@ -110,6 +112,21 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		tmp_y += 60;
 		master_send->property.bind(channel.master_send, handler);
 		controls.push_back(master_send);
+	}
+
+	tmp_y -= 95;
+
+	//Polyphony
+	{
+		tmp_y += 5;
+		Label* octave_label = new Label("Polyphony", main_font, 18, 170, tmp_y);
+		tmp_y += 30;
+		controls.push_back(octave_label);
+
+		DragBox<int>* polyphony = new DragBox<int>(0, 0, 256, main_font, 18, 170, tmp_y, 150, 60);
+		tmp_y += 60;
+		polyphony->property.bind(channel.polyphony_limit, handler);
+		controls.push_back(polyphony);
 	}
 
 
@@ -205,7 +222,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Pitch
 	{
 		tmp_y += 20;
-		CheckBox* pitch = new CheckBox(true, "Pitch", main_font, 18, 630, tmp_y, 40, 40);
+		CheckBox* pitch = new CheckBox(true, "Bender", main_font, 18, 630, tmp_y, 40, 40);
 		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_pitch_bend, &channel), std::bind(&SoundEngineChannel::set_transfer_pitch_bend, &channel, std::placeholders::_1), handler);
 		tmp_y += 40;
 		controls.push_back(pitch);
@@ -223,7 +240,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Aftertouch
 	{
 		tmp_y += 5;
-		CheckBox* cc = new CheckBox(true, "Aftertouch", main_font, 18, 780, tmp_y, 40, 40);
+		CheckBox* cc = new CheckBox(true, "Aftertouch", main_font, 18, 790, tmp_y, 40, 40);
 		cc->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_channel_aftertouch, &channel), std::bind(&SoundEngineChannel::set_transfer_channel_aftertouch, &channel, std::placeholders::_1), handler);
 		tmp_y += 40;
 		controls.push_back(cc);
@@ -231,10 +248,28 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Other
 	{
 		tmp_y += 20;
-		CheckBox* pitch = new CheckBox(true, "Other", main_font, 18, 780, tmp_y, 40, 40);
+		CheckBox* pitch = new CheckBox(true, "Other", main_font, 18, 790, tmp_y, 40, 40);
 		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_other, &channel), std::bind(&SoundEngineChannel::set_transfer_other, &channel, std::placeholders::_1), handler);
 		tmp_y += 40;
 		controls.push_back(pitch);
+	}
+
+	//Sustain
+	{
+		tmp_y += 20;
+		CheckBox* sustain = new CheckBox(true, "Sustain", main_font, 18, 790, tmp_y, 40, 40);
+		sustain->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_sustain, &channel), std::bind(&SoundEngineChannel::set_sustain, &channel, std::placeholders::_1), handler);
+		tmp_y += 40;
+		controls.push_back(sustain);
+	}
+
+	//Pitch Bend
+	{
+		tmp_y += 20;
+		CheckBox* pitch_bend = new CheckBox(true, "Pitch Bend", main_font, 18, 790, tmp_y, 40, 40);
+		pitch_bend->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_pitch_bend, &channel), std::bind(&SoundEngineChannel::set_pitch_bend, &channel, std::placeholders::_1), handler);
+		tmp_y += 40;
+		controls.push_back(pitch_bend);
 	}
 
 	tmp_y = zone_y;

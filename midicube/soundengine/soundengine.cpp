@@ -9,6 +9,16 @@
 
 #include <algorithm>
 
+void SoundEngine::init(SoundEngineChannel* channel) {
+	if (this->channel && this->device) {
+		throw "Channel already initialized";
+	}
+	else {
+		this->channel = channel;
+		this->device = channel->get_device();
+	}
+}
+
 void InsertEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	if (effect) {
 		effect->apply(lsample, rsample, info);
@@ -114,24 +124,33 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	}
 }
 
-void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info, Metronome& metronome, KeyboardEnvironment& env, size_t scene) {
+void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info) {
+	size_t scene = device->scene;
 	//Properties
 	if (engine) {
 		SoundEngineScene& s = scenes[scene];
+		//Pitch and Sustain
+		KeyboardEnvironment env = device->env;
+		if (!s.sustain) {
+			env.sustain = false;
+		}
+		if (!s.pitch_bend) {
+			env.pitch_bend = 1;
+		}
 
 		if (s.active || status.pressed_notes) {
 			//Arpeggiator
 			if (arp.on) {
 				arp.apply(info, device->metronome,
-				[this, scene](SampleInfo& i, unsigned int note, double velocity) {
-					engine->press_note(i, note, note + scenes[scene].source.octave * 12, velocity);
+				[this, s](SampleInfo& i, unsigned int note, double velocity) {
+					engine->press_note(i, note, note + s.source.octave * 12, velocity, polyphony_limit);
 				},
 				[this](SampleInfo& i, unsigned int note) {
 					engine->release_note(i, note);
-				});
+				}, device->env.sustain);
 			}
 			//Process
-			status = engine->process_sample(lsample, rsample, info, env, this->info, *device);
+			status = engine->process_sample(lsample, rsample, info, env);
 			//Effects
 			for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 				effects[i].apply(lsample, rsample, info);
@@ -146,7 +165,8 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	}
 }
 
-bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, KeyboardEnvironment& env, size_t scene) {
+bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
+	size_t scene = device->scene;
 	bool updated = false;
 	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
 		//Effects
@@ -165,18 +185,18 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info, KeyboardEn
 		if (arp.on) {
 			switch (message.type) {
 			case MessageType::NOTE_ON:
-				arp.press_note(info, message.note(), message.velocity()/127.0);
+				arp.press_note(info, message.note(), message.velocity()/127.0, device->env.sustain);
 				break;
 			case MessageType::NOTE_OFF:
-				arp.release_note(info, message.note());
+				arp.release_note(info, message.note(), device->env.sustain);
 				break;
 			default:
-				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env) || updated;
+				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, device->env, polyphony_limit) || updated;
 				break;
 			}
 		}
 		else {
-			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, env) || updated;
+			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, device->env, polyphony_limit) || updated;
 		}
 	}
 	return updated;
@@ -212,6 +232,9 @@ SoundEngine* SoundEngineChannel::get_engine() {
 void SoundEngineChannel::set_engine(SoundEngine* engine) {
 	delete this->engine;
 	this->engine = engine;
+	if (engine) {
+		engine->init(this);
+	}
 }
 
 SoundEngineChannel::~SoundEngineChannel() {
@@ -319,13 +342,7 @@ void SoundEngineChannel::set_active(bool active) {
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	metronome.init(0);
-	for (size_t i = 0; i < this->effects.size(); ++i) {
-		effects[i].device = this;
-	}
-	for (size_t i = 0; i < this->channels.size(); ++i) {
-		SoundEngineChannel& ch = this->channels[i];
-		ch.init_device(this);
-	}
+
 }
 
 void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleInfo &info) {
@@ -336,12 +353,11 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 	}
 
 	//Channels
-	size_t scene = this->scene;
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		double l = 0;
 		double r = 0;
 		SoundEngineChannel& ch = this->channels[i];
-		ch.process_sample(l, r, info, metronome, env, scene);
+		ch.process_sample(l, r, info);
 
 		if (ch.master_send >= 0 && ch.master_send < SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
 			effects[ch.master_send].lsample += l;
@@ -399,7 +415,6 @@ void SoundEngineDevice::add_effect(EffectBuilder* effect) {
 }
 
 bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& source, SampleInfo& info) {
-	size_t scene = this->scene;
 	bool updated = false;
 	double pitch;
 
@@ -474,6 +489,15 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 		break;
 	}
 
+	//Effects
+	for (auto& e : effects) {
+		if (e.get_effect()) {
+			if (e.get_effect()->midi_message(message, info)) {
+				updated = true;
+			}
+		}
+	}
+
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = channels[i];
@@ -483,11 +507,11 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 		switch (message.type) {
 		case MessageType::NOTE_OFF:
 			break;
-		case MessageType::POLYPHONIC_AFTERTOUCH:
-			pass = message.note() >= s.start_note && message.note() <= s.end_note;
-			/* no break */
 		case MessageType::NOTE_ON:
-			pass = pass && message.velocity() >= s.start_velocity && message.velocity() <= s.end_velocity;
+			pass = message.velocity() >= s.start_velocity && message.velocity() <= s.end_velocity;
+			/* no break */
+		case MessageType::POLYPHONIC_AFTERTOUCH:
+			pass = pass && message.note() >= s.start_note && message.note() <= s.end_note;
 			break;
 		case MessageType::MONOPHONIC_AFTERTOUCH:
 			pass = s.transfer_channel_aftertouch;
@@ -508,7 +532,7 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 			break;
 		}
 		//Send
-		if (pass && channel.send(message, info, env, scene)) {
+		if (pass && channel.send(message, info)) {
 			updated = true;
 		}
 	}
@@ -534,6 +558,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ch.arp.on = prog.arp_on;
 		ch.arp.metronome.set_bpm(prog.arpeggiator_bpm);
 		ch.arp.preset = prog.arpeggiator;
+		ch.polyphony_limit = prog.polyphony_limit;
 
 		//Engine
 		SoundEngine* engine = ch.get_engine();
@@ -580,6 +605,7 @@ void SoundEngineDevice::save_program(Program* program) {
 		prog.arp_on = ch.arp.on;
 		prog.arpeggiator_bpm = ch.arp.metronome.get_bpm();
 		prog.arpeggiator = ch.arp.preset;
+		prog.polyphony_limit = ch.polyphony_limit;
 
 		//Engine
 		SoundEngine* engine = ch.get_engine();
@@ -588,9 +614,9 @@ void SoundEngineDevice::save_program(Program* program) {
 		}
 		prog.send_master = ch.master_send;
 		//Effects
-		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
-			InsertEffectProgram& p = prog.effects[i];
-			InsertEffect& effect = ch.effects[i];
+		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
+			InsertEffectProgram& p = prog.effects[j];
+			InsertEffect& effect = ch.effects[j];
 
 			p.effect = effect.get_effect_index();
 			if (effect.get_effect()) {
@@ -626,4 +652,36 @@ SoundEngineDevice::~SoundEngineDevice() {
 		delete effect;
 	}
 	effect_builders.clear();
+}
+
+bool SoundEngineChannel::is_sustain() const {
+	return scenes[device->scene].sustain;
+}
+
+void SoundEngineChannel::set_sustain(bool sustain) {
+	scenes[device->scene].sustain = sustain;
+}
+
+bool SoundEngineChannel::is_pitch_bend() const {
+	return scenes[device->scene].pitch_bend;
+}
+
+void SoundEngineChannel::set_pitch_bend(bool pitch_bend) {
+	scenes[device->scene].pitch_bend = pitch_bend;
+}
+
+void SoundEngineDevice::init(MidiCube *cube) {
+	if (this->cube) {
+		throw "MidiCube already initialized";
+	}
+	else {
+		this->cube = cube;
+		for (size_t i = 0; i < this->effects.size(); ++i) {
+			effects[i].device = this;
+		}
+		for (size_t i = 0; i < this->channels.size(); ++i) {
+			SoundEngineChannel& ch = this->channels[i];
+			ch.init_device(this);
+		}
+	}
 }

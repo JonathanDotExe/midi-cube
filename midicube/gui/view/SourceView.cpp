@@ -89,9 +89,9 @@ Scene SourceView::create(Frame &frame) {
 		y += 40;
 	}
 
-	//Channel
+	//Used Sources
 	{
-		DragBox<int>* value = new DragBox<int>(0, 0, SOUND_ENGINE_MIDI_CHANNELS - 1, main_font, 18, 5, frame.get_height() - 45, 60, 40);
+		DragBox<int>* value = new DragBox<int>(0, 0, SOUND_ENGINE_MIDI_CHANNELS, main_font, 18, 5, frame.get_height() - 45, 60, 40);
 		value->property.bind(frame.cube.used_sources, handler);
 		controls.push_back(value);
 

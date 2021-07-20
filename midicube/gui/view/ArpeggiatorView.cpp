@@ -107,6 +107,10 @@ Scene ArpeggiatorView::create(Frame &frame) {
 	master_sync->property.bind(channel.arp.preset.master_sync, handler);
 	controls.push_back(master_sync);
 	tmp_y += 50;
+	CheckBox* sustain = new CheckBox(true, "Sustain", main_font, 18, 330, tmp_y, 40, 40);
+	sustain->property.bind(channel.arp.preset.sustain, handler);
+	controls.push_back(sustain);
+	tmp_y += 50;
 
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);

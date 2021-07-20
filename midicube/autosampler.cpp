@@ -7,6 +7,7 @@
 
 #include "autosampler.h"
 #include "synthesis.h"
+#include "filter.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>
@@ -420,7 +421,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		else if (opcode.first == "hivel") {
 			tree.put("max_velocity", std::stoi(opcode.second));
 		}
-		else if (opcode.first == "volume") {
+		else if (opcode.first == "volume" || opcode.first == "group_volume") {
 			tree.put("volume", db_to_amp(std::stod(opcode.second)));
 		}
 		else if (opcode.first == "pitch_keytrack") {
@@ -453,13 +454,20 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			}
 		}
 		else if (opcode.first == "loop_start") {
-			tree.put("loop_start", std::stoi(opcode.second));
+			tree.put("sample.loop_start", std::stoi(opcode.second));
 		}
 		else if (opcode.first == "loop_end") {
-			tree.put("loop_end", std::stoi(opcode.second));
+			tree.put("sample.loop_end", std::stoi(opcode.second));
+		}
+		else if (opcode.first == "offset") {
+			tree.put("sample.start", std::stoi(opcode.second));
 		}
 		else if (opcode.first == "ampeg_hold") {
 			tree.put("envelope.attack_hold", std::stod(opcode.second));
+		}
+		//Filter
+		else if (opcode.first == "cutoff") {
+			tree.put("filter.cutoff", invert_scale_cutoff(std::stod(opcode.second)));
 		}
 		//TODO tune
 		else {
@@ -471,18 +479,20 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 
 void SfzSampleConverter::convert() {
 	std::fstream f(src);
-	std::string text;
+	std::vector<std::string> lines;
 	std::string t;
 
-	while (getline(f, t)) {
-		text += t + "\n";
+	while (std::getline(f, t)) {
+		lines.push_back(t);
 	}
 
-	SfzInstrument instrument = parser.parse(text);
+	SfzInstrument instrument = parser.parse(lines, dst);
 	std::cout << "Loaded instrument" << std::endl;
 	pt::ptree tree;
+	pt::ptree sound;
 	//Name
-	tree.put("sound.name", name);
+	sound.put("name", name);
+	parse_opcodes(instrument.global, sound);
 
 	//Groups
 	for (SfzGroup group : instrument.groups) {
@@ -494,8 +504,9 @@ void SfzSampleConverter::convert() {
 			parse_opcodes(region.opcodes, r);
 			g.add_child("regions.region", r);
 		}
-		tree.add_child("sound.groups.group", g);
+		sound.add_child("groups.group", g);
 	}
+	tree.add_child("sound", sound);
 
 	//Save to file
 	try {

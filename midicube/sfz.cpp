@@ -9,6 +9,8 @@
 #include <boost/algorithm/string.hpp>
 #include <regex>
 #include <iostream>
+#include <fstream>
+#include <streambuf>
 
 unsigned int parse_sfz_note(std::string text) {
 	unsigned int note = 0;
@@ -76,34 +78,71 @@ enum ParserMode {
 	NONE, GLOBAL, GROUP, REGION
 };
 
-SfzInstrument SfzParser::parse(std::string text) {
+SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path) {
 	SfzInstrument instrument;
-	boost::replace_all(text, "\r", "");
-	std::vector<std::string> lines = {};
-	boost::split(lines, text, boost::is_any_of("\n"));
 
 	std::vector<std::string> tokens = {};
+	std::unordered_map<std::string, std::string> defines;
 	//Remove comments
-	size_t i = 0;
-	for (std::string line : lines) {
+	for (size_t i = 0; i < lines.size(); ++i) {
+		std::string line = lines[i];
 		if (line.rfind("//", 0) != 0) {
+			//Apply defines
+			if (line.rfind("#define ", 0) != 0) {
+				for (auto pair : defines) {
+					boost::replace_all(line, pair.first, pair.second);
+				}
+			}
+
 			std::vector<std::string> t = {};
 			boost::split(t, line, boost::is_any_of(" "));
 			//Define
 			if (t.size() >= 3 && t[0] == "#define") {
-				//Replace
-				for (size_t j = i + 1; j < lines.size(); ++j) {
-					boost::replace_all(lines[j], t[1], t[2]);
+				defines[t[1]] = t[2];
+			}
+			//Include
+			else if (t.size() >= 2 && t[0] == "#include") {
+				std::cout << "include" << std::endl;
+				std::string file = t[1];
+				for (size_t j = 2; j < t.size(); ++j) {
+					file += " " + t[j];
+				}
+				boost::replace_all(file, "\"", "");
+
+				//Load file
+				std::string filename = path + "/" + file;
+				std::fstream f(filename);
+				std::string t;
+				while (getline(f, t)) {
+					lines.insert(lines.begin() + i + 1, t);
 				}
 			}
 			else {
+				bool chain = false;
+				std::string ts = "";
 				//Add tokens
 				for (std::string token : t) {
-					tokens.push_back(token);
+					size_t index = token.find("=");
+					if (index != std::string::npos) {
+						if (chain) {
+							tokens.push_back(ts);
+							ts = "";
+						}
+						chain = true;
+						ts += token;
+					}
+					else if (chain) {
+						ts += " " + token;
+					}
+					else {
+						tokens.push_back(token);
+					}
+				}
+				if (chain) {
+					tokens.push_back(ts);
 				}
 			}
 		}
-		++i;
 	}
 
 	//Parse lines

@@ -60,6 +60,7 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 			if (i < program->channels.size()) {
 				//Channel
 				program->channels[i].engine_index = c.second.get<ssize_t>("engine", -1);
+				program->channels[i].polyphony_limit = c.second.get<size_t>("polyphony_limit", 0);
 				const auto& scenes = c.second.get_child_optional("scenes");
 				if (scenes) {
 					size_t j = 0;
@@ -68,6 +69,8 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 							break;
 						}
 						program->channels[i].scenes[j].active = s.second.get<bool>("active", false);
+						program->channels[i].scenes[j].sustain = s.second.get<bool>("sustain", true);
+						program->channels[i].scenes[j].pitch_bend = s.second.get<bool>("pitch_bend", true);
 						//Source
 						program->channels[i].scenes[j].source.input = s.second.get<ssize_t>("source.input", 1);
 						program->channels[i].scenes[j].source.start_note = s.second.get<unsigned int>("source.start_note", 0);
@@ -99,6 +102,7 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 				program->channels[i].arpeggiator.repeat_edges = c.second.get<bool>("arpeggiator.repeat_edges", false);
 				program->channels[i].arpeggiator.play_duplicates = c.second.get<bool>("arpeggiator.play_duplicates", false);
 				program->channels[i].arpeggiator.master_sync = c.second.get<bool>("arpeggiator.master_sync", false);
+				program->channels[i].arpeggiator.sustain = c.second.get<bool>("arpeggiator.sustain", false);
 
 				//Sound engine
 				//FIXME
@@ -189,10 +193,13 @@ void save_program(Program* program, pt::ptree& tree) {
 		pt::ptree c;
 		//Channel
 		c.put("engine", program->channels[i].engine_index);
+		c.put("polyphony_limit", program->channels[i].polyphony_limit);
 		for (size_t j = 0; j < SOUND_ENGINE_SCENE_AMOUNT; ++j) {
 			pt::ptree s;
 
 			s.put("active", program->channels[i].scenes[j].active);
+			s.put("sustain", program->channels[i].scenes[j].sustain);
+			s.put("pitch_bend", program->channels[i].scenes[j].pitch_bend);
 			//Source
 			s.put("source.input", program->channels[i].scenes[j].source.input);
 			s.put("source.start_note", program->channels[i].scenes[j].source.start_note);
@@ -220,6 +227,8 @@ void save_program(Program* program, pt::ptree& tree) {
 		c.put("arpeggiator.kb_sync", program->channels[i].arpeggiator.kb_sync);
 		c.put("arpeggiator.repeat_edges", program->channels[i].arpeggiator.repeat_edges);
 		c.put("arpeggiator.play_duplicates", program->channels[i].arpeggiator.play_duplicates);
+		c.put("arpeggiator.master_sync", program->channels[i].arpeggiator.master_sync);
+		c.put("arpeggiator.sustain", program->channels[i].arpeggiator.sustain);
 		//Sound Engine
 		if (program->channels[i].engine_program) {
 			pt::ptree preset = program->channels[i].engine_program->save();
