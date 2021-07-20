@@ -89,8 +89,6 @@ struct PropertyModulation {
 	size_t lfo = 0;
 	double lfo_amount = 0;
 	double velocity_amount = 0;
-	size_t cc = 1;
-	double cc_amount = 0;
 	double aftertouch_amount = 0;
 
 	PropertyModulation(double val) {

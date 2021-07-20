@@ -19,7 +19,7 @@ inline double AnalogSynth::apply_modulation(const FixedScale &scale, PropertyMod
 	double prog = mod.value.get_temp();
 	prog += env_val[mod.mod_env] * mod.mod_env_amount
 			+ lfo_val[mod.lfo] * mod.lfo_amount * lfo_vol[mod.lfo]
-			+ controls[mod.cc] * mod.cc_amount + velocity * mod.velocity_amount + aftertouch * mod.aftertouch_amount;
+			+ velocity * mod.velocity_amount + aftertouch * mod.aftertouch_amount;
 	prog = fmin(fmax(prog, 0.0), 1.0);
 	return scale.value(prog);
 }
@@ -369,8 +369,6 @@ static boost::property_tree::ptree save_prop_mod(PropertyModulation mod) {
 	tree.put("lfo", mod.lfo);
 	tree.put("lfo_amount", mod.lfo_amount);
 	tree.put("velocity_amount", mod.velocity_amount);
-	tree.put("cc", mod.cc);
-	tree.put("cc_amount", mod.cc_amount);
 	tree.put("aftertouch_amount", mod.aftertouch_amount);
 	return tree;
 }
@@ -384,8 +382,6 @@ static PropertyModulation load_prop_mod(boost::property_tree::ptree tree) {
 	mod.lfo = tree.get<size_t>("lfo", 0);
 	mod.lfo_amount = tree.get<double>("lfo_amount", 0);
 	mod.velocity_amount = tree.get<double>("velocity_amount", 0);
-	mod.cc = tree.get<size_t>("cc", 1);
-	mod.cc_amount = tree.get<double>("cc_amount", 0);
 	mod.aftertouch_amount = tree.get<double>("aftertouch_amount", 0);
 	return mod;
 }

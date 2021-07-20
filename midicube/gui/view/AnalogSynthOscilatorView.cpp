@@ -93,24 +93,6 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		boxes.push_back(at_amount);
 	}
 	x += 90;
-	//CC
-	{
-		Label* title = new Label("CC", main_font, 12, x, y);
-		controls->push_back(title);
-
-		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
-		amount->drag_mul /= 2;
-		amount->border = 0;
-		amount->property.bind(mod.cc_amount, handler);
-		controls->push_back(amount);
-		show_amount->push_back(amount);
-		boxes.push_back(amount);
-
-		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_CONTROL_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
-		source->property.bind(mod.cc, handler);
-		controls->push_back(source);
-		show_source->push_back(source);
-	}
 	x += 90;
 	return boxes;
 }
