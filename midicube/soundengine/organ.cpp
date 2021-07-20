@@ -203,42 +203,6 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 
 bool B3Organ::control_change(unsigned int control, unsigned int value) {
 	bool change = false;
-	//Drawbars
-	for (size_t i = 0; i < data.preset.drawbar_ccs.size(); ++i) {
-		if (data.preset.drawbar_ccs[i] == control) {
-			data.preset.drawbars[i] = round((double) value/127 * ORGAN_DRAWBAR_MAX);
-			change = true;
-		}
-	}
-	//Percussion
-	if (control == data.preset.percussion_cc) {
-		data.preset.percussion = value > 0;
-		change = true;
-	}
-	//Percussion Third Harmonic
-	if (control == data.preset.percussion_third_harmonic_cc) {
-		data.preset.percussion_third_harmonic = value > 0;
-		change = true;
-	}
-	//Percussion Fast Decay
-	if (control == data.preset.percussion_fast_decay_cc) {
-		data.preset.percussion_fast_decay = value > 0;
-		change = true;
-	}
-	//Percussion Soft
-	if (control == data.preset.percussion_soft_cc) {
-		data.preset.percussion_soft = value > 0;
-		change = true;
-	}
-	//Vibrato Mix
-	if (control == data.preset.vibrato_mix_cc) {
-		data.preset.vibrato_mix = value/127.0;
-		change = true;
-	}
-	//Swell
-	if (control == data.preset.swell_cc) {
-		data.swell = value/127.0;
-	}
 
 	return change;
 }
@@ -289,19 +253,6 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 			++i;
 		}
 	}
-	//Drawbar CCs
-	const auto& drawbar_ccs = tree.get_child_optional("drawbar_ccs");
-	i = 0;
-	if (drawbar_ccs) {
-		for (pt::ptree::value_type& d : drawbar_ccs.get()) {
-			if (i >= ORGAN_DRAWBAR_COUNT) {
-				break;
-			}
-
-			preset.drawbar_ccs[i] = d.second.get_value<unsigned int>(preset.drawbar_ccs[i]);
-			++i;
-		}
-	}
 
 	//Modeling
 	preset.harmonic_foldback_volume = tree.get<double>("harmonic_foldback_volume", 1);
@@ -315,15 +266,9 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	preset.percussion_soft = tree.get<bool>("percussion_soft", true);
 	preset.percussion_fast_decay = tree.get<bool>("percussion_fast_decay", true);
 
-	preset.percussion_cc = tree.get<unsigned int>("percussion_cc", 24);
-	preset.percussion_third_harmonic_cc = tree.get<unsigned int>("percussion_third_harmonic_cc", 25);
-	preset.percussion_soft_cc = tree.get<unsigned int>("percussion_soft_cc", 26);
-	preset.percussion_fast_decay_cc = tree.get<unsigned int>("percussion_fast_decay_cc", 27);
-
 	//Vibrato/Chorus
 	preset.vibrato_mix = tree.get<double>("vibrato_mix", 0.0);
-	preset.vibrato_mix_cc = tree.get<unsigned int>("vibrato_mix_cc", 38);
-	preset.swell_cc = tree.get<unsigned int>("swell_cc", 11);
+	preset.swell = tree.get<double>("swell", 1);
 }
 
 boost::property_tree::ptree B3OrganProgram::save() {
@@ -332,7 +277,6 @@ boost::property_tree::ptree B3OrganProgram::save() {
 	//Drawbars
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
 		tree.add("drawbars.drawbar", preset.drawbars[i]);
-		tree.add("drawbar_ccs.drawbar", preset.drawbar_ccs[i]);
 	}
 
 	//Modeling
@@ -346,16 +290,9 @@ boost::property_tree::ptree B3OrganProgram::save() {
 	tree.put("percussion_third_harmonic", preset.percussion_third_harmonic);
 	tree.put("percussion_soft", preset.percussion_soft);
 	tree.put("percussion_fast_decay", preset.percussion_fast_decay);
-
-	tree.put("percussion_cc", preset.percussion_cc);
-	tree.put("percussion_third_harmonic_cc", preset.percussion_third_harmonic_cc);
-	tree.put("percussion_soft_cc", preset.percussion_soft_cc);
-	tree.put("percussion_fast_decay_cc", preset.percussion_fast_decay_cc);
-
 	//Vibrato/Chorus
 	tree.put("vibrato_mix", preset.vibrato_mix);
-	tree.put("vibrato_mix_cc", preset.vibrato_mix_cc);
-	tree.put("swell_cc", preset.swell_cc);
+	tree.put("swell", preset.swell);
 
 
 	return tree;

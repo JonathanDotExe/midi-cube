@@ -39,46 +39,37 @@ enum OrganType {
 
 struct B3OrganPreset {
 	OrganType type = ORGAN_TYPE_B3;
-	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbars;
-	std::array<unsigned int, ORGAN_DRAWBAR_COUNT> drawbar_ccs;
+	std::array<BindableTemplateValue<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbars;
 	double harmonic_foldback_volume{1};
 	double multi_note_gain{0.8};
 	double high_gain_reduction = 0.5;
 	double click_attack = 0.00004;
 
-	bool percussion{false};
-	bool percussion_third_harmonic{true};
-	bool percussion_soft{true};
-	bool percussion_fast_decay{true};
+	BindableBooleanValue percussion{false};
+	BindableBooleanValue percussion_third_harmonic{true};
+	BindableBooleanValue percussion_soft{true};
+	BindableBooleanValue percussion_fast_decay{true};
 
 	double percussion_soft_volume{1};
 	double percussion_hard_volume{5};
 	double percussion_fast_decay_time{0.2};
 	double percussion_slow_decay_time{1.0};
 
-	unsigned int percussion_cc{24};
-	unsigned int percussion_third_harmonic_cc{25};
-	unsigned int percussion_soft_cc{26};
-	unsigned int percussion_fast_decay_cc{27};
+	BindableTemplateValue<double> vibrato_mix{0, 0, 1};
+	BindableTemplateValue<double> swell{1, 0, 1};
 
-	double vibrato_mix = 0;
-	unsigned int vibrato_mix_cc{38};
-	unsigned int swell_cc{11};
+	B3OrganPreset () : drawbars{
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+	} {
 
-	B3OrganPreset () {
-		for (size_t i = 0; i < drawbars.size(); ++i) {
-			drawbars[i] = 8;
-		}
-		size_t i = 0;
-		drawbar_ccs.at(i++) = 67;
-		drawbar_ccs.at(i++) = 68;
-		drawbar_ccs.at(i++) = 69;
-		drawbar_ccs.at(i++) = 70;
-		drawbar_ccs.at(i++) = 87;
-		drawbar_ccs.at(i++) = 88;
-		drawbar_ccs.at(i++) = 89;
-		drawbar_ccs.at(i++) = 90;
-		drawbar_ccs.at(i++) = 92;
 	}
 };
 
