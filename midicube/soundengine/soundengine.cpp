@@ -113,6 +113,9 @@ MasterEffect::~MasterEffect() {
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {
 	engine = nullptr;
+
+	binder.add_binding(&volume);
+	binder.add_binding(&panning);
 }
 
 void SoundEngineChannel::init_device(SoundEngineDevice* device) {
@@ -121,6 +124,8 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 		for (size_t i = 0; i < effects.size(); ++i) {
 			effects[i].device = device;
 		}
+
+		binder.init(&device->binding_handler);
 	}
 }
 

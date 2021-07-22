@@ -260,6 +260,7 @@ private:
 	SoundEngine* engine = nullptr;
 	SoundEngineDevice* device = nullptr;
 
+	LocalMidiBindingHandler binder;
 public:
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double> panning{0, -1, 1};
