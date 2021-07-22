@@ -36,6 +36,19 @@ double B3OrganTonewheel::process(SampleInfo& info, double freq, OrganType type) 
 
 //B3Organ
 B3Organ::B3Organ() {
+	//Bind
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		binder.add_binding(&data.preset.drawbars[i]);
+	}
+	binder.add_binding(&data.preset.percussion);
+	binder.add_binding(&data.preset.percussion_third_harmonic);
+	binder.add_binding(&data.preset.percussion_soft);
+	binder.add_binding(&data.preset.percussion_fast_decay);
+
+	binder.add_binding(&data.preset.vibrato_mix);
+	binder.add_binding(&data.preset.swell);
+
+
 	drawbar_notes = {-12, 7, 0, 12, 19, 24, 28, 31, 36};
 	std::vector<double> gear_ratios = {
 		0.817307692,
@@ -77,6 +90,11 @@ B3Organ::B3Organ() {
 		double curr_vol = db_to_amp((-1.5 * ((int) i/12 + 1)));
 		tonewheel_data[i + start_tw].volume = curr_vol;
 	}
+}
+
+void B3Organ::init(SoundEngineChannel* channel) {
+	SoundEngine::init(channel);
+	binder.init(&channel->get_device()->binding_handler);
 }
 
 void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, TriggeredNote& note, double compress_volume) {

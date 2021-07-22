@@ -501,6 +501,10 @@ public:
 
 	void save_program(Program* program);
 
+	MidiCube* get_cube() {
+		return cube;
+	}
+
 	~SoundEngineDevice();
 
 	std::vector<EffectBuilder*> get_effect_builders() {

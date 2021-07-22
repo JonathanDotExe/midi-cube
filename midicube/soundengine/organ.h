@@ -123,10 +123,14 @@ private:
 
 	void trigger_tonewheel(int tonewheel, double vol, SampleInfo& info, TriggeredNote& note, double compress_volume);
 
+	LocalMidiBindingHandler binder;
+
 public:
 	B3OrganData data;
 
 	B3Organ();
+
+	void init(SoundEngineChannel* channel);
 
 	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
 

@@ -241,6 +241,8 @@ private:
 
 	inline double apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ANALOG_PART_COUNT>& lfo_val);
 
+	LocalMidiBindingHandler binder;
+
 public:
 	AnalogSynthPreset preset;
 

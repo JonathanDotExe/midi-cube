@@ -259,8 +259,10 @@ public:
 	}
 
 	void unbind() {
-		for (BindableValue* value : values) {
-			handler->unbind(value);
+		if (handler) {
+			for (BindableValue* value : values) {
+				handler->unbind(value);
+			}
 		}
 	}
 
