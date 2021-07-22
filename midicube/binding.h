@@ -181,13 +181,18 @@ public:
 
 class MidiBindingHandler {
 private:
-	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> persistent;
-	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> temp;
+	/*std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> persistent;
+	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> temp;*/
+	std::vector<BindableValue*> bindings;
 
 public:
 
 	void bind(BindableValue* value, unsigned int persistent_cc, unsigned int temp_cc) {
-		//Unbind
+		value->persistent_cc = persistent_cc;
+		value->temp_cc = temp_cc;
+
+		bindings.push_back(value);
+		/*//Unbind
 		if (value->persistent_cc < MIDI_CONTROL_COUNT) {
 			std::vector<BindableValue*>& vec = persistent[value->persistent_cc];
 			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
@@ -207,32 +212,32 @@ public:
 		if (value->temp_cc < MIDI_CONTROL_COUNT) {
 			std::vector<BindableValue*>& vec = temp[value->temp_cc];
 			vec.push_back(value);
-		}
+		}*/
 	}
 
 	void unbind(BindableValue* value) {
 		//Unbind
-		if (value->persistent_cc < MIDI_CONTROL_COUNT) {
+		/*if (value->persistent_cc < MIDI_CONTROL_COUNT) {
 			std::vector<BindableValue*>& vec = persistent[value->persistent_cc];
 			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
 		}
 		if (value->temp_cc < MIDI_CONTROL_COUNT) {
 			std::vector<BindableValue*>& vec = temp[value->temp_cc];
 			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
-		}
+		}*/
+		bindings.erase(std::remove_if(bindings.begin(), bindings.end(), [value](BindableValue* v) { return v == value; }), bindings.end());
 	}
 
 	bool on_cc(unsigned int control, double value) {
 		bool updated = false;
-		if (control < MIDI_CONTROL_COUNT) {
-			for (BindableValue* val : persistent[control]) {
+		for (BindableValue* val : bindings) {
+			if (val->persistent_cc == control) {
 				val->change_persistent(value);
-				updated = true;
 			}
-			for (BindableValue* val : temp[control]) {
+			if (val->temp_cc == control) {
 				val->change_temp(value);
-				updated = true;
 			}
+			updated = true;
 		}
 		return updated;
 	}
