@@ -210,6 +210,18 @@ public:
 		}
 	}
 
+	void unbind(BindableValue* value) {
+		//Unbind
+		if (value->persistent_cc < MIDI_CONTROL_COUNT) {
+			std::vector<BindableValue*>& vec = persistent[value->persistent_cc];
+			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
+		}
+		if (value->temp_cc < MIDI_CONTROL_COUNT) {
+			std::vector<BindableValue*>& vec = temp[value->temp_cc];
+			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
+		}
+	}
+
 	bool on_cc(unsigned int control, double value) {
 		bool updated = false;
 		if (control < MIDI_CONTROL_COUNT) {
@@ -226,6 +238,38 @@ public:
 	}
 
 };
+
+class LocalMidiBindingHandler {
+private:
+	std::vector<BindableValue*> values;
+	MidiBindingHandler* handler = nullptr;
+
+public:
+
+	void add_binding(BindableValue* value) {
+		values.push_back(value);
+	}
+
+	void init(MidiBindingHandler* handler) {
+		this->handler = handler;
+		//Init values
+		for (BindableValue* value : values) {
+			handler->bind(value, value->persistent_cc, value->temp_cc);
+		}
+	}
+
+	void unbind() {
+		for (BindableValue* value : values) {
+			handler->unbind(value);
+		}
+	}
+
+	~LocalMidiBindingHandler() {
+		unbind();
+	}
+
+};
+
 
 class ControlBinding {
 public:
