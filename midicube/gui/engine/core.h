@@ -88,6 +88,10 @@ public:
 
 	}
 
+	virtual bool on_action(Control* control) {
+		return true;
+	}
+
 	virtual ~ViewController() {
 
 	}
