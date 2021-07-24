@@ -30,6 +30,7 @@ public:
 
 	virtual Scene create(Frame &frame) {
 		std::vector<Control*> controls;
+		ActionHandler& handler = frame.cube.action_handler;
 
 		{
 
@@ -40,29 +41,40 @@ public:
 			Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 50);
 			controls.push_back(pane);
 
-
-			//Rename
-			int width = PROGRAM_NAME_LENGTH * 45;
+			int width = 90 * 3;
 			std::vector<DragBox<int>*> boxes;
-			for (size_t i = 0; i < PROGRAM_NAME_LENGTH; ++i) {
-				size_t index = 0;
-				if (i < name.size()) {
-					char ch = name.at(i);
-					auto pos = std::find(chars.begin(), chars.end(), ch);
-					if (pos != chars.end()) {
-						index = pos - chars.begin();
-					}
-				}
+			size_t index = 0;
+			//Persistent
+			{
+				Label* title = new Label("Persistent", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				controls.push_back(title);
 
-				DragBox<int>* box = new DragBox<int>(index, 0, chars.size() - 1, main_font, 30, 0, 0, 0, 0);
-				box->drag_step = 4;
-				box->to_string = [this](int i) {
-					return std::string{chars.at(i)};
-				};
-				box->update_position(frame.get_width()/2 - width/2 + 45 * i, 150, 40, 40);
-				boxes.push_back(box);
-				controls.push_back(box);
+				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				value->property.bind(this->value.persistent_cc, handler);
+				controls.push_back(value);
 			}
+			++index;
+			//Temp
+			{
+				Label* title = new Label("Modulation", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				controls.push_back(title);
+
+				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				value->property.bind(this->value.temp_cc, handler);
+				controls.push_back(value);
+			}
+			++index;
+			//Range
+			{
+				Label* title = new Label("Range", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				controls.push_back(title);
+
+				DragBox<double>* value = new DragBox<double>(0, -1, 1, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				value->property.bind(this->value.range, handler);
+				controls.push_back(value);
+			}
+			++index;
+
 
 			//Back Button
 			Button* back = new Button("Back", main_font, 18, frame.get_width() - 100, frame.get_height() - 40, 100, 40);

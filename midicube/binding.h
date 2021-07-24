@@ -48,8 +48,6 @@ private:
 	T total_min;
 	T total_max;
 
-	T temp_change = 0;
-
 	double cc_val = 0;
 
 	inline void recalc_temp() {
@@ -57,6 +55,8 @@ private:
 	}
 
 public:
+
+	T temp_change = 0;
 
 	BindableTemplateValue(T val, T min, T max) {
 		this->persistent_value = val;
