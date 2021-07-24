@@ -50,13 +50,26 @@ struct BindableADSREnvelopeData {
 
 	bool pedal_catch = false;
 
+	void add_bindings(LocalMidiBindingHandler& binder) {
+		binder.add_binding(&attack);
+		binder.add_binding(&decay);
+		binder.add_binding(&sustain);
+		binder.add_binding(&release);
+		binder.add_binding(&hold);
+		binder.add_binding(&pre_decay);
+		binder.add_binding(&attack_hold);
+		binder.add_binding(&peak_volume);
+		binder.add_binding(&decay_volume);
+		binder.add_binding(&sustain_time);
+		binder.add_binding(&release_volume);
+	}
+
 	BindableADSREnvelopeData(double attack = 0.0005, double decay = 0, double sustain = 1, double release = 0.0005) {
 		this->attack = attack;
 		this->sustain = sustain;
 		this->decay = decay;
 		this->release = release;
 	}
-
 
 	operator ADSREnvelopeData() const {
 		ADSREnvelopeData env;
@@ -94,6 +107,7 @@ struct PropertyModulation {
 	PropertyModulation(double val) {
 		value = val;
 	}
+
 };
 
 struct FrequencyModulatotion {
@@ -232,6 +246,8 @@ private:
 	AnalogSynthVoice mono_voice;
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;
+
+	void init(SoundEngineChannel* channel);
 
 	inline void process_note(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
 
