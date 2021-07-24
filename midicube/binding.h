@@ -51,12 +51,12 @@ private:
 	double cc_val = 0;
 
 	inline void recalc_temp() {
-		temp_value = fmin(fmax(total_min, persistent_value + (total_max - total_min) * cc_val), total_max);
+		temp_value = std::min(std::max(total_min, static_cast<T>(persistent_value + (total_max - total_min) * cc_val * temp_change)), total_max);
 	}
 
 public:
 
-	T temp_change = 0;
+	double temp_change = 0;
 
 	BindableTemplateValue(T val, T min, T max) {
 		this->persistent_value = val;
@@ -80,7 +80,7 @@ public:
 	}
 
 	void change_persistent(double val) {
-		persistent_value = total_min + (total_max - total_min);
+		persistent_value = total_min + (total_max - total_min) * val;
 		recalc_temp();
 	}
 

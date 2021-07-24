@@ -228,7 +228,7 @@ public:
 		set_func = [&e, &handler](T t) {
 			handler.queue_action(new SetValueAction<E, T>(e, t));
 		};
-		object = *e;
+		object = &e;
 	}
 
 	template <typename E>
@@ -239,7 +239,7 @@ public:
 		set_func = [&e, &handler](T t) {
 			handler.queue_action(new SetValueCastAction<E, T>(e, t));
 		};
-		object = *e;
+		object = &e;
 	}
 
 	template <typename E>
