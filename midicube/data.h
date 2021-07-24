@@ -200,7 +200,14 @@ private:
 	std::function<void (std::function<void (T)>)> get_func = nullptr;
 	std::function<void (T)> set_func = nullptr;
 
+	void* object = nullptr;
+
 public:
+
+	void* get_object() {
+		return object;
+	}
+
 	void get(std::function<void (T)> callback) {
 		get_func(callback);
 	}
@@ -221,6 +228,7 @@ public:
 		set_func = [&e, &handler](T t) {
 			handler.queue_action(new SetValueAction<E, T>(e, t));
 		};
+		object = *e;
 	}
 
 	template <typename E>
@@ -231,6 +239,7 @@ public:
 		set_func = [&e, &handler](T t) {
 			handler.queue_action(new SetValueCastAction<E, T>(e, t));
 		};
+		object = *e;
 	}
 
 	template <typename E>
@@ -241,6 +250,7 @@ public:
 		set_func = [set, &handler](T t) {
 			handler.queue_action(new SetFunctionAction<E, T>(set, t));
 		};
+		object = nullptr;
 	}
 
 	template <typename E>
@@ -255,6 +265,7 @@ public:
 			set(t);
 			lock.unlock();
 		};
+		object = nullptr;
 	}
 
 };
