@@ -66,7 +66,7 @@ protected:
 	SoundEngineDevice* device = nullptr;
 
 public:
-	void init(SoundEngineChannel* channel);
+	virtual void init(SoundEngineChannel* channel);
 
 	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) = 0;
 
