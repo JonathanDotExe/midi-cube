@@ -18,9 +18,10 @@
 class BooleanMidiBindingView : public ViewController {
 private:
 	BindableBooleanValue& value;
+	std::function<ViewController*()> view_factory;
 
 public:
-	BooleanMidiBindingView(BindableBooleanValue& val) : value(val) {
+	BooleanMidiBindingView(BindableBooleanValue& val, std::function<ViewController*()> f) : value(val), view_factory(f) {
 
 	}
 
@@ -70,7 +71,7 @@ public:
 			Button* back = new Button("Back", main_font, 18, frame.get_width() - 100, frame.get_height() - 40, 100, 40);
 			back->set_on_click([&frame, boxes, this]() {
 				//Change view
-				frame.change_view(new SoundEngineView());
+				frame.change_view(view_factory());
 			});
 			back->rect.setFillColor(sf::Color::Yellow);
 			controls.push_back(back);

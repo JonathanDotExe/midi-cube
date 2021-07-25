@@ -19,8 +19,13 @@ private:
 	Button* button = nullptr;
 	bool edit = false;
 	Frame* frame = nullptr;
+	std::function<ViewController*()> view_factory;
 
 public:
+
+	BindingGUIHandler(std::function<ViewController*()> f) : view_factory(f) {
+
+	}
 
 	bool on_action(Control* control) {
 		if (edit) {
@@ -28,42 +33,42 @@ public:
 				OrganSwitch* cast = dynamic_cast<OrganSwitch*>(control);
 				BindableBooleanValue* val = dynamic_cast<BindableBooleanValue*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new BooleanMidiBindingView(*val));
+					frame->change_view(new BooleanMidiBindingView(*val, view_factory));
 				}
 			}
 			else if (dynamic_cast<CheckBox*>(control)) {
 				CheckBox* cast = dynamic_cast<CheckBox*>(control);
 				BindableBooleanValue* val = dynamic_cast<BindableBooleanValue*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new BooleanMidiBindingView(*val));
+					frame->change_view(new BooleanMidiBindingView(*val, view_factory));
 				}
 			}
 			else if (dynamic_cast<DragBox<double>*>(control)) {
 				DragBox<double>* cast = dynamic_cast<DragBox<double>*>(control);
 				BindableTemplateValue<double>* val = dynamic_cast<BindableTemplateValue<double>*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new TemplateMidiBindingView<double>(*val));
+					frame->change_view(new TemplateMidiBindingView<double>(*val, view_factory));
 				}
 			}
 			else if (dynamic_cast<DragBox<int>*>(control)) {
 				DragBox<int>* cast = dynamic_cast<DragBox<int>*>(control);
 				BindableTemplateValue<int>* val = dynamic_cast<BindableTemplateValue<int>*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new TemplateMidiBindingView<int>(*val));
+					frame->change_view(new TemplateMidiBindingView<int>(*val, view_factory));
 				}
 			}
 			else if (dynamic_cast<DragBox<unsigned int>*>(control)) {
 				DragBox<unsigned int>* cast = dynamic_cast<DragBox<unsigned int>*>(control);
 				BindableTemplateValue<unsigned int>* val = dynamic_cast<BindableTemplateValue<unsigned int>*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new TemplateMidiBindingView<unsigned int>(*val));
+					frame->change_view(new TemplateMidiBindingView<unsigned int>(*val, view_factory));
 				}
 			}
 			else if (dynamic_cast<Drawbar<ORGAN_DRAWBAR_MAX>*>(control)) {
 				Drawbar<ORGAN_DRAWBAR_MAX>* cast = dynamic_cast<Drawbar<ORGAN_DRAWBAR_MAX>*>(control);
 				BindableTemplateValue<unsigned int>* val = dynamic_cast<BindableTemplateValue<unsigned int>*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new TemplateMidiBindingView<unsigned int>(*val));
+					frame->change_view(new TemplateMidiBindingView<unsigned int>(*val, view_factory));
 				}
 			}
 			else {

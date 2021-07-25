@@ -9,7 +9,9 @@
 #include "resources.h"
 #include "SoundEngineChannelView.h"
 
-B3OrganView::B3OrganView(B3Organ& o, SoundEngineChannel& ch, int channel_index) : organ(o), channel(ch) {
+B3OrganView::B3OrganView(B3Organ& o, SoundEngineChannel& ch, int channel_index) : organ(o), channel(ch), binder{[this]() {
+	return new B3OrganView(organ, channel, this->channel_index);
+}} {
 	this->channel_index = channel_index;
 }
 
@@ -69,7 +71,7 @@ Scene B3OrganView::create(Frame &frame) {
 
 		tmp_y += 65;
 	}
-	//High Gain REduction
+	//High Gain Reduction
 	{
 		Label* label = new Label("High Gain Reduction", main_font, 18, tmp_x, tmp_y);
 		label->text.setFillColor(sf::Color::White);

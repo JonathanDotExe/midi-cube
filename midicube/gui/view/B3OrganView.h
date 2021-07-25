@@ -15,11 +15,11 @@
 
 class B3OrganView : public ViewController {
 private:
-	BindingGUIHandler binder;
 	B3Organ& organ;
 	SoundEngineChannel& channel;
 	int channel_index;
 	bool edit_midi = false;
+	BindingGUIHandler binder;
 public:
 	B3OrganView(B3Organ& organ, SoundEngineChannel& channel, int channel_index);
 	virtual Scene create(Frame &frame);
