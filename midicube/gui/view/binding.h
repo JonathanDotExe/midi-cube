@@ -66,9 +66,13 @@ public:
 					frame->change_view(new TemplateMidiBindingView<unsigned int>(*val));
 				}
 			}
+			else {
+				return true;
+			}
+			return false;
 		}
 
-		return !edit;
+		return true;
 	}
 
 	Button* create_button(int x, int y, Frame* frame) {
