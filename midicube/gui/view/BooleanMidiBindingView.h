@@ -13,6 +13,7 @@
 #include "resources.h"
 #include "../../midicube.h"
 #include "../../soundengine/soundengine.h"
+#include "SoundEngineView.h"
 
 class BooleanMidiBindingView : public ViewController {
 private:

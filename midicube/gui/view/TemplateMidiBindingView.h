@@ -13,6 +13,7 @@
 #include "resources.h"
 #include "../../midicube.h"
 #include "../../soundengine/soundengine.h"
+#include "SoundEngineView.h"
 
 template<typename T>
 class TemplateMidiBindingView : public ViewController {
@@ -70,7 +71,7 @@ public:
 				controls.push_back(title);
 
 				DragBox<double>* value = new DragBox<double>(0, -1, 1, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.range, handler);
+				value->property.bind(this->value.temp_change, handler);
 				controls.push_back(value);
 			}
 			++index;

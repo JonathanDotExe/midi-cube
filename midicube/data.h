@@ -13,7 +13,7 @@
 #include <iostream>
 #include "boost/lockfree/spsc_queue.hpp"
 #include "util.h"
-
+#include "binding.h"
 
 class Action {
 
@@ -200,11 +200,11 @@ private:
 	std::function<void (std::function<void (T)>)> get_func = nullptr;
 	std::function<void (T)> set_func = nullptr;
 
-	void* object = nullptr;
+	BindableValue* object = nullptr;
 
 public:
 
-	void* get_object() {
+	BindableValue* get_object() {
 		return object;
 	}
 
@@ -228,7 +228,9 @@ public:
 		set_func = [&e, &handler](T t) {
 			handler.queue_action(new SetValueAction<E, T>(e, t));
 		};
-		object = &e;
+		if (std::is_base_of<BindableValue, E>()) {
+			object = (BindableValue*) (&e); //FIXME
+		}
 	}
 
 	template <typename E>
@@ -239,7 +241,10 @@ public:
 		set_func = [&e, &handler](T t) {
 			handler.queue_action(new SetValueCastAction<E, T>(e, t));
 		};
-		object = &e;
+
+		if (std::is_base_of<BindableValue, E>()) {
+			object = (BindableValue*)(&e); //FIXME
+		}
 	}
 
 	template <typename E>
