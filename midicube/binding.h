@@ -23,9 +23,7 @@ class BindableValue {
 
 public:
 
-	//Don't edit
 	unsigned int persistent_cc = 128;
-	//Don't edit
 	unsigned int temp_cc = 128;
 
 	virtual void change_persistent(double val) = 0;

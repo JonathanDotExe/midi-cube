@@ -161,12 +161,12 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				effects[i].apply(lsample, rsample, info);
 			}
 			//Pan
-			lsample *= (1 - fmax(0, panning));
-			rsample *= (1 - fmax(0, -panning));
+			lsample *= (1 - fmax(0, panning.get_temp()));
+			rsample *= (1 - fmax(0, -panning.get_temp()));
 		}
 		//Playback
-		lsample *= volume;
-		rsample *= volume;
+		lsample *= volume.get_temp();
+		rsample *= volume.get_temp();
 	}
 }
 

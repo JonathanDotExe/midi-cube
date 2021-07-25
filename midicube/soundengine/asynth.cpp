@@ -226,7 +226,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 			AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
-				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * std::abs((double) ((int) voice.note) - mono_voice.note) / 50.0);
+				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo.get_temp() * std::abs((double) ((int) voice.note) - mono_voice.note) / 50.0);
 
 			}
 			if (!preset.legato || !mono_voice.valid) {
