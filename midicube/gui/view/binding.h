@@ -60,7 +60,7 @@ public:
 				}
 			}
 			else if (dynamic_cast<Drawbar<ORGAN_DRAWBAR_MAX>*>(control)) {
-				DragBox<unsigned int>* cast = dynamic_cast<DragBox<unsigned int>*>(control);
+				Drawbar<ORGAN_DRAWBAR_MAX>* cast = dynamic_cast<Drawbar<ORGAN_DRAWBAR_MAX>*>(control);
 				BindableTemplateValue<unsigned int>* val = dynamic_cast<BindableTemplateValue<unsigned int>*> (cast->property.get_object());
 				if (val) {
 					frame->change_view(new TemplateMidiBindingView<unsigned int>(*val));
