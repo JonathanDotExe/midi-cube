@@ -14,7 +14,6 @@
 #include "../../midicube.h"
 #include "../../soundengine/soundengine.h"
 
-template<typename T>
 class BooleanMidiBindingView : public ViewController {
 private:
 	BindableBooleanValue& value;
