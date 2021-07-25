@@ -8,12 +8,14 @@
 #ifndef MIDICUBE_GUI_VIEW_B3ORGANVIEW_H_
 #define MIDICUBE_GUI_VIEW_B3ORGANVIEW_H_
 
+#include "binding.h"
 #include "../engine/core.h"
 #include "../engine/control.h"
 #include "../../soundengine/organ.h"
 
 class B3OrganView : public ViewController {
 private:
+	BindingGUIHandler binder;
 	B3Organ& organ;
 	SoundEngineChannel& channel;
 	int channel_index;
@@ -22,6 +24,7 @@ public:
 	B3OrganView(B3Organ& organ, SoundEngineChannel& channel, int channel_index);
 	virtual Scene create(Frame &frame);
 	virtual ~B3OrganView();
+	virtual bool on_action(Control *control);
 };
 
 #endif /* MIDICUBE_GUI_VIEW_B3ORGANVIEW_H_ */

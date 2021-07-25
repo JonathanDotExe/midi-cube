@@ -81,6 +81,7 @@ public:
 			else {
 				button->rect.setFillColor(sf::Color::Yellow);
 			}
+			frame->request_redraw();
 		});
 		if (edit) {
 			button->rect.setFillColor(sf::Color::White);
