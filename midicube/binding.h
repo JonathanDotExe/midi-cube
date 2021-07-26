@@ -23,12 +23,10 @@ class BindableValue {
 
 public:
 
-	unsigned int persistent_cc = 128;
-	unsigned int temp_cc = 128;
+	bool persistent = true;
+	unsigned int cc = 128;
 
-	virtual void change_persistent(double val) = 0;
-
-	virtual void change_temp(double val) = 0;
+	virtual void change(double val) = 0;
 
 	virtual ~BindableValue() {
 
@@ -40,51 +38,43 @@ public:
 template<typename T>
 class BindableTemplateValue : public BindableValue {
 private:
-	T persistent_value;
-	T temp_value;
+	T value;
+	T default_value;
+
+public:
 
 	T total_min;
 	T total_max;
 
-	double cc_val = 0;
+	T binding_min;
+	T binding_max;
 
-	inline void recalc_temp() {
-		temp_value = std::min(std::max(total_min, static_cast<T>(persistent_value + (total_max - total_min) * cc_val * temp_change)), total_max);
-	}
-
-public:
-
-	double temp_change = 0;
-
-	BindableTemplateValue(T val, T min, T max) {
-		this->persistent_value = val;
-		this->total_min = min;
-		this->total_max = max;
-		recalc_temp();
+	BindableTemplateValue(T val, T min, T max) : total_min(min), total_max(max) {
+		this->value = val;
+		this->default_value = val;
+		this->binding_min = min;
+		this->binding_max = max;
 	}
 
 	inline T& operator=(const T& other) {
-		persistent_value = other;
-		recalc_temp();
-		return persistent_value;
+		this->value = other;
+		this->default_value = other;
+		return value;
 	}
 
 	inline operator T() const {
-		return persistent_value;
+		return value;
 	}
 
-	inline const T get_temp() const {
-		return temp_value;
+	inline const T get_default() const {
+		return default_value;
 	}
 
-	void change_persistent(double val) {
-		persistent_value = total_min + (total_max - total_min) * val;
-		recalc_temp();
-	}
-
-	void change_temp(double val) {
-		cc_val = val;
-		recalc_temp();
+	void change(double val) {
+		value = binding_min + (binding_max - binding_min) * val;
+		if (persistent) {
+			default_value = value;
+		}
 	}
 
 	void load(boost::property_tree::ptree& parent, std::string path, T def) {
@@ -131,37 +121,35 @@ public:
 
 class BindableBooleanValue : public BindableValue {
 private:
-	bool persistent_value;
-	bool temp_value;
+	bool value;
+	bool default_value;
 
 public:
 
 	BindableBooleanValue(bool val = false) {
-		this->persistent_value = val;
-		this->temp_value = val;
+		this->value = val;
+		this->default_value = val;
 	}
 
 	inline bool operator=(const bool other) {
-		persistent_value = other;
-		temp_value = other;
-		return persistent_value;
+		value = other;
+		default_value = other;
+		return value;
 	}
 
 	inline operator bool() const {
-		return persistent_value;
+		return value;
 	}
 
-	inline const bool get_temp() const {
-		return temp_value;
+	inline const bool get_default() const {
+		return default_value;
 	}
 
-	void change_persistent(double val) {
-		persistent_value = val > 0;
-		temp_value = persistent_value;
-	}
-
-	void change_temp(double val) {
-		temp_value = val > 0;
+	void change(double val) {
+		value = val > 0;
+		if (persistent) {
+			default_value = value;
+		}
 	}
 
 	void load(boost::property_tree::ptree tree) {
