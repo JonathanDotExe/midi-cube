@@ -154,6 +154,7 @@ void Frame::run(ViewController* v) {
 				std::this_thread::yield();
 			}
 			while (cube.action_handler.remaining_return_actions()) {
+				cube.action_handler.execute_return_actions();
 				std::this_thread::yield();
 			}
 			switch_view(next_view);
