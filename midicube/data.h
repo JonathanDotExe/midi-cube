@@ -11,7 +11,7 @@
 
 #include <functional>
 #include <iostream>
-#include "boost/lockfree/spsc_queue.hpp"
+#include "boost/lockfree/queue.hpp"
 #include "util.h"
 
 
@@ -156,10 +156,12 @@ public:
 
 class ActionHandler {
 private:
-	boost::lockfree::spsc_queue<Action*> realtime_actions;
-	boost::lockfree::spsc_queue<Action*> return_actions;
+	boost::lockfree::queue<Action*> realtime_actions;
+	boost::lockfree::queue<Action*> return_actions;
 public:
 	ActionHandler();
+	bool remaining_realtime_actions();
+	bool remaining_return_actions();
 	void queue_action(Action* action);
 	void execute_realtime_actions();
 	void execute_return_actions();
