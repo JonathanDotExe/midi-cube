@@ -10,16 +10,19 @@
 
 #include "../engine/core.h"
 #include "../engine/control.h"
+#include "binding.h"
 
 class SoundEngineChannelView: public ViewController {
 private:
 	SoundEngineChannel& channel;
 	int channel_index;
+	BindingGUIHandler binder;
 
 public:
 	SoundEngineChannelView(SoundEngineChannel& channel, int channel_index);
 	virtual Scene create(Frame &frame);
 	virtual ~SoundEngineChannelView();
+	virtual bool on_action(Control *control);
 };
 
 ViewController* create_view_for_engine(std::string name, SoundEngine& engine, SoundEngineChannel& channel, int channel_index);

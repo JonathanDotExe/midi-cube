@@ -71,6 +71,13 @@ public:
 					frame->change_view(new TemplateMidiBindingView<unsigned int>(*val, view_factory));
 				}
 			}
+			else if (dynamic_cast<Slider*>(control)) {
+				Slider* cast = dynamic_cast<Slider*>(control);
+				BindableTemplateValue<double>* val = dynamic_cast<BindableTemplateValue<double>*> (cast->property.get_object());
+				if (val) {
+					frame->change_view(new TemplateMidiBindingView<double>(*val, view_factory));
+				}
+			}
 			else {
 				return true;
 			}
