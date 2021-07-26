@@ -12,8 +12,8 @@
 
 
 AnalogSynthOperatorView::AnalogSynthOperatorView(AnalogSynth &s,
-		SoundEngineChannel &c, int channel_index, size_t part) : synth(s), channel(c), binder{[this]() {
-			return new AnalogSynthOperatorView(synth, channel, this->channel_index, this->part);
+		SoundEngineChannel &c, int channel_index, size_t part) : synth(s), channel(c), binder{[&s, &c, channel_index, part]() {
+			return new AnalogSynthOperatorView(s, c, channel_index, part);
 		}} {
 	this->channel_index = channel_index;
 	this->part = part;
@@ -204,7 +204,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 	});
 	controls.push_back(edit);
 
-	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
+	controls.push_back(binder.create_button(frame.get_width() - 70 - 120 - 100, frame.get_height() - 40, &frame));
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);

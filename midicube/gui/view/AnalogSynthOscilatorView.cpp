@@ -9,8 +9,8 @@
 #include "AnalogSynthView.h"
 #include "resources.h"
 
-AnalogSynthOscilatorView::AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineChannel& c, int channel_index, size_t part) : synth(s), channel(c), binder{[this]() {
-	return new AnalogSynthOscilatorView(synth, channel, this->channel_index, this->part);
+AnalogSynthOscilatorView::AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineChannel& c, int channel_index, size_t part) : synth(s), channel(c), binder{[&s, &c, channel_index, part]() {
+	return new AnalogSynthOscilatorView(s, c, channel_index, part);
 }} {
 	this->channel_index = channel_index;
 	this->part = part;
@@ -427,7 +427,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	});
 	controls.push_back(edit);
 
-	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
+	controls.push_back(binder.create_button(frame.get_width() - 70 - 120 - 100, frame.get_height() - 40, &frame));
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);

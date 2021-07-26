@@ -9,8 +9,8 @@
 #include "resources.h"
 #include "SoundEngineChannelView.h"
 
-B3OrganView::B3OrganView(B3Organ& o, SoundEngineChannel& ch, int channel_index) : organ(o), channel(ch), binder{[this]() {
-	return new B3OrganView(organ, channel, this->channel_index);
+B3OrganView::B3OrganView(B3Organ& o, SoundEngineChannel& ch, int channel_index) : organ(o), channel(ch), binder{[&o, &ch, channel_index]() {
+	return new B3OrganView(o, ch, channel_index);
 }} {
 	this->channel_index = channel_index;
 }

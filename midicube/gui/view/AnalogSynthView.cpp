@@ -13,8 +13,8 @@
 #include "AnalogSynthModulatorView.h"
 #include "AnalogSynthFMView.h"
 
-AnalogSynthView::AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int channel_index) : synth(s), channel(c), binder{[this]() {
-	return new AnalogSynthView(synth, channel, this->channel_index);
+AnalogSynthView::AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int channel_index) : synth(s), channel(c), binder{[&s, &c, channel_index]() {
+	return new AnalogSynthView(s, c, channel_index);
 }} {
 	this->channel_index = channel_index;
 }
