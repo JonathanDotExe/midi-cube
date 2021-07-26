@@ -11,6 +11,7 @@
 #include "../engine/core.h"
 #include "../engine/control.h"
 #include "../../soundengine/asynth.h"
+#include "binding.h"
 
 class AnalogSynthModulatorView : public ViewController{
 private:
@@ -19,10 +20,12 @@ private:
 	int channel_index;
 	size_t part;
 	bool edit_source = false;
+	BindingGUIHandler binder;
 public:
 	AnalogSynthModulatorView(AnalogSynth& s, SoundEngineChannel& c, int channel_index, size_t part);
 	virtual ~AnalogSynthModulatorView();
 	virtual Scene create(Frame &frame);
+	virtual bool on_action(Control *control);
 };
 
 

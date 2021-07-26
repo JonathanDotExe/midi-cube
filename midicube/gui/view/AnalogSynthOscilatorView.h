@@ -11,6 +11,7 @@
 #include "../engine/core.h"
 #include "../engine/control.h"
 #include "../../soundengine/asynth.h"
+#include "binding.h"
 
 class AnalogSynthOscilatorView: public ViewController {
 private:
@@ -19,10 +20,12 @@ private:
 	int channel_index;
 	size_t part;
 	bool edit_source = false;
+	BindingGUIHandler binder;
 public:
 	AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineChannel& c, int channel_index, size_t part);
 	virtual ~AnalogSynthOscilatorView();
 	virtual Scene create(Frame &frame);
+	virtual bool on_action(Control *control);
 };
 
 std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyModulation& mod, ActionHandler& handler, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source);
