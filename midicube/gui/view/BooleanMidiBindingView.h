@@ -45,23 +45,23 @@ public:
 			int width = 90 * 2;
 			std::vector<DragBox<int>*> boxes;
 			size_t index = 0;
+			//CC
+			{
+				Label* title = new Label("CC", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				controls.push_back(title);
+
+				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				value->property.bind(this->value.cc, handler);
+				controls.push_back(value);
+			}
+			++index;
 			//Persistent
 			{
 				Label* title = new Label("Persistent", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.persistent_cc, handler);
-				controls.push_back(value);
-			}
-			++index;
-			//Temp
-			{
-				Label* title = new Label("Modulation", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
-				controls.push_back(title);
-
-				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.temp_cc, handler);
+				OrganSwitch* value = new OrganSwitch(true, main_font, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				value->property.bind(this->value.persistent, handler);
 				controls.push_back(value);
 			}
 			++index;

@@ -43,36 +43,46 @@ public:
 			Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 50);
 			controls.push_back(pane);
 
-			int width = 90 * 3;
+			int width = 90 * 4;
 			std::vector<DragBox<int>*> boxes;
 			size_t index = 0;
+			//CC
+			{
+				Label* title = new Label("CC", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				controls.push_back(title);
+
+				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				value->property.bind(this->value.cc, handler);
+				controls.push_back(value);
+			}
+			++index;
 			//Persistent
 			{
 				Label* title = new Label("Persistent", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.persistent_cc, handler);
+				OrganSwitch* value = new OrganSwitch(true, main_font, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				value->property.bind(this->value.persistent, handler);
 				controls.push_back(value);
 			}
 			++index;
-			//Temp
+			//Min
 			{
-				Label* title = new Label("Modulation", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				Label* title = new Label("Min", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.temp_cc, handler);
+				DragBox<T>* value = new DragBox<T>(0, this->value.total_min, this->value.total_max, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				value->property.bind(this->value.binding_min, handler);
 				controls.push_back(value);
 			}
 			++index;
-			//Range
+			//Max
 			{
-				Label* title = new Label("Range", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				Label* title = new Label("Max", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				DragBox<double>* value = new DragBox<double>(0, -1, 1, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.temp_change, handler);
+				DragBox<T>* value = new DragBox<T>(0, this->value.total_min, this->value.total_max, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				value->property.bind(this->value.binding_max, handler);
 				controls.push_back(value);
 			}
 			++index;
