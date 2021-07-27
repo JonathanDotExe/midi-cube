@@ -58,7 +58,7 @@ public:
 		this->binding_max = max;
 	}
 
-	BindableTemplateValue(BindableTemplateValue<T>& other) {
+	BindableTemplateValue(const BindableTemplateValue<T>& other) {
 		this->value = other.default_value;
 		this->default_value = other.default_value;
 		this->binding_min = other.binding_min;
@@ -145,7 +145,7 @@ public:
 		this->default_value = val;
 	}
 
-	BindableBooleanValue(BindableBooleanValue& other) {
+	BindableBooleanValue(const BindableBooleanValue& other) {
 		this->value = other.default_value;
 		this->default_value = other.default_value;
 		this->cc = other.cc;
