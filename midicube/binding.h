@@ -43,7 +43,9 @@ private:
 
 public:
 
+	//DONT CHANGE
 	T total_min;
+	//DONT CHANGE
 	T total_max;
 
 	T binding_min;
@@ -83,22 +85,22 @@ public:
 			load(tree.get());
 		}
 		else {
-			persistent_value = parent.get<T>(path, def);
-			temp_change = 0;
-			persistent_cc = 128;
-			temp_cc = 128;
-			cc_val = 0;
-			recalc_temp();
+			value = parent.get<T>(path, def);
+			default_value = value;
+			binding_min = total_min;
+			binding_max = total_max;
+			cc = 128;
+			persistent = true;
 		}
 	}
 
 	void load(boost::property_tree::ptree& tree) {
-		persistent_value = tree.get("value", persistent_value);
-		temp_change = tree.get("temp_change", temp_change);
-		persistent_cc = tree.get("persistent_cc", persistent_cc);
-		temp_cc = tree.get("temp_cc", temp_cc);
-		cc_val = 0;
-		recalc_temp();
+		value = tree.get("value", value);
+		default_value = value;
+		binding_min = tree.get("binding_min", binding_min);
+		binding_max = tree.get("binding_max", binding_max);
+		cc = tree.get("cc", cc);
+		persistent = tree.get("persistent", persistent);
 	}
 
 	void save(boost::property_tree::ptree& tree, std::string path) {
@@ -108,10 +110,11 @@ public:
 	boost::property_tree::ptree save() {
 		boost::property_tree::ptree tree;
 
-		tree.put("value", persistent_value);
-		tree.put("temp_change", temp_change);
-		tree.put("persistent_cc", persistent_cc);
-		tree.put("temp_cc", temp_cc);
+		tree.put("value", value);
+		tree.put("binding_min", binding_min);
+		tree.put("binding_max", binding_max);
+		tree.put("cc", cc);
+		tree.put("persistent", persistent);
 
 
 		return tree;
@@ -152,13 +155,35 @@ public:
 		}
 	}
 
+	void load(boost::property_tree::ptree& parent, std::string path, bool def) {
+		auto tree = parent.get_child_optional(path);
+		if (tree && tree.get().get_child_optional("value")) {
+			load(tree.get());
+		}
+		else {
+			value = parent.get<bool>(path, def);
+			default_value = value;
+			cc = 128;
+			persistent = true;
+		}
+	}
+
 	void load(boost::property_tree::ptree tree) {
-		persistent_value = tree.get("value", persistent_value);
+		value = tree.get("value", value);
+		default_value = value;
+		cc = tree.get("cc", cc);
+		persistent = tree.get("persistent", persistent);
+	}
+
+	void save(boost::property_tree::ptree& tree, std::string path) {
+		tree.add_child(path, save());
 	}
 
 	boost::property_tree::ptree save() {
 		boost::property_tree::ptree tree;
-		tree.put("value", persistent_value);
+		tree.put("value", value);
+		tree.put("cc", cc);
+		tree.put("persistent", persistent);
 
 		return tree;
 	}
