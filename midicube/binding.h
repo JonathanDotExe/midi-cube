@@ -58,6 +58,17 @@ public:
 		this->binding_max = max;
 	}
 
+	BindableTemplateValue(BindableTemplateValue<T>& other) {
+		this->value = other.default_value;
+		this->default_value = other.default_value;
+		this->binding_min = other.binding_min;
+		this->binding_max = other.binding_max;
+		this->total_min = other.total_min;
+		this->total_max = other.total_max;
+		this->cc = other.cc;
+		this->persistent = other.persistent;
+	}
+
 	inline T& operator=(const T& other) {
 		this->value = other;
 		this->default_value = other;
@@ -95,7 +106,7 @@ public:
 	}
 
 	void load(boost::property_tree::ptree& tree) {
-		value = tree.get("value", value);
+		value = tree.get("value", default_value);
 		default_value = value;
 		binding_min = tree.get("binding_min", binding_min);
 		binding_max = tree.get("binding_max", binding_max);
@@ -132,6 +143,13 @@ public:
 	BindableBooleanValue(bool val = false) {
 		this->value = val;
 		this->default_value = val;
+	}
+
+	BindableBooleanValue(BindableBooleanValue& other) {
+		this->value = other.default_value;
+		this->default_value = other.default_value;
+		this->cc = other.cc;
+		this->persistent = other.persistent;
 	}
 
 	inline bool operator=(const bool other) {
@@ -181,7 +199,7 @@ public:
 
 	boost::property_tree::ptree save() {
 		boost::property_tree::ptree tree;
-		tree.put("value", value);
+		tree.put("value", default_value);
 		tree.put("cc", cc);
 		tree.put("persistent", persistent);
 
@@ -198,10 +216,7 @@ private:
 
 public:
 
-	void bind(BindableValue* value, unsigned int persistent_cc, unsigned int temp_cc) {
-		value->persistent_cc = persistent_cc;
-		value->temp_cc = temp_cc;
-
+	void bind(BindableValue* value) {
 		bindings.push_back(value);
 		/*//Unbind
 		if (value->persistent_cc < MIDI_CONTROL_COUNT) {
@@ -242,11 +257,8 @@ public:
 	bool on_cc(unsigned int control, double value) {
 		bool updated = false;
 		for (BindableValue* val : bindings) {
-			if (val->persistent_cc == control) {
-				val->change_persistent(value);
-			}
-			if (val->temp_cc == control) {
-				val->change_temp(value);
+			if (val->cc == control) {
+				val->change(value);
 			}
 			updated = true;
 		}
@@ -270,7 +282,7 @@ public:
 		this->handler = handler;
 		//Init values
 		for (BindableValue* value : values) {
-			handler->bind(value, value->persistent_cc, value->temp_cc);
+			handler->bind(value);
 		}
 	}
 

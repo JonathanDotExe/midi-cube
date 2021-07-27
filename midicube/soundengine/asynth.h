@@ -73,24 +73,24 @@ struct BindableADSREnvelopeData {
 
 	operator ADSREnvelopeData() const {
 		ADSREnvelopeData env;
-		env.attack = attack.get_temp();
-		env.decay = decay.get_temp();
-		env.sustain = sustain.get_temp();
-		env.release = release.get_temp();
+		env.attack = attack;
+		env.decay = decay;
+		env.sustain = sustain;
+		env.release = release;
 
 		env.attack_shape = attack_shape;
 		env.pre_decay_shape = pre_decay_shape;
 		env.decay_shape = decay_shape;
 		env.release_shape = release_shape;
 
-		env.hold = hold.get_temp();
-		env.pre_decay =  pre_decay.get_temp();
+		env.hold = hold;
+		env.pre_decay =  pre_decay;
 
-		env.attack_hold = attack_hold.get_temp();
-		env.peak_volume = peak_volume.get_temp();
-		env.decay_volume = decay_volume.get_temp();
-		env.sustain_time = sustain_time.get_temp();
-		env.release_volume = release_volume.get_temp();
+		env.attack_hold = attack_hold;
+		env.peak_volume = peak_volume;
+		env.decay_volume = decay_volume;
+		env.sustain_time = sustain_time;
+		env.release_volume = release_volume;
 		return env;
 	}
 };

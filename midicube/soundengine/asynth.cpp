@@ -47,7 +47,7 @@ AnalogSynth::AnalogSynth() {
 }
 
 inline double AnalogSynth::apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ANALOG_PART_COUNT>& lfo_val) {
-	double prog = mod.value.get_temp();
+	double prog = mod.value;
 	prog += env_val[mod.mod_env] * mod.mod_env_amount
 			+ lfo_val[mod.lfo] * mod.lfo_amount * lfo_vol[mod.lfo]
 			+ velocity * mod.velocity_amount + aftertouch * mod.aftertouch_amount;
@@ -69,12 +69,12 @@ void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, 
 		data.resonance = apply_modulation(FILTER_RESONANCE_SCALE, filter.resonance, velocity,
 				aftertouch, lfo_val);
 
-		if (filter.kb_track.get_temp()) {
+		if (filter.kb_track) {
 			double cutoff = data.cutoff;
 			//KB track
 			cutoff *= 1
 					+ ((double) note.note - filter.kb_track_note) / 12.0
-							* filter.kb_track.get_temp();
+							* filter.kb_track;
 			data.cutoff = cutoff;
 		}
 
@@ -226,7 +226,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 			AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
-				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo.get_temp() * std::abs((double) ((int) voice.note) - mono_voice.note) / 50.0);
+				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * std::abs((double) ((int) voice.note) - mono_voice.note) / 50.0);
 
 			}
 			if (!preset.legato || !mono_voice.valid) {
@@ -289,7 +289,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 		}
 		else {
 			AnalogOscilatorData d = { lfo.waveform };
-			double freq = lfo.freq.get_temp();
+			double freq = lfo.freq;
 			//Sync
 			if (lfo.sync_master) {
 				double value = lfo.clock_value;

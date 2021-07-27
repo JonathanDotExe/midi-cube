@@ -121,18 +121,18 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, 
 
 void B3Organ::process_note_sample(double& lsample, double& rsample, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
 	//Organ sound
-	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft.get_temp() ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
+	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
 		int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
-		double vol = data.preset.drawbars[i].get_temp() / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
+		double vol = data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
 		trigger_tonewheel(tonewheel, vol, info, note, vol);
 	}
 	//Percussion
-	double decay = data.preset.percussion_fast_decay.get_temp() ? data.preset.percussion_fast_decay_time : data.preset.percussion_slow_decay_time;
-	if (data.preset.percussion.get_temp() && info.time - data.percussion_start <= decay) {
-		double vol = (1 - (info.time - data.percussion_start)/decay) * (data.preset.percussion_soft.get_temp() ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
+	double decay = data.preset.percussion_fast_decay ? data.preset.percussion_fast_decay_time : data.preset.percussion_slow_decay_time;
+	if (data.preset.percussion && info.time - data.percussion_start <= decay) {
+		double vol = (1 - (info.time - data.percussion_start)/decay) * (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 		vol /= drawbar_amount;
-		int tonewheel = note.note + (data.preset.percussion_third_harmonic.get_temp() ? 19 : 12) - ORGAN_LOWEST_TONEWHEEL_NOTE;
+		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12) - ORGAN_LOWEST_TONEWHEEL_NOTE;
 
 		trigger_tonewheel(tonewheel, vol, info, note, 0);
 	}
@@ -179,7 +179,7 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 	}
 
 	//Chorus/Vibrato
-	if (data.preset.vibrato_mix.get_temp()) {
+	if (data.preset.vibrato_mix) {
 		size_t delays = data.delays.size();
 		//Get vibrato signal
 		double vibrato = 0;
@@ -211,7 +211,7 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 			data.scanner_inverse = false;
 		}
 		//Play back
-		sample = sample * (1 - fmax(0, data.preset.vibrato_mix.get_temp() - 0.5) * 2) + vibrato * (fmin(1, data.preset.vibrato_mix.get_temp() * 2));
+		sample = sample * (1 - fmax(0, data.preset.vibrato_mix - 0.5) * 2) + vibrato * (fmin(1, data.preset.vibrato_mix * 2));
 	}
 
 	//Amplifier
