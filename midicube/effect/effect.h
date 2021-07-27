@@ -19,6 +19,8 @@
 
 namespace pt = boost::property_tree;
 
+class SoundEngineDevice;
+
 class EffectProgram {
 public:
 	std::unordered_map<std::string, unsigned int> ccs;
@@ -48,13 +50,14 @@ public:
 };
 
 class Effect {
+protected:
+	LocalMidiBindingHandler cc;
+
 public:
-	MidiControlHandler cc;
+
+	virtual void init(SoundEngineDevice& engine);
 
 	virtual void apply(double& lsample, double& rsample, SampleInfo& info) = 0;
-	virtual bool midi_message(MidiMessage& msg, SampleInfo& info) {
-		return cc.on_message(msg);
-	}
 	virtual void apply_program(EffectProgram* prog) {
 
 	}

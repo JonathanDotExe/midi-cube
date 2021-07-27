@@ -174,14 +174,6 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 	size_t scene = device->scene;
 	bool updated = false;
 	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
-		//Effects
-		for (auto& e : effects) {
-			if (e.get_effect()) {
-				if (e.get_effect()->midi_message(message, info)) {
-					updated = true;
-				}
-			}
-		}
 		//Aftertouch
 		if (message.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 			this->info.aftertouch = message.monophonic_aftertouch()/127.0;
@@ -494,15 +486,6 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 		break;
 	case MessageType::INVALID:
 		break;
-	}
-
-	//Effects
-	for (auto& e : effects) {
-		if (e.get_effect()) {
-			if (e.get_effect()->midi_message(message, info)) {
-				updated = true;
-			}
-		}
 	}
 
 	//Channels
