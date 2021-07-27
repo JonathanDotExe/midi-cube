@@ -55,7 +55,7 @@ inline double AnalogSynth::apply_modulation(const FixedScale &scale, PropertyMod
 	return scale.value(prog);
 }
 
-void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double velocity, double aftertouch) {
+void AnalogSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double velocity, double aftertouch) {
 	//Filter
 	if (filter.on) {
 		//Pre drive

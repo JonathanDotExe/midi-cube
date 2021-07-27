@@ -121,7 +121,7 @@ public:
 	boost::property_tree::ptree save() {
 		boost::property_tree::ptree tree;
 
-		tree.put("value", value);
+		tree.put("value", default_value);
 		tree.put("binding_min", binding_min);
 		tree.put("binding_max", binding_max);
 		tree.put("cc", cc);
@@ -187,7 +187,7 @@ public:
 	}
 
 	void load(boost::property_tree::ptree tree) {
-		value = tree.get("value", value);
+		value = tree.get("value", default_value);
 		default_value = value;
 		cc = tree.get("cc", cc);
 		persistent = tree.get("persistent", persistent);
