@@ -69,6 +69,20 @@ public:
 		this->persistent = other.persistent;
 	}
 
+	inline BindableTemplateValue<T>& operator=(const BindableTemplateValue<T>& other) {
+		if (&other != this) {
+			this->value = other.default_value;
+			this->default_value = other.default_value;
+			this->binding_min = other.binding_min;
+			this->binding_max = other.binding_max;
+			this->total_min = other.total_min;
+			this->total_max = other.total_max;
+			this->cc = other.cc;
+			this->persistent = other.persistent;
+		}
+		return *this;
+	}
+
 	inline T& operator=(const T& other) {
 		this->value = other;
 		this->default_value = other;

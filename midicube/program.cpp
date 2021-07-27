@@ -215,8 +215,8 @@ void save_program(Program* program, pt::ptree& tree) {
 
 			c.add_child("scenes.scene", s);
 		}
-		program->channels[i].volume.save(tree, "volume");
-		program->channels[i].panning.save(tree, "panning");
+		program->channels[i].volume.save(c, "volume");
+		program->channels[i].panning.save(c, "panning");
 		//Arpeggiator
 		c.put("arpeggiator.on", program->channels[i].arp_on);
 		c.put("arpeggiator.bpm", program->channels[i].arpeggiator_bpm);

@@ -385,6 +385,7 @@ void AnalogSynth::apply_program(EngineProgram *prog) {
 	AnalogSynthProgram* p = dynamic_cast<AnalogSynthProgram*>(prog);
 	//Create new
 	if (p) {
+		std::cout << "Applying preset" << std::endl;
 		preset = p->preset;
 	}
 	else {
@@ -652,7 +653,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 
 	tree.put("mono", preset.mono);
 	tree.put("legato", preset.legato);
-	tree.put("portamendo", preset.portamendo);
+	preset.portamendo.save(tree, "portamendo");
 
 	tree.put("aftertouch_attack", preset.aftertouch_attack);
 	tree.put("aftertouch_release", preset.aftertouch_release);
