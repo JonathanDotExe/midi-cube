@@ -266,7 +266,7 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 				break;
 			}
 
-			preset.drawbars[i] = d.second.get_value<unsigned int>(preset.drawbars[i]);
+			preset.drawbars[i].load(d.second);
 
 			++i;
 		}
@@ -279,14 +279,14 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	preset.high_gain_reduction = tree.get<double>("high_gain_reduction", 0.5);
 
 	//Percussion
-	preset.percussion = tree.get<bool>("percussion", false);
-	preset.percussion_third_harmonic = tree.get<bool>("percussion_third_harmonic", true);
-	preset.percussion_soft = tree.get<bool>("percussion_soft", true);
-	preset.percussion_fast_decay = tree.get<bool>("percussion_fast_decay", true);
+	preset.percussion.load(tree, "percussion", false);
+	preset.percussion_third_harmonic.load(tree, "percussion_third_harmonic", true);
+	preset.percussion_soft.load(tree, "percussion_soft", true);
+	preset.percussion_fast_decay.load(tree, "percussion_fast_decay", true);
 
 	//Vibrato/Chorus
-	preset.vibrato_mix = tree.get<double>("vibrato_mix", 0.0);
-	preset.swell = tree.get<double>("swell", 1);
+	preset.vibrato_mix.load(tree, "vibrato_mix", 0.0);
+	preset.swell.load(tree, "swell", 1);
 }
 
 boost::property_tree::ptree B3OrganProgram::save() {
@@ -294,7 +294,7 @@ boost::property_tree::ptree B3OrganProgram::save() {
 
 	//Drawbars
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		tree.add("drawbars.drawbar", preset.drawbars[i]);
+		preset.drawbars[i].save(tree, "drawbars.drawbar");
 	}
 
 	//Modeling
@@ -304,13 +304,13 @@ boost::property_tree::ptree B3OrganProgram::save() {
 	tree.put("high_gain_reduction", preset.high_gain_reduction);
 
 	//Percussion
-	tree.put("percussion", preset.percussion);
-	tree.put("percussion_third_harmonic", preset.percussion_third_harmonic);
-	tree.put("percussion_soft", preset.percussion_soft);
-	tree.put("percussion_fast_decay", preset.percussion_fast_decay);
+	preset.percussion.save(tree, "percussion");
+	preset.percussion_third_harmonic.save(tree, "percussion_third_harmonic");
+	preset.percussion_soft.save(tree, "percussion_soft");
+	preset.percussion_fast_decay.save(tree, "percussion_fast_decay");
 	//Vibrato/Chorus
-	tree.put("vibrato_mix", preset.vibrato_mix);
-	tree.put("swell", preset.swell);
+	preset.vibrato_mix.save(tree, "vibrato_mix");
+	preset.swell.save(tree, "swell");
 
 
 	return tree;

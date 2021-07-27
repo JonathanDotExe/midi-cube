@@ -376,8 +376,8 @@ struct InsertEffectProgram {
 
 struct ChannelProgram {
 	ssize_t engine_index{-1};
-	double volume = 0.5;
-	double panning = 0;
+	BindableTemplateValue<double> volume{0.5, 0, 1};
+	BindableTemplateValue<double>  panning{0, -1, 1};
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	std::array<InsertEffectProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t send_master = -1;
