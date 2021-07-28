@@ -13,9 +13,9 @@
 #include "effect.h"
 
 struct TremoloPreset {
-	bool on = true;
-	double rate = 2;
-	double depth = 0.5;
+	BindableBooleanValue on = true;
+	BindableTemplateValue<double> rate{2, 0, 8};
+	BindableTemplateValue<double> depth{0.5, 0, 1};
 	AnalogWaveForm waveform = AnalogWaveForm::TRIANGLE_WAVE;
 };
 

@@ -15,11 +15,11 @@
 #define PHASER_ALLPASS_AMOUNT 4
 
 struct PhaserPreset {
-	bool on = true;
-	double center_cutoff = 0.5;
-	double lfo_depth = 0.5;
-	double lfo_rate = 1;
-	double mix = 0.5;
+	BindableBooleanValue on = true;
+	BindableTemplateValue<double> center_cutoff{0.5, 0, 1};
+	BindableTemplateValue<double> lfo_depth{0.5, 0, 1};
+	BindableTemplateValue<double> lfo_rate{1, 0, 8};
+	BindableTemplateValue<double> mix{0.5, 0, 1};
 	AnalogWaveForm vibrato_waveform = AnalogWaveForm::TRIANGLE_WAVE;
 };
 

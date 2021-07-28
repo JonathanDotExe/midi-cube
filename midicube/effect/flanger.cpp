@@ -9,13 +9,7 @@
 #include <cmath>
 
 FlangerEffect::FlangerEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_rate", preset.vibrato_rate, 0, 8));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_depth", preset.vibrato_depth, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
 
-	cc.register_binding(new TemplateControlBinding<double>("feedback", preset.feedback, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 0.02));
 }
 
 void FlangerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {

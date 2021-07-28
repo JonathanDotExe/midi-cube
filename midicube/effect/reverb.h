@@ -15,16 +15,27 @@
 #define REVERB_COMB_FILTERS 4
 #define REVERB_ALLPASS_FILTERS 2
 
+/*
+	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
+	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 2));
+	cc.register_binding(new TemplateControlBinding<double>("decay", preset.decay, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
+
+	cc.register_binding(new TemplateControlBinding<double>("tone", preset.tone, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("resonance", preset.resonance, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("stereo", preset.stereo, -1, 1));
+ */
+
 struct ReverbPreset {
-	bool on = true;
-	double delay = 0.2;
-	double decay = 0.7;
-	double mix = 0.5;
+	BindableBooleanValue on = true;
+	BindableTemplateValue<double> delay{0.2, 0, 2};
+	BindableTemplateValue<double> decay{0.7, 0, 1};
+	BindableTemplateValue<double> mix{0.5, 0, 1};
 
-	double tone = 0.35;
-	double resonance = 0;
+	BindableTemplateValue<double> tone{0.35, 0, 1};
+	BindableTemplateValue<double> resonance{0, 0, 1};
 
-	double stereo = 0;
+	BindableTemplateValue<double> stereo{0, -1, 1};
 };
 
 class CombFilter {

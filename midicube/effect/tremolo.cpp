@@ -9,9 +9,7 @@
 #include <cmath>
 
 TremoloEffect::TremoloEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("rate", preset.rate, 0, 8));
-	cc.register_binding(new TemplateControlBinding<double>("depth", preset.depth, 0, 1));
+
 }
 
 void TremoloEffect::apply(double& lsample, double& rsample, SampleInfo& info) {

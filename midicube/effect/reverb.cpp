@@ -24,14 +24,7 @@ double AllPassFilter::process(double in, double gain, unsigned int delay) {
 }
 
 ReverbEffect::ReverbEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 2));
-	cc.register_binding(new TemplateControlBinding<double>("decay", preset.decay, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
 
-	cc.register_binding(new TemplateControlBinding<double>("tone", preset.tone, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("resonance", preset.resonance, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("stereo", preset.stereo, -1, 1));
 }
 
 void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {

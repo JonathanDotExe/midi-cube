@@ -9,26 +9,7 @@
 #include <cmath>
 
 WahWahEffect::WahWahEffect() {
-	cc.register_binding(
-			new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(
-				new TemplateControlBinding<bool>("auto_wah", preset.auto_wah, false, true));
-	cc.register_binding(
-			new TemplateControlBinding<double>("cutoff", preset.cutoff, 0,
-					1));
-	cc.register_binding(
-			new TemplateControlBinding<double>("resonance", preset.resonance, 0,
-					1));
-	cc.register_binding(
-			new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
 
-	cc.register_binding(
-			new TemplateControlBinding<double>("amount",
-					preset.amount, 0, 1));
-
-	cc.register_binding(
-				new TemplateControlBinding<double>("pedal",
-						pedal, 0, 1, 11));
 }
 
 void WahWahEffect::apply(double &lsample, double &rsample, SampleInfo &info) {

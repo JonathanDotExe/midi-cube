@@ -9,12 +9,7 @@
 #include <cmath>
 
 PhaserEffect::PhaserEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("lfo_rate", preset.lfo_rate, 0, 8));
-	cc.register_binding(new TemplateControlBinding<double>("lfo_depth", preset.lfo_depth, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
 
-	cc.register_binding(new TemplateControlBinding<double>("center_cutoff", preset.center_cutoff, 0, 1));
 }
 
 void PhaserEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
