@@ -9,12 +9,7 @@
 #include <cmath>
 
 CompressorEffect::CompressorEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("threshold", preset.threshold, 0, 2));
-	cc.register_binding(new TemplateControlBinding<double>("ratio", preset.ratio, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("attack", preset.attack, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("release", preset.release, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("makeup_gain", preset.makeup_gain, 0, 5));
+
 }
 
 void CompressorEffect::apply(double& lsample, double& rsample, SampleInfo& info) {

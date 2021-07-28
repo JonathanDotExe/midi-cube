@@ -12,16 +12,28 @@
 #include "../oscilator.h"
 #include "effect.h"
 
+/*
+	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
+	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("left_delay", preset.left_delay, 0, 5));
+	cc.register_binding(new TemplateControlBinding<double>("left_init_delay_offset", preset.left_init_delay_offset, -5, 5));
+	cc.register_binding(new TemplateControlBinding<double>("left_feedback", preset.left_feedback, 0, 1));
+	cc.register_binding(new TemplateControlBinding<double>("right_delay", preset.right_delay, 0, 5));
+	cc.register_binding(new TemplateControlBinding<double>("right_init_delay_offset", preset.right_init_delay_offset, -5, 5));
+	cc.register_binding(new TemplateControlBinding<double>("right_feedback", preset.right_feedback, 0, 1));
+	cc.register_binding(new TemplateControlBinding<bool>("stereo", preset.stereo, false, true));
+ */
+
 struct DelayPreset {
-	bool on = true;
-	double left_init_delay_offset = 0.0;
-	double left_delay = 0.1;
-	double left_feedback = 0.2;
-	double right_init_delay_offset = 0.0;
-	double right_delay = 0.1;
-	double right_feedback = 0.2;
-	bool stereo = false;
-	double mix = 0.5;
+	BindableBooleanValue on = true;
+	BindableTemplateValue<double> left_init_delay_offset{0.0, -5, 5};
+	BindableTemplateValue<double> left_delay{0.1, 0, 5};
+	BindableTemplateValue<double> left_feedback{0.2, 0, 1};
+	BindableTemplateValue<double> right_init_delay_offset{0.0, -5, 5};
+	BindableTemplateValue<double> right_delay{0.1, 0, 5};
+	BindableTemplateValue<double> right_feedback{0.2, 0, 1};
+	BindableBooleanValue stereo = true;
+	BindableTemplateValue<double> mix{0.5, 0, 1};
 };
 
 

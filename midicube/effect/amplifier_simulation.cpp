@@ -8,10 +8,7 @@
 #include "amplifier_simulation.h"
 
 AmplifierSimulationEffect::AmplifierSimulationEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true, 28));
-	cc.register_binding(new TemplateControlBinding<double>("post_gain", preset.post_gain, 0, 1, 35));
-	cc.register_binding(new TemplateControlBinding<double>("drive", preset.drive, 0, 1, 36));
-	cc.register_binding(new TemplateControlBinding<double>("tone", preset.tone, 0, 1, 37));
+
 }
 
 static inline double cubic_distortion(double sample) {
@@ -124,7 +121,6 @@ void AmplifierSimulationEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new AmplifierSimulationProgram();
 	}
-	p->ccs = cc.get_ccs();
 	p->preset = preset;
 	*prog = p;
 }
@@ -133,11 +129,9 @@ void AmplifierSimulationEffect::apply_program(EffectProgram *prog) {
 	AmplifierSimulationProgram* p = dynamic_cast<AmplifierSimulationProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
 		preset = {};
 	}
 }

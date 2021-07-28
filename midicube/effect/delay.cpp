@@ -9,15 +9,7 @@
 #include <cmath>
 
 DelayEffect::DelayEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("left_delay", preset.left_delay, 0, 5));
-	cc.register_binding(new TemplateControlBinding<double>("left_init_delay_offset", preset.left_init_delay_offset, -5, 5));
-	cc.register_binding(new TemplateControlBinding<double>("left_feedback", preset.left_feedback, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("right_delay", preset.right_delay, 0, 5));
-	cc.register_binding(new TemplateControlBinding<double>("right_init_delay_offset", preset.right_init_delay_offset, -5, 5));
-	cc.register_binding(new TemplateControlBinding<double>("right_feedback", preset.right_feedback, 0, 1));
-	cc.register_binding(new TemplateControlBinding<bool>("stereo", preset.stereo, false, true));
+
 }
 
 void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {

@@ -13,12 +13,12 @@
 #include "effect.h"
 
 struct CompressorPreset {
-	bool on = true;
-	double threshold = -20;
-	double ratio = 4;
-	double attack = 0.1;
-	double release = 0.1;
-	double makeup_gain = 1;
+	BindableBooleanValue on = true;
+	BindableTemplateValue<double> threshold{-20, -50, 0};
+	BindableTemplateValue<double> ratio{4, 1, 15};
+	BindableTemplateValue<double> attack{0.1, 0, 1};
+	BindableTemplateValue<double> release{0.1, 0, 1};
+	BindableTemplateValue<double> makeup_gain{1, 0, 5};
 };
 
 

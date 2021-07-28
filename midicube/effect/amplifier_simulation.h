@@ -20,12 +20,11 @@ enum DistortionType {
 };
 
 
-
 struct AmplifierSimulationPreset {
-	bool on = true;
-	double post_gain = 0;
-	double drive = 0;
-	double tone = 0.6;
+	BindableBooleanValue on{true};
+	BindableTemplateValue<double> post_gain{0, 0, 1};
+	BindableTemplateValue<double> drive{0, 0, 1};
+	BindableTemplateValue<double> tone{0.6, 0, 1};
 	DistortionType type = ARCTAN_DISTORTION;
 };
 
