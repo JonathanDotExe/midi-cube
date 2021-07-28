@@ -87,6 +87,7 @@ sampler_deps = [
 	dependency('rtaudio'),
 	dependency('rtmidi'),
 	dependency('sndfile'),
+	dependency('portaudio-2.0'),
 	cxx.find_library('boost_system'),
 	cxx.find_library('boost_filesystem')
 ]
