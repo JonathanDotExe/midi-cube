@@ -28,6 +28,14 @@ void ActionHandler::execute_realtime_actions() {
 	}
 }
 
+bool ActionHandler::remaining_realtime_actions() {
+	return !realtime_actions.empty();
+}
+
+bool ActionHandler::remaining_return_actions() {
+	return !return_actions.empty();
+}
+
 void ActionHandler::execute_return_actions() {
 	Action* action = nullptr;
 	while (return_actions.pop(action)) {
@@ -51,3 +59,5 @@ void FunctionAction::returned() {
 		ret();
 	}
 }
+
+

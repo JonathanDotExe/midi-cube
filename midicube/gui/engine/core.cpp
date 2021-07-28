@@ -147,6 +147,13 @@ void Frame::run(ViewController* v) {
 		window.display();
 		//Change view
 		if (next_view) {
+			//Wait for tasks
+			while (cube.action_handler.remaining_realtime_actions()) {
+				std::this_thread::yield();
+			}
+			while (cube.action_handler.remaining_return_actions()) {
+				std::this_thread::yield();
+			}
 			switch_view(next_view);
 			next_view = nullptr;
 		}
