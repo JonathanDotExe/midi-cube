@@ -1,4 +1,4 @@
-#Rock Pi installation
+# Rock Pi installation
 
 ---
 **Note:** These are just notes I made during the installation. A proper tutorial will be made later (hopefully).
@@ -7,23 +7,23 @@
 
 Used OS: Armbian Focal with legacy kernel (4.4) for Rock Pi 4B
 
-##Update
+## Update
 sudo apt update
 sudo apt upgrade
 
-##Install xorg
+## Install xorg
 sudo apt install xorg
 
-##Change keyboard layout
+## Change keyboard layout
 sudo dpkg-reconfigure keyboard-configuration
 
-##Install dependencies
+## Install dependencies
 sudo apt install git
 sudo apt install meson ninja-build
 
 sudo apt install libsndfile-dev libsfml-dev librtaudio-dev librtmidi-dev libboost-all-dev
 
-##Install midi-cube
+## Install midi-cube
 git clone https://github.com/JonathanDotExe/midi-cube
 cd midi-cube
 mkdir build
@@ -34,7 +34,7 @@ ninja
 cd ..
 mkdir data
 
-##Make script and start
+## Make script and start
 nano start.sh
 
 ```bash
@@ -44,11 +44,11 @@ nano start.sh
 chmod +x start.sh
 startx ./start.sh
 
-##Optimize CPU frequency (optional)
+## Optimize CPU frequency (optional)
 sudo armbian-config
 System > CPU > minimum frequency 1.8 GHz > maximum frequency 1.8 GHz > governor: performance
 
-##Sources
+## Sources
 * https://docs.armbian.com/User-Guide_Fine-Tuning/
 * https://askubuntu.com/questions/434849/change-keyboard-layout-english-uk-on-command-line-to-english-us
 * https://wiki.ubuntuusers.de/Autologin/
