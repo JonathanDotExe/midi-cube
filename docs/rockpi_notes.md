@@ -1,4 +1,4 @@
-#Rock Pi installation
+# Rock Pi installation
 
 ---
 **Note:** These are just notes I made during the installation. A proper tutorial will be made later (hopefully).
@@ -7,34 +7,34 @@
 
 Used OS: Ubuntu Server 18 for Rock Pi 4B
 
-##Update apt repository
+## Update apt repository
 sudo apt-get install wget
 export DISTRO=buster-stable
 wget -O - apt.radxa.com/$DISTRO/public.key | sudo apt-key add -
 sudo apt update
 sudo apt upgrade
 
-##Change keyboard layout
+## Change keyboard layout
 sudo apt install keyboard-configuration
 sudo dpkg-reconfigure keyboard-configuration
 
-##Create user
+## Create user
 sudo useradd midicube
 sudo passwd midicube
 sudo usermod -a -G audio midicube
 
 sudo mkhomedir_helper midicube
 
-##Install dependencies
+## Install dependencies
 sudo apt install git
 sudo apt install meson ninja-build
 
 sudo apt install libsndfile-dev libsfml-dev librtaudio-dev librtmidi-dev libboost-all-dev libfluidsynth-dev
 
-##Install xorg
+## Install xorg
 sudo apt install xorg
 
-##Install midi-cube
+## Install midi-cube
 git clone https://github.com/JonathanDotExe/midi-cube
 cd midi-cube
 mkdir build
@@ -45,7 +45,7 @@ cd ..
 mkdir data
 mkdir data/soundfonts
 
-#Make script and start
+# Make script and start
 Inputs and outputs should be 0 for jack
 nano start-midi-cube.sh
 
@@ -54,7 +54,7 @@ nano start-midi-cube.sh
 chmod +rwx start-midicube.sh
 startx ./start-midicube.sh
 
-##Autologin
+## Autologin
 
 sudo mkdir /etc/systemd/system/getty@tty1.service.d
 sudo nano /etc/systemd/system/getty@tty1.service.d/override.conf
@@ -66,7 +66,7 @@ ExecStart=-/sbin/agetty --autologin midicube --noclear %I $TERM
 Type=idle
 ```
 
-##Start MIDICube after login
+## Start MIDICube after login
 nano wait.py
 
 ```Python
@@ -100,7 +100,7 @@ fi
 
 ```
 
-##Sources
+## Sources
 * https://wiki.radxa.com/Rockpi4/FAQs#Radxa_APT_public_key_is_not_available
 * https://askubuntu.com/questions/434849/change-keyboard-layout-english-uk-on-command-line-to-english-us
 * https://askubuntu.com/questions/335961/create-default-home-directory-for-existing-user-in-terminal
