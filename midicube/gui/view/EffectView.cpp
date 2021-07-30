@@ -32,13 +32,6 @@ EffectView::~EffectView() {
 
 }
 
-void create_cc_control(MidiControlHandler& m, ActionHandler& handler, void* field, int x, int y, int width, int height, std::vector<Control*>& controls, std::vector<Control*>& show_midi) {
-	DragBox<int>* midi = new DragBox<int>(0, 0, 128, main_font, 16, x, y, width, height);
-	midi->property.bind(m.get_binding(field)->cc, handler);
-	controls.push_back(midi);
-	show_midi.push_back(midi);
-}
-
 Scene EffectView::create(Frame &frame) {
 	frame.cube.lock.lock();
 	std::vector<Control*> controls;
@@ -84,8 +77,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(amplifier);
 			hide_midi.push_back(amplifier);
 
-			create_cc_control(effect->cc, handler, &amp->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -102,8 +93,6 @@ Scene EffectView::create(Frame &frame) {
 			boost->property.bind(amp->preset.post_gain, handler);
 			controls.push_back(boost);
 			hide_midi.push_back(boost);
-
-			create_cc_control(effect->cc, handler, &amp->preset.post_gain, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -122,8 +111,6 @@ Scene EffectView::create(Frame &frame) {
 			overdrive->property.bind(amp->preset.drive, handler);
 			controls.push_back(overdrive);
 			hide_midi.push_back(overdrive);
-
-			create_cc_control(effect->cc, handler, &amp->preset.drive, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -160,8 +147,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(amp_tone);
 			hide_midi.push_back(amp_tone);
 
-			create_cc_control(effect->cc, handler, &amp->preset.tone, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 		}
 	}
@@ -186,8 +171,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &rotary->preset.on, tmp_x, tmp_y, 80, 60, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 90;
 		}
@@ -203,8 +186,6 @@ Scene EffectView::create(Frame &frame) {
 			rotary_speed->property.bind(rotary->preset.fast, handler);
 			controls.push_back(rotary_speed);
 			hide_midi.push_back(rotary_speed);
-
-			create_cc_control(effect->cc, handler, &rotary->preset.fast, tmp_x, tmp_y, 80, 60, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 90;
@@ -443,8 +424,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &reverb->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -460,8 +439,6 @@ Scene EffectView::create(Frame &frame) {
 			delay->property.bind(reverb->preset.delay, handler);
 			controls.push_back(delay);
 			hide_midi.push_back(delay);
-
-			create_cc_control(effect->cc, handler, &reverb->preset.delay, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -479,8 +456,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(decay);
 			hide_midi.push_back(decay);
 
-			create_cc_control(effect->cc, handler, &reverb->preset.decay, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -497,8 +472,6 @@ Scene EffectView::create(Frame &frame) {
 			mix->property.bind(reverb->preset.mix, handler);
 			controls.push_back(mix);
 			hide_midi.push_back(mix);
-
-			create_cc_control(effect->cc, handler, &reverb->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -519,8 +492,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(tone);
 			hide_midi.push_back(tone);
 
-			create_cc_control(effect->cc, handler, &reverb->preset.tone, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -537,8 +508,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(resonance);
 			hide_midi.push_back(resonance);
 
-			create_cc_control(effect->cc, handler, &reverb->preset.resonance, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -554,8 +523,6 @@ Scene EffectView::create(Frame &frame) {
 			stereo->property.bind(reverb->preset.stereo, handler);
 			controls.push_back(stereo);
 			hide_midi.push_back(stereo);
-
-			create_cc_control(effect->cc, handler, &reverb->preset.stereo, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -582,8 +549,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &chorus->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -599,8 +564,6 @@ Scene EffectView::create(Frame &frame) {
 			rate->property.bind(chorus->preset.vibrato_rate, handler);
 			controls.push_back(rate);
 			hide_midi.push_back(rate);
-
-			create_cc_control(effect->cc, handler, &chorus->preset.vibrato_rate, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -619,8 +582,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(depth);
 			hide_midi.push_back(depth);
 
-			create_cc_control(effect->cc, handler, &chorus->preset.vibrato_depth, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -637,8 +598,6 @@ Scene EffectView::create(Frame &frame) {
 			mix->property.bind(chorus->preset.mix, handler);
 			controls.push_back(mix);
 			hide_midi.push_back(mix);
-
-			create_cc_control(effect->cc, handler, &chorus->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -658,8 +617,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(chorus->preset.delay, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &chorus->preset.delay, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -702,8 +659,6 @@ Scene EffectView::create(Frame &frame) {
 			on->property.bind(bitcrusher->preset.on, handler);
 			controls.push_back(on);
 			hide_midi.push_back(on);
-
-			create_cc_control(effect->cc, handler, &bitcrusher->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -965,8 +920,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &tremolo->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -982,8 +935,6 @@ Scene EffectView::create(Frame &frame) {
 			rate->property.bind(tremolo->preset.rate, handler);
 			controls.push_back(rate);
 			hide_midi.push_back(rate);
-
-			create_cc_control(effect->cc, handler, &tremolo->preset.rate, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1001,8 +952,6 @@ Scene EffectView::create(Frame &frame) {
 			depth->property.bind(tremolo->preset.depth, handler);
 			controls.push_back(depth);
 			hide_midi.push_back(depth);
-
-			create_cc_control(effect->cc, handler, &tremolo->preset.depth, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1049,8 +998,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &delay->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1067,8 +1014,6 @@ Scene EffectView::create(Frame &frame) {
 			value->drag_step = 4;
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &delay->preset.left_delay, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1087,9 +1032,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &delay->preset.left_init_delay_offset,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1107,8 +1049,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &delay->preset.left_feedback, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1124,8 +1064,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(delay->preset.mix, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &delay->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1150,8 +1088,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(stereo);
 			hide_midi.push_back(stereo);
 
-			create_cc_control(effect->cc, handler, &delay->preset.stereo, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1168,8 +1104,6 @@ Scene EffectView::create(Frame &frame) {
 			value->drag_step = 4;
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &delay->preset.right_delay, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1188,9 +1122,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &delay->preset.right_init_delay_offset,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1207,8 +1138,6 @@ Scene EffectView::create(Frame &frame) {
 			value->drag_step = 4;
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &delay->preset.right_feedback, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1235,9 +1164,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &flanger->preset.on, tmp_x,
-					tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1254,9 +1180,6 @@ Scene EffectView::create(Frame &frame) {
 			rate->property.bind(flanger->preset.vibrato_rate, handler);
 			controls.push_back(rate);
 			hide_midi.push_back(rate);
-
-			create_cc_control(effect->cc, handler, &flanger->preset.vibrato_rate,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1275,10 +1198,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(depth);
 			hide_midi.push_back(depth);
 
-			create_cc_control(effect->cc, handler,
-					&flanger->preset.vibrato_depth, tmp_x, tmp_y, 180, 120,
-					controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1294,9 +1213,6 @@ Scene EffectView::create(Frame &frame) {
 			mix->property.bind(flanger->preset.mix, handler);
 			controls.push_back(mix);
 			hide_midi.push_back(mix);
-
-			create_cc_control(effect->cc, handler, &flanger->preset.mix, tmp_x,
-					tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1315,9 +1231,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(flanger->preset.delay, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &flanger->preset.delay, tmp_x,
-					tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1351,9 +1264,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &flanger->preset.feedback, tmp_x,
-					tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1378,8 +1288,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &phaser->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1395,8 +1303,6 @@ Scene EffectView::create(Frame &frame) {
 			rate->property.bind(phaser->preset.lfo_rate, handler);
 			controls.push_back(rate);
 			hide_midi.push_back(rate);
-
-			create_cc_control(effect->cc, handler, &phaser->preset.lfo_rate, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1415,8 +1321,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(depth);
 			hide_midi.push_back(depth);
 
-			create_cc_control(effect->cc, handler, &phaser->preset.lfo_depth, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1433,8 +1337,6 @@ Scene EffectView::create(Frame &frame) {
 			mix->property.bind(phaser->preset.mix, handler);
 			controls.push_back(mix);
 			hide_midi.push_back(mix);
-
-			create_cc_control(effect->cc, handler, &phaser->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1454,8 +1356,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(phaser->preset.center_cutoff, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &phaser->preset.center_cutoff, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1497,8 +1397,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &wahwah->preset.on, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1515,9 +1413,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &wahwah->preset.auto_wah, tmp_x,
-					tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1533,8 +1428,6 @@ Scene EffectView::create(Frame &frame) {
 			rate->property.bind(wahwah->preset.cutoff, handler);
 			controls.push_back(rate);
 			hide_midi.push_back(rate);
-
-			create_cc_control(effect->cc, handler, &wahwah->preset.cutoff, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1553,8 +1446,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(depth);
 			hide_midi.push_back(depth);
 
-			create_cc_control(effect->cc, handler, &wahwah->preset.resonance, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1571,8 +1462,6 @@ Scene EffectView::create(Frame &frame) {
 			mix->property.bind(wahwah->preset.mix, handler);
 			controls.push_back(mix);
 			hide_midi.push_back(mix);
-
-			create_cc_control(effect->cc, handler, &wahwah->preset.mix, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1593,8 +1482,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &wahwah->preset.amount, tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1610,8 +1497,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(wahwah->pedal, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &wahwah->pedal, tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1638,9 +1523,6 @@ Scene EffectView::create(Frame &frame) {
 			on->property.bind(equalizer->preset.on, handler);
 			controls.push_back(on);
 			hide_midi.push_back(on);
-
-			create_cc_control(effect->cc, handler, &equalizer->preset.on, tmp_x,
-					tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1670,9 +1552,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &equalizer->preset.low_gain,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1690,9 +1569,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(equalizer->preset.low_mid_gain, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &equalizer->preset.low_mid_gain,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1712,9 +1588,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &equalizer->preset.mid_gain,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1732,9 +1605,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(equalizer->preset.high_gain, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &equalizer->preset.high_gain,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1756,9 +1626,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &equalizer->preset.low_freq,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1775,9 +1642,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(equalizer->preset.low_mid_freq, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &equalizer->preset.low_mid_freq,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1796,9 +1660,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &equalizer->preset.mid_freq,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1815,9 +1676,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(equalizer->preset.high_freq, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &equalizer->preset.high_freq,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1845,9 +1703,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(on);
 			hide_midi.push_back(on);
 
-			create_cc_control(effect->cc, handler, &compressor->preset.on, tmp_x,
-					tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1865,9 +1720,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &compressor->preset.threshold,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1884,9 +1736,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(compressor->preset.ratio, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &compressor->preset.ratio,
-				tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1907,9 +1756,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &compressor->preset.attack,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
-
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
@@ -1926,9 +1772,6 @@ Scene EffectView::create(Frame &frame) {
 			value->property.bind(compressor->preset.release, handler);
 			controls.push_back(value);
 			hide_midi.push_back(value);
-
-			create_cc_control(effect->cc, handler, &compressor->preset.release,
-					tmp_x, tmp_y, 180, 120, controls, show_midi);
 
 			tmp_y -= 25;
 			tmp_x += 200;
@@ -1947,8 +1790,6 @@ Scene EffectView::create(Frame &frame) {
 			controls.push_back(value);
 			hide_midi.push_back(value);
 
-			create_cc_control(effect->cc, handler, &compressor->preset.makeup_gain,
-				tmp_x, tmp_y, 180, 120, controls, show_midi);
 			tmp_y -= 25;
 			tmp_x += 200;
 		}
