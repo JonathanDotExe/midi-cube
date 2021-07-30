@@ -91,7 +91,7 @@ void CompressorEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new CompressorProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -100,11 +100,11 @@ void CompressorEffect::apply_program(EffectProgram *prog) {
 	CompressorProgram* p = dynamic_cast<CompressorProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

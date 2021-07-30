@@ -78,7 +78,7 @@ void ChorusEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new ChorusProgram();
 	}
-	p->ccs = cc.get_ccs();
+
 	p->preset = preset;
 	*prog = p;
 }
@@ -87,11 +87,10 @@ void ChorusEffect::apply_program(EffectProgram *prog) {
 	ChorusProgram* p = dynamic_cast<ChorusProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

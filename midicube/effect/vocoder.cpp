@@ -139,7 +139,7 @@ void VocoderEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new VocoderProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -148,11 +148,11 @@ void VocoderEffect::apply_program(EffectProgram *prog) {
 	VocoderProgram* p = dynamic_cast<VocoderProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

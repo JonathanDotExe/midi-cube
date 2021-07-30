@@ -80,7 +80,7 @@ void FlangerEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new FlangerProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -89,11 +89,11 @@ void FlangerEffect::apply_program(EffectProgram *prog) {
 	FlangerProgram* p = dynamic_cast<FlangerProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

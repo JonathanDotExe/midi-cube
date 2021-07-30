@@ -84,7 +84,7 @@ void EqualizerEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new EqualizerProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -93,11 +93,11 @@ void EqualizerEffect::apply_program(EffectProgram *prog) {
 	EqualizerProgram* p = dynamic_cast<EqualizerProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

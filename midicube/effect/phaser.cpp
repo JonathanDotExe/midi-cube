@@ -83,7 +83,7 @@ void PhaserEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new PhaserProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -92,11 +92,11 @@ void PhaserEffect::apply_program(EffectProgram *prog) {
 	PhaserProgram* p = dynamic_cast<PhaserProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }
