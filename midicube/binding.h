@@ -211,7 +211,7 @@ public:
 		tree.add_child(path, save());
 	}
 
-	boost::property_tree::ptree save() {
+	boost::property_tree::ptree save() const {
 		boost::property_tree::ptree tree;
 		tree.put("value", default_value);
 		tree.put("cc", cc);
@@ -314,6 +314,31 @@ public:
 
 };
 
+namespace boost {
+	namespace property_tree {
+
+		template<>
+		struct translator_between<ptree, BindableBooleanValue>
+		{
+			struct type {
+				typedef ptree internal_type;
+				typedef BindableBooleanValue external_type;
+
+				boost::optional<external_type> get_value(const internal_type& tree) {
+					BindableBooleanValue b = true;
+					b.load(tree);
+					return b;
+				}
+
+				boost::optional<internal_type> put_value(const external_type& b) {
+					return b.save();
+				}
+
+			};
+		};
+
+	}
+}
 
 
 #endif /* MIDICUBE_BINDING_H_ */
