@@ -63,7 +63,7 @@ struct AudioSample {
 	double isample(unsigned int channel, double time, unsigned int sample_rate) {
 		if (channels > 0) {
 			channel %= channels;
-			double index = time * sample_rate;
+			double index = time * this->sample_rate;
 			std::size_t index1 = (std::size_t) floor(index)  * channels + channel;
 			std::size_t index2 = (std::size_t) ceil(index) * channels + channel;
 			double sample1 = index1 < samples.size() ? samples[index1] : 0;
@@ -118,7 +118,7 @@ struct StreamedAudioSample {
 	double isample(unsigned int channel, double time, unsigned int sample_rate) {
 		if (channels > 0) {
 			channel %= channels;
-			double index = time * sample_rate;
+			double index = time * this->sample_rate;
 			std::size_t index1 = (std::size_t) floor(index)  * channels + channel;
 			std::size_t index2 = (std::size_t) ceil(index) * channels + channel;
 			double sample1 = 0;
