@@ -25,13 +25,14 @@ bool read_stream_audio_file(StreamedAudioSample& audio, std::string fname) {
 	bool success = true;
 
 	file = sf_open(fname.c_str(), SFM_READ, &info);
-	sf_command(file, SFC_GET_INSTRUMENT, &loop, sizeof(loop));
 
 	//Info
 	audio.channels = info.channels;
 	audio.sample_rate = info.samplerate;
 	audio.path = fname;
-	if (loop.loop_count > 0) {
+
+	if (sf_command(file, SFC_GET_INSTRUMENT, &loop, sizeof(loop)) == SF_TRUE && loop.loop_count > 0) {
+		audio.looped = true;
 		audio.loop_start = loop.loops[0].start;
 		audio.loop_end = loop.loops[0].end;
 	}

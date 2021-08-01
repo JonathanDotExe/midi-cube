@@ -88,6 +88,7 @@ struct AudioSample {
 struct StreamedAudioSample {
 	unsigned int sample_rate = 1;
 	unsigned int channels = 1;
+	bool looped = false;
 	unsigned int loop_start = 0;
 	unsigned int loop_end = 0;
 	unsigned int total_size = 0;

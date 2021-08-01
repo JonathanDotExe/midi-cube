@@ -112,6 +112,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 				}
 			}
 			else if (note.time >= loop_start_time) {
+				std::cout << note.sample->loop_start << "/" << note.sample->loop_end << std::endl;
 				note.hit_loop = true;
 			}
 		}
@@ -365,12 +366,16 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 		if (!region.sample.sample) {
 			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
 		}
-		if (region.sample.loop_start == 0 && region.sample.loop_end == 0) {
+		if (region.sample.loop_start == 0 && region.sample.loop_end == 0 && region.sample.sample->looped) {
+			if (region.loop == NO_LOOP) {
+				region.loop = ATTACK_LOOP;
+			}
 			region.sample.loop_start = region.sample.sample->loop_start;
 			region.sample.loop_end = region.sample.sample->loop_end;
+			std::cout << region.sample.sample->path << std::endl;
 		}
 		if (region.sample.loop_end < region.sample.loop_start) {
-			region.sample.loop_end = region.sample.sample->total_size/region.sample.sample->channels;
+			region.sample.loop_end = region.sample.sample->total_size;
 		}
 	}
 
