@@ -9,7 +9,11 @@
 #include <cmath>
 
 PhaserEffect::PhaserEffect() {
-
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.center_cutoff);
+	cc.add_binding(&preset.lfo_depth);
+	cc.add_binding(&preset.lfo_rate);
+	cc.add_binding(&preset.mix);
 }
 
 void PhaserEffect::apply(double& lsample, double& rsample, SampleInfo& info) {

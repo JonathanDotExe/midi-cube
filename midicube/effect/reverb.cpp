@@ -24,7 +24,13 @@ double AllPassFilter::process(double in, double gain, unsigned int delay) {
 }
 
 ReverbEffect::ReverbEffect() {
-
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.delay);
+	cc.add_binding(&preset.decay);
+	cc.add_binding(&preset.mix);
+	cc.add_binding(&preset.tone);
+	cc.add_binding(&preset.resonance);
+	cc.add_binding(&preset.stereo);
 }
 
 void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {

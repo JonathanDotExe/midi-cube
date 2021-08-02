@@ -9,7 +9,13 @@
 #include <cmath>
 
 FlangerEffect::FlangerEffect() {
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.vibrato_rate);
+	cc.add_binding(&preset.vibrato_depth);
+	cc.add_binding(&preset.mix);
 
+	cc.add_binding(&preset.delay);
+	cc.add_binding(&preset.feedback);
 }
 
 void FlangerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {

@@ -9,7 +9,12 @@
 #include <cmath>
 
 WahWahEffect::WahWahEffect() {
-
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.cutoff);
+	cc.add_binding(&preset.resonance);
+	cc.add_binding(&preset.amount);
+	cc.add_binding(&preset.mix);
+	cc.add_binding(&preset.auto_wah);
 }
 
 void WahWahEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
