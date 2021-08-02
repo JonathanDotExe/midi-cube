@@ -372,7 +372,6 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 			}
 			region.sample.loop_start = region.sample.sample->loop_start;
 			region.sample.loop_end = region.sample.sample->loop_end;
-			std::cout << region.sample.sample->path << std::endl;
 		}
 		if (region.sample.loop_end < region.sample.loop_start) {
 			region.sample.loop_end = region.sample.sample->total_size;

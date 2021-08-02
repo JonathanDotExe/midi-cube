@@ -195,7 +195,7 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 				break;
 			}
 		}
-		else {
+		else if (engine) {
 			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, device->env, polyphony_limit) || updated;
 		}
 	}
