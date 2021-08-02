@@ -9,7 +9,15 @@
 #include <cmath>
 
 DelayEffect::DelayEffect() {
-
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.left_init_delay_offset);
+	cc.add_binding(&preset.left_delay);
+	cc.add_binding(&preset.left_feedback);
+	cc.add_binding(&preset.right_init_delay_offset);
+	cc.add_binding(&preset.right_delay);
+	cc.add_binding(&preset.right_feedback);
+	cc.add_binding(&preset.stereo);
+	cc.add_binding(&preset.mix);
 }
 
 void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {

@@ -9,7 +9,7 @@
 #include <cmath>
 
 BitCrusherEffect::BitCrusherEffect() {
-
+	cc.add_binding(&preset.on);
 }
 
 void BitCrusherEffect::apply(double& lsample, double& rsample, SampleInfo& info) {

@@ -9,7 +9,15 @@
 #include <cmath>
 
 EqualizerEffect::EqualizerEffect() {
-
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.low_freq);
+	cc.add_binding(&preset.low_gain);
+	cc.add_binding(&preset.low_mid_freq);
+	cc.add_binding(&preset.low_mid_gain);
+	cc.add_binding(&preset.mid_freq);
+	cc.add_binding(&preset.mid_gain);
+	cc.add_binding(&preset.high_freq);
+	cc.add_binding(&preset.high_gain);
 }
 
 void EqualizerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {

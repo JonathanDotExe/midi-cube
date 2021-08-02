@@ -8,7 +8,10 @@
 #include "amplifier_simulation.h"
 
 AmplifierSimulationEffect::AmplifierSimulationEffect() {
-
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.post_gain);
+	cc.add_binding(&preset.drive);
+	cc.add_binding(&preset.tone);
 }
 
 static inline double cubic_distortion(double sample) {
