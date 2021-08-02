@@ -112,7 +112,6 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 				}
 			}
 			else if (note.time >= loop_start_time) {
-				std::cout << note.sample->loop_start << "/" << note.sample->loop_end << std::endl;
 				note.hit_loop = true;
 			}
 		}
