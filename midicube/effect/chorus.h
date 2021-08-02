@@ -12,13 +12,14 @@
 #include "../oscilator.h"
 #include "effect.h"
 
-struct ChorusPreset {
-	bool on = true;
-	double vibrato_rate = 2;
-	double vibrato_depth = 0.5;
-	double mix = 0.5;
 
-	double delay = 0.015;
+struct ChorusPreset {
+	BindableBooleanValue on = true;
+	BindableTemplateValue<double> vibrato_rate{2, 0, 8};
+	BindableTemplateValue<double> vibrato_depth{0.5, 0, 1};
+	BindableTemplateValue<double> mix{0.5, 0, 1};
+
+	BindableTemplateValue<double> delay{0.015, 0, 0.03};
 	AnalogWaveForm vibrato_waveform = AnalogWaveForm::TRIANGLE_WAVE;
 };
 

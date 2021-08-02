@@ -113,7 +113,9 @@ void Frame::run(ViewController* v) {
 				if (event.mouseButton.button == sf::Mouse::Left) {
 					mouse_pressed = false;
 					if (selected && selected->collides(event.mouseButton.x, event.mouseButton.y)) {
-						selected->on_mouse_action();
+						if (view->on_action(selected)) {
+							selected->on_mouse_action();
+						}
 					}
 					selected = nullptr;
 				}

@@ -8,10 +8,10 @@
 #include "amplifier_simulation.h"
 
 AmplifierSimulationEffect::AmplifierSimulationEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true, 28));
-	cc.register_binding(new TemplateControlBinding<double>("post_gain", preset.post_gain, 0, 1, 35));
-	cc.register_binding(new TemplateControlBinding<double>("drive", preset.drive, 0, 1, 36));
-	cc.register_binding(new TemplateControlBinding<double>("tone", preset.tone, 0, 1, 37));
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.post_gain);
+	cc.add_binding(&preset.drive);
+	cc.add_binding(&preset.tone);
 }
 
 static inline double cubic_distortion(double sample) {
@@ -97,18 +97,18 @@ std::string get_effect_name<AmplifierSimulationEffect>() {
 
 void AmplifierSimulationProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.post_gain = tree.get<double>("post_gain", 0);
-	preset.drive = tree.get<double>("drive", 0);
-	preset.tone = tree.get<double>("tone", 0.6);
+	preset.on.load(tree, "on", true);
+	preset.post_gain.load(tree, "post_gain", 0);
+	preset.drive.load(tree, "drive", 0);
+	preset.tone.load(tree, "tone", 0.6);
 }
 
 boost::property_tree::ptree AmplifierSimulationProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("post_gain", preset.post_gain);
-	tree.put("drive", preset.drive);
-	tree.put("tone", preset.tone);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("post_gain", preset.post_gain.save());
+	tree.add_child("drive", preset.drive.save());
+	tree.add_child("tone", preset.tone.save());
 	return tree;
 }
 
@@ -124,7 +124,6 @@ void AmplifierSimulationEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new AmplifierSimulationProgram();
 	}
-	p->ccs = cc.get_ccs();
 	p->preset = preset;
 	*prog = p;
 }
@@ -133,11 +132,9 @@ void AmplifierSimulationEffect::apply_program(EffectProgram *prog) {
 	AmplifierSimulationProgram* p = dynamic_cast<AmplifierSimulationProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
 		preset = {};
 	}
 }

@@ -19,26 +19,16 @@
 
 namespace pt = boost::property_tree;
 
+class SoundEngineDevice;
+
 class EffectProgram {
 public:
-	std::unordered_map<std::string, unsigned int> ccs;
-
 	virtual void load(pt::ptree tree) {
-		auto ccs = tree.get_child_optional("ccs");
-		if (ccs) {
-			for (auto c : ccs.get()) {
-				std::string name = c.first;
-				unsigned int cc = c.second.get_value<unsigned int>(128);
-				this->ccs.insert(std::pair<std::string, unsigned int>(name, cc));
-			}
-		}
+
 	}
 
 	virtual pt::ptree save() {
 		pt::ptree tree;
-		for (auto cc : ccs) {
-			tree.add("ccs." + cc.first, cc.second);
-		}
 		return tree;
 	}
 
@@ -48,13 +38,14 @@ public:
 };
 
 class Effect {
+protected:
+	LocalMidiBindingHandler cc;
+
 public:
-	MidiControlHandler cc;
+
+	virtual void init(SoundEngineDevice& engine);
 
 	virtual void apply(double& lsample, double& rsample, SampleInfo& info) = 0;
-	virtual bool midi_message(MidiMessage& msg, SampleInfo& info) {
-		return cc.on_message(msg);
-	}
 	virtual void apply_program(EffectProgram* prog) {
 
 	}

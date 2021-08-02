@@ -13,13 +13,13 @@
 #include "effect.h"
 
 struct FlangerPreset {
-	bool on = true;
-	double vibrato_rate = 2;
-	double vibrato_depth = 0.5;
-	double mix = 0.5;
+	BindableBooleanValue on = true;
+	BindableTemplateValue<double> vibrato_rate{2, 0, 8};
+	BindableTemplateValue<double> vibrato_depth{0.5, 0, 1};
+	BindableTemplateValue<double> mix{0.5, 0, 1};
 
-	double delay = 0.05;
-	double feedback = 0.0;
+	BindableTemplateValue<double> delay{0.005, 0, 0.02};
+	BindableTemplateValue<double> feedback{0.0, 0, 1.0};
 	AnalogWaveForm vibrato_waveform = AnalogWaveForm::TRIANGLE_WAVE;
 };
 

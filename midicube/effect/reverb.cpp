@@ -24,14 +24,13 @@ double AllPassFilter::process(double in, double gain, unsigned int delay) {
 }
 
 ReverbEffect::ReverbEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 2));
-	cc.register_binding(new TemplateControlBinding<double>("decay", preset.decay, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
-
-	cc.register_binding(new TemplateControlBinding<double>("tone", preset.tone, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("resonance", preset.resonance, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("stereo", preset.stereo, -1, 1));
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.delay);
+	cc.add_binding(&preset.decay);
+	cc.add_binding(&preset.mix);
+	cc.add_binding(&preset.tone);
+	cc.add_binding(&preset.resonance);
+	cc.add_binding(&preset.stereo);
 }
 
 void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
@@ -76,7 +75,7 @@ void ReverbEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new ReverbProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -85,11 +84,11 @@ void ReverbEffect::apply_program(EffectProgram *prog) {
 	ReverbProgram* p = dynamic_cast<ReverbProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }
@@ -110,25 +109,25 @@ EffectProgram* create_effect_program<ReverbEffect>() {
 
 void ReverbProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.delay = tree.get<double>("delay", 0.2);
-	preset.decay = tree.get<double>("decay", 0.7);
-	preset.mix = tree.get<double>("mix", 0.5);
+	preset.on.load(tree, "on", true);
+	preset.delay.load(tree, "delay", 0.2);
+	preset.decay.load(tree, "decay", 0.7);
+	preset.mix.load(tree, "mix", 0.5);
 
-	preset.tone = tree.get<double>("tone", 0.35);
-	preset.resonance = tree.get<double>("resonance", 0.0);
-	preset.stereo = tree.get<double>("stereo", 0.0);
+	preset.tone.load(tree, "tone", 0.35);
+	preset.resonance.load(tree, "resonance", 0.0);
+	preset.stereo.load(tree, "stereo", 0.0);
 }
 
 boost::property_tree::ptree ReverbProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("delay", preset.delay);
-	tree.put("decay", preset.decay);
-	tree.put("mix", preset.mix);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("delay", preset.delay.save());
+	tree.add_child("decay", preset.decay.save());
+	tree.add_child("mix", preset.mix.save());
 
-	tree.put("tone", preset.tone);
-	tree.put("resonance", preset.resonance);
-	tree.put("stereo", preset.stereo);
+	tree.add_child("tone", preset.tone.save());
+	tree.add_child("resonance", preset.resonance.save());
+	tree.add_child("stereo", preset.stereo.save());
 	return tree;
 }

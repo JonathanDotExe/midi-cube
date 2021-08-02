@@ -12,8 +12,8 @@ static inline double sound_delay(double rotation, double max_delay, unsigned int
 }
 
 RotarySpeakerEffect::RotarySpeakerEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true, 22));
-	cc.register_binding(new TemplateControlBinding<bool>("fast", preset.fast, false, true, 23));
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.fast);
 
 	filter_data.type = FilterType::LP_24;
 	filter_data.cutoff = 800;
@@ -97,8 +97,8 @@ EffectProgram* create_effect_program<RotarySpeakerEffect>() {
 
 void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.fast = tree.get<bool>("fast", false);
+	preset.on.load(tree, "on", true);
+	preset.fast.load(tree, "fast", false);
 
 	preset.stereo_mix = tree.get<double>("stereo_mix", 0.7);
 	preset.type = tree.get<bool>("type", false);
@@ -119,8 +119,8 @@ void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree RotarySpeakerProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("fast", preset.fast);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("fast", preset.fast.save());
 
 	tree.put("stereo_mix", preset.stereo_mix);
 	tree.put("type", preset.type);
@@ -148,7 +148,7 @@ void RotarySpeakerEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new RotarySpeakerProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -157,11 +157,11 @@ void RotarySpeakerEffect::apply_program(EffectProgram *prog) {
 	RotarySpeakerProgram* p = dynamic_cast<RotarySpeakerProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

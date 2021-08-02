@@ -13,7 +13,7 @@
 #include <iostream>
 #include "boost/lockfree/queue.hpp"
 #include "util.h"
-
+#include "binding.h"
 
 class Action {
 
@@ -115,7 +115,7 @@ public:
 	}
 
 	virtual void execute() {
-		t = static_cast<T>(v);
+		t = v;
 	}
 
 	virtual void returned() {
@@ -123,6 +123,33 @@ public:
 	}
 
 	virtual ~SetValueAction() {
+
+	}
+
+};
+
+template <typename T, typename V>
+class SetValueCastAction : public Action {
+
+private:
+	T& t;
+	V v;
+
+public:
+
+	SetValueCastAction(T& var, V val) : t(var), v(val) {
+
+	}
+
+	virtual void execute() {
+		t = static_cast<T>(v);
+	}
+
+	virtual void returned() {
+
+	}
+
+	virtual ~SetValueCastAction() {
 
 	}
 
@@ -175,7 +202,14 @@ private:
 	std::function<void (std::function<void (T)>)> get_func = nullptr;
 	std::function<void (T)> set_func = nullptr;
 
+	BindableValue* object = nullptr;
+
 public:
+
+	BindableValue* get_object() {
+		return object;
+	}
+
 	void get(std::function<void (T)> callback) {
 		get_func(callback);
 	}
@@ -196,6 +230,23 @@ public:
 		set_func = [&e, &handler](T t) {
 			handler.queue_action(new SetValueAction<E, T>(e, t));
 		};
+		if (std::is_base_of<BindableValue, E>()) {
+			object = (BindableValue*) (&e); //FIXME
+		}
+	}
+
+	template <typename E>
+	void bind_cast(E& e, ActionHandler& handler) {
+		get_func = [&e, &handler](std::function<void (T)> callback) {
+			handler.queue_action(new GetValueAction<E, T>(e, callback));
+		};
+		set_func = [&e, &handler](T t) {
+			handler.queue_action(new SetValueCastAction<E, T>(e, t));
+		};
+
+		if (std::is_base_of<BindableValue, E>()) {
+			object = (BindableValue*)(&e); //FIXME
+		}
 	}
 
 	template <typename E>
@@ -206,6 +257,7 @@ public:
 		set_func = [set, &handler](T t) {
 			handler.queue_action(new SetFunctionAction<E, T>(set, t));
 		};
+		object = nullptr;
 	}
 
 	template <typename E>
@@ -220,6 +272,7 @@ public:
 			set(t);
 			lock.unlock();
 		};
+		object = nullptr;
 	}
 
 };

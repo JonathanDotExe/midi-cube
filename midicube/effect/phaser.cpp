@@ -9,12 +9,11 @@
 #include <cmath>
 
 PhaserEffect::PhaserEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("lfo_rate", preset.lfo_rate, 0, 8));
-	cc.register_binding(new TemplateControlBinding<double>("lfo_depth", preset.lfo_depth, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
-
-	cc.register_binding(new TemplateControlBinding<double>("center_cutoff", preset.center_cutoff, 0, 1));
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.center_cutoff);
+	cc.add_binding(&preset.lfo_depth);
+	cc.add_binding(&preset.lfo_rate);
+	cc.add_binding(&preset.mix);
 }
 
 void PhaserEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -60,23 +59,23 @@ EffectProgram* create_effect_program<PhaserEffect>() {
 
 void PhaserProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.lfo_rate = tree.get<double>("lfo_rate", 1);
-	preset.lfo_depth = tree.get<double>("lfo_depth", 0.25);
-	preset.mix = tree.get<double>("mix", 0.5);
+	preset.on.load(tree, "on", true);
+	preset.lfo_rate.load(tree, "lfo_rate", 1);
+	preset.lfo_depth.load(tree, "lfo_depth", 0.25);
+	preset.mix.load(tree, "mix", 0.5);
 
-	preset.center_cutoff = tree.get<double>("center_cutoff", 0.5);
+	preset.center_cutoff.load(tree, "center_cutoff", 0.5);
 	preset.vibrato_waveform = (AnalogWaveForm) tree.get<unsigned int>("vibrato_waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
 }
 
 boost::property_tree::ptree PhaserProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("lfo_rate", preset.lfo_rate);
-	tree.put("lfo_depth", preset.lfo_depth);
-	tree.put("mix", preset.mix);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("lfo_rate", preset.lfo_rate.save());
+	tree.add_child("lfo_depth", preset.lfo_depth.save());
+	tree.add_child("mix", preset.mix.save());
 
-	tree.put("center_cutoff", preset.center_cutoff);
+	tree.add_child("center_cutoff", preset.center_cutoff.save());
 	tree.put("vibrato_waveform", (unsigned int) preset.vibrato_waveform);
 	return tree;
 }
@@ -88,7 +87,7 @@ void PhaserEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new PhaserProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -97,11 +96,11 @@ void PhaserEffect::apply_program(EffectProgram *prog) {
 	PhaserProgram* p = dynamic_cast<PhaserProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

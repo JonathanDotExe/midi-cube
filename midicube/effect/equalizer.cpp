@@ -9,15 +9,15 @@
 #include <cmath>
 
 EqualizerEffect::EqualizerEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("low_freq", preset.low_freq, 20, 400));
-	cc.register_binding(new TemplateControlBinding<double>("low_gain", preset.low_gain, -1, 1));
-	cc.register_binding(new TemplateControlBinding<double>("low_mid_freq", preset.low_mid_freq, 100, 1000));
-	cc.register_binding(new TemplateControlBinding<double>("low_mid_gain", preset.low_mid_gain, -1, 1));
-	cc.register_binding(new TemplateControlBinding<double>("mid_freq", preset.mid_freq, 200, 8000));
-	cc.register_binding(new TemplateControlBinding<double>("mid_gain", preset.mid_gain, -1, 1));
-	cc.register_binding(new TemplateControlBinding<double>("high_freq", preset.high_freq, 1000, 20000));
-	cc.register_binding(new TemplateControlBinding<double>("high_gain", preset.high_gain, -1, 1));
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.low_freq);
+	cc.add_binding(&preset.low_gain);
+	cc.add_binding(&preset.low_mid_freq);
+	cc.add_binding(&preset.low_mid_gain);
+	cc.add_binding(&preset.mid_freq);
+	cc.add_binding(&preset.mid_gain);
+	cc.add_binding(&preset.high_freq);
+	cc.add_binding(&preset.high_gain);
 }
 
 void EqualizerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -60,28 +60,28 @@ EffectProgram* create_effect_program<EqualizerEffect>() {
 
 void EqualizerProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.low_freq = tree.get<double>("low_freq", 100);
-	preset.low_gain = tree.get<double>("low_gain", 0);
-	preset.low_mid_freq = tree.get<double>("low_mid_freq", 400);
-	preset.low_mid_gain = tree.get<double>("low_mid_gain", 0);
-	preset.mid_freq = tree.get<double>("mid_freq", 1000);
-	preset.mid_gain = tree.get<double>("mid_gain", 0);
-	preset.high_freq = tree.get<double>("high_freq", 400);
-	preset.high_gain = tree.get<double>("high_gain", 0);
+	preset.on.load(tree, "on", true);
+	preset.low_freq.load(tree, "low_freq", 100);
+	preset.low_gain.load(tree, "low_gain", 0);
+	preset.low_mid_freq.load(tree, "low_mid_freq", 400);
+	preset.low_mid_gain.load(tree, "low_mid_gain", 0);
+	preset.mid_freq.load(tree, "mid_freq", 1000);
+	preset.mid_gain.load(tree, "mid_gain", 0);
+	preset.high_freq.load(tree, "high_freq", 400);
+	preset.high_gain.load(tree, "high_gain", 0);
 }
 
 boost::property_tree::ptree EqualizerProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("low_freq", preset.low_freq);
-	tree.put("low_gain", preset.low_gain);
-	tree.put("low_mid_freq", preset.low_mid_freq);
-	tree.put("low_mid_gain", preset.low_mid_gain);
-	tree.put("mid_freq", preset.mid_freq);
-	tree.put("mid_gain", preset.mid_gain);
-	tree.put("high_freq", preset.high_freq);
-	tree.put("high_gain", preset.high_gain);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("low_freq", preset.low_freq.save());
+	tree.add_child("low_gain", preset.low_gain.save());
+	tree.add_child("low_mid_freq", preset.low_mid_freq.save());
+	tree.add_child("low_mid_gain", preset.low_mid_gain.save());
+	tree.add_child("mid_freq", preset.mid_freq.save());
+	tree.add_child("mid_gain", preset.mid_gain.save());
+	tree.add_child("high_freq", preset.high_freq.save());
+	tree.add_child("high_gain", preset.high_gain.save());
 	return tree;
 }
 
@@ -92,7 +92,7 @@ void EqualizerEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new EqualizerProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -101,11 +101,11 @@ void EqualizerEffect::apply_program(EffectProgram *prog) {
 	EqualizerProgram* p = dynamic_cast<EqualizerProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

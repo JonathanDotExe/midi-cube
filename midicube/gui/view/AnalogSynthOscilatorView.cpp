@@ -9,7 +9,9 @@
 #include "AnalogSynthView.h"
 #include "resources.h"
 
-AnalogSynthOscilatorView::AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineChannel& c, int channel_index, size_t part) : synth(s), channel(c) {
+AnalogSynthOscilatorView::AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineChannel& c, int channel_index, size_t part) : synth(s), channel(c), binder{[&s, &c, channel_index, part]() {
+	return new AnalogSynthOscilatorView(s, c, channel_index, part);
+}} {
 	this->channel_index = channel_index;
 	this->part = part;
 }
@@ -93,30 +95,12 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		boxes.push_back(at_amount);
 	}
 	x += 90;
-	//CC
-	{
-		Label* title = new Label("CC", main_font, 12, x, y);
-		controls->push_back(title);
-
-		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
-		amount->drag_mul /= 2;
-		amount->border = 0;
-		amount->property.bind(mod.cc_amount, handler);
-		controls->push_back(amount);
-		show_amount->push_back(amount);
-		boxes.push_back(amount);
-
-		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_CONTROL_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
-		source->property.bind(mod.cc, handler);
-		controls->push_back(source);
-		show_source->push_back(source);
-	}
 	x += 90;
 	return boxes;
 }
 
 
-void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeData& data, ActionHandler& handler) {
+void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREnvelopeData& data, ActionHandler& handler) {
 	DragBoxScale<double> scale = {
 			[](double progress, double min, double max) {
 				progress *= progress;
@@ -248,7 +232,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x , y + 15, 80, 40);
-		shape->property.bind(data.attack_shape, handler);
+		shape->property.bind_cast(data.attack_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -258,7 +242,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
-		shape->property.bind(data.pre_decay_shape, handler);
+		shape->property.bind_cast(data.pre_decay_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -268,7 +252,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
-		shape->property.bind(data.decay_shape, handler);
+		shape->property.bind_cast(data.decay_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -289,7 +273,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, ADSREnvelopeDa
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
-		shape->property.bind(data.release_shape, handler);
+		shape->property.bind_cast(data.release_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -319,7 +303,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
-		waveform->property.bind(osc.waveform, handler);
+		waveform->property.bind_cast(osc.waveform, handler);
 		controls.push_back(waveform);
 	}
 	//Fixed Freq
@@ -443,6 +427,7 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 	});
 	controls.push_back(edit);
 
+	controls.push_back(binder.create_button(frame.get_width() - 70 - 120 - 100, frame.get_height() - 40, &frame));
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
@@ -463,4 +448,8 @@ Scene AnalogSynthOscilatorView::create(Frame &frame) {
 
 AnalogSynthOscilatorView::~AnalogSynthOscilatorView() {
 
+}
+
+bool AnalogSynthOscilatorView::on_action(Control *control) {
+	return binder.on_action(control);
 }

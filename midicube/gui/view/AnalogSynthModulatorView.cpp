@@ -11,7 +11,9 @@
 #include "resources.h"
 
 AnalogSynthModulatorView::AnalogSynthModulatorView(AnalogSynth &s,
-		SoundEngineChannel &c, int channel_index, size_t part) : synth(s), channel(c) {
+		SoundEngineChannel &c, int channel_index, size_t part) : synth(s), channel(c), binder{[&s, &c, channel_index, part]() {
+			return new AnalogSynthModulatorView(s, c, channel_index, part);
+		}} {
 	this->channel_index = channel_index;
 	this->part = part;
 }
@@ -75,7 +77,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
-		waveform->property.bind(lfo.waveform, handler);
+		waveform->property.bind_cast(lfo.waveform, handler);
 		controls.push_back(waveform);
 	}
 	tmp_x = 500;
@@ -138,6 +140,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 	});
 	controls.push_back(edit);
 
+	controls.push_back(binder.create_button(frame.get_width() - 70 - 120 - 100, frame.get_height() - 40, &frame));
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
@@ -158,4 +161,8 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 
 AnalogSynthModulatorView::~AnalogSynthModulatorView() {
 
+}
+
+bool AnalogSynthModulatorView::on_action(Control *control) {
+	return binder.on_action(control);
 }

@@ -32,6 +32,9 @@ Effect* InsertEffect::get_effect() const {
 void InsertEffect::set_effect(Effect *effect) {
 	delete this->effect;
 	this->effect = effect;
+	if (effect) {
+		effect->init(*device);
+	}
 }
 
 void InsertEffect::set_effect_index(ssize_t index) {
@@ -80,6 +83,9 @@ Effect* MasterEffect::get_effect() const {
 void MasterEffect::set_effect(Effect *effect) {
 	delete this->effect;
 	this->effect = effect;
+	if (effect) {
+		effect->init(*device);
+	}
 }
 
 void MasterEffect::set_effect_index(ssize_t index) {
@@ -113,6 +119,9 @@ MasterEffect::~MasterEffect() {
 //SoundEngineChannel
 SoundEngineChannel::SoundEngineChannel() {
 	engine = nullptr;
+
+	binder.add_binding(&volume);
+	binder.add_binding(&panning);
 }
 
 void SoundEngineChannel::init_device(SoundEngineDevice* device) {
@@ -121,6 +130,8 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 		for (size_t i = 0; i < effects.size(); ++i) {
 			effects[i].device = device;
 		}
+
+		binder.init(&device->binding_handler);
 	}
 }
 
@@ -169,14 +180,6 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 	size_t scene = device->scene;
 	bool updated = false;
 	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
-		//Effects
-		for (auto& e : effects) {
-			if (e.get_effect()) {
-				if (e.get_effect()->midi_message(message, info)) {
-					updated = true;
-				}
-			}
-		}
 		//Aftertouch
 		if (message.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 			this->info.aftertouch = message.monophonic_aftertouch()/127.0;
@@ -450,6 +453,8 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 				updated = true;
 			}
 		}
+		//Binding handler
+		updated = binding_handler.on_cc(message.control(), message.value()/127.0) || updated;
 		break;
 	case MessageType::PROGRAM_CHANGE:
 		break;
@@ -487,15 +492,6 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 		break;
 	case MessageType::INVALID:
 		break;
-	}
-
-	//Effects
-	for (auto& e : effects) {
-		if (e.get_effect()) {
-			if (e.get_effect()->midi_message(message, info)) {
-				updated = true;
-			}
-		}
 	}
 
 	//Channels

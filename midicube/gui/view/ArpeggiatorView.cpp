@@ -49,7 +49,7 @@ Scene ArpeggiatorView::create(Frame &frame) {
 	//Pattern
 	ComboBox* pattern = new ComboBox(0, patterns, main_font, 24, 0, 10, tmp_y, 300, 60);
 	pattern->rect.setFillColor(sf::Color(0, 180, 255));
-	pattern->property.bind(channel.arp.preset.pattern, handler);
+	pattern->property.bind_cast(channel.arp.preset.pattern, handler);
 	controls.push_back(pattern);
 	tmp_y += 70;
 

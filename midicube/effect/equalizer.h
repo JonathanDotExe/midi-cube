@@ -13,15 +13,15 @@
 #include "effect.h"
 
 struct EqualizerPreset {
-	bool on = true;
-	double low_freq = 100;
-	double low_gain = 0;
-	double low_mid_freq = 400;
-	double low_mid_gain = 0;
-	double mid_freq = 1000;
-	double mid_gain = 0;
-	double high_freq = 4000;
-	double high_gain = 0;
+	BindableBooleanValue on = true;
+	BindableTemplateValue<double> low_freq{100, 20, 400};
+	BindableTemplateValue<double> low_gain{0, -1, 5};
+	BindableTemplateValue<double> low_mid_freq{400, 100, 1000};
+	BindableTemplateValue<double> low_mid_gain{0, -1, 5};
+	BindableTemplateValue<double> mid_freq{1000, 200, 8000};
+	BindableTemplateValue<double> mid_gain{0, -1, 5};
+	BindableTemplateValue<double> high_freq{4000, 1000, 20000};
+	BindableTemplateValue<double> high_gain{0, -1, 5};
 };
 
 

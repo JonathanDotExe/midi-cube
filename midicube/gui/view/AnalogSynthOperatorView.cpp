@@ -12,7 +12,9 @@
 
 
 AnalogSynthOperatorView::AnalogSynthOperatorView(AnalogSynth &s,
-		SoundEngineChannel &c, int channel_index, size_t part) : synth(s), channel(c) {
+		SoundEngineChannel &c, int channel_index, size_t part) : synth(s), channel(c), binder{[&s, &c, channel_index, part]() {
+			return new AnalogSynthOperatorView(s, c, channel_index, part);
+		}} {
 	this->channel_index = channel_index;
 	this->part = part;
 }
@@ -35,7 +37,7 @@ static void create_filter_view(int& tmp_x, int& tmp_y, FilterEntity& filter, std
 		std::vector<std::string> filter_types = {"LP 12", "LP 24", "HP 12", "HP 24", "BP 12", "BP 24"};
 
 		ComboBox* filter_type = new ComboBox(1, filter_types, main_font, 16, 0, tmp_x, tmp_y + 15, 150, 40);
-		filter_type->property.bind(filter.type, handler);
+		filter_type->property.bind_cast(filter.type, handler);
 		controls.push_back(filter_type);
 	}
 	tmp_x += 160;
@@ -202,6 +204,7 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 	});
 	controls.push_back(edit);
 
+	controls.push_back(binder.create_button(frame.get_width() - 70 - 120 - 100, frame.get_height() - 40, &frame));
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
@@ -218,4 +221,8 @@ Scene AnalogSynthOperatorView::create(Frame &frame) {
 	}
 
 	return {controls};
+}
+
+bool AnalogSynthOperatorView::on_action(Control *control) {
+	return binder.on_action(control);
 }

@@ -9,7 +9,7 @@
 #include <cmath>
 
 BitCrusherEffect::BitCrusherEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
+	cc.add_binding(&preset.on);
 }
 
 void BitCrusherEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -31,13 +31,13 @@ std::string get_effect_name<BitCrusherEffect>() {
 
 void BitCrusherProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
+	preset.on.load(tree, "on", true);
 	preset.bits = tree.get<unsigned int>("bits", 16);
 }
 
 boost::property_tree::ptree BitCrusherProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
+	tree.add_child("on", preset.on.save());
 	tree.put("bits", preset.bits);
 	return tree;
 }
@@ -56,7 +56,6 @@ void BitCrusherEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new BitCrusherProgram();
 	}
-	p->ccs = cc.get_ccs();
 	p->preset = preset;
 	*prog = p;
 }
@@ -65,11 +64,9 @@ void BitCrusherEffect::apply_program(EffectProgram *prog) {
 	BitCrusherProgram* p = dynamic_cast<BitCrusherProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
 		preset = {};
 	}
 }

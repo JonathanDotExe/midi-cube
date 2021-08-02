@@ -88,8 +88,8 @@ Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
 					}
 				}
 
-				program->channels[i].volume = c.second.get<double>("volume", 0.5);
-				program->channels[i].panning = c.second.get<double>("panning", 0);
+				program->channels[i].volume.load(c.second, "volume", 0.5);
+				program->channels[i].panning.load(c.second, "panning", 0);
 
 				//Arpeggiator
 				program->channels[i].arp_on = c.second.get<bool>("arpeggiator.on", false);
@@ -215,8 +215,8 @@ void save_program(Program* program, pt::ptree& tree) {
 
 			c.add_child("scenes.scene", s);
 		}
-		c.put("volume", program->channels[i].volume);
-		c.put("panning", program->channels[i].panning);
+		program->channels[i].volume.save(c, "volume");
+		program->channels[i].panning.save(c, "panning");
 		//Arpeggiator
 		c.put("arpeggiator.on", program->channels[i].arp_on);
 		c.put("arpeggiator.bpm", program->channels[i].arpeggiator_bpm);

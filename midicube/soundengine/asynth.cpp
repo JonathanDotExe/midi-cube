@@ -12,19 +12,50 @@
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
 AnalogSynth::AnalogSynth() {
+	//Parts
+	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+		LFOEntity& lfo = preset.lfos[i];
+		binder.add_binding(&lfo.volume.value);
+		binder.add_binding(&lfo.freq);
 
+		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
+		binder.add_binding(&mod_env.volume.value);
+		mod_env.env.add_bindings(binder);
+
+		OscilatorEntity& osc = preset.oscilators[i];
+		binder.add_binding(&osc.volume.value);
+		binder.add_binding(&osc.sync_mul.value);
+		binder.add_binding(&osc.pulse_width.value);
+		binder.add_binding(&osc.unison_detune.value);
+		binder.add_binding(&osc.pitch.value);
+
+		OperatorEntity& op = preset.operators[i];
+		op.env.add_bindings(binder);
+		binder.add_binding(&op.volume.value);
+		binder.add_binding(&op.panning.value);
+
+		binder.add_binding(&op.first_filter.cutoff.value);
+		binder.add_binding(&op.first_filter.resonance.value);
+		binder.add_binding(&op.first_filter.kb_track);
+
+		binder.add_binding(&op.second_filter.cutoff.value);
+		binder.add_binding(&op.second_filter.resonance.value);
+		binder.add_binding(&op.second_filter.kb_track);
+	}
+	//Global
+	binder.add_binding(&preset.portamendo);
 }
 
 inline double AnalogSynth::apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ANALOG_PART_COUNT>& lfo_val) {
 	double prog = mod.value;
 	prog += env_val[mod.mod_env] * mod.mod_env_amount
 			+ lfo_val[mod.lfo] * mod.lfo_amount * lfo_vol[mod.lfo]
-			+ controls[mod.cc] * mod.cc_amount + velocity * mod.velocity_amount + aftertouch * mod.aftertouch_amount;
+			+ velocity * mod.velocity_amount + aftertouch * mod.aftertouch_amount;
 	prog = fmin(fmax(prog, 0.0), 1.0);
 	return scale.value(prog);
 }
 
-void AnalogSynth::apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double velocity, double aftertouch) {
+void AnalogSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double velocity, double aftertouch) {
 	//Filter
 	if (filter.on) {
 		//Pre drive
@@ -72,8 +103,9 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 	//Mod Envs
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
+		ADSREnvelopeData data = mod_env.env;
 		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, velocity, aftertouch, lfo_val);
-		env_val[i] = note.parts[i].mod_env.amplitude(mod_env.env, info.time_step, note.pressed, env.sustain)* volume;
+		env_val[i] = note.parts[i].mod_env.amplitude(data, info.time_step, note.pressed, env.sustain)* volume;
 	}
 	//LFOs
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
@@ -138,7 +170,8 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		}
 		//Post processing
 		//Volume
-		double volume = apply_modulation(VOLUME_SCALE, op.volume, velocity, aftertouch, lfo_val) * op_part.amp_env.amplitude(op.env, info.time_step,
+		ADSREnvelopeData data = op.env;
+		double volume = apply_modulation(VOLUME_SCALE, op.volume, velocity, aftertouch, lfo_val) * op_part.amp_env.amplitude(data, info.time_step,
 						note.pressed, env.sustain);
 		//Octave amp
 		if (op.amp_kb_track_upper && note.note > op.amp_kb_track_note) {
@@ -352,6 +385,7 @@ void AnalogSynth::apply_program(EngineProgram *prog) {
 	AnalogSynthProgram* p = dynamic_cast<AnalogSynthProgram*>(prog);
 	//Create new
 	if (p) {
+		std::cout << "Applying preset" << std::endl;
 		preset = p->preset;
 	}
 	else {
@@ -361,29 +395,25 @@ void AnalogSynth::apply_program(EngineProgram *prog) {
 
 static boost::property_tree::ptree save_prop_mod(PropertyModulation mod) {
 	boost::property_tree::ptree tree;
-	tree.put("value", mod.value);
+	mod.value.save(tree, "value");
 	tree.put("mod_env", mod.mod_env);
 	tree.put("mod_env_amount", mod.mod_env_amount);
 	tree.put("lfo", mod.lfo);
 	tree.put("lfo_amount", mod.lfo_amount);
 	tree.put("velocity_amount", mod.velocity_amount);
-	tree.put("cc", mod.cc);
-	tree.put("cc_amount", mod.cc_amount);
 	tree.put("aftertouch_amount", mod.aftertouch_amount);
 	return tree;
 }
 
 
 static PropertyModulation load_prop_mod(boost::property_tree::ptree tree) {
-	PropertyModulation mod;
-	mod.value = tree.get<double>("value", 0);
+	PropertyModulation mod{0};
+	mod.value.load(tree, "value", 0);
 	mod.mod_env = tree.get<size_t>("mod_env", 0);
 	mod.mod_env_amount = tree.get<double>("mod_env_amount", 0);
 	mod.lfo = tree.get<size_t>("lfo", 0);
 	mod.lfo_amount = tree.get<double>("lfo_amount", 0);
 	mod.velocity_amount = tree.get<double>("velocity_amount", 0);
-	mod.cc = tree.get<size_t>("cc", 1);
-	mod.cc_amount = tree.get<double>("cc_amount", 0);
 	mod.aftertouch_amount = tree.get<double>("aftertouch_amount", 0);
 	return mod;
 }
@@ -393,35 +423,35 @@ static PropertyModulation load_prop_mod(boost::property_tree::ptree parent, std:
 	if (val) {
 		return load_prop_mod(val.get());
 	}
-	return {};
+	return {0};
 }
 
-static ADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
-	ADSREnvelopeData data;
+static BindableADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
+	BindableADSREnvelopeData data;
 
-	data.attack = tree.get("attack", 0.0005);
-	data.decay = tree.get("decay", 0.0);
-	data.sustain = tree.get("sustain", 1.0);
-	data.release = tree.get("release", 0.0005);
+	data.attack.load(tree, "attack", 0.0005);
+	data.decay.load(tree, "decay", 0.0);
+	data.sustain.load(tree, "sustain", 1.0);
+	data.release.load(tree, "release", 0.0005);
 
 	data.attack_shape = (ADSREnvelopeShape) tree.get<unsigned int>("attack_shape", 0);
 	data.pre_decay_shape = (ADSREnvelopeShape) tree.get<unsigned int>("pre_decay_shape", 1);
 	data.decay_shape = (ADSREnvelopeShape) tree.get<unsigned int>("decay_shape", 1);
 	data.release_shape = (ADSREnvelopeShape) tree.get<unsigned int>("release_shape", 1);
 
-	data.pre_decay = tree.get("pre_decay", 0.0);
-	data.hold = tree.get("hold", 0.0);
+	data.pre_decay.load(tree, "pre_decay", 0.0);
+	data.hold.load(tree, "hold", 0.0);
 
-	data.attack_hold = tree.get("attack_hold", 0.0);
-	data.peak_volume = tree.get("peak_volume", 1.0);
-	data.sustain_time = tree.get("sustain_time", 0);
-	data.release_volume = tree.get("release_volume", 0.0);
+	data.attack_hold.load(tree, "attack_hold", 0.0);
+	data.peak_volume.load(tree, "peak_volume", 1.0);
+	data.sustain_time.load(tree, "sustain_time", 0);
+	data.release_volume.load(tree, "release_volume", 0.0);
 
 	return data;
 }
 
 
-static ADSREnvelopeData load_adsr(boost::property_tree::ptree parent, std::string path) {
+static BindableADSREnvelopeData load_adsr(boost::property_tree::ptree parent, std::string path) {
 	const auto& val = parent.get_child_optional(path);
 	if (val) {
 		return load_adsr(val.get());
@@ -430,25 +460,25 @@ static ADSREnvelopeData load_adsr(boost::property_tree::ptree parent, std::strin
 }
 
 
-static boost::property_tree::ptree save_adsr(ADSREnvelopeData data) {
+static boost::property_tree::ptree save_adsr(BindableADSREnvelopeData& data) {
 	boost::property_tree::ptree tree;
-	tree.put("attack", data.attack);
-	tree.put("decay", data.decay);
-	tree.put("sustain", data.sustain);
-	tree.put("release", data.release);
+	data.attack.save(tree, "attack");
+	data.decay.save(tree, "decay");
+	data.sustain.save(tree, "sustain");
+	data.release.save(tree, "release");
 
 	tree.put("attack_shape", (unsigned int) data.attack_shape);
 	tree.put("pre_decay_shape", (unsigned int) data.pre_decay_shape);
 	tree.put("decay_shape", (unsigned int) data.decay_shape);
 	tree.put("release_shape", (unsigned int) data.release_shape);
 
-	tree.put("pre_decay", data.pre_decay);
-	tree.put("hold", data.hold);
+	data.pre_decay.save(tree, "pre_decay");
+	data.hold.save(tree, "hold");
 
-	tree.put("attack_hold", data.attack_hold);
-	tree.put("peak_volume", data.peak_volume);
-	tree.put("sustain_time", data.sustain_time);
-	tree.put("release_volume", data.release_volume);
+	data.attack_hold.save(tree, "attack_hold");
+	data.peak_volume.save(tree, "peak_volume");
+	data.sustain_time.save(tree, "sustain_time");
+	data.release_volume.save(tree, "release_volume");
 	return tree;
 }
 
@@ -461,7 +491,7 @@ static FilterEntity load_filter(boost::property_tree::ptree tree) {
 	filter.type = (FilterType) tree.get<int>("type", 0);
 	filter.cutoff = load_prop_mod(tree, "cutoff");
 	filter.resonance = load_prop_mod(tree, "resonance");
-	filter.kb_track = tree.get<double>("kb_track", 0);
+	filter.kb_track.load(tree, "kb_track", 0);
 	filter.kb_track_note = tree.get<int>("kb_track_note", 36);
 
 	return filter;
@@ -483,7 +513,7 @@ static boost::property_tree::ptree save_filter(FilterEntity filter) {
 	o.put("type", (int) filter.type);
 	o.add_child("cutoff", save_prop_mod(filter.cutoff));
 	o.add_child("resonance", save_prop_mod(filter.resonance));
-	o.put("kb_track", filter.kb_track);
+	filter.kb_track.save(o, "kb_track");
 	o.put("kb_track_note", filter.kb_track_note);
 	return o;
 }
@@ -498,7 +528,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 
 	preset.mono = tree.get<bool>("mono", false);
 	preset.legato = tree.get<bool>("legato", false);
-	preset.portamendo = tree.get<double>("portamendo", 0.0);
+	preset.portamendo.load(tree, "portamendo", 0.0);
 
 	preset.aftertouch_attack = tree.get<double>("aftertouch_attack", 0.0);
 	preset.aftertouch_release = tree.get<double>("aftertouch_release", 0.0);
@@ -514,7 +544,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 				break;
 			}
 			preset.lfos[i].volume = load_prop_mod(lfo.second, "volume");
-			preset.lfos[i].freq = lfo.second.get<double>("freq", 1);
+			preset.lfos[i].freq.load(lfo.second, "freq", 1);
 			preset.lfos[i].sync_master = lfo.second.get<bool>("sync_master", false);
 			preset.lfos[i].clock_value = lfo.second.get<int>("clock_value", 1);
 			preset.lfos[i].sync_phase = lfo.second.get<double>("sync_phase", 0);
@@ -588,20 +618,8 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			op.amp_kb_track_lower = o.second.get<double>("amp_kb_track_lower", 0);
 			op.amp_kb_track_note = o.second.get<int>("amp_kb_track_note", 60);
 
-			if (o.second.get_child_optional("first_filter")) {
-				op.first_filter = load_filter(o.second, "first_filter");
-				op.second_filter = load_filter(o.second, "second_filter");
-			}
-			else {
-				op.first_filter.on = o.second.get<bool>("filter", false);
-				op.first_filter.drive = o.second.get<bool>("pre_filter_drive", false);
-				op.first_filter.drive_amount = o.second.get<double>("pre_filter_drive_amount", 0);
-				op.first_filter.type = (FilterType) o.second.get<int>("filter_type", 0);
-				op.first_filter.cutoff = load_prop_mod(o.second, "filter_cutoff");
-				op.first_filter.resonance = load_prop_mod(o.second, "filter_resonance");
-				op.first_filter.kb_track = o.second.get<double>("filter_kb_track", 0);
-				op.first_filter.kb_track_note = o.second.get<int>("filter_kb_track_note", 36);
-			}
+			op.first_filter = load_filter(o.second, "first_filter");
+			op.second_filter = load_filter(o.second, "second_filter");
 
 			op.filter_parallel = o.second.get<bool>("filter_parallel", false);
 			op.oscilator_count = o.second.get<size_t>("oscilator_count", 1);
@@ -635,7 +653,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 
 	tree.put("mono", preset.mono);
 	tree.put("legato", preset.legato);
-	tree.put("portamendo", preset.portamendo);
+	preset.portamendo.save(tree, "portamendo");
 
 	tree.put("aftertouch_attack", preset.aftertouch_attack);
 	tree.put("aftertouch_release", preset.aftertouch_release);
@@ -646,7 +664,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		boost::property_tree::ptree lfo;
 		lfo.add_child("volume", save_prop_mod(preset.lfos[i].volume));
-		lfo.put("freq", preset.lfos[i].freq);
+		preset.lfos[i].freq.save(lfo, "freq");
 		lfo.put("sync_master", preset.lfos[i].sync_master);
 		lfo.put("clock_value", preset.lfos[i].clock_value);
 		lfo.put("sync_phase", preset.lfos[i].sync_phase);
@@ -721,6 +739,11 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	}
 
 	return tree;
+}
+
+void AnalogSynth::init(SoundEngineChannel *channel) {
+	SoundEngine::init(channel);
+	binder.init(&channel->get_device()->binding_handler);
 }
 
 AnalogSynth::~AnalogSynth() {

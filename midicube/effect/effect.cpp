@@ -6,4 +6,8 @@
  */
 
 #include "effect.h"
+#include "../soundengine/soundengine.h"
 
+void Effect::init(SoundEngineDevice &engine) {
+	cc.init(&engine.binding_handler);
+}

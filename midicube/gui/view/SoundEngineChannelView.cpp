@@ -15,7 +15,10 @@
 #include "EffectView.h"
 #include "../../soundengine/organ.h"
 
-SoundEngineChannelView::SoundEngineChannelView(SoundEngineChannel& ch, int channel_index) : channel(ch) {
+SoundEngineChannelView::SoundEngineChannelView(SoundEngineChannel& ch, int channel_index) : channel(ch), binder{[&ch, channel_index]() {
+	return new SoundEngineChannelView(ch, channel_index);
+}} {
+
 	this->channel_index = channel_index;
 }
 
@@ -299,6 +302,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		controls.push_back(end_velocity);
 	}
 
+	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->set_on_click([&frame]() {
@@ -324,4 +328,8 @@ ViewController* create_view_for_engine(std::string name, SoundEngine& engine, So
 		return new SamplerView(dynamic_cast<Sampler&>(engine), channel, channel_index);
 	}
 	return nullptr;
+}
+
+bool SoundEngineChannelView::on_action(Control *control) {
+	return binder.on_action(control);
 }

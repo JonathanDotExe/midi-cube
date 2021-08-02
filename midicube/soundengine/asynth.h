@@ -28,17 +28,86 @@ const FixedScale PANNING_SCALE(-1, {}, 1);
 #define ANALOG_SYNTH_POLYPHONY 30
 #define ASYNTH_MOTION_SEQUENCER_LENGTH 16
 
+struct BindableADSREnvelopeData {
+	BindableTemplateValue<double> attack{0.0005, 0.0005, 5};
+	BindableTemplateValue<double> decay{0, 0, 10};
+	BindableTemplateValue<double> sustain{1, 0, 1};
+	BindableTemplateValue<double> release{0.0005, 0.0005, 10};
+
+	ADSREnvelopeShape attack_shape = ADSREnvelopeShape::LINEAR_ADSR;
+	ADSREnvelopeShape pre_decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
+	ADSREnvelopeShape decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
+	ADSREnvelopeShape release_shape = ADSREnvelopeShape::ANALOG_ADSR;
+
+	BindableTemplateValue<double> hold{0, 0, 10};
+	BindableTemplateValue<double> pre_decay{0, 0, 10};
+
+	BindableTemplateValue<double> attack_hold{0, 0, 5};
+	BindableTemplateValue<double> peak_volume{1, 0, 1};
+	BindableTemplateValue<double> decay_volume{1, 0, 1};
+	BindableTemplateValue<double> sustain_time{0, 0, 20};
+	BindableTemplateValue<double> release_volume{0, 0, 1};
+
+	bool pedal_catch = false;
+
+	void add_bindings(LocalMidiBindingHandler& binder) {
+		binder.add_binding(&attack);
+		binder.add_binding(&decay);
+		binder.add_binding(&sustain);
+		binder.add_binding(&release);
+		binder.add_binding(&hold);
+		binder.add_binding(&pre_decay);
+		binder.add_binding(&attack_hold);
+		binder.add_binding(&peak_volume);
+		binder.add_binding(&decay_volume);
+		binder.add_binding(&sustain_time);
+		binder.add_binding(&release_volume);
+	}
+
+	BindableADSREnvelopeData(double attack = 0.0005, double decay = 0, double sustain = 1, double release = 0.0005) {
+		this->attack = attack;
+		this->sustain = sustain;
+		this->decay = decay;
+		this->release = release;
+	}
+
+	operator ADSREnvelopeData() const {
+		ADSREnvelopeData env;
+		env.attack = attack;
+		env.decay = decay;
+		env.sustain = sustain;
+		env.release = release;
+
+		env.attack_shape = attack_shape;
+		env.pre_decay_shape = pre_decay_shape;
+		env.decay_shape = decay_shape;
+		env.release_shape = release_shape;
+
+		env.hold = hold;
+		env.pre_decay =  pre_decay;
+
+		env.attack_hold = attack_hold;
+		env.peak_volume = peak_volume;
+		env.decay_volume = decay_volume;
+		env.sustain_time = sustain_time;
+		env.release_volume = release_volume;
+		return env;
+	}
+};
 
 struct PropertyModulation {
-	double value = 0;
+	BindableTemplateValue<double> value{0, 0, 1};
 	size_t mod_env = 0;
 	double mod_env_amount = 0;
 	size_t lfo = 0;
 	double lfo_amount = 0;
 	double velocity_amount = 0;
-	size_t cc = 1;
-	double cc_amount = 0;
 	double aftertouch_amount = 0;
+
+	PropertyModulation(double val) {
+		value = val;
+	}
+
 };
 
 struct FrequencyModulatotion {
@@ -74,13 +143,13 @@ struct FilterEntity {
 	FilterType type = FilterType::LP_12;
 	PropertyModulation cutoff = {1};
 	PropertyModulation resonance = {0};
-	double kb_track = 0;
+	BindableTemplateValue<double> kb_track{0, 0, 1};
 	unsigned int kb_track_note = 36;
 };
 
 struct OperatorEntity {
 	bool audible = true;
-	ADSREnvelopeData env{0.0005, 0, 1, 0.0005};
+	BindableADSREnvelopeData env{0.0005, 0, 1, 0.0005};
 	double amp_kb_track_upper = 0;
 	double amp_kb_track_lower = 0;
 	unsigned int amp_kb_track_note = 60;
@@ -100,12 +169,12 @@ struct OperatorEntity {
 
 struct ModEnvelopeEntity {
 	PropertyModulation volume = {1};
-	ADSREnvelopeData env{0.0005, 0, 1, 0.0005};
+	BindableADSREnvelopeData env{0.0005, 0, 1, 0.0005};
 };
 
 struct LFOEntity {
 	PropertyModulation volume = {1};
-	double freq = 1;
+	BindableTemplateValue<double> freq{1, 0, 50};
 	bool sync_master = false;
 	int clock_value = 1;
 	double sync_phase = 0;
@@ -125,7 +194,7 @@ struct AnalogSynthPreset {
 
 	bool mono = false;
 	bool legato = false;
-	double portamendo = 0;
+	BindableTemplateValue<double> portamendo{0, 0, 10};
 
 	double aftertouch_attack = 0;
 	double aftertouch_release = 0;
@@ -178,13 +247,17 @@ private:
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;
 
+	void init(SoundEngineChannel* channel);
+
 	inline void process_note(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
 
 	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
 
-	inline void apply_filter(FilterEntity filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double velocity, double aftertouch);
+	inline void apply_filter(FilterEntity& filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double velocity, double aftertouch);
 
 	inline double apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ANALOG_PART_COUNT>& lfo_val);
+
+	LocalMidiBindingHandler binder;
 
 public:
 	AnalogSynthPreset preset;

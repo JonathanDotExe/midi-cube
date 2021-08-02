@@ -9,13 +9,13 @@
 #include <cmath>
 
 FlangerEffect::FlangerEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_rate", preset.vibrato_rate, 0, 8));
-	cc.register_binding(new TemplateControlBinding<double>("vibrato_depth", preset.vibrato_depth, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.vibrato_rate);
+	cc.add_binding(&preset.vibrato_depth);
+	cc.add_binding(&preset.mix);
 
-	cc.register_binding(new TemplateControlBinding<double>("feedback", preset.feedback, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 0.02));
+	cc.add_binding(&preset.delay);
+	cc.add_binding(&preset.feedback);
 }
 
 void FlangerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -56,25 +56,25 @@ EffectProgram* create_effect_program<FlangerEffect>() {
 
 void FlangerProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.vibrato_rate = tree.get<double>("vibrato_rate", 2);
-	preset.vibrato_depth = tree.get<double>("vibrato_depth", 0.5);
-	preset.mix = tree.get<double>("mix", 0.5);
+	preset.on.load(tree, "on", true);
+	preset.vibrato_rate.load(tree, "vibrato_rate", 2);
+	preset.vibrato_depth.load(tree, "vibrato_depth", 0.5);
+	preset.mix.load(tree, "mix", 0.5);
 
-	preset.delay = tree.get<double>("delay", 0.015);
-	preset.feedback = tree.get<double>("feedback", 0);
+	preset.delay.load(tree, "delay", 0.015);
+	preset.feedback.load(tree, "feedback", 0);
 	preset.vibrato_waveform = (AnalogWaveForm) tree.get<unsigned int>("vibrato_waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
 }
 
 boost::property_tree::ptree FlangerProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("vibrato_rate", preset.vibrato_rate);
-	tree.put("vibrato_depth", preset.vibrato_depth);
-	tree.put("mix", preset.mix);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("vibrato_rate", preset.vibrato_rate.save());
+	tree.add_child("vibrato_depth", preset.vibrato_depth.save());
+	tree.add_child("mix", preset.mix.save());
 
-	tree.put("delay", preset.delay);
-	tree.put("feedback", preset.feedback);
+	tree.add_child("delay", preset.delay.save());
+	tree.add_child("feedback", preset.feedback.save());
 	tree.put("vibrato_waveform", (unsigned int) preset.vibrato_waveform);
 	return tree;
 }
@@ -86,7 +86,7 @@ void FlangerEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new FlangerProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -95,11 +95,11 @@ void FlangerEffect::apply_program(EffectProgram *prog) {
 	FlangerProgram* p = dynamic_cast<FlangerProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

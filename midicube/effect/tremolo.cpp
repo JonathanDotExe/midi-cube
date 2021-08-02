@@ -9,9 +9,9 @@
 #include <cmath>
 
 TremoloEffect::TremoloEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("rate", preset.rate, 0, 8));
-	cc.register_binding(new TemplateControlBinding<double>("depth", preset.depth, 0, 1));
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.rate);
+	cc.add_binding(&preset.depth);
 }
 
 void TremoloEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -44,17 +44,17 @@ EffectProgram* create_effect_program<TremoloEffect>() {
 
 void TremoloProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.rate = tree.get<double>("rate", 2);
-	preset.depth = tree.get<double>("depth", 0.5);
+	preset.on.load(tree, "on", true);
+	preset.rate.load(tree, "rate", 2);
+	preset.depth.load(tree, "depth", 0.5);
 	preset.waveform = (AnalogWaveForm) tree.get<unsigned int>("waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
 }
 
 boost::property_tree::ptree TremoloProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("rate", preset.rate);
-	tree.put("depth", preset.depth);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("rate", preset.rate.save());
+	tree.add_child("depth", preset.depth.save());
 	tree.put("waveform", (unsigned int) preset.waveform);
 	return tree;
 }
@@ -66,7 +66,7 @@ void TremoloEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new TremoloProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -75,11 +75,11 @@ void TremoloEffect::apply_program(EffectProgram *prog) {
 	TremoloProgram* p = dynamic_cast<TremoloProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

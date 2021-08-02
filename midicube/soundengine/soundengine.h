@@ -66,7 +66,7 @@ protected:
 	SoundEngineDevice* device = nullptr;
 
 public:
-	void init(SoundEngineChannel* channel);
+	virtual void init(SoundEngineChannel* channel);
 
 	virtual bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) = 0;
 
@@ -260,9 +260,10 @@ private:
 	SoundEngine* engine = nullptr;
 	SoundEngineDevice* device = nullptr;
 
+	LocalMidiBindingHandler binder;
 public:
-	double volume = 0.5;
-	double panning = 0;
+	BindableTemplateValue<double> volume{0.5, 0, 1};
+	BindableTemplateValue<double> panning{0, -1, 1};
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	Arpeggiator arp;
 
@@ -375,8 +376,9 @@ struct InsertEffectProgram {
 
 struct ChannelProgram {
 	ssize_t engine_index{-1};
-	double volume = 0.5;
-	double panning = 0;
+	bool active = true;
+	BindableTemplateValue<double> volume{0.5, 0, 1};
+	BindableTemplateValue<double>  panning{0, -1, 1};
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	std::array<InsertEffectProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t send_master = -1;
@@ -465,6 +467,7 @@ private:
 	MidiCube* cube = nullptr;
 
 public:
+	MidiBindingHandler binding_handler;
 	KeyboardEnvironment env;
 
 	Metronome metronome;
@@ -499,6 +502,10 @@ public:
 	void apply_program(Program* program);
 
 	void save_program(Program* program);
+
+	MidiCube* get_cube() {
+		return cube;
+	}
 
 	~SoundEngineDevice();
 

@@ -53,6 +53,7 @@ src = [
 	'midicube/gui/view/AnalogSynthView.cpp',
 	'midicube/gui/view/ArpeggiatorView.cpp',
 	'midicube/gui/view/B3OrganView.cpp',
+	'midicube/gui/view/BooleanMidiBindingView.cpp',
 	'midicube/gui/view/EffectView.cpp',
 	'midicube/gui/view/LooperView.cpp',
 	'midicube/gui/view/MasterEffectView.cpp',
@@ -64,6 +65,7 @@ src = [
 	'midicube/gui/view/SoundEngineChannelView.cpp',
 	'midicube/gui/view/SoundEngineView.cpp',
 	'midicube/gui/view/SourceView.cpp',
+	'midicube/gui/view/TemplateMidiBindingView.cpp',
 	
 	'midicube/effect/amplifier_simulation.cpp',
 	'midicube/effect/bitcrusher.cpp',

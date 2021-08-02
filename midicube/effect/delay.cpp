@@ -9,15 +9,15 @@
 #include <cmath>
 
 DelayEffect::DelayEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("left_delay", preset.left_delay, 0, 5));
-	cc.register_binding(new TemplateControlBinding<double>("left_init_delay_offset", preset.left_init_delay_offset, -5, 5));
-	cc.register_binding(new TemplateControlBinding<double>("left_feedback", preset.left_feedback, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("right_delay", preset.right_delay, 0, 5));
-	cc.register_binding(new TemplateControlBinding<double>("right_init_delay_offset", preset.right_init_delay_offset, -5, 5));
-	cc.register_binding(new TemplateControlBinding<double>("right_feedback", preset.right_feedback, 0, 1));
-	cc.register_binding(new TemplateControlBinding<bool>("stereo", preset.stereo, false, true));
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.left_init_delay_offset);
+	cc.add_binding(&preset.left_delay);
+	cc.add_binding(&preset.left_feedback);
+	cc.add_binding(&preset.right_init_delay_offset);
+	cc.add_binding(&preset.right_delay);
+	cc.add_binding(&preset.right_feedback);
+	cc.add_binding(&preset.stereo);
+	cc.add_binding(&preset.mix);
 }
 
 void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -70,28 +70,28 @@ EffectProgram* create_effect_program<DelayEffect>() {
 
 void DelayProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.mix = tree.get<double>("mix", 0.5);
-	preset.left_delay = tree.get<double>("left_delay", 0.1);
-	preset.left_init_delay_offset = tree.get<double>("left_init_delay_offset", 0.0);
-	preset.left_feedback = tree.get<double>("left_feedback", 0.2);
-	preset.right_delay = tree.get<double>("right_delay", 0.1);
-	preset.right_init_delay_offset = tree.get<double>("right_init_delay_offset", 0.0);
-	preset.right_feedback = tree.get<double>("right_feedback", 0.2);
-	preset.on = tree.get<bool>("stereo", false);
+	preset.on.load(tree, "on", true);
+	preset.mix.load(tree, "mix", 0.5);
+	preset.left_delay.load(tree, "left_delay", 0.1);
+	preset.left_init_delay_offset.load(tree, "left_init_delay_offset", 0.0);
+	preset.left_feedback.load(tree, "left_feedback", 0.2);
+	preset.right_delay.load(tree, "right_delay", 0.1);
+	preset.right_init_delay_offset.load(tree, "right_init_delay_offset", 0.0);
+	preset.right_feedback.load(tree, "right_feedback", 0.2);
+	preset.on.load(tree, "stereo", false);
 }
 
 boost::property_tree::ptree DelayProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("mix", preset.mix);
-	tree.put("left_delay", preset.left_delay);
-	tree.put("left_init_delay_offset", preset.left_init_delay_offset);
-	tree.put("left_feedback", preset.left_feedback);
-	tree.put("right_delay", preset.right_delay);
-	tree.put("right_init_delay_offset", preset.right_init_delay_offset);
-	tree.put("right_feedback", preset.right_feedback);
-	tree.put("stereo", preset.stereo);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("mix", preset.mix.save());
+	tree.add_child("left_delay", preset.left_delay.save());
+	tree.add_child("left_init_delay_offset", preset.left_init_delay_offset.save());
+	tree.add_child("left_feedback", preset.left_feedback.save());
+	tree.add_child("right_delay", preset.right_delay.save());
+	tree.add_child("right_init_delay_offset", preset.right_init_delay_offset.save());
+	tree.add_child("right_feedback", preset.right_feedback.save());
+	tree.add_child("stereo", preset.stereo.save());
 	return tree;
 }
 
@@ -102,7 +102,7 @@ void DelayEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new DelayProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -111,11 +111,11 @@ void DelayEffect::apply_program(EffectProgram *prog) {
 	DelayProgram* p = dynamic_cast<DelayProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }

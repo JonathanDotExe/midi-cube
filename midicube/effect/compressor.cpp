@@ -9,12 +9,12 @@
 #include <cmath>
 
 CompressorEffect::CompressorEffect() {
-	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(new TemplateControlBinding<double>("threshold", preset.threshold, 0, 2));
-	cc.register_binding(new TemplateControlBinding<double>("ratio", preset.ratio, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("attack", preset.attack, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("release", preset.release, 0, 1));
-	cc.register_binding(new TemplateControlBinding<double>("makeup_gain", preset.makeup_gain, 0, 5));
+	cc.add_binding(&preset.on);
+	cc.add_binding(&preset.threshold);
+	cc.add_binding(&preset.ratio);
+	cc.add_binding(&preset.attack);
+	cc.add_binding(&preset.release);
+	cc.add_binding(&preset.makeup_gain);
 }
 
 void CompressorEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
@@ -69,23 +69,23 @@ EffectProgram* create_effect_program<CompressorEffect>() {
 
 void CompressorProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.threshold = tree.get<double>("threshold", -20);
-	preset.ratio = tree.get<double>("ratio", 4);
-	preset.attack = tree.get<double>("attack", 0.1);
-	preset.release = tree.get<double>("release", 0.1);
-	preset.makeup_gain = tree.get<double>("makeup_gain", 1);
+	preset.on.load(tree, "on", true);
+	preset.threshold.load(tree, "threshold", -20);
+	preset.ratio.load(tree, "ratio", 4);
+	preset.attack.load(tree, "attack", 0.1);
+	preset.release.load(tree, "release", 0.1);
+	preset.makeup_gain.load(tree, "makeup_gain", 1);
 
 }
 
 boost::property_tree::ptree CompressorProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("threshold", preset.threshold);
-	tree.put("ratio", preset.ratio);
-	tree.put("attack", preset.attack);
-	tree.put("release", preset.release);
-	tree.put("makeup_gain", preset.makeup_gain);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("threshold", preset.threshold.save());
+	tree.add_child("ratio", preset.ratio.save());
+	tree.add_child("attack", preset.attack.save());
+	tree.add_child("release", preset.release.save());
+	tree.add_child("makeup_gain", preset.makeup_gain.save());
 	return tree;
 }
 
@@ -96,7 +96,7 @@ void CompressorEffect::save_program(EffectProgram **prog) {
 		delete *prog;
 		p = new CompressorProgram();
 	}
-	p->ccs = cc.get_ccs();
+	
 	p->preset = preset;
 	*prog = p;
 }
@@ -105,11 +105,11 @@ void CompressorEffect::apply_program(EffectProgram *prog) {
 	CompressorProgram* p = dynamic_cast<CompressorProgram*>(prog);
 	//Create new
 	if (p) {
-		cc.set_ccs(p->ccs);
+		
 		preset = p->preset;
 	}
 	else {
-		cc.set_ccs({});
+		
 		preset = {};
 	}
 }
