@@ -32,6 +32,9 @@ Effect* InsertEffect::get_effect() const {
 void InsertEffect::set_effect(Effect *effect) {
 	delete this->effect;
 	this->effect = effect;
+	if (effect) {
+		effect->init(*device);
+	}
 }
 
 void InsertEffect::set_effect_index(ssize_t index) {
@@ -80,6 +83,9 @@ Effect* MasterEffect::get_effect() const {
 void MasterEffect::set_effect(Effect *effect) {
 	delete this->effect;
 	this->effect = effect;
+	if (effect) {
+		effect->init(*device);
+	}
 }
 
 void MasterEffect::set_effect_index(ssize_t index) {
