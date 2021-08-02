@@ -80,12 +80,12 @@ void CompressorProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree CompressorProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("threshold", preset.threshold);
-	tree.put("ratio", preset.ratio);
-	tree.put("attack", preset.attack);
-	tree.put("release", preset.release);
-	tree.put("makeup_gain", preset.makeup_gain);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("threshold", preset.threshold.save());
+	tree.add_child("ratio", preset.ratio.save());
+	tree.add_child("attack", preset.attack.save());
+	tree.add_child("release", preset.release.save());
+	tree.add_child("makeup_gain", preset.makeup_gain.save());
 	return tree;
 }
 

@@ -121,13 +121,13 @@ void ReverbProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree ReverbProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("delay", preset.delay);
-	tree.put("decay", preset.decay);
-	tree.put("mix", preset.mix);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("delay", preset.delay.save());
+	tree.add_child("decay", preset.decay.save());
+	tree.add_child("mix", preset.mix.save());
 
-	tree.put("tone", preset.tone);
-	tree.put("resonance", preset.resonance);
-	tree.put("stereo", preset.stereo);
+	tree.add_child("tone", preset.tone.save());
+	tree.add_child("resonance", preset.resonance.save());
+	tree.add_child("stereo", preset.stereo.save());
 	return tree;
 }

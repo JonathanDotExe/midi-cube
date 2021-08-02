@@ -75,13 +75,13 @@ void WahWahProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree WahWahProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("auto_wah", preset.auto_wah);
-	tree.put("mix", preset.mix);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("auto_wah", preset.auto_wah.save());
+	tree.add_child("mix", preset.mix.save());
 
-	tree.put("cutoff", preset.cutoff);
-	tree.put("resonance", preset.resonance);
-	tree.put("amount", preset.amount);
+	tree.add_child("cutoff", preset.cutoff.save());
+	tree.add_child("resonance", preset.resonance.save());
+	tree.add_child("amount", preset.amount.save());
 	return tree;
 }
 

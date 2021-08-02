@@ -83,15 +83,15 @@ void DelayProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree DelayProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("mix", preset.mix);
-	tree.put("left_delay", preset.left_delay);
-	tree.put("left_init_delay_offset", preset.left_init_delay_offset);
-	tree.put("left_feedback", preset.left_feedback);
-	tree.put("right_delay", preset.right_delay);
-	tree.put("right_init_delay_offset", preset.right_init_delay_offset);
-	tree.put("right_feedback", preset.right_feedback);
-	tree.put("stereo", preset.stereo);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("mix", preset.mix.save());
+	tree.add_child("left_delay", preset.left_delay.save());
+	tree.add_child("left_init_delay_offset", preset.left_init_delay_offset.save());
+	tree.add_child("left_feedback", preset.left_feedback.save());
+	tree.add_child("right_delay", preset.right_delay.save());
+	tree.add_child("right_init_delay_offset", preset.right_init_delay_offset.save());
+	tree.add_child("right_feedback", preset.right_feedback.save());
+	tree.add_child("stereo", preset.stereo.save());
 	return tree;
 }
 

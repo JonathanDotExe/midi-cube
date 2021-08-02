@@ -68,13 +68,13 @@ void FlangerProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree FlangerProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("vibrato_rate", preset.vibrato_rate);
-	tree.put("vibrato_depth", preset.vibrato_depth);
-	tree.put("mix", preset.mix);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("vibrato_rate", preset.vibrato_rate.save());
+	tree.add_child("vibrato_depth", preset.vibrato_depth.save());
+	tree.add_child("mix", preset.mix.save());
 
-	tree.put("delay", preset.delay);
-	tree.put("feedback", preset.feedback);
+	tree.add_child("delay", preset.delay.save());
+	tree.add_child("feedback", preset.feedback.save());
 	tree.put("vibrato_waveform", (unsigned int) preset.vibrato_waveform);
 	return tree;
 }

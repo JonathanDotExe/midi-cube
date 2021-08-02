@@ -119,8 +119,8 @@ void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree RotarySpeakerProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("fast", preset.fast);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("fast", preset.fast.save());
 
 	tree.put("stereo_mix", preset.stereo_mix);
 	tree.put("type", preset.type);

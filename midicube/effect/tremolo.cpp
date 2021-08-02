@@ -52,9 +52,9 @@ void TremoloProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree TremoloProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("rate", preset.rate);
-	tree.put("depth", preset.depth);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("rate", preset.rate.save());
+	tree.add_child("depth", preset.depth.save());
 	tree.put("waveform", (unsigned int) preset.waveform);
 	return tree;
 }

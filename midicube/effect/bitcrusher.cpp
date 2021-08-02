@@ -37,7 +37,7 @@ void BitCrusherProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree BitCrusherProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
+	tree.add_child("on", preset.on.save());
 	tree.put("bits", preset.bits);
 	return tree;
 }

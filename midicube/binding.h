@@ -314,6 +314,7 @@ public:
 
 };
 
+/*
 namespace boost {
 	namespace property_tree {
 
@@ -338,7 +339,7 @@ namespace boost {
 		};
 
 	}
-}
+}*/
 
 
 #endif /* MIDICUBE_BINDING_H_ */

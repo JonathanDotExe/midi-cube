@@ -70,12 +70,12 @@ void PhaserProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree PhaserProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("lfo_rate", preset.lfo_rate);
-	tree.put("lfo_depth", preset.lfo_depth);
-	tree.put("mix", preset.mix);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("lfo_rate", preset.lfo_rate.save());
+	tree.add_child("lfo_depth", preset.lfo_depth.save());
+	tree.add_child("mix", preset.mix.save());
 
-	tree.put("center_cutoff", preset.center_cutoff);
+	tree.add_child("center_cutoff", preset.center_cutoff.save());
 	tree.put("vibrato_waveform", (unsigned int) preset.vibrato_waveform);
 	return tree;
 }

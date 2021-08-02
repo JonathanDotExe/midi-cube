@@ -73,15 +73,15 @@ void EqualizerProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree EqualizerProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("low_freq", preset.low_freq);
-	tree.put("low_gain", preset.low_gain);
-	tree.put("low_mid_freq", preset.low_mid_freq);
-	tree.put("low_mid_gain", preset.low_mid_gain);
-	tree.put("mid_freq", preset.mid_freq);
-	tree.put("mid_gain", preset.mid_gain);
-	tree.put("high_freq", preset.high_freq);
-	tree.put("high_gain", preset.high_gain);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("low_freq", preset.low_freq.save());
+	tree.add_child("low_gain", preset.low_gain.save());
+	tree.add_child("low_mid_freq", preset.low_mid_freq.save());
+	tree.add_child("low_mid_gain", preset.low_mid_gain.save());
+	tree.add_child("mid_freq", preset.mid_freq.save());
+	tree.add_child("mid_gain", preset.mid_gain.save());
+	tree.add_child("high_freq", preset.high_freq.save());
+	tree.add_child("high_gain", preset.high_gain.save());
 	return tree;
 }
 

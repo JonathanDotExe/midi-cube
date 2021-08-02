@@ -105,10 +105,10 @@ void AmplifierSimulationProgram::load(boost::property_tree::ptree tree) {
 
 boost::property_tree::ptree AmplifierSimulationProgram::save() {
 	boost::property_tree::ptree tree = EffectProgram::save();
-	tree.put("on", preset.on);
-	tree.put("post_gain", preset.post_gain);
-	tree.put("drive", preset.drive);
-	tree.put("tone", preset.tone);
+	tree.add_child("on", preset.on.save());
+	tree.add_child("post_gain", preset.post_gain.save());
+	tree.add_child("drive", preset.drive.save());
+	tree.add_child("tone", preset.tone.save());
 	return tree;
 }
 
