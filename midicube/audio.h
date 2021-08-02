@@ -11,7 +11,7 @@
 #include <exception>
 #include <atomic>
 #include <array>
-#include <portaudio.h>
+#include <rtaudio/RtAudio.h>
 
 class AudioException : public std::exception {
 
@@ -39,48 +39,13 @@ struct SampleInfo {
 class AudioHandler {
 
 private:
-	PaStream *stream = NULL;
-	bool input = false;
-	void* user_data = nullptr;
-	void (* get_sample) (double&, double&, SampleInfo&, void*) = nullptr;
-	/**
-	 * Only for use in the audio thread
-	 */
-	unsigned int buffer_size = 256;
-	double time{0.0};
-	double time_step{0.0};
-	unsigned int sample_rate{0};
-	unsigned int sample_time{0};
-public:
-
-	AudioHandler() {
-
-	}
-
-	~AudioHandler() {
-		close();
-	};
-
-	void set_sample_callback(void (* get_sample) (double&, double&, SampleInfo&, void*), void* user_data);
-
-	void init(int out_device = -1, int in_device = -1);
-
-	void close();
-
-	int process(const float* output_buffer, float* input_buffer, unsigned int buffer_size);
-
-	SampleInfo sample_info();
-
-};
-
-/*
-class AudioHandler {
-
-private:
 	RtAudio audio;
 	bool input = false;
 	void* user_data = nullptr;
 	void (* get_sample) (double&, double&, SampleInfo&, void*) = nullptr;
+	/**
+	 * Only for use in the jack audio thread
+	 */
 	unsigned int buffer_size = 256;
 	double time{0.0};
 	double time_step{0.0};
@@ -112,6 +77,5 @@ public:
 	SampleInfo sample_info();
 
 };
- */
 
 #endif /* MIDICUBE_AUDIO_H_ */
