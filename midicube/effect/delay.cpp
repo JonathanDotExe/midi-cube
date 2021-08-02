@@ -70,15 +70,15 @@ EffectProgram* create_effect_program<DelayEffect>() {
 
 void DelayProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.mix = tree.get<double>("mix", 0.5);
-	preset.left_delay = tree.get<double>("left_delay", 0.1);
-	preset.left_init_delay_offset = tree.get<double>("left_init_delay_offset", 0.0);
-	preset.left_feedback = tree.get<double>("left_feedback", 0.2);
-	preset.right_delay = tree.get<double>("right_delay", 0.1);
-	preset.right_init_delay_offset = tree.get<double>("right_init_delay_offset", 0.0);
-	preset.right_feedback = tree.get<double>("right_feedback", 0.2);
-	preset.on = tree.get<bool>("stereo", false);
+	preset.on.load(tree, "on", true);
+	preset.mix.load(tree, "mix", 0.5);
+	preset.left_delay.load(tree, "left_delay", 0.1);
+	preset.left_init_delay_offset.load(tree, "left_init_delay_offset", 0.0);
+	preset.left_feedback.load(tree, "left_feedback", 0.2);
+	preset.right_delay.load(tree, "right_delay", 0.1);
+	preset.right_init_delay_offset.load(tree, "right_init_delay_offset", 0.0);
+	preset.right_feedback.load(tree, "right_feedback", 0.2);
+	preset.on.load(tree, "stereo", false);
 }
 
 boost::property_tree::ptree DelayProgram::save() {

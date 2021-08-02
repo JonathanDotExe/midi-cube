@@ -97,8 +97,8 @@ EffectProgram* create_effect_program<RotarySpeakerEffect>() {
 
 void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.fast = tree.get<bool>("fast", false);
+	preset.on.load(tree, "on", true);
+	preset.fast.load(tree, "fast", false);
 
 	preset.stereo_mix = tree.get<double>("stereo_mix", 0.7);
 	preset.type = tree.get<bool>("type", false);

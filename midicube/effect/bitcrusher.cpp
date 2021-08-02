@@ -31,7 +31,7 @@ std::string get_effect_name<BitCrusherEffect>() {
 
 void BitCrusherProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
+	preset.on.load(tree, "on", true);
 	preset.bits = tree.get<unsigned int>("bits", 16);
 }
 

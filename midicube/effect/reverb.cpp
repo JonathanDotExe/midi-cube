@@ -109,14 +109,14 @@ EffectProgram* create_effect_program<ReverbEffect>() {
 
 void ReverbProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.delay = tree.get<double>("delay", 0.2);
-	preset.decay = tree.get<double>("decay", 0.7);
-	preset.mix = tree.get<double>("mix", 0.5);
+	preset.on.load(tree, "on", true);
+	preset.delay.load(tree, "delay", 0.2);
+	preset.decay.load(tree, "decay", 0.7);
+	preset.mix.load(tree, "mix", 0.5);
 
-	preset.tone = tree.get<double>("tone", 0.35);
-	preset.resonance = tree.get<double>("resonance", 0.0);
-	preset.stereo = tree.get<double>("stereo", 0.0);
+	preset.tone.load(tree, "tone", 0.35);
+	preset.resonance.load(tree, "resonance", 0.0);
+	preset.stereo.load(tree, "stereo", 0.0);
 }
 
 boost::property_tree::ptree ReverbProgram::save() {

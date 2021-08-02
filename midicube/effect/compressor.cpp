@@ -69,12 +69,12 @@ EffectProgram* create_effect_program<CompressorEffect>() {
 
 void CompressorProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.threshold = tree.get<double>("threshold", -20);
-	preset.ratio = tree.get<double>("ratio", 4);
-	preset.attack = tree.get<double>("attack", 0.1);
-	preset.release = tree.get<double>("release", 0.1);
-	preset.makeup_gain = tree.get<double>("makeup_gain", 1);
+	preset.on.load(tree, "on", true);
+	preset.threshold.load(tree, "threshold", -20);
+	preset.ratio.load(tree, "ratio", 4);
+	preset.attack.load(tree, "attack", 0.1);
+	preset.release.load(tree, "release", 0.1);
+	preset.makeup_gain.load(tree, "makeup_gain", 1);
 
 }
 

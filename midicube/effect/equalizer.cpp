@@ -60,15 +60,15 @@ EffectProgram* create_effect_program<EqualizerEffect>() {
 
 void EqualizerProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.low_freq = tree.get<double>("low_freq", 100);
-	preset.low_gain = tree.get<double>("low_gain", 0);
-	preset.low_mid_freq = tree.get<double>("low_mid_freq", 400);
-	preset.low_mid_gain = tree.get<double>("low_mid_gain", 0);
-	preset.mid_freq = tree.get<double>("mid_freq", 1000);
-	preset.mid_gain = tree.get<double>("mid_gain", 0);
-	preset.high_freq = tree.get<double>("high_freq", 400);
-	preset.high_gain = tree.get<double>("high_gain", 0);
+	preset.on.load(tree, "on", true);
+	preset.low_freq.load(tree, "low_freq", 100);
+	preset.low_gain.load(tree, "low_gain", 0);
+	preset.low_mid_freq.load(tree, "low_mid_freq", 400);
+	preset.low_mid_gain.load(tree, "low_mid_gain", 0);
+	preset.mid_freq.load(tree, "mid_freq", 1000);
+	preset.mid_gain.load(tree, "mid_gain", 0);
+	preset.high_freq.load(tree, "high_freq", 400);
+	preset.high_gain.load(tree, "high_gain", 0);
 }
 
 boost::property_tree::ptree EqualizerProgram::save() {

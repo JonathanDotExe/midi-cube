@@ -55,12 +55,12 @@ EffectProgram* create_effect_program<ChorusEffect>() {
 
 void ChorusProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.vibrato_rate = tree.get<double>("vibrato_rate", 2);
-	preset.vibrato_depth = tree.get<double>("vibrato_depth", 0.5);
-	preset.mix = tree.get<double>("mix", 0.5);
+	preset.on.load(tree, "on", true);
+	preset.vibrato_rate.load(tree, "vibrato_rate", 2);
+	preset.vibrato_depth.load(tree, "vibrato_depth", 0.5);
+	preset.mix.load(tree, "mix", 0.5);
 
-	preset.delay = tree.get<double>("delay", 0.015);
+	preset.delay.load(tree, "delay", 0.015);
 	preset.vibrato_waveform = (AnalogWaveForm) tree.get<unsigned int>("vibrato_waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
 }
 

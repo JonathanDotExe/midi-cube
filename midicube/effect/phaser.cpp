@@ -59,12 +59,12 @@ EffectProgram* create_effect_program<PhaserEffect>() {
 
 void PhaserProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.lfo_rate = tree.get<double>("lfo_rate", 1);
-	preset.lfo_depth = tree.get<double>("lfo_depth", 0.25);
-	preset.mix = tree.get<double>("mix", 0.5);
+	preset.on.load(tree, "on", true);
+	preset.lfo_rate.load(tree, "lfo_rate", 1);
+	preset.lfo_depth.load(tree, "lfo_depth", 0.25);
+	preset.mix.load(tree, "mix", 0.5);
 
-	preset.center_cutoff = tree.get<double>("center_cutoff", 0.5);
+	preset.center_cutoff.load(tree, "center_cutoff", 0.5);
 	preset.vibrato_waveform = (AnalogWaveForm) tree.get<unsigned int>("vibrato_waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
 }
 

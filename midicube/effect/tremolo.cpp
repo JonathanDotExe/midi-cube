@@ -44,9 +44,9 @@ EffectProgram* create_effect_program<TremoloEffect>() {
 
 void TremoloProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.rate = tree.get<double>("rate", 2);
-	preset.depth = tree.get<double>("depth", 0.5);
+	preset.on.load(tree, "on", true);
+	preset.rate.load(tree, "rate", 2);
+	preset.depth.load(tree, "depth", 0.5);
 	preset.waveform = (AnalogWaveForm) tree.get<unsigned int>("waveform", (unsigned int) AnalogWaveForm::TRIANGLE_WAVE);
 }
 

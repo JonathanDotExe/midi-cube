@@ -65,12 +65,12 @@ EffectProgram* create_effect_program<WahWahEffect>() {
 
 void WahWahProgram::load(boost::property_tree::ptree tree) {
 	EffectProgram::load(tree);
-	preset.on = tree.get<bool>("on", true);
-	preset.auto_wah = tree.get<bool>("auto_wah", true);
-	preset.mix = tree.get<double>("mix", 1);
-	preset.cutoff = tree.get<double>("cutoff", 0.2);
-	preset.resonance = tree.get<double>("resonance", 0.5);
-	preset.amount = tree.get<double>("amount", 0.5);
+	preset.on.load(tree, "on", true);
+	preset.auto_wah.load(tree, "auto_wah", true);
+	preset.mix.load(tree, "mix", 1);
+	preset.cutoff.load(tree, "cutoff", 0.2);
+	preset.resonance.load(tree, "resonance", 0.5);
+	preset.amount.load(tree, "amount", 0.5);
 }
 
 boost::property_tree::ptree WahWahProgram::save() {
