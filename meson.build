@@ -2,9 +2,9 @@ project('midi-cube', 'cpp', default_options: ['cpp_std=c++17'])
 cxx = meson.get_compiler('cpp')
 
 deps = [
+	dependency('rtaudio'),
 	dependency('rtmidi'),
 	dependency('sndfile'),
-	dependency('portaudio-2.0'),
 	dependency('sfml-system'),
 	dependency('sfml-window'),
 	dependency('sfml-graphics'),
@@ -87,7 +87,6 @@ sampler_deps = [
 	dependency('rtaudio'),
 	dependency('rtmidi'),
 	dependency('sndfile'),
-	dependency('portaudio-2.0'),
 	cxx.find_library('boost_system'),
 	cxx.find_library('boost_filesystem')
 ]
