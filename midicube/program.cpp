@@ -360,6 +360,8 @@ void ProgramManager::save_new_program() {
 		user->save_program(prog);
 		bank->programs.push_back(prog);
 		curr_program = bank->programs.size() - 1;
+
+		save_all();
 		unlock();
 	}));
 }
@@ -374,6 +376,7 @@ void ProgramManager::save_init_program() {
 		user->apply_program(prog);
 		bank->programs.push_back(prog);
 		curr_program = bank->programs.size() - 1;
+		save_all();
 		unlock();
 	}));
 }
@@ -385,6 +388,7 @@ void ProgramManager::overwrite_program() {
 
 		prog->name = program_name;
 		user->save_program(prog);
+		save_all();
 		unlock();
 	}));
 }
@@ -434,7 +438,6 @@ void ProgramManager::load_all() {
 }
 
 void ProgramManager::save_all() {
-	lock();
 	std::vector<std::string> filenames;
 	for (auto b : banks) {
 		while (std::find(filenames.begin(), filenames.end(), b->filename) != filenames.end()) {
@@ -443,7 +446,6 @@ void ProgramManager::save_all() {
 		save_bank(*b, path + "/" + b->filename + ".xml");
 		filenames.push_back(b->filename);
 	}
-	unlock();
 }
 
 ProgramManager::~ProgramManager() {

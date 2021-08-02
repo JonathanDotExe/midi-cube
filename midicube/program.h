@@ -72,7 +72,7 @@ private:
 	std::vector<Bank*> banks;
 	ActionHandler& handler;
 	ProgramUser* user = nullptr;
-	std::mutex mutex;
+	SpinLock mutex;
 
 public:
 	std::string bank_name = "";
@@ -133,6 +133,7 @@ public:
 	}
 
 	void load_all();
+	//Mutex has to be locked by user
 	void save_all();
 	~ProgramManager();
 };
