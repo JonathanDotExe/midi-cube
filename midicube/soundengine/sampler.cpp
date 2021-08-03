@@ -277,19 +277,18 @@ Sampler::~Sampler() {
 
 void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::string folder, StreamedAudioPool& pool) {
 	region.env.env.pedal_catch = true;
-	region.env.velocity_amount = tree.get<double>("envelope.velocity_amount", region.env.velocity_amount);
-	region.env.env.attack = tree.get<double>("envelope.attack", region.env.env.attack);
-	region.env.env.decay = tree.get<double>("envelope.decay", region.env.env.decay);
-	region.env.env.sustain = tree.get<double>("envelope.sustain", region.env.env.sustain);
-	region.env.env.release = tree.get<double>("envelope.release", region.env.env.release);
-	region.env.env.attack_hold = tree.get<double>("envelope.attack_hold", region.env.env.attack_hold);
+	region.env.velocity_amount.load(tree, "envelope.velocity_amount", region.env.velocity_amount.value);
+	region.env.env.attack.load(tree, "envelope.attack", region.env.env.attack.value);
+	region.env.env.decay.load(tree, "envelope.decay", region.env.env.decay.value);
+	region.env.env.sustain.load(tree, "envelope.sustain", region.env.env.sustain.value);
+	region.env.env.release.load(tree, "envelope.release", region.env.env.release.value);
+	region.env.env.attack_hold.load(tree, "envelope.attack_hold", region.env.env.attack_hold.value);
 	region.env.sustain_entire_sample = tree.get<bool>("envelope.sustain_entire_sample", region.env.sustain_entire_sample);
 
-	region.filter.filter_cutoff = tree.get<double>("filter.cutoff", region.filter.filter_cutoff);
+	region.filter.filter_cutoff.load(tree, "filter.cutoff", region.filter.filter_cutoff.value);
 	region.filter.filter_kb_track = tree.get<double>("filter.kb_track", region.filter.filter_kb_track);
 	region.filter.filter_kb_track_note = tree.get<unsigned int>("filter.kb_track_note", region.filter.filter_kb_track_note);
-	region.filter.filter_resonance = tree.get<double>("filter.resonance", region.filter.filter_resonance);
-	region.filter.filter_velocity_amount = tree.get<double>("filter.velocity_amount", region.filter.filter_velocity_amount);
+	region.filter.filter_resonance.load(tree, "filter.resonance", region.filter.filter_resonance.value);
 
 	region.pitch_keytrack = tree.get<double>("pitch_keytrack", region.pitch_keytrack);
 	region.release_decay = tree.get<double>("release_decay", region.release_decay);
@@ -331,7 +330,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity);
 	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity);
 
-	region.volume = tree.get<double>("volume", region.volume);
+	region.volume.load(tree, "volume", region.volume.value);
 
 	std::string trigger = tree.get<std::string>("trigger", "");
 	if (trigger == "attack") {

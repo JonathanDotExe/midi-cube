@@ -15,6 +15,8 @@
 #include "../audioloader.h"
 #include <array>
 
+namespace pt = boost::property_tree;
+
 #define MIDI_NOTES 128
 
 struct ModulateableProperty {
@@ -29,6 +31,28 @@ struct ModulateableProperty {
 		val += cc_val[cc] * cc_amount;
 		return val;
 	}
+
+	void load(boost::property_tree::ptree& parent, std::string path, double def) {
+		auto tree = parent.get_child_optional(path);
+		if (tree && tree.get().get_child_optional("value")) {
+			load(tree.get(), def);
+		}
+		else {
+			value = parent.get<double>(path, def);
+			cc = 0;
+			cc_amount = 0;
+			velocity_amount = 0;
+		}
+	}
+
+	void load(boost::property_tree::ptree& tree, double def) {
+		value = tree.get("value", def);
+		cc = tree.get("cc", cc);
+		cc_amount = tree.get("cc_amount", cc_amount);
+		velocity_amount = tree.get("velocity_amount", velocity_amount);
+	}
+
+
 
 };
 
