@@ -395,16 +395,16 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			tree.put("envelope.velocity_amount", std::stod(opcode.second)/100.0);
 		}
 		else if (opcode.first == "ampeg_attack") {
-			tree.put("envelope.attack", std::stod(opcode.second));
+			tree.put("envelope.attack.value", std::stod(opcode.second));
 		}
 		else if (opcode.first == "ampeg_decay") {
-			tree.put("envelope.decay", std::stod(opcode.second));
+			tree.put("envelope.decay.value", std::stod(opcode.second));
 		}
 		else if (opcode.first == "ampeg_sustain") {
-			tree.put("envelope.sustain", std::stod(opcode.second));
+			tree.put("envelope.sustain.value", std::stod(opcode.second));
 		}
 		else if (opcode.first == "ampeg_release") {
-			tree.put("envelope.release", std::stod(opcode.second));
+			tree.put("envelope.release.value", std::stod(opcode.second));
 		}
 		else if (opcode.first == "lokey") {
 			tree.put("min_note", parse_sfz_note(opcode.second));
@@ -422,7 +422,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			tree.put("max_velocity", std::stoi(opcode.second));
 		}
 		else if (opcode.first == "volume" || opcode.first == "group_volume") {
-			tree.put("volume", db_to_amp(std::stod(opcode.second)));
+			tree.put("volume.value", db_to_amp(std::stod(opcode.second)));
 		}
 		else if (opcode.first == "pitch_keytrack") {
 			tree.put("pitch_keytrack", std::stod(opcode.second)/100.0);
@@ -463,11 +463,11 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			tree.put("sample.start", std::stoi(opcode.second));
 		}
 		else if (opcode.first == "ampeg_hold") {
-			tree.put("envelope.attack_hold", std::stod(opcode.second));
+			tree.put("envelope.attack_hold.value", std::stod(opcode.second));
 		}
 		//Filter
 		else if (opcode.first == "cutoff") {
-			tree.put("filter.cutoff", invert_scale_cutoff(std::stod(opcode.second)));
+			tree.put("filter.cutoff.value", invert_scale_cutoff(std::stod(opcode.second)));
 		}
 		//TODO tune
 		else {
