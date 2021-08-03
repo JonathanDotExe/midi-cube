@@ -13,16 +13,75 @@
 #include "../envelope.h"
 #include "../util.h"
 #include "../audioloader.h"
+#include <array>
 
 #define MIDI_NOTES 128
 
 struct ModulateableProperty {
 	double value = 0;
-	unsigned int cc = 128;
+	unsigned int cc = 0;
 	double cc_amount = 0;
 	double velocity_amount = 0;
 	double velocity_percent = 0;
+
+	inline double apply_modulation(double velocity, std::array<double, MIDI_CONTROL_COUNT>& cc_val) {
+		double val = value;
+		val += velocity * velocity_amount;
+		val += cc_val[cc] * cc_amount;
+		if (velocity_percent) {
+			val = val * (1 - velocity_percent) + val * velocity_percent * velocity;
+		}
+		return val;
+	}
+
 };
+
+struct ModulatableADSREnvelopeData {
+	ModulateableProperty attack{0.0005};
+	ModulateableProperty decay{0};
+	ModulateableProperty sustain{1};
+	ModulateableProperty release{0.0005};
+
+	ADSREnvelopeShape attack_shape = ADSREnvelopeShape::LINEAR_ADSR;
+	ADSREnvelopeShape pre_decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
+	ADSREnvelopeShape decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
+	ADSREnvelopeShape release_shape = ADSREnvelopeShape::ANALOG_ADSR;
+
+	ModulateableProperty hold{0};
+	ModulateableProperty pre_decay{0};
+
+	ModulateableProperty attack_hold{0};
+	ModulateableProperty peak_volume{1};
+	ModulateableProperty decay_volume{1};
+	ModulateableProperty sustain_time{0};
+	ModulateableProperty release_volume{0};
+
+	bool pedal_catch = false;
+
+	inline ADSREnvelopeData apply(double velocity, std::array<double, MIDI_CONTROL_COUNT>& cc_val) {
+		ADSREnvelopeData env;
+		env.attack = attack.apply_modulation(velocity, cc_val);
+		env.decay = decay.apply_modulation(velocity, cc_val);
+		env.sustain = sustain.apply_modulation(velocity, cc_val);
+		env.release = release.apply_modulation(velocity, cc_val);
+
+		env.attack_shape = attack_shape;
+		env.pre_decay_shape = pre_decay_shape;
+		env.decay_shape = decay_shape;
+		env.release_shape = release_shape;
+
+		env.hold = hold.apply_modulation(velocity, cc_val);
+		env.pre_decay =  pre_decay.apply_modulation(velocity, cc_val);
+
+		env.attack_hold = attack_hold.apply_modulation(velocity, cc_val);
+		env.peak_volume = peak_volume.apply_modulation(velocity, cc_val);
+		env.decay_volume = decay_volume.apply_modulation(velocity, cc_val);
+		env.sustain_time = sustain_time.apply_modulation(velocity, cc_val);
+		env.release_volume = release_volume.apply_modulation(velocity, cc_val);
+		return env;
+	}
+};
+
 
 enum LoopType {
 	NO_LOOP, ATTACK_LOOP, ALWAYS_LOOP
@@ -43,7 +102,7 @@ struct SampleFilter {
 };
 
 struct SampleEnvelope {
-	ADSREnvelopeData env = {0, 0, 1, 0.001, LINEAR_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR};
+	ModulatableADSREnvelopeData env = {0, 0, 1, 0.001, LINEAR_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR};
 	ModulateableProperty velocity_amount{0.0};
 	bool sustain_entire_sample = false;
 };
