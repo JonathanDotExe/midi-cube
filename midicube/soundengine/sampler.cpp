@@ -177,7 +177,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			SamplerVoice& voice = this->note.note[slot];
 			voice.current_buffer = 0;
 			voice.region = region;
-			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume.apply_modulation(voice.velocity, cc) * sample->volume; //FIXME
+			voice.layer_amp = (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0)) * region->volume.apply_modulation(voice.velocity, cc) * sample->volume; //FIXME
 			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
 			//TODO preload at start time
@@ -374,27 +374,6 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 		}
 		if (region.sample.loop_end < region.sample.loop_start) {
 			region.sample.loop_end = region.sample.sample->total_size;
-		}
-	}
-
-	//Sustain Sample
-	std::string sfile = tree.get<std::string>("sustain_sample.name", "");
-	region.sustain_sample.start = tree.get<unsigned int>("sustain_sample.start", region.sustain_sample.start);
-	region.sustain_sample.loop_start = tree.get<unsigned int>("sustain_sample.loop_start", region.sustain_sample.loop_start);
-	region.sustain_sample.loop_end = tree.get<unsigned int>("sustain_sample.loop_end", region.sustain_sample.loop_end);
-	region.sustain_sample.loop_crossfade = tree.get<unsigned int>("sustain_sample.loop_crossfade", region.sustain_sample.loop_start);
-
-	if (load_sample && sfile != "") {
-		region.sustain_sample.sample = pool.load_sample(folder + "/" + sfile);
-		if (region.sustain_sample.sample) {
-			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
-		}
-		if (region.sustain_sample.loop_start == 0 && region.sample.loop_end == 0) {
-			region.sustain_sample.loop_start = region.sample.sample->loop_start;
-			region.sustain_sample.loop_end = region.sample.sample->loop_end;
-		}
-		if (region.sustain_sample.loop_end < region.sustain_sample.loop_start) {
-			region.sustain_sample.loop_end = region.sustain_sample.sample->total_size/region.sustain_sample.sample->channels;
 		}
 	}
 }

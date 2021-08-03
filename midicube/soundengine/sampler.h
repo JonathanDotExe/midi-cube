@@ -140,13 +140,11 @@ struct SampleRegion {
 	unsigned int min_note = 0;
 	unsigned int max_note = 127;
 	double note = 60;
-	double layer_velocity_amount = 0.0;
 	ModulateableProperty volume{1};
 	double pitch_keytrack = 1;
 	double release_decay = 1;
 
 	LoopedAudioSample sample;
-	LoopedAudioSample sustain_sample;
 	LoopType loop = NO_LOOP;
 
 	SampleFilter filter;
