@@ -147,7 +147,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		vel_amount += note.region->env.velocity_amount.apply_modulation(note.velocity, cc);
 
 		vol *= vel_amount * (note.velocity - 1) + 1;
-		vol *= note.layer_amp;
+		vol *= note.layer_amp  * note.region->volume.apply_modulation(note.velocity, cc);
 
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
@@ -177,7 +177,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			SamplerVoice& voice = this->note.note[slot];
 			voice.current_buffer = 0;
 			voice.region = region;
-			voice.layer_amp = (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0)) * region->volume.apply_modulation(voice.velocity, cc) * sample->volume; //FIXME
+			voice.layer_amp = (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0)) * sample->volume; //FIXME
 			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
 			//TODO preload at start time

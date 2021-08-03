@@ -52,8 +52,6 @@ struct ModulateableProperty {
 		velocity_amount = tree.get("velocity_amount", velocity_amount);
 	}
 
-
-
 };
 
 struct ModulatableADSREnvelopeData {
