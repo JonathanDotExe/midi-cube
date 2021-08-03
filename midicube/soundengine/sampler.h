@@ -16,6 +16,14 @@
 
 #define MIDI_NOTES 128
 
+struct ModulateableProperty {
+	double value = 0;
+	unsigned int cc = 128;
+	double cc_amount = 0;
+	double velocity_amount = 0;
+	double velocity_percent = 0;
+};
+
 enum LoopType {
 	NO_LOOP, ATTACK_LOOP, ALWAYS_LOOP
 };
@@ -27,8 +35,8 @@ enum TriggerType {
 struct SampleFilter {
 	bool on = false;
 	FilterType filter_type = FilterType::LP_12;
-	double filter_cutoff = 1;
-	double filter_resonance = 0;
+	ModulateableProperty filter_cutoff{1};
+	ModulateableProperty filter_resonance{0};
 	double filter_kb_track = 0;
 	unsigned int filter_kb_track_note = 36;
 	double filter_velocity_amount = 0.0;
@@ -36,7 +44,7 @@ struct SampleFilter {
 
 struct SampleEnvelope {
 	ADSREnvelopeData env = {0, 0, 1, 0.001, LINEAR_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR};
-	double velocity_amount = 0.0;
+	ModulateableProperty velocity_amount{0.0};
 	bool sustain_entire_sample = false;
 };
 
@@ -55,7 +63,7 @@ struct SampleRegion {
 	unsigned int max_note = 127;
 	double note = 60;
 	double layer_velocity_amount = 0.0;
-	double volume = 1;
+	ModulateableProperty volume{1};
 	double pitch_keytrack = 1;
 	double release_decay = 1;
 
