@@ -124,8 +124,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		//Filter
 		if (note.region->filter.on) {
 			FilterData filter { note.region->filter.filter_type };
-			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.region->filter.filter_cutoff + note.region->filter.filter_velocity_amount * note.velocity))); //TODO optimize
-			filter.resonance = note.region->filter.filter_resonance;
+			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.region->filter.filter_cutoff.apply_modulation(note.velocity, cc)))); //TODO optimize
+			filter.resonance = note.region->filter.filter_resonance.apply_modulation(note.velocity, cc);
 
 			if (note.region->filter.filter_kb_track) {
 				double cutoff = filter.cutoff;
@@ -141,9 +141,10 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		//Env
 		if (!note.region->env.sustain_entire_sample) {
 			//Volume
-			vol = note.env.amplitude(note.region->env.env, info.time_step, note.pressed, env.sustain);
+			ADSREnvelopeData data = note.region->env.env.apply(note.velocity, cc);
+			vol = note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
 		}
-		vel_amount += note.region->env.velocity_amount;
+		vel_amount += note.region->env.velocity_amount.apply_modulation(note.velocity, cc);
 
 		vol *= vel_amount * (note.velocity - 1) + 1;
 		vol *= note.layer_amp;
@@ -176,7 +177,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			SamplerVoice& voice = this->note.note[slot];
 			voice.current_buffer = 0;
 			voice.region = region;
-			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume * sample->volume;
+			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume.apply_modulation(voice.velocity, cc) * sample->volume; //FIXME
 			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
 			//TODO preload at start time

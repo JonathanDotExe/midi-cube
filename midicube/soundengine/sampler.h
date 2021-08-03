@@ -22,15 +22,11 @@ struct ModulateableProperty {
 	unsigned int cc = 0;
 	double cc_amount = 0;
 	double velocity_amount = 0;
-	double velocity_percent = 0;
 
 	inline double apply_modulation(double velocity, std::array<double, MIDI_CONTROL_COUNT>& cc_val) {
 		double val = value;
 		val += velocity * velocity_amount;
 		val += cc_val[cc] * cc_amount;
-		if (velocity_percent) {
-			val = val * (1 - velocity_percent) + val * velocity_percent * velocity;
-		}
 		return val;
 	}
 
@@ -98,7 +94,6 @@ struct SampleFilter {
 	ModulateableProperty filter_resonance{0};
 	double filter_kb_track = 0;
 	unsigned int filter_kb_track_note = 36;
-	double filter_velocity_amount = 0.0;
 };
 
 struct SampleEnvelope {
@@ -208,6 +203,7 @@ class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 private:
 	SampleSound* sample;
 	SampleRegionIndex index;
+	std::array<double, MIDI_CONTROL_COUNT> cc;
 
 	void set_sample (SampleSound* sample);
 
