@@ -388,7 +388,7 @@ void SfzSampleConverter::request_params() {
 	std::cin >> name;
 }
 
-static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::string name, std::string converted_name, pt::ptree& tree, std::string vel_name="") {
+static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::string name, std::string converted_name, pt::ptree& tree, std::string vel_name="", std::function<double (std::string)> value_converter = [](std::string str) { return std::stod(str); }, std::function<double (std::string)> mod_converter = [](std::string str) { return std::stod(str); }) {
 	if (opcode.first == name) {
 		tree.put(converted_name + ".value", std::stod(opcode.second));
 		return true;
@@ -406,6 +406,12 @@ static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::s
 }
 
 static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree) {
+	std::function<double(std::string)> filter_conv = [](std::string str) {
+		return invert_scale_cutoff(std::stod(str));
+	};
+	std::function<double(std::string)> filter_mod_conv = [](std::string str) {
+		return (invert_scale_cutoff(200) - invert_scale_cutoff(100)) * std::stod(str)/1200.0;
+	};
 	//Opcodes
 	for (auto opcode : opcodes) {
 		if (opcode.first == "amp_veltrack") {
@@ -483,7 +489,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 
 		}
 		//Filter
-		else if (parse_modulatable(opcode, "cutoff", "filter.cutoff", tree, "")) {
+		else if (parse_modulatable(opcode, "cutoff", "filter.cutoff", tree, "", filter_conv, filter_mod_conv)) {
 
 		}
 		//TODO tune
