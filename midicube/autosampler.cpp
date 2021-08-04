@@ -444,7 +444,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		else if (opcode.first == "hivel") {
 			tree.put("max_velocity", std::stoi(opcode.second));
 		}
-		else if (parse_modulatable(opcode, "volume", "volume", tree) || parse_modulatable(opcode, "group_volume", "volume", tree)) {
+		else if (parse_modulatable(opcode, "volume", "volume", tree) || parse_modulatable(opcode, "gain", "volume", tree) || parse_modulatable(opcode, "group_volume", "volume", tree)) {
 			//tree.put("volume.value", db_to_amp(std::stod(opcode.second)));
 		}
 		else if (opcode.first == "pitch_keytrack") {

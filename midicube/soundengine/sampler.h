@@ -23,12 +23,16 @@ struct ModulateableProperty {
 	double value = 0;
 	unsigned int cc = 0;
 	double cc_amount = 0;
+	double cc_multiplier = 1;
 	double velocity_amount = 0;
 
 	inline double apply_modulation(double velocity, std::array<double, MIDI_CONTROL_COUNT>& cc_val) {
 		double val = value;
 		val += velocity * velocity_amount;
 		val += cc_val[cc] * cc_amount;
+		if (cc_multiplier != 1) {
+			val *= (1 - cc_val[cc]) + cc_val[cc] * cc_multiplier;
+		}
 		return val;
 	}
 
@@ -41,6 +45,7 @@ struct ModulateableProperty {
 			value = parent.get<double>(path, def);
 			cc = 0;
 			cc_amount = 0;
+			cc_multiplier = 1;
 			velocity_amount = 0;
 		}
 	}
@@ -49,6 +54,7 @@ struct ModulateableProperty {
 		value = tree.get("value", def);
 		cc = tree.get("cc", cc);
 		cc_amount = tree.get("cc_amount", cc_amount);
+		cc_multiplier = tree.get("cc_multiplier", cc_multiplier);
 		velocity_amount = tree.get("velocity_amount", velocity_amount);
 	}
 
