@@ -388,6 +388,23 @@ void SfzSampleConverter::request_params() {
 	std::cin >> name;
 }
 
+static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::string name, std::string converted_name, pt::ptree& tree, std::string vel_name="") {
+	if (opcode.first == name) {
+		tree.put(converted_name + ".value", std::stod(opcode.second));
+		return true;
+	}
+	else if (opcode.first.rfind(name + "_oncc", 0) == 0) {
+		int cc = std::stoi(opcode.first.substr(name.size() + std::string("_oncc").size()));
+		tree.put(converted_name + ".cc", cc);
+		tree.put(converted_name + ".cc_amount", std::stod(opcode.second));
+		return true;
+	}
+	else if (opcode.first == vel_name) {
+		tree.put(converted_name + ".velocity_amount", std::stod(opcode.second));
+	}
+	return false;
+}
+
 static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree) {
 	//Opcodes
 	for (auto opcode : opcodes) {
