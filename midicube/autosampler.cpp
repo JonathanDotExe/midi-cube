@@ -411,17 +411,17 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		if (opcode.first == "amp_veltrack") {
 			tree.put("envelope.velocity_amount", std::stod(opcode.second)/100.0);
 		}
-		else if (opcode.first == "ampeg_attack") {
-			tree.put("envelope.attack.value", std::stod(opcode.second));
+		else if (parse_modulatable(opcode, "ampeg_attack", "envelope.attack", tree, "ampeg_vel2attack")) {
+
+		 }
+		else if (parse_modulatable(opcode, "ampeg_decay", "envelope.decay", tree, "ampeg_vel2decay")) {
+
 		}
-		else if (opcode.first == "ampeg_decay") {
-			tree.put("envelope.decay.value", std::stod(opcode.second));
+		else if (parse_modulatable(opcode, "ampeg_sustain", "envelope.sustain", tree, "ampeg_vel2sustain")) {
+
 		}
-		else if (opcode.first == "ampeg_sustain") {
-			tree.put("envelope.sustain.value", std::stod(opcode.second));
-		}
-		else if (opcode.first == "ampeg_release") {
-			tree.put("envelope.release.value", std::stod(opcode.second));
+		else if (parse_modulatable(opcode, "ampeg_release", "envelope.release", tree, "ampeg_vel2release")) {
+
 		}
 		else if (opcode.first == "lokey") {
 			tree.put("min_note", parse_sfz_note(opcode.second));
@@ -438,8 +438,8 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		else if (opcode.first == "hivel") {
 			tree.put("max_velocity", std::stoi(opcode.second));
 		}
-		else if (opcode.first == "volume" || opcode.first == "group_volume") {
-			tree.put("volume.value", db_to_amp(std::stod(opcode.second)));
+		else if (parse_modulatable(opcode, "volume", "volume", tree) || parse_modulatable(opcode, "group_volume", "volume", tree)) {
+			//tree.put("volume.value", db_to_amp(std::stod(opcode.second)));
 		}
 		else if (opcode.first == "pitch_keytrack") {
 			tree.put("pitch_keytrack", std::stod(opcode.second)/100.0);
@@ -479,12 +479,12 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		else if (opcode.first == "offset") {
 			tree.put("sample.start", std::stoi(opcode.second));
 		}
-		else if (opcode.first == "ampeg_hold") {
-			tree.put("envelope.attack_hold.value", std::stod(opcode.second));
+		else if (parse_modulatable(opcode, "ampeg_hold", "envelope.attack_hold", tree, "ampeg_vel2hold")) {
+
 		}
 		//Filter
-		else if (opcode.first == "cutoff") {
-			tree.put("filter.cutoff.value", invert_scale_cutoff(std::stod(opcode.second)));
+		else if (parse_modulatable(opcode, "cutoff", "filter.cutoff", tree, "")) {
+
 		}
 		//TODO tune
 		else {
