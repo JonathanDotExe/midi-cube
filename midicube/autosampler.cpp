@@ -388,19 +388,24 @@ void SfzSampleConverter::request_params() {
 	std::cin >> name;
 }
 
-static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::string name, std::string converted_name, pt::ptree& tree, std::string vel_name="", std::function<double (std::string)> value_converter = [](std::string str) { return std::stod(str); }, std::function<double (std::string)> mod_converter = [](std::string str) { return std::stod(str); }) {
+static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::string name, std::string converted_name, pt::ptree& tree, std::string vel_name="", std::function<double (std::string)> value_converter = [](std::string str) { return std::stod(str); }, std::function<double (std::string)> mod_converter = [](std::string str) { return std::stod(str); }, bool cc_multiplier = false) {
 	if (opcode.first == name) {
-		tree.put(converted_name + ".value", std::stod(opcode.second));
+		tree.put(converted_name + ".value", value_converter(opcode.second));
 		return true;
 	}
 	else if (opcode.first.rfind(name + "_oncc", 0) == 0) {
 		int cc = std::stoi(opcode.first.substr(name.size() + std::string("_oncc").size()));
 		tree.put(converted_name + ".cc", cc);
-		tree.put(converted_name + ".cc_amount", std::stod(opcode.second));
+		if (cc_multiplier) {
+			tree.put(converted_name + ".cc_multiplier", mod_converter(opcode.second));
+		}
+		else {
+			tree.put(converted_name + ".cc_amount", mod_converter(opcode.second));
+		}
 		return true;
 	}
 	else if (opcode.first == vel_name) {
-		tree.put(converted_name + ".velocity_amount", std::stod(opcode.second));
+		tree.put(converted_name + ".velocity_amount", mod_converter(opcode.second));
 	}
 	return false;
 }
@@ -411,6 +416,9 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 	};
 	std::function<double(std::string)> filter_mod_conv = [](std::string str) {
 		return (invert_scale_cutoff(200) - invert_scale_cutoff(100)) * std::stod(str)/1200.0;
+	};
+	std::function<double(std::string)> db_conv = [](std::string str) {
+		return db_to_amp(std::stod(str));
 	};
 	//Opcodes
 	for (auto opcode : opcodes) {
@@ -444,8 +452,8 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		else if (opcode.first == "hivel") {
 			tree.put("max_velocity", std::stoi(opcode.second));
 		}
-		else if (parse_modulatable(opcode, "volume", "volume", tree) || parse_modulatable(opcode, "gain", "volume", tree) || parse_modulatable(opcode, "group_volume", "volume", tree)) {
-			//tree.put("volume.value", db_to_amp(std::stod(opcode.second)));
+		else if (parse_modulatable(opcode, "volume", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "gain", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "group_volume", "volume", tree, "", db_conv, db_conv, true)) {
+
 		}
 		else if (opcode.first == "pitch_keytrack") {
 			tree.put("pitch_keytrack", std::stod(opcode.second)/100.0);
