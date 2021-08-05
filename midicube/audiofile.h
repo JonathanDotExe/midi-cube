@@ -126,7 +126,7 @@ struct StreamedAudioSample {
 			double sample2 = 0;
 			if (index2 >= head_samples.size()) {
 				if (lock.try_lock()) {
-					last_used = TIME_NOW();
+					//last_used = TIME_NOW();
 					sample1 = index1 < samples.size() ? samples[index1] : 0;
 					sample2 = index2 < samples.size() ? samples[index2] : 0;
 					lock.unlock();

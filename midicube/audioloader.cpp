@@ -57,7 +57,7 @@ void StreamedAudioPool::stop() {
 }
 
 void StreamedAudioPool::start() {
-	for (size_t i = 0; i < 1; ++i) {
+	for (size_t i = 0; i < 4; ++i) {
 		std::thread thread([this]() { run(); });
 		thread.detach();
 	}
