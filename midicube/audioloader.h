@@ -33,7 +33,8 @@ public:
 
 	StreamedAudioSample* load_sample(std::string fname);
 	void queue_request(LoadRequest request);
-	void run(bool gc);
+	void run();
+	void run_gc();
 	void stop();
 	void start();
 
