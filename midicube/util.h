@@ -171,7 +171,7 @@ public:
 	}
 
 	inline void unlock() {
-		flag.clear(std::memory_order_acquire);
+		flag.clear(std::memory_order_release);
 	}
 
 };
