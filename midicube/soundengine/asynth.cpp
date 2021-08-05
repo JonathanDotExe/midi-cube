@@ -444,6 +444,7 @@ static BindableADSREnvelopeData load_adsr(boost::property_tree::ptree tree) {
 
 	data.attack_hold.load(tree, "attack_hold", 0.0);
 	data.peak_volume.load(tree, "peak_volume", 1.0);
+	data.decay_volume.load(tree, "decay_volume", 1.0);
 	data.sustain_time.load(tree, "sustain_time", 0);
 	data.release_volume.load(tree, "release_volume", 0.0);
 
@@ -477,6 +478,7 @@ static boost::property_tree::ptree save_adsr(BindableADSREnvelopeData& data) {
 
 	data.attack_hold.save(tree, "attack_hold");
 	data.peak_volume.save(tree, "peak_volume");
+	data.decay_volume.save(tree, "decay_volume");
 	data.sustain_time.save(tree, "sustain_time");
 	data.release_volume.save(tree, "release_volume");
 	return tree;
