@@ -29,39 +29,24 @@ void StreamedAudioPool::queue_request(LoadRequest request) {
 	requests.push(request);
 }
 
-void StreamedAudioPool::run(bool gc) {
+void StreamedAudioPool::run() {
 	using namespace std::chrono_literals;
 	while (running) {
 		LoadRequest req;
 		if (requests.pop(req)) {
 			//Assumes that files don't change
 			//Open
-			req.sample->lock.lock();
-			req.sample->last_used = TIME_NOW();
 			if (!req.sample->loaded) {
+				req.sample->lock.lock();
+				req.sample->last_used = TIME_NOW();
 				SndfileHandle file(req.sample->path);
 				req.sample->samples = std::vector<float>(req.sample->total_size * req.sample->channels, 0);
 				file.read(&req.sample->samples[0], req.sample->samples.size());
 				req.sample->loaded = true;
+				req.sample->lock.unlock();
 			}
-			req.sample->lock.unlock();
 		}
 		else {
-			if (gc) {
-				//Garbage collect
-				unsigned int time = TIME_NOW();
-				gc_index %= samples.size();
-				StreamedAudioSample* sample = samples[gc_index];
-				if (sample->lock.try_lock()) {
-					if (sample->loaded && sample->last_used + 20000 < time) {
-						//Delete
-						sample->samples.clear();
-						sample->loaded = false;
-					}
-					sample->lock.unlock();
-				}
-				++gc_index;
-			}
 			std::this_thread::sleep_for(1ms);
 		}
 	}
@@ -72,8 +57,31 @@ void StreamedAudioPool::stop() {
 }
 
 void StreamedAudioPool::start() {
-	for (size_t i = 0; i < 4; ++i) {
-		std::thread thread([this, i]() { run(i == 0); });
+	for (size_t i = 0; i < 1; ++i) {
+		std::thread thread([this]() { run(); });
 		thread.detach();
+	}
+	std::thread thread([this]() { run_gc(); });
+	thread.detach();
+}
+
+void StreamedAudioPool::run_gc() {
+	while (running) {
+		//Garbage collect
+		unsigned int time = TIME_NOW();
+		gc_index %= samples.size();
+		StreamedAudioSample* sample = samples[gc_index];
+		if (sample->loaded) {
+			if (sample->lock.try_lock()) {
+				if (sample->loaded && sample->last_used + 60000 < time) {
+					//Delete
+					sample->samples.clear();
+					sample->loaded = false;
+				}
+				sample->lock.unlock();
+			}
+		}
+		++gc_index;
+		std::this_thread::sleep_for(100ms);
 	}
 }

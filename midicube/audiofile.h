@@ -95,7 +95,7 @@ struct StreamedAudioSample {
 	std::string path;
 	std::array<float, STREAM_AUDIO_CHUNK_SIZE> head_samples = {};
 	SpinLock lock;
-	bool loaded = false;
+	std::atomic<bool> loaded{false};
 	unsigned int last_used = 0;
 	std::vector<float> samples;
 

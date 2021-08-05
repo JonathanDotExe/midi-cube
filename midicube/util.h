@@ -14,7 +14,7 @@
 #include <boost/smart_ptr/detail/spinlock.hpp>
 #include <thread>
 #include <chrono>
-//#include <emmintrin.h>
+#include <emmintrin.h>
 
 
 template<class T, std::size_t N> class CircularBuffer {
@@ -142,7 +142,7 @@ public:
 			if (try_lock()) {
 				return;
 			}
-//			_mm_pause();
+			_mm_pause();
 		}
 		//Spin with yield
 		while (true) {
@@ -151,16 +151,16 @@ public:
 					return;
 				}
 
-//				_mm_pause();
-//				_mm_pause();
-//				_mm_pause();
-//				_mm_pause();
-//				_mm_pause();
-//				_mm_pause();
-//				_mm_pause();
-//				_mm_pause();
-//				_mm_pause();
-//				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
+				_mm_pause();
 			}
 			std::this_thread::yield();
 		}
