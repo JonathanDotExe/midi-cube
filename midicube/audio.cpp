@@ -5,7 +5,6 @@
  *      Author: jojo
  */
 #include "audio.h"
-#include <pa_linux_alsa.h>
 #include <math.h>
 #include <iostream>
 
@@ -13,78 +12,71 @@
 #define _countof(arr) (sizeof(arr)/sizeof(arr[0]))
 #endif
 
-int g_process(const void* input_buffer, void* output_buffer, long unsigned int buffer_size, const PaStreamCallbackTimeInfo* time, PaStreamCallbackFlags status, void* arg) {
+int g_process(void* output_buffer, void* input_buffer, unsigned int buffer_size, double time, RtAudioStreamStatus status, void* arg) {
 	AudioHandler* handler = (AudioHandler*) arg;
-	return handler->process((const float*) input_buffer, (float*) output_buffer, buffer_size);
+	return handler->process((double*) output_buffer, (double*) input_buffer, buffer_size, time);
 }
 
 void AudioHandler::init(int out_device, int in_device) {
-	PaError paerr;
-	paerr = Pa_Initialize();
-	if (paerr != paNoError) {
-		throw AudioException(Pa_GetErrorText(paerr));
-	}
-	const size_t device_count = Pa_GetDeviceCount();
-	//List devices
-	for (size_t i = 0; i < device_count; ++i) {
-		const PaDeviceInfo* info = Pa_GetDeviceInfo(i);
-		std::cout << i << ": " << info->name << " " << info->maxOutputChannels << " outs " << info->maxInputChannels<< " ins " << Pa_GetHostApiInfo(info->hostApi)->name << std::endl;
-	}
-	if ((int) device_count <= std::max(std::max(out_device, in_device), 0)) {
+	if ((int) audio.getDeviceCount() <= std::max(std::max(out_device, in_device), 0)) {
 		throw AudioException("No audio devices detected");
 	}
+	//List devices
+	for (size_t i = 0; i < audio.getDeviceCount(); ++i) {
+		RtAudio::DeviceInfo info = audio.getDeviceInfo(i);
+		std::cout << i << ": " << info.name << " " << info.outputChannels << " outs " << info.inputChannels << " ins" << std::endl;
+	}
+
+	//Set up options
+	RtAudio::StreamOptions options;
+	options.flags = options.flags | RTAUDIO_SCHEDULE_REALTIME;
+	options.priority = 90;
 
 	//Set up output
-	PaStreamParameters params;
-	params.device = out_device >= 0 ? out_device : Pa_GetDefaultOutputDevice();
-	params.sampleFormat = paFloat32;
-	const PaDeviceInfo* out_info = Pa_GetDeviceInfo(params.device);
-	params.suggestedLatency = out_info->defaultLowOutputLatency;
-	params.channelCount = 2;
-	params.hostApiSpecificStreamInfo = NULL;
+	RtAudio::StreamParameters params;
+	params.deviceId = out_device >= 0 ? out_device : audio.getDefaultOutputDevice();
+	params.nChannels = 2;
+	params.firstChannel = 0;
 
 	//Set up input
-	PaStreamParameters input_params;
-	input_params.device = in_device >= 0 ? in_device : Pa_GetDefaultInputDevice();
-	input_params.sampleFormat = paFloat32;
-	const PaDeviceInfo* in_info = Pa_GetDeviceInfo(input_params.device);
-	input_params.suggestedLatency = in_info->defaultLowInputLatency;
-	input_params.channelCount = 1;
-	input_params.hostApiSpecificStreamInfo = NULL;
+	RtAudio::StreamParameters input_params;
+	input_params.deviceId = in_device >= 0 ? in_device : audio.getDefaultInputDevice();
+	input_params.nChannels = 1;
+	input_params.firstChannel = 0;
 
 	sample_rate = 48000;
 	time_step = 1.0/sample_rate;
-	buffer_size = 64;
+	buffer_size = 256;
 
 	input = in_device >= 0;
 
-	std::cout << "Using output device " << out_info->name << " with two channels" << std::endl;
+	RtAudio::DeviceInfo out_info = audio.getDeviceInfo(params.deviceId);
+	std::cout << "Using output device " << out_info.name << " with two channels" << std::endl;
 
 	if (input) {
-		std::cout << "Using input device " << in_info->name << " with one channels" << std::endl;
+		RtAudio::DeviceInfo in_info = audio.getDeviceInfo(params.deviceId);
+		std::cout << "Using input device " << in_info.name << " with one channels" << std::endl;
 	}
 	else {
 		std::cout << "Using no input device" << std::endl;
 	}
 
-	paerr = Pa_OpenStream(&this->stream, input ? &input_params : NULL, &params, sample_rate, buffer_size, paNoFlag, &g_process, this);
-	if (paerr != paNoError) {
-		throw AudioException(Pa_GetErrorText(paerr));
+	try {
+		audio.openStream(&params, input ? &input_params : nullptr, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
+		audio.startStream();
+		sample_rate = audio.getStreamSampleRate();
+		time_step = 1.0/sample_rate;
+		std::cout << "Opened audio stream Sample Rate: " << sample_rate << " Hz ... Buffer Size: " << buffer_size << std::endl;
 	}
-	PaAlsa_EnableRealtimeScheduling(stream, 90);
-	paerr = Pa_StartStream(this->stream);
-	if (paerr != paNoError) {
-		throw AudioException(Pa_GetErrorText(paerr));
+	catch (RtAudioError& e) {
+		throw AudioException(e.getMessage().c_str());
 	}
-
-	sample_rate = Pa_GetStreamInfo(this->stream)->sampleRate;
-	time_step = 1.0/sample_rate;
-	std::cout << "Opened audio stream Sample Rate: " << sample_rate << " Hz ... Buffer Size: " << buffer_size << std::endl;
 };
 
-int AudioHandler::process(const float* input_buffer, float* output_buffer, unsigned int buffer_size) {
+int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned int buffer_size, double t) {
 	SampleInfo info;
 	//Compute each sample
+	//TODO Use rtaudio time
 	for (size_t i = 0; i < buffer_size; ++i) {
 		double in = input ? *input_buffer++ : 0;
 		info = {time, time_step, sample_rate, sample_time, in};
@@ -100,12 +92,13 @@ int AudioHandler::process(const float* input_buffer, float* output_buffer, unsig
 		this->time += time_step;
 		++sample_time;
 	}
-	return paContinue;
+	return 0;
 };
 
 void AudioHandler::close() {
-	Pa_CloseStream(stream);
-	Pa_Terminate();
+	if (audio.isStreamOpen()) {
+		audio.closeStream();
+	}
 };
 
 void AudioHandler::set_sample_callback(void (* get_sample) (double&, double&, SampleInfo&, void*), void* user_data) {
