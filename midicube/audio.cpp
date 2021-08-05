@@ -44,7 +44,7 @@ void AudioHandler::init(int out_device, int in_device) {
 	input_params.nChannels = 1;
 	input_params.firstChannel = 0;
 
-	sample_rate = 48000;
+	sample_rate = 44100;
 	time_step = 1.0/sample_rate;
 	buffer_size = 256;
 
