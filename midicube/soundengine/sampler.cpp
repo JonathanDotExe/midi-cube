@@ -6,6 +6,7 @@
  */
 
 #include "sampler.h"
+#include "../sfz.cpp"
 #include <iostream>
 #include <fstream>
 #include <boost/property_tree/ptree.hpp>
@@ -38,9 +39,18 @@ SampleSound* SampleSoundStore::get_sound(size_t index) {
 void SampleSoundStore::load_sounds(std::string folder) {
 	//Read folders
 	std::regex reg(".*\\.xml");
+	std::regex sfz_reg(".*\\.sfz");
 	for (const auto& f : boost::filesystem::directory_iterator(folder)) {
 		std::string file = f.path().string();
 		if (boost::filesystem::is_directory(file)) {
+			//Convert sfz files
+			for (const auto& i : boost::filesystem::directory_iterator(file)) {
+				std::string name = i.path().string();
+				if (std::regex_match(name, sfz_reg)) {
+					convert_sfz_to_sampler(name, file + "/" + i.path().stem() + "xml", i.path().stem());
+				}
+			}
+			//Load xml files
 			for (const auto& i : boost::filesystem::directory_iterator(file)) {
 				std::string name = i.path().string();
 				if (std::regex_match(name, reg)) {
