@@ -181,6 +181,7 @@ struct SampleRegionIndex {
 
 class SampleSound {
 public:
+	std::string default_path = "./";
 	std::string name = "Sample";
 	double volume = 1;
 	std::vector<SampleRegion*> samples = {};

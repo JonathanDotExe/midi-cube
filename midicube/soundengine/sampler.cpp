@@ -412,10 +412,17 @@ extern SampleSound* load_sound(std::string folder, StreamedAudioPool& pool) {
 		//Parse
 		sound = new SampleSound();
 		sound->name = tree.get<std::string>("sound.name", "Sound");
+		sound->default_path = tree.get<std::string>("sound.default_path", ".");
 		sound->volume = tree.get<double>("sound.master_volume", 1);
 		SampleRegion master;
 		if (tree.get_child_optional("sound")) {
 			load_region(tree.get_child("sound"), master, false, folder, pool);
+		}
+		if (sound->default_path.rfind("/", 0) == 0) { //FIXME
+			folder = sound->default_path;
+		}
+		else {
+			folder += "/" + sound->default_path;
 		}
 		//Load groups
 		auto groups = tree.get_child_optional("sound.groups");
