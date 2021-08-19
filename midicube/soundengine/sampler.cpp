@@ -43,7 +43,7 @@ void SampleSoundStore::load_sounds(std::string folder) {
 		if (boost::filesystem::is_directory(file)) {
 			for (const auto& i : boost::filesystem::directory_iterator(file)) {
 				std::string name = i.path().string();
-				if (std::regex_match(file, reg)) {
+				if (std::regex_match(name, reg)) {
 					SampleSound* s = load_sound(name, file, pool);
 					if (s) {
 						samples.push_back(s);
@@ -75,7 +75,9 @@ SampleSoundStore::~SampleSoundStore() {
 
 //Sampler
 Sampler::Sampler() {
-	set_sample(global_sample_store.get_sound(0));
+	if (global_sound_store.get_sounds().size() > 0) {
+		set_sample(global_sample_store.get_sound(0));
+	}
 }
 
 inline size_t find_floor_block(double time, unsigned int sample_rate, size_t size) {
@@ -417,7 +419,7 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 	pt::ptree tree;
 	SampleSound* sound = nullptr;
 	try {
-		pt::read_xml(folder + "/" + file, tree);
+		pt::read_xml(file, tree);
 
 		//Parse
 		sound = new SampleSound();
