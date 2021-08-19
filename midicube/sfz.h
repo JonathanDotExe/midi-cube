@@ -5,6 +5,9 @@
  *      Author: jojo
  */
 
+#ifndef MIDICUBE_SFZ_H_
+#define MIDICUBE_SFZ_H_
+
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -40,3 +43,4 @@ public:
 
 void convert_sfz_to_sampler(std::string src, std::string dst, std::string name);
 
+#endif
