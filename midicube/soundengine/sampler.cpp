@@ -11,6 +11,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>
+#include <regex>
 
 namespace pt = boost::property_tree;
 
@@ -35,11 +36,20 @@ SampleSound* SampleSoundStore::get_sound(size_t index) {
 }
 
 void SampleSoundStore::load_sounds(std::string folder) {
+	//Read folders
+	std::regex reg(".*\\.xml");
 	for (const auto& f : boost::filesystem::directory_iterator(folder)) {
 		std::string file = f.path().string();
-		SampleSound* s = load_sound(file, pool);
-		if (s) {
-			samples.push_back(s);
+		if (boost::filesystem::is_directory(file)) {
+			for (const auto& i : boost::filesystem::directory_iterator(file)) {
+				std::string name = i.path().string();
+				if (std::regex_match(file, reg)) {
+					SampleSound* s = load_sound(name, file, pool);
+					if (s) {
+						samples.push_back(s);
+					}
+				}
+			}
 		}
 	}
 }
@@ -402,12 +412,12 @@ void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegi
 	}
 }
 
-extern SampleSound* load_sound(std::string folder, StreamedAudioPool& pool) {
+extern SampleSound* load_sound(std::string file, std::string folder, StreamedAudioPool& pool) {
 	//Load file
 	pt::ptree tree;
 	SampleSound* sound = nullptr;
 	try {
-		pt::read_xml(folder + "/sound.xml", tree);
+		pt::read_xml(folder + "/" + file, tree);
 
 		//Parse
 		sound = new SampleSound();

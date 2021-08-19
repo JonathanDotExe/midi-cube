@@ -532,6 +532,7 @@ void SfzSampleConverter::convert() {
 	//Name
 	sound.put("name", name);
 	parse_opcodes(instrument.global, sound);
+	parse_control_opcodes(instrument.control, sound);
 
 	//Groups
 	for (SfzGroup group : instrument.groups) {
