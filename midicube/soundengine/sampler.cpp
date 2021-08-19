@@ -75,7 +75,7 @@ SampleSoundStore::~SampleSoundStore() {
 
 //Sampler
 Sampler::Sampler() {
-	if (global_sound_store.get_sounds().size() > 0) {
+	if (global_sample_store.get_sounds().size() > 0) {
 		set_sample(global_sample_store.get_sound(0));
 	}
 }
