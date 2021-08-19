@@ -75,7 +75,7 @@ unsigned int parse_sfz_note(std::string text) {
 }
 
 enum ParserMode {
-	NONE, GLOBAL, GROUP, REGION
+	NONE, GLOBAL, CONTROL, GROUP, REGION
 };
 
 SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path) {
@@ -165,6 +165,9 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 			else if (token == "<global>") {
 				mode = GLOBAL;
 			}
+			else if (token == "<control>") {
+				mode = CONTROL;
+			}
 			//Attribute
 			else {
 				size_t index = token.find("=");
@@ -178,6 +181,9 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 						break;
 					case GLOBAL:
 						instrument.global[opcode] = value;
+						break;
+					case CONTROL:
+						instrument.control[opcode] = value;
 						break;
 					case GROUP:
 						instrument.groups.at(instrument.groups.size() - 1).opcodes[opcode] = value;

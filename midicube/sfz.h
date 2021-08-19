@@ -20,6 +20,7 @@ struct SfzGroup {
 
 struct SfzInstrument {
 	std::unordered_map<std::string, std::string> global;
+	std::unordered_map<std::string, std::string> control;
 	std::vector<SfzGroup> groups;
 };
 

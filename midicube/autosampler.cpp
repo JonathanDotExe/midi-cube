@@ -508,6 +508,14 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 	}
 }
 
+static void parse_control_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree) {
+	for (auto opcode : opcodes) {
+		if (opcode.first == "default_path") {
+			tree.put("default_path", opcode.second);
+		}
+	}
+}
+
 void SfzSampleConverter::convert() {
 	std::fstream f(src);
 	std::vector<std::string> lines;
