@@ -1,1 +1,1 @@
-./build/midi-cube 4 4 0 > midicube_log.txt 2>&1
+./build/midi-cube 5 -1 0 > midicube_log.txt 2>&1

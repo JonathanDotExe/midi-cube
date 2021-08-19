@@ -1,4 +1,4 @@
-4
+5
 -1
 0
 Couldn't load ./data/samples/samples.zip/sound.xml: cannot open file
@@ -53,6 +53,14 @@ Program 2
 Load
 Program 2
 Load
+Program 2
+Load
+Program 0
+Load
+Program 2
+Load
+Program 1
+Load
 Loaded bank Default
 Program 0
 Load
@@ -71,19 +79,17 @@ Applying preset
 Selected program: Invisible Touch
 Opening MIDI port: Midi Through:Midi Through Port-0 14:0
 Registering callback
-Opening MIDI port: Steinberg UR22mkII:Steinberg UR22mkII MIDI 1 20:0
+Opening MIDI port: Steinberg UR22mkII:Steinberg UR22mkII MIDI 1 24:0
 Registering callback
 0: hw:HD-Audio Generic,3 8 outs 0 ins
 1: hw:HD-Audio Generic,7 8 outs 0 ins
 2: hw:HD-Audio Generic,8 8 outs 0 ins
 3: hw:HD-Audio Generic,9 8 outs 0 ins
-4: hw:Steinberg UR22mkII,0 2 outs 2 ins
-5: hw:HD-Audio Generic,0 2 outs 2 ins
+4: hw:HD-Audio Generic,0 2 outs 2 ins
+5: hw:Steinberg UR22mkII,0 2 outs 2 ins
 6: default 32 outs 32 ins
 Using output device hw:Steinberg UR22mkII,0 with two channels
 Using no input device
 Opened audio stream Sample Rate: 48000 Hz ... Buffer Size: 64
 Setting vertical sync not supported
-Applying preset
-Applying preset
-Selected program: Its My Life
+Selected program: Splendid Grand
