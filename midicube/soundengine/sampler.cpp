@@ -168,7 +168,6 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		}
 		vel_amount += note.region->env.velocity_amount.apply_modulation(note.velocity, cc);
 
-		vol *= vel_amount * (note.velocity - 1) + 1;
 		vol *= note.layer_amp  * note.region->volume.apply_modulation(note.velocity, cc);
 
 		//Playback
@@ -197,7 +196,6 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 		for (SampleRegion* region : index.velocities[velocity * 127][note]) {
 			size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
 			SamplerVoice& voice = this->note.note[slot];
-			voice.current_buffer = 0;
 			voice.region = region;
 			voice.layer_amp = (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0)) * sample->volume; //FIXME
 			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME

@@ -67,9 +67,9 @@ struct ModulatableADSREnvelopeData {
 	ModulateableProperty release{0.0005};
 
 	ADSREnvelopeShape attack_shape = ADSREnvelopeShape::LINEAR_ADSR;
-	ADSREnvelopeShape pre_decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
-	ADSREnvelopeShape decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
-	ADSREnvelopeShape release_shape = ADSREnvelopeShape::ANALOG_ADSR;
+	ADSREnvelopeShape pre_decay_shape = ADSREnvelopeShape::EXPONENTIAL_ADSR;
+	ADSREnvelopeShape decay_shape = ADSREnvelopeShape::EXPONENTIAL_ADSR;
+	ADSREnvelopeShape release_shape = ADSREnvelopeShape::EXPONENTIAL_ADSR;
 
 	ModulateableProperty hold{0};
 	ModulateableProperty pre_decay{0};
@@ -170,9 +170,6 @@ struct SamplerVoice : public TriggeredNote {
 	WaveTableADSREnvelope env;
 	Filter lfilter;
 	Filter rfilter;
-	size_t current_buffer = 0;
-	size_t floor_block = 0;
-	size_t ceil_block = 0;
 };
 
 struct SampleRegionIndex {
