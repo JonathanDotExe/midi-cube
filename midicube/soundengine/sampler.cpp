@@ -47,7 +47,7 @@ void SampleSoundStore::load_sounds(std::string folder) {
 			for (const auto& i : boost::filesystem::directory_iterator(file)) {
 				std::string name = i.path().string();
 				if (std::regex_match(name, sfz_reg)) {
-					convert_sfz_to_sampler(name, file + "/" + i.path().stem().string() + ".xml", i.path().stem().string());
+					convert_sfz_to_sampler(name, file, file + "/" + i.path().stem().string() + ".xml", i.path().stem().string());
 				}
 			}
 			//Load xml files
@@ -197,7 +197,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 			size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
 			SamplerVoice& voice = this->note.note[slot];
 			voice.region = region;
-			voice.layer_amp = (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0)) * sample->volume; //FIXME
+			voice.layer_amp = sample->volume; //FIXME
 			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
 			//TODO preload at start time

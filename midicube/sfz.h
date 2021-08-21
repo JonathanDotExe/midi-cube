@@ -41,6 +41,6 @@ public:
 
 };
 
-void convert_sfz_to_sampler(std::string src, std::string dst, std::string name);
+void convert_sfz_to_sampler(std::string src, std::string folder, std::string dst, std::string name);
 
 #endif

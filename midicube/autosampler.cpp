@@ -389,5 +389,6 @@ void SfzSampleConverter::request_params() {
 }
 
 void SfzSampleConverter::convert() {
-	convert_sfz_to_sampler(src, dst, name);
+	boost::filesystem::path p(src);
+	convert_sfz_to_sampler(src, p.parent_path().string(), dst, name);
 }

@@ -349,7 +349,7 @@ static void parse_control_opcodes(std::unordered_map<std::string, std::string> o
 	}
 }
 
-void convert_sfz_to_sampler(std::string src, std::string dst, std::string name) {
+void convert_sfz_to_sampler(std::string src, std::string folder, std::string dst, std::string name) {
 	SfzParser parser;
 	std::fstream f(src);
 	std::vector<std::string> lines;
