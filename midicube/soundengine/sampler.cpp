@@ -47,7 +47,7 @@ void SampleSoundStore::load_sounds(std::string folder) {
 			for (const auto& i : boost::filesystem::directory_iterator(file)) {
 				std::string name = i.path().string();
 				if (std::regex_match(name, sfz_reg)) {
-					convert_sfz_to_sampler(name, file + "/" + i.path().stem().string() + "xml", i.path().stem().string());
+					convert_sfz_to_sampler(name, file + "/" + i.path().stem().string() + ".xml", i.path().stem().string());
 				}
 			}
 			//Load xml files

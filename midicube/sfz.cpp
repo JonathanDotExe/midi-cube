@@ -22,20 +22,25 @@ namespace pt = boost::property_tree;
 unsigned int parse_sfz_note(std::string text) {
 	unsigned int note = 0;
 	boost::to_lower(text);
+	boost::replace_all(text, "c#", "db");
+	boost::replace_all(text, "d#", "eb");
+	boost::replace_all(text, "f#", "gb");
+	boost::replace_all(text, "g#", "ab");
+	boost::replace_all(text, "a#", "bb");
 
 	size_t len = 1;
 	bool found = true;
 	if (text.rfind("c", 0) == 0) {
 		note = 0;
 	}
-	else if (text.rfind("c#", 0) == 0 || text.rfind("db", 0) == 0) {
+	else if (text.rfind("db", 0) == 0) {
 		len = 2;
 		note = 1;
 	}
 	else if (text.rfind("d", 0) == 0) {
 		note = 2;
 	}
-	else if (text.rfind("d#", 0) == 0 || text.rfind("eb", 0) == 0) {
+	else if (text.rfind("eb", 0) == 0) {
 		len = 2;
 		note = 3;
 	}
@@ -45,21 +50,21 @@ unsigned int parse_sfz_note(std::string text) {
 	else if (text.rfind("f", 0) == 0) {
 		note = 5;
 	}
-	else if (text.rfind("f#", 0) == 0 || text.rfind("gb", 0) == 0) {
+	else if (text.rfind("gb", 0) == 0) {
 		len = 2;
 		note = 6;
 	}
 	else if (text.rfind("g", 0) == 0) {
 		note = 7;
 	}
-	else if (text.rfind("g#", 0) == 0 || text.rfind("ab", 0) == 0) {
+	else if (text.rfind("ab", 0) == 0) {
 		len = 2;
 		note = 8;
 	}
 	else if (text.rfind("a", 0) == 0) {
 		note = 9;
 	}
-	else if (text.rfind("a#", 0) == 0 || text.rfind("bb", 0) == 0) {
+	else if (text.rfind("bb", 0) == 0) {
 		len = 2;
 		note = 10;
 	}
@@ -378,10 +383,10 @@ void convert_sfz_to_sampler(std::string src, std::string dst, std::string name) 
 	tree.add_child("sound", sound);
 	//Save to file
 	try {
-		pt::write_xml(dst + "/sound.xml", tree);
+		pt::write_xml(dst, tree);
 		std::cout << "Finished converting sound" << name << "!" << std::endl;
 	}
 	catch (pt::xml_parser_error& e) {
-		std::cerr << "Couldn't save file!" << std::endl;
+		std::cerr << "Couldn't save file " << dst << "!" << std::endl;
 	}
 }
