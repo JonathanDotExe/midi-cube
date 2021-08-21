@@ -244,88 +244,94 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 	};
 	//Opcodes
 	for (auto opcode : opcodes) {
-		if (opcode.first == "amp_veltrack") {
-			tree.put("envelope.velocity_amount", std::stod(opcode.second)/100.0);
-		}
-		else if (parse_modulatable(opcode, "ampeg_attack", "envelope.attack", tree, "ampeg_vel2attack")) {
+		try {
+			if (opcode.first == "amp_veltrack") {
+				tree.put("envelope.velocity_amount", std::stod(opcode.second)/100.0);
+			}
+			else if (parse_modulatable(opcode, "ampeg_attack", "envelope.attack", tree, "ampeg_vel2attack")) {
 
-		 }
-		else if (parse_modulatable(opcode, "ampeg_decay", "envelope.decay", tree, "ampeg_vel2decay")) {
+			 }
+			else if (parse_modulatable(opcode, "ampeg_decay", "envelope.decay", tree, "ampeg_vel2decay")) {
 
-		}
-		else if (parse_modulatable(opcode, "ampeg_sustain", "envelope.sustain", tree, "ampeg_vel2sustain")) {
+			}
+			else if (parse_modulatable(opcode, "ampeg_sustain", "envelope.sustain", tree, "ampeg_vel2sustain")) {
 
-		}
-		else if (parse_modulatable(opcode, "ampeg_release", "envelope.release", tree, "ampeg_vel2release")) {
+			}
+			else if (parse_modulatable(opcode, "ampeg_release", "envelope.release", tree, "ampeg_vel2release")) {
 
-		}
-		else if (opcode.first == "lokey") {
-			tree.put("min_note", parse_sfz_note(opcode.second));
-		}
-		else if (opcode.first == "hikey") {
-			tree.put("max_note", parse_sfz_note(opcode.second));
-		}
-		else if (opcode.first == "pitch_keycenter") {
-			tree.put("note", parse_sfz_note(opcode.second));
-		}
-		else if (opcode.first == "lovel") {
-			tree.put("min_velocity", std::stoi(opcode.second));
-		}
-		else if (opcode.first == "hivel") {
-			tree.put("max_velocity", std::stoi(opcode.second));
-		}
-		else if (parse_modulatable(opcode, "volume", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "gain", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "group_volume", "volume", tree, "", db_conv, db_conv, true)) {
+			}
+			else if (opcode.first == "lokey") {
+				tree.put("min_note", parse_sfz_note(opcode.second));
+			}
+			else if (opcode.first == "hikey") {
+				tree.put("max_note", parse_sfz_note(opcode.second));
+			}
+			else if (opcode.first == "pitch_keycenter") {
+				tree.put("note", parse_sfz_note(opcode.second));
+			}
+			else if (opcode.first == "lovel") {
+				tree.put("min_velocity", std::stoi(opcode.second));
+			}
+			else if (opcode.first == "hivel") {
+				tree.put("max_velocity", std::stoi(opcode.second));
+			}
+			else if (parse_modulatable(opcode, "volume", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "gain", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "group_volume", "volume", tree, "", db_conv, db_conv, true)) {
 
-		}
-		else if (opcode.first == "pitch_keytrack") {
-			tree.put("pitch_keytrack", std::stod(opcode.second)/100.0);
-		}
-		else if (opcode.first == "rt_decay") {
-			tree.put("release_decay", db_to_amp(-std::stod(opcode.second)));
-		}
-		else if (opcode.first == "trigger") {
-			tree.put("trigger", opcode.second);
-			if (opcode.second != "attack") {
-				tree.put("envelope.sustain_entire_sample", true);
+			}
+			else if (opcode.first == "pitch_keytrack") {
+				tree.put("pitch_keytrack", std::stod(opcode.second)/100.0);
+			}
+			else if (opcode.first == "rt_decay") {
+				tree.put("release_decay", db_to_amp(-std::stod(opcode.second)));
+			}
+			else if (opcode.first == "trigger") {
+				tree.put("trigger", opcode.second);
+				if (opcode.second != "attack") {
+					tree.put("envelope.sustain_entire_sample", true);
+				}
+			}
+			else if (opcode.first == "sample") {
+				std::string path = opcode.second;
+				boost::replace_all(path, "\\", "/");
+				tree.put("sample.name", path);
+			}
+			else if (opcode.first == "loop_mode") {
+				if (opcode.second == "one_shot") {
+					tree.put("envelope.sustain_entire_sample", true);
+					tree.put("loop_type", "no_loop");
+				}
+				else if (opcode.second == "no_loop") {
+					tree.put("loop_type", "no_loop");
+				}
+				else if (opcode.second == "loop_continuous") {
+					tree.put("loop_type", "attack_loop");
+				}
+			}
+			else if (opcode.first == "loop_start") {
+				tree.put("sample.loop_start", std::stoi(opcode.second));
+			}
+			else if (opcode.first == "loop_end") {
+				tree.put("sample.loop_end", std::stoi(opcode.second));
+			}
+			else if (opcode.first == "offset") {
+				tree.put("sample.start", std::stoi(opcode.second));
+			}
+			else if (parse_modulatable(opcode, "ampeg_hold", "envelope.attack_hold", tree, "ampeg_vel2hold")) {
+
+			}
+			//Filter
+			else if (parse_modulatable(opcode, "cutoff", "filter.cutoff", tree, "", filter_conv, filter_mod_conv)) {
+
+			}
+			//TODO tune
+			else {
+				std::cout << "Skipping unrecognized opcode " << opcode.first << "="
+						<< opcode.second << std::endl;
 			}
 		}
-		else if (opcode.first == "sample") {
-			std::string path = opcode.second;
-			boost::replace_all(path, "\\", "/");
-			tree.put("sample.name", path);
-		}
-		else if (opcode.first == "loop_mode") {
-			if (opcode.second == "one_shot") {
-				tree.put("envelope.sustain_entire_sample", true);
-				tree.put("loop_type", "no_loop");
-			}
-			else if (opcode.second == "no_loop") {
-				tree.put("loop_type", "no_loop");
-			}
-			else if (opcode.second == "loop_continuous") {
-				tree.put("loop_type", "attack_loop");
-			}
-		}
-		else if (opcode.first == "loop_start") {
-			tree.put("sample.loop_start", std::stoi(opcode.second));
-		}
-		else if (opcode.first == "loop_end") {
-			tree.put("sample.loop_end", std::stoi(opcode.second));
-		}
-		else if (opcode.first == "offset") {
-			tree.put("sample.start", std::stoi(opcode.second));
-		}
-		else if (parse_modulatable(opcode, "ampeg_hold", "envelope.attack_hold", tree, "ampeg_vel2hold")) {
-
-		}
-		//Filter
-		else if (parse_modulatable(opcode, "cutoff", "filter.cutoff", tree, "", filter_conv, filter_mod_conv)) {
-
-		}
-		//TODO tune
-		else {
-			std::cout << "Skipping unrecognized opcode " << opcode.first << "="
-					<< opcode.second << std::endl;
+		catch (std::invalid_argument& e) {
+			std::cout << "Couldn't convert opcode " << opcode.first << "="
+									<< opcode.second << std::endl;
 		}
 	}
 }
@@ -349,7 +355,7 @@ void convert_sfz_to_sampler(std::string src, std::string dst, std::string name) 
 	}
 
 	SfzInstrument instrument = parser.parse(lines, dst);
-	std::cout << "Loaded instrument" << std::endl;
+	std::cout << "Loaded sfz instrument " << name << std::endl;
 	pt::ptree tree;
 	pt::ptree sound;
 	//Name
@@ -370,11 +376,10 @@ void convert_sfz_to_sampler(std::string src, std::string dst, std::string name) 
 		sound.add_child("groups.group", g);
 	}
 	tree.add_child("sound", sound);
-
 	//Save to file
 	try {
 		pt::write_xml(dst + "/sound.xml", tree);
-		std::cout << "Finished converting sound!" << std::endl;
+		std::cout << "Finished converting sound" << name << "!" << std::endl;
 	}
 	catch (pt::xml_parser_error& e) {
 		std::cerr << "Couldn't save file!" << std::endl;
