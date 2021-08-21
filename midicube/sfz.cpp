@@ -359,7 +359,7 @@ void convert_sfz_to_sampler(std::string src, std::string folder, std::string dst
 		lines.push_back(t);
 	}
 
-	SfzInstrument instrument = parser.parse(lines, dst);
+	SfzInstrument instrument = parser.parse(lines, folder);
 	std::cout << "Loaded sfz instrument " << name << std::endl;
 	pt::ptree tree;
 	pt::ptree sound;
