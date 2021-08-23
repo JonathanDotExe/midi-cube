@@ -166,9 +166,11 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 			ADSREnvelopeData data = note.region->env.env.apply(note.velocity, cc);
 			vol = note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
 		}
-		vel_amount += note.region->env.velocity_amount.apply_modulation(note.velocity, cc);
+		vel_amount = note.region->env.velocity_amount.apply_modulation(note.velocity, cc);
 
+		vol *= (1 - vel_amount) + note.velocity * vel_amount;
 		vol *= note.layer_amp  * note.region->volume.apply_modulation(note.velocity, cc);
+
 
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
