@@ -110,7 +110,7 @@ struct SampleControl {
 	unsigned int cc = 0;
 	double default_value = 0;
 	std::string name = "Control";
-	bool saved = false;
+	bool save = false;
 };
 
 enum LoopType {

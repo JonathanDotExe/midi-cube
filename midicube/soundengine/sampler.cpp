@@ -429,6 +429,13 @@ void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegi
 	}
 }
 
+void load_control(pt::ptree tree, SampleControl& control) {
+	control.cc = tree.get("cc", control.cc);
+	control.default_value = tree.get("default_value", control.default_value);
+	control.name = tree.get("name", control.name);
+	control.save = tree.get("save", control.save);
+}
+
 extern SampleSound* load_sound(std::string file, std::string folder, StreamedAudioPool& pool) {
 	//Load file
 	pt::ptree tree;
@@ -450,6 +457,15 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 		}
 		else {
 			folder += "/" + sound->default_path;
+		}
+		//Load controls
+		auto controls = tree.get_child_optional("sound.controls");
+		if (controls) {
+			for (auto child : controls.get()) {
+				SampleControl control;
+				load_control(child.second, control);
+				sound->controls.push_back(control);
+			}
 		}
 		//Load groups
 		auto groups = tree.get_child_optional("sound.groups");
