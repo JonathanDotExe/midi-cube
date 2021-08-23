@@ -281,7 +281,7 @@ void Sampler::set_sample(SampleSound *sample) {
 	index = {};
 	if (sample) {
 		//Set controls
-		cc = 0;
+		cc = {};
 		for (SampleControl control : sample->controls) {
 			cc[control.cc] = control.default_value;
 		}

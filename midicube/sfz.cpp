@@ -342,10 +342,40 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 }
 
 static void parse_control_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree) {
+	std::unordered_map<unsigned int, pt::ptree> controls;
 	for (auto opcode : opcodes) {
 		if (opcode.first == "default_path") {
 			tree.put("default_path", opcode.second);
 		}
+		else if (opcode.first.rfind("set_cc", 0) == 0) {
+			unsigned int cc = std::stoi(opcode.first.substr(std::string("set_cc").size()));
+			if (controls.find(cc) == controls.end()) {
+				controls[cc] = {};
+				controls[cc].put("cc", cc);
+			}
+			controls[cc].put("default_value", std::stoi(opcode.second)/127.0);
+		}
+		else if (opcode.first.rfind("set_hdcc", 0) == 0) {
+			unsigned int cc = std::stoi(opcode.first.substr(std::string("sethd_cc").size()));
+			if (controls.find(cc) == controls.end()) {
+				controls[cc] = {};
+				controls[cc].put("cc", cc);
+			}
+			controls[cc].put("default_value", std::stod(opcode.second));
+		}
+		else if (opcode.first.rfind("label_cc", 0) == 0) {
+			unsigned int cc = std::stoi(opcode.first.substr(std::string("label_cc").size()));
+			if (controls.find(cc) == controls.end()) {
+				controls[cc] = {};
+				controls[cc].put("cc", cc);
+			}
+			controls[cc].put("name", opcode.second);
+			controls[cc].put("save", true);
+		}
+	}
+	//Add controls
+	for (auto control : controls) {
+		tree.add_child("controls.control", control.second);
 	}
 }
 
