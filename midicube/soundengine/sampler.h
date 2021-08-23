@@ -61,10 +61,10 @@ struct ModulateableProperty {
 };
 
 struct ModulatableADSREnvelopeData {
-	ModulateableProperty attack{0.0005};
+	ModulateableProperty attack{0.001};
 	ModulateableProperty decay{0};
 	ModulateableProperty sustain{1};
-	ModulateableProperty release{0.0005};
+	ModulateableProperty release{0.001};
 
 	ADSREnvelopeShape attack_shape = ADSREnvelopeShape::LINEAR_ADSR;
 	ADSREnvelopeShape pre_decay_shape = ADSREnvelopeShape::EXPONENTIAL_ADSR;
@@ -106,6 +106,12 @@ struct ModulatableADSREnvelopeData {
 	}
 };
 
+struct SampleControl {
+	unsigned int cc = 0;
+	double default_value = 0;
+	std::string name = "Control";
+	bool saved = false;
+};
 
 enum LoopType {
 	NO_LOOP, ATTACK_LOOP, ALWAYS_LOOP
@@ -181,6 +187,7 @@ public:
 	std::string default_path = "./";
 	std::string name = "Sample";
 	double volume = 1;
+	std::vector<SampleControl> controls;
 	std::vector<SampleRegion*> samples = {};
 
 	SampleSound();

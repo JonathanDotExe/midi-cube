@@ -171,7 +171,6 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		vol *= (1 - vel_amount) + note.velocity * vel_amount;
 		vol *= note.layer_amp  * note.region->volume.apply_modulation(note.velocity, cc);
 
-
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
 			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack);
@@ -281,6 +280,12 @@ void Sampler::set_sample(SampleSound *sample) {
 	this->sample = sample;
 	index = {};
 	if (sample) {
+		//Set controls
+		cc = 0;
+		for (SampleControl control : sample->controls) {
+			cc[control.cc] = control.default_value;
+		}
+		//Build index
 		for (SampleRegion* region : sample->samples) {
 			size_t max_vel = std::min((size_t) MIDI_NOTES, (size_t) region->max_velocity);
 			size_t max_note = std::min((size_t) MIDI_NOTES, (size_t) region->max_note);
