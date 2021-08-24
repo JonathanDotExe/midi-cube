@@ -235,11 +235,12 @@ class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 private:
 	SampleSound* sample;
 	SampleRegionIndex index;
-	std::array<double, MIDI_CONTROL_COUNT> cc;
 
 	void set_sample (SampleSound* sample);
 
 public:
+
+	std::array<double, MIDI_CONTROL_COUNT> cc;
 
 	Sampler();
 
@@ -252,6 +253,10 @@ public:
 	void release_note(SampleInfo& info, unsigned int note);
 
 	std::string get_name();
+
+	SampleSound* get_sound() {
+		return sample;
+	}
 
 	ssize_t get_sound_index();
 
