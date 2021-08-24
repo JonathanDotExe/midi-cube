@@ -525,6 +525,7 @@ boost::property_tree::ptree SamplerProgram::save() {
 		boost::property_tree::ptree child;
 		child.put("cc", control.first);
 		child.put("value", control.second);
+		tree.add_child("controls.control", child);
 	}
 	return tree;
 }
