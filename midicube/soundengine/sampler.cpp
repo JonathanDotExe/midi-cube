@@ -262,14 +262,27 @@ void Sampler::save_program(EngineProgram **prog) {
 		p = new SamplerProgram();
 	}
 	p->sound_name = this->sample ? this->sample->name : "";
+	p->controls.clear();
+	if (this->sample) {
+		//Controls
+		for (SampleControl& control : this->sample->controls) {
+			if (control.save) {
+				p->controls[control.cc] = cc[control.cc];
+			}
+		}
+	}
 	*prog = p;
 }
 
 void Sampler::apply_program(EngineProgram *prog) {
 	SamplerProgram* p = dynamic_cast<SamplerProgram*>(prog);
-	//Create new
+	//Sample
 	if (p) {
 		set_sample(global_sample_store.get_sound(p->sound_name));
+		//Controls
+		for (auto control : p->controls) {
+			cc[control.first] = control.second;
+		}
 	}
 	else {
 		set_sample(nullptr);
@@ -497,10 +510,21 @@ void __fix_link_sampler_name__ () {
 //SamplerProgram
 void SamplerProgram::load(boost::property_tree::ptree tree) {
 	sound_name = tree.get("sound_name", "");
+	auto c = tree.get_child_optional("controls");
+	if (c) {
+		for (auto control : c.get()) {
+			controls[control.second.get("cc", 0)] = control.second.get("value", 0);
+		}
+	}
 }
 
 boost::property_tree::ptree SamplerProgram::save() {
 	boost::property_tree::ptree tree;
 	tree.put("sound_name", sound_name);
+	for (auto control : controls) {
+		boost::property_tree::ptree child;
+		child.put("cc", control.first);
+		child.put("value", control.second);
+	}
 	return tree;
 }

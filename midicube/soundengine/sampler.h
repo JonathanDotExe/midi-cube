@@ -199,6 +199,7 @@ public:
 class SamplerProgram : public EngineProgram {
 public:
 	std::string sound_name;
+	std::unordered_map<unsigned int, double> controls;
 
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
