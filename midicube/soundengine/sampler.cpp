@@ -513,7 +513,7 @@ void SamplerProgram::load(boost::property_tree::ptree tree) {
 	auto c = tree.get_child_optional("controls");
 	if (c) {
 		for (auto control : c.get()) {
-			controls[control.second.get("cc", 0)] = control.second.get("value", 0);
+			controls[control.second.get("cc", 0)] = control.second.get("value", 0.0);
 		}
 	}
 }
