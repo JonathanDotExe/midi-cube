@@ -175,6 +175,7 @@ struct SamplerVoice : public TriggeredNote {
 };
 
 struct SampleRegionIndex {
+	std::vector<unsigned int> controls = {};
 	std::array<std::array<std::vector<SampleRegion*>, MIDI_NOTES>, MIDI_NOTES> velocities;
 };
 
@@ -238,6 +239,7 @@ public:
 
 	std::array<double, MIDI_CONTROL_COUNT> cc;
 
+	virtual bool control_change(unsigned int control, unsigned int value);
 	Sampler();
 
 	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index);

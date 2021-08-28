@@ -297,6 +297,7 @@ void Sampler::set_sample(SampleSound *sample) {
 		cc = {};
 		for (SampleControl control : sample->controls) {
 			cc[control.cc] = control.default_value;
+			index.controls.push_back(control.cc);
 		}
 		//Build index
 		for (SampleRegion* region : sample->samples) {
@@ -528,4 +529,12 @@ boost::property_tree::ptree SamplerProgram::save() {
 		tree.add_child("controls.control", child);
 	}
 	return tree;
+}
+
+bool Sampler::control_change(unsigned int control, unsigned int value) {
+	bool updated = BaseSoundEngine::control_change(control, value);
+	if (std::find(index.controls.begin(), index.controls.end(), control) == index.controls.end()) {
+		cc[control] = value/127.0;
+	}
+	return updated;
 }
