@@ -254,7 +254,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 	for (auto opcode : opcodes) {
 		try {
 			if (parse_modulatable(opcode, "amp_veltrack", "envelope.velocity_amount", tree, "", percent_conv, percent_conv)) {
-				tree.put("envelope.velocity_amount", std::stod(opcode.second)/100.0);
+
 			}
 			else if (parse_modulatable(opcode, "ampeg_attack", "envelope.attack", tree, "ampeg_vel2attack")) {
 
