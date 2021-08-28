@@ -38,15 +38,11 @@ struct ModulateableProperty {
 
 	void load(boost::property_tree::ptree& parent, std::string path, double def) {
 		auto tree = parent.get_child_optional(path);
-		if (tree && tree.get().get_child_optional("value")) {
+		if (tree && (tree.get().get_child_optional("value") || tree.get().get_child_optional("cc_amount") || tree.get().get_child_optional("velocity_amount"))) {
 			load(tree.get(), def);
 		}
 		else {
 			value = parent.get<double>(path, def);
-			cc = 0;
-			cc_amount = 0;
-			cc_multiplier = 1;
-			velocity_amount = 0;
 		}
 	}
 
