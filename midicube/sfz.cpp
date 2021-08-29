@@ -114,7 +114,6 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 			}
 			//Include
 			else if (t.size() >= 2 && t[0] == "#include") {
-				std::cout << "include" << std::endl;
 				std::string file = t[1];
 				for (size_t j = 2; j < t.size(); ++j) {
 					file += " " + t[j];
@@ -329,6 +328,12 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			}
 			//Filter
 			else if (parse_modulatable(opcode, "cutoff", "filter.cutoff", tree, "", filter_conv, filter_mod_conv)) {
+
+			}
+			else if (opcode.first == "group_label") {
+
+			}
+			else if (opcode.first == "region_label") {
 
 			}
 			//TODO tune
