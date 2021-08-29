@@ -195,26 +195,35 @@ bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnviro
 void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) {
 	if (this->sample) {
 		for (SampleRegion* region : index.velocities[velocity * 127][note]) {
-			size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
-			SamplerVoice& voice = this->note.note[slot];
-			voice.region = region;
-			voice.layer_amp = sample->volume; //FIXME
-			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
-
-			//TODO preload at start time
-			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
-				voice.time = (double) voice.sample->loop_start/voice.sample->sample->sample_rate;
+			//Check triggers
+			bool trigger = true;
+			for (auto t : region->control_triggers) {
+				if (cc[t.first] < t.second.min_val || cc[t.first] > t.second.max_val) {
+					trigger = false;
+				}
 			}
-			else {
-				voice.time = (double) voice.sample->start/voice.sample->sample->sample_rate;
-			}
-			voice.hit_loop = false;
-			voice.env.reset();
+			if (trigger) {
+				size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
+				SamplerVoice& voice = this->note.note[slot];
+				voice.region = region;
+				voice.layer_amp = sample->volume; //FIXME
+				voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
-			//Load sample
-			LoadRequest req;
-			req.sample = voice.sample->sample;
-			global_sample_store.pool.queue_request(req);
+				//TODO preload at start time
+				if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
+					voice.time = (double) voice.sample->loop_start/voice.sample->sample->sample_rate;
+				}
+				else {
+					voice.time = (double) voice.sample->start/voice.sample->sample->sample_rate;
+				}
+				voice.hit_loop = false;
+				voice.env.reset();
+
+				//Load sample
+				LoadRequest req;
+				req.sample = voice.sample->sample;
+				global_sample_store.pool.queue_request(req);
+			}
 		}
 	}
 }
