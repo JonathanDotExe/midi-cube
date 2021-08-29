@@ -104,7 +104,7 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.region && note.sample) {
-		double vol = 1;
+		double vol = note.region->amplitude.apply_modulation(note.velocity, cc);
 		double vel_amount = 0;
 
 		double l = 0;
@@ -164,7 +164,7 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		if (!note.region->env.sustain_entire_sample) {
 			//Volume
 			ADSREnvelopeData data = note.region->env.env.apply(note.velocity, cc);
-			vol = note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
+			vol *= note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
 		}
 		vel_amount = note.region->env.velocity_amount.apply_modulation(note.velocity, cc);
 
@@ -372,6 +372,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity);
 
 	region.volume.load(tree, "volume", region.volume.value);
+	region.amplitude.load(tree, "amplitude", region.amplitude.value);
 
 	std::string trigger = tree.get<std::string>("trigger", "");
 	if (trigger == "attack") {

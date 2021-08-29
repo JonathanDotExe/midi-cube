@@ -285,6 +285,9 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			else if (parse_modulatable(opcode, "volume", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "gain", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "group_volume", "volume", tree, "", db_conv, db_conv, true)) {
 
 			}
+			else if (parse_modulatable(opcode, "amplitude", "amplitude", tree, "", percent_conv, percent_conv)) {
+
+			}
 			else if (opcode.first == "pitch_keytrack") {
 				tree.put("pitch_keytrack", std::stod(opcode.second)/100.0);
 			}

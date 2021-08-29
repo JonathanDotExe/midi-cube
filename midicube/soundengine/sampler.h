@@ -147,6 +147,7 @@ struct SampleRegion {
 	unsigned int max_note = 127;
 	double note = 60;
 	ModulateableProperty volume{1};
+	ModulateableProperty amplitude{1};
 	double pitch_keytrack = 1;
 	double release_decay = 1;
 
