@@ -140,11 +140,17 @@ struct LoopedAudioSample {
 	unsigned int loop_crossfade = 0;
 };
 
+struct ControlTrigger {
+	double min_val = 0;
+	double max_val = 1;
+};
+
 struct SampleRegion {
 	unsigned int min_velocity = 0;
 	unsigned int max_velocity = 127;
 	unsigned int min_note = 0;
 	unsigned int max_note = 127;
+	std::unordered_map<unsigned int, ControlTrigger> control_triggers;
 	double note = 60;
 	ModulateableProperty volume{1};
 	ModulateableProperty amplitude{1};

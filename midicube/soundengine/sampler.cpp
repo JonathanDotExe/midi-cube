@@ -371,6 +371,14 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity);
 	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity);
 
+	//Control
+	auto control_triggers = tree.get_child_optional("control_triggers");
+	if (control_triggers) {
+		for (auto trigger : control_triggers.get()) {
+			region.control_triggers[trigger.second.get("cc", 0)] = {trigger.second.get("min_value", 0)/127.0, trigger.second.get("max_value", 127)/127.0};
+		}
+	}
+
 	region.volume.load(tree, "volume", region.volume.value);
 	region.amplitude.load(tree, "amplitude", region.amplitude.value);
 
