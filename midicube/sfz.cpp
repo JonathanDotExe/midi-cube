@@ -228,6 +228,10 @@ static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::s
 		else {
 			tree.put(converted_name + ".cc_amount", mod_converter(opcode.second));
 		}
+		//Amplitude FIXME
+		if (converted_name == "amplitude" && !tree.get_child_optional(converted_name + ".value")) {
+			tree.put(converted_name + ".value", 0.0);
+		}
 		return true;
 	}
 	else if (opcode.first == vel_name) {
