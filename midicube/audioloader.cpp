@@ -19,10 +19,12 @@
 #endif
 
 StreamedAudioSample* StreamedAudioPool::load_sample(std::string fname) {
-	StreamedAudioSample* sample = new StreamedAudioSample();
-	read_stream_audio_file(*sample, fname);
-	samples.push_back(sample);
-	return sample;
+	if (!samples.count(fname)) {
+		StreamedAudioSample* sample = new StreamedAudioSample();
+		read_stream_audio_file(*sample, fname);
+		samples[fname] = sample;
+	}
+	return samples[fname];
 }
 
 void StreamedAudioPool::queue_request(LoadRequest request) {
@@ -66,11 +68,15 @@ void StreamedAudioPool::start() {
 }
 
 void StreamedAudioPool::run_gc() {
+	std::vector<std::string> keys;
+	for (auto sample : samples) {
+		keys.push_back(sample.first);
+	}
 	while (running) {
 		//Garbage collect
 		unsigned int time = TIME_NOW();
-		gc_index %= samples.size();
-		StreamedAudioSample* sample = samples[gc_index];
+		gc_index %= keys.size();
+		StreamedAudioSample* sample = samples[keys[gc_index]];
 		if (sample->loaded) {
 			if (sample->lock.try_lock()) {
 				if (sample->loaded && sample->last_used + 60000 < time) {

@@ -12,6 +12,7 @@
 #include "audiofile.h"
 #include "boost/lockfree/queue.hpp"
 #include <thread>
+#include <map>
 
 
 struct LoadRequest {
@@ -20,7 +21,7 @@ struct LoadRequest {
 
 class StreamedAudioPool {
 private:
-	std::vector<StreamedAudioSample*> samples;
+	std::map<std::string, StreamedAudioSample*> samples;
 	boost::lockfree::queue<LoadRequest> requests;
 	std::atomic<bool> running{true};
 	size_t gc_index = 0;
@@ -40,8 +41,8 @@ public:
 
 	~StreamedAudioPool() {
 		stop();
-		for (StreamedAudioSample* sample : samples) {
-			delete sample;
+		for (auto sample : samples) {
+			delete sample.second;
 		}
 		samples.clear();
 	}
