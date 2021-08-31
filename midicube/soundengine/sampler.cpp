@@ -6,11 +6,13 @@
  */
 
 #include "sampler.h"
+#include "../sfz.h"
 #include <iostream>
 #include <fstream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>
+#include <regex>
 
 namespace pt = boost::property_tree;
 
@@ -35,11 +37,29 @@ SampleSound* SampleSoundStore::get_sound(size_t index) {
 }
 
 void SampleSoundStore::load_sounds(std::string folder) {
+	//Read folders
+	std::regex reg(".*\\.xml");
+	std::regex sfz_reg(".*\\.sfz");
 	for (const auto& f : boost::filesystem::directory_iterator(folder)) {
 		std::string file = f.path().string();
-		SampleSound* s = load_sound(file, pool);
-		if (s) {
-			samples.push_back(s);
+		if (boost::filesystem::is_directory(file)) {
+			//Convert sfz files
+			for (const auto& i : boost::filesystem::directory_iterator(file)) {
+				std::string name = i.path().string();
+				if (std::regex_match(name, sfz_reg)) {
+					convert_sfz_to_sampler(name, file, file + "/" + i.path().stem().string() + ".xml", i.path().stem().string());
+				}
+			}
+			//Load xml files
+			for (const auto& i : boost::filesystem::directory_iterator(file)) {
+				std::string name = i.path().string();
+				if (std::regex_match(name, reg)) {
+					SampleSound* s = load_sound(name, file, pool);
+					if (s) {
+						samples.push_back(s);
+					}
+				}
+			}
 		}
 	}
 }
@@ -65,7 +85,9 @@ SampleSoundStore::~SampleSoundStore() {
 
 //Sampler
 Sampler::Sampler() {
-	set_sample(global_sample_store.get_sound(0));
+	if (global_sample_store.get_sounds().size() > 0) {
+		set_sample(global_sample_store.get_sound(0));
+	}
 }
 
 inline size_t find_floor_block(double time, unsigned int sample_rate, size_t size) {
@@ -82,7 +104,7 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.region && note.sample) {
-		double vol = 1;
+		double vol = note.region->amplitude.apply_modulation(note.velocity, cc);
 		double vel_amount = 0;
 
 		double l = 0;
@@ -124,8 +146,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		//Filter
 		if (note.region->filter.on) {
 			FilterData filter { note.region->filter.filter_type };
-			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.region->filter.filter_cutoff + note.region->filter.filter_velocity_amount * note.velocity))); //TODO optimize
-			filter.resonance = note.region->filter.filter_resonance;
+			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.region->filter.filter_cutoff.apply_modulation(note.velocity, cc)))); //TODO optimize
+			filter.resonance = note.region->filter.filter_resonance.apply_modulation(note.velocity, cc);
 
 			if (note.region->filter.filter_kb_track) {
 				double cutoff = filter.cutoff;
@@ -141,12 +163,13 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		//Env
 		if (!note.region->env.sustain_entire_sample) {
 			//Volume
-			vol = note.env.amplitude(note.region->env.env, info.time_step, note.pressed, env.sustain);
+			ADSREnvelopeData data = note.region->env.env.apply(note.velocity, cc);
+			vol *= note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
 		}
-		vel_amount += note.region->env.velocity_amount;
+		vel_amount = note.region->env.velocity_amount.apply_modulation(note.velocity, cc);
 
-		vol *= vel_amount * (note.velocity - 1) + 1;
-		vol *= note.layer_amp;
+		vol *= (1 - vel_amount) + note.velocity * vel_amount;
+		vol *= note.layer_amp  * note.region->volume.apply_modulation(note.velocity, cc);
 
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
@@ -172,27 +195,35 @@ bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnviro
 void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) {
 	if (this->sample) {
 		for (SampleRegion* region : index.velocities[velocity * 127][note]) {
-			size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
-			SamplerVoice& voice = this->note.note[slot];
-			voice.current_buffer = 0;
-			voice.region = region;
-			voice.layer_amp = (1 - voice.region->layer_velocity_amount * (1 - (velocity - voice.region->min_velocity/127.0)/(voice.region->max_velocity/127.0 - voice.region->min_velocity/127.0))) * region->volume * sample->volume;
-			voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
-
-			//TODO preload at start time
-			if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
-				voice.time = (double) voice.sample->loop_start/voice.sample->sample->sample_rate;
+			//Check triggers
+			bool trigger = true;
+			for (auto t : region->control_triggers) {
+				if (cc[t.first] < t.second.min_val || cc[t.first] > t.second.max_val) {
+					trigger = false;
+				}
 			}
-			else {
-				voice.time = (double) voice.sample->start/voice.sample->sample->sample_rate;
-			}
-			voice.hit_loop = false;
-			voice.env.reset();
+			if (trigger) {
+				size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
+				SamplerVoice& voice = this->note.note[slot];
+				voice.region = region;
+				voice.layer_amp = sample->volume; //FIXME
+				voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 
-			//Load sample
-			LoadRequest req;
-			req.sample = voice.sample->sample;
-			global_sample_store.pool.queue_request(req);
+				//TODO preload at start time
+				if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
+					voice.time = (double) voice.sample->loop_start/voice.sample->sample->sample_rate;
+				}
+				else {
+					voice.time = (double) voice.sample->start/voice.sample->sample->sample_rate;
+				}
+				voice.hit_loop = false;
+				voice.env.reset();
+
+				//Load sample
+				LoadRequest req;
+				req.sample = voice.sample->sample;
+				global_sample_store.pool.queue_request(req);
+			}
 		}
 	}
 }
@@ -240,14 +271,27 @@ void Sampler::save_program(EngineProgram **prog) {
 		p = new SamplerProgram();
 	}
 	p->sound_name = this->sample ? this->sample->name : "";
+	p->controls.clear();
+	if (this->sample) {
+		//Controls
+		for (SampleControl& control : this->sample->controls) {
+			if (control.save) {
+				p->controls[control.cc] = cc[control.cc];
+			}
+		}
+	}
 	*prog = p;
 }
 
 void Sampler::apply_program(EngineProgram *prog) {
 	SamplerProgram* p = dynamic_cast<SamplerProgram*>(prog);
-	//Create new
+	//Sample
 	if (p) {
 		set_sample(global_sample_store.get_sound(p->sound_name));
+		//Controls
+		for (auto control : p->controls) {
+			cc[control.first] = control.second;
+		}
 	}
 	else {
 		set_sample(nullptr);
@@ -258,6 +302,13 @@ void Sampler::set_sample(SampleSound *sample) {
 	this->sample = sample;
 	index = {};
 	if (sample) {
+		//Set controls
+		cc = {};
+		for (SampleControl control : sample->controls) {
+			cc[control.cc] = control.default_value;
+			index.controls.push_back(control.cc);
+		}
+		//Build index
 		for (SampleRegion* region : sample->samples) {
 			size_t max_vel = std::min((size_t) MIDI_NOTES, (size_t) region->max_velocity);
 			size_t max_note = std::min((size_t) MIDI_NOTES, (size_t) region->max_note);
@@ -276,19 +327,18 @@ Sampler::~Sampler() {
 
 void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::string folder, StreamedAudioPool& pool) {
 	region.env.env.pedal_catch = true;
-	region.env.velocity_amount = tree.get<double>("envelope.velocity_amount", region.env.velocity_amount);
-	region.env.env.attack = tree.get<double>("envelope.attack", region.env.env.attack);
-	region.env.env.decay = tree.get<double>("envelope.decay", region.env.env.decay);
-	region.env.env.sustain = tree.get<double>("envelope.sustain", region.env.env.sustain);
-	region.env.env.release = tree.get<double>("envelope.release", region.env.env.release);
-	region.env.env.attack_hold = tree.get<double>("envelope.attack_hold", region.env.env.attack_hold);
+	region.env.velocity_amount.load(tree, "envelope.velocity_amount", region.env.velocity_amount.value);
+	region.env.env.attack.load(tree, "envelope.attack", region.env.env.attack.value);
+	region.env.env.decay.load(tree, "envelope.decay", region.env.env.decay.value);
+	region.env.env.sustain.load(tree, "envelope.sustain", region.env.env.sustain.value);
+	region.env.env.release.load(tree, "envelope.release", region.env.env.release.value);
+	region.env.env.attack_hold.load(tree, "envelope.attack_hold", region.env.env.attack_hold.value);
 	region.env.sustain_entire_sample = tree.get<bool>("envelope.sustain_entire_sample", region.env.sustain_entire_sample);
 
-	region.filter.filter_cutoff = tree.get<double>("filter.cutoff", region.filter.filter_cutoff);
+	region.filter.filter_cutoff.load(tree, "filter.cutoff", region.filter.filter_cutoff.value);
 	region.filter.filter_kb_track = tree.get<double>("filter.kb_track", region.filter.filter_kb_track);
 	region.filter.filter_kb_track_note = tree.get<unsigned int>("filter.kb_track_note", region.filter.filter_kb_track_note);
-	region.filter.filter_resonance = tree.get<double>("filter.resonance", region.filter.filter_resonance);
-	region.filter.filter_velocity_amount = tree.get<double>("filter.velocity_amount", region.filter.filter_velocity_amount);
+	region.filter.filter_resonance.load(tree, "filter.resonance", region.filter.filter_resonance.value);
 
 	region.pitch_keytrack = tree.get<double>("pitch_keytrack", region.pitch_keytrack);
 	region.release_decay = tree.get<double>("release_decay", region.release_decay);
@@ -330,7 +380,16 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity);
 	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity);
 
-	region.volume = tree.get<double>("volume", region.volume);
+	//Control
+	auto control_triggers = tree.get_child_optional("control_triggers");
+	if (control_triggers) {
+		for (auto trigger : control_triggers.get()) {
+			region.control_triggers[trigger.second.get("cc", 0)] = {trigger.second.get("min_value", 0)/127.0, trigger.second.get("max_value", 127)/127.0};
+		}
+	}
+
+	region.volume.load(tree, "volume", region.volume.value);
+	region.amplitude.load(tree, "amplitude", region.amplitude.value);
 
 	std::string trigger = tree.get<std::string>("trigger", "");
 	if (trigger == "attack") {
@@ -376,27 +435,6 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 			region.sample.loop_end = region.sample.sample->total_size;
 		}
 	}
-
-	//Sustain Sample
-	std::string sfile = tree.get<std::string>("sustain_sample.name", "");
-	region.sustain_sample.start = tree.get<unsigned int>("sustain_sample.start", region.sustain_sample.start);
-	region.sustain_sample.loop_start = tree.get<unsigned int>("sustain_sample.loop_start", region.sustain_sample.loop_start);
-	region.sustain_sample.loop_end = tree.get<unsigned int>("sustain_sample.loop_end", region.sustain_sample.loop_end);
-	region.sustain_sample.loop_crossfade = tree.get<unsigned int>("sustain_sample.loop_crossfade", region.sustain_sample.loop_start);
-
-	if (load_sample && sfile != "") {
-		region.sustain_sample.sample = pool.load_sample(folder + "/" + sfile);
-		if (region.sustain_sample.sample) {
-			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
-		}
-		if (region.sustain_sample.loop_start == 0 && region.sample.loop_end == 0) {
-			region.sustain_sample.loop_start = region.sample.sample->loop_start;
-			region.sustain_sample.loop_end = region.sample.sample->loop_end;
-		}
-		if (region.sustain_sample.loop_end < region.sustain_sample.loop_start) {
-			region.sustain_sample.loop_end = region.sustain_sample.sample->total_size/region.sustain_sample.sample->channels;
-		}
-	}
 }
 
 void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegion region, std::string folder, StreamedAudioPool& pool) {
@@ -423,20 +461,43 @@ void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegi
 	}
 }
 
-extern SampleSound* load_sound(std::string folder, StreamedAudioPool& pool) {
+void load_control(pt::ptree tree, SampleControl& control) {
+	control.cc = tree.get("cc", control.cc);
+	control.default_value = tree.get("default_value", control.default_value);
+	control.name = tree.get("name", control.name);
+	control.save = tree.get("save", control.save);
+}
+
+extern SampleSound* load_sound(std::string file, std::string folder, StreamedAudioPool& pool) {
 	//Load file
 	pt::ptree tree;
 	SampleSound* sound = nullptr;
 	try {
-		pt::read_xml(folder + "/sound.xml", tree);
+		pt::read_xml(file, tree);
 
 		//Parse
 		sound = new SampleSound();
 		sound->name = tree.get<std::string>("sound.name", "Sound");
+		sound->default_path = tree.get<std::string>("sound.default_path", ".");
 		sound->volume = tree.get<double>("sound.master_volume", 1);
 		SampleRegion master;
 		if (tree.get_child_optional("sound")) {
 			load_region(tree.get_child("sound"), master, false, folder, pool);
+		}
+		if (sound->default_path.rfind("/", 0) == 0) { //FIXME
+			folder = sound->default_path;
+		}
+		else {
+			folder += "/" + sound->default_path;
+		}
+		//Load controls
+		auto controls = tree.get_child_optional("sound.controls");
+		if (controls) {
+			for (auto child : controls.get()) {
+				SampleControl control;
+				load_control(child.second, control);
+				sound->controls.push_back(control);
+			}
 		}
 		//Load groups
 		auto groups = tree.get_child_optional("sound.groups");
@@ -468,10 +529,30 @@ void __fix_link_sampler_name__ () {
 //SamplerProgram
 void SamplerProgram::load(boost::property_tree::ptree tree) {
 	sound_name = tree.get("sound_name", "");
+	auto c = tree.get_child_optional("controls");
+	if (c) {
+		for (auto control : c.get()) {
+			controls[control.second.get("cc", 0)] = control.second.get("value", 0.0);
+		}
+	}
 }
 
 boost::property_tree::ptree SamplerProgram::save() {
 	boost::property_tree::ptree tree;
 	tree.put("sound_name", sound_name);
+	for (auto control : controls) {
+		boost::property_tree::ptree child;
+		child.put("cc", control.first);
+		child.put("value", control.second);
+		tree.add_child("controls.control", child);
+	}
 	return tree;
+}
+
+bool Sampler::control_change(unsigned int control, unsigned int value) {
+	bool updated = BaseSoundEngine::control_change(control, value);
+	if (std::find(index.controls.begin(), index.controls.end(), control) == index.controls.end()) {
+		cc[control] = value/127.0;
+	}
+	return updated;
 }
