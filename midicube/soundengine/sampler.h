@@ -13,6 +13,7 @@
 #include "../envelope.h"
 #include "../util.h"
 #include "../audioloader.h"
+#include "../sfz.h"
 #include <array>
 
 namespace pt = boost::property_tree;
@@ -138,11 +139,6 @@ struct LoopedAudioSample {
 	unsigned int loop_start = 0;
 	unsigned int loop_end = 0;
 	unsigned int loop_crossfade = 0;
-};
-
-struct ControlTrigger {
-	double min_val = 0;
-	double max_val = 1;
 };
 
 struct SampleRegion {

@@ -12,6 +12,12 @@
 #include <vector>
 #include <unordered_map>
 
+
+struct ControlTrigger {
+	double min_val = 0;
+	double max_val = 1;
+};
+
 struct SfzRegion {
 	std::unordered_map<std::string, std::string> opcodes;
 };

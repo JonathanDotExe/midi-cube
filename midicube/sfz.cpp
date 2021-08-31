@@ -253,6 +253,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 	std::function<double(std::string)> percent_conv = [](std::string str) {
 		return std::stod(str)/100.0;
 	};
+	std::unordered_map<unsigned int, ControlTrigger> triggers;
 	//Opcodes
 	for (auto opcode : opcodes) {
 		try {
@@ -285,6 +286,20 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			}
 			else if (opcode.first == "hivel") {
 				tree.put("max_velocity", std::stoi(opcode.second));
+			}
+			else if (opcode.first.rfind("locc", 0) == 0) {
+				int cc = std::stoi(opcode.first.substr(std::string("locc").size()));
+				if (!triggers.count(cc)) {
+					triggers[cc] = {0, 127};
+				}
+				triggers[cc].min_val = std::stoi(opcode.second)/127.0;
+			}
+			else if (opcode.first.rfind("hicc", 0) == 0) {
+				int cc = std::stoi(opcode.first.substr(std::string("hicc").size()));
+				if (!triggers.count(cc)) {
+					triggers[cc] = {0, 127};
+				}
+				triggers[cc].max_val = std::stoi(opcode.second)/127.0;
 			}
 			else if (parse_modulatable(opcode, "volume", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "gain", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "group_volume", "volume", tree, "", db_conv, db_conv, true)) {
 
@@ -353,6 +368,12 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			std::cout << "Couldn't convert opcode " << opcode.first << "="
 									<< opcode.second << std::endl;
 		}
+	}
+	for (auto trigger : triggers) {
+		pt::ptree t;
+		t.put("cc", trigger.first);
+		t.put("min_value", static_cast<unsigned int>(trigger.second.min_val * 127));
+		t.put("max_value", static_cast<unsigned int>(trigger.second.max_val * 127));
 	}
 }
 
