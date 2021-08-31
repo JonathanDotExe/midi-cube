@@ -292,14 +292,14 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 				if (!triggers.count(cc)) {
 					triggers[cc] = {0, 127};
 				}
-				triggers[cc].min_val = std::stoi(opcode.second)/127.0;
+				triggers[cc].min_val = std::stoi(opcode.second);
 			}
 			else if (opcode.first.rfind("hicc", 0) == 0) {
 				int cc = std::stoi(opcode.first.substr(std::string("hicc").size()));
 				if (!triggers.count(cc)) {
 					triggers[cc] = {0, 127};
 				}
-				triggers[cc].max_val = std::stoi(opcode.second)/127.0;
+				triggers[cc].max_val = std::stoi(opcode.second);
 			}
 			else if (parse_modulatable(opcode, "volume", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "gain", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "group_volume", "volume", tree, "", db_conv, db_conv, true)) {
 
@@ -372,8 +372,9 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 	for (auto trigger : triggers) {
 		pt::ptree t;
 		t.put("cc", trigger.first);
-		t.put("min_value", static_cast<unsigned int>(trigger.second.min_val * 127));
-		t.put("max_value", static_cast<unsigned int>(trigger.second.max_val * 127));
+		t.put("min_value", static_cast<unsigned int>(trigger.second.min_val));
+		t.put("max_value", static_cast<unsigned int>(trigger.second.max_val));
+		tree.add_child("control_triggers.control", t);
 	}
 }
 
