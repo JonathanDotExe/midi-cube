@@ -202,7 +202,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 					trigger = false;
 				}
 			}
-			if (trigger) {
+			if (trigger && (region->preset < 0 || static_cast<unsigned int>(region->preset) == preset)) {
 				size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
 				SamplerVoice& voice = this->note.note[slot];
 				voice.region = region;
@@ -302,6 +302,7 @@ void Sampler::set_sample(SampleSound *sample) {
 	this->sample = sample;
 	index = {};
 	if (sample) {
+		preset = sample->preset_start;
 		//Set controls
 		cc = {};
 		for (SampleControl control : sample->controls) {

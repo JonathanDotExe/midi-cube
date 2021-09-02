@@ -110,6 +110,10 @@ struct SampleControl {
 	bool save = false;
 };
 
+struct SamplePreset {
+	std::string name;
+};
+
 enum LoopType {
 	NO_LOOP, ATTACK_LOOP, ALWAYS_LOOP
 };
@@ -152,6 +156,7 @@ struct SampleRegion {
 	ModulateableProperty amplitude{1};
 	double pitch_keytrack = 1;
 	double release_decay = 1;
+	int preset = -1;
 
 	LoopedAudioSample sample;
 	LoopType loop = NO_LOOP;
@@ -187,7 +192,10 @@ public:
 	std::string default_path = "./";
 	std::string name = "Sample";
 	double volume = 1;
+	unsigned int preset_start = 0;
+	unsigned int preset_end = 1;
 	std::vector<SampleControl> controls;
+	std::unordered_map<unsigned int, SamplePreset> presets = {};
 	std::vector<SampleRegion*> samples = {};
 
 	SampleSound();
@@ -234,6 +242,7 @@ class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 
 private:
 	SampleSound* sample;
+	unsigned int preset = 0;
 	SampleRegionIndex index;
 
 	void set_sample (SampleSound* sample);
