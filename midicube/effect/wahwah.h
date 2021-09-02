@@ -40,7 +40,7 @@ struct WahWahPreset {
 	BindableBooleanValue on = true;
 	BindableTemplateValue<double> cutoff{0.2, 0, 1};
 	BindableTemplateValue<double> resonance{0.5, 0, 1};
-	BindableTemplateValue<double> amount{0.5, 0, 1};
+	BindableTemplateValue<double> amount{0.5, 0, 10};
 	BindableTemplateValue<double> mix{1, 0, 1};
 
 	BindableBooleanValue auto_wah = true;
