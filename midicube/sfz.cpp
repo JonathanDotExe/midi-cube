@@ -272,8 +272,17 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			else if (parse_modulatable(opcode, "ampeg_release", "envelope.release", tree, "ampeg_vel2release")) {
 
 			}
-			else if (opcode.first == "lokey") {
+			else if (opcode.first == "sw_last") {
+				tree.put("preset", parse_sfz_note(opcode.second));
+			}
+			else if (opcode.first == "sw_lokey") { //FIXME only in global
 				tree.put("min_note", parse_sfz_note(opcode.second));
+			}
+			else if (opcode.first == "sw_hikey") { //FIXME only in global
+				tree.put("preset_start", parse_sfz_note(opcode.second));
+			}
+			else if (opcode.first == "lokey") {
+				tree.put("preset_start", parse_sfz_note(opcode.second));
 			}
 			else if (opcode.first == "hikey") {
 				tree.put("max_note", parse_sfz_note(opcode.second));
