@@ -512,7 +512,7 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 			}
 		}
 		if (sound->presets.empty()) {
-			presets[0] = {"Default"};
+			sound->presets[0] = {"Default"};
 		}
 		//Load groups
 		auto groups = tree.get_child_optional("sound.groups");

@@ -242,13 +242,13 @@ class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 
 private:
 	SampleSound* sample;
-	unsigned int preset = 0;
 	SampleRegionIndex index;
 
 	void set_sample (SampleSound* sample);
 
 public:
 
+	unsigned int preset = 0;
 	std::array<double, MIDI_CONTROL_COUNT> cc;
 
 	virtual bool control_change(unsigned int control, unsigned int value);
