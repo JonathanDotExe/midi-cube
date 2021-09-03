@@ -481,6 +481,8 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 		sound->name = tree.get<std::string>("sound.name", "Sound");
 		sound->default_path = tree.get<std::string>("sound.default_path", ".");
 		sound->volume = tree.get<double>("sound.master_volume", 1);
+		sound->preset_start = tree.get<double>("sound.preset_start", 0);
+		sound->preset_end = tree.get<double>("sound.preset_end", 1);
 		SampleRegion master;
 		if (tree.get_child_optional("sound")) {
 			load_region(tree.get_child("sound"), master, false, folder, pool);
@@ -499,6 +501,18 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 				load_control(child.second, control);
 				sound->controls.push_back(control);
 			}
+		}
+		//Load preset
+		auto presets = tree.get_child_optional("sound.presets");
+		if (presets) {
+			for (auto child : controls.get()) {
+				SamplePreset preset;
+				preset.name = child.second.get("name", "Default");
+				sound->presets[child.second.get("index", 0)] = preset;
+			}
+		}
+		if (sound->presets.empty()) {
+			presets[0] = {"Default"};
 		}
 		//Load groups
 		auto groups = tree.get_child_optional("sound.groups");
