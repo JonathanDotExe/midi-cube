@@ -240,7 +240,7 @@ static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::s
 	return false;
 }
 
-static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree) {
+static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree, std::unordered_map<unsigned int, std::string> preset_names) {
 	std::function<double(std::string)> filter_conv = [](std::string str) {
 		return invert_scale_cutoff(std::stod(str));
 	};
@@ -254,6 +254,8 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		return std::stod(str)/100.0;
 	};
 	std::unordered_map<unsigned int, ControlTrigger> triggers;
+	int keyswitch = -1;
+	std::string name = "";
 	//Opcodes
 	for (auto opcode : opcodes) {
 		try {
@@ -385,6 +387,9 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		t.put("max_value", static_cast<unsigned int>(trigger.second.max_val));
 		tree.add_child("control_triggers.control", t);
 	}
+	if (keyswitch >= 0 && name) {
+		preset_names[keyswitch] = name;
+	}
 }
 
 static void parse_control_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree) {
@@ -440,22 +445,31 @@ void convert_sfz_to_sampler(std::string src, std::string folder, std::string dst
 	pt::ptree tree;
 	pt::ptree sound;
 	//Name
+	std::unordered_map<unsigned int, std::string> preset_names;
 	sound.put("name", name);
-	parse_opcodes(instrument.global, sound);
+	parse_opcodes(instrument.global, sound, preset_names);
 	parse_control_opcodes(instrument.control, sound);
 
 	//Groups
 	for (SfzGroup group : instrument.groups) {
 		pt::ptree g;
-		parse_opcodes(group.opcodes, g);
+		parse_opcodes(group.opcodes, g, preset_names);
 		//Regions
 		for (SfzRegion region : group.regions) {
 			pt::ptree r;
-			parse_opcodes(region.opcodes, r);
+			parse_opcodes(region.opcodes, r, preset_names);
 			g.add_child("regions.region", r);
 		}
 		sound.add_child("groups.group", g);
 	}
+	//Presets
+	for (auto preset : preset_names) {
+		pt::ptree p;
+		p.put("name", preset.first);
+		p.put("index", preset.second);
+		sound.add_child("presets.preset", p);
+	}
+
 	tree.add_child("sound", sound);
 	//Save to file
 	try {
