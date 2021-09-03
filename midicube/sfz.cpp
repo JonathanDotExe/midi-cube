@@ -387,7 +387,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		t.put("max_value", static_cast<unsigned int>(trigger.second.max_val));
 		tree.add_child("control_triggers.control", t);
 	}
-	if (keyswitch >= 0 && name) {
+	if (keyswitch >= 0 && name != "") {
 		preset_names[keyswitch] = name;
 	}
 }
