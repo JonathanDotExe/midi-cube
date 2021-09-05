@@ -156,7 +156,8 @@ struct SampleRegion {
 	ModulateableProperty amplitude{1};
 	double pitch_keytrack = 1;
 	double release_decay = 1;
-	int preset = -1;
+	unsigned int min_preset = 0;
+	unsigned int max_preset = 0;
 
 	LoopedAudioSample sample;
 	LoopType loop = NO_LOOP;

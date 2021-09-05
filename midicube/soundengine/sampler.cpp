@@ -202,7 +202,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 					trigger = false;
 				}
 			}
-			if (trigger && (region->preset < 0 || static_cast<unsigned int>(region->preset) == preset)) {
+			if (trigger && preset >= region->min_preset && preset <= region->max_preset) {
 				size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
 				SamplerVoice& voice = this->note.note[slot];
 				voice.region = region;
@@ -380,6 +380,8 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.max_note = tree.get<unsigned int>("max_note", region.max_note);
 	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity);
 	region.max_velocity = tree.get<unsigned int>("max_velocity", region.max_velocity);
+	region.min_preset = tree.get<unsigned int>("min_preset", region.min_preset);
+	region.max_preset = tree.get<unsigned int>("max_preset", region.max_preset);
 
 	//Control
 	auto control_triggers = tree.get_child_optional("control_triggers");
@@ -502,7 +504,7 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 				sound->controls.push_back(control);
 			}
 		}
-		//Load preset
+		//Load presets
 		auto presets = tree.get_child_optional("sound.presets");
 		if (presets) {
 			for (auto child : controls.get()) {
