@@ -112,6 +112,7 @@ struct SampleControl {
 
 struct SamplePreset {
 	std::string name;
+	unsigned int preset_number = 0;
 };
 
 enum LoopType {
@@ -193,10 +194,8 @@ public:
 	std::string default_path = "./";
 	std::string name = "Sample";
 	double volume = 1;
-	unsigned int preset_start = 0;
-	unsigned int preset_end = 1;
 	std::vector<SampleControl> controls;
-	std::unordered_map<unsigned int, SamplePreset> presets = {};
+	std::vector<SamplePreset> presets = {};
 	std::vector<SampleRegion*> samples = {};
 
 	SampleSound();
@@ -247,9 +246,10 @@ private:
 
 	void set_sample (SampleSound* sample);
 
-public:
+	unsigned int preset_number = 0;
+	size_t preset_index = 0;
 
-	unsigned int preset = 0;
+public:
 	std::array<double, MIDI_CONTROL_COUNT> cc;
 
 	virtual bool control_change(unsigned int control, unsigned int value);
@@ -273,12 +273,24 @@ public:
 
 	void set_sound_index(ssize_t index);
 
+
+
 	void save_program(EngineProgram **prog);
 
 	void apply_program(EngineProgram *prog);
 
 	~Sampler();
 
+	size_t get_preset_index() const {
+		return preset_index;
+	}
+
+	void set_preset_index(size_t presetIndex = 0) {
+		preset_index = presetIndex;
+		if (sample) {
+			preset_number = sample->presets[presetIndex].preset_number;
+		}
+	}
 };
 
 extern SampleSound* load_sound(std::string file, std::string folder, StreamedAudioPool& pool);

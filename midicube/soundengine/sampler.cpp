@@ -202,7 +202,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 					trigger = false;
 				}
 			}
-			if (trigger && preset >= region->min_preset && preset <= region->max_preset) {
+			if (trigger && preset_number >= region->min_preset && preset_number <= region->max_preset) {
 				size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
 				SamplerVoice& voice = this->note.note[slot];
 				voice.region = region;
@@ -301,8 +301,8 @@ void Sampler::apply_program(EngineProgram *prog) {
 void Sampler::set_sample(SampleSound *sample) {
 	this->sample = sample;
 	index = {};
+	set_preset_index(0);
 	if (sample) {
-		preset = sample->preset_start;
 		//Set controls
 		cc = {};
 		for (SampleControl control : sample->controls) {
@@ -483,8 +483,6 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 		sound->name = tree.get<std::string>("sound.name", "Sound");
 		sound->default_path = tree.get<std::string>("sound.default_path", ".");
 		sound->volume = tree.get<double>("sound.master_volume", 1);
-		sound->preset_start = tree.get<double>("sound.preset_start", 0);
-		sound->preset_end = tree.get<double>("sound.preset_end", 1);
 		SampleRegion master;
 		if (tree.get_child_optional("sound")) {
 			load_region(tree.get_child("sound"), master, false, folder, pool);
@@ -510,11 +508,12 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 			for (auto child : presets.get()) {
 				SamplePreset preset;
 				preset.name = child.second.get("name", "Default");
-				sound->presets[child.second.get("index", 0)] = preset;
+				preset.preset_number = child.second.get("index", 0);
+				sound->presets.push_back(preset);
 			}
 		}
 		if (sound->presets.empty()) {
-			sound->presets[0] = {"Default"};
+			sound->presets.push_back({"Default", 0});
 		}
 		//Load groups
 		auto groups = tree.get_child_optional("sound.groups");

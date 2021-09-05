@@ -48,22 +48,17 @@ Scene SamplerView::create(Frame &frame) {
 	//Preset
 	std::vector<std::string> presets = {};
 	if (sample) {
-		for (unsigned int i = sample->preset_start; i < sample->preset_end; ++i) {
-			if (sample->presets.find(i) != sample->presets.end()) {
-				presets.push_back(sample->presets[i].name);
-			}
-			else {
-				presets.push_back(std::to_string(i));
-			}
+		for (SamplePreset preset : sample->presets) {
+			presets.push_back(preset.name);
 		}
 	}
 	if (presets.empty()) {
 		presets.push_back("Default");
 	}
 
-	ComboBox* preset = new ComboBox(0, presets, main_font, 24, sample ? sample->preset_start : 0, 10, 120, 300, 80);
+	ComboBox* preset = new ComboBox(0, presets, main_font, 24, 0, 10, 120, 300, 80);
 	preset->rect.setFillColor(sf::Color(0, 180, 255));
-	preset->property.bind(sampler.preset, handler);
+	preset->property.bind_function<size_t>(std::bind(&Sampler::get_preset_index, &sampler), std::bind(&Sampler::set_preset_index, &sampler, std::placeholders::_1), handler);
 	controls.push_back(preset);
 
 
