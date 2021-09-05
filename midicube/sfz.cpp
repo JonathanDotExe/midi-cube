@@ -277,8 +277,19 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			}
 			else if (opcode.first == "sw_last") {
 				unsigned int note = parse_sfz_note(opcode.second);
-				tree.put("preset", note);
+				tree.put("min_preset", note);
+				tree.put("max_preset", note);
 				keyswitch_low = note;
+				keyswitch_high = note;
+			}
+			else if (opcode.first == "sw_lolast") {
+				unsigned int note = parse_sfz_note(opcode.second);
+				tree.put("min_preset", note);
+				keyswitch_low = note;
+			}
+			else if (opcode.first == "sw_hilast") {
+				unsigned int note = parse_sfz_note(opcode.second);
+				tree.put("max_preset", note);
 				keyswitch_high = note;
 			}
 			else if (opcode.first == "sw_lokey") { //FIXME only in global
