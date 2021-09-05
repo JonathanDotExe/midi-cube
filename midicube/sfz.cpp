@@ -302,7 +302,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 				name = opcode.second;
 			}
 			else if (opcode.first == "lokey") {
-				tree.put("preset_start", parse_sfz_note(opcode.second));
+				tree.put("min_note", parse_sfz_note(opcode.second));
 			}
 			else if (opcode.first == "hikey") {
 				tree.put("max_note", parse_sfz_note(opcode.second));
