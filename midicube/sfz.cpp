@@ -236,6 +236,7 @@ static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::s
 	}
 	else if (opcode.first == vel_name) {
 		tree.put(converted_name + ".velocity_amount", mod_converter(opcode.second));
+		return true;
 	}
 	return false;
 }
@@ -265,7 +266,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			}
 			else if (parse_modulatable(opcode, "ampeg_attack", "envelope.attack", tree, "ampeg_vel2attack")) {
 
-			 }
+			}
 			else if (parse_modulatable(opcode, "ampeg_decay", "envelope.decay", tree, "ampeg_vel2decay")) {
 
 			}
