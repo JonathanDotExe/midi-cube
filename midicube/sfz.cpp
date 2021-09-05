@@ -254,7 +254,8 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		return std::stod(str)/100.0;
 	};
 	std::unordered_map<unsigned int, ControlTrigger> triggers;
-	int keyswitch = -1;
+	unsigned int keyswitch_low = 0;
+	unsigned int keyswitch_high = 127;
 	std::string name = "";
 	//Opcodes
 	for (auto opcode : opcodes) {
@@ -275,13 +276,19 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 
 			}
 			else if (opcode.first == "sw_last") {
-				tree.put("preset", parse_sfz_note(opcode.second));
+				unsigned int note = parse_sfz_note(opcode.second);
+				tree.put("preset", note);
+				keyswitch_low = note;
+				keyswitch_high = note;
 			}
 			else if (opcode.first == "sw_lokey") { //FIXME only in global
 				tree.put("min_note", parse_sfz_note(opcode.second));
 			}
 			else if (opcode.first == "sw_hikey") { //FIXME only in global
 				tree.put("preset_start", parse_sfz_note(opcode.second));
+			}
+			else if (opcode.first == "sw_label") {
+				name = opcode.second;
 			}
 			else if (opcode.first == "lokey") {
 				tree.put("preset_start", parse_sfz_note(opcode.second));
@@ -387,8 +394,10 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 		t.put("max_value", static_cast<unsigned int>(trigger.second.max_val));
 		tree.add_child("control_triggers.control", t);
 	}
-	if (keyswitch >= 0 && name != "") {
-		preset_names[keyswitch] = name;
+	if (name != "") {
+		for (unsigned int i = keyswitch_low; i <= keyswitch_high; ++i) {
+			preset_names[i] = name;
+		}
 	}
 }
 
