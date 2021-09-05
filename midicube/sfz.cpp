@@ -485,8 +485,8 @@ void convert_sfz_to_sampler(std::string src, std::string folder, std::string dst
 	//Presets
 	for (auto preset : preset_names) {
 		pt::ptree p;
-		p.put("name", preset.first);
-		p.put("index", preset.second);
+		p.put("name", preset.second);
+		p.put("index", preset.first);
 		sound.add_child("presets.preset", p);
 	}
 

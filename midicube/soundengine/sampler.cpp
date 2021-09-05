@@ -507,7 +507,7 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 		//Load presets
 		auto presets = tree.get_child_optional("sound.presets");
 		if (presets) {
-			for (auto child : controls.get()) {
+			for (auto child : presets.get()) {
 				SamplePreset preset;
 				preset.name = child.second.get("name", "Default");
 				sound->presets[child.second.get("index", 0)] = preset;
