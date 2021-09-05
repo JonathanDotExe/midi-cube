@@ -240,7 +240,7 @@ static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::s
 	return false;
 }
 
-static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree, std::unordered_map<unsigned int, std::string> preset_names) {
+static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, pt::ptree& tree, std::unordered_map<unsigned int, std::string>& preset_names) {
 	std::function<double(std::string)> filter_conv = [](std::string str) {
 		return invert_scale_cutoff(std::stod(str));
 	};
@@ -255,7 +255,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 	};
 	std::unordered_map<unsigned int, ControlTrigger> triggers;
 	unsigned int keyswitch_low = 0;
-	unsigned int keyswitch_high = 127;
+	unsigned int keyswitch_high = 0;
 	std::string name = "";
 	//Opcodes
 	for (auto opcode : opcodes) {
@@ -282,10 +282,10 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 				keyswitch_high = note;
 			}
 			else if (opcode.first == "sw_lokey") { //FIXME only in global
-				tree.put("min_note", parse_sfz_note(opcode.second));
+				tree.put("preset_start", parse_sfz_note(opcode.second));
 			}
 			else if (opcode.first == "sw_hikey") { //FIXME only in global
-				tree.put("preset_start", parse_sfz_note(opcode.second));
+				tree.put("preset_end", parse_sfz_note(opcode.second));
 			}
 			else if (opcode.first == "sw_label") {
 				name = opcode.second;

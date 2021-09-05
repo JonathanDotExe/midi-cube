@@ -52,6 +52,9 @@ Scene SamplerView::create(Frame &frame) {
 			if (sample->presets.find(i) != sample->presets.end()) {
 				presets.push_back(sample->presets[i].name);
 			}
+			else {
+				presets.push_back(std::to_string(i));
+			}
 		}
 	}
 	if (presets.empty()) {

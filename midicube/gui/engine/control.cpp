@@ -177,7 +177,7 @@ void ComboBox::on_mouse_action() {
 void ComboBox::update_properties() {
 	if (property.is_bound()) {
 		property.get([this](double v) {
-			index = v - start_val;
+			index = fmax(0, v - start_val);
 			update_position(this->x, this->y, width, height);
 		});
 	}

@@ -325,7 +325,7 @@ public:
 
 	ComboBox(int value, std::vector<std::string> values, sf::Font& font, int text_size = 12, int start_val = 0, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
 		this->start_val = start_val;
-		this->index = value - start_val;
+		this->index = fmax(0, value - start_val);
 		this->values = values;
 
 		this->text.setFont(font);
