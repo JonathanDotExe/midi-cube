@@ -62,7 +62,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		boxes.push_back(amount);
 
 		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
-		source->property.bind(mod.lfo_amount, handler);
+		source->property.bind(mod.lfo, handler);
 		controls->push_back(source);
 		show_source->push_back(source);
 	}
