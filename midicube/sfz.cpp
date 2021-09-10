@@ -393,6 +393,38 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			else if (opcode.first == "fil_keycenter") {
 				tree.put("filter.kb_track_note", parse_sfz_note(opcode.second));
 			}
+			else if (opcode.first == "fil_type") {
+				/* LP_12, LP_24, HP_12, HP_24, LP_12_BP, LP_24_BP, LP_6, HP_6, BP_12 */
+				if (opcode.second == "lpf1_p") {
+					tree.put("filter.type", "LP_6");
+				}
+				else if (opcode.second == "hpf1_p") {
+					tree.put("filter.type", "HP_6");
+				}
+				else if (opcode.second == "lpf2_p") {
+					tree.put("filter.type", "LP_12");
+				}
+				else if (opcode.second == "hpf2_p") {
+					tree.put("filter.type", "HP_12");
+				}
+				else if (opcode.second == "lpf4_p") {
+					tree.put("filter.type", "LP_24");
+				}
+				else if (opcode.second == "hpf4_p") {
+					tree.put("filter.type", "HP_24");
+				}
+				else if (opcode.second == "bpf2_p") {
+					tree.put("filter.type", "BP_12");
+				}
+				else if (opcode.second == "bpf4_p") {
+					tree.put("filter.type", "LP_BP_24");
+					std::cout << "Filter type bpf4_p is implemented differently and may sound unexpected!" << std::endl;
+				}
+				else {
+					std::cout << "Skipping unrecognized filter type"
+											<< opcode.second << std::endl;
+				}
+			}
 			//Ignore
 			else if (opcode.first == "group_label") {
 
