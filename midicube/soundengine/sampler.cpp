@@ -13,6 +13,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>
 #include <regex>
+#include <boost/algorithm/string.hpp>
 
 namespace pt = boost::property_tree;
 
@@ -423,7 +424,9 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_crossfade);
 
 	if (load_sample && file != "") {
-		region.sample.sample = pool.load_sample(folder + "/" + file);
+		std::string filename = folder + "/" + file;
+		boost::replace_all(filename, "\\", "/");
+		region.sample.sample = pool.load_sample(filename);
 		if (!region.sample.sample) {
 			std::cerr << "Couldn't load sample file " << folder + "/" + file << std::endl;
 		}
