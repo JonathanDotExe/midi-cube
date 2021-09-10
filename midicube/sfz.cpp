@@ -384,9 +384,16 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 
 			}
 			//Filter
-			else if (parse_modulatable(opcode, "cutoff", "filter.cutoff", tree, "", filter_conv, filter_mod_conv)) {
+			else if (parse_modulatable(opcode, "cutoff", "filter.cutoff", tree, "fil_veltrack", filter_conv, filter_mod_conv)) {
 
 			}
+			else if (opcode.first == "fil_keytrack") {
+				tree.put("filter.kb_track", std::stoi(opcode.second)/100.0);
+			}
+			else if (opcode.first == "fil_keycenter") {
+				tree.put("filter.kb_track_note", parse_sfz_note(opcode.second));
+			}
+			//Ignore
 			else if (opcode.first == "group_label") {
 
 			}
