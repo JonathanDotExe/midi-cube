@@ -311,6 +311,11 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			else if (opcode.first == "pitch_keycenter") {
 				tree.put("note", parse_sfz_note(opcode.second));
 			}
+			else if (opcode.first == "key") {
+				tree.put("min_note", parse_sfz_note(opcode.second));
+				tree.put("max_note", parse_sfz_note(opcode.second));
+				tree.put("note", parse_sfz_note(opcode.second));
+			}
 			else if (opcode.first == "lovel") {
 				tree.put("min_velocity", std::stoi(opcode.second));
 			}
