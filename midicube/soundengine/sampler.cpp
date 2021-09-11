@@ -215,7 +215,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 					voice.time = (double) voice.sample->loop_start/voice.sample->sample->sample_rate;
 				}
 				else {
-					voice.time = (double) voice.sample->start/voice.sample->sample->sample_rate;
+					voice.time = (double) voice.sample->start.apply_modulation(voice.velocity, cc)/voice.sample->sample->sample_rate;
 				}
 				voice.hit_loop = false;
 				voice.env.reset();
@@ -418,7 +418,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 		region.loop = LoopType::ALWAYS_LOOP;
 	}
 
-	region.sample.start = tree.get<unsigned int>("sample.start", region.sample.start);
+	region.sample.start.load(tree, "sample.start", region.sample.start.value);
 	region.sample.loop_start = tree.get<unsigned int>("sample.loop_start", region.sample.loop_start);
 	region.sample.loop_end = tree.get<unsigned int>("sample.loop_end", region.sample.loop_end);
 	region.sample.loop_crossfade = tree.get<unsigned int>("sample.loop_crossfade", region.sample.loop_crossfade);
