@@ -28,10 +28,15 @@ struct SfzGroup {
 	std::vector<SfzRegion> regions;
 };
 
+struct SfzMaster {
+	std::unordered_map<std::string, std::string> opcodes;
+	std::vector<SfzGroup> groups;
+};
+
 struct SfzInstrument {
 	std::unordered_map<std::string, std::string> global;
 	std::unordered_map<std::string, std::string> control;
-	std::vector<SfzGroup> groups;
+	std::vector<SfzMaster> masters;
 };
 
 unsigned int parse_sfz_note(std::string text);

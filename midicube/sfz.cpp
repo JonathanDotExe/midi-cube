@@ -87,7 +87,7 @@ unsigned int parse_sfz_note(std::string text) {
 }
 
 enum ParserMode {
-	NONE, GLOBAL, CONTROL, GROUP, REGION
+	NONE, GLOBAL, CONTROL, MASTER, GROUP, REGION
 };
 
 SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path) {
@@ -98,7 +98,7 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 	//Remove comments
 	for (size_t i = 0; i < lines.size(); ++i) {
 		std::string line = lines[i];
-		if (line.rfind("//", 0) != 0) {
+		if (line.rfind("//", 0) != 0 && !std::all_of(line.begin(), line.end(), isspace)) {
 			//Apply defines
 			if (line.rfind("#define ", 0) != 0) {
 				for (auto pair : defines) {
@@ -106,6 +106,8 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 				}
 			}
 
+			boost::replace_all(line, "\r", "");
+			boost::replace_all(line, "\n", "");
 			std::vector<std::string> t = {};
 			boost::split(t, line, boost::is_any_of(" "));
 			//Define
@@ -114,6 +116,7 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 			}
 			//Include
 			else if (t.size() >= 2 && t[0] == "#include") {
+				std::cout << "Including \"" << line << "\"" << std::endl;
 				std::string file = t[1];
 				for (size_t j = 2; j < t.size(); ++j) {
 					file += " " + t[j];
@@ -122,8 +125,12 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 
 				//Load file
 				std::string filename = path + "/" + file;
-				std::fstream f(filename);
+				std::cout << "Including \"" << filename << "\"" << std::endl;
+				std::ifstream f(filename);
 				std::string t;
+				if (f.fail()) {
+					std::cout << strerror(errno) << std::endl;
+				}
 				while (getline(f, t)) {
 					lines.insert(lines.begin() + i + 1, t);
 				}
@@ -162,16 +169,26 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 		boost::trim(token);
 		if (token.size() != 0) {
 			//Change header
-			if (token == "<group>") {
+			if (token == "<master>") {
+				mode = MASTER;
+				instrument.masters.push_back({});
+			}
+			else if (token == "<group>") {
 				mode = GROUP;
-				instrument.groups.push_back({});
+				if (instrument.masters.size() == 0) {
+					instrument.masters.push_back({});
+				}
+				instrument.masters.back().groups.push_back({});
 			}
 			else if (token == "<region>") {
 				mode = REGION;
-				if (instrument.groups.size() == 0) {
-					instrument.groups.push_back({});
+				if (instrument.masters.size() == 0) {
+					instrument.masters.push_back({});
 				}
-				instrument.groups.at(instrument.groups.size() - 1).regions.push_back({});
+				if (instrument.masters.back().groups.size() == 0) {
+					instrument.masters.back().groups.push_back({});
+				}
+				instrument.masters.back().groups.back().regions.push_back({});
 			}
 			else if (token == "<global>") {
 				mode = GLOBAL;
@@ -196,11 +213,14 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 					case CONTROL:
 						instrument.control[opcode] = value;
 						break;
+					case MASTER:
+						instrument.masters.back().opcodes[opcode] = value;
+						break;
 					case GROUP:
-						instrument.groups.at(instrument.groups.size() - 1).opcodes[opcode] = value;
+						instrument.masters.back().groups.back().opcodes[opcode] = value;
 						break;
 					case REGION:
-						instrument.groups.at(instrument.groups.size() - 1).regions.at(instrument.groups.at(instrument.groups.size() - 1).regions.size() - 1).opcodes[opcode] = value;
+						instrument.masters.back().groups.back().regions.back().opcodes[opcode] = value;
 						break;
 					}
 				}
@@ -516,17 +536,24 @@ void convert_sfz_to_sampler(std::string src, std::string folder, std::string dst
 	parse_control_opcodes(instrument.control, sound);
 
 	//Groups
-	for (SfzGroup group : instrument.groups) {
-		pt::ptree g;
-		parse_opcodes(group.opcodes, g, preset_names);
-		//Regions
-		for (SfzRegion region : group.regions) {
-			pt::ptree r;
-			parse_opcodes(region.opcodes, r, preset_names);
-			g.add_child("regions.region", r);
+	for (SfzMaster master : instrument.masters) {
+		pt::ptree m;
+		parse_opcodes(master.opcodes, m, preset_names);
+		//Groups
+		for (SfzGroup group : master.groups) {
+			pt::ptree g;
+			parse_opcodes(group.opcodes, g, preset_names);
+			//Regions
+			for (SfzRegion region : group.regions) {
+				pt::ptree r;
+				parse_opcodes(region.opcodes, r, preset_names);
+				g.add_child("regions.region", r);
+			}
+			m.add_child("groups.group", g);
 		}
-		sound.add_child("groups.group", g);
+		sound.add_child("groups.group", m);
 	}
+
 	//Presets
 	for (auto preset : preset_names) {
 		pt::ptree p;
