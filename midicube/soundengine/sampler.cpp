@@ -454,8 +454,14 @@ void load_groups(pt::ptree tree, std::vector<SampleRegion*>& regions, SampleRegi
 		auto rs = t.get_child_optional("regions");
 		if (rs) {
 			for (auto re : rs.get()) {
-				regions.push_back(new SampleRegion(r));
-				load_region(re.second, *regions.at(regions.size() - 1), true, folder, pool);
+				SampleRegion* region = new SampleRegion(r);
+				load_region(re.second, *region, true, folder, pool);
+				if (region->sample.sample) {
+					regions.push_back(region);
+				}
+				else {
+					delete region;
+				}
 			}
 		}
 		//Groups

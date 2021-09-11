@@ -22,7 +22,12 @@ StreamedAudioSample* StreamedAudioPool::load_sample(std::string fname) {
 	if (!samples.count(fname)) {
 		StreamedAudioSample* sample = new StreamedAudioSample();
 		read_stream_audio_file(*sample, fname);
-		samples[fname] = sample;
+		if (sample) {
+			samples[fname] = sample;
+		}
+		else {
+			return nullptr;
+		}
 	}
 	return samples[fname];
 }
