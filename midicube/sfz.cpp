@@ -397,7 +397,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			else if (opcode.first == "loop_end") {
 				tree.put("sample.loop_end", std::stoi(opcode.second));
 			}
-			else if (opcode.first == "offset") {
+			else if (parse_modulatable(opcode, "offset", "sample.start", tree, "")) {
 				tree.put("sample.start", std::stoi(opcode.second));
 			}
 			else if (parse_modulatable(opcode, "ampeg_hold", "envelope.attack_hold", tree, "ampeg_vel2hold")) {
