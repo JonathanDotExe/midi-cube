@@ -14,6 +14,7 @@
 #include "soundengine/soundengine.h"
 #include "audioloader.h"
 #include "util.h"
+#include "plugin.h"
 
 struct MidiCubeInput {
 	MidiInput* in = nullptr;
