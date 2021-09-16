@@ -64,6 +64,8 @@ public:
 
 	virtual PluginInstance* create(PluginHost* host) = 0;
 
+	virtual PluginProgram* create_program() = 0;
+
 	virtual ~Plugin() {
 
 	}
@@ -91,6 +93,10 @@ public:
 	virtual void process(double** inputs, double** outputs, const SampleInfo& info) = 0;
 
 	virtual void recieve_midi(MidiMessage& message, const SampleInfo& info) = 0;
+
+	virtual void apply_program(PluginProgram* prog) = 0;
+
+	virtual void save_program(PluginProgram** prog) = 0;
 
 	virtual ~PluginInstance() {
 
