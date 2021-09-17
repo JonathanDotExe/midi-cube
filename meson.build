@@ -28,6 +28,7 @@ src = [
 	'midicube/midi.cpp',
 	'midicube/midicube.cpp',
 	'midicube/oscilator.cpp',
+	'midicube/pcm.cpp',
 	'midicube/plugin.cpp',
 	'midicube/program.cpp',
 	'midicube/sfz.cpp',
