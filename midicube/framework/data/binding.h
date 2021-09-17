@@ -12,7 +12,7 @@
 #include <array>
 #include <unordered_map>
 #include <algorithm>
-#include "midi.h"
+#include "../core/midi.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>

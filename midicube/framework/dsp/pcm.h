@@ -8,7 +8,7 @@
 #ifndef MIDICUBE_PCM_H_
 #define MIDICUBE_PCM_H_
 
-#include "audiofile.h"
+#include "../util/audiofile.h"
 
 struct PCMWaveFormZone {
 	AudioSample sample;

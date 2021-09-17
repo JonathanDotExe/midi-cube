@@ -9,7 +9,6 @@
 #define MIDICUBE_OSCILATOR_H_
 
 #include "envelope.h"
-#include "audio.h"
 #include "synthesis.h"
 #include <vector>
 #include <array>

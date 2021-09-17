@@ -5,7 +5,7 @@
  *      Author: jojo
  */
 
-#include "midiio.cpp"
+#include "midiio.h"
 
 //MidiHandler
 unsigned int MidiHandler::available_ports() {

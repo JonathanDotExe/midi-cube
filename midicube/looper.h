@@ -11,7 +11,7 @@
 #include <array>
 #include <atomic>
 #include "audio.h"
-#include "metronome.h"
+#include "framework/core/metronome.h"
 
 //16 MB
 #define LOOPER_CHANNELS 8

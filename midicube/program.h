@@ -19,8 +19,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "midi.h"
-#include "data.h"
+#include "midiio.h"
+#include "framework/data/data.h"
 #include "soundengine/soundengine.h"
 
 namespace pt = boost::property_tree;

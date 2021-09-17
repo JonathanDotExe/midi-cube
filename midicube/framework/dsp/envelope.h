@@ -11,10 +11,10 @@
 #define ENVELOPE_FOLLOWER_BUFFER_SIZE 44100
 
 #include <array>
-#include "midi.h"
+#include "../core/midi.h"
 #include "filter.h"
 #include "wavetable.h"
-#include "metronome.h"
+#include "../core/metronome.h"
 
 struct TriggeredNote {
 	double start_time = 0;

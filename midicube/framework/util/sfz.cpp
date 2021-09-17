@@ -6,8 +6,8 @@
  */
 
 #include "sfz.h"
-#include "synthesis.h"
-#include "filter.h"
+#include "../dsp/synthesis.h"
+#include "../dsp/filter.h"
 #include <boost/algorithm/string.hpp>
 #include <regex>
 #include <iostream>

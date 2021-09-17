@@ -100,10 +100,10 @@ sampler_src = [
 	'autosampler-main.cpp',
 	'midicube/autosampler.cpp',
 	'midicube/audio.cpp',
-	'midicube/audiofile.cpp',
-	'midicube/filter.cpp',
-	'midicube/sfz.cpp',
-	'midicube/synthesis.cpp'
+	'midicube/framework/util/audiofile.cpp',
+	'midicube/framework/dsp/filter.cpp',
+	'midicube/framework/util/sfz.cpp',
+	'midicube/framework/dsp/synthesis.cpp'
 ]
 
 executable('midi-cube-autosampler', sampler_src, dependencies: sampler_deps, link_args: '-latomic')

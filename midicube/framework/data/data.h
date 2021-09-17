@@ -12,7 +12,7 @@
 #include <functional>
 #include <iostream>
 #include "boost/lockfree/queue.hpp"
-#include "util.h"
+#include "../util/util.h"
 #include "binding.h"
 
 class Action {

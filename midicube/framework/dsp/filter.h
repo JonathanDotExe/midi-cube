@@ -9,7 +9,6 @@
 #define MIDICUBE_FILTER_H_
 #include <array>
 #include <type_traits>
-#include "audio.h"
 #include "synthesis.h"
 #include <cmath>
 

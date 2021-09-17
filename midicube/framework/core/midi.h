@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_MIDI_H_
 #define MIDICUBE_MIDI_H_
 
+#include <string>
 #include <vector>
 #include <exception>
 #include <functional>
@@ -23,6 +24,14 @@
 #define MONOPHONIC_AFTERTOUCH_BIT 0xD
 #define PITCH_BEND_BIT 0xE
 #define SYSEX_BIT 0xF
+
+struct SampleInfo {
+	double time;
+	double time_step;
+	unsigned int sample_rate;
+	unsigned int sample_time;
+	double input_sample;
+};
 
 class MidiException: public std::exception {
 

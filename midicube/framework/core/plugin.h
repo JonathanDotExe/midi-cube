@@ -9,7 +9,6 @@
 #define MIDICUBE_PLUGIN_H_
 
 #include <string>
-#include "audio.h"
 #include "midi.h"
 #include <algorithm>
 
