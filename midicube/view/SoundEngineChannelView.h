@@ -8,9 +8,9 @@
 #ifndef MIDICUBE_GUI_VIEW_SOUNDENGINECHANNELVIEW_H_
 #define MIDICUBE_GUI_VIEW_SOUNDENGINECHANNELVIEW_H_
 
-#include "../engine/core.h"
-#include "../engine/control.h"
-#include "../view/binding.h"
+#include "../framework/gui/core.h"
+#include "../framework/gui/control.h"
+#include "binding.h"
 
 class SoundEngineChannelView: public ViewController {
 private:

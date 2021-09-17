@@ -10,9 +10,9 @@
 
 #include <SFML/Graphics.hpp>
 #include <functional>
-#include "../../util.h"
-#include "../../midicube.h"
-#include "../../data.h"
+#include "../util/util.h"
+#include "../../midicube.h" //FIXME
+#include "../data/data.h"
 
 #define SELECTABLE virtual bool selectable() const { return true; };
 

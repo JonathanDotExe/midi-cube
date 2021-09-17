@@ -6,7 +6,7 @@
  */
 
 #include "sampler.h"
-#include "../sfz.h"
+#include "../framework/util/sfz.h"
 #include <iostream>
 #include <fstream>
 #include <boost/property_tree/ptree.hpp>

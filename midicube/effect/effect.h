@@ -9,9 +9,9 @@
 #define MIDICUBE_EFFECT_EFFECT_H_
 
 #include "../audio.h"
-#include "../oscilator.h"
-#include "../midi.h"
-#include "../binding.h"
+#include "../framework/dsp/oscilator.h"
+#include "../midiio.h"
+#include "../framework/data/binding.h"
 
 #include <unordered_map>
 

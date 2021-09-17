@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "midicube/gui/view/SoundEngineView.h"
+#include "midicube/view/SoundEngineView.h"
 #include "midicube/midicube.h"
 #include "midicube/effect/effect.h"
 

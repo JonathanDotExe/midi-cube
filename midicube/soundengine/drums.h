@@ -9,7 +9,7 @@
 #define MIDICUBE_SOUNDENGINE_DRUMS_H_
 
 #include "soundengine.h"
-#include "../audiofile.h"
+#include "../framework/util/audiofile.h"
 #include <unordered_map>
 
 

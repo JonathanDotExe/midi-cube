@@ -8,8 +8,8 @@
 #ifndef MIDICUBE_GUI_VIEW_ARPEGGIATORVIEW_H_
 #define MIDICUBE_GUI_VIEW_ARPEGGIATORVIEW_H_
 
-#include "../engine/core.h"
-#include "../engine/control.h"
+#include "../framework/gui/core.h"
+#include "../framework/gui/control.h"
 
 class ArpeggiatorView: public ViewController {
 private:

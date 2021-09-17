@@ -7,7 +7,7 @@
 
 
 #include "organ.h"
-#include "../oscilator.h"
+#include "../framework/dsp/oscilator.h"
 #include <cmath>
 
 //B3OrganTonewheel

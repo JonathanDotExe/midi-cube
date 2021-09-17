@@ -8,15 +8,13 @@
 #ifndef MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_
 #define MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_
 
-#include "../midi.h"
+#include "../framework/core/midi.h"
 #include "../effect/effect.h"
-#include "../envelope.h"
+#include "../framework/dsp/envelope.h"
 #include "../audio.h"
-#include "../synthesis.h"
+#include "../framework/dsp/synthesis.h"
 #include "../looper.h"
-#include "../metronome.h"
-#include "../effect/vocoder.h"
-#include "../effect/bitcrusher.h"
+#include "../framework/core/metronome.h"
 #include "voice.h"
 #include <string>
 #include <array>

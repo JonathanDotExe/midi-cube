@@ -9,11 +9,11 @@
 #define MIDICUBE_SOUNDENGINE_SAMPLER_H_
 
 #include "soundengine.h"
-#include "../audiofile.h"
-#include "../envelope.h"
-#include "../util.h"
-#include "../audioloader.h"
-#include "../sfz.h"
+#include "../framework/util/audiofile.h"
+#include "../framework/dsp/envelope.h"
+#include "../framework/util/util.h"
+#include "../framework/util/audioloader.h"
+#include "../framework/util/sfz.h"
 #include <array>
 
 namespace pt = boost::property_tree;

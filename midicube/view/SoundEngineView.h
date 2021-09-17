@@ -8,10 +8,10 @@
 #ifndef MIDICUBE_GUI_VIEW_SOUNDENGINEVIEW_H_
 #define MIDICUBE_GUI_VIEW_SOUNDENGINEVIEW_H_
 
-#include "../engine/core.h"
-#include "../engine/control.h"
-#include "../../midicube.h"
-#include "../../soundengine/soundengine.h"
+#include "../framework/gui/core.h"
+#include "../framework/gui/control.h"
+#include "../midicube.h"
+#include "../soundengine/soundengine.h"
 #include "../view/resources.h"
 
 class SoundEngineView : public ViewController {

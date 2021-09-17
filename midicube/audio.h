@@ -12,6 +12,7 @@
 #include <atomic>
 #include <array>
 #include <rtaudio/RtAudio.h>
+#include "framework/core/midi.h"
 
 class AudioException : public std::exception {
 

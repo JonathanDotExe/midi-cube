@@ -8,9 +8,9 @@
 #ifndef MIDICUBE_GUI_VIEW_ANALOGSYNTHOPERATORVIEW_H_
 #define MIDICUBE_GUI_VIEW_ANALOGSYNTHOPERATORVIEW_H_
 
-#include "../engine/core.h"
-#include "../engine/control.h"
-#include "../../soundengine/asynth.h"
+#include "../framework/gui/core.h"
+#include "../framework/gui/control.h"
+#include "../soundengine/asynth.h"
 #include "../view/binding.h"
 
 class AnalogSynthOperatorView : public ViewController {

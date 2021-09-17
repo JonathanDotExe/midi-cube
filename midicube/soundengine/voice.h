@@ -8,11 +8,10 @@
 #ifndef MIDICUBE_SOUNDENGINE_VOICE_H_
 #define MIDICUBE_SOUNDENGINE_VOICE_H_
 
-#include "../midi.h"
-#include "../envelope.h"
-#include "../audio.h"
-#include "../synthesis.h"
-#include "../metronome.h"
+#include "../midiio.h"
+#include "../framework/dsp/envelope.h"
+#include "../framework/dsp/synthesis.h"
+#include "../framework/core/metronome.h"
 #include <string>
 #include <array>
 #include <functional>

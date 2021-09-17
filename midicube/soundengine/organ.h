@@ -10,9 +10,7 @@
 
 
 #include "soundengine.h"
-#include "../synthesis.h"
-#include "../effect/rotary_speaker.h"
-#include "../effect/amplifier_simulation.h"
+#include "../framework/dsp/synthesis.h"
 
 #define ORGAN_DRAWBAR_COUNT 9
 #define ORGAN_DRAWBAR_MAX 8
@@ -91,8 +89,6 @@ public:
 class B3OrganData {
 public:
 	B3OrganPreset preset;
-	AmplifierSimulationEffect amplifier;
-	RotarySpeakerEffect rotary_speaker;
 	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels = {};
 	std::array<DelayBuffer, ORGAN_VIBRATO_DELAY_STAGES> delays;
 

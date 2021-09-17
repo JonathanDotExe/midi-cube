@@ -9,9 +9,9 @@
 #define MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 
 #include "soundengine.h"
-#include "../oscilator.h"
-#include "../filter.h"
-#include "../util.h"
+#include "../framework/dsp/oscilator.h"
+#include "../framework/dsp/filter.h"
+#include "../framework/util/util.h"
 
 #define ANALOG_PART_COUNT 8
 #define ANALOG_CONTROL_COUNT 128
