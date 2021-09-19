@@ -9,7 +9,7 @@
 #define MIDICUBE_EFFECT_WAH_WAH_H_
 
 #include "../audio.h"
-#include "../oscilator.h"
+#include "../framework/dsp/oscilator.h"
 #include "effect.h"
 
 

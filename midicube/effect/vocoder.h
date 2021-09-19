@@ -10,9 +10,9 @@
 
 #include <array>
 
-#include "../synthesis.h"
-#include "../envelope.h"
-#include "../filter.h"
+#include "../framework/dsp/synthesis.h"
+#include "../framework/dsp/envelope.h"
+#include "../framework/dsp/filter.h"
 #include "effect.h"
 
 #define VOCODER_BAND_COUNT 32

@@ -8,9 +8,9 @@
 #ifndef MIDICUBE_EFFECT_AMPLIFIER_SIMULATION_H_
 #define MIDICUBE_EFFECT_AMPLIFIER_SIMULATION_H_
 
-#include "../audio.h"
-#include "../filter.h"
-#include "../synthesis.h"
+#include "../framework/core/midi.h"
+#include "../framework/dsp/filter.h"
+#include "../framework/dsp/synthesis.h"
 #include "effect.h"
 
 #define AMP_OVERSAMPLING 2

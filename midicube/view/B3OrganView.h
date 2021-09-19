@@ -10,7 +10,7 @@
 
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
-#include "../../soundengine/organ.h"
+#include "../soundengine/organ.h"
 #include "../view/binding.h"
 
 class B3OrganView : public ViewController {

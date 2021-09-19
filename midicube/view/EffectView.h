@@ -10,8 +10,8 @@
 
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
-#include "../../effect/effect.h"
-#include "../../soundengine/soundengine.h"
+#include "../effect/effect.h"
+#include "../soundengine/soundengine.h"
 #include "../view/binding.h"
 
 class EffectView : public ViewController {

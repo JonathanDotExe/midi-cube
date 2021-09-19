@@ -5,8 +5,8 @@
  *      Author: jojo
  */
 
-#include "../engine/control.h"
-#include "../../soundengine/organ.h"
+#include "../framework/gui/control.h"
+#include "../soundengine/organ.h"
 #include "../view/BooleanMidiBindingView.h"
 #include "../view/resources.h"
 #include "../view/TemplateMidiBindingView.h"

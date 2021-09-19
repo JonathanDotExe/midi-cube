@@ -9,7 +9,7 @@
 #define MIDICUBE_EFFECT_PHASER_H_
 
 #include "../audio.h"
-#include "../oscilator.h"
+#include "../framework/dsp/oscilator.h"
 #include "effect.h"
 
 #define PHASER_ALLPASS_AMOUNT 4

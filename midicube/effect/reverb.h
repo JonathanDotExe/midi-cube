@@ -10,7 +10,7 @@
 
 #include "effect.h"
 
-#include "../synthesis.h"
+#include "../framework/dsp/synthesis.h"
 
 #define REVERB_COMB_FILTERS 4
 #define REVERB_ALLPASS_FILTERS 2

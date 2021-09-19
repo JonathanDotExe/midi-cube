@@ -10,7 +10,7 @@
 
 #include "../audio.h"
 #include "../framework/dsp/oscilator.h"
-#include "../midiio.h"
+#include "../framework/core/midi.h"
 #include "../framework/data/binding.h"
 
 #include <unordered_map>

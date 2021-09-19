@@ -10,7 +10,7 @@
 
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
-#include "../../soundengine/asynth.h"
+#include "../soundengine/asynth.h"
 #include "../view/binding.h"
 
 class AnalogSynthView: public ViewController {
