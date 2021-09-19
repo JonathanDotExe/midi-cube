@@ -10,7 +10,7 @@
 
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
-#include "../../soundengine/sampler.h"
+#include "../soundengine/sampler.h"
 
 class SamplerView: public ViewController {
 	private:

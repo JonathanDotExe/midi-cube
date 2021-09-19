@@ -6,8 +6,8 @@
  */
 
 #include "autosampler.h"
-#include "synthesis.h"
-#include "filter.h"
+#include "framework/dsp/synthesis.h"
+#include "framework/dsp/filter.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>

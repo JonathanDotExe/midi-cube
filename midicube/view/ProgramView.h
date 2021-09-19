@@ -10,8 +10,8 @@
 
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
-#include "../../midicube.h"
-#include "../../soundengine/soundengine.h"
+#include "../midicube.h"
+#include "../soundengine/soundengine.h"
 #include "../view/resources.h"
 
 #define PROGRAM_VIEW_ROWS 4
