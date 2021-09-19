@@ -105,7 +105,7 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 
 void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
 	if (note.region && note.sample) {
-		double vol = note.region->amplitude.apply_modulation(note.velocity, cc);
+		double vol = note.region->amplitude.apply_modulation(&note, this);
 		double vel_amount = 0;
 
 		double l = 0;
@@ -147,8 +147,8 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		//Filter
 		if (note.region->filter.on) {
 			FilterData filter { note.region->filter.filter_type };
-			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.region->filter.filter_cutoff.apply_modulation(note.velocity, cc)))); //TODO optimize
-			filter.resonance = note.region->filter.filter_resonance.apply_modulation(note.velocity, cc);
+			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.region->filter.filter_cutoff.apply_modulation(&note, this)))); //TODO optimize
+			filter.resonance = note.region->filter.filter_resonance.apply_modulation(&note, this);
 
 			if (note.region->filter.filter_kb_track) {
 				double cutoff = filter.cutoff;
@@ -164,13 +164,13 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 		//Env
 		if (!note.region->env.sustain_entire_sample) {
 			//Volume
-			ADSREnvelopeData data = note.region->env.env.apply(note.velocity, cc);
+			ADSREnvelopeData data = note.region->env.env.apply(&note, this);
 			vol *= note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
 		}
-		vel_amount = note.region->env.velocity_amount.apply_modulation(note.velocity, cc);
+		vel_amount = note.region->env.velocity_amount.apply_modulation(&note, this);
 
 		vol *= (1 - vel_amount) + note.velocity * vel_amount;
-		vol *= note.layer_amp  * note.region->volume.apply_modulation(note.velocity, cc);
+		vol *= note.layer_amp  * note.region->volume.apply_modulation(&note, this);
 
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
@@ -215,7 +215,7 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 					voice.time = (double) voice.sample->loop_start/voice.sample->sample->sample_rate;
 				}
 				else {
-					voice.time = (double) voice.sample->start.apply_modulation(voice.velocity, cc)/voice.sample->sample->sample_rate;
+					voice.time = (double) voice.sample->start.apply_modulation(&voice, this)/voice.sample->sample->sample_rate;
 				}
 				voice.hit_loop = false;
 				voice.env.reset();
