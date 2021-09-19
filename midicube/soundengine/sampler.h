@@ -169,6 +169,9 @@ struct SampleRegion {
 };
 
 struct SamplerVoice : public TriggeredNote {
+	double unirand = 0;
+	double birand = 0;
+	bool alternate = false;
 	double time = 0;
 	bool hit_loop = false;
 	double layer_amp = 1;
@@ -243,6 +246,7 @@ private:
 
 	unsigned int preset_number = 0;
 	size_t preset_index = 0;
+	bool alternate = false;
 
 public:
 	std::array<double, MIDI_CONTROL_COUNT> cc;
@@ -287,7 +291,37 @@ public:
 		}
 	}
 
-	double get_cc_value(unsigned int cc);
+	inline double get_cc_value(unsigned int cc, SamplerVoice* voice) {
+		if (cc <= 127) {
+			return this->cc[cc];
+		}
+		else {
+			switch (cc) {
+			case 128:
+				return (device->env.pitch_bend_percent * 0.5) + 0.5;
+			case 129:
+				return channel->info.aftertouch;
+			case 130:
+				return channel->info.aftertouch; //FIXME support poly at
+			case 131:
+				return voice->velocity; //Note on velocity
+			case 132:
+				return voice->velocity; //Note off velocity FIXME
+			case 133:
+				return voice->note/127.0;
+			case 134:
+				return channel->status.pressed_notes > 0;
+			case 135:
+				return voice->unirand;
+			case 136:
+				return voice->birand;
+			case 137:
+				return voice->alternate;
+			default:
+				return 0;
+			}
+		}
+	}
 };
 
 extern SampleSound* load_sound(std::string file, std::string folder, StreamedAudioPool& pool);
@@ -298,7 +332,7 @@ inline double ModulateableProperty::apply_modulation(SamplerVoice *voice,
 		Sampler *sampler) {
 	double val = value;
 	val += voice->velocity * velocity_amount;
-	double cc_val = sampler->get_cc_value(cc);
+	double cc_val = sampler->get_cc_value(cc, voice);
 	val += cc_val * cc_amount;
 	if (cc_multiplier != 1) {
 		val *= (1 - cc_val) + cc_val * cc_multiplier;

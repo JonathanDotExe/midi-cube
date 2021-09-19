@@ -209,6 +209,10 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 				voice.region = region;
 				voice.layer_amp = sample->volume; //FIXME
 				voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
+				voice.unirand = (double) rand()/RAND_MAX;
+				voice.birand = (double) rand()/RAND_MAX * 2 - 1.0;
+				voice.alternate = alternate;
+				alternate = !alternate;
 
 				//TODO preload at start time
 				if (voice.region && voice.region->loop == LoopType::ALWAYS_LOOP) {
@@ -581,3 +585,4 @@ bool Sampler::control_change(unsigned int control, unsigned int value) {
 	}
 	return updated;
 }
+
