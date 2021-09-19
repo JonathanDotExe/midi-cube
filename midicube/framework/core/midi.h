@@ -25,14 +25,6 @@
 #define PITCH_BEND_BIT 0xE
 #define SYSEX_BIT 0xF
 
-struct SampleInfo {
-	double time;
-	double time_step;
-	unsigned int sample_rate;
-	unsigned int sample_time;
-	double input_sample;
-};
-
 class MidiException: public std::exception {
 
 private:

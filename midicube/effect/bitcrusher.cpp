@@ -5,6 +5,7 @@
  *      Author: jojo
  */
 
+
 #include "bitcrusher.h"
 #include <cmath>
 

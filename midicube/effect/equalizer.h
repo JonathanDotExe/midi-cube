@@ -8,7 +8,7 @@
 #ifndef MIDICUBE_EFFECT_EQUALIZER_H_
 #define MIDICUBE_EFFECT_EQUALIZER_H_
 
-#include "../audio.h"
+#include "../framework/core/audio.h"
 #include "../framework/dsp/oscilator.h"
 #include "effect.h"
 

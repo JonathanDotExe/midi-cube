@@ -8,7 +8,7 @@
 #ifndef MIDICUBE_EFFECT_AMPLIFIER_SIMULATION_H_
 #define MIDICUBE_EFFECT_AMPLIFIER_SIMULATION_H_
 
-#include "../framework/core/midi.h"
+#include "../framework/core/audio.h"
 #include "../framework/dsp/filter.h"
 #include "../framework/dsp/synthesis.h"
 #include "effect.h"

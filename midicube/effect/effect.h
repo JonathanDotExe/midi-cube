@@ -8,7 +8,7 @@
 #ifndef MIDICUBE_EFFECT_EFFECT_H_
 #define MIDICUBE_EFFECT_EFFECT_H_
 
-#include "../audio.h"
+#include "../framework/core/audio.h"
 #include "../framework/dsp/oscilator.h"
 #include "../framework/core/midi.h"
 #include "../framework/data/binding.h"

@@ -8,7 +8,7 @@
 #ifndef MIDICUBE_EFFECT_ROTARY_SPEAKER_H_
 #define MIDICUBE_EFFECT_ROTARY_SPEAKER_H_
 
-#include "../audio.h"
+#include "../framework/core/audio.h"
 #include "../framework/dsp/filter.h"
 #include "../framework/dsp/synthesis.h"
 #include "effect.h"

@@ -11,6 +11,7 @@
 #define ENVELOPE_FOLLOWER_BUFFER_SIZE 44100
 
 #include <array>
+#include "../core/audio.h"
 #include "../core/midi.h"
 #include "filter.h"
 #include "wavetable.h"

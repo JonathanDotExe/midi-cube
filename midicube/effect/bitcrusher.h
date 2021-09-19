@@ -8,7 +8,7 @@
 #ifndef MIDICUBE_EFFECT_BITCRUSHER_H_
 #define MIDICUBE_EFFECT_BITCRUSHER_H_
 
-#include "../audio.h"
+#include "../framework/core/audio.h"
 #include "effect.h"
 
 struct BitCrusherPreset {

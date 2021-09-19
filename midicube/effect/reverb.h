@@ -9,7 +9,7 @@
 #define MIDICUBE_EFFECT_REVERB_H_
 
 #include "effect.h"
-
+#include "../framework/core/audio.h"
 #include "../framework/dsp/synthesis.h"
 
 #define REVERB_COMB_FILTERS 4
