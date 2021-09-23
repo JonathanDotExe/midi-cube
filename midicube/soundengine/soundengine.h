@@ -15,6 +15,7 @@
 #include "../framework/dsp/synthesis.h"
 #include "../looper.h"
 #include "../framework/core/metronome.h"
+#include "../framework/core/plugin.h"
 #include "voice.h"
 #include <string>
 #include <array>
@@ -204,7 +205,7 @@ struct SoundEngineScene {
 
 class InsertEffect {
 private:
-	Effect* effect = nullptr;
+	Plugin* effect = nullptr;
 
 public:
 	SoundEngineDevice* device = nullptr;
@@ -219,16 +220,16 @@ public:
 
 	void apply(double& lsample, double& rsample, SampleInfo& info);
 
-	void set_effect(Effect *effect = nullptr);
+	void set_effect(Plugin *effect = nullptr);
 
-	Effect* get_effect() const;
+	Plugin* get_effect() const;
 
 	~InsertEffect();
 };
 
 class MasterEffect {
 private:
-	Effect* effect = nullptr;
+	Plugin* effect = nullptr;
 
 public:
 	SoundEngineDevice* device = nullptr;
@@ -246,16 +247,16 @@ public:
 
 	void apply(double& lsample, double& rsample, SampleInfo& info);
 
-	void set_effect(Effect *effect = nullptr);
+	void set_effect(Plugin *effect = nullptr);
 
-	Effect* get_effect() const;
+	Plugin* get_effect() const;
 
 	~MasterEffect();
 };
 
 class SoundEngineChannel {
 private:
-	SoundEngine* engine = nullptr;
+	Plugin* engine = nullptr;
 	SoundEngineDevice* device = nullptr;
 
 	LocalMidiBindingHandler binder;

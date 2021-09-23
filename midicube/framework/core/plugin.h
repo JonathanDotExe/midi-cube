@@ -42,6 +42,9 @@ public:
 class PluginHost {
 
 public:
+
+	virtual KeyboardEnvironment get_environment();
+
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info) = 0;
 
 	virtual ~PluginHost() {
@@ -102,7 +105,8 @@ public:
 	virtual void save_program(PluginProgram** prog) = 0;
 
 	virtual ~PluginInstance() {
-
+		delete inputs;
+		delete outputs;
 	}
 
 	PluginHost& get_host() const {

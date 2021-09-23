@@ -25,11 +25,11 @@ void InsertEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	}
 }
 
-Effect* InsertEffect::get_effect() const {
+Plugin* InsertEffect::get_effect() const {
 	return effect;
 }
 
-void InsertEffect::set_effect(Effect *effect) {
+void InsertEffect::set_effect(Plugin *effect) {
 	delete this->effect;
 	this->effect = effect;
 	if (effect) {
@@ -76,11 +76,11 @@ void MasterEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 	this->rsample = 0;
 }
 
-Effect* MasterEffect::get_effect() const {
+Plugin* MasterEffect::get_effect() const {
 	return effect;
 }
 
-void MasterEffect::set_effect(Effect *effect) {
+void MasterEffect::set_effect(Plugin *effect) {
 	delete this->effect;
 	this->effect = effect;
 	if (effect) {
@@ -228,11 +228,11 @@ ssize_t SoundEngineChannel::get_engine_index() {
 	return index;
 }
 
-SoundEngine* SoundEngineChannel::get_engine() {
+Plugin* SoundEngineChannel::get_engine() {
 	return engine;
 }
 
-void SoundEngineChannel::set_engine(SoundEngine* engine) {
+void SoundEngineChannel::set_engine(Plugin* engine) {
 	delete this->engine;
 	this->engine = engine;
 	if (engine) {
