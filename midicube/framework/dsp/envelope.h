@@ -36,6 +36,7 @@ struct KeyboardEnvironment {
 	double sustain_release_time = 0;
 	double pitch_bend = 1;
 	std::array<double, MIDI_CONTROL_COUNT> ccs;
+	double pitch_bend_percent = 0.5;
 };
 
 enum ADSREnvelopeShape {
