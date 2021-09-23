@@ -88,8 +88,8 @@ protected:
 	}
 
 public:
-	double** inputs;
-	double** outputs;
+	double* inputs;
+	double* outputs;
 
 	PluginInstance(PluginHost& h, Plugin& p) : host(h), plugin(p) {
 		inputs = new double[p.info.input_channels];
@@ -116,6 +116,42 @@ public:
 	Plugin& get_plugin() const {
 		return plugin;
 	}
+};
+
+class PluginSlot {
+
+private:
+	PluginHost* host = nullptr;
+	PluginInstance* plugin = nullptr;
+
+public:
+
+	void init(PluginHost* host) {
+		if (this->host) {
+			throw "Host already initialised!";
+		}
+		this->host = host;
+	}
+
+	PluginInstance* get_plugin() const {
+		return plugin;
+	}
+
+	void set_plugin(Plugin* plugin) {
+		if (this->plugin) {
+			delete this->plugin;
+			this->plugin = nullptr;
+		}
+		if (plugin) {
+			this->plugin = plugin->create(host);
+		}
+	}
+
+	~PluginSlot() {
+		delete plugin;
+	}
+
+
 };
 
 #endif
