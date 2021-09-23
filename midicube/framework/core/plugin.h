@@ -85,12 +85,15 @@ protected:
 	}
 
 public:
+	double** inputs;
+	double** outputs;
 
 	PluginInstance(PluginHost& h, Plugin& p) : host(h), plugin(p) {
-
+		inputs = new double[p.info.input_channels];
+		outputs = new double[p.info.output_channels];
 	}
 
-	virtual void process(double** inputs, double** outputs, const SampleInfo& info) = 0;
+	virtual void process(const SampleInfo& info) = 0;
 
 	virtual void recieve_midi(MidiMessage& message, const SampleInfo& info) = 0;
 
