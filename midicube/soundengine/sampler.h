@@ -20,6 +20,9 @@ namespace pt = boost::property_tree;
 
 #define MIDI_NOTES 128
 
+class Sampler;
+struct SamplerVoice;
+
 struct ModulateableProperty {
 	double value = 0;
 	unsigned int cc = 0;
@@ -27,15 +30,7 @@ struct ModulateableProperty {
 	double cc_multiplier = 1;
 	double velocity_amount = 0;
 
-	inline double apply_modulation(double velocity, std::array<double, MIDI_CONTROL_COUNT>& cc_val) {
-		double val = value;
-		val += velocity * velocity_amount;
-		val += cc_val[cc] * cc_amount;
-		if (cc_multiplier != 1) {
-			val *= (1 - cc_val[cc]) + cc_val[cc] * cc_multiplier;
-		}
-		return val;
-	}
+	inline double apply_modulation(SamplerVoice* voice, Sampler* sampler);
 
 	void load(boost::property_tree::ptree& parent, std::string path, double def) {
 		auto tree = parent.get_child_optional(path);
@@ -79,26 +74,26 @@ struct ModulatableADSREnvelopeData {
 
 	bool pedal_catch = false;
 
-	inline ADSREnvelopeData apply(double velocity, std::array<double, MIDI_CONTROL_COUNT>& cc_val) {
+	inline ADSREnvelopeData apply(SamplerVoice* voice, Sampler* sampler) {
 		ADSREnvelopeData env;
-		env.attack = attack.apply_modulation(velocity, cc_val);
-		env.decay = decay.apply_modulation(velocity, cc_val);
-		env.sustain = sustain.apply_modulation(velocity, cc_val);
-		env.release = release.apply_modulation(velocity, cc_val);
+		env.attack = attack.apply_modulation(voice, sampler);
+		env.decay = decay.apply_modulation(voice, sampler);
+		env.sustain = sustain.apply_modulation(voice, sampler);
+		env.release = release.apply_modulation(voice, sampler);
 
 		env.attack_shape = attack_shape;
 		env.pre_decay_shape = pre_decay_shape;
 		env.decay_shape = decay_shape;
 		env.release_shape = release_shape;
 
-		env.hold = hold.apply_modulation(velocity, cc_val);
-		env.pre_decay =  pre_decay.apply_modulation(velocity, cc_val);
+		env.hold = hold.apply_modulation(voice, sampler);
+		env.pre_decay =  pre_decay.apply_modulation(voice, sampler);
 
-		env.attack_hold = attack_hold.apply_modulation(velocity, cc_val);
-		env.peak_volume = peak_volume.apply_modulation(velocity, cc_val);
-		env.decay_volume = decay_volume.apply_modulation(velocity, cc_val);
-		env.sustain_time = sustain_time.apply_modulation(velocity, cc_val);
-		env.release_volume = release_volume.apply_modulation(velocity, cc_val);
+		env.attack_hold = attack_hold.apply_modulation(voice, sampler);
+		env.peak_volume = peak_volume.apply_modulation(voice, sampler);
+		env.decay_volume = decay_volume.apply_modulation(voice, sampler);
+		env.sustain_time = sustain_time.apply_modulation(voice, sampler);
+		env.release_volume = release_volume.apply_modulation(voice, sampler);
 		return env;
 	}
 };
@@ -174,6 +169,9 @@ struct SampleRegion {
 };
 
 struct SamplerVoice : public TriggeredNote {
+	double unirand = 0;
+	double birand = 0;
+	bool alternate = false;
 	double time = 0;
 	bool hit_loop = false;
 	double layer_amp = 1;
@@ -248,6 +246,7 @@ private:
 
 	unsigned int preset_number = 0;
 	size_t preset_index = 0;
+	bool alternate = false;
 
 public:
 	std::array<double, MIDI_CONTROL_COUNT> cc;
@@ -291,11 +290,55 @@ public:
 			preset_number = sample->presets[presetIndex].preset_number;
 		}
 	}
+
+	inline double get_cc_value(unsigned int cc, SamplerVoice* voice) {
+		if (cc <= 127) {
+			return this->cc[cc];
+		}
+		else {
+			switch (cc) {
+			case 128:
+				return (device->env.pitch_bend_percent * 0.5) + 0.5;
+			case 129:
+				return channel->info.aftertouch;
+			case 130:
+				return channel->info.aftertouch; //FIXME support poly at
+			case 131:
+				return voice->velocity; //Note on velocity
+			case 132:
+				return voice->velocity; //Note off velocity FIXME
+			case 133:
+				return voice->note/127.0;
+			case 134:
+				return channel->status.pressed_notes > 0;
+			case 135:
+				return voice->unirand;
+			case 136:
+				return voice->birand;
+			case 137:
+				return voice->alternate;
+			default:
+				return 0;
+			}
+		}
+	}
 };
 
 extern SampleSound* load_sound(std::string file, std::string folder, StreamedAudioPool& pool);
 
 extern void save_sound(std::string file);
+
+inline double ModulateableProperty::apply_modulation(SamplerVoice *voice,
+		Sampler *sampler) {
+	double val = value;
+	val += voice->velocity * velocity_amount;
+	double cc_val = sampler->get_cc_value(cc, voice);
+	val += cc_val * cc_amount;
+	if (cc_multiplier != 1) {
+		val *= (1 - cc_val) + cc_val * cc_multiplier;
+	}
+	return val;
+}
 
 
 #endif /* MIDICUBE_SOUNDENGINE_SAMPLER_H_ */

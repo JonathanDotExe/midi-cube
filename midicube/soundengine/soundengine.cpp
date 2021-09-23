@@ -459,7 +459,8 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	case MessageType::PROGRAM_CHANGE:
 		break;
 	case MessageType::PITCH_BEND:
-		pitch = (message.get_pitch_bend()/8192.0 - 1.0) * 2;
+		env.pitch_bend_percent = message.get_pitch_bend()/8192.0 - 1.0;
+		pitch = env.pitch_bend_percent * 2;
 		env.pitch_bend = note_to_freq_transpose(pitch);
 		break;
 	case MessageType::SYSEX:
