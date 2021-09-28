@@ -46,17 +46,7 @@ struct EngineStatus {
 	size_t latest_note_index = 0;
 };
 
-class EngineProgram {
-public:
-	virtual void load(pt::ptree tree) = 0;
-
-	virtual pt::ptree save() = 0;
-
-	virtual ~EngineProgram() {
-
-	}
-};
-
+/*
 class SoundEngine {
 
 protected:
@@ -181,6 +171,7 @@ EngineStatus BaseSoundEngine<V, P>::process_sample(double& lsample, double& rsam
 
 template <typename T>
 std::string get_engine_name();
+*/
 
 struct ChannelSource {
 	ssize_t input = 1;
@@ -203,60 +194,9 @@ struct SoundEngineScene {
 	ChannelSource source;
 };
 
-class InsertEffect {
-private:
-	Plugin* effect = nullptr;
-
-public:
-	SoundEngineDevice* device = nullptr;
-
-	InsertEffect() {
-
-	}
-
-	void set_effect_index(ssize_t index);
-
-	ssize_t get_effect_index();
-
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-
-	void set_effect(Plugin *effect = nullptr);
-
-	Plugin* get_effect() const;
-
-	~InsertEffect();
-};
-
-class MasterEffect {
-private:
-	Plugin* effect = nullptr;
-
-public:
-	SoundEngineDevice* device = nullptr;
-	double lsample = 0;
-	double rsample = 0;
-	size_t next_effect = 0;
-
-	MasterEffect() {
-
-	}
-
-	void set_effect_index(ssize_t index);
-
-	ssize_t get_effect_index();
-
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-
-	void set_effect(Plugin *effect = nullptr);
-
-	Plugin* get_effect() const;
-
-	~MasterEffect();
-};
-
 class SoundEngineChannel {
 private:
-	Plugin* engine = nullptr;
+	PluginSlot engine;
 	SoundEngineDevice* device = nullptr;
 
 	LocalMidiBindingHandler binder;
@@ -267,7 +207,7 @@ public:
 	Arpeggiator arp;
 
 	//Effects
-	std::array<InsertEffect, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
+	std::array<PluginSlot, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t master_send = -1;
 
 	EngineStatus status = {};
@@ -356,30 +296,13 @@ public:
 
 };
 
-struct MasterEffectProgram {
-	ssize_t next_effect = -1;
-	ssize_t effect = -1;
-	EffectProgram* prog = nullptr;
-	~MasterEffectProgram() {
-		delete prog;
-	}
-};
-
-struct InsertEffectProgram {
-	ssize_t effect = -1;
-	EffectProgram* prog = nullptr;
-	~InsertEffectProgram() {
-		delete prog;
-	}
-};
-
 struct ChannelProgram {
 	ssize_t engine_index{-1};
 	bool active = true;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double>  panning{0, -1, 1};
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
-	std::array<InsertEffectProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
+	std::array<PluginSlotProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t send_master = -1;
 	size_t polyphony_limit = 0;
 
@@ -387,7 +310,7 @@ struct ChannelProgram {
 	bool arp_on;
 	ArpeggiatorPreset arpeggiator;
 
-	EngineProgram* engine_program = nullptr;
+	PluginSlotProgram engine_program;
 
 	~ChannelProgram() {
 		delete engine_program;
@@ -398,7 +321,7 @@ struct Program {
 	std::string name;
 	unsigned int metronome_bpm = 120;
 	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{2, true}};
-	std::array<MasterEffectProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
+	std::array<PluginSlotProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
 	std::array<MotionSeqeuncerPreset<MOTION_SEQUENCER_LENGTH>, MOTION_SEQUENCER_AMOUNT> motion_sequencers;
 };
 
@@ -473,7 +396,7 @@ public:
 	Looper looper;
 	bool play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
-	std::array<MasterEffect, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
+	std::array<PluginSlot, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
 	double volume{0.2};
 	size_t scene{0};
 	std::array<unsigned int, SOUND_ENGINE_SCENE_AMOUNT> scene_ccs = {52, 53, 54, 55, 57, 58, 59, 60};
