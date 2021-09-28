@@ -58,25 +58,6 @@ public:
 	}
 };
 
-class EffectBuilder {
-public:
-
-	virtual Effect* build() = 0;
-
-	virtual std::string get_name() = 0;
-
-	virtual bool matches(Effect* effect) = 0;
-
-	virtual EffectProgram* create_program() = 0;
-
-	virtual ~EffectBuilder() {
-
-	};
-};
-
-template <typename T>
-std::string get_effect_name();
-
 template <typename T>
 EffectProgram* create_effect_program();
 
