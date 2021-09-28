@@ -10,6 +10,7 @@
 
 #include <string>
 #include "midi.h"
+#include <map>
 #include <algorithm>
 
 #include <boost/property_tree/ptree.hpp>
@@ -126,12 +127,40 @@ public:
 
 class PluginManager {
 private:
-	std::unordered_map<std::string, Plugin*> plugins;
+	std::map<std::string, Plugin*> plugins;
 
 public:
 
+	std::vector<PluginInfo> get_infos() {
+		std::vector<PluginInfo> infos;
+		for (auto plugin : plugins) {
+			infos.push_back(plugin.second->info);
+		}
+		return infos;
+	}
+
+	void add_plugin(Plugin* plugin) {
+		if (get_plugin(plugin->info.identifier_name)) {
+			throw "Conflicting plugin identifier! Plugin with name " << plugin->info.identifier_name << "already exists!";
+		}
+		else {
+			plugins[plugin->info.identifier_name] = plugin;
+		}
+	}
+
 	Plugin* get_plugin(std::string identifier) {
-		return plugins[identifier];
+		if (plugins.find(identifier) == plugins.end()) {
+			return nullptr;
+		}
+		else {
+			return plugins[identifier];
+		}
+	}
+
+	~PluginManager() {
+		for (auto plugin : plugins) {
+			delete plugin.second;
+		}
 	}
 
 };
