@@ -34,10 +34,14 @@ public:
 
 	virtual pt::ptree save() = 0;
 
+	virtual std::string get_plugin_name() = 0;
+
 	virtual ~PluginProgram() {
 
 	}
 };
+
+class Plugin;
 
 class PluginHost {
 
@@ -46,6 +50,8 @@ public:
 	virtual KeyboardEnvironment get_environment();
 
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info) = 0;
+
+	virtual Plugin* get_plugin(std::string identifier);
 
 	virtual ~PluginHost() {
 
@@ -118,6 +124,55 @@ public:
 	}
 };
 
+class PluginManager {
+private:
+	std::unordered_map<std::string, Plugin*> plugins;
+
+public:
+
+	Plugin* get_plugin(std::string identifier) {
+		return plugins[identifier];
+	}
+
+};
+
+class PluginSlotProgram {
+private:
+	PluginProgram* program = nullptr;
+
+public:
+	PluginSlotProgram() {
+
+	}
+
+	void load(pt::ptree tree, PluginManager* mgr) {
+		Plugin* plugin = mgr->get_plugin(tree.get("plugin", ""));
+		if (plugin) {
+			if (program) {
+				delete program;
+			}
+			program = plugin->create_program();
+			if (tree.get_child_optional("data")) {
+				program->load(tree.get_child("data"));
+			}
+		}
+	}
+
+	pt::ptree save() {
+		pt::ptree tree;
+		tree.put("plugin", program ? program->get_plugin_name() : nullptr);
+		if (program) {
+			tree.add_child("data", program->save());
+		}
+		return tree;
+	}
+
+	~PluginSlotProgram() {
+
+	}
+
+};
+
 class PluginSlot {
 
 private:
@@ -146,6 +201,8 @@ public:
 			this->plugin = plugin->create(host);
 		}
 	}
+
+
 
 	~PluginSlot() {
 		delete plugin;
