@@ -145,6 +145,20 @@ public:
 
 	}
 
+	void save_program(PluginInstance* plugin) {
+		if (plugin) {
+			plugin->save_program(&program); //FIXME ensure deletion of pointer in save_program
+		}
+		else {
+			delete program;
+			program = nullptr;
+		}
+	}
+
+	PluginProgram* get_program() {
+		return program;
+	}
+
 	void load(pt::ptree tree, PluginManager* mgr) {
 		Plugin* plugin = mgr->get_plugin(tree.get("plugin", ""));
 		if (plugin) {
@@ -168,7 +182,7 @@ public:
 	}
 
 	~PluginSlotProgram() {
-
+		delete program;
 	}
 
 };
@@ -202,7 +216,25 @@ public:
 		}
 	}
 
+	void load(PluginSlotProgram& prog, PluginManager* mgr) {
+		if (prog.get_program()) {
+			Plugin* p = mgr->get_plugin(prog.get_program()->get_plugin_name());
+			if (p) {
+				set_plugin(p);
+				plugin->apply_program(prog.get_program());
+			}
+			else {
+				set_plugin(nullptr);
+			}
+		}
+		else {
+			set_plugin(nullptr);
+		}
+	}
 
+	void save(PluginSlotProgram& prog) {
+		prog.save_program(plugin);
+	}
 
 	~PluginSlot() {
 		delete plugin;
