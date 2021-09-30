@@ -10,6 +10,7 @@
 
 #include <string>
 #include "midi.h"
+#include "audio.h"
 #include <map>
 #include <algorithm>
 
