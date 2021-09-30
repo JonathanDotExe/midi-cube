@@ -43,7 +43,6 @@ src = [
 	'midicube/soundengine/organ.cpp',
 	'midicube/soundengine/sampler.cpp',
 	'midicube/soundengine/soundengine.cpp',
-	'midicube/soundengine/voice.cpp',
 	
 	'midicube/framework/gui/control.cpp',
 	'midicube/framework/gui/core.cpp',
