@@ -141,7 +141,7 @@ public:
 
 	void add_plugin(Plugin* plugin) {
 		if (get_plugin(plugin->info.identifier_name)) {
-			throw "Conflicting plugin identifier! Plugin with name " << plugin->info.identifier_name << "already exists!";
+			throw "Conflicting plugin identifier! Plugin with name " + plugin->info.identifier_name + "already exists!";
 		}
 		else {
 			plugins[plugin->info.identifier_name] = plugin;

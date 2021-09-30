@@ -22,7 +22,7 @@ void MidiCube::init(int out_device, int in_device) {
 	engine.init(this);
 	global_sample_store.load_sounds("./data/samples");
 	//Sound Engines
-	fill_sound_engine_device(&engine);
+	//TODO init plugins
 	//Default setting
 	Arpeggiator& arp = engine.channels[1].arp;
 	arp.on = true;
@@ -35,10 +35,10 @@ void MidiCube::init(int out_device, int in_device) {
 	engine.channels[0].scenes[0].active = true;
 	//engine.channels[0].vocoder_preset.on = true;
 
-	engine.channels[0].set_engine_index(2);
+	//engine.channels[0].set_engine_index(2);
 
 	engine.channels[9].scenes[0].active = true;
-	engine.channels[9].set_engine_index(3);
+	//engine.channels[9].set_engine_index(3);
 
 	//engine.channels[10].bitcrusher_preset.on = true;
 	//engine.channels[10].bitcrusher_preset.bits = 8;
