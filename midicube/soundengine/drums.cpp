@@ -14,16 +14,16 @@
 namespace pt = boost::property_tree;
 
 //SampleDrums
-SampleDrums::SampleDrums () {
+SampleDrums::SampleDrums(PluginHost& h, Plugin& p) : SoundEngine(h, p){
 	drumkit = load_drumkit("./data/drumkits/drums1");
 }
 
-void SampleDrums::process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+void SampleDrums::process_note_sample(const SampleInfo& info, TriggeredNote& note, size_t note_index) {
 	try {
 		if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
 			AudioSample& audio = drumkit->notes[note.note];
-			lsample += audio.sample(0, info.time - note.start_time, info.sample_rate);
-			rsample += audio.sample(1, info.time - note.start_time, info.sample_rate);
+			outputs[0] += audio.sample(0, info.time - note.start_time, info.sample_rate);
+			outputs[1] += audio.sample(1, info.time - note.start_time, info.sample_rate);
 		}
 	}
 	catch (std::exception& e) {
@@ -32,11 +32,23 @@ void SampleDrums::process_note_sample(double& lsample, double& rsample, SampleIn
 	}
 }
 
-bool SampleDrums::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+bool SampleDrums::note_finished(const SampleInfo& info, TriggeredNote& note, size_t note_index) {
 	if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
 		return info.time - note.start_time > (double) drumkit->notes[note.note].duration();
 	}
 	return true;
+}
+
+void SampleDrums::apply_program(PluginProgram *prog) {
+	SampleDrumsProgram* p = dynamic_cast<SampleDrumsProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		*prog = new SampleDrumsProgram();
+	}
+}
+
+void SampleDrums::save_program(PluginProgram **prog) {
 }
 
 SampleDrums::~SampleDrums() {
@@ -77,11 +89,24 @@ extern SampleDrumKit* load_drumkit(std::string folder) {
 	return drumkit;
 }
 
-template<>
-std::string get_engine_name<SampleDrums>() {
-	return "Sample Drums";
+
+//SampleDrumsPlugin
+PluginProgram* SampleDrumsPlugin::create_program() {
+	return new SampleDrumsProgram();
 }
 
-void __fix_link_drums_name__ () {
-	get_engine_name<SampleDrums>();
+PluginInstance* SampleDrumsPlugin::create(PluginHost *host) {
+	return new SampleDrums(*host, *this);
+}
+
+//SampleDrumsProgram
+void SampleDrumsProgram::load(boost::property_tree::ptree tree) {
+}
+
+std::string SampleDrumsProgram::get_plugin_name() {
+	return SAMPLE_DRUMS_IDENTIFIER;
+}
+
+boost::property_tree::ptree SampleDrumsProgram::save() {
+	return {};
 }

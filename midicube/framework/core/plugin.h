@@ -11,6 +11,7 @@
 #include <string>
 #include "midi.h"
 #include "audio.h"
+#include "../dsp/envelope.h"
 #include <map>
 #include <algorithm>
 

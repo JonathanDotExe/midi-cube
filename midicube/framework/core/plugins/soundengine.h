@@ -26,7 +26,7 @@ protected:
 
 public:
 
-	SoundEngine(PluginInfo i) : Plugin(i) {
+	SoundEngine(PluginHost& h, Plugin& p) : PluginInstance(h, p) {
 
 	}
 
@@ -54,9 +54,11 @@ public:
 		process_sample(info);
 	}
 
-	virtual void process_sample(const SampleInfo& info) = 0;
+	virtual void process_sample(const SampleInfo& info) {
 
-	virtual void process_note_sample(const SampleInfo& info, V& voice) = 0;
+	}
+
+	virtual void process_note_sample(const SampleInfo& info, V& voice, size_t note_index) = 0;
 
 	virtual void recieve_midi(MidiMessage& message, const SampleInfo& info) {
 		switch (message.type) {
@@ -86,7 +88,8 @@ public:
 
 	}
 
-	virtual bool note_finished(SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) {
+	virtual bool note_finished(const SampleInfo& info, V& note, size_t note_index) {
+		const KeyboardEnvironment& env = get_host().get_environment();
 		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
 	};
 
