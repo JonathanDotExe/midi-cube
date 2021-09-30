@@ -49,7 +49,7 @@ class PluginHost {
 
 public:
 
-	virtual KeyboardEnvironment get_environment();
+	virtual const KeyboardEnvironment& get_environment();
 
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info) = 0;
 

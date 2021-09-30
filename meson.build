@@ -15,6 +15,7 @@ deps = [
 
 src = [
 	'midicube-main.cpp',
+	'midicube/framework/core/plugins/soundengine.cpp',
 	'midicube/framework/core/metronome.cpp',
 	'midicube/framework/core/midi.cpp',
 	'midicube/framework/core/plugin.cpp',
