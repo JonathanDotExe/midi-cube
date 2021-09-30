@@ -9,8 +9,20 @@
 #define MIDICUBE_FRAMEWORK_CORE_PLUGINS_SOUNDENGINE_H_
 
 #include "../plugin.h"
+#include "../util/voice.h"
 
+struct EngineStatus {
+	size_t pressed_notes = 0;
+	size_t latest_note_index = 0;
+};
+
+template<typename V, size_t P>
 class SoundEngine : public PluginInstance {
+private:
+	EngineStatus status;
+
+protected:
+	VoiceManager<V, P> voice_mgr;
 
 public:
 
@@ -18,15 +30,53 @@ public:
 
 	}
 
-	virtual void process(const SampleInfo& info) = 0;
-
-	virtual void recieve_midi(MidiMessage& message, const SampleInfo& info) {
-
+	virtual void process(const SampleInfo& info) {
+		EngineStatus status = {0, 0};
+		//Notes
+		for (size_t i = 0; i < P; ++i) {
+			if (voice_mgr.note[i].valid) {
+				if (note_finished(info, voice_mgr.note[i], i)) {
+					voice_mgr.note[i].valid = false;
+				}
+				else {
+					++status.pressed_notes; //TODO might cause problems in the future
+					voice_mgr.note[i].phase_shift += (env.pitch_bend - 1) * info.time_step;
+					process_note_sample(lsample, rsample, info, voice_mgr.note[i], env, i);
+					if (!status.pressed_notes || voice_mgr.note[status.latest_note_index].start_time < voice_mgr.note[i].start_time) {
+						status.latest_note_index = i;
+					}
+				}
+			}
+		}
+		set_s
+		//Static sample
+		process_sample(lsample, rsample, info, env, status);
 	}
 
-	virtual void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) = 0;
+	virtual void process_sample(const SampleInfo& info) = 0;
 
-	virtual void release_note(SampleInfo& info, unsigned int real_note) = 0;
+	virtual void process_note_sample(const SampleInfo& info, V& voice) = 0;
+
+	virtual void recieve_midi(MidiMessage& message, const SampleInfo& info) {
+		switch (message.type) {
+		case MessageType::NOTE_ON:
+			press_note(info, message.note, message.velocity);
+			break;
+		case MessageType::NOTE_OFF:
+			release_note(info, message.note, message.velocity);
+			break;
+		default:
+			break;
+		}
+	}
+
+	virtual void press_note(const SampleInfo& info, unsigned int note, double velocity) {
+		voice_mgr.press_note(info, note, note, velocity, 0); //FIXME parameters
+	}
+
+	virtual void release_note(const SampleInfo& info, unsigned int note, double velocity) {
+		voice_mgr.release_note(info, note); //FIXME parameters
+	}
 
 	virtual ~SoundEngine() {
 
@@ -53,10 +103,6 @@ public:
 
 	virtual void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status) {
 
-	};
-
-	virtual bool control_change(unsigned int control, unsigned int value) {
-		return false;
 	};
 
 	virtual bool note_finished(SampleInfo& info, V& note, KeyboardEnvironment& env, size_t note_index) {
