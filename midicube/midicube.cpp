@@ -6,7 +6,6 @@
  */
 
 #include "midicube.h"
-#include "soundengine/engines.h"
 #include <iostream>
 
 

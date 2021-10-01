@@ -41,11 +41,6 @@ struct ChannelInfo {
 	double aftertouch = 0;
 };
 
-struct EngineStatus {
-	size_t pressed_notes = 0;
-	size_t latest_note_index = 0;
-};
-
 struct ChannelSource {
 	ssize_t input = 1;
 	unsigned int start_note = 0;
@@ -83,7 +78,6 @@ public:
 	std::array<PluginSlot, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t master_send = -1;
 
-	EngineStatus status = {};
 	ChannelInfo info;
 	size_t polyphony_limit = 0;
 

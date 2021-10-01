@@ -40,11 +40,11 @@ struct Bank {
 	}
 };
 
-Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*>);
+Program* load_program(pt::ptree& tree);
 
 void save_program(Program* program, pt::ptree& tree);
 
-Bank* load_bank(std::string path, std::string filename, std::vector<EffectBuilder*> builders);
+Bank* load_bank(std::string path, std::string filename);
 
 void save_bank(Bank& bank, std::string path);
 

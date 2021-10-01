@@ -27,7 +27,7 @@ std::string bank_filename(std::string name) {
 	return filename;
 }
 
-Program* load_program(pt::ptree& tree, std::vector<EffectBuilder*> builders) {
+Program* load_program(pt::ptree& tree) {
 	Program* program = new Program();
 	program->name = tree.get<std::string>("name", "Init");
 	program->metronome_bpm = tree.get<unsigned int>("metronome_bpm", 120);
@@ -262,7 +262,7 @@ void save_program(Program* program, pt::ptree& tree) {
 	}
 }
 
-Bank* load_bank(std::string path, std::string filename, std::vector<EffectBuilder*> builders) {
+Bank* load_bank(std::string path, std::string filename) {
 	pt::ptree tree;
 	try {
 		pt::read_xml(path, tree);
