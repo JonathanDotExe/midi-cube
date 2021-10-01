@@ -48,6 +48,8 @@ B3Organ::B3Organ(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	binder.add_binding(&data.preset.vibrato_mix);
 	binder.add_binding(&data.preset.swell);
 
+	binder.init(h.get_binding_handler());
+
 
 	drawbar_notes = {-12, 7, 0, 12, 19, 24, 28, 31, 36};
 	std::vector<double> gear_ratios = {
@@ -90,11 +92,6 @@ B3Organ::B3Organ(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 		double curr_vol = db_to_amp((-1.5 * ((int) i/12 + 1)));
 		tonewheel_data[i + start_tw].volume = curr_vol;
 	}
-}
-
-void B3Organ::init(SoundEngineChannel* channel) {
-	SoundEngine::init(channel);
-	binder.init(&channel->get_device()->binding_handler); //FIXME
 }
 
 void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& info, TriggeredNote& note, double compress_volume) {

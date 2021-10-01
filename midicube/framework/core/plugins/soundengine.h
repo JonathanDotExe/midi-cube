@@ -9,7 +9,7 @@
 #define MIDICUBE_FRAMEWORK_CORE_PLUGINS_SOUNDENGINE_H_
 
 #include "../plugin.h"
-#include "../util/voice.h"
+#include "../../util/voice.h"
 
 struct EngineStatus {
 	size_t pressed_notes = 0;

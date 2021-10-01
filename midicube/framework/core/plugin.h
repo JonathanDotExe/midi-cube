@@ -12,6 +12,7 @@
 #include "midi.h"
 #include "audio.h"
 #include "../dsp/envelope.h"
+#include "../data/binding.h"
 #include <map>
 #include <algorithm>
 
@@ -51,6 +52,8 @@ class PluginHost {
 public:
 
 	virtual const KeyboardEnvironment& get_environment();
+
+	virtual MidiBindingHandler* get_binding_handler();
 
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info) = 0;
 
