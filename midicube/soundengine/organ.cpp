@@ -11,7 +11,7 @@
 #include <cmath>
 
 //B3OrganTonewheel
-double B3OrganTonewheel::process(SampleInfo& info, double freq, OrganType type) {
+double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType type) {
 	//Rotation
 	double volume = this->volume;
 	rotation += freq * info.time_step;
@@ -35,7 +35,7 @@ double B3OrganTonewheel::process(SampleInfo& info, double freq, OrganType type) 
 }
 
 //B3Organ
-B3Organ::B3Organ() {
+B3Organ::B3Organ(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	//Bind
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
 		binder.add_binding(&data.preset.drawbars[i]);
@@ -94,10 +94,10 @@ B3Organ::B3Organ() {
 
 void B3Organ::init(SoundEngineChannel* channel) {
 	SoundEngine::init(channel);
-	binder.init(&channel->get_device()->binding_handler);
+	binder.init(&channel->get_device()->binding_handler); //FIXME
 }
 
-void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, TriggeredNote& note, double compress_volume) {
+void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& info, TriggeredNote& note, double compress_volume) {
 	bool vol_mul = 1;
 	while (tonewheel < 0) {
 		tonewheel += 12;
@@ -119,7 +119,7 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, SampleInfo& info, 
 	}
 }
 
-void B3Organ::process_note_sample(double& lsample, double& rsample, SampleInfo &info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+void B3Organ::process_note_sample(const SampleInfo &info, TriggeredNote& note, size_t note_index) {
 	//Organ sound
 	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
@@ -146,11 +146,12 @@ void B3Organ::process_note_sample(double& lsample, double& rsample, SampleInfo &
 	return vol;
 }*/
 
-bool B3Organ::note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index) {
+bool B3Organ::note_finished(const SampleInfo& info, TriggeredNote& note, size_t note_index) {
 	return !note.pressed && info.time > note.release_time + ORGAN_MAX_UP_DELAY + data.preset.click_attack;
 };
 
-void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info, KeyboardEnvironment& env, EngineStatus& status) {
+void B3Organ::process_sample(const SampleInfo &info) {
+	const KeyboardEnvironment& env = host.get_environment();
 	//Update properties
 	double swell = this->data.swell * SWELL_RANGE + MIN_SWELL;
 
@@ -214,27 +215,16 @@ void B3Organ::process_sample(double& lsample, double& rsample, SampleInfo &info,
 		sample = sample * (1 - fmax(0, data.preset.vibrato_mix - 0.5) * 2) + vibrato * (fmin(1, data.preset.vibrato_mix * 2));
 	}
 
-	//Amplifier
-	lsample = sample;
-	rsample = sample;
+	//Play back
+	outputs[0] = sample;
+	outputs[1] = sample;
 }
 
-bool B3Organ::control_change(unsigned int control, unsigned int value) {
-	bool change = false;
+void B3Organ::control_change(unsigned int control, unsigned int value) {
 
-	return change;
 }
 
-template<>
-std::string get_engine_name<B3Organ>() {
-	return "B3 Organ";
-}
-
-void __fix_link_organ_name__ () {
-	get_engine_name<B3Organ>();
-}
-
-void B3Organ::save_program(EngineProgram **prog) {
+void B3Organ::save_program(PluginProgram **prog) {
 	B3OrganProgram* p = dynamic_cast<B3OrganProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -245,7 +235,7 @@ void B3Organ::save_program(EngineProgram **prog) {
 	*prog = p;
 }
 
-void B3Organ::apply_program(EngineProgram *prog) {
+void B3Organ::apply_program(PluginProgram *prog) {
 	B3OrganProgram* p = dynamic_cast<B3OrganProgram*>(prog);
 	if (p) {
 		data.preset = p->preset;
@@ -314,4 +304,8 @@ boost::property_tree::ptree B3OrganProgram::save() {
 
 
 	return tree;
+}
+
+std::string B3OrganProgram::get_plugin_name() {
+	return B3_ORGAN_ENGINE_NAME;
 }

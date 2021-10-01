@@ -293,6 +293,9 @@ public:
 	}
 
 	void init(MidiBindingHandler* handler) {
+		if (this->handler) {
+			throw "Binding handler already initialized";
+		}
 		this->handler = handler;
 		//Init values
 		for (BindableValue* value : values) {

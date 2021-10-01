@@ -8,8 +8,8 @@
 #ifndef MIDICUBE_SOUNDENGINE_ORGAN_H_
 #define MIDICUBE_SOUNDENGINE_ORGAN_H_
 
-
-#include "soundengine.h"
+#include "../framework/data/binding.h"
+#include "../framework/core/plugins/soundengine.h"
 #include "../framework/dsp/synthesis.h"
 
 #define ORGAN_DRAWBAR_COUNT 9
@@ -26,6 +26,8 @@
 
 #define ORGAN_VIBRATO_RATE 7
 #define ORGAN_VIBRATO_DELAY_STAGES 9
+
+#define B3_ORGAN_ENGINE_NAME "midicue_b3_organ"
 
 enum OrganChorusVibratoType {
 	B3_NONE, B3_CHORUS_1, B3_CHORUS_2, B3_CHORUS_3, B3_VIBRATO_1, B3_VIBRATO_2, B3_VIBRATO_3
@@ -83,7 +85,7 @@ public:
 	double rotation = 0;
 	double volume = 0;
 	double compress_volume = 0;
-	double process(SampleInfo& info, double freq, OrganType type);
+	double process(const SampleInfo& info, double freq, OrganType type);
 };
 
 class B3OrganData {
@@ -100,45 +102,44 @@ public:
 	double swell = 1;
 };
 
-class B3OrganProgram : public EngineProgram {
+class B3OrganProgram : public PluginProgram {
 public:
 	B3OrganPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 };
 
 #define B3_ORGAN_POLYPHONY 61
 
-class B3Organ : public BaseSoundEngine<TriggeredNote, B3_ORGAN_POLYPHONY> {
+class B3Organ : public SoundEngine<TriggeredNote, B3_ORGAN_POLYPHONY> {
 
 private:
 	//Static values
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbar_notes;
 	std::array<B3OrganTonewheelData, ORGAN_TONEWHEEL_AMOUNT> tonewheel_data;
 
-	void trigger_tonewheel(int tonewheel, double vol, SampleInfo& info, TriggeredNote& note, double compress_volume);
+	void trigger_tonewheel(int tonewheel, double vol, const SampleInfo& info, TriggeredNote& note, double compress_volume);
 
 	LocalMidiBindingHandler binder;
 
 public:
 	B3OrganData data;
 
-	B3Organ();
+	B3Organ(PluginHost& h, Plugin& p);
 
-	void init(SoundEngineChannel* channel);
+	void process_note_sample(const SampleInfo& info, TriggeredNote& note, size_t note_index);
 
-	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void process_sample(const SampleInfo& info);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
+	void control_change(unsigned int control, unsigned int value);
 
-	bool control_change(unsigned int control, unsigned int value);
+	bool note_finished(const SampleInfo& info, TriggeredNote& note, size_t note_index);
 
-	bool note_finished(SampleInfo& info, TriggeredNote& note, KeyboardEnvironment& env, size_t note_index);
+	void save_program(PluginProgram **prog);
 
-	void save_program(EngineProgram **prog);
-
-	void apply_program(EngineProgram *prog);
+	void apply_program(PluginProgram *prog);
 
 };
 
