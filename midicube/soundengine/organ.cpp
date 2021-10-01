@@ -148,7 +148,8 @@ bool B3Organ::note_finished(const SampleInfo& info, TriggeredNote& note, size_t 
 };
 
 void B3Organ::process_sample(const SampleInfo &info) {
-	const KeyboardEnvironment& env = host.get_environment();
+	EngineStatus status = get_status();
+	const KeyboardEnvironment& env = get_host().get_environment();
 	//Update properties
 	double swell = this->data.swell * SWELL_RANGE + MIN_SWELL;
 
@@ -304,5 +305,5 @@ boost::property_tree::ptree B3OrganProgram::save() {
 }
 
 std::string B3OrganProgram::get_plugin_name() {
-	return B3_ORGAN_ENGINE_NAME;
+	return B3_ORGAN_IDENTIFIER;
 }

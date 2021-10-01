@@ -27,7 +27,7 @@
 #define ORGAN_VIBRATO_RATE 7
 #define ORGAN_VIBRATO_DELAY_STAGES 9
 
-#define B3_ORGAN_ENGINE_NAME "midicue_b3_organ"
+#define B3_ORGAN_IDENTIFIER "midicue_b3_organ"
 
 enum OrganChorusVibratoType {
 	B3_NONE, B3_CHORUS_1, B3_CHORUS_2, B3_CHORUS_3, B3_VIBRATO_1, B3_VIBRATO_2, B3_VIBRATO_3
@@ -141,6 +141,27 @@ public:
 
 	void apply_program(PluginProgram *prog);
 
+};
+
+class OrganPlugin : public Plugin {
+public:
+	OrganPlugin() : Plugin({
+		"B3 Organ",
+		B3_ORGAN_IDENTIFIER,
+		0,
+		2,
+		true,
+		false
+	}){
+
+	}
+
+	virtual PluginProgram* create_program();
+	virtual PluginInstance* create(PluginHost *host);
+
+	virtual ~OrganPlugin() {
+
+	}
 };
 
 #endif /* MIDICUBE_SOUNDENGINE_ORGAN_H_ */

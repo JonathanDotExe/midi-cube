@@ -31,7 +31,7 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info) {
 	size_t scene = device->scene;
 	//Properties
-	Plugin* engine = this->engine.get_plugin();
+	PluginInstance* engine = this->engine.get_plugin();
 	if (engine) {
 		SoundEngineScene& s = scenes[scene];
 		//Pitch and Sustain

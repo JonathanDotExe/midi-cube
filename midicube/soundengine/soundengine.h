@@ -16,7 +16,7 @@
 #include "../looper.h"
 #include "../framework/core/metronome.h"
 #include "../framework/core/plugin.h"
-#include "voice.h"
+#include "../framework/util/voice.h"
 #include <string>
 #include <array>
 #include <functional>
@@ -45,10 +45,6 @@ struct EngineStatus {
 	size_t pressed_notes = 0;
 	size_t latest_note_index = 0;
 };
-
-/*
-
-*/
 
 struct ChannelSource {
 	ssize_t input = 1;
@@ -188,7 +184,7 @@ struct ChannelProgram {
 struct Program {
 	std::string name;
 	unsigned int metronome_bpm = 120;
-	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{2, true}};
+	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{true}};
 	std::array<PluginSlotProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
 	std::array<MotionSeqeuncerPreset<MOTION_SEQUENCER_LENGTH>, MOTION_SEQUENCER_AMOUNT> motion_sequencers;
 };
