@@ -11,7 +11,8 @@
 #define OSC_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
-AdvancedSynth::AdvancedSynth(PluginHost& h, Plugin& p) : Plugin(h, p) {
+AdvancedSynth::AdvancedSynth(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
+	binder.init(get_host().get_binding_handler());
 	//Parts
 	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
 		LFOEntity& lfo = preset.lfos[i];
@@ -83,7 +84,7 @@ void AdvancedSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrie
 }
 
 void AdvancedSynth::process_note(double& lsample, double& rsample,
-		const SampleInfo &info, AdavancedSynthVoice &note, KeyboardEnvironment &env) {
+		const SampleInfo &info, AdavancedSynthVoice &note, const KeyboardEnvironment &env) {
 	//Aftertouch
 	double aftertouch = this->aftertouch.get(info.time);
 	double velocity = note.velocity;
@@ -219,8 +220,8 @@ void AdvancedSynth::process_note_sample(const SampleInfo &info,	AdavancedSynthVo
 void AdvancedSynth::process_sample(const SampleInfo &info) {
 	//Mono
 	if (preset.mono) {
-		if (status.pressed_notes) {
-			AdavancedSynthVoice& voice = this->voice_mgr.note[status.latest_note_index];
+		if (get_status().pressed_notes) {
+			AdavancedSynthVoice& voice = this->voice_mgr.note[get_status().latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
 				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * std::abs((double) ((int) voice.note) - mono_voice.note) / 50.0);
@@ -326,7 +327,7 @@ bool AdvancedSynth::note_finished(const SampleInfo &info, AdavancedSynthVoice &n
 }
 
 void AdvancedSynth::press_note(const SampleInfo& info, unsigned int note, double velocity) {
-	AdavancedSynthVoice& voice = this->note.note[this->note.press_note(info, note, note, velocity, 0)]; //FIXME parameters
+	AdavancedSynthVoice& voice = this->voice_mgr.note[this->voice_mgr.press_note(info, note, note, velocity, 0)]; //FIXME parameters
 	voice.aftertouch = 0;
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();
@@ -347,12 +348,12 @@ void AdvancedSynth::press_note(const SampleInfo& info, unsigned int note, double
 	}
 }
 
-void AdvancedSynth::release_note(SampleInfo& info, unsigned int note) {
-	BaseSoundEngine::release_note(info, note);
+void AdvancedSynth::release_note(const SampleInfo& info, unsigned int note, double velocity) {
+	SoundEngine::release_note(info, note, velocity);
 }
 
 bool AdvancedSynth::amp_finished(const SampleInfo &info, AdavancedSynthVoice &note,
-		KeyboardEnvironment &env) {
+		const KeyboardEnvironment &env) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.op_count && finished; ++i) {
 		finished = note.parts[i].amp_env.is_finished();
@@ -360,7 +361,7 @@ bool AdvancedSynth::amp_finished(const SampleInfo &info, AdavancedSynthVoice &no
 	return finished;
 }
 
-void AdvancedSynth::save_program(EngineProgram **prog) {
+void AdvancedSynth::save_program(PluginProgram **prog) {
 	AdavancedSynthProgram* p = dynamic_cast<AdavancedSynthProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -371,7 +372,7 @@ void AdvancedSynth::save_program(EngineProgram **prog) {
 	*prog = p;
 }
 
-void AdvancedSynth::apply_program(EngineProgram *prog) {
+void AdvancedSynth::apply_program(PluginProgram *prog) {
 	AdavancedSynthProgram* p = dynamic_cast<AdavancedSynthProgram*>(prog);
 	//Create new
 	if (p) {
@@ -733,23 +734,12 @@ boost::property_tree::ptree AdavancedSynthProgram::save() {
 	return tree;
 }
 
-void AdvancedSynth::init(SoundEngineChannel *channel) {
-	SoundEngine::init(channel);
-	binder.init(&channel->get_device()->binding_handler);
-}
-
 AdvancedSynth::~AdvancedSynth() {
 
 }
 
-template<>
-std::string get_engine_name<AdvancedSynth>() {
-	return "Analog Synth";
-}
-
-void __fix_link_asynth_name__ () {
-	get_engine_name<AdvancedSynth>();
-}
 
 std::string AdavancedSynthProgram::get_plugin_name() {
+	return ASYNTH_IDENTIFIER;
 }
+

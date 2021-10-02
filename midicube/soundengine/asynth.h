@@ -251,9 +251,9 @@ private:
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;
 
-	inline void process_note(double& lsample, double& rsample, const SampleInfo& info, AdavancedSynthVoice& note, KeyboardEnvironment& env);
+	inline void process_note(double& lsample, double& rsample, const SampleInfo& info, AdavancedSynthVoice& note, const KeyboardEnvironment& env);
 
-	inline bool amp_finished(const SampleInfo& info, AdavancedSynthVoice& note, KeyboardEnvironment& env);
+	inline bool amp_finished(const SampleInfo& info, AdavancedSynthVoice& note, const KeyboardEnvironment& env);
 
 	inline void apply_filter(FilterEntity& filter, Filter& f, double& carrier, AdavancedSynthVoice &note, double time_step, double velocity, double aftertouch);
 
@@ -274,7 +274,7 @@ public:
 
 	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(const SampleInfo& info, AdavancedSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
+	bool note_finished(const SampleInfo& info, AdavancedSynthVoice& note, size_t note_index);
 	
 	void press_note(const SampleInfo& info, unsigned int note, double velocity);
 
