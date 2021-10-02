@@ -19,7 +19,7 @@
 namespace pt = boost::property_tree;
 
 #define MIDI_NOTES 128
-#define SAMPLER_INDENTIFIER "midicube_sampler"
+#define SAMPLER_INDENTIFIER "midicube_sample_player"
 
 class Sampler;
 struct SamplerVoice;
@@ -208,6 +208,7 @@ public:
 	std::string sound_name;
 	std::unordered_map<unsigned int, double> controls;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
@@ -254,7 +255,7 @@ public:
 
 	void control_change(unsigned int control, unsigned int value);
 
-	Sampler();
+	Sampler(PluginHost& h, Plugin& plugin);
 
 	void process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index);
 

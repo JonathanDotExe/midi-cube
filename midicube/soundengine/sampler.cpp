@@ -85,7 +85,7 @@ SampleSoundStore::~SampleSoundStore() {
 }
 
 //Sampler
-Sampler::Sampler() {
+Sampler::Sampler(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	if (global_sample_store.get_sounds().size() > 0) {
 		set_sample(global_sample_store.get_sound(0));
 	}
@@ -104,6 +104,8 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 }
 
 void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
+	double lsample = 0;
+	double rsample = 0;
 	const KeyboardEnvironment& env = get_host().get_environment();
 	if (note.region && note.sample) {
 		double vol = note.region->amplitude.apply_modulation(&note, this);
@@ -185,6 +187,10 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 		ADSREnvelopeData data = {0, 0, 0, 0};
 		note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
 	}
+
+	//Playback
+	outputs[0] += lsample;
+	outputs[1] += rsample;
 }
 
 bool Sampler::note_finished(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
@@ -568,6 +574,10 @@ boost::property_tree::ptree SamplerProgram::save() {
 		tree.add_child("controls.control", child);
 	}
 	return tree;
+}
+
+std::string SamplerProgram::get_plugin_name() {
+	return SAMPLER_INDENTIFIER;
 }
 
 void Sampler::control_change(unsigned int control, unsigned int value) {
