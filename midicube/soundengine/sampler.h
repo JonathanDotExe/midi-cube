@@ -355,7 +355,8 @@ public:
 		true,
 		false
 	}) {
-
+		store.load_sounds("./data/samples"); //FIXME dynamic path
+		store.pool.start();
 	}
 
 	PluginProgram* create_program() {
@@ -364,6 +365,11 @@ public:
 	PluginInstance* create(PluginHost *host) {
 		return new Sampler(*host, *this, store);
 	}
+
+	~SamplerPlugin() {
+		store.pool.stop();
+	}
+
 };
 
 

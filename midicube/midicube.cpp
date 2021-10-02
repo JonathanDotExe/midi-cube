@@ -19,7 +19,6 @@ MidiCube::MidiCube() : prog_mgr("./data/programs", action_handler) {
 
 void MidiCube::init(int out_device, int in_device) {
 	engine.init(this);
-	global_sample_store.load_sounds("./data/samples");
 	//Sound Engines
 	//TODO init plugins
 	//Default setting
@@ -49,9 +48,6 @@ void MidiCube::init(int out_device, int in_device) {
 	prog_mgr.init_user(this);
 	prog_mgr.load_all();
 	prog_mgr.apply_program_direct(0, 0);
-
-	//Init stream loader
-	global_sample_store.pool.start();
 
 	//MIDI Inputs
 	//Input-Devices
@@ -141,7 +137,6 @@ MidiCube::~MidiCube() {
 		delete in.in;
 	}
 	inputs.clear();
-	global_sample_store.pool.stop();
 	lock.unlock();
 }
 
