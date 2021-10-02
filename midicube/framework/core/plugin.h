@@ -53,6 +53,8 @@ public:
 
 	virtual const KeyboardEnvironment& get_environment();
 
+	virtual const Metronome& get_metronome();
+
 	virtual MidiBindingHandler* get_binding_handler();
 
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info) = 0;

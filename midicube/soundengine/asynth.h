@@ -253,7 +253,7 @@ private:
 
 	inline void process_note(double& lsample, double& rsample, const SampleInfo& info, AdavancedSynthVoice& note, KeyboardEnvironment& env);
 
-	inline bool amp_finished(SampleInfo& info, AdavancedSynthVoice& note, KeyboardEnvironment& env);
+	inline bool amp_finished(const SampleInfo& info, AdavancedSynthVoice& note, KeyboardEnvironment& env);
 
 	inline void apply_filter(FilterEntity& filter, Filter& f, double& carrier, AdavancedSynthVoice &note, double time_step, double velocity, double aftertouch);
 
@@ -264,13 +264,13 @@ private:
 public:
 	AdvancedSynthPreset preset;
 
-	AdvancedSynth();
+	AdvancedSynth(PluginHost& h, Plugin& p);
 
 	void process_note_sample(const SampleInfo& info, AdavancedSynthVoice& note, size_t note_index);
 
 	void process_sample(const SampleInfo& info);
 
-	void midi_message(MidiMessage& msg, const SampleInfo& info);
+	void recieve_midi(MidiMessage& msg, const SampleInfo& info);
 
 	void control_change(unsigned int control, unsigned int value);
 

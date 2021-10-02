@@ -11,7 +11,7 @@
 #define OSC_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
-AdvancedSynth::AdvancedSynth() {
+AdvancedSynth::AdvancedSynth(PluginHost& h, Plugin& p) : Plugin(h, p) {
 	//Parts
 	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
 		LFOEntity& lfo = preset.lfos[i];
@@ -83,7 +83,7 @@ void AdvancedSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrie
 }
 
 void AdvancedSynth::process_note(double& lsample, double& rsample,
-		SampleInfo &info, AdavancedSynthVoice &note, KeyboardEnvironment &env) {
+		const SampleInfo &info, AdavancedSynthVoice &note, KeyboardEnvironment &env) {
 	//Aftertouch
 	double aftertouch = this->aftertouch.get(info.time);
 	double velocity = note.velocity;
@@ -210,20 +210,17 @@ void AdvancedSynth::process_note(double& lsample, double& rsample,
 	}
 }
 
-void AdvancedSynth::process_note_sample(
-		double& lsample, double& rsample, SampleInfo &info,
-		AdavancedSynthVoice &note, KeyboardEnvironment &env, size_t note_index) {
+void AdvancedSynth::process_note_sample(const SampleInfo &info,	AdavancedSynthVoice &note, size_t note_index) {
 	if (!preset.mono) {
-		process_note(lsample, rsample, info, note, env);
+		process_note(outputs[0], outputs[1], info, note, get_host().get_environment());
 	}
 }
 
-void AdvancedSynth::process_sample(double& lsample, double& rsample,
-		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
+void AdvancedSynth::process_sample(const SampleInfo &info) {
 	//Mono
 	if (preset.mono) {
 		if (status.pressed_notes) {
-			AdavancedSynthVoice& voice = this->note.note[status.latest_note_index];
+			AdavancedSynthVoice& voice = this->voice_mgr.note[status.latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
 				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * std::abs((double) ((int) voice.note) - mono_voice.note) / 50.0);
@@ -266,11 +263,11 @@ void AdvancedSynth::process_sample(double& lsample, double& rsample,
 		//Playback
 		if (mono_voice.valid) {
 			double pitch = note_port.get(info.time);
-			KeyboardEnvironment e = env;
+			KeyboardEnvironment e = get_host().get_environment();
 			e.pitch_bend *= note_to_freq_transpose(
 					pitch - mono_voice.note);
 
-			process_note(lsample, rsample, info, mono_voice, e);
+			process_note(outputs[0], outputs[1], info, mono_voice, e);
 			if (amp_finished(info, mono_voice, e)) {
 				mono_voice.valid = false;
 			}
@@ -283,32 +280,28 @@ void AdvancedSynth::process_sample(double& lsample, double& rsample,
 	lfo_mod = { };
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
 		LFOEntity &lfo = preset.lfos[i];
-		if (lfo.motion_sequencer >= 0 && lfo.motion_sequencer < MOTION_SEQUENCER_AMOUNT) {
-			lfo_val[i] = device->motion_sequencer_values[lfo.motion_sequencer];
-			lfo_mod[i] = 0; //TODO
-		}
-		else {
-			AnalogOscilatorData d = { lfo.waveform };
-			double freq = lfo.freq;
-			//Sync
-			if (lfo.sync_master) {
-				double value = lfo.clock_value;
-				if (lfo.clock_value <= 0) {
-					value = 1.0/(-fmin(lfo.clock_value, -1));
-				}
-				freq = device->metronome.get_bpm()/60.0 * value;
-				if (device->metronome.is_beat(info.sample_time, info.sample_rate, value)) {
-					lfos[i].reset(lfo.sync_phase);
-				}
+		AnalogOscilatorData d = { lfo.waveform };
+		double freq = lfo.freq;
+		//Sync
+		if (lfo.sync_master) {
+			double value = lfo.clock_value;
+			if (lfo.clock_value <= 0) {
+				value = 1.0/(-fmin(lfo.clock_value, -1));
 			}
-			lfos[i].process(freq, info.time_step, d);
-			lfo_val[i] = lfos[i].carrier(lfo.freq, info.time_step, d);
-			lfo_mod[i] = lfos[i].modulator(lfo.freq, info.time_step, d);
+			const Metronome& metronome = get_host().get_metronome();
+			freq = metronome.get_bpm()/60.0 * value;
+			if (metronome.is_beat(info.sample_time, info.sample_rate, value)) {
+				lfos[i].reset(lfo.sync_phase);
+			}
 		}
+		lfos[i].process(freq, info.time_step, d);
+		lfo_val[i] = lfos[i].carrier(lfo.freq, info.time_step, d);
+		lfo_mod[i] = lfos[i].modulator(lfo.freq, info.time_step, d);
 	}
 }
 
-bool AdvancedSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) {
+void AdvancedSynth::recieve_midi(MidiMessage& msg, const SampleInfo& info) {
+	SoundEngine::recieve_midi(msg, info);
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 		double at = msg.monophonic_aftertouch()/127.0;
 		if (at > aftertouch.get(info.time)) {
@@ -318,25 +311,22 @@ bool AdvancedSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& in
 			aftertouch.set(at, info.time, preset.aftertouch_release);
 		}
 	}
-	return BaseSoundEngine::midi_message(msg, transpose, info, env, polyphony_limit);
 }
 
-bool AdvancedSynth::control_change(unsigned int control, unsigned int value) {
+void AdvancedSynth::control_change(unsigned int control, unsigned int value) {
 	controls[control] = value / 127.0;
-	return false;
 }
 
-bool AdvancedSynth::note_finished(SampleInfo &info, AdavancedSynthVoice &note,
-		KeyboardEnvironment &env, size_t note_index) {
+bool AdvancedSynth::note_finished(const SampleInfo &info, AdavancedSynthVoice &note, size_t note_index) {
 	//Mono notes
 	if (preset.mono) {
 		return !note.pressed;
 	}
-	return !note.pressed && amp_finished(info, note, env);
+	return !note.pressed && amp_finished(info, note, get_host().get_environment());
 }
 
-void AdvancedSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) {
-	AdavancedSynthVoice& voice = this->note.note[this->note.press_note(info, real_note, note, velocity, polyphony_limit)];
+void AdvancedSynth::press_note(const SampleInfo& info, unsigned int note, double velocity) {
+	AdavancedSynthVoice& voice = this->note.note[this->note.press_note(info, note, note, velocity, 0)]; //FIXME parameters
 	voice.aftertouch = 0;
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();
@@ -361,7 +351,7 @@ void AdvancedSynth::release_note(SampleInfo& info, unsigned int note) {
 	BaseSoundEngine::release_note(info, note);
 }
 
-bool AdvancedSynth::amp_finished(SampleInfo &info, AdavancedSynthVoice &note,
+bool AdvancedSynth::amp_finished(const SampleInfo &info, AdavancedSynthVoice &note,
 		KeyboardEnvironment &env) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.op_count && finished; ++i) {

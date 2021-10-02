@@ -42,7 +42,7 @@ public:
 				else {
 					++status.pressed_notes; //TODO might cause problems in the future
 					voice_mgr.note[i].phase_shift += (env.pitch_bend - 1) * info.time_step;
-					process_note_sample(info, voice_mgr.note[i]);
+					process_note_sample(info, voice_mgr.note[i], i);
 					if (!status.pressed_notes || voice_mgr.note[status.latest_note_index].start_time < voice_mgr.note[i].start_time) {
 						status.latest_note_index = i;
 					}

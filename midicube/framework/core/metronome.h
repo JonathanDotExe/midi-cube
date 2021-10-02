@@ -22,15 +22,15 @@ public:
 
 	void init (unsigned int time);
 
-	bool is_beat(unsigned int time, unsigned int sample_rate, double value);
+	bool is_beat(unsigned int time, unsigned int sample_rate, double value) const;
 
-	double last_beat(unsigned int time, unsigned int sample_rate, double value);
+	double last_beat(unsigned int time, unsigned int sample_rate, double value) const;
 
 	void set_bpm(unsigned int bpm);
 
-	double beats(unsigned int time, unsigned int sample_rate, double value);
+	double beats(unsigned int time, unsigned int sample_rate, double value) const;
 
-	unsigned int get_bpm();
+	unsigned int get_bpm() const;
 
 };
 
