@@ -15,18 +15,18 @@
 
 class AnalogSynthView: public ViewController {
 private:
-	AnalogSynth& synth;
+	AdvancedSynth& synth;
 	SoundEngineChannel& channel;
 	int channel_index;
-	std::array<size_t, ANALOG_PART_COUNT> part_sizes = {1, 1, 1, 1, 1, 1, 1, 1};
-	std::array<Button*, ANALOG_PART_COUNT> operators;
+	std::array<size_t, ASYNTH_PART_COUNT> part_sizes = {1, 1, 1, 1, 1, 1, 1, 1};
+	std::array<Button*, ASYNTH_PART_COUNT> operators;
 	Frame* frame = nullptr;
 	BindingGUIHandler binder;
 
 	void position_operators();
 
 public:
-	AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int channel_index);
+	AnalogSynthView(AdvancedSynth& s, SoundEngineChannel& c, int channel_index);
 	virtual Scene create(Frame &frame);
 	virtual void update_properties();
 

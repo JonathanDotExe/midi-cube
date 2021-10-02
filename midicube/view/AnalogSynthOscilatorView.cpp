@@ -10,7 +10,7 @@
 #include "../view/AnalogSynthView.h"
 #include "../view/resources.h"
 
-AnalogSynthOscilatorView::AnalogSynthOscilatorView(AnalogSynth& s, SoundEngineChannel& c, int channel_index, size_t part) : synth(s), channel(c), binder{[&s, &c, channel_index, part]() {
+AnalogSynthOscilatorView::AnalogSynthOscilatorView(AdvancedSynth& s, SoundEngineChannel& c, int channel_index, size_t part) : synth(s), channel(c), binder{[&s, &c, channel_index, part]() {
 	return new AnalogSynthOscilatorView(s, c, channel_index, part);
 }} {
 	this->channel_index = channel_index;
@@ -43,7 +43,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		show_amount->push_back(amount);
 		boxes.push_back(amount);
 
-		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
+		DragBox<int>* source = new DragBox<int>(0, 0, ASYNTH_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
 		source->property.bind(mod.mod_env, handler);
 		controls->push_back(source);
 		show_source->push_back(source);
@@ -62,7 +62,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		show_amount->push_back(amount);
 		boxes.push_back(amount);
 
-		DragBox<int>* source = new DragBox<int>(0, 0, ANALOG_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
+		DragBox<int>* source = new DragBox<int>(0, 0, ASYNTH_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
 		source->property.bind(mod.lfo, handler);
 		controls->push_back(source);
 		show_source->push_back(source);

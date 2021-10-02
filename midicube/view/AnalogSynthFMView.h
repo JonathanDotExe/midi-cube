@@ -15,11 +15,11 @@
 
 class AnalogSynthFMView : public ViewController{
 private:
-	AnalogSynth& synth;
+	AdvancedSynth& synth;
 	SoundEngineChannel& channel;
 	int channel_index;
 public:
-	AnalogSynthFMView(AnalogSynth& s, SoundEngineChannel& c, int channel_index);
+	AnalogSynthFMView(AdvancedSynth& s, SoundEngineChannel& c, int channel_index);
 	virtual Scene create(Frame &frame);
 	virtual ~AnalogSynthFMView();
 };

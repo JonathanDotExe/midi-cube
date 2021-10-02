@@ -8,12 +8,12 @@
 #ifndef MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 #define MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 
-#include "soundengine.h"
+#include "../framework/core/plugins/soundengine.h"
 #include "../framework/dsp/oscilator.h"
 #include "../framework/dsp/filter.h"
 #include "../framework/util/util.h"
 
-#define ANALOG_PART_COUNT 8
+#define ASYNTH_PART_COUNT 8
 #define ANALOG_CONTROL_COUNT 128
 
 const FixedScale VOLUME_SCALE = {0, {}, 1};
@@ -25,8 +25,11 @@ const FixedScale FILTER_RESONANCE_SCALE(0, {}, 1);
 const FixedScale PITCH_SCALE(-2, {}, 2);
 const FixedScale PANNING_SCALE(-1, {}, 1);
 
-#define ANALOG_SYNTH_POLYPHONY 30
+#define ASYNTH_POLYPHONY 30
+#define ASYNTH_IDENTIFIER "midicube_advanced_synth"
 #define ASYNTH_MOTION_SEQUENCER_LENGTH 16
+
+
 
 struct BindableADSREnvelopeData {
 	BindableTemplateValue<double> attack{0.0005, 0.0005, 5};
@@ -162,7 +165,7 @@ struct OperatorEntity {
 	bool filter_parallel = false;
 
 	unsigned int oscilator_count = 1;
-	std::array<double, ANALOG_PART_COUNT> fm;
+	std::array<double, ASYNTH_PART_COUNT> fm;
 
 };
 
@@ -182,11 +185,11 @@ struct LFOEntity {
 	int motion_sequencer = -1;
 };
 
-struct AnalogSynthPreset {
-	std::array<LFOEntity, ANALOG_PART_COUNT> lfos;
-	std::array<ModEnvelopeEntity, ANALOG_PART_COUNT> mod_envs;
-	std::array<OscilatorEntity, ANALOG_PART_COUNT> oscilators;
-	std::array<OperatorEntity, ANALOG_PART_COUNT> operators;
+struct AdvancedSynthPreset {
+	std::array<LFOEntity, ASYNTH_PART_COUNT> lfos;
+	std::array<ModEnvelopeEntity, ASYNTH_PART_COUNT> mod_envs;
+	std::array<OscilatorEntity, ASYNTH_PART_COUNT> oscilators;
+	std::array<OperatorEntity, ASYNTH_PART_COUNT> operators;
 
 	size_t lfo_count = 0;
 	size_t mod_env_count = 0;
@@ -202,7 +205,7 @@ struct AnalogSynthPreset {
 	double velocity_aftertouch_amount = 0;
 };
 
-struct AnalogSynthPart {
+struct AdvancedSynthPart {
 	UnisonOscilator<8> oscilator;
 	Filter filter;
 	WaveTableADSREnvelope amp_env;
@@ -213,76 +216,75 @@ struct AnalogSynthPart {
 	double fm = 0;
 };
 
-struct AnalogSynthVoice : public TriggeredNote {
-	std::array<AnalogSynthPart, ANALOG_PART_COUNT> parts;
+struct AdavancedSynthVoice : public TriggeredNote {
+	std::array<AdvancedSynthPart, ASYNTH_PART_COUNT> parts;
 	double max_aftertouch = 0;
 };
 
-class AnalogSynthProgram : public EngineProgram {
+class AdavancedSynthProgram : public PluginProgram {
 public:
-	AnalogSynthPreset preset;
+	AdvancedSynthPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
-	virtual ~AnalogSynthProgram() {
+	virtual ~AdavancedSynthProgram() {
 
 	}
 };
 
-class AnalogSynth : public BaseSoundEngine<AnalogSynthVoice, ANALOG_SYNTH_POLYPHONY> {
+class AdvancedSynth : public SoundEngine<AdavancedSynthVoice, ASYNTH_POLYPHONY> {
 
 private:
-	std::array<double, ANALOG_PART_COUNT> env_val = {};
-	std::array<AnalogOscilator, ANALOG_PART_COUNT> lfos;
-	std::array<double, ANALOG_PART_COUNT> lfo_val = {};
-	std::array<double, ANALOG_PART_COUNT> lfo_mod = {};
-	std::array<double, ANALOG_PART_COUNT> lfo_vol = {};
+	std::array<double, ASYNTH_PART_COUNT> env_val = {};
+	std::array<AnalogOscilator, ASYNTH_PART_COUNT> lfos;
+	std::array<double, ASYNTH_PART_COUNT> lfo_val = {};
+	std::array<double, ASYNTH_PART_COUNT> lfo_mod = {};
+	std::array<double, ASYNTH_PART_COUNT> lfo_vol = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
 	PortamendoBuffer aftertouch{0, 0};
 
 	bool first_port = true;
 	PortamendoBuffer note_port{0, 0};
-	AnalogSynthVoice mono_voice;
+	AdavancedSynthVoice mono_voice;
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;
 
-	void init(SoundEngineChannel* channel);
+	inline void process_note(double& lsample, double& rsample, const SampleInfo& info, AdavancedSynthVoice& note, KeyboardEnvironment& env);
 
-	inline void process_note(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
+	inline bool amp_finished(SampleInfo& info, AdavancedSynthVoice& note, KeyboardEnvironment& env);
 
-	inline bool amp_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env);
+	inline void apply_filter(FilterEntity& filter, Filter& f, double& carrier, AdavancedSynthVoice &note, double time_step, double velocity, double aftertouch);
 
-	inline void apply_filter(FilterEntity& filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double velocity, double aftertouch);
-
-	inline double apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ANALOG_PART_COUNT>& lfo_val);
+	inline double apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ASYNTH_PART_COUNT>& lfo_val);
 
 	LocalMidiBindingHandler binder;
 
 public:
-	AnalogSynthPreset preset;
+	AdvancedSynthPreset preset;
 
-	AnalogSynth();
+	AdvancedSynth();
 
-	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
+	void process_note_sample(const SampleInfo& info, AdavancedSynthVoice& note, size_t note_index);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info, KeyboardEnvironment& env, EngineStatus& status);
+	void process_sample(const SampleInfo& info);
 
-	bool midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit);
+	void midi_message(MidiMessage& msg, const SampleInfo& info);
 
-	bool control_change(unsigned int control, unsigned int value);
+	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(SampleInfo& info, AnalogSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
+	bool note_finished(const SampleInfo& info, AdavancedSynthVoice& note, KeyboardEnvironment& env, size_t note_index);
 	
-	void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit);
+	void press_note(const SampleInfo& info, unsigned int note, double velocity);
 
-	void release_note(SampleInfo& info, unsigned int note);
+	void release_note(const SampleInfo& info, unsigned int note, double velocity);
 
-	void save_program(EngineProgram **prog);
+	void save_program(PluginProgram **prog);
 
-	void apply_program(EngineProgram *prog);
+	void apply_program(PluginProgram *prog);
 
-	~AnalogSynth();
+	~AdvancedSynth();
 
 };
 

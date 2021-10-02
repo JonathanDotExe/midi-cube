@@ -14,7 +14,7 @@
 #include "../view/resources.h"
 #include "../view/SoundEngineChannelView.h"
 
-AnalogSynthView::AnalogSynthView(AnalogSynth& s, SoundEngineChannel& c, int channel_index) : synth(s), channel(c), binder{[&s, &c, channel_index]() {
+AnalogSynthView::AnalogSynthView(AdvancedSynth& s, SoundEngineChannel& c, int channel_index) : synth(s), channel(c), binder{[&s, &c, channel_index]() {
 	return new AnalogSynthView(s, c, channel_index);
 }} {
 	this->channel_index = channel_index;
@@ -31,10 +31,10 @@ Scene AnalogSynthView::create(Frame &frame) {
 	controls.push_back(bg);
 
 	//Channels
-	int cols = ANALOG_PART_COUNT;
+	int cols = ASYNTH_PART_COUNT;
 	int pane_width = (frame.get_width() - 15) / cols;
 	int pane_height = 150;
-	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
 		//Background pane
 		int x = 10 + pane_width * (i % cols);
 		int y = 10;
@@ -43,7 +43,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		controls.push_back(pane);
 	}
 
-	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
 		int x = 10 + pane_width * (i % cols);
 		int y = 10;
 
@@ -83,7 +83,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		Label* title = new Label("Operator Count", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
 
-		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		DragBox<int>* value = new DragBox<int>(0, 0, ASYNTH_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->property.bind(synth.preset.op_count, handler);
 		controls.push_back(value);
 	}
@@ -93,7 +93,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 		Label* title = new Label("Env Count", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
 
-		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		DragBox<int>* value = new DragBox<int>(0, 0, ASYNTH_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->property.bind(synth.preset.mod_env_count, handler);
 		controls.push_back(value);
 	}
@@ -101,7 +101,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 	{
 		Label* title = new Label("LFO Count", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
-		DragBox<int>* value = new DragBox<int>(0, 0, ANALOG_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
+		DragBox<int>* value = new DragBox<int>(0, 0, ASYNTH_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->property.bind(synth.preset.lfo_count, handler);
 		controls.push_back(value);
 	}
@@ -199,7 +199,7 @@ Scene AnalogSynthView::create(Frame &frame) {
 }
 
 void AnalogSynthView::update_properties() {
-	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
 		frame->cube.action_handler.queue_action(new GetValueAction<unsigned int, unsigned int>(synth.preset.operators[i].oscilator_count, [i, this](size_t size) {
 			part_sizes[i] = size;
 			position_operators();
@@ -208,10 +208,10 @@ void AnalogSynthView::update_properties() {
 }
 
 void AnalogSynthView::position_operators() {
-	int cols = ANALOG_PART_COUNT;
+	int cols = ASYNTH_PART_COUNT;
 	int pane_width = (frame->get_width() - 15) / cols; //FIXME
 	size_t pos = 0;
-	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
 		int x = 10 + pane_width * pos;
 		int y = 10;
 		Button* op = operators[i];

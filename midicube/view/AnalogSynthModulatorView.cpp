@@ -11,7 +11,7 @@
 #include "../view/AnalogSynthView.h"
 #include "../view/resources.h"
 
-AnalogSynthModulatorView::AnalogSynthModulatorView(AnalogSynth &s,
+AnalogSynthModulatorView::AnalogSynthModulatorView(AdvancedSynth &s,
 		SoundEngineChannel &c, int channel_index, size_t part) : synth(s), channel(c), binder{[&s, &c, channel_index, part]() {
 			return new AnalogSynthModulatorView(s, c, channel_index, part);
 		}} {

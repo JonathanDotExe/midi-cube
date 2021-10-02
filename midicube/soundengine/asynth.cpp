@@ -11,9 +11,9 @@
 #define OSC_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
-AnalogSynth::AnalogSynth() {
+AdvancedSynth::AdvancedSynth() {
 	//Parts
-	for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
 		LFOEntity& lfo = preset.lfos[i];
 		binder.add_binding(&lfo.volume.value);
 		binder.add_binding(&lfo.freq);
@@ -46,7 +46,7 @@ AnalogSynth::AnalogSynth() {
 	binder.add_binding(&preset.portamendo);
 }
 
-inline double AnalogSynth::apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ANALOG_PART_COUNT>& lfo_val) {
+inline double AdvancedSynth::apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ASYNTH_PART_COUNT>& lfo_val) {
 	double prog = mod.value;
 	prog += env_val[mod.mod_env] * mod.mod_env_amount
 			+ lfo_val[mod.lfo] * mod.lfo_amount * lfo_vol[mod.lfo]
@@ -55,7 +55,7 @@ inline double AnalogSynth::apply_modulation(const FixedScale &scale, PropertyMod
 	return scale.value(prog);
 }
 
-void AnalogSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrier, AnalogSynthVoice &note, double time_step, double velocity, double aftertouch) {
+void AdvancedSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrier, AdavancedSynthVoice &note, double time_step, double velocity, double aftertouch) {
 	//Filter
 	if (filter.on) {
 		//Pre drive
@@ -82,8 +82,8 @@ void AnalogSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrier,
 	}
 }
 
-void AnalogSynth::process_note(double& lsample, double& rsample,
-		SampleInfo &info, AnalogSynthVoice &note, KeyboardEnvironment &env) {
+void AdvancedSynth::process_note(double& lsample, double& rsample,
+		SampleInfo &info, AdavancedSynthVoice &note, KeyboardEnvironment &env) {
 	//Aftertouch
 	double aftertouch = this->aftertouch.get(info.time);
 	double velocity = note.velocity;
@@ -115,13 +115,13 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 	size_t i = 0;
 	for (size_t j = 0; j < preset.op_count; ++j) {
 		OperatorEntity& op = preset.operators[j];
-		AnalogSynthPart& op_part = note.parts[j];
-		const size_t max = std::min(i + op.oscilator_count, (size_t) ANALOG_PART_COUNT);
+		AdvancedSynthPart& op_part = note.parts[j];
+		const size_t max = std::min(i + op.oscilator_count, (size_t) ASYNTH_PART_COUNT);
 		//FM
 		double fm = op_part.fm * PI2;
 		op_part.fm = 0;
 		bool modulates = false;
-		for (size_t j = 0; j < ANALOG_PART_COUNT; ++j) {
+		for (size_t j = 0; j < ASYNTH_PART_COUNT; ++j) {
 			if (op.fm[j]) {
 				modulates = true;
 				break;
@@ -131,7 +131,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		double carrier = 0;
 		double modulator = 0;
 		for (; i < max; ++i) {
-			AnalogSynthPart& part = note.parts[i];
+			AdvancedSynthPart& part = note.parts[i];
 			OscilatorEntity &osc = preset.oscilators[i];
 			//Frequency
 			double freq = 0;
@@ -183,7 +183,7 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 		//Frequency modulate others
 		if (modulates) {
 			modulator *= volume;
-			for (size_t i = 0; i < ANALOG_PART_COUNT; ++i) {
+			for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
 				note.parts[i].fm += modulator * op.fm[i];
 			}
 		}
@@ -210,20 +210,20 @@ void AnalogSynth::process_note(double& lsample, double& rsample,
 	}
 }
 
-void AnalogSynth::process_note_sample(
+void AdvancedSynth::process_note_sample(
 		double& lsample, double& rsample, SampleInfo &info,
-		AnalogSynthVoice &note, KeyboardEnvironment &env, size_t note_index) {
+		AdavancedSynthVoice &note, KeyboardEnvironment &env, size_t note_index) {
 	if (!preset.mono) {
 		process_note(lsample, rsample, info, note, env);
 	}
 }
 
-void AnalogSynth::process_sample(double& lsample, double& rsample,
+void AdvancedSynth::process_sample(double& lsample, double& rsample,
 		SampleInfo &info, KeyboardEnvironment &env, EngineStatus &status) {
 	//Mono
 	if (preset.mono) {
 		if (status.pressed_notes) {
-			AnalogSynthVoice& voice = this->note.note[status.latest_note_index];
+			AdavancedSynthVoice& voice = this->note.note[status.latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
 				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * std::abs((double) ((int) voice.note) - mono_voice.note) / 50.0);
@@ -308,7 +308,7 @@ void AnalogSynth::process_sample(double& lsample, double& rsample,
 	}
 }
 
-bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) {
+bool AdvancedSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info, KeyboardEnvironment& env, size_t polyphony_limit) {
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 		double at = msg.monophonic_aftertouch()/127.0;
 		if (at > aftertouch.get(info.time)) {
@@ -321,12 +321,12 @@ bool AnalogSynth::midi_message(MidiMessage& msg, int transpose, SampleInfo& info
 	return BaseSoundEngine::midi_message(msg, transpose, info, env, polyphony_limit);
 }
 
-bool AnalogSynth::control_change(unsigned int control, unsigned int value) {
+bool AdvancedSynth::control_change(unsigned int control, unsigned int value) {
 	controls[control] = value / 127.0;
 	return false;
 }
 
-bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
+bool AdvancedSynth::note_finished(SampleInfo &info, AdavancedSynthVoice &note,
 		KeyboardEnvironment &env, size_t note_index) {
 	//Mono notes
 	if (preset.mono) {
@@ -335,8 +335,8 @@ bool AnalogSynth::note_finished(SampleInfo &info, AnalogSynthVoice &note,
 	return !note.pressed && amp_finished(info, note, env);
 }
 
-void AnalogSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) {
-	AnalogSynthVoice& voice = this->note.note[this->note.press_note(info, real_note, note, velocity, polyphony_limit)];
+void AdvancedSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) {
+	AdavancedSynthVoice& voice = this->note.note[this->note.press_note(info, real_note, note, velocity, polyphony_limit)];
 	voice.aftertouch = 0;
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();
@@ -345,7 +345,7 @@ void AnalogSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned 
 	for (size_t i = 0; i < preset.op_count; ++i) {
 		OperatorEntity& op = preset.operators[i];
 		voice.parts[i].amp_env.reset();
-		size_t max = std::max(j + op.oscilator_count, (size_t) ANALOG_PART_COUNT);
+		size_t max = std::max(j + op.oscilator_count, (size_t) ASYNTH_PART_COUNT);
 		for (; j < max; ++j) {
 			OscilatorEntity& osc = preset.oscilators[j];
 			if (osc.reset) {
@@ -357,11 +357,11 @@ void AnalogSynth::press_note(SampleInfo& info, unsigned int real_note, unsigned 
 	}
 }
 
-void AnalogSynth::release_note(SampleInfo& info, unsigned int note) {
+void AdvancedSynth::release_note(SampleInfo& info, unsigned int note) {
 	BaseSoundEngine::release_note(info, note);
 }
 
-bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,
+bool AdvancedSynth::amp_finished(SampleInfo &info, AdavancedSynthVoice &note,
 		KeyboardEnvironment &env) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.op_count && finished; ++i) {
@@ -370,19 +370,19 @@ bool AnalogSynth::amp_finished(SampleInfo &info, AnalogSynthVoice &note,
 	return finished;
 }
 
-void AnalogSynth::save_program(EngineProgram **prog) {
-	AnalogSynthProgram* p = dynamic_cast<AnalogSynthProgram*>(*prog);
+void AdvancedSynth::save_program(EngineProgram **prog) {
+	AdavancedSynthProgram* p = dynamic_cast<AdavancedSynthProgram*>(*prog);
 	//Create new
 	if (!p) {
 		delete *prog;
-		p = new AnalogSynthProgram();
+		p = new AdavancedSynthProgram();
 	}
 	p->preset = preset;
 	*prog = p;
 }
 
-void AnalogSynth::apply_program(EngineProgram *prog) {
-	AnalogSynthProgram* p = dynamic_cast<AnalogSynthProgram*>(prog);
+void AdvancedSynth::apply_program(EngineProgram *prog) {
+	AdavancedSynthProgram* p = dynamic_cast<AdavancedSynthProgram*>(prog);
 	//Create new
 	if (p) {
 		std::cout << "Applying preset" << std::endl;
@@ -521,7 +521,7 @@ static boost::property_tree::ptree save_filter(FilterEntity filter) {
 }
 
 
-void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
+void AdavancedSynthProgram::load(boost::property_tree::ptree tree) {
 	preset = {};
 	//Global patch info
 	preset.lfo_count = tree.get<size_t>("lfo_count", 0);
@@ -542,7 +542,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	if (lfos) {
 		size_t i = 0;
 		for (pt::ptree::value_type& lfo : lfos.get()) {
-			if (i >= ANALOG_PART_COUNT) {
+			if (i >= ASYNTH_PART_COUNT) {
 				break;
 			}
 			preset.lfos[i].volume = load_prop_mod(lfo.second, "volume");
@@ -561,7 +561,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	if (envs) {
 		size_t i = 0;
 		for (pt::ptree::value_type& env : envs.get()) {
-			if (i >= ANALOG_PART_COUNT) {
+			if (i >= ASYNTH_PART_COUNT) {
 				break;
 			}
 			preset.mod_envs[i].volume = load_prop_mod(env.second, "volume");
@@ -575,7 +575,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	if (oscs) {
 		size_t i = 0;
 		for (pt::ptree::value_type& o : oscs.get()) {
-			if (i >= ANALOG_PART_COUNT) {
+			if (i >= ASYNTH_PART_COUNT) {
 				break;
 			}
 			OscilatorEntity& osc = preset.oscilators[i];
@@ -606,7 +606,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	if (ops) {
 		size_t i = 0;
 		for (pt::ptree::value_type& o : ops.get()) {
-			if (i >= ANALOG_PART_COUNT) {
+			if (i >= ASYNTH_PART_COUNT) {
 				break;
 			}
 
@@ -631,7 +631,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 			size_t k = 0;
 			if (fm) {
 				for (pt::ptree::value_type& f : fm.get()) {
-					if (k >= ANALOG_PART_COUNT) {
+					if (k >= ASYNTH_PART_COUNT) {
 						break;
 					}
 
@@ -646,7 +646,7 @@ void AnalogSynthProgram::load(boost::property_tree::ptree tree) {
 	}
 }
 
-boost::property_tree::ptree AnalogSynthProgram::save() {
+boost::property_tree::ptree AdavancedSynthProgram::save() {
 	boost::property_tree::ptree tree;
 	//Global patch info
 	tree.put("lfo_count", preset.lfo_count);
@@ -690,7 +690,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	for (size_t i = 0; i < preset.op_count; ++i) {
 		OperatorEntity& op = preset.operators[i];
 		//Oscilators
-		for (size_t j = 0; j < op.oscilator_count && j + osc_count < ANALOG_PART_COUNT; ++j) {
+		for (size_t j = 0; j < op.oscilator_count && j + osc_count < ASYNTH_PART_COUNT; ++j) {
 			boost::property_tree::ptree o;
 			OscilatorEntity& osc = preset.oscilators[osc_count + j];
 			o.put("waveform", (int) osc.waveform);
@@ -733,7 +733,7 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 		o.put("oscilator_count", op.oscilator_count);
 
 		//FM
-		for (size_t k = 0; k < ANALOG_PART_COUNT; ++k) {
+		for (size_t k = 0; k < ASYNTH_PART_COUNT; ++k) {
 			o.add("fm.amount", op.fm[k]);
 		}
 
@@ -743,21 +743,23 @@ boost::property_tree::ptree AnalogSynthProgram::save() {
 	return tree;
 }
 
-void AnalogSynth::init(SoundEngineChannel *channel) {
+void AdvancedSynth::init(SoundEngineChannel *channel) {
 	SoundEngine::init(channel);
 	binder.init(&channel->get_device()->binding_handler);
 }
 
-AnalogSynth::~AnalogSynth() {
+AdvancedSynth::~AdvancedSynth() {
 
 }
 
 template<>
-std::string get_engine_name<AnalogSynth>() {
+std::string get_engine_name<AdvancedSynth>() {
 	return "Analog Synth";
 }
 
 void __fix_link_asynth_name__ () {
-	get_engine_name<AnalogSynth>();
+	get_engine_name<AdvancedSynth>();
 }
 
+std::string AdavancedSynthProgram::get_plugin_name() {
+}

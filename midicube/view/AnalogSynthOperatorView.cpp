@@ -12,7 +12,7 @@
 #include "../view/resources.h"
 
 
-AnalogSynthOperatorView::AnalogSynthOperatorView(AnalogSynth &s,
+AnalogSynthOperatorView::AnalogSynthOperatorView(AdvancedSynth &s,
 		SoundEngineChannel &c, int channel_index, size_t part) : synth(s), channel(c), binder{[&s, &c, channel_index, part]() {
 			return new AnalogSynthOperatorView(s, c, channel_index, part);
 		}} {
