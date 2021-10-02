@@ -18,8 +18,6 @@
 namespace pt = boost::property_tree;
 
 
-SampleSoundStore global_sample_store = {};
-
 //SampleSound
 SampleSound::SampleSound() {
 
@@ -85,9 +83,9 @@ SampleSoundStore::~SampleSoundStore() {
 }
 
 //Sampler
-Sampler::Sampler(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
-	if (global_sample_store.get_sounds().size() > 0) {
-		set_sample(global_sample_store.get_sound(0));
+Sampler::Sampler(PluginHost& h, Plugin& p, SampleSoundStore& s) : SoundEngine(h, p), store(s) {
+	if (store.get_sounds().size() > 0) {
+		set_sample(store.get_sound(0));
 	}
 }
 
@@ -234,7 +232,7 @@ void Sampler::press_note(const SampleInfo& info, unsigned int note, double veloc
 				//Load sample
 				LoadRequest req;
 				req.sample = voice.sample->sample;
-				global_sample_store.pool.queue_request(req);
+				store.pool.queue_request(req);
 			}
 		}
 	}
@@ -258,7 +256,7 @@ std::string Sampler::get_name() {
 }
 
 ssize_t Sampler::get_sound_index() {
-	auto sounds = global_sample_store.get_sounds();
+	auto sounds = store.get_sounds();
 	ssize_t index = std::find(sounds.begin(), sounds.end(), sample) - sounds.begin();
 	if (index >= (ssize_t) sounds.size()) {
 		index = -1;
@@ -271,7 +269,7 @@ void Sampler::set_sound_index(ssize_t index) {
 		set_sample(nullptr);
 	}
 	else {
-		set_sample(global_sample_store.get_sound(index));
+		set_sample(store.get_sound(index));
 	}
 }
 
@@ -299,7 +297,7 @@ void Sampler::apply_program(PluginProgram *prog) {
 	SamplerProgram* p = dynamic_cast<SamplerProgram*>(prog);
 	//Sample
 	if (p) {
-		set_sample(global_sample_store.get_sound(p->sound_name));
+		set_sample(store.get_sound(p->sound_name));
 		//Controls
 		for (auto control : p->controls) {
 			cc[control.first] = control.second;

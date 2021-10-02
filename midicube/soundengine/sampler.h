@@ -234,8 +234,6 @@ public:
 	~SampleSoundStore();
 };
 
-extern SampleSoundStore global_sample_store;
-
 #define SAMPLER_POLYPHONY 64
 
 class Sampler : public SoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
@@ -243,6 +241,7 @@ class Sampler : public SoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 private:
 	SampleSound* sample;
 	SampleRegionIndex index;
+	SampleSoundStore& store;
 
 	void set_sample (SampleSound* sample);
 
@@ -255,7 +254,7 @@ public:
 
 	void control_change(unsigned int control, unsigned int value);
 
-	Sampler(PluginHost& h, Plugin& plugin);
+	Sampler(PluginHost& h, Plugin& plugin, SampleSoundStore& s);
 
 	void process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index);
 
@@ -344,15 +343,18 @@ inline double ModulateableProperty::apply_modulation(SamplerVoice *voice,
 }
 
 class SamplerPlugin : public Plugin {
+private:
+	SampleSoundStore store;
+
 public:
 	SamplerPlugin() : Plugin({
 		"B3 Organ",
-		SAMPLER_IDENTIFIER,
+		SAMPLER_INDENTIFIER,
 		0,
 		2,
 		true,
 		false
-	}){
+	}) {
 
 	}
 
@@ -360,7 +362,7 @@ public:
 		return new SamplerProgram();
 	}
 	PluginInstance* create(PluginHost *host) {
-		return new Sampler(*host, *this);
+		return new Sampler(*host, *this, store);
 	}
 };
 
