@@ -587,4 +587,3 @@ void Sampler::control_change(unsigned int control, unsigned int value) {
 	}
 	//FIXME update notifications
 }
-

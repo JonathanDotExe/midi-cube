@@ -343,5 +343,26 @@ inline double ModulateableProperty::apply_modulation(SamplerVoice *voice,
 	return val;
 }
 
+class SamplerPlugin : public Plugin {
+public:
+	SamplerPlugin() : Plugin({
+		"B3 Organ",
+		SAMPLER_IDENTIFIER,
+		0,
+		2,
+		true,
+		false
+	}){
+
+	}
+
+	PluginProgram* create_program() {
+		return new SamplerProgram();
+	}
+	PluginInstance* create(PluginHost *host) {
+		return new Sampler(*host, *this);
+	}
+};
+
 
 #endif /* MIDICUBE_SOUNDENGINE_SAMPLER_H_ */
