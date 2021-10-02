@@ -216,12 +216,12 @@ struct AdvancedSynthPart {
 	double fm = 0;
 };
 
-struct AdavancedSynthVoice : public TriggeredNote {
+struct AdvancedSynthVoice : public TriggeredNote {
 	std::array<AdvancedSynthPart, ASYNTH_PART_COUNT> parts;
 	double max_aftertouch = 0;
 };
 
-class AdavancedSynthProgram : public PluginProgram {
+class AdvancedSynthProgram : public PluginProgram {
 public:
 	AdvancedSynthPreset preset;
 
@@ -229,12 +229,12 @@ public:
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
-	virtual ~AdavancedSynthProgram() {
+	virtual ~AdvancedSynthProgram() {
 
 	}
 };
 
-class AdvancedSynth : public SoundEngine<AdavancedSynthVoice, ASYNTH_POLYPHONY> {
+class AdvancedSynth : public SoundEngine<AdvancedSynthVoice, ASYNTH_POLYPHONY> {
 
 private:
 	std::array<double, ASYNTH_PART_COUNT> env_val = {};
@@ -247,15 +247,15 @@ private:
 
 	bool first_port = true;
 	PortamendoBuffer note_port{0, 0};
-	AdavancedSynthVoice mono_voice;
+	AdvancedSynthVoice mono_voice;
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;
 
-	inline void process_note(double& lsample, double& rsample, const SampleInfo& info, AdavancedSynthVoice& note, const KeyboardEnvironment& env);
+	inline void process_note(double& lsample, double& rsample, const SampleInfo& info, AdvancedSynthVoice& note, const KeyboardEnvironment& env);
 
-	inline bool amp_finished(const SampleInfo& info, AdavancedSynthVoice& note, const KeyboardEnvironment& env);
+	inline bool amp_finished(const SampleInfo& info, AdvancedSynthVoice& note, const KeyboardEnvironment& env);
 
-	inline void apply_filter(FilterEntity& filter, Filter& f, double& carrier, AdavancedSynthVoice &note, double time_step, double velocity, double aftertouch);
+	inline void apply_filter(FilterEntity& filter, Filter& f, double& carrier, AdvancedSynthVoice &note, double time_step, double velocity, double aftertouch);
 
 	inline double apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ASYNTH_PART_COUNT>& lfo_val);
 
@@ -266,7 +266,7 @@ public:
 
 	AdvancedSynth(PluginHost& h, Plugin& p);
 
-	void process_note_sample(const SampleInfo& info, AdavancedSynthVoice& note, size_t note_index);
+	void process_note_sample(const SampleInfo& info, AdvancedSynthVoice& note, size_t note_index);
 
 	void process_sample(const SampleInfo& info);
 
@@ -274,7 +274,7 @@ public:
 
 	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(const SampleInfo& info, AdavancedSynthVoice& note, size_t note_index);
+	bool note_finished(const SampleInfo& info, AdvancedSynthVoice& note, size_t note_index);
 	
 	void press_note(const SampleInfo& info, unsigned int note, double velocity);
 
@@ -286,6 +286,32 @@ public:
 
 	~AdvancedSynth();
 
+};
+
+class AdavancedSynthPlugin : public Plugin {
+public:
+	AdavancedSynthPlugin() : Plugin({
+		"A-Synth",
+		ASYNTH_IDENTIFIER,
+		0,
+		2,
+		true,
+		false
+	}){
+
+	}
+
+	virtual PluginProgram* create_program() {
+		return new AdvancedSynthPreset();
+	}
+
+	virtual PluginInstance* create(PluginHost *host) {
+		return new AdvancedSynth(*host, *this);
+	}
+
+	virtual ~AdavancedSynthPlugin() {
+
+	}
 };
 
 

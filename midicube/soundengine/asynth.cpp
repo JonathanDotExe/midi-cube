@@ -56,7 +56,7 @@ inline double AdvancedSynth::apply_modulation(const FixedScale &scale, PropertyM
 	return scale.value(prog);
 }
 
-void AdvancedSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrier, AdavancedSynthVoice &note, double time_step, double velocity, double aftertouch) {
+void AdvancedSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrier, AdvancedSynthVoice &note, double time_step, double velocity, double aftertouch) {
 	//Filter
 	if (filter.on) {
 		//Pre drive
@@ -84,7 +84,7 @@ void AdvancedSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrie
 }
 
 void AdvancedSynth::process_note(double& lsample, double& rsample,
-		const SampleInfo &info, AdavancedSynthVoice &note, const KeyboardEnvironment &env) {
+		const SampleInfo &info, AdvancedSynthVoice &note, const KeyboardEnvironment &env) {
 	//Aftertouch
 	double aftertouch = this->aftertouch.get(info.time);
 	double velocity = note.velocity;
@@ -211,7 +211,7 @@ void AdvancedSynth::process_note(double& lsample, double& rsample,
 	}
 }
 
-void AdvancedSynth::process_note_sample(const SampleInfo &info,	AdavancedSynthVoice &note, size_t note_index) {
+void AdvancedSynth::process_note_sample(const SampleInfo &info,	AdvancedSynthVoice &note, size_t note_index) {
 	if (!preset.mono) {
 		process_note(outputs[0], outputs[1], info, note, get_host().get_environment());
 	}
@@ -221,7 +221,7 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 	//Mono
 	if (preset.mono) {
 		if (get_status().pressed_notes) {
-			AdavancedSynthVoice& voice = this->voice_mgr.note[get_status().latest_note_index];
+			AdvancedSynthVoice& voice = this->voice_mgr.note[get_status().latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
 				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * std::abs((double) ((int) voice.note) - mono_voice.note) / 50.0);
@@ -318,7 +318,7 @@ void AdvancedSynth::control_change(unsigned int control, unsigned int value) {
 	controls[control] = value / 127.0;
 }
 
-bool AdvancedSynth::note_finished(const SampleInfo &info, AdavancedSynthVoice &note, size_t note_index) {
+bool AdvancedSynth::note_finished(const SampleInfo &info, AdvancedSynthVoice &note, size_t note_index) {
 	//Mono notes
 	if (preset.mono) {
 		return !note.pressed;
@@ -327,7 +327,7 @@ bool AdvancedSynth::note_finished(const SampleInfo &info, AdavancedSynthVoice &n
 }
 
 void AdvancedSynth::press_note(const SampleInfo& info, unsigned int note, double velocity) {
-	AdavancedSynthVoice& voice = this->voice_mgr.note[this->voice_mgr.press_note(info, note, note, velocity, 0)]; //FIXME parameters
+	AdvancedSynthVoice& voice = this->voice_mgr.note[this->voice_mgr.press_note(info, note, note, velocity, 0)]; //FIXME parameters
 	voice.aftertouch = 0;
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();
@@ -352,7 +352,7 @@ void AdvancedSynth::release_note(const SampleInfo& info, unsigned int note, doub
 	SoundEngine::release_note(info, note, velocity);
 }
 
-bool AdvancedSynth::amp_finished(const SampleInfo &info, AdavancedSynthVoice &note,
+bool AdvancedSynth::amp_finished(const SampleInfo &info, AdvancedSynthVoice &note,
 		const KeyboardEnvironment &env) {
 	bool finished = true;
 	for (size_t i = 0; i < preset.op_count && finished; ++i) {
@@ -362,18 +362,18 @@ bool AdvancedSynth::amp_finished(const SampleInfo &info, AdavancedSynthVoice &no
 }
 
 void AdvancedSynth::save_program(PluginProgram **prog) {
-	AdavancedSynthProgram* p = dynamic_cast<AdavancedSynthProgram*>(*prog);
+	AdvancedSynthProgram* p = dynamic_cast<AdvancedSynthProgram*>(*prog);
 	//Create new
 	if (!p) {
 		delete *prog;
-		p = new AdavancedSynthProgram();
+		p = new AdvancedSynthProgram();
 	}
 	p->preset = preset;
 	*prog = p;
 }
 
 void AdvancedSynth::apply_program(PluginProgram *prog) {
-	AdavancedSynthProgram* p = dynamic_cast<AdavancedSynthProgram*>(prog);
+	AdvancedSynthProgram* p = dynamic_cast<AdvancedSynthProgram*>(prog);
 	//Create new
 	if (p) {
 		std::cout << "Applying preset" << std::endl;
@@ -512,7 +512,7 @@ static boost::property_tree::ptree save_filter(FilterEntity filter) {
 }
 
 
-void AdavancedSynthProgram::load(boost::property_tree::ptree tree) {
+void AdvancedSynthProgram::load(boost::property_tree::ptree tree) {
 	preset = {};
 	//Global patch info
 	preset.lfo_count = tree.get<size_t>("lfo_count", 0);
@@ -637,7 +637,7 @@ void AdavancedSynthProgram::load(boost::property_tree::ptree tree) {
 	}
 }
 
-boost::property_tree::ptree AdavancedSynthProgram::save() {
+boost::property_tree::ptree AdvancedSynthProgram::save() {
 	boost::property_tree::ptree tree;
 	//Global patch info
 	tree.put("lfo_count", preset.lfo_count);
@@ -739,7 +739,7 @@ AdvancedSynth::~AdvancedSynth() {
 }
 
 
-std::string AdavancedSynthProgram::get_plugin_name() {
+std::string AdvancedSynthProgram::get_plugin_name() {
 	return ASYNTH_IDENTIFIER;
 }
 

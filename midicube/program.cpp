@@ -116,7 +116,7 @@ Program* load_program(pt::ptree& tree) {
 				}
 				//Synth
 				else if (program->channels[i].engine_index == 2) {
-					program->channels[i].engine_program = new AdavancedSynthProgram();
+					program->channels[i].engine_program = new AdvancedSynthProgram();
 				}
 				const auto& preset =  c.second.get_child_optional("preset");
 				if (preset && program->channels[i].engine_program) {
