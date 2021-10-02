@@ -103,7 +103,8 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 	return (block - 1) % block_count;
 }
 
-void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
+void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
+	const KeyboardEnvironment& env = get_host().get_environment();
 	if (note.region && note.sample) {
 		double vol = note.region->amplitude.apply_modulation(&note, this);
 		double vel_amount = 0;
@@ -186,14 +187,14 @@ void Sampler::process_note_sample(double& lsample, double& rsample, SampleInfo& 
 	}
 }
 
-bool Sampler::note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index) {
+bool Sampler::note_finished(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
 	if (note.region && note.sample) {
 		return (note.region->loop == NO_LOOP && note.time > note.sample->sample->total_duration()) || (!note.region->env.sustain_entire_sample && note.env.is_finished()) || note.layer_amp <= 0.0005;
 	}
 	return true;
 }
 
-void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit) {
+void Sampler::press_note(const SampleInfo& info, unsigned int note, double velocity) {
 	if (this->sample) {
 		for (SampleRegion* region : index.velocities[velocity * 127][note]) {
 			//Check triggers
@@ -204,8 +205,8 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 				}
 			}
 			if (trigger && preset_number >= region->min_preset && preset_number <= region->max_preset) {
-				size_t slot = this->note.press_note(info, real_note, note, velocity, polyphony_limit);
-				SamplerVoice& voice = this->note.note[slot];
+				size_t slot = this->voice_mgr.press_note(info, note, note, velocity, 0); //FIXME parameters
+				SamplerVoice& voice = this->voice_mgr.note[slot];
 				voice.region = region;
 				voice.layer_amp = sample->volume; //FIXME
 				voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
@@ -233,13 +234,13 @@ void Sampler::press_note(SampleInfo& info, unsigned int real_note, unsigned int 
 	}
 }
 
-void Sampler::release_note(SampleInfo& info, unsigned int note) {
+void Sampler::release_note(const SampleInfo& info, unsigned int note, double velocity) {
 	for (size_t i = 0; i < SAMPLER_POLYPHONY; ++i) {
-		if (this->note.note[i].real_note == note && this->note.note[i].pressed) {
-			this->note.note[i].pressed = false;
-			this->note.note[i].release_time = info.time;
-			if (this->note.note[i].region->trigger == TriggerType::RELEASE_TRIGGER) {
-				this->note.note[i].layer_amp *= pow(this->note.note[i].region->release_decay, this->note.note[i].release_time - this->note.note[i].start_time);
+		if (this->voice_mgr.note[i].real_note == note && voice_mgr.note[i].pressed) {
+			voice_mgr.note[i].pressed = false;
+			voice_mgr.note[i].release_time = info.time;
+			if (voice_mgr.note[i].region->trigger == TriggerType::RELEASE_TRIGGER) {
+				voice_mgr.note[i].layer_amp *= pow(voice_mgr.note[i].region->release_decay, voice_mgr.note[i].release_time - voice_mgr.note[i].start_time);
 			}
 		}
 	}
@@ -268,7 +269,7 @@ void Sampler::set_sound_index(ssize_t index) {
 	}
 }
 
-void Sampler::save_program(EngineProgram **prog) {
+void Sampler::save_program(PluginProgram **prog) {
 	SamplerProgram* p = dynamic_cast<SamplerProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -288,7 +289,7 @@ void Sampler::save_program(EngineProgram **prog) {
 	*prog = p;
 }
 
-void Sampler::apply_program(EngineProgram *prog) {
+void Sampler::apply_program(PluginProgram *prog) {
 	SamplerProgram* p = dynamic_cast<SamplerProgram*>(prog);
 	//Sample
 	if (p) {
@@ -546,15 +547,6 @@ extern void save_sound(std::string file) {
 
 }
 
-template<>
-std::string get_engine_name<Sampler>() {
-	return "Sampler";
-}
-
-void __fix_link_sampler_name__ () {
-	get_engine_name<Sampler>();
-}
-
 //SamplerProgram
 void SamplerProgram::load(boost::property_tree::ptree tree) {
 	sound_name = tree.get("sound_name", "");
@@ -578,11 +570,11 @@ boost::property_tree::ptree SamplerProgram::save() {
 	return tree;
 }
 
-bool Sampler::control_change(unsigned int control, unsigned int value) {
-	bool updated = BaseSoundEngine::control_change(control, value);
+void Sampler::control_change(unsigned int control, unsigned int value) {
+	SoundEngine::control_change(control, value);
 	if (std::find(index.controls.begin(), index.controls.end(), control) == index.controls.end()) {
 		cc[control] = value/127.0;
 	}
-	return updated;
+	//FIXME update notifications
 }
 

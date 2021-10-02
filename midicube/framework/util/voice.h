@@ -19,7 +19,7 @@
 template<typename V, size_t P>
 class VoiceManager {
 private:
-	size_t next_freq_slot(SampleInfo& info, size_t polyphony_limit = 0) {
+	size_t next_freq_slot(const SampleInfo& info, size_t polyphony_limit = 0) {
 		size_t size = P;
 		if (polyphony_limit > 0) {
 			size = std::min(polyphony_limit, P);
@@ -65,7 +65,7 @@ public:
 		}
 	}
 
-	size_t press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit = 0) {
+	size_t press_note(const SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit = 0) {
 		size_t slot = next_freq_slot(info, polyphony_limit);
 		this->note[slot].freq = note_to_freq(note);
 		this->note[slot].velocity = velocity;
@@ -80,7 +80,7 @@ public:
 	}
 
 
-	void release_note(SampleInfo& info, unsigned int real_note, bool invalidate = false) {
+	void release_note(const SampleInfo& info, unsigned int real_note, bool invalidate = false) {
 		for (size_t i = 0; i < P; ++i) {
 			if (this->note[i].real_note == real_note && this->note[i].pressed) {
 				this->note[i].pressed = false;

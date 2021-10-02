@@ -64,7 +64,7 @@ public:
 
 	virtual PluginProgram* create_program();
 	virtual PluginInstance* create(PluginHost *host);
-	virtual ~SampleDrums() {
+	virtual ~SampleDrumsPlugin() {
 
 	}
 };

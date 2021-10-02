@@ -40,15 +40,16 @@ bool SampleDrums::note_finished(const SampleInfo& info, TriggeredNote& note, siz
 }
 
 void SampleDrums::apply_program(PluginProgram *prog) {
+
+}
+
+void SampleDrums::save_program(PluginProgram **prog) {
 	SampleDrumsProgram* p = dynamic_cast<SampleDrumsProgram*>(*prog);
 	//Create new
 	if (!p) {
 		delete *prog;
 		*prog = new SampleDrumsProgram();
 	}
-}
-
-void SampleDrums::save_program(PluginProgram **prog) {
 }
 
 SampleDrums::~SampleDrums() {

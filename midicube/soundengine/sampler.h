@@ -8,7 +8,7 @@
 #ifndef MIDICUBE_SOUNDENGINE_SAMPLER_H_
 #define MIDICUBE_SOUNDENGINE_SAMPLER_H_
 
-#include "soundengine.h"
+#include "../framework/core/plugins/soundengine.h"
 #include "../framework/util/audiofile.h"
 #include "../framework/dsp/envelope.h"
 #include "../framework/util/util.h"
@@ -19,6 +19,7 @@
 namespace pt = boost::property_tree;
 
 #define MIDI_NOTES 128
+#define SAMPLER_INDENTIFIER "midicube_sampler"
 
 class Sampler;
 struct SamplerVoice;
@@ -202,7 +203,7 @@ public:
 
 };
 
-class SamplerProgram : public EngineProgram {
+class SamplerProgram : public PluginProgram {
 public:
 	std::string sound_name;
 	std::unordered_map<unsigned int, double> controls;
@@ -236,7 +237,7 @@ extern SampleSoundStore global_sample_store;
 
 #define SAMPLER_POLYPHONY 64
 
-class Sampler : public BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
+class Sampler : public SoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 
 private:
 	SampleSound* sample;
@@ -251,16 +252,17 @@ private:
 public:
 	std::array<double, MIDI_CONTROL_COUNT> cc;
 
-	virtual bool control_change(unsigned int control, unsigned int value);
+	void control_change(unsigned int control, unsigned int value);
+
 	Sampler();
 
-	void process_note_sample(double& lsample, double& rsample, SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index);
+	void process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index);
 
-	bool note_finished(SampleInfo& info, SamplerVoice& note, KeyboardEnvironment& env, size_t note_index);
+	bool note_finished(const SampleInfo& info, SamplerVoice& note, size_t note_index);
 
-	void press_note(SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit);
+	void press_note(const SampleInfo& info, unsigned int note, double velocity);
 
-	void release_note(SampleInfo& info, unsigned int note);
+	void release_note(const SampleInfo& info, unsigned int note, double velocity);
 
 	std::string get_name();
 
@@ -272,11 +274,9 @@ public:
 
 	void set_sound_index(ssize_t index);
 
+	void save_program(PluginProgram **prog);
 
-
-	void save_program(EngineProgram **prog);
-
-	void apply_program(EngineProgram *prog);
+	void apply_program(PluginProgram *prog);
 
 	~Sampler();
 
@@ -292,17 +292,19 @@ public:
 	}
 
 	inline double get_cc_value(unsigned int cc, SamplerVoice* voice) {
+		const KeyboardEnvironment& env = get_host().get_environment();
+
 		if (cc <= 127) {
 			return this->cc[cc];
 		}
 		else {
 			switch (cc) {
 			case 128:
-				return (device->env.pitch_bend_percent * 0.5) + 0.5;
+				return (env.pitch_bend_percent * 0.5) + 0.5;
 			case 129:
-				return channel->info.aftertouch;
+				return env.aftertouch;
 			case 130:
-				return channel->info.aftertouch; //FIXME support poly at
+				return env.aftertouch; //FIXME support poly at
 			case 131:
 				return voice->velocity; //Note on velocity
 			case 132:
@@ -310,7 +312,7 @@ public:
 			case 133:
 				return voice->note/127.0;
 			case 134:
-				return channel->status.pressed_notes > 0;
+				return get_status().pressed_notes > 0;
 			case 135:
 				return voice->unirand;
 			case 136:
