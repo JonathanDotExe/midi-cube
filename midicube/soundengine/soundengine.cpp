@@ -43,19 +43,20 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 			env.pitch_bend = 1;
 		}
 
-		if (s.active || status.pressed_notes) {
+		if (s.active) { //FIXME maintain when notes pressed
 			//Arpeggiator
 			if (arp.on) {
-				arp.apply(info, device->metronome,
-				[this, s](SampleInfo& i, unsigned int note, double velocity) {
+				//FIXME add arpeggiator plugin
+				/*arp.apply(info, device->metronome,
+				[this, s](const SampleInfo& i, unsigned int note, double velocity) {
 					engine->press_note(i, note, note + s.source.octave * 12, velocity, polyphony_limit);
 				},
-				[this](SampleInfo& i, unsigned int note) {
+				[this](const SampleInfo& i, unsigned int note) {
 					engine->release_note(i, note);
-				}, device->env.sustain);
+				}, device->env.sustain);*/
 			}
 			//Process
-			status = engine->process_sample(lsample, rsample, info, env);
+			engine->process(info);
 		}
 		//Effects
 		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {

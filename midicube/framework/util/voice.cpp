@@ -12,7 +12,7 @@ Arpeggiator::Arpeggiator() {
 
 }
 
-void Arpeggiator::apply(SampleInfo& info, Metronome& master, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release, bool sustain) {
+void Arpeggiator::apply(SampleInfo& info, Metronome& master, std::function<void(const SampleInfo&, unsigned int, double)> press, std::function<void(const SampleInfo&, unsigned int, double)> release, bool sustain) {
 	//Clean sustained notes
 	if (!preset.hold && preset.sustain && !sustain) {
 		for (size_t i = 0; i < this->note.note.size(); ++i) {
@@ -252,7 +252,7 @@ void Arpeggiator::apply(SampleInfo& info, Metronome& master, std::function<void(
 			break;
 		}
 		//Press note
-		release(info, curr_note);
+		release(info, curr_note, 0);
 		if (next_index >= 0) {
 			curr_note = next_note;
 			this->note_index = next_index;

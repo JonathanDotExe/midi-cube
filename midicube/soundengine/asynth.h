@@ -302,7 +302,7 @@ public:
 	}
 
 	virtual PluginProgram* create_program() {
-		return new AdvancedSynthPreset();
+		return new AdvancedSynthProgram();
 	}
 
 	virtual PluginInstance* create(PluginHost *host) {

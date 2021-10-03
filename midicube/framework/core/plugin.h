@@ -130,6 +130,36 @@ public:
 	Plugin& get_plugin() const {
 		return plugin;
 	}
+
+	inline void take_input_mono(double sample) {
+		const size_t ins = plugin.info.input_channels;
+		for (size_t i = 0; i < ins; ++i) {
+			inputs[i] = sample;
+		}
+	}
+
+	inline void playback_outputs_stereo(double& lsample, double& rsample) {
+		lsample = 0;
+		rsample = 0;
+		const size_t outs = plugin.info.output_channels;
+		if (outs > 1) {
+			for (size_t i = 0; i < outs; ++i) {
+				if (i % 2 == 0) {
+					lsample += outputs[i];
+				}
+				else {
+					rsample += outputs[i];
+				}
+				outputs[i] = 0;
+			}
+		}
+		else if (outs > 0) {
+			lsample = outputs[0];
+			rsample = outputs[0];
+			outputs[0] = 0;
+		}
+	}
+
 };
 
 class PluginManager {

@@ -129,7 +129,7 @@ public:
 
 	Arpeggiator();
 
-	void apply(SampleInfo& info, Metronome& master, std::function<void(SampleInfo&, unsigned int, double)> press, std::function<void(SampleInfo&, unsigned int)> release, bool sustain);
+	void apply(SampleInfo& info, Metronome& master, std::function<void(const SampleInfo&, unsigned int, double)> press, std::function<void(const SampleInfo&, unsigned int, double)> release, bool sustain);
 
 	void press_note(SampleInfo& info, unsigned int note, double velocity, bool sustain);
 
