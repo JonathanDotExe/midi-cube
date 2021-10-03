@@ -85,7 +85,7 @@ public:
 
 	void init_device(SoundEngineDevice* device);
 
-	bool send(MidiMessage& message, SampleInfo& info);
+	void send(MidiMessage& message, SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 

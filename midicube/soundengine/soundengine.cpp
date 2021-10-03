@@ -6,6 +6,7 @@
  */
 
 #include "soundengine.h"
+#include "../midicube.cpp"
 
 #include <algorithm>
 
@@ -56,11 +57,14 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 				}, device->env.sustain);*/
 			}
 			//Process
+			//TODO take input
 			engine->process(info);
+			engine->playback_outputs_stereo(lsample, rsample);
 		}
 		//Effects
 		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
-			effects[i].apply(lsample, rsample, info);
+			effects[i].get_plugin()->process(info);
+			effects[i].get_plugin()->playback_outputs_stereo(lsample, rsample);
 		}
 		//Pan
 		lsample *= (1 - fmax(0, panning));
@@ -71,16 +75,16 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	}
 }
 
-bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
+void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 	size_t scene = device->scene;
-	bool updated = false;
-	if (scenes[scene].active || (status.pressed_notes && message.type != MessageType::NOTE_ON)) {
+	PluginInstance* engine = this->engine.get_plugin();
+	if (scenes[scene].active /* || (status.pressed_notes && message.type != MessageType::NOTE_ON)*/) { //FIXME send when channel is deactivated
 		//Aftertouch
 		if (message.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 			this->info.aftertouch = message.monophonic_aftertouch()/127.0;
 		}
 		//Note
-		if (arp.on) {
+		/*if (arp.on) {
 			switch (message.type) {
 			case MessageType::NOTE_ON:
 				arp.press_note(info, message.note(), message.velocity()/127.0, device->env.sustain);
@@ -89,15 +93,14 @@ bool SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
 				arp.release_note(info, message.note(), device->env.sustain);
 				break;
 			default:
-				updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, device->env, polyphony_limit) || updated;
+				updated = engine->recieve_midi(message, scenes[scene].source.octave * 12, info, device->env, polyphony_limit) || updated;
 				break;
 			}
 		}
-		else if (engine) {
-			updated = engine->midi_message(message, scenes[scene].source.octave * 12, info, device->env, polyphony_limit) || updated;
-		}
+		else if (engine) {*/
+			engine->recieve_midi(message, info); //FIXME transpose not working
+		/*}*/
 	}
-	return updated;
 }
 
 PluginInstance* SoundEngineChannel::get_engine() {
@@ -403,7 +406,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
 
-		ch.engine.load(prog.engine_program, mgr); //FIXME manager
+		ch.engine.load(prog.engine_program, &cube->plugin_mgr);
 		ch.volume = prog.volume;
 		ch.panning = prog.panning;
 		ch.scenes = prog.scenes;
@@ -416,14 +419,14 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ch.master_send = prog.send_master;
 		//Effects
 		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
-			PluginProgram& p = prog.effects[i];
-			ch.effects[i].load(p, mgr); //FIXME manager
+			PluginSlotProgram& p = prog.effects[i];
+			ch.effects[i].load(p, &cube->plugin_mgr);
 		}
 	}
 	//Master Effects
 	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
-		PluginProgram& p = program->effects[i];
-		effects[i].load(p, mgr); //FIXME manager
+		PluginSlotProgram& p = program->effects[i];
+		effects[i].load(p, &cube->plugin_mgr);
 	}
 }
 
@@ -454,7 +457,7 @@ void SoundEngineDevice::save_program(Program* program) {
 	}
 	//Master Effects
 	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
-		PluginSlotProgram& p = program->effects[j];
+		PluginSlotProgram& p = program->effects[i];
 		effects[i].save(p);
 	}
 }
@@ -467,8 +470,8 @@ SoundEngineDevice::~SoundEngineDevice() {
 			channels[i].effects[j].set_plugin(nullptr);
 		}
 	}
-	for (size_t j = 0; j < .effects.size(); ++j) {
-		.effects[j].set_plugin(nullptr);
+	for (size_t j = 0; j < effects.size(); ++j) {
+		effects[j].set_plugin(nullptr);
 	}
 }
 
