@@ -138,6 +138,20 @@ public:
 		}
 	}
 
+	inline void take_input_stereo(double lsample, double rsample) {
+		const size_t ins = plugin.info.input_channels;
+		for (size_t i = 0; i < ins; ++i) {
+			for (size_t i = 0; i < ins; ++i) {
+				if (i % 2 == 0) {
+					inputs[i] = lsample;
+				}
+				else {
+					inputs[i] = rsample;
+				}
+			}
+		}
+	}
+
 	inline void playback_outputs_stereo(double& lsample, double& rsample) {
 		lsample = 0;
 		rsample = 0;

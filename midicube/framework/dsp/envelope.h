@@ -104,7 +104,7 @@ struct MotionSeqeuncerEntry {
 };
 
 template<size_t N>
-struct MotionSeqeuncerPreset {
+struct MotionSequncerPreset {
 	unsigned int clock_value = 1;
 	std::array<MotionSeqeuncerEntry, N> entries;
 };
@@ -114,7 +114,7 @@ class MotionSequencer {
 
 public:
 
-	double amplitude(MotionSeqeuncerPreset<N>& preset, Metronome& metronome, SampleInfo& info);
+	double amplitude(MotionSequncerPreset<N>& preset, Metronome& metronome, SampleInfo& info);
 
 };
 
@@ -130,7 +130,7 @@ public:
 };
 
 template<size_t N>
-double MotionSequencer<N>::amplitude(MotionSeqeuncerPreset<N> &preset,
+double MotionSequencer<N>::amplitude(MotionSequncerPreset<N> &preset,
 		Metronome &metronome, SampleInfo& info) {
 	//Find beat
 	double value = preset.clock_value;

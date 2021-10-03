@@ -275,7 +275,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 	rsample *= volume;
 }
 
-bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& source, SampleInfo& info) {
+void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& source, SampleInfo& info) {
 	bool updated = false;
 	double pitch;
 
@@ -387,12 +387,12 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 			break;
 		}
 		//Send
-		if (pass && channel.send(message, info)) {
-			updated = true;
+		if (pass) {
+			channel.send(message, info);
 		}
 	}
 
-	return updated;
+	//TODO refresh GUI
 }
 
 
@@ -425,7 +425,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 	}
 	//Master Effects
 	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
-		PluginSlotProgram& p = program->effects[i];
+		MasterEffectProgram& p = program->effects[i];
 		effects[i].load(p, &cube->plugin_mgr);
 	}
 }
@@ -457,7 +457,7 @@ void SoundEngineDevice::save_program(Program* program) {
 	}
 	//Master Effects
 	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
-		PluginSlotProgram& p = program->effects[i];
+		MasterEffectProgram& p = program->effects[i];
 		effects[i].save(p);
 	}
 }
@@ -471,7 +471,7 @@ SoundEngineDevice::~SoundEngineDevice() {
 		}
 	}
 	for (size_t j = 0; j < effects.size(); ++j) {
-		effects[j].set_plugin(nullptr);
+		effects[j].effect.set_plugin(nullptr);
 	}
 }
 

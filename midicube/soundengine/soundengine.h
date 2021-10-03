@@ -175,12 +175,35 @@ struct ChannelProgram {
 	PluginSlotProgram engine_program;
 };
 
+struct MasterEffectProgram {
+	ssize_t next_effect = -1;
+	PluginSlotProgram prog;
+};
+
+struct MasterEffect {
+public:
+	PluginSlot effect;
+	double lsample = 0;
+	double rsample = 0;
+	size_t next_effect = 0;
+
+	void load(MasterEffectProgram& prog, PluginManager* mgr) {
+		next_effect = prog.next_effect;
+		effect.load(prog.prog, mgr);
+	}
+
+	void save(MasterEffectProgram& prog) {
+		prog.next_effect = next_effect;
+		effect.save(prog.prog);
+	}
+};
+
 struct Program {
 	std::string name;
 	unsigned int metronome_bpm = 120;
 	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{true}};
-	std::array<PluginSlotProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
-	std::array<MotionSeqeuncerPreset<MOTION_SEQUENCER_LENGTH>, MOTION_SEQUENCER_AMOUNT> motion_sequencers;
+	std::array<MasterEffectProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
+	std::array<MotionSequncerPreset<MOTION_SEQUENCER_LENGTH>, MOTION_SEQUENCER_AMOUNT> motion_sequencers;
 };
 
 struct MidiSource {
@@ -214,13 +237,13 @@ public:
 	Looper looper;
 	bool play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
-	std::array<PluginSlot, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
+	std::array<MasterEffect, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
 	double volume{0.2};
 	size_t scene{0};
 	std::array<unsigned int, SOUND_ENGINE_SCENE_AMOUNT> scene_ccs = {52, 53, 54, 55, 57, 58, 59, 60};
 
 	size_t motion_sequencer_amount = 0;
-	std::array<MotionSeqeuncerPreset<MOTION_SEQUENCER_LENGTH>, MOTION_SEQUENCER_AMOUNT> motion_sequencer_presets;
+	std::array<MotionSequncerPreset<MOTION_SEQUENCER_LENGTH>, MOTION_SEQUENCER_AMOUNT> motion_sequencer_presets;
 	std::array<double, MOTION_SEQUENCER_AMOUNT> motion_sequencer_values = {};
 
 	unsigned int sustain_control{64};
@@ -229,7 +252,7 @@ public:
 
 	void init(MidiCube* cube);
 
-	bool send(MidiMessage& message, size_t input, MidiSource& source, SampleInfo& info);
+	void send(MidiMessage& message, size_t input, MidiSource& source, SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 
