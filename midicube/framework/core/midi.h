@@ -70,56 +70,56 @@ public:
 	/**
 	 * NOTE_ON, NOTE_OFF, POLYPHONIC_AFTERTOUCH
 	 */
-	inline unsigned int& note() {
+	inline unsigned int& note() const{
 		return first_data;
 	}
 
 	/**
 	 * NOTE_ON, NOTE_OFF
 	 */
-	inline unsigned int& velocity() {
+	inline unsigned int& velocity() const{
 		return second_data;
 	}
 
 	/**
 	 * POLYPHONIC_AFTERTOUCH
 	 */
-	inline unsigned int& polyphonic_aftertouch() {
+	inline unsigned int& polyphonic_aftertouch() const{
 		return second_data;
 	}
 
 	/**
 	 * MONOPHONIC_AFTERTOUCH
 	 */
-	inline unsigned int& monophonic_aftertouch() {
+	inline unsigned int& monophonic_aftertouch() const{
 		return first_data;
 	}
 
 	/**
 	 * PROGRAM_CHANGE
 	 */
-	inline unsigned int& program(){
+	inline unsigned int& program() const{
 		return first_data;
 	}
 
 	/**
 	 * CONTROL_CHANGE
 	 */
-	inline unsigned int& control() {
+	inline unsigned int& control() const{
 		return first_data;
 	}
 
 	/**
 	 * CONTROL_CHANGE
 	 */
-	inline unsigned int& value() {
+	inline unsigned int& value() const{
 		return second_data;
 	}
 
 	/**
 	 * PITCH_BEND
 	 */
-	inline unsigned int get_pitch_bend() {
+	inline unsigned int get_pitch_bend() const{
 		return (second_data << 7) + first_data;
 	}
 

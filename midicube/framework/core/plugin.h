@@ -112,7 +112,7 @@ public:
 
 	virtual void process(const SampleInfo& info) = 0;
 
-	virtual void recieve_midi(MidiMessage& message, const SampleInfo& info) = 0;
+	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info) = 0;
 
 	virtual void apply_program(PluginProgram* prog) = 0;
 

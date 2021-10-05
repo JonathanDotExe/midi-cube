@@ -53,7 +53,6 @@ public:
 	//Methods are executed in realtime thread
 	virtual void apply_program(Program* prog) = 0;
 	virtual void save_program(Program* prog) = 0;
-	virtual std::vector<EffectBuilder*> get_effect_builders() = 0;
 	virtual ~ProgramUser() {
 
 	}

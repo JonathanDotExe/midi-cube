@@ -62,7 +62,7 @@ struct SoundEngineScene {
 	ChannelSource source;
 };
 
-class SoundEngineChannel {
+class SoundEngineChannel : public PluginHost {
 private:
 	SoundEngineDevice* device = nullptr;
 
@@ -81,11 +81,17 @@ public:
 	ChannelInfo info;
 	size_t polyphony_limit = 0;
 
+	virtual void recieve_midi(const MidiMessage &message,
+			const SampleInfo &info);
+	virtual MidiBindingHandler* get_binding_handler();
+	virtual Plugin* get_plugin(std::string identifier);
+	const virtual Metronome& get_metronome();
+	const virtual KeyboardEnvironment& get_environment();
 	SoundEngineChannel();
 
 	void init_device(SoundEngineDevice* device);
 
-	void send(MidiMessage& message, SampleInfo& info);
+	void send(const MidiMessage& message, const SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, SampleInfo& info);
 

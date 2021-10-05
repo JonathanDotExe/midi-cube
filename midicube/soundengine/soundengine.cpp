@@ -78,7 +78,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	}
 }
 
-void SoundEngineChannel::send(MidiMessage &message, SampleInfo& info) {
+void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info) {
 	size_t scene = device->scene;
 	PluginInstance* engine = this->engine.get_plugin();
 	if (scenes[scene].active /* || (status.pressed_notes && message.type != MessageType::NOTE_ON)*/) { //FIXME send when channel is deactivated
@@ -514,4 +514,24 @@ void SoundEngineDevice::init(MidiCube *cube) {
 			ch.init_device(this);
 		}
 	}
+}
+
+void SoundEngineChannel::recieve_midi(const MidiMessage &message,
+		const SampleInfo &info) {
+}
+
+MidiBindingHandler* SoundEngineChannel::get_binding_handler() {
+	return device->binding_handler;
+}
+
+Plugin* SoundEngineChannel::get_plugin(std::string identifier) {
+	return device->get_cube()->plugin_mgr.get_plugin(identifier);
+}
+
+const Metronome& SoundEngineChannel::get_metronome() {
+	return device->metronome;
+}
+
+const KeyboardEnvironment& SoundEngineChannel::get_environment() {
+	return device->env;
 }
