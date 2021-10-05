@@ -140,15 +140,20 @@ public:
 
 	inline void take_input_stereo(double lsample, double rsample) {
 		const size_t ins = plugin.info.input_channels;
-		for (size_t i = 0; i < ins; ++i) {
+		if (ins > 1) {
 			for (size_t i = 0; i < ins; ++i) {
-				if (i % 2 == 0) {
-					inputs[i] = lsample;
-				}
-				else {
-					inputs[i] = rsample;
+				for (size_t i = 0; i < ins; ++i) {
+					if (i % 2 == 0) {
+						inputs[i] = lsample;
+					}
+					else {
+						inputs[i] = rsample;
+					}
 				}
 			}
+		}
+		else if (ins == 1){
+			inputs[0] = rsample + lsample;
 		}
 	}
 
@@ -167,7 +172,7 @@ public:
 				outputs[i] = 0;
 			}
 		}
-		else if (outs > 0) {
+		else if (outs == 1) {
 			lsample = outputs[0];
 			rsample = outputs[0];
 			outputs[0] = 0;

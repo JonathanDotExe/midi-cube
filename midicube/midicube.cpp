@@ -119,8 +119,8 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 				break;
 			}
 			//Type
-			if (pass && engine.send(message, i, source, info)) {
-				updated = true;
+			if (pass) {
+				engine.send(message, i, source, info);
 			}
 		}
 	}
