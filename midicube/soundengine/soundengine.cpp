@@ -63,8 +63,11 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 		}
 		//Effects
 		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
-			effects[i].get_plugin()->process(info);
-			effects[i].get_plugin()->playback_outputs_stereo(lsample, rsample);
+			if (effects[i].get_plugin()) {
+				effects[i].get_plugin()->take_input_stereo(lsample, rsample);
+				effects[i].get_plugin()->process(info);
+				effects[i].get_plugin()->playback_outputs_stereo(lsample, rsample);
+			}
 		}
 		//Pan
 		lsample *= (1 - fmax(0, panning));
@@ -246,7 +249,13 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 		MasterEffect& effect = effects[i];
 		double l = 0;
 		double r = 0;
-		effect.apply(l, r, info);
+		if (effect.effect.get_plugin()) {
+			effect.effect.get_plugin()->take_input_stereo(effect.lsample, effect.rsample);
+			effect.effect.get_plugin()->process(info);
+			effect.effect.get_plugin()->playback_outputs_stereo(l, r);
+		}
+		effect.lsample = 0;
+		effect.rsample = 0;
 
 		if (effect.next_effect > i && effect.next_effect < SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
 			effects[effect.next_effect].lsample += l;
