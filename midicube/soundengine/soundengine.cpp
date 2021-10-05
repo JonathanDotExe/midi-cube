@@ -533,5 +533,5 @@ const Metronome& SoundEngineChannel::get_metronome() {
 }
 
 const KeyboardEnvironment& SoundEngineChannel::get_environment() {
-	return device->env;
+	return device->env; //TODO channel aftertouch
 }

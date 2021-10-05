@@ -301,7 +301,7 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 	}
 }
 
-void AdvancedSynth::recieve_midi(MidiMessage& msg, const SampleInfo& info) {
+void AdvancedSynth::recieve_midi(const MidiMessage& msg, const SampleInfo& info) {
 	SoundEngine::recieve_midi(msg, info);
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 		double at = msg.monophonic_aftertouch()/127.0;

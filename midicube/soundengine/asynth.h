@@ -270,7 +270,7 @@ public:
 
 	void process_sample(const SampleInfo& info);
 
-	void recieve_midi(MidiMessage& msg, const SampleInfo& info);
+	void recieve_midi(const MidiMessage& msg, const SampleInfo& info);
 
 	void control_change(unsigned int control, unsigned int value);
 

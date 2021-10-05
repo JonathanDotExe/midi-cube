@@ -60,7 +60,7 @@ public:
 
 	virtual void process_note_sample(const SampleInfo& info, V& voice, size_t note_index) = 0;
 
-	virtual void recieve_midi(MidiMessage& message, const SampleInfo& info) {
+	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info) {
 		switch (message.type) {
 		case MessageType::NOTE_ON:
 			this->press_note(info, message.note(), message.velocity()/127.0);
