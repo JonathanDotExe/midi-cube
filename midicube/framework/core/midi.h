@@ -70,56 +70,79 @@ public:
 	/**
 	 * NOTE_ON, NOTE_OFF, POLYPHONIC_AFTERTOUCH
 	 */
-	inline unsigned int& note() const{
+	inline unsigned int note() const{
 		return first_data;
+	}
+
+	inline void set_note(unsigned int value) {
+		first_data = value;
 	}
 
 	/**
 	 * NOTE_ON, NOTE_OFF
 	 */
-	inline unsigned int& velocity() const{
+	inline unsigned int velocity() const{
 		return second_data;
+	}
+
+	inline void set_velocity(unsigned int value) {
+		second_data = value;
 	}
 
 	/**
 	 * POLYPHONIC_AFTERTOUCH
 	 */
-	inline unsigned int& polyphonic_aftertouch() const{
+	inline unsigned int polyphonic_aftertouch() const{
 		return second_data;
+	}
+	inline void set_polyphonic_aftertouch(unsigned int value) {
+		second_data = value;
 	}
 
 	/**
 	 * MONOPHONIC_AFTERTOUCH
 	 */
-	inline unsigned int& monophonic_aftertouch() const{
+	inline unsigned int monophonic_aftertouch() const{
 		return first_data;
+	}
+	inline void set_monoponic_aftertouch(unsigned int value) {
+		first_data = value;
 	}
 
 	/**
 	 * PROGRAM_CHANGE
 	 */
-	inline unsigned int& program() const{
+	inline unsigned int program() const{
 		return first_data;
+	}
+	inline void set_program(unsigned int value) {
+		first_data = value;
 	}
 
 	/**
 	 * CONTROL_CHANGE
 	 */
-	inline unsigned int& control() const{
+	inline unsigned int control() const{
 		return first_data;
+	}
+	inline void set_control(unsigned int value) {
+		first_data = value;
 	}
 
 	/**
 	 * CONTROL_CHANGE
 	 */
-	inline unsigned int& value() const{
+	inline unsigned int value() const{
 		return second_data;
+	}
+	inline void set_value(unsigned int value) {
+		second_data = value;
 	}
 
 	/**
 	 * PITCH_BEND
 	 */
-	inline unsigned int get_pitch_bend() const{
+	inline unsigned int pitch_bend() const{
 		return (second_data << 7) + first_data;
 	}
 

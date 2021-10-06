@@ -42,7 +42,7 @@ std::string MidiMessage::to_string() {
 	case MessageType::MONOPHONIC_AFTERTOUCH:
 			return "[MONOPHONIC_AFTERTOUCH Message touch="s + std::to_string(monophonic_aftertouch()) + "]"s;
 	case MessageType::PITCH_BEND:
-			return "[PITCH_BEND Message pitch_bend="s + std::to_string(get_pitch_bend()) + "]"s;
+			return "[PITCH_BEND Message pitch_bend="s + std::to_string(pitch_bend()) + "]"s;
 	case MessageType::SYSEX:
 			return "[SYSEX Message]";
 	default:
