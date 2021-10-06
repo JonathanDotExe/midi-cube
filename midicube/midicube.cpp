@@ -46,7 +46,7 @@ void MidiCube::init(int out_device, int in_device) {
 	}
 	//Load programs
 	prog_mgr.init_user(this);
-	prog_mgr.load_all();
+	prog_mgr.load_all(&plugin_mgr);
 	prog_mgr.apply_program_direct(0, 0);
 
 	//MIDI Inputs

@@ -131,7 +131,7 @@ public:
 		return curr_program;
 	}
 
-	void load_all();
+	void load_all(PluginManager* mgr);
 	//Mutex has to be locked by user
 	void save_all();
 	~ProgramManager();

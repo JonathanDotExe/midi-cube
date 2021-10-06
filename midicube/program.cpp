@@ -27,7 +27,7 @@ std::string bank_filename(std::string name) {
 	return filename;
 }
 
-Program* load_program(pt::ptree& tree) {
+Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 	Program* program = new Program();
 	program->name = tree.get<std::string>("name", "Init");
 	program->metronome_bpm = tree.get<unsigned int>("metronome_bpm", 120);
@@ -59,7 +59,9 @@ Program* load_program(pt::ptree& tree) {
 		for (pt::ptree::value_type& c : channels.get()) {
 			if (i < program->channels.size()) {
 				//Channel
-				program->channels[i].engine_index = c.second.get<ssize_t>("engine", -1);
+				if (c.second.get_child_optional("engine")) {
+					program->channels[i].engine_program.load(c.second.get_child("engine"), mgr);
+				}
 				program->channels[i].polyphony_limit = c.second.get<size_t>("polyphony_limit", 0);
 				const auto& scenes = c.second.get_child_optional("scenes");
 				if (scenes) {
@@ -105,23 +107,6 @@ Program* load_program(pt::ptree& tree) {
 				program->channels[i].arpeggiator.sustain = c.second.get<bool>("arpeggiator.sustain", false);
 
 				//Sound engine
-				//FIXME
-				//Sampler
-				if (program->channels[i].engine_index == 0) {
-					program->channels[i].engine_program = new SamplerProgram();
-				}
-				//Organ
-				else if (program->channels[i].engine_index == 1) {
-					program->channels[i].engine_program = new B3OrganProgram();
-				}
-				//Synth
-				else if (program->channels[i].engine_index == 2) {
-					program->channels[i].engine_program = new AdvancedSynthProgram();
-				}
-				const auto& preset =  c.second.get_child_optional("preset");
-				if (preset && program->channels[i].engine_program) {
-					program->channels[i].engine_program->load(preset.get());
-				}
 				program->channels[i].send_master = c.second.get<ssize_t>("send_master", -1);
 				//Effects
 				const auto& effects = c.second.get_child_optional("insert_effects");
@@ -131,14 +116,7 @@ Program* load_program(pt::ptree& tree) {
 						if (j >= CHANNEL_INSERT_EFFECT_AMOUNT) {
 							break;
 						}
-						program->channels[i].effects[j].effect = s.second.get<ssize_t>("effect_type", -1);
-						const auto& p = s.second.get_child_optional("preset");
-						if (p && program->channels[i].effects[j].effect >= 0 && program->channels[i].effects[j].effect < (ssize_t) builders.size()) {
-							program->channels[i].effects[j].prog = builders.at(program->channels[i].effects[j].effect)->create_program();
-							if (program->channels[i].effects[j].prog) {
-								program->channels[i].effects[j].prog->load(p.get());
-							}
-						}
+						program->channels[i].effects[j].load(s.second, mgr);
 						++j;
 					}
 				}
@@ -155,17 +133,7 @@ Program* load_program(pt::ptree& tree) {
 			if (j >= SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
 				break;
 			}
-			program->effects[j].effect = s.second.get<ssize_t>("effect_type", -1);
-			program->effects[j].next_effect = s.second.get<ssize_t>("next_effect", -1);
-			const auto& p = s.second.get_child_optional("preset");
-			if (p && program->effects[j].effect >= 0 && program->effects[j].effect < (ssize_t) builders.size()) {
-				program->effects[j].prog = builders.at(program->effects[j].effect)->create_program();
-				std::cout << "Program " << program->effects[j].effect << std::endl;
-				if (program->effects[j].prog) {
-					std::cout << "Load" << std::endl;
-					program->effects[j].prog->load(p.get());
-				}
-			}
+			program->effects[j].prog.load(s.second, mgr);
 			++j;
 		}
 	}
@@ -192,7 +160,7 @@ void save_program(Program* program, pt::ptree& tree) {
 	for (size_t i = 0; i < program->channels.size(); ++i) {
 		pt::ptree c;
 		//Channel
-		c.put("engine", program->channels[i].engine_index);
+		c.put_child("engine", program->channels[i].engine_program.save());
 		c.put("polyphony_limit", program->channels[i].polyphony_limit);
 		for (size_t j = 0; j < SOUND_ENGINE_SCENE_AMOUNT; ++j) {
 			pt::ptree s;
@@ -229,21 +197,12 @@ void save_program(Program* program, pt::ptree& tree) {
 		c.put("arpeggiator.play_duplicates", program->channels[i].arpeggiator.play_duplicates);
 		c.put("arpeggiator.master_sync", program->channels[i].arpeggiator.master_sync);
 		c.put("arpeggiator.sustain", program->channels[i].arpeggiator.sustain);
-		//Sound Engine
-		if (program->channels[i].engine_program) {
-			pt::ptree preset = program->channels[i].engine_program->save();
-			c.add_child("preset", preset);
-		}
 		c.put("send_master", program->channels[i].send_master);
 		//Effects
 		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
 			pt::ptree t;
-			InsertEffectProgram& effect = program->channels[i].effects[j];
-			t.put("effect_type", effect.effect);
-			if (effect.prog)  {
-				t.add_child("preset", effect.prog->save());
-			}
-			c.add_child("insert_effects.effect", t);
+			PluginSlotProgram& effect = program->channels[i].effects[j];
+			t.put("effect", effect.save());
 		}
 
 
@@ -253,16 +212,13 @@ void save_program(Program* program, pt::ptree& tree) {
 	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
 		pt::ptree t;
 		MasterEffectProgram& effect = program->effects[i];
-		t.put("effect_type", effect.effect);
+		t.put_child("effect", effect.save());
 		t.put("next_effect", effect.next_effect);
-		if (effect.prog)  {
-			t.add_child("preset", effect.prog->save());
-		}
 		tree.add_child("master_effects.effect", t);
 	}
 }
 
-Bank* load_bank(std::string path, std::string filename) {
+Bank* load_bank(std::string path, std::string filename, PluginManager* mgr) {
 	pt::ptree tree;
 	try {
 		pt::read_xml(path, tree);
@@ -279,7 +235,7 @@ Bank* load_bank(std::string path, std::string filename) {
 	const auto& programs =  tree.get_child_optional("bank.programs");
 	if (programs) {
 		for (pt::ptree::value_type& p : programs.get()) {
-			Program* prog = load_program(p.second, builders);
+			Program* prog = load_program(p.second, mgr);
 			bank->programs.push_back(prog);
 		}
 	}
@@ -412,7 +368,7 @@ void ProgramManager::overwrite_bank() {
 	//Don't update filename
 }
 
-void ProgramManager::load_all() {
+void ProgramManager::load_all(PluginManager* mgr) {
 	lock();
 	boost::filesystem::create_directory(path);
 	std::regex reg(".*\\.xml");
@@ -420,7 +376,7 @@ void ProgramManager::load_all() {
 		std::string file = f.path().string();
 		if (std::regex_match(file, reg)) {
 			std::string name = f.path().stem().string();
-			Bank* bank = load_bank(file, name, user->get_effect_builders());
+			Bank* bank = load_bank(file, name, mgr);
 			if (bank) {
 				banks.push_back(bank);
 				std::cout << "Loaded bank " << bank->name << std::endl;
