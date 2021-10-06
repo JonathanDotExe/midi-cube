@@ -212,7 +212,7 @@ void save_program(Program* program, pt::ptree& tree) {
 	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
 		pt::ptree t;
 		MasterEffectProgram& effect = program->effects[i];
-		t.put_child("effect", effect.save());
+		t.put_child("effect", effect.prog.save());
 		t.put("next_effect", effect.next_effect);
 		tree.add_child("master_effects.effect", t);
 	}

@@ -557,3 +557,10 @@ const Metronome& SoundEngineDeviceHost::get_metronome() {
 const KeyboardEnvironment& SoundEngineDeviceHost::get_environment() {
 	return device->env; //TODO channel aftertouch
 }
+
+void SoundEngineDeviceHost::init(SoundEngineDevice *device) {
+	if (this->device) {
+		throw "Device already intialized!";
+	}
+	this->device = device;
+}
