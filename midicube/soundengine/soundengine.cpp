@@ -20,9 +20,9 @@ SoundEngineChannel::SoundEngineChannel() {
 void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	if (!this->device) {
 		this->device = device;
-		//TODO init engine
+		engine.init(this);
 		for (size_t i = 0; i < effects.size(); ++i) {
-			//TODO init effects
+			effects[i].init(this);
 		}
 
 		binder.init(&device->binding_handler);
@@ -326,7 +326,7 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	case MessageType::PROGRAM_CHANGE:
 		break;
 	case MessageType::PITCH_BEND:
-		env.pitch_bend_percent = message.get_pitch_bend()/8192.0 - 1.0;
+		env.pitch_bend_percent = message.pitch_bend()/8192.0 - 1.0;
 		pitch = env.pitch_bend_percent * 2;
 		env.pitch_bend = note_to_freq_transpose(pitch);
 		break;
@@ -521,7 +521,7 @@ void SoundEngineChannel::recieve_midi(const MidiMessage &message,
 }
 
 MidiBindingHandler* SoundEngineChannel::get_binding_handler() {
-	return device->binding_handler;
+	return &device->binding_handler;
 }
 
 Plugin* SoundEngineChannel::get_plugin(std::string identifier) {
