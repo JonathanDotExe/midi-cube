@@ -221,6 +221,7 @@ struct MidiSource {
 	bool clock_in = false;
 };
 
+class SoundEngineDeviceHost;
 
 class SoundEngineDevice {
 
@@ -234,6 +235,7 @@ private:
 	double first_beat_time = 0;
 
 	MidiCube* cube = nullptr;
+	SoundEngineDeviceHost host;
 
 public:
 	MidiBindingHandler binding_handler;
@@ -272,6 +274,24 @@ public:
 
 	~SoundEngineDevice();
 
+};
+
+class SoundEngineDeviceHost : public PluginHost {
+private:
+	SoundEngineDevice* device = nullptr;
+public:
+	void init(SoundEngineDevice* device) {
+		if (this->device) {
+			throw "Device already intialized!";
+		}
+		this->device = device;
+	}
+	void recieve_midi(const MidiMessage &message,
+			const SampleInfo &info);
+	Plugin* get_plugin(std::string identifier);
+	MidiBindingHandler* get_binding_handler();
+	const Metronome& get_metronome();
+	const KeyboardEnvironment& get_environment();
 };
 
 

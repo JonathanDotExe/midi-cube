@@ -217,8 +217,8 @@ void SoundEngineChannel::set_active(bool active) {
 
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
+	host.init(this);
 	metronome.init(0);
-
 }
 
 void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleInfo &info) {
@@ -507,7 +507,7 @@ void SoundEngineDevice::init(MidiCube *cube) {
 	else {
 		this->cube = cube;
 		for (size_t i = 0; i < this->effects.size(); ++i) {
-			//TODO init effects
+			effects[i].effect.init(&host);
 		}
 		for (size_t i = 0; i < this->channels.size(); ++i) {
 			SoundEngineChannel& ch = this->channels[i];
@@ -533,5 +533,27 @@ const Metronome& SoundEngineChannel::get_metronome() {
 }
 
 const KeyboardEnvironment& SoundEngineChannel::get_environment() {
+	return device->env; //TODO channel aftertouch
+}
+
+//SoundEngineDeviceHost
+void SoundEngineDeviceHost::recieve_midi(const MidiMessage &message,
+		const SampleInfo &info) {
+	//TODO
+}
+
+Plugin* SoundEngineDeviceHost::get_plugin(std::string identifier) {
+	return device->get_cube()->plugin_mgr.get_plugin(identifier);
+}
+
+MidiBindingHandler* SoundEngineDeviceHost::get_binding_handler() {
+	return &device->binding_handler;
+}
+
+const Metronome& SoundEngineDeviceHost::get_metronome() {
+	return device->metronome;
+}
+
+const KeyboardEnvironment& SoundEngineDeviceHost::get_environment() {
 	return device->env; //TODO channel aftertouch
 }
