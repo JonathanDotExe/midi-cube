@@ -15,6 +15,7 @@ deps = [
 
 src = [
 	'midicube-main.cpp',
+	'midicube/framework/core/plugins/effect.cpp',
 	'midicube/framework/core/plugins/soundengine.cpp',
 	'midicube/framework/core/metronome.cpp',
 	'midicube/framework/core/midi.cpp',
@@ -75,7 +76,6 @@ src = [
 	'midicube/effect/chorus.cpp',
 	'midicube/effect/compressor.cpp',
 	'midicube/effect/delay.cpp',
-	'midicube/effect/effect.cpp',
 	'midicube/effect/equalizer.cpp',
 	'midicube/effect/flanger.cpp',
 	'midicube/effect/phaser.cpp',
