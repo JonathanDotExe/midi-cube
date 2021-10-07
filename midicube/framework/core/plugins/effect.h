@@ -26,5 +26,21 @@ public:
 	}
 };
 
+template<typename T, typename P>
+class EffectPlugin : public Plugin {
+public:
+
+	EffectPlugin(PluginInfo info) : Plugin(info) {
+
+	}
+
+	PluginProgram* create_program() {
+		return new P();
+	}
+	PluginInstance* create(PluginHost *host) {
+		return new T(*host, *this);
+	}
+};
+
 
 #endif /* MIDICUBE_FRAMEWORK_CORE_PLUGINS_EFFECT_H_ */

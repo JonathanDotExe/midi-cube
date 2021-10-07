@@ -59,4 +59,6 @@ public:
 	~AmplifierSimulationEffect();
 };
 
+
+
 #endif /* MIDICUBE_EFFECT_AMPLIFIER_SIMULATION_H_ */
