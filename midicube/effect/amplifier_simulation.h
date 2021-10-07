@@ -59,6 +59,18 @@ public:
 	~AmplifierSimulationEffect();
 };
 
+class AmplifierSimulationPlugin : public EffectPlugin<AmplifierSimulationEffect, AmplifierSimulationProgram> {
+public:
+	AmplifierSimulationPlugin() : EffectPlugin({
+		"Amplifier",
+		AMPLIFIER_SIMULATION_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
 
+	}
+};
 
 #endif /* MIDICUBE_EFFECT_AMPLIFIER_SIMULATION_H_ */

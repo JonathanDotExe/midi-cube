@@ -136,9 +136,3 @@ void AmplifierSimulationEffect::apply_program(PluginProgram *prog) {
 std::string AmplifierSimulationProgram::get_plugin_name() {
 	return AMPLIFIER_SIMULATION_IDENTIFIER;
 }
-
-PluginProgram* AmplifierSimulationPlugin::create_program() {
-}
-
-PluginInstance* AmplifierSimulationPlugin::create(PluginHost *host) {
-}
