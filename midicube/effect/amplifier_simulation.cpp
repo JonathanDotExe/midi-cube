@@ -7,7 +7,7 @@
 
 #include "amplifier_simulation.h"
 
-AmplifierSimulationEffect::AmplifierSimulationEffect() {
+AmplifierSimulationEffect::AmplifierSimulationEffect(PluginHost& h, Plugin& plugin) : Effect(h, plugin) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.post_gain);
 	cc.add_binding(&preset.drive);

@@ -8,8 +8,8 @@
 #ifndef MIDICUBE_EFFECT_BITCRUSHER_H_
 #define MIDICUBE_EFFECT_BITCRUSHER_H_
 
+#include "../framework/core/plugins/effect.h"
 #include "../framework/core/audio.h"
-#include "effect.h"
 
 struct BitCrusherPreset {
 	BindableBooleanValue on{true};
@@ -17,7 +17,7 @@ struct BitCrusherPreset {
 };
 
 
-class BitCrusherProgram : public EffectProgram {
+class BitCrusherProgram : public PluginProgram {
 public:
 	BitCrusherPreset preset;
 
@@ -34,9 +34,9 @@ public:
 	BitCrusherPreset preset;
 
 	BitCrusherEffect();
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	void apply(const SampleInfo& info);
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	~BitCrusherEffect();
 };
 

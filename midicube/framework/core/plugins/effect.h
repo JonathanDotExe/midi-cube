@@ -15,6 +15,9 @@ protected:
 	LocalMidiBindingHandler cc;
 
 public:
+	Effect(PluginHost& h, Plugin& plugin) : PluginInstance(h, plugin) {
+
+	}
 
 	virtual void apply_program(PluginProgram *prog);
 	virtual void process(const SampleInfo &info) = 0;
