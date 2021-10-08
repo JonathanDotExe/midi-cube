@@ -10,7 +10,7 @@
 
 #include "../framework/core/audio.h"
 #include "../framework/dsp/oscilator.h"
-#include "effect.h"
+#include "../framework/core/plugins/effect.h"
 
 #define TREMOLO_IDENTIFIER "midicube_tremolo"
 

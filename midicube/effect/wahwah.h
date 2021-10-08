@@ -10,31 +10,7 @@
 
 #include "../framework/core/audio.h"
 #include "../framework/dsp/oscilator.h"
-#include "effect.h"
-
-
-/*
-	cc.register_binding(
-			new TemplateControlBinding<bool>("on", preset.on, false, true));
-	cc.register_binding(
-				new TemplateControlBinding<bool>("auto_wah", preset.auto_wah, false, true));
-	cc.register_binding(
-			new TemplateControlBinding<double>("cutoff", preset.cutoff, 0,
-					1));
-	cc.register_binding(
-			new TemplateControlBinding<double>("resonance", preset.resonance, 0,
-					1));
-	cc.register_binding(
-			new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
-
-	cc.register_binding(
-			new TemplateControlBinding<double>("amount",
-					preset.amount, 0, 1));
-
-	cc.register_binding(
-				new TemplateControlBinding<double>("pedal",
-						pedal, 0, 1, 11));
- */
+#include "../framework/core/plugins/effect.h"
 
 struct WahWahPreset {
 	BindableBooleanValue on = true;

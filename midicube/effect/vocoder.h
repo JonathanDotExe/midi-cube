@@ -13,7 +13,7 @@
 #include "../framework/dsp/synthesis.h"
 #include "../framework/dsp/envelope.h"
 #include "../framework/dsp/filter.h"
-#include "effect.h"
+#include "../framework/core/plugins/effect.h"
 
 #define VOCODER_BAND_COUNT 32
 #define VOCODER_IDENTIFIER "midicube_vocoder"
@@ -96,6 +96,20 @@ public:
 
 	void process(const SampleInfo& info);
 
+};
+
+class VocoderPlugin : public EffectPlugin<VocoderEffect, VocoderProgram> {
+public:
+	VocoderPlugin() : EffectPlugin({
+		"Vocoder",
+		VOCODER_IDENTIFIER,
+		3,
+		2,
+		false,
+		false
+	}) {
+
+	}
 };
 
 
