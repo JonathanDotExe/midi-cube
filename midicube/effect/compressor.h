@@ -10,7 +10,9 @@
 
 #include "../framework/core/audio.h"
 #include "../framework/dsp/oscilator.h"
-#include "effect.h"
+#include "../framework/core/plugins/effect.h"
+
+#define COMPRESSOR_IDENTIFIER "midicube_compressor"
 
 struct CompressorPreset {
 	BindableBooleanValue on = true;
@@ -22,12 +24,14 @@ struct CompressorPreset {
 };
 
 
-class CompressorProgram : public EffectProgram {
+class CompressorProgram : public PluginProgram {
 public:
 	CompressorPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
+
 
 	virtual ~CompressorProgram() {
 
@@ -45,10 +49,24 @@ public:
 	CompressorPreset preset;
 
 	CompressorEffect();
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	void process(const SampleInfo& info);
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	~CompressorEffect();
+};
+
+class CompressorPlugin : public EffectPlugin<CompressorEffect, CompressorProgram> {
+public:
+	CompressorPlugin() : EffectPlugin({
+		"Compressor",
+		COMPRESSOR_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
 };
 
 #endif /* MIDICUBE_EFFECT_COMPRESSOR_H_ */

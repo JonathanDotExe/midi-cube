@@ -17,11 +17,11 @@ CompressorEffect::CompressorEffect() {
 	cc.add_binding(&preset.makeup_gain);
 }
 
-void CompressorEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+void CompressorEffect::process(const SampleInfo& info) {
 	if (preset.on) {
 		//Get volume
-		lenv.apply(lsample, info.time_step);
-		renv.apply(rsample, info.time_step);
+		lenv.apply(inputs[0], info.time_step);
+		renv.apply(inputs[1], info.time_step);
 		double lv = lenv.volume();
 		double rv = renv.volume();
 
@@ -47,8 +47,8 @@ void CompressorEffect::apply(double& lsample, double& rsample, SampleInfo& info)
 		rvol.set(rcomp, info.time, rslope);
 
 		//Apply
-		lsample *= lvol.get(info.time) * preset.makeup_gain;
-		rsample *= rvol.get(info.time) * preset.makeup_gain;
+		outputs[0] = inputs[0] * lvol.get(info.time) * preset.makeup_gain;
+		outputs[1] = inputs[1] * rvol.get(info.time) * preset.makeup_gain;
 	}
 }
 
@@ -56,19 +56,7 @@ CompressorEffect::~CompressorEffect() {
 
 }
 
-template<>
-std::string get_effect_name<CompressorEffect>() {
-	return "Compressor";
-}
-
-template <>
-EffectProgram* create_effect_program<CompressorEffect>() {
-	return new CompressorProgram();
-}
-
-
 void CompressorProgram::load(boost::property_tree::ptree tree) {
-	EffectProgram::load(tree);
 	preset.on.load(tree, "on", true);
 	preset.threshold.load(tree, "threshold", -20);
 	preset.ratio.load(tree, "ratio", 4);
@@ -79,7 +67,7 @@ void CompressorProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree CompressorProgram::save() {
-	boost::property_tree::ptree tree = EffectProgram::save();
+	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
 	tree.add_child("threshold", preset.threshold.save());
 	tree.add_child("ratio", preset.ratio.save());
@@ -89,7 +77,7 @@ boost::property_tree::ptree CompressorProgram::save() {
 	return tree;
 }
 
-void CompressorEffect::save_program(EffectProgram **prog) {
+void CompressorEffect::save_program(PluginProgram **prog) {
 	CompressorProgram* p = dynamic_cast<CompressorProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -101,7 +89,7 @@ void CompressorEffect::save_program(EffectProgram **prog) {
 	*prog = p;
 }
 
-void CompressorEffect::apply_program(EffectProgram *prog) {
+void CompressorEffect::apply_program(PluginProgram *prog) {
 	CompressorProgram* p = dynamic_cast<CompressorProgram*>(prog);
 	//Create new
 	if (p) {
@@ -112,4 +100,8 @@ void CompressorEffect::apply_program(EffectProgram *prog) {
 		
 		preset = {};
 	}
+}
+
+std::string CompressorProgram::get_plugin_name() {
+	return COMPRESSOR_IDENTIFIER;
 }
