@@ -8,13 +8,15 @@
 #include "tremolo.h"
 #include <cmath>
 
-TremoloEffect::TremoloEffect() {
+TremoloEffect::TremoloEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.rate);
 	cc.add_binding(&preset.depth);
 }
 
-void TremoloEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+void TremoloEffect::process(const SampleInfo& info) {
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
 	if (preset.on) {
 		//Tremolo
 		AnalogOscilatorData data = {preset.waveform};
@@ -22,8 +24,8 @@ void TremoloEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		double mul = (1 - preset.depth) + preset.depth * (osc.carrier(preset.rate, info.time_step, data) + 1)/2.0;
 
 		//Apply
-		lsample *= mul;
-		rsample *= mul;
+		outputs[0] *= mul;
+		outputs[1] *= mul;
 	}
 }
 
@@ -31,19 +33,8 @@ TremoloEffect::~TremoloEffect() {
 
 }
 
-template<>
-std::string get_effect_name<TremoloEffect>() {
-	return "Tremolo";
-}
-
-template <>
-EffectProgram* create_effect_program<TremoloEffect>() {
-	return new TremoloProgram();
-}
-
 
 void TremoloProgram::load(boost::property_tree::ptree tree) {
-	EffectProgram::load(tree);
 	preset.on.load(tree, "on", true);
 	preset.rate.load(tree, "rate", 2);
 	preset.depth.load(tree, "depth", 0.5);
@@ -51,7 +42,7 @@ void TremoloProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree TremoloProgram::save() {
-	boost::property_tree::ptree tree = EffectProgram::save();
+	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
 	tree.add_child("rate", preset.rate.save());
 	tree.add_child("depth", preset.depth.save());
@@ -59,7 +50,7 @@ boost::property_tree::ptree TremoloProgram::save() {
 	return tree;
 }
 
-void TremoloEffect::save_program(EffectProgram **prog) {
+void TremoloEffect::save_program(PluginProgram **prog) {
 	TremoloProgram* p = dynamic_cast<TremoloProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -71,7 +62,7 @@ void TremoloEffect::save_program(EffectProgram **prog) {
 	*prog = p;
 }
 
-void TremoloEffect::apply_program(EffectProgram *prog) {
+void TremoloEffect::apply_program(PluginProgram *prog) {
 	TremoloProgram* p = dynamic_cast<TremoloProgram*>(prog);
 	//Create new
 	if (p) {
@@ -82,4 +73,8 @@ void TremoloEffect::apply_program(EffectProgram *prog) {
 		
 		preset = {};
 	}
+}
+
+std::string TremoloProgram::get_plugin_name() {
+	return TREMOLO_IDENTIFIER;
 }

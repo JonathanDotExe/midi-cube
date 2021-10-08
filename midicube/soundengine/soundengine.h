@@ -9,7 +9,6 @@
 #define MIDICUBE_SOUNDENGINE_SOUNDENGINE_H_
 
 #include "../framework/core/midi.h"
-#include "../effect/effect.h"
 #include "../framework/dsp/envelope.h"
 #include "../audio.h"
 #include "../framework/dsp/synthesis.h"

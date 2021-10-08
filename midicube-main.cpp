@@ -2,7 +2,6 @@
 
 #include "midicube/view/SoundEngineView.h"
 #include "midicube/midicube.h"
-#include "midicube/effect/effect.h"
 
 using namespace std;
 

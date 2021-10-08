@@ -92,7 +92,7 @@ public:
 class RotarySpeakerPlugin : public EffectPlugin<RotarySpeakerEffect, RotarySpeakerProgram> {
 public:
 	RotarySpeakerPlugin() : EffectPlugin({
-		"RotarySpeaker",
+		"Rotary Speaker",
 		ROTARY_SPEAKER_IDENTIFIER,
 		2,
 		2,

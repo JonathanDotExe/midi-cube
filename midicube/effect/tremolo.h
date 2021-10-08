@@ -12,6 +12,8 @@
 #include "../framework/dsp/oscilator.h"
 #include "effect.h"
 
+#define TREMOLO_IDENTIFIER "midicube_tremolo"
+
 struct TremoloPreset {
 	BindableBooleanValue on = true;
 	BindableTemplateValue<double> rate{2, 0, 8};
@@ -20,10 +22,11 @@ struct TremoloPreset {
 };
 
 
-class TremoloProgram : public EffectProgram {
+class TremoloProgram : public PluginProgram {
 public:
 	TremoloPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
@@ -39,11 +42,25 @@ private:
 public:
 	TremoloPreset preset;
 
-	TremoloEffect();
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	TremoloEffect(PluginHost& h, Plugin& p);
+	void process(const SampleInfo& info);
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	~TremoloEffect();
+};
+
+class TremoloPlugin : public EffectPlugin<TremoloEffect, TremoloProgram> {
+public:
+	TremoloPlugin() : EffectPlugin({
+		"Tremolo",
+		TREMOLO_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
 };
 
 #endif /* MIDICUBE_EFFECT_TREMOLO_H_ */
