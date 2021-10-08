@@ -11,7 +11,7 @@ static inline double sound_delay(double rotation, double max_delay, unsigned int
 	return (1 + rotation) * max_delay * 0.5 * sample_rate;
 }
 
-RotarySpeakerEffect::RotarySpeakerEffect() {
+RotarySpeakerEffect::RotarySpeakerEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.fast);
 
@@ -19,10 +19,12 @@ RotarySpeakerEffect::RotarySpeakerEffect() {
 	filter_data.cutoff = 800;
 }
 
-void RotarySpeakerEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
+void RotarySpeakerEffect::process(const SampleInfo &info) {
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
 	if (preset.on) {
 		//Sum samples up
-		double sample = (lsample + rsample) / 2.0;
+		double sample = (outputs[0] + outputs[1]) / 2.0;
 		//Filter
 		double bass_sample = filter.apply(filter_data, sample, info.time_step);
 		double horn_sample = sample - bass_sample;
@@ -55,11 +57,11 @@ void RotarySpeakerEffect::apply(double &lsample, double &rsample, SampleInfo &in
 		rs *= 2.0/(1 + preset.stereo_mix);
 
 		//Mix
-		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
 
-		lsample += ls * fmin(0.5, preset.mix) * 2;
-		rsample += rs * fmin(0.5, preset.mix) * 2;
+		outputs[0] += ls * fmin(0.5, preset.mix) * 2;
+		outputs[1] += rs * fmin(0.5, preset.mix) * 2;
 	}
 
 	//Rotate speakers
@@ -85,18 +87,7 @@ RotarySpeakerEffect::~RotarySpeakerEffect() {
 	// TODO Auto-generated destructor stub
 }
 
-template<>
-std::string get_effect_name<RotarySpeakerEffect>() {
-	return "Rotary Speaker";
-}
-
-template <>
-EffectProgram* create_effect_program<RotarySpeakerEffect>() {
-	return new RotarySpeakerProgram();
-}
-
 void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
-	EffectProgram::load(tree);
 	preset.on.load(tree, "on", true);
 	preset.fast.load(tree, "fast", false);
 
@@ -118,7 +109,7 @@ void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree RotarySpeakerProgram::save() {
-	boost::property_tree::ptree tree = EffectProgram::save();
+	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
 	tree.add_child("fast", preset.fast.save());
 
@@ -141,7 +132,7 @@ boost::property_tree::ptree RotarySpeakerProgram::save() {
 	return tree;
 }
 
-void RotarySpeakerEffect::save_program(EffectProgram **prog) {
+void RotarySpeakerEffect::save_program(PluginProgram **prog) {
 	RotarySpeakerProgram* p = dynamic_cast<RotarySpeakerProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -153,7 +144,7 @@ void RotarySpeakerEffect::save_program(EffectProgram **prog) {
 	*prog = p;
 }
 
-void RotarySpeakerEffect::apply_program(EffectProgram *prog) {
+void RotarySpeakerEffect::apply_program(PluginProgram *prog) {
 	RotarySpeakerProgram* p = dynamic_cast<RotarySpeakerProgram*>(prog);
 	//Create new
 	if (p) {
@@ -164,4 +155,8 @@ void RotarySpeakerEffect::apply_program(EffectProgram *prog) {
 		
 		preset = {};
 	}
+}
+
+std::string RotarySpeakerProgram::get_plugin_name() {
+	return ROTARY_SPEAKER_IDENTIFIER;
 }

@@ -10,7 +10,7 @@
 
 #include "../framework/core/audio.h"
 #include "../framework/dsp/oscilator.h"
-#include "effect.h"
+#include "../framework/core/plugins/effect.h"
 
 #define PHASER_ALLPASS_AMOUNT 4
 #define PHASER_IDENTIFIER "midicube_phaser"

@@ -8,7 +8,7 @@
 #ifndef MIDICUBE_EFFECT_REVERB_H_
 #define MIDICUBE_EFFECT_REVERB_H_
 
-#include "effect.h"
+#include "../framework/core/plugins/effect.h"
 #include "../framework/core/audio.h"
 #include "../framework/dsp/synthesis.h"
 

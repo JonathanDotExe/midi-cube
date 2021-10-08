@@ -11,10 +11,11 @@
 #include "../framework/core/audio.h"
 #include "../framework/dsp/filter.h"
 #include "../framework/dsp/synthesis.h"
-#include "effect.h"
+#include "../framework/core/plugins/effect.h"
+
+#define ROTARY_SPEAKER_IDENTIFIER "midicube_rotary_speaker"
 
 #define ROTARY_CUTOFF 800
-
 
 #define ROTARY_HORN_SLOW_FREQUENCY 0.85
 #define ROTARY_HORN_FAST_FREQUENCY 6.65
@@ -53,10 +54,11 @@ struct RotarySpeakerPreset {
 };
 
 
-class RotarySpeakerProgram : public EffectProgram {
+class RotarySpeakerProgram : public PluginProgram {
 public:
 	RotarySpeakerPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
@@ -80,11 +82,25 @@ private:
 public:
 	RotarySpeakerPreset preset;
 
-	RotarySpeakerEffect();
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	RotarySpeakerEffect(PluginHost& h, Plugin& p);
+	void process(const SampleInfo& info);
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	~RotarySpeakerEffect();
+};
+
+class RotarySpeakerPlugin : public EffectPlugin<RotarySpeakerEffect, RotarySpeakerProgram> {
+public:
+	RotarySpeakerPlugin() : EffectPlugin({
+		"RotarySpeaker",
+		ROTARY_SPEAKER_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
 };
 
 #endif /* MIDICUBE_EFFECT_ROTARY_SPEAKER_H_ */
