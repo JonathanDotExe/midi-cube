@@ -10,7 +10,9 @@
 
 #include "../framework/core/audio.h"
 #include "../framework/dsp/oscilator.h"
-#include "effect.h"
+#include "../framework/core/plugins/effect.h"
+
+#define EQUALIZER_IDENTIFIER "midicube_4_band_eq"
 
 struct EqualizerPreset {
 	BindableBooleanValue on = true;
@@ -25,10 +27,11 @@ struct EqualizerPreset {
 };
 
 
-class EqualizerProgram : public EffectProgram {
+class EqualizerProgram : public PluginProgram {
 public:
 	EqualizerPreset preset;
 
+	virtual std::__cxx11::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
@@ -51,11 +54,25 @@ private:
 public:
 	EqualizerPreset preset;
 
-	EqualizerEffect();
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	EqualizerEffect(PluginHost& h, Plugin& p);
+	void process(const SampleInfo& info);
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	~EqualizerEffect();
+};
+
+class EqualizerPlugin : public EffectPlugin<EqualizerEffect, EqualizerProgram> {
+public:
+	EqualizerPlugin() : EffectPlugin({
+		"Equalizer",
+		EQUALIZER_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
 };
 
 #endif /* MIDICUBE_EFFECT_EQUALIZER_H_ */
