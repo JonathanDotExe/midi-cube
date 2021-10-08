@@ -8,7 +8,7 @@
 #include "delay.h"
 #include <cmath>
 
-DelayEffect::DelayEffect() {
+DelayEffect::DelayEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.left_init_delay_offset);
 	cc.add_binding(&preset.left_delay);
@@ -20,8 +20,10 @@ DelayEffect::DelayEffect() {
 	cc.add_binding(&preset.mix);
 }
 
-void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+void DelayEffect::process(const SampleInfo& info) {
 	if (preset.on) {
+		outputs[0] = inputs[0];
+		outputs[1] = inputs[1];
 		double l = ldelay.process();
 		double r = rdelay.process();
 
@@ -38,18 +40,18 @@ void DelayEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		}
 
 		//Delay
-		ldelay.add_sample(lsample, left_init_delay);
-		rdelay.add_sample(rsample, right_init_delay);
+		ldelay.add_sample(outputs[0], left_init_delay);
+		rdelay.add_sample(outputs[1], right_init_delay);
 		//Feedback
 		ldelay.add_sample(l * left_feedback, left_delay);
 		rdelay.add_sample(r * right_feedback, right_delay);
 
 		//Mix
-		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
 
-		lsample += l * fmin(0.5, preset.mix) * 2;
-		rsample += r * fmin(0.5, preset.mix) * 2;
+		outputs[0] += l * fmin(0.5, preset.mix) * 2;
+		outputs[1] += r * fmin(0.5, preset.mix) * 2;
 	}
 }
 
@@ -57,19 +59,8 @@ DelayEffect::~DelayEffect() {
 
 }
 
-template<>
-std::string get_effect_name<DelayEffect>() {
-	return "Delay";
-}
-
-template <>
-EffectProgram* create_effect_program<DelayEffect>() {
-	return new DelayProgram();
-}
-
 
 void DelayProgram::load(boost::property_tree::ptree tree) {
-	EffectProgram::load(tree);
 	preset.on.load(tree, "on", true);
 	preset.mix.load(tree, "mix", 0.5);
 	preset.left_delay.load(tree, "left_delay", 0.1);
@@ -82,7 +73,7 @@ void DelayProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree DelayProgram::save() {
-	boost::property_tree::ptree tree = EffectProgram::save();
+	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
 	tree.add_child("mix", preset.mix.save());
 	tree.add_child("left_delay", preset.left_delay.save());
@@ -95,7 +86,7 @@ boost::property_tree::ptree DelayProgram::save() {
 	return tree;
 }
 
-void DelayEffect::save_program(EffectProgram **prog) {
+void DelayEffect::save_program(PluginProgram **prog) {
 	DelayProgram* p = dynamic_cast<DelayProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -107,7 +98,7 @@ void DelayEffect::save_program(EffectProgram **prog) {
 	*prog = p;
 }
 
-void DelayEffect::apply_program(EffectProgram *prog) {
+void DelayEffect::apply_program(PluginProgram *prog) {
 	DelayProgram* p = dynamic_cast<DelayProgram*>(prog);
 	//Create new
 	if (p) {
@@ -118,4 +109,8 @@ void DelayEffect::apply_program(EffectProgram *prog) {
 		
 		preset = {};
 	}
+}
+
+std::string DelayProgram::get_plugin_name() {
+	return DELAY_IDENTIFIER;
 }

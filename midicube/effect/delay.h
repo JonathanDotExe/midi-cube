@@ -12,6 +12,8 @@
 #include "../framework/dsp/oscilator.h"
 #include "effect.h"
 
+#define DELAY_IDENTIFIER "midicube_delay"
+
 /*
 	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
 	cc.register_binding(new TemplateControlBinding<double>("mix", preset.mix, 0, 1));
@@ -37,10 +39,11 @@ struct DelayPreset {
 };
 
 
-class DelayProgram : public EffectProgram {
+class DelayProgram : public PluginProgram {
 public:
 	DelayPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
@@ -58,10 +61,10 @@ private:
 public:
 	DelayPreset preset;
 
-	DelayEffect();
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	DelayEffect(PluginHost& h, Plugin& p);
+	void process(const SampleInfo& info);
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	~DelayEffect();
 };
 
