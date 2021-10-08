@@ -9,15 +9,15 @@
 #include "bitcrusher.h"
 #include <cmath>
 
-BitCrusherEffect::BitCrusherEffect() {
+BitCrusherEffect::BitCrusherEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 }
 
-void BitCrusherEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+void BitCrusherEffect::apply(const SampleInfo& info) {
 	if (preset.on) {
 		double accuracy = pow(2, preset.bits - 1);
-		lsample = (int) (lsample * accuracy)/(accuracy);
-		rsample = (int) (rsample * accuracy)/(accuracy);
+		outputs[0] =  (inputs[0] * accuracy)/(accuracy);
+		outputs[1] =  (inputs[1] * accuracy)/(accuracy);
 	}
 }
 
@@ -25,32 +25,19 @@ BitCrusherEffect::~BitCrusherEffect() {
 
 }
 
-template<>
-std::string get_effect_name<BitCrusherEffect>() {
-	return "Bit Crusher";
-}
-
 void BitCrusherProgram::load(boost::property_tree::ptree tree) {
-	EffectProgram::load(tree);
 	preset.on.load(tree, "on", true);
 	preset.bits = tree.get<unsigned int>("bits", 16);
 }
 
 boost::property_tree::ptree BitCrusherProgram::save() {
-	boost::property_tree::ptree tree = EffectProgram::save();
+	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
 	tree.put("bits", preset.bits);
 	return tree;
 }
 
-
-template <>
-EffectProgram* create_effect_program<BitCrusherEffect>() {
-	return new BitCrusherProgram();
-}
-
-
-void BitCrusherEffect::save_program(EffectProgram **prog) {
+void BitCrusherEffect::save_program(PluginProgram **prog) {
 	BitCrusherProgram* p = dynamic_cast<BitCrusherProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -61,7 +48,7 @@ void BitCrusherEffect::save_program(EffectProgram **prog) {
 	*prog = p;
 }
 
-void BitCrusherEffect::apply_program(EffectProgram *prog) {
+void BitCrusherEffect::apply_program(PluginProgram *prog) {
 	BitCrusherProgram* p = dynamic_cast<BitCrusherProgram*>(prog);
 	//Create new
 	if (p) {
@@ -70,4 +57,8 @@ void BitCrusherEffect::apply_program(EffectProgram *prog) {
 	else {
 		preset = {};
 	}
+}
+
+std::__cxx11::string BitCrusherProgram::get_plugin_name() {
+	return BIT_CRUSHER_IDENTIFIER;
 }
