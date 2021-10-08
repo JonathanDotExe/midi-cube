@@ -41,12 +41,12 @@ void AudioHandler::init(int out_device, int in_device) {
 	//Set up input
 	RtAudio::StreamParameters input_params;
 	input_params.deviceId = in_device >= 0 ? in_device : audio.getDefaultInputDevice();
-	input_params.nChannels = 1;
+	input_params.nChannels = 2;
 	input_params.firstChannel = 0;
 
 	sample_rate = 48000;
 	time_step = 1.0/sample_rate;
-	buffer_size = 256;
+	buffer_size = 64;
 
 	input = in_device >= 0;
 
@@ -78,7 +78,11 @@ int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned 
 	//Compute each sample
 	//TODO Use rtaudio time
 	for (size_t i = 0; i < buffer_size; ++i) {
-		double in = input ? *input_buffer++ : 0;
+		double in = 0;
+		if (input) {
+			in += (*input_buffer++);
+			in += (*input_buffer++);
+		}
 		info = {time, time_step, sample_rate, sample_time, in};
 
 		double lsample = 0;
