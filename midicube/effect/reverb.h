@@ -15,6 +15,8 @@
 #define REVERB_COMB_FILTERS 4
 #define REVERB_ALLPASS_FILTERS 2
 
+#define REVERB_IDENTIFIER "midicube_schroeder_reverb"
+
 /*
 	cc.register_binding(new TemplateControlBinding<bool>("on", preset.on, false, true));
 	cc.register_binding(new TemplateControlBinding<double>("delay", preset.delay, 0, 2));
@@ -38,7 +40,7 @@ struct ReverbPreset {
 	BindableTemplateValue<double> stereo{0, -1, 1};
 };
 
-class CombFilter {
+class ReverbCombFilter {
 private:
 	DelayBuffer delay;
 
@@ -47,7 +49,7 @@ public:
 	double process(double in, double gain, unsigned int delay);
 };
 
-class AllPassFilter {
+class ReverbAllPassFilter {
 private:
 	DelayBuffer indelay;
 	DelayBuffer delay;
@@ -57,10 +59,11 @@ public:
 	double process(double in, double gain, unsigned int delay);
 };
 
-class ReverbProgram : public EffectProgram {
+class ReverbProgram : public PluginProgram {
 public:
 	ReverbPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
@@ -71,10 +74,10 @@ public:
 
 class ReverbEffect : public Effect {
 private:
-	std::array<CombFilter, 4> lcomb_filters;
-	std::array<CombFilter, 4> rcomb_filters;
-	std::array<AllPassFilter, 2> lallpass_filters;
-	std::array<AllPassFilter, 2> rallpass_filters;
+	std::array<ReverbCombFilter, 4> lcomb_filters;
+	std::array<ReverbCombFilter, 4> rcomb_filters;
+	std::array<ReverbAllPassFilter, 2> lallpass_filters;
+	std::array<ReverbAllPassFilter, 2> rallpass_filters;
 
 	Filter lfilter;
 	Filter rfilter;
@@ -89,10 +92,24 @@ public:
 	ReverbPreset preset;
 
 	ReverbEffect();
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	void process(const SampleInfo& info);
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	~ReverbEffect();
+};
+
+class ReverbPlugin : public EffectPlugin<ReverbEffect, ReverbProgram> {
+public:
+	ReverbPlugin() : EffectPlugin({
+		"Reverb",
+		REVERB_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
 };
 
 #endif /* MIDICUBE_EFFECT_REVERB_H_ */

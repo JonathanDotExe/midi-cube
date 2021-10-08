@@ -9,14 +9,14 @@
 
 #include <cmath>
 
-double CombFilter::process(double in, double gain, unsigned int delay) {
+double ReverbCombFilter::process(double in, double gain, unsigned int delay) {
 	double out = this->delay.process();
 	out += in;
 	this->delay.add_sample(out * gain, delay);
 	return out;
 }
 
-double AllPassFilter::process(double in, double gain, unsigned int delay) {
+double ReverbAllPassFilter::process(double in, double gain, unsigned int delay) {
 	double out = in + this->indelay.process() + this->delay.process();
 	this->indelay.add_sample(out * -gain, delay);
 	this->delay.add_sample(out * gain, delay - 20);
@@ -33,7 +33,9 @@ ReverbEffect::ReverbEffect() {
 	cc.add_binding(&preset.stereo);
 }
 
-void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
+void ReverbEffect::process(const SampleInfo &info) {
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
 	if (preset.on) {
 		double l = 0;
 		double r = 0;
@@ -42,8 +44,8 @@ void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 		for (size_t i = 0; i < REVERB_COMB_FILTERS; ++i) {
 			double comb_delay = (preset.delay * comb_delay_mul[i]) * info.sample_rate;
 			double decay = preset.decay * comb_decay_mul[i];
-			l += lcomb_filters[i].process(lsample, decay, comb_delay * (1 - preset.stereo * 0.2));
-			r += rcomb_filters[i].process(rsample, decay, comb_delay * (1 + preset.stereo * 0.2));
+			l += lcomb_filters[i].process(outputs[0], decay, comb_delay * (1 - preset.stereo * 0.2));
+			r += rcomb_filters[i].process(outputs[1], decay, comb_delay * (1 + preset.stereo * 0.2));
 		}
 
 		//All pass filters
@@ -60,15 +62,15 @@ void ReverbEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 		l = lfilter.apply(data, l, info.time_step);
 		r = lfilter.apply(data, r, info.time_step);
 		//Mix
-		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
 
-		lsample += l * fmin(0.5, preset.mix) * 2;
-		rsample += r * fmin(0.5, preset.mix) * 2;
+		outputs[0] += l * fmin(0.5, preset.mix) * 2;
+		outputs[1] += r * fmin(0.5, preset.mix) * 2;
 	}
 }
 
-void ReverbEffect::save_program(EffectProgram **prog) {
+void ReverbEffect::save_program(PluginProgram **prog) {
 	ReverbProgram* p = dynamic_cast<ReverbProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -80,7 +82,7 @@ void ReverbEffect::save_program(EffectProgram **prog) {
 	*prog = p;
 }
 
-void ReverbEffect::apply_program(EffectProgram *prog) {
+void ReverbEffect::apply_program(PluginProgram *prog) {
 	ReverbProgram* p = dynamic_cast<ReverbProgram*>(prog);
 	//Create new
 	if (p) {
@@ -96,19 +98,8 @@ void ReverbEffect::apply_program(EffectProgram *prog) {
 ReverbEffect::~ReverbEffect() {
 }
 
-template<>
-std::string get_effect_name<ReverbEffect>() {
-	return "Reverb";
-}
-
-template <>
-EffectProgram* create_effect_program<ReverbEffect>() {
-	return new ReverbProgram();
-}
-
 
 void ReverbProgram::load(boost::property_tree::ptree tree) {
-	EffectProgram::load(tree);
 	preset.on.load(tree, "on", true);
 	preset.delay.load(tree, "delay", 0.2);
 	preset.decay.load(tree, "decay", 0.7);
@@ -120,7 +111,7 @@ void ReverbProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree ReverbProgram::save() {
-	boost::property_tree::ptree tree = EffectProgram::save();
+	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
 	tree.add_child("delay", preset.delay.save());
 	tree.add_child("decay", preset.decay.save());
@@ -130,4 +121,8 @@ boost::property_tree::ptree ReverbProgram::save() {
 	tree.add_child("resonance", preset.resonance.save());
 	tree.add_child("stereo", preset.stereo.save());
 	return tree;
+}
+
+std::string ReverbProgram::get_plugin_name() {
+	return REVERB_IDENTIFIER;
 }
