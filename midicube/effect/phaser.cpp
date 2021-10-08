@@ -8,7 +8,7 @@
 #include "phaser.h"
 #include <cmath>
 
-PhaserEffect::PhaserEffect() {
+PhaserEffect::PhaserEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.center_cutoff);
 	cc.add_binding(&preset.lfo_depth);
@@ -16,7 +16,9 @@ PhaserEffect::PhaserEffect() {
 	cc.add_binding(&preset.mix);
 }
 
-void PhaserEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+void PhaserEffect::process(const SampleInfo& info) {
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
 	if (preset.on) {
 		//Cutoff
 		AnalogOscilatorData data = {preset.vibrato_waveform};
@@ -26,19 +28,19 @@ void PhaserEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 
 		//Allpass
 		FilterData filter{FilterType::LP_6, scale_cutoff(cutoff), 0};
-		double l = lsample;
-		double r = rsample;
+		double l = inputs[0];
+		double r = inputs[1];
 		for (size_t i = 0; i < PHASER_ALLPASS_AMOUNT; ++i) {
 			l = 2 * lfilter[i].apply(filter, l, info.time_step) - l;
 			r = 2 * rfilter[i].apply(filter, r, info.time_step) - r;
 		}
 
 		//Mix
-		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
 
-		lsample += l * fmin(0.5, preset.mix) * 2;
-		rsample += r * fmin(0.5, preset.mix) * 2;
+		outputs[0] += l * fmin(0.5, preset.mix) * 2;
+		outputs[1] += r * fmin(0.5, preset.mix) * 2;
 	}
 }
 
@@ -46,19 +48,7 @@ PhaserEffect::~PhaserEffect() {
 
 }
 
-template<>
-std::string get_effect_name<PhaserEffect>() {
-	return "Phaser";
-}
-
-template <>
-EffectProgram* create_effect_program<PhaserEffect>() {
-	return new PhaserProgram();
-}
-
-
 void PhaserProgram::load(boost::property_tree::ptree tree) {
-	EffectProgram::load(tree);
 	preset.on.load(tree, "on", true);
 	preset.lfo_rate.load(tree, "lfo_rate", 1);
 	preset.lfo_depth.load(tree, "lfo_depth", 0.25);
@@ -69,7 +59,7 @@ void PhaserProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree PhaserProgram::save() {
-	boost::property_tree::ptree tree = EffectProgram::save();
+	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
 	tree.add_child("lfo_rate", preset.lfo_rate.save());
 	tree.add_child("lfo_depth", preset.lfo_depth.save());
@@ -80,7 +70,7 @@ boost::property_tree::ptree PhaserProgram::save() {
 	return tree;
 }
 
-void PhaserEffect::save_program(EffectProgram **prog) {
+void PhaserEffect::save_program(PluginProgram **prog) {
 	PhaserProgram* p = dynamic_cast<PhaserProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -92,7 +82,7 @@ void PhaserEffect::save_program(EffectProgram **prog) {
 	*prog = p;
 }
 
-void PhaserEffect::apply_program(EffectProgram *prog) {
+void PhaserEffect::apply_program(PluginProgram *prog) {
 	PhaserProgram* p = dynamic_cast<PhaserProgram*>(prog);
 	//Create new
 	if (p) {
@@ -103,4 +93,8 @@ void PhaserEffect::apply_program(EffectProgram *prog) {
 		
 		preset = {};
 	}
+}
+
+std::string PhaserProgram::get_plugin_name() {
+	return PHASER_IDENTIFIER;
 }

@@ -13,6 +13,7 @@
 #include "effect.h"
 
 #define PHASER_ALLPASS_AMOUNT 4
+#define PHASER_IDENTIFIER "midicube_phaser"
 
 struct PhaserPreset {
 	BindableBooleanValue on = true;
@@ -24,10 +25,11 @@ struct PhaserPreset {
 };
 
 
-class PhaserProgram : public EffectProgram {
+class PhaserProgram : public PluginProgram {
 public:
 	PhaserPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
@@ -39,17 +41,32 @@ public:
 class PhaserEffect : public Effect {
 private:
 	AnalogOscilator osc;
-	std::array<Filter, 4> lfilter;
-	std::array<Filter, 4> rfilter;
+	std::array<Filter, PHASER_ALLPASS_AMOUNT> lfilter;
+	std::array<Filter, PHASER_ALLPASS_AMOUNT> rfilter;
 
 public:
 	PhaserPreset preset;
 
-	PhaserEffect();
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	PhaserEffect(PluginHost& h, Plugin& p);
+	void process(const SampleInfo& info);
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	~PhaserEffect();
 };
+
+class PhaserPlugin : public EffectPlugin<PhaserEffect, PhaserProgram> {
+public:
+	PhaserPlugin() : EffectPlugin({
+		"Phaser",
+		PHASER_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
+};
+
 
 #endif /* MIDICUBE_EFFECT_PHASER_H_ */
