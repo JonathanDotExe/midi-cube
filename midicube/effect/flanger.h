@@ -10,7 +10,9 @@
 
 #include "../framework/core/audio.h"
 #include "../framework/dsp/oscilator.h"
-#include "effect.h"
+#include "../framework/core/plugins/effect.h"
+
+#define FLANGER_IDENTIFIER "midicube_flanger"
 
 struct FlangerPreset {
 	BindableBooleanValue on = true;
@@ -24,10 +26,11 @@ struct FlangerPreset {
 };
 
 
-class FlangerProgram : public EffectProgram {
+class FlangerProgram : public PluginProgram {
 public:
 	FlangerPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
@@ -46,10 +49,25 @@ public:
 	FlangerPreset preset;
 
 	FlangerEffect();
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	void process(const SampleInfo& info);
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	~FlangerEffect();
 };
+
+class FlangerPlugin : public EffectPlugin<FlangerEffect, FlangerProgram> {
+public:
+	FlangerPlugin() : EffectPlugin({
+		"Flanger",
+		FLANGER_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
+};
+
 
 #endif /* MIDICUBE_EFFECT_FLANGER_H_ */

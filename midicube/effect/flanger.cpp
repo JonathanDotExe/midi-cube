@@ -18,7 +18,9 @@ FlangerEffect::FlangerEffect() {
 	cc.add_binding(&preset.feedback);
 }
 
-void FlangerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+void FlangerEffect::process(const SampleInfo& info) {
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
 	if (preset.on) {
 		double l = ldelay.process();
 		double r = rdelay.process();
@@ -27,15 +29,15 @@ void FlangerEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		AnalogOscilatorData data = {preset.vibrato_waveform};
 		osc.process(preset.vibrato_rate, info.time_step, data);
 		double del = (1 + osc.carrier(preset.vibrato_rate, info.time_step, data) * preset.vibrato_depth * 0.2) * preset.delay * info.sample_rate;
-		ldelay.add_isample(lsample + l * preset.feedback, del);
-		rdelay.add_isample(rsample + r * preset.feedback, del);
+		ldelay.add_isample(outputs[0] + l * preset.feedback, del);
+		rdelay.add_isample(outputs[1] + r * preset.feedback, del);
 
 		//Mix
-		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
 
-		lsample += l * fmin(0.5, preset.mix) * 2;
-		rsample += r * fmin(0.5, preset.mix) * 2;
+		outputs[0] += l * fmin(0.5, preset.mix) * 2;
+		outputs[1] += r * fmin(0.5, preset.mix) * 2;
 	}
 }
 
@@ -43,19 +45,7 @@ FlangerEffect::~FlangerEffect() {
 
 }
 
-template<>
-std::string get_effect_name<FlangerEffect>() {
-	return "Flanger";
-}
-
-template <>
-EffectProgram* create_effect_program<FlangerEffect>() {
-	return new FlangerProgram();
-}
-
-
 void FlangerProgram::load(boost::property_tree::ptree tree) {
-	EffectProgram::load(tree);
 	preset.on.load(tree, "on", true);
 	preset.vibrato_rate.load(tree, "vibrato_rate", 2);
 	preset.vibrato_depth.load(tree, "vibrato_depth", 0.5);
@@ -67,7 +57,7 @@ void FlangerProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree FlangerProgram::save() {
-	boost::property_tree::ptree tree = EffectProgram::save();
+	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
 	tree.add_child("vibrato_rate", preset.vibrato_rate.save());
 	tree.add_child("vibrato_depth", preset.vibrato_depth.save());
@@ -79,7 +69,7 @@ boost::property_tree::ptree FlangerProgram::save() {
 	return tree;
 }
 
-void FlangerEffect::save_program(EffectProgram **prog) {
+void FlangerEffect::save_program(PluginProgram **prog) {
 	FlangerProgram* p = dynamic_cast<FlangerProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -91,7 +81,7 @@ void FlangerEffect::save_program(EffectProgram **prog) {
 	*prog = p;
 }
 
-void FlangerEffect::apply_program(EffectProgram *prog) {
+void FlangerEffect::apply_program(PluginProgram *prog) {
 	FlangerProgram* p = dynamic_cast<FlangerProgram*>(prog);
 	//Create new
 	if (p) {
@@ -102,4 +92,8 @@ void FlangerEffect::apply_program(EffectProgram *prog) {
 		
 		preset = {};
 	}
+}
+
+std::string FlangerProgram::get_plugin_name() {
+	return FLANGER_IDENTIFIER;
 }
