@@ -12,7 +12,6 @@
 #include "../framework/core/audio.h"
 #include "../framework/dsp/filter.h"
 #include "../framework/dsp/synthesis.h"
-#include "effect.h"
 
 #define AMP_OVERSAMPLING 2
 #define AMPLIFIER_SIMULATION_IDENTIFIER "midicube_overdrive_amp"

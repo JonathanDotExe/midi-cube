@@ -9,6 +9,26 @@
 #include <iostream>
 
 
+#include "soundengine/organ.h"
+#include "soundengine/drums.h"
+#include "soundengine/sampler.h"
+#include "soundengine/asynth.h"
+
+#include "effect/amplifier_simulation.h"
+#include "effect/bitcrusher.h"
+#include "effect/chorus.h"
+#include "effect/compressor.h"
+#include "effect/delay.h"
+#include "effect/equalizer.h"
+#include "effect/flanger.h"
+#include "effect/phaser.h"
+#include "effect/reverb.h"
+#include "effect/rotary_speaker.h"
+#include "effect/tremolo.h"
+#include "effect/vocoder.h"
+#include "effect/wahwah.h"
+
+
 static void process_func(double& lsample, double& rsample, SampleInfo& info, void* user_data) {
 	((MidiCube*) user_data)->process(lsample, rsample, info);
 }
@@ -20,7 +40,24 @@ MidiCube::MidiCube() : prog_mgr("./data/programs", action_handler) {
 void MidiCube::init(int out_device, int in_device) {
 	engine.init(this);
 	//Sound Engines
-	//TODO init plugins
+	plugin_mgr.add_plugin(new AdvancedSynthPlugin());
+	plugin_mgr.add_plugin(new OrganPlugin());
+	plugin_mgr.add_plugin(new SamplerPlugin());
+	plugin_mgr.add_plugin(new SampleDrumsPlugin());
+	//Effects
+	plugin_mgr.add_plugin(new EqualizerPlugin());
+	plugin_mgr.add_plugin(new CompressorPlugin());
+	plugin_mgr.add_plugin(new ReverbPlugin());
+	plugin_mgr.add_plugin(new DelayPlugin());
+	plugin_mgr.add_plugin(new ChorusPlugin());
+	plugin_mgr.add_plugin(new FlangerPlugin());
+	plugin_mgr.add_plugin(new PhaserPlugin());
+	plugin_mgr.add_plugin(new WahWahPlugin());
+	plugin_mgr.add_plugin(new TremoloPlugin());
+	plugin_mgr.add_plugin(new BitCrusherPlugin());
+	plugin_mgr.add_plugin(new AmplifierSimulationPlugin());
+	plugin_mgr.add_plugin(new RotarySpeakerPlugin());
+	plugin_mgr.add_plugin(new VocoderPlugin());
 	//Default setting
 	Arpeggiator& arp = engine.channels[1].arp;
 	arp.on = true;

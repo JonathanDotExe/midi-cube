@@ -36,13 +36,13 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, Sample
 	if (engine) {
 		SoundEngineScene& s = scenes[scene];
 		//Pitch and Sustain
-		KeyboardEnvironment env = device->env;
-		if (!s.sustain) {
+		//FIXME customize environment
+		/*if (!s.sustain) {
 			env.sustain = false;
 		}
 		if (!s.pitch_bend) {
 			env.pitch_bend = 1;
-		}
+		}*/
 
 		if (s.active) { //FIXME maintain when notes pressed
 			//Arpeggiator

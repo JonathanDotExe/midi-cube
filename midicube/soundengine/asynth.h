@@ -288,9 +288,9 @@ public:
 
 };
 
-class AdavancedSynthPlugin : public Plugin {
+class AdvancedSynthPlugin : public Plugin {
 public:
-	AdavancedSynthPlugin() : Plugin({
+	AdvancedSynthPlugin() : Plugin({
 		"A-Synth",
 		ASYNTH_IDENTIFIER,
 		0,
@@ -309,7 +309,7 @@ public:
 		return new AdvancedSynth(*host, *this);
 	}
 
-	virtual ~AdavancedSynthPlugin() {
+	virtual ~AdvancedSynthPlugin() {
 
 	}
 };
