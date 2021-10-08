@@ -43,4 +43,18 @@ public:
 	~BitCrusherEffect();
 };
 
+class BitCrusherPlugin : public EffectPlugin<BitCrusherEffect, BitCrusherProgram> {
+public:
+	BitCrusherPlugin() : EffectPlugin({
+		"Bit Crusher",
+		BIT_CRUSHER_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
+};
+
 #endif /* MIDICUBE_EFFECT_BITCRUSHER_H_ */
