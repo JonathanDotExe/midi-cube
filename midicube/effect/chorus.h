@@ -11,8 +11,10 @@
 
 #include "../framework/core/audio.h"
 #include "../framework/dsp/oscilator.h"
-#include "effect.h"
+#include "../framework/core/plugins/effect.h"
 
+
+#define CHORUS_IDENTIFIER "midicube_chorus"
 
 struct ChorusPreset {
 	BindableBooleanValue on = true;
@@ -25,10 +27,11 @@ struct ChorusPreset {
 };
 
 
-class ChorusProgram : public EffectProgram {
+class ChorusProgram : public PluginProgram {
 public:
 	ChorusPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
@@ -46,11 +49,25 @@ private:
 public:
 	ChorusPreset preset;
 
-	ChorusEffect();
-	void apply(double& lsample, double& rsample, SampleInfo& info);
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	ChorusEffect(PluginHost& h, Plugin& p);
+	void process(const SampleInfo& info);
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	~ChorusEffect();
+};
+
+class ChorusPlugin : public EffectPlugin<ChorusEffect, ChorusProgram> {
+public:
+	ChorusPlugin() : EffectPlugin({
+		"Bit Crusher",
+		CHORUS_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
 };
 
 #endif /* MIDICUBE_EFFECT_CHORUS_H_ */

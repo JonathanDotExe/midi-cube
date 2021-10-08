@@ -8,7 +8,7 @@
 #include "chorus.h"
 #include <cmath>
 
-ChorusEffect::ChorusEffect() {
+ChorusEffect::ChorusEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.vibrato_rate);
 	cc.add_binding(&preset.vibrato_depth);
@@ -17,7 +17,7 @@ ChorusEffect::ChorusEffect() {
 	cc.add_binding(&preset.delay);
 }
 
-void ChorusEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
+void ChorusEffect::process(const SampleInfo& info) {
 	if (preset.on) {
 		double l = ldelay.process();
 		double r = rdelay.process();
@@ -26,15 +26,15 @@ void ChorusEffect::apply(double& lsample, double& rsample, SampleInfo& info) {
 		AnalogOscilatorData data = {preset.vibrato_waveform};
 		osc.process(preset.vibrato_rate, info.time_step, data);
 		double del = (1 + osc.carrier(preset.vibrato_rate, info.time_step, data) * preset.vibrato_depth * 0.2) * preset.delay * info.sample_rate;
-		ldelay.add_isample(lsample, del);
-		rdelay.add_isample(rsample, del);
+		ldelay.add_isample(inputs[0], del);
+		rdelay.add_isample(inputs[1], del);
 
 		//Mix
-		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[0] = inputs[0] * (1 - (fmax(0, preset.mix - 0.5) * 2));
+		outputs[1] = inputs[1] * (1 - (fmax(0, preset.mix - 0.5) * 2));
 
-		lsample += l * fmin(0.5, preset.mix) * 2;
-		rsample += r * fmin(0.5, preset.mix) * 2;
+		outputs[0] += l * fmin(0.5, preset.mix) * 2;
+		outputs[1] += r * fmin(0.5, preset.mix) * 2;
 	}
 }
 
@@ -42,19 +42,7 @@ ChorusEffect::~ChorusEffect() {
 
 }
 
-template<>
-std::string get_effect_name<ChorusEffect>() {
-	return "Chorus";
-}
-
-template <>
-EffectProgram* create_effect_program<ChorusEffect>() {
-	return new ChorusProgram();
-}
-
-
 void ChorusProgram::load(boost::property_tree::ptree tree) {
-	EffectProgram::load(tree);
 	preset.on.load(tree, "on", true);
 	preset.vibrato_rate.load(tree, "vibrato_rate", 2);
 	preset.vibrato_depth.load(tree, "vibrato_depth", 0.5);
@@ -65,7 +53,7 @@ void ChorusProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree ChorusProgram::save() {
-	boost::property_tree::ptree tree = EffectProgram::save();
+	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
 	tree.add_child("vibrato_rate", preset.vibrato_rate.save());
 	tree.add_child("vibrato_depth", preset.vibrato_depth.save());
@@ -76,7 +64,7 @@ boost::property_tree::ptree ChorusProgram::save() {
 	return tree;
 }
 
-void ChorusEffect::save_program(EffectProgram **prog) {
+void ChorusEffect::save_program(PluginProgram **prog) {
 	ChorusProgram* p = dynamic_cast<ChorusProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -88,7 +76,7 @@ void ChorusEffect::save_program(EffectProgram **prog) {
 	*prog = p;
 }
 
-void ChorusEffect::apply_program(EffectProgram *prog) {
+void ChorusEffect::apply_program(PluginProgram *prog) {
 	ChorusProgram* p = dynamic_cast<ChorusProgram*>(prog);
 	//Create new
 	if (p) {
@@ -98,4 +86,8 @@ void ChorusEffect::apply_program(EffectProgram *prog) {
 		
 		preset = {};
 	}
+}
+
+std::string ChorusProgram::get_plugin_name() {
+	return CHORUS_IDENTIFIER;
 }
