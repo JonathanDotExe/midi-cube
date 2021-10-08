@@ -16,6 +16,7 @@
 #include "effect.h"
 
 #define VOCODER_BAND_COUNT 32
+#define VOCODER_IDENTIFIER "midicube_vocoder"
 
 const std::vector<double> frequencies = {
 		240, 2400,
@@ -64,10 +65,11 @@ struct VocoderBand {
 	PortamendoBuffer port{0, 0};
 };
 
-class VocoderProgram : public EffectProgram {
+class VocoderProgram : public PluginProgram {
 public:
 	VocoderPreset preset;
 
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 
@@ -84,11 +86,15 @@ private:
 public:
 	VocoderPreset preset;
 
-	void save_program(EffectProgram **prog);
-	void apply_program(EffectProgram *prog);
+	VocoderEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
+
+	}
+
+	void save_program(PluginProgram **prog);
+	void apply_program(PluginProgram *prog);
 	VocoderEffect();
 
-	void apply(double& lsample, double& rsample, SampleInfo& info);
+	void process(const SampleInfo& info);
 
 };
 
