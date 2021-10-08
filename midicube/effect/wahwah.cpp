@@ -8,7 +8,7 @@
 #include "wahwah.h"
 #include <cmath>
 
-WahWahEffect::WahWahEffect() {
+WahWahEffect::WahWahEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.cutoff);
 	cc.add_binding(&preset.resonance);
@@ -17,7 +17,9 @@ WahWahEffect::WahWahEffect() {
 	cc.add_binding(&preset.auto_wah);
 }
 
-void WahWahEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
+void WahWahEffect::process(const SampleInfo &info) {
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
 	if (preset.on) {
 		//Cutoff
 		FilterData ldata;
@@ -25,8 +27,8 @@ void WahWahEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 
 		double amount = fmin(1 - preset.cutoff, preset.amount);
 		if (preset.auto_wah) {
-			lenv.apply(lsample, info.time_step);
-			renv.apply(rsample, info.time_step);
+			lenv.apply(outputs[0], info.time_step);
+			renv.apply(outputs[1], info.time_step);
 
 			ldata = {FilterType::LP_6, scale_cutoff(preset.cutoff + lenv.volume() * amount), preset.resonance};
 			rdata = {FilterType::LP_6, scale_cutoff(preset.cutoff + renv.volume() * amount), preset.resonance};
@@ -37,15 +39,15 @@ void WahWahEffect::apply(double &lsample, double &rsample, SampleInfo &info) {
 		}
 
 		//Filter
-		double l = lfilter.apply(ldata, lsample, info.time_step);
-		double r = rfilter.apply(rdata, rsample, info.time_step);
+		double l = lfilter.apply(ldata, outputs[0], info.time_step);
+		double r = rfilter.apply(rdata, outputs[1], info.time_step);
 
 		//Mix
-		lsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		rsample *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
 
-		lsample += l * fmin(0.5, preset.mix) * 2;
-		rsample += r * fmin(0.5, preset.mix) * 2;
+		outputs[0] += l * fmin(0.5, preset.mix) * 2;
+		outputs[1] += r * fmin(0.5, preset.mix) * 2;
 	}
 }
 
@@ -53,18 +55,7 @@ WahWahEffect::~WahWahEffect() {
 
 }
 
-template<>
-std::string get_effect_name<WahWahEffect>() {
-	return "Wah-Wah";
-}
-
-template<>
-EffectProgram* create_effect_program<WahWahEffect>() {
-	return new WahWahProgram();
-}
-
 void WahWahProgram::load(boost::property_tree::ptree tree) {
-	EffectProgram::load(tree);
 	preset.on.load(tree, "on", true);
 	preset.auto_wah.load(tree, "auto_wah", true);
 	preset.mix.load(tree, "mix", 1);
@@ -74,7 +65,7 @@ void WahWahProgram::load(boost::property_tree::ptree tree) {
 }
 
 boost::property_tree::ptree WahWahProgram::save() {
-	boost::property_tree::ptree tree = EffectProgram::save();
+	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
 	tree.add_child("auto_wah", preset.auto_wah.save());
 	tree.add_child("mix", preset.mix.save());
@@ -85,7 +76,7 @@ boost::property_tree::ptree WahWahProgram::save() {
 	return tree;
 }
 
-void WahWahEffect::save_program(EffectProgram **prog) {
+void WahWahEffect::save_program(PluginProgram **prog) {
 	WahWahProgram *p = dynamic_cast<WahWahProgram*>(*prog);
 	//Create new
 	if (!p) {
@@ -97,7 +88,7 @@ void WahWahEffect::save_program(EffectProgram **prog) {
 	*prog = p;
 }
 
-void WahWahEffect::apply_program(EffectProgram *prog) {
+void WahWahEffect::apply_program(PluginProgram *prog) {
 	WahWahProgram *p = dynamic_cast<WahWahProgram*>(prog);
 	//Create new
 	if (p) {
@@ -105,4 +96,8 @@ void WahWahEffect::apply_program(EffectProgram *prog) {
 	} else {
 		preset = { };
 	}
+}
+
+std::string WahWahProgram::get_plugin_name() {
+	return WAH_WAH_IDENTIFIER;
 }
