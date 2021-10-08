@@ -18,6 +18,8 @@ ChorusEffect::ChorusEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 }
 
 void ChorusEffect::process(const SampleInfo& info) {
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
 	if (preset.on) {
 		double l = ldelay.process();
 		double r = rdelay.process();
@@ -30,8 +32,8 @@ void ChorusEffect::process(const SampleInfo& info) {
 		rdelay.add_isample(inputs[1], del);
 
 		//Mix
-		outputs[0] = inputs[0] * (1 - (fmax(0, preset.mix - 0.5) * 2));
-		outputs[1] = inputs[1] * (1 - (fmax(0, preset.mix - 0.5) * 2));
+		outputs[0] *= (1 - (fmax(0, preset.mix - 0.5) * 2));
+		outputs[1] *= (1 - (fmax(0, preset.mix - 0.5) * 2));
 
 		outputs[0] += l * fmin(0.5, preset.mix) * 2;
 		outputs[1] += r * fmin(0.5, preset.mix) * 2;

@@ -21,9 +21,9 @@ DelayEffect::DelayEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 }
 
 void DelayEffect::process(const SampleInfo& info) {
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
 	if (preset.on) {
-		outputs[0] = inputs[0];
-		outputs[1] = inputs[1];
 		double l = ldelay.process();
 		double r = rdelay.process();
 

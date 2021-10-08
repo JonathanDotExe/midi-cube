@@ -16,8 +16,12 @@ BitCrusherEffect::BitCrusherEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 void BitCrusherEffect::apply(const SampleInfo& info) {
 	if (preset.on) {
 		double accuracy = pow(2, preset.bits - 1);
-		outputs[0] =  (inputs[0] * accuracy)/(accuracy);
-		outputs[1] =  (inputs[1] * accuracy)/(accuracy);
+		outputs[0] = (inputs[0] * accuracy)/(accuracy);
+		outputs[1] = (inputs[1] * accuracy)/(accuracy);
+	}
+	else {
+		outputs[0] = inputs[0];
+		outputs[1] = inputs[1];
 	}
 }
 

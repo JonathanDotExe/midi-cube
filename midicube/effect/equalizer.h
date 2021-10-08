@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_EFFECT_EQUALIZER_H_
 #define MIDICUBE_EFFECT_EQUALIZER_H_
 
+#include <string>
 #include "../framework/core/audio.h"
 #include "../framework/dsp/oscilator.h"
 #include "../framework/core/plugins/effect.h"
@@ -31,7 +32,7 @@ class EqualizerProgram : public PluginProgram {
 public:
 	EqualizerPreset preset;
 
-	virtual std::__cxx11::string get_plugin_name();
+	virtual std::string get_plugin_name();
 	virtual void load(boost::property_tree::ptree tree);
 	virtual boost::property_tree::ptree save();
 

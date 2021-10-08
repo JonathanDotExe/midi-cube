@@ -18,6 +18,8 @@ CompressorEffect::CompressorEffect() {
 }
 
 void CompressorEffect::process(const SampleInfo& info) {
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
 	if (preset.on) {
 		//Get volume
 		lenv.apply(inputs[0], info.time_step);
@@ -47,8 +49,8 @@ void CompressorEffect::process(const SampleInfo& info) {
 		rvol.set(rcomp, info.time, rslope);
 
 		//Apply
-		outputs[0] = inputs[0] * lvol.get(info.time) * preset.makeup_gain;
-		outputs[1] = inputs[1] * rvol.get(info.time) * preset.makeup_gain;
+		outputs[0] *= lvol.get(info.time) * preset.makeup_gain;
+		outputs[1] *= rvol.get(info.time) * preset.makeup_gain;
 	}
 }
 
