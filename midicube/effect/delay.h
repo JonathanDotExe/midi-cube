@@ -68,4 +68,18 @@ public:
 	~DelayEffect();
 };
 
+class DelayPlugin : public EffectPlugin<DelayEffect, DelayProgram> {
+public:
+	DelayPlugin() : EffectPlugin({
+		"Delay",
+		DELAY_IDENTIFIER,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
+};
+
 #endif /* MIDICUBE_EFFECT_DELAY_H_ */
