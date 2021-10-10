@@ -499,38 +499,40 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = channels[i];
 		ChannelSource& s = channel.scenes[scene].source;
-		//Flter
-		bool pass = true;
-		switch (message.type) {
-		case MessageType::NOTE_OFF:
-			break;
-		case MessageType::NOTE_ON:
-			pass = message.velocity() >= s.start_velocity && message.velocity() <= s.end_velocity;
-			/* no break */
-		case MessageType::POLYPHONIC_AFTERTOUCH:
-			pass = pass && message.note() >= s.start_note && message.note() <= s.end_note;
-			break;
-		case MessageType::MONOPHONIC_AFTERTOUCH:
-			pass = s.transfer_channel_aftertouch;
-			break;
-		case MessageType::CONTROL_CHANGE:
-			pass = s.transfer_cc;	//FIXME global ccs are updated anyways
-			break;
-		case MessageType::PROGRAM_CHANGE:
-			pass = s.transfer_prog_change;
-			break;
-		case MessageType::PITCH_BEND:
-			pass = s.transfer_pitch_bend;
-			break;
-		case MessageType::SYSEX:
-			pass = s.transfer_other; //TODO remove probably
-			break;
-		case MessageType::INVALID:
-			break;
-		}
-		//Send
-		if (pass && channel.send(message, info)) {
-			updated = true;
+		if (input == s.input) {
+			//Filter
+			bool pass = true;
+			switch (message.type) {
+			case MessageType::NOTE_OFF:
+				break;
+			case MessageType::NOTE_ON:
+				pass = message.velocity() >= s.start_velocity && message.velocity() <= s.end_velocity;
+				/* no break */
+			case MessageType::POLYPHONIC_AFTERTOUCH:
+				pass = pass && message.note() >= s.start_note && message.note() <= s.end_note;
+				break;
+			case MessageType::MONOPHONIC_AFTERTOUCH:
+				pass = s.transfer_channel_aftertouch;
+				break;
+			case MessageType::CONTROL_CHANGE:
+				pass = s.transfer_cc;	//FIXME global ccs are updated anyways
+				break;
+			case MessageType::PROGRAM_CHANGE:
+				pass = s.transfer_prog_change;
+				break;
+			case MessageType::PITCH_BEND:
+				pass = s.transfer_pitch_bend;
+				break;
+			case MessageType::SYSEX:
+				pass = s.transfer_other; //TODO remove probably
+				break;
+			case MessageType::INVALID:
+				break;
+			}
+			//Send
+			if (pass && channel.send(message, info)) {
+				updated = true;
+			}
 		}
 	}
 
