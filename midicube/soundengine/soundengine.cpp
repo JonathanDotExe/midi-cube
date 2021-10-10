@@ -366,7 +366,8 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = channels[i];
 		ChannelSource& s = channel.scenes[scene].source;
-		//Flter
+		if (input == s.input) {
+		//Filter
 		bool pass = true;
 		switch (message.type) {
 		case MessageType::NOTE_OFF:
@@ -400,7 +401,6 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 			channel.send(message, info);
 		}
 	}
-
 	//TODO refresh GUI
 }
 
