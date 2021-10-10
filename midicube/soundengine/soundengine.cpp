@@ -58,13 +58,14 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 			}
 			//Process
 			//TODO take input
+			engine->take_inputs(inputs, input_count);
 			engine->process(info);
 			engine->playback_outputs_stereo(lsample, rsample);
 		}
 		//Effects
 		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 			if (effects[i].get_plugin()) {
-				effects[i].get_plugin()->take_input_stereo(lsample, rsample);
+				effects[i].get_plugin()->take_input_stereo_and_inputs(lsample, rsample, inputs, input_count);
 				effects[i].get_plugin()->process(info);
 				effects[i].get_plugin()->playback_outputs_stereo(lsample, rsample);
 			}
@@ -251,7 +252,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, double*
 		double r = 0;
 		if (effect.effect.get_plugin()) {
 			//TODO take inputs
-			effect.effect.get_plugin()->take_input_stereo(effect.lsample, effect.rsample);
+			effect.effect.get_plugin()->take_input_stereo_and_inputs(effect.lsample, effect.rsample, inputs, input_count);
 			effect.effect.get_plugin()->process(info);
 			effect.effect.get_plugin()->playback_outputs_stereo(l, r);
 		}
