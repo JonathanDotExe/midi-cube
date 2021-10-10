@@ -14,7 +14,6 @@ struct SampleInfo {
 	double time_step;
 	unsigned int sample_rate;
 	unsigned int sample_time;
-	double input_sample;
 };
 
 

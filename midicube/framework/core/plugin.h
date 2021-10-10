@@ -157,6 +157,32 @@ public:
 		}
 	}
 
+	inline void take_input_stereo_and_inputs(double lsample, double rsample, double* inputs, const size_t input_count) {
+		const size_t ins = plugin.info.input_channels;
+		if (ins > 1) {
+			this->inputs[0] = lsample;
+			this->inputs[1] = rsample;
+			const size_t mic_inputs = ins - 2;
+			if (mic_inputs > 0) {
+				for (size_t i = 0; i < input_count; ++i) {
+					this->inputs[2 + (i % mic_inputs)] = inputs[i];
+				}
+			}
+		}
+		else if (ins == 1){
+			this->inputs[0] = rsample + lsample;
+		}
+	}
+
+	inline void take_inputs(double* inputs, const size_t input_count) {
+		const size_t ins = plugin.info.input_channels;
+		if (ins > 0) {
+			for (size_t i = 0; i < input_count; ++i) {
+				this->inputs[(i % ins)] = inputs[i];
+			}
+		}
+	}
+
 	inline void playback_outputs_stereo(double& lsample, double& rsample) {
 		lsample = 0;
 		rsample = 0;
