@@ -44,7 +44,7 @@ public:
 	ssize_t record_channel = -1;
 	ssize_t solo_channel = -1;
 
-	void apply(double& lsample, double& rsample, Metronome& metronome, SampleInfo& info);
+	void apply(double& lsample, double& rsample, Metronome& metronome, const SampleInfo& info);
 
 };
 

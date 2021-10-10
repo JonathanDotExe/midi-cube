@@ -92,7 +92,7 @@ public:
 
 	void send(const MidiMessage& message, const SampleInfo& info);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info);
+	void process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info);
 
 	PluginInstance* get_engine();
 
@@ -275,7 +275,7 @@ public:
 
 	void send(MidiMessage& message, size_t input, MidiSource& source, SampleInfo& info);
 
-	void process_sample(double& lsample, double& rsample, SampleInfo& info);
+	void process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info);
 
 	void apply_program(Program* program);
 

@@ -37,7 +37,7 @@ public:
 	BitCrusherPreset preset;
 
 	BitCrusherEffect(PluginHost& h, Plugin& p);
-	void apply(const SampleInfo& info);
+	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);
 	void apply_program(PluginProgram *prog);
 	~BitCrusherEffect();

@@ -29,7 +29,7 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	}
 }
 
-void SoundEngineChannel::process_sample(double& lsample, double& rsample, SampleInfo &info) {
+void SoundEngineChannel::process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info) {
 	size_t scene = device->scene;
 	//Properties
 	PluginInstance* engine = this->engine.get_plugin();
@@ -221,7 +221,7 @@ SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	metronome.init(0);
 }
 
-void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleInfo &info) {
+void SoundEngineDevice::process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info) {
 	//Motion Sequencer
 	size_t motion_sequencer_amount = std::min(this->motion_sequencer_amount, (size_t) MOTION_SEQUENCER_AMOUNT);
 	for (size_t i = 0; i < motion_sequencer_amount; ++i) {
@@ -233,7 +233,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 		double l = 0;
 		double r = 0;
 		SoundEngineChannel& ch = this->channels[i];
-		ch.process_sample(l, r, info);
+		ch.process_sample(l, r, inputs, input_count, info);
 
 		if (ch.master_send >= 0 && ch.master_send < SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
 			effects[ch.master_send].lsample += l;
@@ -250,6 +250,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, SampleI
 		double l = 0;
 		double r = 0;
 		if (effect.effect.get_plugin()) {
+			//TODO take inputs
 			effect.effect.get_plugin()->take_input_stereo(effect.lsample, effect.rsample);
 			effect.effect.get_plugin()->process(info);
 			effect.effect.get_plugin()->playback_outputs_stereo(l, r);

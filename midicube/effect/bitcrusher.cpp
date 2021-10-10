@@ -13,7 +13,7 @@ BitCrusherEffect::BitCrusherEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 }
 
-void BitCrusherEffect::apply(const SampleInfo& info) {
+void BitCrusherEffect::process(const SampleInfo& info) {
 	if (preset.on) {
 		double accuracy = pow(2, preset.bits - 1);
 		outputs[0] = (inputs[0] * accuracy)/(accuracy);
@@ -63,6 +63,6 @@ void BitCrusherEffect::apply_program(PluginProgram *prog) {
 	}
 }
 
-std::__cxx11::string BitCrusherProgram::get_plugin_name() {
+std::string BitCrusherProgram::get_plugin_name() {
 	return BIT_CRUSHER_IDENTIFIER;
 }

@@ -39,7 +39,7 @@ void LooperChannel::record(double lin, double rin, Metronome& metronome, SampleI
 	}
 }
 
-void Looper::apply(double& lsample, double& rsample, Metronome& metronome, SampleInfo& info) {
+void Looper::apply(double& lsample, double& rsample, Metronome& metronome, const SampleInfo& info) {
 	if (active) {
 		double l = lsample;
 		double r = rsample;

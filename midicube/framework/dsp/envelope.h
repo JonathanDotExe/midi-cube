@@ -114,7 +114,7 @@ class MotionSequencer {
 
 public:
 
-	double amplitude(MotionSequncerPreset<N>& preset, Metronome& metronome, SampleInfo& info);
+	double amplitude(MotionSequncerPreset<N>& preset, Metronome& metronome, const SampleInfo& info);
 
 };
 
@@ -131,7 +131,7 @@ public:
 
 template<size_t N>
 double MotionSequencer<N>::amplitude(MotionSequncerPreset<N> &preset,
-		Metronome &metronome, SampleInfo& info) {
+		Metronome &metronome, const SampleInfo& info) {
 	//Find beat
 	double value = preset.clock_value;
 	if (preset.clock_value <= 0) {
