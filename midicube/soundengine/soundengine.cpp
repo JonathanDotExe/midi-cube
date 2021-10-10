@@ -251,7 +251,6 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, double*
 		double l = 0;
 		double r = 0;
 		if (effect.effect.get_plugin()) {
-			//TODO take inputs
 			effect.effect.get_plugin()->take_input_stereo_and_inputs(effect.lsample, effect.rsample, inputs, input_count);
 			effect.effect.get_plugin()->process(info);
 			effect.effect.get_plugin()->playback_outputs_stereo(l, r);

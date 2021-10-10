@@ -32,9 +32,9 @@ public:
 	bool play{true};
 	bool reset{false};	//true will invoke a reset next sample
 
-	void apply(double& lout, double& rout, Metronome& metronome, SampleInfo& info);
+	void apply(double& lout, double& rout, Metronome& metronome, const SampleInfo& info);
 
-	void record(double lin, double rin, Metronome& metronome, SampleInfo& info);
+	void record(double lin, double rin, Metronome& metronome, const SampleInfo& info);
 };
 
 class Looper {

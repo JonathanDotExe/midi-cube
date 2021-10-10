@@ -48,7 +48,7 @@ private:
 public:
 	CompressorPreset preset;
 
-	CompressorEffect();
+	CompressorEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);
 	void apply_program(PluginProgram *prog);

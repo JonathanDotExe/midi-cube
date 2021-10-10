@@ -83,7 +83,7 @@ int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned 
 			in += (*input_buffer++);
 			in += (*input_buffer++);
 		}
-		info = {time, time_step, sample_rate, sample_time, in};
+		info = {time, time_step, sample_rate, sample_time};
 
 		double lsample = 0;
 		double rsample = 0;

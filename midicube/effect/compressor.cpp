@@ -8,7 +8,7 @@
 #include "compressor.h"
 #include <cmath>
 
-CompressorEffect::CompressorEffect() {
+CompressorEffect::CompressorEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.threshold);
 	cc.add_binding(&preset.ratio);

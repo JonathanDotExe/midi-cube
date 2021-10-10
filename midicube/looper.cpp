@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <algorithm>
 
-void LooperChannel::apply(double& lout, double& rout, Metronome& metronome, SampleInfo& info) {
+void LooperChannel::apply(double& lout, double& rout, Metronome& metronome, const SampleInfo& info) {
 	//Play
 	if (play) {
 		if (reset) {
@@ -28,7 +28,7 @@ void LooperChannel::apply(double& lout, double& rout, Metronome& metronome, Samp
 	}
 }
 
-void LooperChannel::record(double lin, double rin, Metronome& metronome, SampleInfo& info) {
+void LooperChannel::record(double lin, double rin, Metronome& metronome, const SampleInfo& info) {
 	unsigned int bpm = metronome.get_bpm();
 	size_t index = info.sample_time % (preset.bars * info.sample_rate * 4 * 60 / std::max(bpm, (unsigned int) 1)); //FIXME Assuming its a 4/4 measure
 

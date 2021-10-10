@@ -8,7 +8,7 @@
 #include "flanger.h"
 #include <cmath>
 
-FlangerEffect::FlangerEffect() {
+FlangerEffect::FlangerEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.vibrato_rate);
 	cc.add_binding(&preset.vibrato_depth);

@@ -23,7 +23,7 @@ double ReverbAllPassFilter::process(double in, double gain, unsigned int delay) 
 	return out;
 }
 
-ReverbEffect::ReverbEffect() {
+ReverbEffect::ReverbEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.delay);
 	cc.add_binding(&preset.decay);
