@@ -13,6 +13,7 @@
 #include "audio.h"
 #include "../dsp/envelope.h"
 #include "../data/binding.h"
+#include "../gui/core.h"
 #include <map>
 #include <algorithm>
 
@@ -26,7 +27,7 @@ enum class PluginType {
 struct PluginInfo {
 	std::string name = "Plugin";
 	std::string identifier_name = "plugin";
-	PluginType type;
+	PluginType type = PluginType::OTHER;
 	unsigned int input_channels = 0;
 	unsigned int output_channels = 0;
 	bool input_midi = false;
@@ -83,6 +84,8 @@ public:
 	virtual PluginInstance* create(PluginHost* host) = 0;
 
 	virtual PluginProgram* create_program() = 0;
+
+	virtual ViewController* create_view() = 0;
 
 	virtual ~Plugin() {
 
