@@ -34,9 +34,9 @@ class AudioHandler {
 
 private:
 	RtAudio audio;
-	bool input = false;
+	size_t inputs = 0;
 	void* user_data = nullptr;
-	void (* get_sample) (double&, double&, SampleInfo&, void*) = nullptr;
+	void (* get_sample) (double&, double&, double*, const size_t, SampleInfo&, void*) = nullptr;
 	/**
 	 * Only for use in the jack audio thread
 	 */
@@ -60,7 +60,7 @@ public:
 		close();
 	};
 
-	void set_sample_callback(void (* get_sample) (double&, double&, SampleInfo&, void*), void* user_data);
+	void set_sample_callback(void (* get_sample) (double&, double&, double*, const size_t, SampleInfo&, void*), void* user_data);
 
 	void init(int out_device = -1, int in_device = -1);
 

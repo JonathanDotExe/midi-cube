@@ -48,12 +48,12 @@ void AudioHandler::init(int out_device, int in_device) {
 	time_step = 1.0/sample_rate;
 	buffer_size = 64;
 
-	input = in_device >= 0;
+	inputs = in_device >= 0 ? 2 : 0; //TODO custom input amount
 
 	RtAudio::DeviceInfo out_info = audio.getDeviceInfo(params.deviceId);
 	std::cout << "Using output device " << out_info.name << " with two channels" << std::endl;
 
-	if (input) {
+	if (inputs) {
 		RtAudio::DeviceInfo in_info = audio.getDeviceInfo(params.deviceId);
 		std::cout << "Using input device " << in_info.name << " with one channels" << std::endl;
 	}
@@ -62,7 +62,7 @@ void AudioHandler::init(int out_device, int in_device) {
 	}
 
 	try {
-		audio.openStream(&params, input ? &input_params : nullptr, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
+		audio.openStream(&params, inputs ? &input_params : nullptr, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
 		audio.startStream();
 		sample_rate = audio.getStreamSampleRate();
 		time_step = 1.0/sample_rate;
@@ -78,16 +78,15 @@ int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned 
 	//Compute each sample
 	//TODO Use rtaudio time
 	for (size_t i = 0; i < buffer_size; ++i) {
-		double in = 0;
-		if (input) {
-			in += (*input_buffer++);
-			in += (*input_buffer++);
-		}
 		info = {time, time_step, sample_rate, sample_time};
 
 		double lsample = 0;
 		double rsample = 0;
-		get_sample(lsample, rsample, info, user_data);
+		get_sample(lsample, rsample, input_buffer, inputs, info, user_data);
+
+		for (size_t i = 0; i < inputs; ++i) {
+			++input_buffer;
+		}
 
 		//TODO array safety
 		*output_buffer++ = lsample;
@@ -105,7 +104,7 @@ void AudioHandler::close() {
 	}
 };
 
-void AudioHandler::set_sample_callback(void (* get_sample) (double&, double&, SampleInfo&, void*), void* user_data) {
+void AudioHandler::set_sample_callback(void (* get_sample) (double&, double&, double*, const size_t, SampleInfo&, void*), void* user_data) {
 	this->get_sample = get_sample;
 	this->user_data = user_data;
 }

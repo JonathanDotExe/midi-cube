@@ -29,8 +29,8 @@
 #include "effect/wahwah.h"
 
 
-static void process_func(double& lsample, double& rsample, SampleInfo& info, void* user_data) {
-	((MidiCube*) user_data)->process(lsample, rsample, info);
+static void process_func(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info, void* user_data) {
+	((MidiCube*) user_data)->process(lsample, rsample, inputs, input_count, info);
 }
 
 MidiCube::MidiCube() : prog_mgr("./data/programs", action_handler) {
@@ -110,13 +110,13 @@ void MidiCube::init(int out_device, int in_device) {
 	audio_handler.init(out_device, in_device);
 }
 
-void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
+void MidiCube::process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info) {
 	if (lock.try_lock()) {
 		//Lock actions
 		action_handler.execute_realtime_actions();
 		//Messages
 		size_t i = 0;
-		for (MidiCubeInput in : inputs) {
+		for (MidiCubeInput in : this->inputs) {
 			MidiMessage msg;
 			while (in.in->read(&msg)) {
 				process_midi(msg, i);
@@ -124,7 +124,7 @@ void MidiCube::process(double& lsample, double& rsample, SampleInfo& info) {
 			++i;
 		}
 		//Process
-		engine.process_sample(lsample, rsample, info);
+		engine.process_sample(lsample, rsample, inputs, input_count, info);
 		lock.unlock();
 	}
 }

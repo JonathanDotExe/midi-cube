@@ -51,7 +51,7 @@ public:
 	virtual void apply_program(Program *prog);
 	MidiCube();
 	void init(int out_device = -1, int in_device = -1);
-	inline void process(double& lsample, double& rsample, SampleInfo& info);
+	inline void process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info);
 	std::vector<MidiCubeInput> get_inputs();
 
 	~MidiCube();
