@@ -59,6 +59,7 @@ public:
 	PhaserPlugin() : EffectPlugin({
 		"Phaser",
 		PHASER_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

@@ -54,6 +54,7 @@ public:
 	TremoloPlugin() : EffectPlugin({
 		"Tremolo",
 		TREMOLO_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

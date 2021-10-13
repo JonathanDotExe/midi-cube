@@ -25,6 +25,4 @@ public:
 	virtual bool on_action(Control *control);
 };
 
-ViewController* create_view_for_engine(std::string name, SoundEngine& engine, SoundEngineChannel& channel, int channel_index);
-
 #endif /* MIDICUBE_GUI_VIEW_SOUNDENGINECHANNELVIEW_H_ */

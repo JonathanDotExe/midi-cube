@@ -61,6 +61,7 @@ public:
 	ChorusPlugin() : EffectPlugin({
 		"Bit Crusher",
 		CHORUS_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

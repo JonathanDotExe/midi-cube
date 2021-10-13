@@ -73,6 +73,7 @@ public:
 	DelayPlugin() : EffectPlugin({
 		"Delay",
 		DELAY_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

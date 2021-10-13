@@ -318,19 +318,6 @@ SoundEngineChannelView::~SoundEngineChannelView() {
 
 }
 
-ViewController* create_view_for_engine(std::string name, SoundEngine& engine, SoundEngineChannel& channel, int channel_index) {
-	if (get_engine_name<B3Organ>() == name) {
-		return new B3OrganView(dynamic_cast<B3Organ&>(engine), channel, channel_index);
-	}
-	else if (get_engine_name<AdvancedSynth>() == name) {
-		return new AnalogSynthView(dynamic_cast<AdvancedSynth&>(engine), channel, channel_index);
-	}
-	else if (get_engine_name<Sampler>() == name) {
-		return new SamplerView(dynamic_cast<Sampler&>(engine), channel, channel_index);
-	}
-	return nullptr;
-}
-
 bool SoundEngineChannelView::on_action(Control *control) {
 	return binder.on_action(control);
 }

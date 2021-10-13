@@ -48,6 +48,7 @@ public:
 	BitCrusherPlugin() : EffectPlugin({
 		"Bit Crusher",
 		BIT_CRUSHER_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

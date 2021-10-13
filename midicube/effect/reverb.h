@@ -103,6 +103,7 @@ public:
 	ReverbPlugin() : EffectPlugin({
 		"Reverb",
 		REVERB_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

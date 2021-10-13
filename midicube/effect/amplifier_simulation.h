@@ -63,6 +63,7 @@ public:
 	AmplifierSimulationPlugin() : EffectPlugin({
 		"Amplifier",
 		AMPLIFIER_SIMULATION_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

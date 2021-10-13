@@ -60,6 +60,7 @@ public:
 	FlangerPlugin() : EffectPlugin({
 		"Flanger",
 		FLANGER_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

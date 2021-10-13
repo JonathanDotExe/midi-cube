@@ -94,6 +94,7 @@ public:
 	RotarySpeakerPlugin() : EffectPlugin({
 		"Rotary Speaker",
 		ROTARY_SPEAKER_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

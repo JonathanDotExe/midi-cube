@@ -293,6 +293,7 @@ public:
 	AdvancedSynthPlugin() : Plugin({
 		"A-Synth",
 		ASYNTH_IDENTIFIER,
+		PluginType::SOUND_ENGINE,
 		0,
 		2,
 		true,

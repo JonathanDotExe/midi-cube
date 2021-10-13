@@ -350,6 +350,7 @@ public:
 	SamplerPlugin() : Plugin({
 		"B3 Organ",
 		SAMPLER_INDENTIFIER,
+		PluginType::SOUND_ENGINE,
 		0,
 		2,
 		true,

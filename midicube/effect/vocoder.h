@@ -103,6 +103,7 @@ public:
 	VocoderPlugin() : EffectPlugin({
 		"Vocoder",
 		VOCODER_IDENTIFIER,
+		PluginType::EFFECT,
 		3,
 		2,
 		false,

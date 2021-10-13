@@ -26,6 +26,7 @@ enum class PluginType {
 struct PluginInfo {
 	std::string name = "Plugin";
 	std::string identifier_name = "plugin";
+	PluginType type;
 	unsigned int input_channels = 0;
 	unsigned int output_channels = 0;
 	bool input_midi = false;

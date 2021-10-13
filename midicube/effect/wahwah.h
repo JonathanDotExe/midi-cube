@@ -61,6 +61,7 @@ public:
 	WahWahPlugin() : EffectPlugin({
 		"Wah-Wah",
 		WAH_WAH_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

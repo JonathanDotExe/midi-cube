@@ -60,6 +60,7 @@ public:
 	CompressorPlugin() : EffectPlugin({
 		"Compressor",
 		COMPRESSOR_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,

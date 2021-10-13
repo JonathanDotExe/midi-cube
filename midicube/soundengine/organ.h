@@ -148,6 +148,7 @@ public:
 	OrganPlugin() : Plugin({
 		"B3 Organ",
 		B3_ORGAN_IDENTIFIER,
+		PluginType::SOUND_ENGINE,
 		0,
 		2,
 		true,

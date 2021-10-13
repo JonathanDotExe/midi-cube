@@ -54,6 +54,7 @@ public:
 	SampleDrumsPlugin() : Plugin({
 		"Sample Drums",
 		SAMPLE_DRUMS_IDENTIFIER,
+		PluginType::SOUND_ENGINE,
 		0,
 		2,
 		true,

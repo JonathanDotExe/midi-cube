@@ -67,6 +67,7 @@ public:
 	EqualizerPlugin() : EffectPlugin({
 		"Equalizer",
 		EQUALIZER_IDENTIFIER,
+		PluginType::EFFECT,
 		2,
 		2,
 		false,
