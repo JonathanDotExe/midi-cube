@@ -27,20 +27,6 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	std::vector<Control*> controls;
 	ActionHandler& handler = frame.cube.action_handler;
 
-	//Sound engines
-	std::vector<std::string> engine_names;
-	engine_names.push_back("None");
-	for (SoundEngineBuilder* engine : frame.cube.engine.get_engine_builders()) {
-		engine_names.push_back(engine->get_name());
-	}
-
-	//Effects
-	std::vector<std::string> effect_names;
-	effect_names.push_back("None");
-	for (EffectBuilder* effect : frame.cube.engine.get_effect_builders()) {
-		effect_names.push_back(effect->get_name());
-	}
-
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
@@ -54,26 +40,22 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 	//Col 1
 	//Engine
-	ComboBox* engine = new ComboBox(0, engine_names, main_font, 24, -1, 10, 45, 300, 80);
+	//TODO engine selector
+	/*ComboBox* engine = new ComboBox(0, engine_names, main_font, 24, -1, 10, 45, 300, 80);
 	engine->rect.setFillColor(sf::Color(0, 180, 255));
 	engine->property.bind_function<ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), std::bind(&SoundEngineChannel::set_engine_index, &channel, std::placeholders::_1), frame.cube.lock);
-	controls.push_back(engine);
+	controls.push_back(engine);*/
 
 	//Edit
 	Button* edit_engine = new Button("Edit", main_font, 18, 10, 130, 300, 60);
 	edit_engine->set_on_click([this, &frame]() {
 		//TODO not optimal solution
-		ssize_t engine_index = channel.get_engine_index();
-		if (engine_index >= 0) {
-			std::string name = frame.cube.engine.get_engine_builders().at(engine_index)->get_name();
-			frame.cube.lock.lock();
-			SoundEngine& en = *channel.get_engine();
-			ViewController* view = create_view_for_engine(name, en, channel, channel_index);
-			if (view) {
-				frame.change_view(view);
-			}
-			frame.cube.lock.unlock();
+		frame.cube.lock.lock();
+		Plugin* engine = channel.engine.get_plugin();
+		if (engine) {
+			frame.change_view(engine->create_view()); //TODO make back function
 		}
+		frame.cube.lock.unlock();
 	});
 	controls.push_back(edit_engine);
 
@@ -87,20 +69,21 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Effects
 	for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 		//Effect
-		ComboBox* effect = new ComboBox(0, effect_names, main_font, 18, -1, 10, tmp_y, 200, 60);
+		//TODO Effect selector
+		/*ComboBox* effect = new ComboBox(0, effect_names, main_font, 18, -1, 10, tmp_y, 200, 60);
 		effect->rect.setFillColor(sf::Color(128, 255, 255));
 		effect->property.bind_function<ssize_t>(std::bind(&InsertEffect::get_effect_index, &channel.effects[i]), std::bind(&InsertEffect::set_effect_index, &channel.effects[i], std::placeholders::_1), frame.cube.lock);
-		controls.push_back(effect);
+		controls.push_back(effect);*/
 		//Edit
 		Button* edit_effect = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
 
 		edit_effect->set_on_click([this, &frame, i]() {
-			Effect* effect = channel.effects[i].get_effect();
+			frame.cube.lock.lock();
+			Plugin* effect = channel.effects[i].get_plugin();
 			if (effect) {
-				SoundEngineChannel& c = channel;
-				int ci = channel_index;
-				frame.change_view(new EffectView(effect, [&c, ci]() { return new SoundEngineChannelView(c, ci); }));
+				frame.change_view(effect->create_view()); //TODO make back function
 			}
+			frame.cube.lock.unlock();
 		});
 		controls.push_back(edit_effect);
 		tmp_y += 65;

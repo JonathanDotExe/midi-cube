@@ -44,29 +44,23 @@ Scene MasterEffectView::create(Frame &frame) {
 
 		controls.push_back(pane);
 
-		//Effects
-		std::vector<std::string> effect_names;
-		effect_names.push_back("None");
-		for (EffectBuilder* effect : frame.cube.engine.get_effect_builders()) {
-			effect_names.push_back(effect->get_name());
-		}
-
 		//Title
 		Label* title = new Label("Effect " + std::to_string(i), main_font, 16, x + 5, y + 5);
 		controls.push_back(title);
 
 		//Effect
-		ComboBox* e = new ComboBox(0, effect_names, main_font, 12, -1, x + 5, y + 30, pane_width - 15, 30);
+		//TODO Effect selector
+		/*ComboBox* e = new ComboBox(0, effect_names, main_font, 12, -1, x + 5, y + 30, pane_width - 15, 30);
 		e->rect.setFillColor(sf::Color(128, 255, 255));
 		e->property.bind_function<ssize_t>(std::bind(&MasterEffect::get_effect_index, &effect), std::bind(&MasterEffect::set_effect_index, &effect, std::placeholders::_1), frame.cube.lock);
-		controls.push_back(e);
+		controls.push_back(e);*/
 		//Edit
 		Button* edit_effect = new Button("Edit", main_font, 12, x + 5, y + 65, pane_width - 15, 30);
 		edit_effect->set_on_click([this, &frame, i, &effect]() {
 			frame.cube.lock.lock();
-			Effect* eff = effect.get_effect();
+			Plugin* eff = effect.effect.get_plugin();
 			if (eff) {
-				frame.change_view(new EffectView(eff, []() { return new MasterEffectView(); }));
+				frame.change_view(eff->create_view());
 			}
 			frame.cube.lock.unlock();
 		});

@@ -33,9 +33,6 @@ Scene SoundEngineView::create(Frame& frame) {
 
 	SoundEngineDevice& sound_engine = frame.cube.engine;
 	//Sound engines
-	for (SoundEngineBuilder* engine : sound_engine.get_engine_builders()) {
-		engine_names.push_back(engine->get_name());
-	}
 
 	//Channels
 	int rows = 2;
@@ -59,8 +56,8 @@ Scene SoundEngineView::create(Frame& frame) {
 		CheckBox* active = new CheckBox(false, "", main_font, 12, x + pane_width - 30, y + 5, 20, 20);
 		active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), handler);
 		controls.push_back(active);
-		//Engine
-		Button* engine = new Button("Engine", main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
+		//TODO Engine
+		/*Button* engine = new Button("Engine", main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
 		engine->rect.setFillColor(sf::Color(0, 180, 255));
 		controls.push_back(engine);
 		engine_buttons[i] = engine;
@@ -70,7 +67,7 @@ Scene SoundEngineView::create(Frame& frame) {
 
 		handler.queue_action(new GetFunctionAction<ssize_t, ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), [this, i](ssize_t index) {
 			engine_buttons[i]->update_text(index < 0 ? "None" : engine_names.at(index));
-		}));
+		}));*/
 
 		//Volume
 		Slider* volume = new Slider(0, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);

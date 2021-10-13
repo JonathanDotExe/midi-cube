@@ -17,7 +17,6 @@
 class SoundEngineView : public ViewController {
 private:
 	std::array<Button*, SOUND_ENGINE_MIDI_CHANNELS> engine_buttons;
-	std::vector<std::string> engine_names;
 	SoundEngineDevice* engine = nullptr;
 
 public:
