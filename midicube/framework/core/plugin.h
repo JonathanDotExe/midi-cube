@@ -13,21 +13,21 @@
 #include "audio.h"
 #include "../dsp/envelope.h"
 #include "../data/binding.h"
-#include "../gui/core.h"
+//#include "../gui/core.h"
 #include <map>
 #include <algorithm>
 
 #include <boost/property_tree/ptree.hpp>
 namespace pt = boost::property_tree;
 
-enum class PluginType {
-	SOUND_ENGINE, EFFECT, SEQUENCER, OTHER
+enum PluginType {
+	PLUGIN_TYPE_SOUND_ENGINE, PLUGIN_TYPE_EFFECT, PLUGIN_TYPE_SEQUENCER, PLUGIN_TYPE_OTHER
 };
 
 struct PluginInfo {
 	std::string name = "Plugin";
 	std::string identifier_name = "plugin";
-	PluginType type = PluginType::OTHER;
+	PluginType type = PluginType::PLUGIN_TYPE_OTHER;
 	unsigned int input_channels = 0;
 	unsigned int output_channels = 0;
 	bool input_midi = false;
@@ -120,9 +120,9 @@ public:
 
 	virtual void save_program(PluginProgram** prog) = 0;
 
-	virtual ViewController* create_view() {
+	/*virtual ViewController* create_view() {
 		return nullptr; //FIXME
-	}
+	}*/
 
 	virtual ~PluginInstance() {
 		delete inputs;

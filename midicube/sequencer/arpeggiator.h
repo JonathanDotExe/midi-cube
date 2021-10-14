@@ -38,8 +38,7 @@ class ArpeggiatorPlugin : public Plugin {
 public:
 	ArpeggiatorPlugin() : Plugin({
 		"Arpeggiator",
-		ARPEGGIATOR_IDENTIFIER,
-		PluginType::SEQUENCER,
+		PluginType::PLUGIN_TYPE_SEQUENCER,
 		0,
 		2,
 		true,

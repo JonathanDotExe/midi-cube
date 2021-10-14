@@ -11,6 +11,7 @@
 #include <SFML/Graphics.hpp>
 #include <functional>
 #include "../util/util.h"
+#include "../../midicube.h" //FIXME
 #include "../data/data.h"
 
 #define SELECTABLE virtual bool selectable() const { return true; };
@@ -116,7 +117,8 @@ private:
 	bool render_sleep = true;
 
 public:
-	Frame(int width, int height, std::string title, bool render_sleep = true);
+	MidiCube& cube;
+	Frame(MidiCube& cube, int width, int height, std::string title, bool render_sleep = true);
 
 	void run(ViewController* v);
 
