@@ -71,7 +71,6 @@ public:
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double> panning{0, -1, 1};
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
-	Arpeggiator arp;
 
 	//Effects
 	std::array<PluginSlot, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
@@ -172,10 +171,6 @@ struct ChannelProgram {
 	std::array<PluginSlotProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t send_master = -1;
 	size_t polyphony_limit = 0;
-
-	unsigned int arpeggiator_bpm = 120;
-	bool arp_on;
-	ArpeggiatorPreset arpeggiator;
 
 	PluginSlotProgram engine_program;
 };

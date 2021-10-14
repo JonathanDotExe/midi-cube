@@ -94,47 +94,6 @@ public:
 
 };
 
-#define ARPEGGIATOR_POLYPHONY 30
 
-enum ArpeggiatorPattern {
-	ARP_UP, ARP_DOWN, ARP_RANDOM, ARP_UP_DOWN, ARP_DOWN_UP
-};
-
-struct ArpeggiatorPreset {
-	ArpeggiatorPattern pattern;
-	unsigned int octaves = 1;
-	unsigned int value = 1;
-	bool hold = false;
-	bool repeat_edges = false;
-	bool kb_sync = true;
-	bool play_duplicates = false;
-	bool master_sync = false;
-	bool sustain = false;
-};
-
-class Arpeggiator {
-
-private:
-	unsigned int curr_note = 0;
-	std::size_t data_index = 0;
-	std::size_t note_index = 0;
-	bool restart = true;
-	bool second = false;
-	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
-
-public:
-	bool on = false;
-	ArpeggiatorPreset preset;
-	Metronome metronome;
-
-	Arpeggiator();
-
-	void apply(SampleInfo& info, Metronome& master, std::function<void(const SampleInfo&, unsigned int, double)> press, std::function<void(const SampleInfo&, unsigned int, double)> release, bool sustain);
-
-	void press_note(SampleInfo& info, unsigned int note, double velocity, bool sustain);
-
-	void release_note(SampleInfo& info, unsigned int note, bool sustain);
-
-};
 
 #endif /* MIDICUBE_SOUNDENGINE_VOICE_H_ */

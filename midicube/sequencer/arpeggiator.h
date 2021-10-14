@@ -11,19 +11,67 @@
 
 #include "../framework/core/plugin.h"
 #include "../framework/util/audiofile.h"
+#include "../framework/util/voice.h"
 #include <unordered_map>
 
 #define ARPEGGIATOR_IDENTIFIER "midicube_arpeggiator"
+#define ARPEGGIATOR_POLYPHONY 30
+
+enum ArpeggiatorPattern {
+	ARP_UP, ARP_DOWN, ARP_RANDOM, ARP_UP_DOWN, ARP_DOWN_UP
+};
+
+struct ArpeggiatorPreset {
+	ArpeggiatorPattern pattern;
+	unsigned int octaves = 1;
+	unsigned int value = 1;
+	bool hold = false;
+	bool repeat_edges = false;
+	bool kb_sync = true;
+	bool play_duplicates = false;
+	bool master_sync = false;
+	bool sustain = false;
+};
+
+class Arpeggiator {
+
+private:
+	unsigned int curr_note = 0;
+	std::size_t data_index = 0;
+	std::size_t note_index = 0;
+	bool restart = true;
+	bool second = false;
+	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
+
+public:
+	bool on = false;
+	ArpeggiatorPreset preset;
+	Metronome metronome;
+
+	Arpeggiator();
+
+	void apply(const SampleInfo& info, const Metronome& master, std::function<void(const SampleInfo&, unsigned int, double)> press, std::function<void(const SampleInfo&, unsigned int, double)> release, bool sustain);
+
+	void press_note(const SampleInfo& info, unsigned int note, double velocity, bool sustain);
+
+	void release_note(const SampleInfo& info, unsigned int note, bool sustain);
+
+};
 
 class ArpeggiatorProgram : public PluginProgram {
 public:
-	virtual void load(boost::property_tree::ptree tree);
-	virtual std::string get_plugin_name();
-	virtual boost::property_tree::ptree save();
+	ArpeggiatorPreset preset;
+	unsigned int bpm = 120;
+	bool on;
+
+	void load(boost::property_tree::ptree tree);
+	std::string get_plugin_name();
+	boost::property_tree::ptree save();
 };
 
 class ArpeggiatorInstance : public PluginInstance {
-
+private:
+	Arpeggiator arp;
 public:
 
 	ArpeggiatorInstance(PluginHost& h, Plugin& p);
@@ -38,11 +86,12 @@ class ArpeggiatorPlugin : public Plugin {
 public:
 	ArpeggiatorPlugin() : Plugin({
 		"Arpeggiator",
+		ARPEGGIATOR_IDENTIFIER,
 		PluginType::PLUGIN_TYPE_SEQUENCER,
 		0,
-		2,
+		0,
 		true,
-		false
+		true
 	}){
 
 	}

@@ -45,6 +45,8 @@ src = [
 	'midicube/soundengine/sampler.cpp',
 	'midicube/soundengine/soundengine.cpp',
 	
+	'midicube/sequencer/arpeggiator.cpp',
+	
 	'midicube/framework/gui/control.cpp',
 	'midicube/framework/gui/core.cpp',
 	'midicube/framework/gui/util.cpp',
