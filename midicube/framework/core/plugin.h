@@ -85,8 +85,6 @@ public:
 
 	virtual PluginProgram* create_program() = 0;
 
-	virtual ViewController* create_view() = 0;
-
 	virtual ~Plugin() {
 
 	}
@@ -121,6 +119,10 @@ public:
 	virtual void apply_program(PluginProgram* prog) = 0;
 
 	virtual void save_program(PluginProgram** prog) = 0;
+
+	virtual ViewController* create_view() {
+		return nullptr; //FIXME
+	}
 
 	virtual ~PluginInstance() {
 		delete inputs;

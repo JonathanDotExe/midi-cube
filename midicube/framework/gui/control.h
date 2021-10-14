@@ -10,6 +10,7 @@
 
 #include "core.h"
 #include "util.h"
+#include "math.h"
 #include <functional>
 
 class Label : public Control {
