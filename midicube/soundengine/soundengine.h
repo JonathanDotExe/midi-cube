@@ -67,6 +67,7 @@ private:
 
 	LocalMidiBindingHandler binder;
 public:
+	PluginSlot sequencer;
 	PluginSlot engine;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double> panning{0, -1, 1};
@@ -79,17 +80,17 @@ public:
 	ChannelInfo info;
 	size_t polyphony_limit = 0;
 
-	virtual void recieve_midi(const MidiMessage &message,
-			const SampleInfo &info);
-	virtual MidiBindingHandler* get_binding_handler();
-	virtual Plugin* get_plugin(std::string identifier);
-	const virtual Metronome& get_metronome();
-	const virtual KeyboardEnvironment& get_environment();
+	void recieve_midi(const MidiMessage &message,
+			const SampleInfo &info, void* src);
+	MidiBindingHandler* get_binding_handler();
+	Plugin* get_plugin(std::string identifier);
+	const Metronome& get_metronome();
+	const KeyboardEnvironment& get_environment();
 	SoundEngineChannel();
 
 	void init_device(SoundEngineDevice* device);
 
-	void send(const MidiMessage& message, const SampleInfo& info);
+	void send(const MidiMessage& message, const SampleInfo& info, void* src);
 
 	void process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info);
 
@@ -223,7 +224,7 @@ private:
 public:
 	void init(SoundEngineDevice* device);
 	void recieve_midi(const MidiMessage &message,
-			const SampleInfo &info);
+			const SampleInfo &info, void* src);
 	Plugin* get_plugin(std::string identifier);
 	MidiBindingHandler* get_binding_handler();
 	const Metronome& get_metronome();

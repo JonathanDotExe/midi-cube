@@ -45,17 +45,6 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 		}*/
 
 		if (s.active) { //FIXME maintain when notes pressed
-			//Arpeggiator
-			if (arp.on) {
-				//FIXME add arpeggiator plugin
-				/*arp.apply(info, device->metronome,
-				[this, s](const SampleInfo& i, unsigned int note, double velocity) {
-					engine->press_note(i, note, note + s.source.octave * 12, velocity, polyphony_limit);
-				},
-				[this](const SampleInfo& i, unsigned int note) {
-					engine->release_note(i, note);
-				}, device->env.sustain);*/
-			}
 			//Process
 			//TODO take input
 			engine->take_inputs(inputs, input_count);
@@ -79,7 +68,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 	}
 }
 
-void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info) {
+void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info, void* src) {
 	size_t scene = device->scene;
 	PluginInstance* engine = this->engine.get_plugin();
 	if (scenes[scene].active /* || (status.pressed_notes && message.type != MessageType::NOTE_ON)*/) { //FIXME send when channel is deactivated
@@ -519,7 +508,8 @@ void SoundEngineDevice::init(MidiCube *cube) {
 }
 
 void SoundEngineChannel::recieve_midi(const MidiMessage &message,
-		const SampleInfo &info) {
+		const SampleInfo &info, void* src) {
+	this->send(message, info, src);
 }
 
 MidiBindingHandler* SoundEngineChannel::get_binding_handler() {
@@ -540,7 +530,7 @@ const KeyboardEnvironment& SoundEngineChannel::get_environment() {
 
 //SoundEngineDeviceHost
 void SoundEngineDeviceHost::recieve_midi(const MidiMessage &message,
-		const SampleInfo &info) {
+		const SampleInfo &info, void* src) {
 	//TODO
 }
 

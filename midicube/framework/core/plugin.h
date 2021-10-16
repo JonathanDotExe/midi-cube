@@ -59,7 +59,7 @@ public:
 
 	virtual MidiBindingHandler* get_binding_handler();
 
-	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info) = 0;
+	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info, void* source) = 0;
 
 	virtual Plugin* get_plugin(std::string identifier);
 
@@ -100,7 +100,7 @@ private:
 protected:
 
 	void send_midi(const MidiMessage& msg, const SampleInfo& info) {
-		host.recieve_midi(msg, info);
+		host.recieve_midi(msg, info, this);
 	}
 
 public:
