@@ -308,10 +308,30 @@ boost::property_tree::ptree ArpeggiatorProgram::save() {
 }
 
 void ArpeggiatorInstance::apply_program(PluginProgram *prog) {
-
+	ArpeggiatorProgram* p = dynamic_cast<ArpeggiatorProgram*>(prog);
+	if (p) {
+		arp.preset = p->preset;
+		arp.on = p->on;
+		arp.metronome.set_bpm(p->bpm);
+	}
+	else {
+		arp.preset = {};
+		arp.on = true;
+		arp.metronome.set_bpm(120);
+	}
 }
 
 void ArpeggiatorInstance::save_program(PluginProgram **prog) {
+	ArpeggiatorProgram* p = dynamic_cast<ArpeggiatorProgram*>(*prog);
+	//Create new
+	if (!p) {
+		delete *prog;
+		p = new ArpeggiatorProgram();
+	}
+	p->preset = arp.preset;
+	p->on = arp.on;
+	p->bpm = arp.metronome.get_bpm();
+	*prog = p;
 }
 
 void ArpeggiatorInstance::process(const SampleInfo &info) {
@@ -350,9 +370,9 @@ ArpeggiatorInstance::~ArpeggiatorInstance() {
 }
 
 PluginProgram* ArpeggiatorPlugin::create_program() {
-	return nullptr;
+	return new ArpeggiatorProgram();
 }
 
 PluginInstance* ArpeggiatorPlugin::create(PluginHost *host) {
-	return nullptr;
+	return new ArpeggiatorInstance(*host, *this);
 }

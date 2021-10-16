@@ -44,7 +44,7 @@ private:
 	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
 
 public:
-	bool on = false;
+	bool on = true;
 	ArpeggiatorPreset preset;
 	Metronome metronome;
 
