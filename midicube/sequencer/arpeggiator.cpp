@@ -364,13 +364,13 @@ void ArpeggiatorInstance::process(const SampleInfo &info) {
 		msg.type = MessageType::NOTE_ON;
 		msg.set_note(note);
 		msg.set_velocity(velocity * 127);
-		this->get_host().recieve_midi(msg, info);
+		this->send_midi(msg, info);
 	}, [this](const SampleInfo& info, unsigned int note, double velocity) {
 		MidiMessage msg;
 		msg.type = MessageType::NOTE_OFF;
 		msg.set_note(note);
 		msg.set_velocity(velocity * 127);
-		this->get_host().recieve_midi(msg, info);
+		this->send_midi(msg, info);
 	}, get_host().get_environment().sustain);
 }
 
@@ -378,15 +378,22 @@ ArpeggiatorInstance::ArpeggiatorInstance(PluginHost &h, Plugin &p) : PluginInsta
 }
 
 void ArpeggiatorInstance::recieve_midi(const MidiMessage &message, const SampleInfo &info) {
-	switch (message.type) {
-	case MessageType::NOTE_ON:
-		arp.press_note(info, message.note(), message.velocity()/127.0, get_host().get_environment().sustain);
-		break;
-	case MessageType::NOTE_OFF:
-		arp.release_note(info, message.note(), get_host().get_environment().sustain);
-		break;
-	default:
-		break;
+	if (arp.on) {
+		switch (message.type) {
+		case MessageType::NOTE_ON:
+			arp.press_note(info, message.note(), message.velocity()/127.0, get_host().get_environment().sustain);
+			break;
+		case MessageType::NOTE_OFF:
+			arp.release_note(info, message.note(), get_host().get_environment().sustain);
+			//Maybe pass a well TODO
+			break;
+		default:
+			this->send_midi(message, info);
+			break;
+		}
+	}
+	else {
+		this->send_midi(message, info);
 	}
 }
 
