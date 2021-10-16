@@ -32,7 +32,7 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 	program->name = tree.get<std::string>("name", "Init");
 	program->metronome_bpm = tree.get<unsigned int>("metronome_bpm", 120);
 	//Motion Sequencers
-	const auto& motion_sequencers = tree.get_child_optional("motion_seqeuncers");
+	/*const auto& motion_sequencers = tree.get_child_optional("motion_seqeuncers");
 	if (motion_sequencers) {
 		size_t i = 0;
 		for (pt::ptree::value_type& m : motion_sequencers.get()) {
@@ -51,7 +51,7 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 			}
 			++i;
 		}
-	}
+	}*/
 	//Channels
 	const auto& channels = tree.get_child_optional("channels");
 	if (channels) {
@@ -134,7 +134,7 @@ void save_program(Program* program, pt::ptree& tree) {
 	tree.put("name", program->name);
 	tree.put("metronome_bpm", program->metronome_bpm);
 	//Motion Sequencers
-	for (size_t i = 0; i < program->motion_sequencers.size(); ++i) {
+	/*for (size_t i = 0; i < program->motion_sequencers.size(); ++i) {
 		pt::ptree m;
 		m.put("clock_value", program->motion_sequencers[i].clock_value);
 		for (size_t j = 0; j < program->motion_sequencers[i].entries.size(); ++j) {
@@ -145,7 +145,7 @@ void save_program(Program* program, pt::ptree& tree) {
 			m.add_child("entry", s);
 		}
 		tree.add_child("entries", m);
-	}
+	}*/
 	//Channels
 	for (size_t i = 0; i < program->channels.size(); ++i) {
 		pt::ptree c;

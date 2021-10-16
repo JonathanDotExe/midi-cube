@@ -10,8 +10,8 @@
 
 #include <array>
 #include <atomic>
-#include "audio.h"
-#include "framework/core/metronome.h"
+#include "../framework/core/audio.h"
+#include "../framework/core/metronome.h"
 #include "../framework/core/plugins/effect.h"
 
 #define LOOPER_IDENTIFIER "midicube_audio_flanger"

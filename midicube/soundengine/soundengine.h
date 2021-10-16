@@ -204,7 +204,6 @@ struct Program {
 	unsigned int metronome_bpm = 120;
 	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{true}};
 	std::array<MasterEffectProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
-	std::array<MotionSequncerPreset<MOTION_SEQUENCER_LENGTH>, MOTION_SEQUENCER_AMOUNT> motion_sequencers;
 };
 
 struct MidiSource {
@@ -257,10 +256,6 @@ public:
 	double volume{0.2};
 	size_t scene{0};
 	std::array<unsigned int, SOUND_ENGINE_SCENE_AMOUNT> scene_ccs = {52, 53, 54, 55, 57, 58, 59, 60};
-
-	size_t motion_sequencer_amount = 0;
-	std::array<MotionSequncerPreset<MOTION_SEQUENCER_LENGTH>, MOTION_SEQUENCER_AMOUNT> motion_sequencer_presets;
-	std::array<double, MOTION_SEQUENCER_AMOUNT> motion_sequencer_values = {};
 
 	unsigned int sustain_control{64};
 

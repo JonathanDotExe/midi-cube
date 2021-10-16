@@ -204,12 +204,6 @@ SoundEngineDevice::SoundEngineDevice() : metronome(120){
 }
 
 void SoundEngineDevice::process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info) {
-	//Motion Sequencer
-	size_t motion_sequencer_amount = std::min(this->motion_sequencer_amount, (size_t) MOTION_SEQUENCER_AMOUNT);
-	for (size_t i = 0; i < motion_sequencer_amount; ++i) {
-		motion_sequencer_values[i] = motion_sequencers[i].amplitude(motion_sequencer_presets[i], metronome, info);
-	}
-
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		double l = 0;
@@ -389,7 +383,6 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 void SoundEngineDevice::apply_program(Program* program) {
 	//Global
 	metronome.set_bpm(program->metronome_bpm);
-	motion_sequencer_presets = program->motion_sequencers;
 	scene = 0;
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
@@ -421,7 +414,6 @@ void SoundEngineDevice::apply_program(Program* program) {
 void SoundEngineDevice::save_program(Program* program) {
 	//Global
 	program->metronome_bpm = metronome.get_bpm();
-	program->motion_sequencers = motion_sequencer_presets;
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelProgram& prog = program->channels[i];
