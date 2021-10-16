@@ -297,14 +297,38 @@ void Arpeggiator::release_note(const SampleInfo& info, unsigned int note, bool s
 
 
 void ArpeggiatorProgram::load(boost::property_tree::ptree tree) {
+	on = tree.get<bool>("on", false);
+	bpm = tree.get<unsigned int>("bpm", 120);
+	preset.pattern = static_cast<ArpeggiatorPattern>(tree.get<size_t>("pattern", 0));
+	preset.octaves = tree.get<unsigned int>("octaves", 1);
+	preset.value = tree.get<unsigned int>("note_value", 1);
+	preset.hold = tree.get<bool>("hold", false);
+	preset.kb_sync = tree.get<bool>("kb_sync", true);
+	preset.repeat_edges = tree.get<bool>("repeat_edges", false);
+	preset.play_duplicates = tree.get<bool>("play_duplicates", false);
+	preset.master_sync = tree.get<bool>("master_sync", false);
+	preset.sustain = tree.get<bool>("sustain", false);
 }
+
 
 std::string ArpeggiatorProgram::get_plugin_name() {
 	return ARPEGGIATOR_IDENTIFIER;
 }
 
 boost::property_tree::ptree ArpeggiatorProgram::save() {
-	return {};
+	boost::property_tree::ptree tree;
+	tree.put("arpeggiator.on", on);
+	tree.put("arpeggiator.bpm", bpm);
+	tree.put("pattern", static_cast<size_t>(preset.pattern));
+	tree.put("octaves", preset.octaves);
+	tree.put("note_value", preset.value);
+	tree.put("hold", preset.hold);
+	tree.put("kb_sync", preset.kb_sync);
+	tree.put("repeat_edges", preset.repeat_edges);
+	tree.put("play_duplicates", preset.play_duplicates);
+	tree.put("master_sync", preset.master_sync);
+	tree.put("sustain", preset.sustain);
+	return tree;
 }
 
 void ArpeggiatorInstance::apply_program(PluginProgram *prog) {
