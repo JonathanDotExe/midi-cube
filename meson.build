@@ -34,7 +34,6 @@ src = [
 	'midicube/framework/util/util.cpp',
 	
 	'midicube/audio.cpp',
-	'midicube/looper.cpp',
 	'midicube/midicube.cpp',
 	'midicube/midiio.cpp',
 	'midicube/program.cpp',
@@ -80,6 +79,7 @@ src = [
 	'midicube/effect/delay.cpp',
 	'midicube/effect/equalizer.cpp',
 	'midicube/effect/flanger.cpp',
+	'midicube/effect/looper.cpp',
 	'midicube/effect/phaser.cpp',
 	'midicube/effect/reverb.cpp',
 	'midicube/effect/rotary_speaker.cpp',

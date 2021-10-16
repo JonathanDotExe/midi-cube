@@ -21,6 +21,7 @@
 #include "effect/delay.h"
 #include "effect/equalizer.h"
 #include "effect/flanger.h"
+#include "effect/looper.h"
 #include "effect/phaser.h"
 #include "effect/reverb.h"
 #include "effect/rotary_speaker.h"
@@ -58,6 +59,7 @@ void MidiCube::init(int out_device, int in_device) {
 	plugin_mgr.add_plugin(new AmplifierSimulationPlugin());
 	plugin_mgr.add_plugin(new RotarySpeakerPlugin());
 	plugin_mgr.add_plugin(new VocoderPlugin());
+	plugin_mgr.add_plugin(new LooperPlugin());
 	//Default engines
 	engine.channels[0].scenes[0].active = true;
 

@@ -248,8 +248,6 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, double*
 			rsample += r;
 		}
 	}
-	//Looper
-	looper.apply(lsample, rsample, metronome, info);
 	//Metronome
 	if (play_metronome) {
 		if (metronome.is_beat(info.sample_time, info.sample_rate, 1)) {

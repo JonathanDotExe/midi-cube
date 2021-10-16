@@ -12,7 +12,6 @@
 #include "../framework/dsp/envelope.h"
 #include "../audio.h"
 #include "../framework/dsp/synthesis.h"
-#include "../looper.h"
 #include "../framework/core/metronome.h"
 #include "../framework/core/plugin.h"
 #include "../framework/util/voice.h"
@@ -252,7 +251,6 @@ public:
 	KeyboardEnvironment env;
 
 	Metronome metronome;
-	Looper looper;
 	bool play_metronome{false};
 	std::array<SoundEngineChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
 	std::array<MasterEffect, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;

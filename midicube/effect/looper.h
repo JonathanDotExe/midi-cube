@@ -65,4 +65,19 @@ public:
 
 };
 
+class LooperPlugin : public EffectPlugin<Looper, LooperProgram> {
+public:
+	LooperPlugin() : EffectPlugin({
+		"LOOPER",
+		LOOPER_IDENTIFIER,
+		PluginType::PLUGIN_TYPE_EFFECT,
+		2,
+		2,
+		false,
+		false
+	}) {
+
+	}
+};
+
 #endif /* MIDICUBE_SOUNDENGINE_LOOPER_H_ */
