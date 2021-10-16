@@ -174,6 +174,7 @@ struct ChannelProgram {
 	size_t polyphony_limit = 0;
 
 	PluginSlotProgram engine_program;
+	PluginSlotProgram sequencer_program;
 };
 
 struct MasterEffectProgram {

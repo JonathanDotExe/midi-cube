@@ -62,6 +62,9 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 				if (c.second.get_child_optional("engine")) {
 					program->channels[i].engine_program.load(c.second.get_child("engine"), mgr);
 				}
+				if (c.second.get_child_optional("sequencer")) {
+					program->channels[i].sequencer_program.load(c.second.get_child("sequencer"), mgr);
+				}
 				program->channels[i].polyphony_limit = c.second.get<size_t>("polyphony_limit", 0);
 				const auto& scenes = c.second.get_child_optional("scenes");
 				if (scenes) {
@@ -92,19 +95,6 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 
 				program->channels[i].volume.load(c.second, "volume", 0.5);
 				program->channels[i].panning.load(c.second, "panning", 0);
-
-				//Arpeggiator
-				program->channels[i].arp_on = c.second.get<bool>("arpeggiator.on", false);
-				program->channels[i].arpeggiator_bpm = c.second.get<unsigned int>("arpeggiator.bpm", 120);
-				program->channels[i].arpeggiator.pattern = static_cast<ArpeggiatorPattern>(c.second.get<size_t>("arpeggiator.pattern", 0));
-				program->channels[i].arpeggiator.octaves = c.second.get<unsigned int>("arpeggiator.octaves", 1);
-				program->channels[i].arpeggiator.value = c.second.get<unsigned int>("arpeggiator.note_value", 1);
-				program->channels[i].arpeggiator.hold = c.second.get<bool>("arpeggiator.hold", false);
-				program->channels[i].arpeggiator.kb_sync = c.second.get<bool>("arpeggiator.kb_sync", true);
-				program->channels[i].arpeggiator.repeat_edges = c.second.get<bool>("arpeggiator.repeat_edges", false);
-				program->channels[i].arpeggiator.play_duplicates = c.second.get<bool>("arpeggiator.play_duplicates", false);
-				program->channels[i].arpeggiator.master_sync = c.second.get<bool>("arpeggiator.master_sync", false);
-				program->channels[i].arpeggiator.sustain = c.second.get<bool>("arpeggiator.sustain", false);
 
 				//Sound engine
 				program->channels[i].send_master = c.second.get<ssize_t>("send_master", -1);
@@ -161,6 +151,7 @@ void save_program(Program* program, pt::ptree& tree) {
 		pt::ptree c;
 		//Channel
 		c.put_child("engine", program->channels[i].engine_program.save());
+		c.put_child("sequencer", program->channels[i].sequencer_program.save());
 		c.put("polyphony_limit", program->channels[i].polyphony_limit);
 		for (size_t j = 0; j < SOUND_ENGINE_SCENE_AMOUNT; ++j) {
 			pt::ptree s;
@@ -186,17 +177,7 @@ void save_program(Program* program, pt::ptree& tree) {
 		program->channels[i].volume.save(c, "volume");
 		program->channels[i].panning.save(c, "panning");
 		//Arpeggiator
-		c.put("arpeggiator.on", program->channels[i].arp_on);
-		c.put("arpeggiator.bpm", program->channels[i].arpeggiator_bpm);
-		c.put("arpeggiator.pattern", static_cast<size_t>(program->channels[i].arpeggiator.pattern));
-		c.put("arpeggiator.octaves", program->channels[i].arpeggiator.octaves);
-		c.put("arpeggiator.note_value", program->channels[i].arpeggiator.value);
-		c.put("arpeggiator.hold", program->channels[i].arpeggiator.hold);
-		c.put("arpeggiator.kb_sync", program->channels[i].arpeggiator.kb_sync);
-		c.put("arpeggiator.repeat_edges", program->channels[i].arpeggiator.repeat_edges);
-		c.put("arpeggiator.play_duplicates", program->channels[i].arpeggiator.play_duplicates);
-		c.put("arpeggiator.master_sync", program->channels[i].arpeggiator.master_sync);
-		c.put("arpeggiator.sustain", program->channels[i].arpeggiator.sustain);
+
 		c.put("send_master", program->channels[i].send_master);
 		//Effects
 		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
@@ -204,7 +185,6 @@ void save_program(Program* program, pt::ptree& tree) {
 			PluginSlotProgram& effect = program->channels[i].effects[j];
 			t.put("effect", effect.save());
 		}
-
 
 		tree.add_child("channels.channel", c);
 	}
@@ -260,7 +240,6 @@ void save_bank(Bank& bank, std::string path) {
 		std::cerr << "Couldn't save bank " << path << std::endl;
 	}
 }
-
 
 ProgramManager::ProgramManager(std::string path, ActionHandler& h) : handler(h) {
 	this->path = path;

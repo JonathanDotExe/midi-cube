@@ -380,7 +380,7 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 			}
 			//Send
 			if (pass) {
-				channel.send(message, info);
+				channel.send(message, info, nullptr);
 			}
 		}
 	}
@@ -399,12 +399,10 @@ void SoundEngineDevice::apply_program(Program* program) {
 		SoundEngineChannel& ch = channels[i];
 
 		ch.engine.load(prog.engine_program, &cube->plugin_mgr);
+		ch.sequencer.load(prog.sequencer_program, &cube->plugin_mgr);
 		ch.volume = prog.volume;
 		ch.panning = prog.panning;
 		ch.scenes = prog.scenes;
-		ch.arp.on = prog.arp_on;
-		ch.arp.metronome.set_bpm(prog.arpeggiator_bpm);
-		ch.arp.preset = prog.arpeggiator;
 		ch.polyphony_limit = prog.polyphony_limit;
 
 		//Engine
@@ -431,12 +429,10 @@ void SoundEngineDevice::save_program(Program* program) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
 		ch.engine.save(prog.engine_program);
+		ch.sequencer.save(prog.sequencer_program);
 		prog.volume = ch.volume;
 		prog.panning = ch.panning;
 		prog.scenes = ch.scenes;
-		prog.arp_on = ch.arp.on;
-		prog.arpeggiator_bpm = ch.arp.metronome.get_bpm();
-		prog.arpeggiator = ch.arp.preset;
 		prog.polyphony_limit = ch.polyphony_limit;
 
 		//Engine

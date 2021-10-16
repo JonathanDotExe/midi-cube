@@ -58,25 +58,8 @@ void MidiCube::init(int out_device, int in_device) {
 	plugin_mgr.add_plugin(new AmplifierSimulationPlugin());
 	plugin_mgr.add_plugin(new RotarySpeakerPlugin());
 	plugin_mgr.add_plugin(new VocoderPlugin());
-	//Default setting
-	Arpeggiator& arp = engine.channels[1].arp;
-	arp.on = true;
-	arp.preset.octaves = 3;
-	arp.preset.pattern = ArpeggiatorPattern::ARP_UP;
-	arp.preset.value = 1;
-	arp.metronome.set_bpm(440);
-
 	//Default engines
 	engine.channels[0].scenes[0].active = true;
-	//engine.channels[0].vocoder_preset.on = true;
-
-	//engine.channels[0].set_engine_index(2);
-
-	engine.channels[9].scenes[0].active = true;
-	//engine.channels[9].set_engine_index(3);
-
-	//engine.channels[10].bitcrusher_preset.on = true;
-	//engine.channels[10].bitcrusher_preset.bits = 8;
 
 	for (size_t i = 0; i < engine.channels.size(); ++i) {
 		engine.channels[i].scenes[0].source.input = 1;
