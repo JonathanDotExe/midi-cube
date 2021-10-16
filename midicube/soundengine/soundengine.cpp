@@ -72,27 +72,19 @@ void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info
 	size_t scene = device->scene;
 	PluginInstance* engine = this->engine.get_plugin();
 	if (scenes[scene].active /* || (status.pressed_notes && message.type != MessageType::NOTE_ON)*/) { //FIXME send when channel is deactivated
-		//Aftertouch
-		if (message.type == MessageType::MONOPHONIC_AFTERTOUCH) {
-			this->info.aftertouch = message.monophonic_aftertouch()/127.0;
-		}
-		//Note
-		/*if (arp.on) {
-			switch (message.type) {
-			case MessageType::NOTE_ON:
-				arp.press_note(info, message.note(), message.velocity()/127.0, device->env.sustain);
-				break;
-			case MessageType::NOTE_OFF:
-				arp.release_note(info, message.note(), device->env.sustain);
-				break;
-			default:
-				updated = engine->recieve_midi(message, scenes[scene].source.octave * 12, info, device->env, polyphony_limit) || updated;
-				break;
+		//Recieve midi
+		PluginInstance* seq = sequencer.get_plugin();
+		if (seq == nullptr || src == seq) {
+			//Aftertouch
+			if (message.type == MessageType::MONOPHONIC_AFTERTOUCH) {
+				this->info.aftertouch = message.monophonic_aftertouch()/127.0;
 			}
-		}
-		else if (engine) {*/
 			engine->recieve_midi(message, info); //FIXME transpose not working
-		/*}*/
+		}
+		//Sequencer
+		else if (seq != nullptr){
+			seq->recieve_midi(message, info);
+		}
 	}
 }
 
