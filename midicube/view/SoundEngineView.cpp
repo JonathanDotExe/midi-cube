@@ -16,22 +16,20 @@
 #include "../view/SoundEngineChannelView.h"
 #include "../view/SourceView.h"
 
-SoundEngineView::SoundEngineView() : ViewController() {
+SoundEngineView::SoundEngineView(MidiCube& c) : ViewController(), cube(c) {
 
 }
 
-Scene SoundEngineView::create(Frame& frame) {
+Scene SoundEngineView::create(ViewHost& frame) {
 	std::vector<Control*> controls;
-
-	ActionHandler& handler = frame.cube.action_handler;
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
 
-	this->engine = &frame.cube.engine;
+	this->engine = &cube.engine;
 
-	SoundEngineDevice& sound_engine = frame.cube.engine;
+	SoundEngineDevice& sound_engine = cube.engine;
 	//Sound engines
 
 	//Channels
@@ -54,7 +52,7 @@ Scene SoundEngineView::create(Frame& frame) {
 
 		//Active
 		CheckBox* active = new CheckBox(false, "", main_font, 12, x + pane_width - 30, y + 5, 20, 20);
-		active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), handler);
+		active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), cube.lock);
 		controls.push_back(active);
 		//TODO Engine
 		/*Button* engine = new Button("Engine", main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
@@ -71,23 +69,23 @@ Scene SoundEngineView::create(Frame& frame) {
 
 		//Volume
 		Slider* volume = new Slider(0, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);
-		volume->property.bind(channel.volume, handler);
+		volume->property.bind(channel.volume, cube.lock);
 		controls.push_back(volume);
 	}
 
 	//Metronome
 	CheckBox* metronome = new CheckBox(false, "Metronome", main_font, 18, 10, frame.get_height() - 45, 40, 40);
-	metronome->property.bind(engine->play_metronome, handler);
+	metronome->property.bind(engine->play_metronome, cube.lock);
 	controls.push_back(metronome);
 
 	DragBox<int>* bpm = new DragBox<int>(120, 10, 480, main_font, 18, 200, frame.get_height() - 45, 100, 40);
 	bpm->drag_mul = 0.00125;
-	bpm->property.bind_function<unsigned int>(std::bind(&Metronome::get_bpm, &engine->metronome), std::bind(&Metronome::set_bpm, &engine->metronome, std::placeholders::_1), handler);
+	bpm->property.bind_function<unsigned int>(std::bind(&Metronome::get_bpm, &engine->metronome), std::bind(&Metronome::set_bpm, &engine->metronome, std::placeholders::_1), cube.lock);
 	controls.push_back(bpm);
 
 	//Volume
 	DragBox<double>* volume = new DragBox<double>(0, 0, 1, main_font, 18, 330, frame.get_height() - 45, 100, 40);
-	volume->property.bind(engine->volume, handler);
+	volume->property.bind(engine->volume, cube.lock);
 	controls.push_back(volume);
 
 	//Effects
@@ -121,10 +119,10 @@ Scene SoundEngineView::create(Frame& frame) {
 	//Program Button
 	Button* program = new Button("Programs", main_font, 18, frame.get_width() - 175, frame.get_height() - 45, 100, 40);
 	program->set_on_click([&frame]() {
-		frame.cube.prog_mgr.lock();
-		size_t bank = frame.cube.prog_mgr.get_curr_bank_index();
-		size_t page = frame.cube.prog_mgr.get_curr_program_index()/(PROGRAM_VIEW_ROWS * PROGRAM_VIEW_COLS);
-		frame.cube.prog_mgr.unlock();
+		cube.prog_mgr.lock();
+		size_t bank = cube.prog_mgr.get_curr_bank_index();
+		size_t page = cube.prog_mgr.get_curr_program_index()/(PROGRAM_VIEW_ROWS * PROGRAM_VIEW_COLS);
+		cube.prog_mgr.unlock();
 		frame.change_view(new ProgramView(bank, page));
 	});
 	controls.push_back(program);

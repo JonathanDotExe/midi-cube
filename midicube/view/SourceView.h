@@ -15,10 +15,13 @@
 #include "../view/resources.h"
 
 class SourceView : public ViewController {
+private:
+	MidiCube& cube;
+
 public:
-	SourceView();
+	SourceView(MidiCube& c);
 	virtual ~SourceView();
-	virtual Scene create(Frame &frame);
+	virtual Scene create(ViewHost &frame);
 	virtual void update_properties();
 };
 

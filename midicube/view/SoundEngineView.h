@@ -17,12 +17,13 @@
 class SoundEngineView : public ViewController {
 private:
 	std::array<Button*, SOUND_ENGINE_MIDI_CHANNELS> engine_buttons;
+	MidiCube& cube;
 	SoundEngineDevice* engine = nullptr;
 
 public:
-	SoundEngineView();
+	SoundEngineView(MidiCube& c);
 
-	virtual Scene create(Frame& frame);
+	virtual Scene create(ViewHost& frame);
 
 	virtual ~SoundEngineView();
 
