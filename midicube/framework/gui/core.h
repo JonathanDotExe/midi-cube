@@ -17,20 +17,22 @@
 
 
 
-class Frame;
+class ViewHost;
 
 class Control {
-protected:
+private:
 	int x = 0;
 	int y = 0;
 	int width = 0;
 	int height = 0;
 	bool visible = true;
+	ViewHost* host = nullptr;
 
 public:
-	Frame* frame = nullptr;
 
 	Control(int x = 0, int y = 0, int width = 0, int height = 0);
+
+	virtual void init(ViewHost* host);
 
 	virtual void update_position(int x, int y, int width, int height);
 
@@ -81,7 +83,7 @@ public:
 
 	}
 
-	virtual Scene create(Frame& frame) = 0;
+	virtual Scene create(ViewHost& frame) = 0;
 
 	virtual void update_properties() {
 
@@ -94,6 +96,55 @@ public:
 	virtual ~ViewController() {
 
 	}
+};
+
+class ViewHost {
+private:
+	ViewController* view = nullptr;
+	std::vector<Control*> controls;
+
+public:
+	ViewHost() {
+
+	}
+
+	virtual void change_view(ViewController* view) = 0;
+
+	virtual int get_x_offset() const = 0;
+
+	virtual int get_y_offset() const = 0;
+
+	virtual int get_height() const = 0;
+
+	virtual int get_width() const = 0;
+
+	virtual std::vector<Control*> get_controls() {
+		return controls;
+	}
+
+	virtual void add_control(Control* control) {
+		if (control == nullptr) {
+			throw "Can't add nullptr control!";
+		}
+		else if (std::find(controls.begin(), controls.end(), control) == controls.end()) {
+			control->init(this);
+			controls.push_back(control);
+		}
+		else {
+			throw "Can't add same control to frame twice!";
+		}
+	}
+
+	virtual ~ViewHost() {
+		delete view;
+		for (Control* control : controls) {
+			delete control;
+		}
+	}
+
+protected:
+	virtual void switch_view(ViewController* view);
+
 };
 
 class Frame {

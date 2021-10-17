@@ -13,6 +13,14 @@ Control::Control(int x, int y, int width, int height) {
 	update_position(x, y, width, height);
 }
 
+void init(ViewHost* host) {
+	if (this->host != nullptr) {
+		throw "Control already initialized";
+	}
+	this->host = host;
+	update_properties();
+}
+
 void Control::update_position(int x, int y, int width, int height) {
 	this->x = x;
 	this->y = y;
@@ -37,6 +45,23 @@ void Control::set_visible(bool visible) {
 	if (frame) {
 		frame->request_redraw();
 	}
+}
+
+//ViewHost
+void ViewHost::switch_view(ViewController *view) {
+	//Init view
+	delete this->view;
+	this->view = view;
+	//Controls
+	Scene scene = view->create(*this);
+	for (Control* control : controls) {
+		delete control;
+	}
+	controls.clear();
+	for (Control* control : scene.controls) {
+		add_control(control);
+	}
+	view->update_properties();
 }
 
 //Frame
@@ -178,8 +203,8 @@ void Frame::switch_view(ViewController* view) {
 
 Frame::~Frame() {
 	delete view;
+	delete next_view;
 	for (Control* control : controls) {
 		delete control;
 	}
 }
-
