@@ -58,6 +58,8 @@ public:
 
 	virtual const Metronome& get_metronome();
 
+	virtual SpinLock& get_lock();
+
 	virtual MidiBindingHandler* get_binding_handler();
 
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info, void* source) = 0;
@@ -72,6 +74,7 @@ public:
 
 class PluginInstance;
 
+//TODO use locks in all plugins
 class Plugin {
 
 public:
@@ -97,7 +100,6 @@ class PluginInstance {
 private:
 	PluginHost& host;
 	Plugin& plugin;
-	SpinLock lock;
 
 protected:
 
@@ -139,8 +141,8 @@ public:
 		return plugin;
 	}
 
-	SpinLock& get_lock() const {
-		return lock;
+	inline SpinLock& get_lock() const {
+		return host.get_lock();
 	}
 
 	inline void take_input_mono(double sample) {

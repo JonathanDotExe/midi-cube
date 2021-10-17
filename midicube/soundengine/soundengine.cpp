@@ -197,6 +197,10 @@ void SoundEngineChannel::set_active(bool active) {
 	scenes[device->scene].active = active;
 }
 
+SpinLock& SoundEngineChannel::get_lock() {
+	return device->get_cube()->lock;
+}
+
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	host.init(this);
@@ -533,4 +537,8 @@ void SoundEngineDeviceHost::init(SoundEngineDevice *device) {
 		throw "Device already intialized!";
 	}
 	this->device = device;
+}
+
+SpinLock& SoundEngineDeviceHost::get_lock() {
+	return this->device->get_cube()->lock;
 }

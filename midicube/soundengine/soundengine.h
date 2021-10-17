@@ -79,6 +79,7 @@ public:
 	ChannelInfo info;
 	size_t polyphony_limit = 0;
 
+	virtual SpinLock& get_lock();
 	void recieve_midi(const MidiMessage &message,
 			const SampleInfo &info, void* src);
 	MidiBindingHandler* get_binding_handler();
@@ -228,6 +229,7 @@ public:
 	MidiBindingHandler* get_binding_handler();
 	const Metronome& get_metronome();
 	const KeyboardEnvironment& get_environment();
+	SpinLock& get_lock();
 };
 
 
