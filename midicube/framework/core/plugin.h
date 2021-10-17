@@ -13,6 +13,7 @@
 #include "audio.h"
 #include "../dsp/envelope.h"
 #include "../data/binding.h"
+#include "../util/util.h"
 //#include "../gui/core.h"
 #include <map>
 #include <algorithm>
@@ -96,6 +97,7 @@ class PluginInstance {
 private:
 	PluginHost& host;
 	Plugin& plugin;
+	SpinLock lock;
 
 protected:
 
@@ -135,6 +137,10 @@ public:
 
 	Plugin& get_plugin() const {
 		return plugin;
+	}
+
+	SpinLock& get_lock() const {
+		return lock;
 	}
 
 	inline void take_input_mono(double sample) {
