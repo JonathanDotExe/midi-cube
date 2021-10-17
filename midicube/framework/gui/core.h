@@ -48,8 +48,8 @@ public:
 		return false;
 	}
 
-	virtual void on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
-
+	virtual Control* on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
+		return button == sf::Mouse::Button::Left;
 	}
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
@@ -71,6 +71,10 @@ public:
 	bool is_visible() const;
 
 	void set_visible(bool visible = true);
+
+	ViewHost* get_host() const {
+		return host;
+	}
 };
 
 struct Scene {
@@ -118,6 +122,12 @@ public:
 
 	virtual int get_width() const = 0;
 
+	virtual int request_redraw() = 0;
+
+	virtual Control* on_mouse_pressed (int x, int y, sf::Mouse::Button button);
+
+	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
+
 	virtual std::vector<Control*> get_controls() {
 		return controls;
 	}
@@ -142,18 +152,20 @@ public:
 		}
 	}
 
+	ViewController* get_view() {
+		return view;
+	}
+
 protected:
 	virtual void switch_view(ViewController* view);
 
 };
 
-class Frame {
+class Frame : public ViewHost {
 private:
 	int width;
 	int height;
 	std::string title;
-	ViewController* view;
-	std::vector<Control*> controls;
 
 	bool mouse_pressed = false;
 	int last_mouse_x = 0;
@@ -196,9 +208,13 @@ public:
 		return width;
 	}
 
-private:
-	void switch_view(ViewController* view);
+	int get_y_offset() const {
+		return 0;
+	}
 
+	int get_x_offset() const {
+		return 0;
+	}
 };
 
 #endif /* MIDICUBE_GUI_ENGINE_CORE_H_ */

@@ -13,7 +13,7 @@ Control::Control(int x, int y, int width, int height) {
 	update_position(x, y, width, height);
 }
 
-void init(ViewHost* host) {
+void Control::init(ViewHost* host) {
 	if (this->host != nullptr) {
 		throw "Control already initialized";
 	}
@@ -27,8 +27,8 @@ void Control::update_position(int x, int y, int width, int height) {
 	this->width = width;
 	this->height = height;
 
-	if (frame) {
-		frame->request_redraw();
+	if (host) {
+		host->request_redraw();
 	}
 }
 
@@ -42,8 +42,8 @@ bool Control::is_visible() const {
 
 void Control::set_visible(bool visible) {
 	this->visible = visible;
-	if (frame) {
-		frame->request_redraw();
+	if (host) {
+		host->request_redraw();
 	}
 }
 
@@ -64,12 +64,31 @@ void ViewHost::switch_view(ViewController *view) {
 	view->update_properties();
 }
 
+Control* ViewHost::on_mouse_pressed (int x, int y, sf::Mouse::Button button) {
+	Control* selected = nullptr;
+	for (Control* control : controls) {
+		if (control->is_visible() && control->selectable() && control->collides(x - get_x_offset(), y - get_y_offset())) {
+			selected = control->on_mouse_pressed(x - get_x_offset(), y - get_y_offset(), button);
+			break; //Only click first control
+		}
+	}
+	return selected;
+}
+
+void ViewHost::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+	for (Control* control : controls) {
+		if (control->is_visible() && control->selectable() && control->collides(x - get_x_offset(), y - get_y_offset())) {
+			control->on_mouse_released(x - get_x_offset(), y - get_y_offset(), button);
+			break;
+		}
+	}
+}
+
 //Frame
-Frame::Frame(int width, int height, std::string title, bool render_sleep) {
+Frame::Frame(int width, int height, std::string title, bool render_sleep) : ViewHost(){
 	this->width = width;
 	this->height = height;
 	this->title = title;
-	this->view = nullptr;
 	this->render_sleep = render_sleep;
 
 	this->selected = nullptr;
@@ -104,21 +123,13 @@ void Frame::run(ViewController* v) {
 				break;
 			case sf::Event::MouseButtonPressed:
 			{
-				bool left = event.mouseButton.button == sf::Mouse::Left;
-				if (left) {
+				if (event.mouseButton.button == sf::Mouse::Left) {
 					mouse_pressed = true;
 					last_mouse_x = event.mouseButton.x;
 					last_mouse_y = event.mouseButton.y;
 				}
-				for (Control* control : controls) {
-					if (control->is_visible() && control->selectable() && control->collides(event.mouseButton.x, event.mouseButton.y)) {
-						control->on_mouse_pressed(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
-						if (left) {
-							selected = control;
-						}
-						break;
-					}
-				}
+
+				on_mouse_pressed(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
 				request_redraw();
 			}
 				break;
@@ -135,19 +146,16 @@ void Frame::run(ViewController* v) {
 			case sf::Event::MouseButtonReleased:
 				if (event.mouseButton.button == sf::Mouse::Left) {
 					mouse_pressed = false;
-					if (selected && selected->collides(event.mouseButton.x, event.mouseButton.y)) {
-						if (view->on_action(selected)) {
+					if (selected) {
+						ViewController* view = selected->get_host()->get_view();
+						if (view && selected->collides(event.mouseButton.x - selected->get_host()->get_x_offset(), event.mouseButton.y - selected->get_host()->get_y_offset()) && view->on_action(selected)) {
 							selected->on_mouse_action();
 						}
 					}
 					selected = nullptr;
 				}
-				for (Control* control : controls) {
-					if (control->is_visible() && control->selectable() && control->collides(event.mouseButton.x, event.mouseButton.y)) {
-						control->on_mouse_released(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
-						break;
-					}
-				}
+
+				on_mouse_released(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
 				request_redraw();
 				break;
 			default:
@@ -182,29 +190,7 @@ void Frame::update_properties() {
 
 }
 
-void Frame::switch_view(ViewController* view) {
-	//Init view
-	delete this->view;
-	this->view = view;
-	//Controls
-	Scene scene = view->create(*this);
-	for (Control* control : controls) {
-		delete control;
-	}
-	controls.clear();
-	for (Control* control : scene.controls) {
-		control->frame = this;
-		control->update_properties();
-		controls.push_back(control);
-	}
-	view->update_properties();
-	request_redraw();
+Frame::~Frame() {
+	delete next_view;
 }
 
-Frame::~Frame() {
-	delete view;
-	delete next_view;
-	for (Control* control : controls) {
-		delete control;
-	}
-}
