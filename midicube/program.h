@@ -63,13 +63,13 @@ enum ProgramManagerProperty {
 	pProgramManagerProgram,
 };
 
+//TODO program manager thread safety
 class ProgramManager {
 private:
 	std::string path;
 	size_t curr_bank = 0;
 	size_t curr_program = 0;
 	std::vector<Bank*> banks;
-	ActionHandler& handler;
 	ProgramUser* user = nullptr;
 	SpinLock mutex;
 
@@ -77,7 +77,7 @@ public:
 	std::string bank_name = "";
 	std::string program_name = "";
 
-	ProgramManager(std::string path, ActionHandler& h);
+	ProgramManager(std::string path);
 	inline void lock() {
 		mutex.lock();
 	}
@@ -88,9 +88,7 @@ public:
 	size_t bank_count() {
 		return banks.size();
 	}
-	//Mutex has to be locked by user
 	void apply_program(size_t bank, size_t program);
-	void apply_program_direct(size_t bank, size_t program);
 	//Mutex has to be locked by user
 	void delete_program();
 	//Mutex has to be locked by user

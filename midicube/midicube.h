@@ -40,7 +40,6 @@ public:
 
 	ProgramManager prog_mgr;
 	SoundEngineDevice engine;
-	ActionHandler action_handler;
 	PluginManager plugin_mgr;
 
 	std::atomic<bool> updated{false};

@@ -34,7 +34,7 @@ static void process_func(double& lsample, double& rsample, double* inputs, const
 	((MidiCube*) user_data)->process(lsample, rsample, inputs, input_count, info);
 }
 
-MidiCube::MidiCube() : prog_mgr("./data/programs", action_handler) {
+MidiCube::MidiCube() : prog_mgr("./data/programs") {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -69,7 +69,7 @@ void MidiCube::init(int out_device, int in_device) {
 	//Load programs
 	prog_mgr.init_user(this);
 	prog_mgr.load_all(&plugin_mgr);
-	prog_mgr.apply_program_direct(0, 0);
+	prog_mgr.apply_program(0, 0);
 
 	//MIDI Inputs
 	//Input-Devices
@@ -97,8 +97,6 @@ void MidiCube::init(int out_device, int in_device) {
 
 void MidiCube::process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info) {
 	if (lock.try_lock()) {
-		//Lock actions
-		action_handler.execute_realtime_actions();
 		//Messages
 		size_t i = 0;
 		for (MidiCubeInput in : this->inputs) {
