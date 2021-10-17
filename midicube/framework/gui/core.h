@@ -49,7 +49,7 @@ public:
 	}
 
 	virtual Control* on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
-		return button == sf::Mouse::Button::Left;
+		return button == sf::Mouse::Button::Left ? this : nullptr;
 	}
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
@@ -122,7 +122,7 @@ public:
 
 	virtual int get_width() const = 0;
 
-	virtual int request_redraw() = 0;
+	virtual void request_redraw() = 0;
 
 	virtual Control* on_mouse_pressed (int x, int y, sf::Mouse::Button button);
 

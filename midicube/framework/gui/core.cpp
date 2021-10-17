@@ -165,7 +165,7 @@ void Frame::run(ViewController* v) {
 		//Render
 		if (redraw || !render_sleep) {
 			window.clear(sf::Color(80, 80, 80));
-			for (Control* control : controls) {
+			for (Control* control : get_controls()) {
 				if (control->is_visible()) {
 					control->draw(window, selected == control);
 				}
