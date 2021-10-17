@@ -40,7 +40,7 @@ void Control::set_visible(bool visible) {
 }
 
 //Frame
-Frame::Frame(MidiCube& c, int width, int height, std::string title, bool render_sleep) : cube(c) {
+Frame::Frame(int width, int height, std::string title, bool render_sleep) {
 	this->width = width;
 	this->height = height;
 	this->title = title;
@@ -63,15 +63,13 @@ void Frame::run(ViewController* v) {
 
 	while (window.isOpen()) {
 		//Property changes
-		if (cube.updated) {
-			for (Control* control : controls) {
-				control->update_properties();
-			}
-			view->update_properties();
-			cube.updated = false;
+		/*
+		TODO property updates
+		for (Control* control : controls) {
+			control->update_properties();
 		}
-		//Execute return actions
-		cube.action_handler.execute_return_actions();
+		view->update_properties();
+		*/
 		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -149,14 +147,6 @@ void Frame::run(ViewController* v) {
 		window.display();
 		//Change view
 		if (next_view) {
-			//Wait for tasks
-			while (cube.action_handler.remaining_realtime_actions()) {
-				std::this_thread::yield();
-			}
-			while (cube.action_handler.remaining_return_actions()) {
-				cube.action_handler.execute_return_actions();
-				std::this_thread::yield();
-			}
 			switch_view(next_view);
 			next_view = nullptr;
 		}
