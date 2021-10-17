@@ -75,6 +75,22 @@ public:
 	ViewHost* get_host() const {
 		return host;
 	}
+
+	int get_height() const {
+		return height;
+	}
+
+	int get_width() const {
+		return width;
+	}
+
+	int get_x() const {
+		return x;
+	}
+
+	int get_y() const {
+		return y;
+	}
 };
 
 struct Scene {

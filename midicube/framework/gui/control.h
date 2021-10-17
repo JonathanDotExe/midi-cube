@@ -214,9 +214,10 @@ public:
 		window.draw(text);
 	}
 
-	virtual void on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
+	virtual Control* on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
 		hit_border = false;
 		temp_drag = 0;
+		return Control::on_mouse_pressed(x, y, button);
 	}
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
@@ -244,7 +245,7 @@ public:
 					if (property.is_bound()) {
 						property.set(value);
 					}
-					update_position(this->x, this->y, width, height);
+					update_position(get_x(), get_y(), get_width(), get_height());
 				}
 			}
 		}
@@ -265,7 +266,7 @@ protected:
 		if (property.is_bound()) {
 			property.get([this](T v) {
 				progress = fmin(fmax(scale.progress(v, min, max), 0), 1);
-				update_position(this->x, this->y, width, height);
+				update_position(get_x(), get_y(), get_width(), get_height());
 			});
 
 		}

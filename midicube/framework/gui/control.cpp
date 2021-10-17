@@ -50,7 +50,7 @@ void Button::on_mouse_action() {
 
 void Button::update_text(std::string text) {
 	this->text.setString(text);
-	update_position(x, y, width, height);
+	update_position(get_x(), get_y(), get_width(), get_height());
 }
 
 //Slider
@@ -86,7 +86,7 @@ void Slider::draw(sf::RenderWindow& window, bool selected) {
 
 void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 	double old_prog = progress;
-	progress -= (double)y_motion/height;
+	progress -= (double)y_motion/get_height();
 
 	if (progress < 0) {
 		progress = 0;
@@ -100,7 +100,7 @@ void Slider::on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 		if (property.is_bound()) {
 			property.set(value);
 		}
-		update_position(this->x, this->y, width, height);
+		update_position(get_x(), get_y(), get_width(), get_height());
 	}
 }
 
@@ -108,7 +108,7 @@ void Slider::update_properties() {
 	if (property.is_bound()) {
 		property.get([this](double v) {
 			progress = fmin(fmax((v - min)/(max - min), 0), 1);
-			update_position(this->x, this->y, width, height);
+			update_position(get_x(), get_y(), get_width(), get_height());
 		});
 	}
 }
@@ -137,14 +137,14 @@ void CheckBox::on_mouse_action() {
 	if (property.is_bound()) {
 		property.set(checked);
 	}
-	frame->request_redraw();
+	get_host()->request_redraw();
 }
 
 void CheckBox::update_properties() {
 	if (property.is_bound()) {
 		property.get([this](bool v) {
 			checked = v;
-			frame->request_redraw();
+			get_host()->request_redraw();
 		});
 	}
 }
@@ -171,14 +171,14 @@ void ComboBox::on_mouse_action() {
 	if (property.is_bound()) {
 		property.set(index + start_val);
 	}
-	update_position(this->x, this->y, width, height);
+	update_position(get_x(), get_y(), get_width(), get_height());
 }
 
 void ComboBox::update_properties() {
 	if (property.is_bound()) {
 		property.get([this](double v) {
 			index = fmax(0, v - start_val);
-			update_position(this->x, this->y, width, height);
+			update_position(get_x(), get_y(), get_width(), get_height());
 		});
 	}
 }
@@ -219,15 +219,15 @@ void OrganSwitch::on_mouse_action() {
 	if (property.is_bound()) {
 		property.set(checked);
 	}
-	update_position(this->x, this->y, width, height);
+	update_position(get_x(), get_y(), get_width(), get_height());
 }
 
 void OrganSwitch::update_properties(){
 	if (property.is_bound()) {
 		property.get([this](bool v) {
 			checked = v;
-			update_position(this->x, this->y, width, height);
-			frame->request_redraw();
+			update_position(get_x(), get_y(), get_width(), get_height());
+			get_host()->request_redraw();
 		});
 	}
 }
