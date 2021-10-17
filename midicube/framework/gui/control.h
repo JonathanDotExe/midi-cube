@@ -202,11 +202,11 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height) {
 		Control::update_position(x, y, width, height);
-		rect.setPosition(x, y);
+		rect.setPosition(x + get_host()->get_x_offset(), y + get_host()->get_y_offset());
 		rect.setSize(sf::Vector2<float>(width, height));
 		T value = scale.value(progress, min, max);
 		text.setString(to_string(value));
-		center_text(text, x, y, width, height);
+		center_text(text, x + get_host()->get_x_offset(), y + get_host()->get_y_offset(), width, height);
 	}
 
 	virtual void draw(sf::RenderWindow& window, bool selected) {
@@ -404,18 +404,18 @@ public:
 		double real_prog = (double) value/MAX;
 		//Slider
 		double range = height - button_height;
-		slider_rect.setPosition(x + width/2 - width * slider_width / 2, y);
+		slider_rect.setPosition(x  + get_host()->get_x_offset() + width/2 - width * slider_width / 2, y + get_host()->get_y_offset());
 		slider_rect.setSize(sf::Vector2<float>(width * slider_width, real_prog * range - 2));
 		//Button
-		button_rect.setPosition(x, y + real_prog * range);
+		button_rect.setPosition(x + get_host()->get_x_offset(), y + get_host()->get_y_offset() + real_prog * range);
 		button_rect.setSize(sf::Vector2<float>(width, button_height));
 
 		//Value Text
 		text.setString(std::to_string(value));
-		center_text_top(text, x, y + height + 5, width, height);
+		center_text_top(text, x + get_host()->get_x_offset(), y + get_host()->get_y_offset() + height + 5, width, height);
 
 		//Title Text
-		center_text_top(title_text, x, y - 40, width, 40);
+		center_text_top(title_text, x + get_host()->get_x_offset(), y + get_host()->get_y_offset() - 40, width, 40);
 	}
 
 	virtual void draw(sf::RenderWindow& window, bool selected) {
