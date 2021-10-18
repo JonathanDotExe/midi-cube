@@ -24,7 +24,7 @@
 #include "../view/SoundEngineView.h"
 
 EffectView::EffectView(PluginInstance* e) :
-		effect(e), binder{[e]() {
+		effect(e), binder{e->get_lock(), [e]() {
 			return new EffectView(e);
 		}} {
 

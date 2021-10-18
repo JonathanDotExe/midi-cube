@@ -17,11 +17,12 @@
 
 class BooleanMidiBindingView : public ViewController {
 private:
+	SpinLock& lock;
 	BindableBooleanValue& value;
 	std::function<ViewController*()> view_factory;
 
 public:
-	BooleanMidiBindingView(BindableBooleanValue& val, std::function<ViewController*()> f) : value(val), view_factory(f) {
+	BooleanMidiBindingView(BindableBooleanValue& val, std::function<ViewController*()> f, SpinLock& l) : lock(l), value(val), view_factory(f) {
 
 	}
 
@@ -29,10 +30,8 @@ public:
 
 	}
 
-	virtual Scene create(Frame &frame) {
+	virtual Scene create(ViewHost &frame) {
 		std::vector<Control*> controls;
-		ActionHandler& handler = frame.cube.action_handler;
-
 		{
 
 			//Background
@@ -51,7 +50,7 @@ public:
 				controls.push_back(title);
 
 				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.cc, handler);
+				value->property.bind(this->value.cc, lock);
 				controls.push_back(value);
 			}
 			++index;
@@ -61,7 +60,7 @@ public:
 				controls.push_back(title);
 
 				OrganSwitch* value = new OrganSwitch(true, main_font, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.persistent, handler);
+				value->property.bind(this->value.persistent, lock);
 				controls.push_back(value);
 			}
 			++index;

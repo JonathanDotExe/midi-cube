@@ -23,7 +23,7 @@ private:
 	std::function<ViewController*()> view_factory;
 
 public:
-	TemplateMidiBindingView(BindableTemplateValue<T>& val, std::function<ViewController*()> f, SpinLock& l) : value(val), view_factory(f), lock(l) {
+	TemplateMidiBindingView(BindableTemplateValue<T>& val, std::function<ViewController*()> f, SpinLock& l) : lock(l), value(val), view_factory(f) {
 
 	}
 
