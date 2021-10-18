@@ -9,19 +9,17 @@
 
 #include "../view/SoundEngineView.h"
 
-SceneView::SceneView() {
-
+SceneView::SceneView(SoundEngineDevice* engine) {
+	this->engine = engine;
 }
 
 Scene SceneView::create(Frame &frame) {
 	std::vector<Control*> controls;
 
+	SpinLock& lock = engine->get_cube()->lock;
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
-
-	this->engine = &frame.cube.engine;
-	this->handler = &frame.cube.action_handler;
 
 	//Scenes
 	int rows = 2;
@@ -36,7 +34,8 @@ Scene SceneView::create(Frame &frame) {
 		Button* scene = new Button("Scene " + std::to_string(i + 1), main_font, 32, x, y,  pane_width - 5, pane_height - 5);
 		scene->set_on_click([&frame, this, i]() {
 			//Change scene
-			handler->queue_action(new SetValueAction<size_t, size_t>(this->engine->scene, i));
+
+			this->engine->scene = i;
 			this->update_properties();
 		});
 
@@ -48,7 +47,7 @@ Scene SceneView::create(Frame &frame) {
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	exit->set_on_click([&frame]() {
-		frame.change_view(new SoundEngineView());
+		frame.change_view(new SoundEngineView(engine->get_cube()));
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);

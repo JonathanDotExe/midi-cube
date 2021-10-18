@@ -16,8 +16,8 @@
 #include "../view/SamplerView.h"
 #include "../view/SoundEngineView.h"
 
-SoundEngineChannelView::SoundEngineChannelView(SoundEngineChannel& ch, int channel_index) : channel(ch), binder{[&ch, channel_index]() {
-	return new SoundEngineChannelView(ch, channel_index);
+SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{[&ch, channel_index]() {
+	return new SoundEngineChannelView(c, ch, channel_index);
 }} {
 
 	this->channel_index = channel_index;
@@ -25,7 +25,6 @@ SoundEngineChannelView::SoundEngineChannelView(SoundEngineChannel& ch, int chann
 
 Scene SoundEngineChannelView::create(Frame &frame) {
 	std::vector<Control*> controls;
-	ActionHandler& handler = frame.cube.action_handler;
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -50,12 +49,12 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	Button* edit_engine = new Button("Edit", main_font, 18, 10, 130, 300, 60);
 	edit_engine->set_on_click([this, &frame]() {
 		//TODO not optimal solution
-		frame.cube.lock.lock();
+		cube.lock.lock();
 		Plugin* engine = channel.engine.get_plugin();
 		if (engine) {
 			frame.change_view(engine->create_view()); //TODO make back function
 		}
-		frame.cube.lock.unlock();
+		cube.lock.unlock();
 	});
 	controls.push_back(edit_engine);
 
@@ -78,12 +77,12 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		Button* edit_effect = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
 
 		edit_effect->set_on_click([this, &frame, i]() {
-			frame.cube.lock.lock();
+			cube.lock.lock();
 			Plugin* effect = channel.effects[i].get_plugin();
 			if (effect) {
 				frame.change_view(effect->create_view()); //TODO make back function
 			}
-			frame.cube.lock.unlock();
+			cube.lock.unlock();
 		});
 		controls.push_back(edit_effect);
 		tmp_y += 65;
@@ -97,7 +96,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 		DragBox<int>* master_send = new DragBox<int>(0, -1, SOUND_ENGINE_MASTER_EFFECT_AMOUNT - 1, main_font, 18, 10, tmp_y, 150, 60);
 		tmp_y += 60;
-		master_send->property.bind(channel.master_send, handler);
+		master_send->property.bind(channel.master_send, cube.lock);
 		controls.push_back(master_send);
 	}
 
@@ -112,13 +111,13 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 		DragBox<int>* polyphony = new DragBox<int>(0, 0, 256, main_font, 18, 170, tmp_y, 150, 60);
 		tmp_y += 60;
-		polyphony->property.bind(channel.polyphony_limit, handler);
+		polyphony->property.bind(channel.polyphony_limit, cube.lock);
 		controls.push_back(polyphony);
 	}
 
 
 	CheckBox* active = new CheckBox(true, "Active", main_font, 18, 10, frame.get_height() - 95, 40, 40);
-	active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), handler);
+	active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), cube.lock);
 	controls.push_back(active);
 	//Col 2
 	//Volume
@@ -127,7 +126,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		controls.push_back(vol_label);
 
 		Slider* volume = new Slider(0, 0, 1, main_font, 330, 45, 60, 400, 0.7, 0.1);
-		volume->property.bind(channel.volume, handler);
+		volume->property.bind(channel.volume, cube.lock);
 		controls.push_back(volume);
 	}
 	//Panning
@@ -136,7 +135,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		controls.push_back(pan_label);
 
 		Slider* pan = new Slider(0, -1, 1, main_font, 400, 45, 60, 400, 0.7, 0.1);
-		pan->property.bind(channel.panning, handler);
+		pan->property.bind(channel.panning, cube.lock);
 		controls.push_back(pan);
 	}
 
@@ -150,7 +149,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 		controls.push_back(source_label);
 
 		DragBox<int>* source = new DragBox<int>(0, -1, 15, main_font, 18, 470, tmp_y, 150, 60);
-		source->property.bind_function<ssize_t>(std::bind(&SoundEngineChannel::get_input, &channel), std::bind(&SoundEngineChannel::set_input, &channel, std::placeholders::_1), handler);
+		source->property.bind_function<ssize_t>(std::bind(&SoundEngineChannel::get_input, &channel), std::bind(&SoundEngineChannel::set_input, &channel, std::placeholders::_1), cube.lock);
 		tmp_y += 60;
 		controls.push_back(source);
 	}
@@ -163,7 +162,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 		DragBox<int>* octave = new DragBox<int>(0, -3, 3, main_font, 18, 470, tmp_y, 150, 60);
 		tmp_y += 60;
-		octave->property.bind_function<int>(std::bind(&SoundEngineChannel::get_octave, &channel), std::bind(&SoundEngineChannel::set_octave, &channel, std::placeholders::_1), handler);
+		octave->property.bind_function<int>(std::bind(&SoundEngineChannel::get_octave, &channel), std::bind(&SoundEngineChannel::set_octave, &channel, std::placeholders::_1), cube.lock);
 		controls.push_back(octave);
 	}
 	int zone_y = tmp_y;
@@ -176,7 +175,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 		DragBox<int>* start_note = new DragBox<int>(0, 0, 127, main_font, 18, 470, tmp_y, 150, 60);
 		tmp_y += 60;
-		start_note->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_start_note, &channel), std::bind(&SoundEngineChannel::set_start_note, &channel, std::placeholders::_1), handler);
+		start_note->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_start_note, &channel), std::bind(&SoundEngineChannel::set_start_note, &channel, std::placeholders::_1), cube.lock);
 		controls.push_back(start_note);
 	}
 
@@ -189,7 +188,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 		DragBox<int>* end_note = new DragBox<int>(0, 0, 127, main_font, 18, 470, tmp_y, 150, 60);
 		tmp_y += 60;
-		end_note->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_end_note, &channel), std::bind(&SoundEngineChannel::set_end_note, &channel, std::placeholders::_1), handler);
+		end_note->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_end_note, &channel), std::bind(&SoundEngineChannel::set_end_note, &channel, std::placeholders::_1), cube.lock);
 		controls.push_back(end_note);
 	}
 
@@ -202,7 +201,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	{
 		tmp_y += 5;
 		CheckBox* cc = new CheckBox(true, "CC", main_font, 18, 630, tmp_y, 40, 40);
-		cc->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_cc, &channel), std::bind(&SoundEngineChannel::set_transfer_cc, &channel, std::placeholders::_1), handler);
+		cc->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_cc, &channel), std::bind(&SoundEngineChannel::set_transfer_cc, &channel, std::placeholders::_1), cube.lock);
 		tmp_y += 40;
 		controls.push_back(cc);
 	}
@@ -210,7 +209,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	{
 		tmp_y += 20;
 		CheckBox* pitch = new CheckBox(true, "Bender", main_font, 18, 630, tmp_y, 40, 40);
-		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_pitch_bend, &channel), std::bind(&SoundEngineChannel::set_transfer_pitch_bend, &channel, std::placeholders::_1), handler);
+		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_pitch_bend, &channel), std::bind(&SoundEngineChannel::set_transfer_pitch_bend, &channel, std::placeholders::_1), cube.lock);
 		tmp_y += 40;
 		controls.push_back(pitch);
 	}
@@ -218,7 +217,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	{
 		tmp_y += 20;
 		CheckBox* pitch = new CheckBox(true, "Prog", main_font, 18, 630, tmp_y, 40, 40);
-		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_prog_change, &channel), std::bind(&SoundEngineChannel::set_transfer_prog_change, &channel, std::placeholders::_1), handler);
+		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_prog_change, &channel), std::bind(&SoundEngineChannel::set_transfer_prog_change, &channel, std::placeholders::_1), cube.lock);
 		tmp_y += 40;
 		controls.push_back(pitch);
 	}
@@ -236,7 +235,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	{
 		tmp_y += 20;
 		CheckBox* pitch = new CheckBox(true, "Other", main_font, 18, 790, tmp_y, 40, 40);
-		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_other, &channel), std::bind(&SoundEngineChannel::set_transfer_other, &channel, std::placeholders::_1), handler);
+		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_other, &channel), std::bind(&SoundEngineChannel::set_transfer_other, &channel, std::placeholders::_1), cube.lock);
 		tmp_y += 40;
 		controls.push_back(pitch);
 	}
@@ -245,7 +244,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	{
 		tmp_y += 20;
 		CheckBox* sustain = new CheckBox(true, "Sustain", main_font, 18, 790, tmp_y, 40, 40);
-		sustain->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_sustain, &channel), std::bind(&SoundEngineChannel::set_sustain, &channel, std::placeholders::_1), handler);
+		sustain->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_sustain, &channel), std::bind(&SoundEngineChannel::set_sustain, &channel, std::placeholders::_1), cube.lock);
 		tmp_y += 40;
 		controls.push_back(sustain);
 	}
@@ -254,7 +253,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	{
 		tmp_y += 20;
 		CheckBox* pitch_bend = new CheckBox(true, "Pitch Bend", main_font, 18, 790, tmp_y, 40, 40);
-		pitch_bend->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_pitch_bend, &channel), std::bind(&SoundEngineChannel::set_pitch_bend, &channel, std::placeholders::_1), handler);
+		pitch_bend->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_pitch_bend, &channel), std::bind(&SoundEngineChannel::set_pitch_bend, &channel, std::placeholders::_1), cube.lock);
 		tmp_y += 40;
 		controls.push_back(pitch_bend);
 	}
@@ -269,7 +268,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 		DragBox<int>* start_velocity = new DragBox<int>(0, 0, 127, main_font, 18, 630, tmp_y, 150, 60);
 		tmp_y += 60;
-		start_velocity->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_start_velocity, &channel), std::bind(&SoundEngineChannel::set_start_velocity, &channel, std::placeholders::_1), handler);
+		start_velocity->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_start_velocity, &channel), std::bind(&SoundEngineChannel::set_start_velocity, &channel, std::placeholders::_1), cube.lock);
 		controls.push_back(start_velocity);
 	}
 
@@ -282,7 +281,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 
 		DragBox<int>* end_velocity = new DragBox<int>(0, 0, 127, main_font, 18, 630, tmp_y, 150, 60);
 		tmp_y += 60;
-		end_velocity->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_end_velocity, &channel), std::bind(&SoundEngineChannel::set_end_velocity, &channel, std::placeholders::_1), handler);
+		end_velocity->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_end_velocity, &channel), std::bind(&SoundEngineChannel::set_end_velocity, &channel, std::placeholders::_1), cube.lock);
 		controls.push_back(end_velocity);
 	}
 
@@ -290,7 +289,7 @@ Scene SoundEngineChannelView::create(Frame &frame) {
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->set_on_click([&frame]() {
-		frame.change_view(new SoundEngineView());
+		frame.change_view(new SoundEngineView(cube));
 	});
 	controls.push_back(back);
 

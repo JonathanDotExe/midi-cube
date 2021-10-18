@@ -14,12 +14,13 @@
 
 class SoundEngineChannelView: public ViewController {
 private:
+	MidiCube& cube;
 	SoundEngineChannel& channel;
 	int channel_index;
 	BindingGUIHandler binder;
 
 public:
-	SoundEngineChannelView(SoundEngineChannel& channel, int channel_index);
+	SoundEngineChannelView(MidiCube& c, SoundEngineChannel& channel, int channel_index);
 	virtual Scene create(Frame &frame);
 	virtual ~SoundEngineChannelView();
 	virtual bool on_action(Control *control);
