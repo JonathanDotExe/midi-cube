@@ -23,9 +23,9 @@
 #include "../view/resources.h"
 #include "../view/SoundEngineView.h"
 
-EffectView::EffectView(Effect *e, std::function<ViewController* ()> b) :
-		effect(e), back(b), binder{[e, b]() {
-			return new EffectView(e, b);
+EffectView::EffectView(PluginInstance* e) :
+		effect(e), binder{[e]() {
+			return new EffectView(e);
 		}} {
 
 }
@@ -34,11 +34,10 @@ EffectView::~EffectView() {
 
 }
 
-Scene EffectView::create(Frame &frame) {
-	frame.cube.lock.lock();
+Scene EffectView::create(ViewHost &frame) {
+	SpinLock& lock = effect->get_host().get_lock();
+	lock.lock();
 	std::vector<Control*> controls;
-
-	ActionHandler &handler = frame.cube.action_handler;
 
 	//Background
 	Pane *bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(),
@@ -72,7 +71,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *amplifier = new OrganSwitch(false, main_font, tmp_x,
 					tmp_y, 180, 120);
-			amplifier->property.bind(amp->preset.on, handler);
+			amplifier->property.bind(amp->preset.on, lock);
 			controls.push_back(amplifier);
 
 			tmp_y -= 25;
@@ -88,7 +87,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *boost = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			boost->property.bind(amp->preset.post_gain, handler);
+			boost->property.bind(amp->preset.post_gain, lock);
 			controls.push_back(boost);
 
 			tmp_y -= 25;
@@ -105,7 +104,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *overdrive = new DragBox<double>(0, 0, 1, main_font,
 					24, tmp_x, tmp_y, 180, 120);
-			overdrive->property.bind(amp->preset.drive, handler);
+			overdrive->property.bind(amp->preset.drive, lock);
 			controls.push_back(overdrive);
 
 			tmp_y -= 25;
@@ -123,7 +122,7 @@ Scene EffectView::create(Frame &frame) {
 			ComboBox *distortion_type = new ComboBox(0, { "Digital",
 					"Polynomal", "Arctan", "Cubic", "Fuzz" }, main_font, 24, 0, tmp_x, tmp_y,
 					180, 120);
-			distortion_type->property.bind_cast(amp->preset.type, handler);
+			distortion_type->property.bind_cast(amp->preset.type, lock);
 			controls.push_back(distortion_type);
 
 			tmp_y -= 25;
@@ -139,7 +138,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *amp_tone = new DragBox<double>(0, 0, 1, main_font,
 					24, tmp_x, tmp_y, 180, 120);
-			amp_tone->property.bind(amp->preset.tone, handler);
+			amp_tone->property.bind(amp->preset.tone, lock);
 			controls.push_back(amp_tone);
 
 			tmp_y -= 25;
@@ -162,7 +161,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
 					80, 60, "Rotate", "Stop");
-			on->property.bind(rotary->preset.on, handler);
+			on->property.bind(rotary->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -177,7 +176,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *rotary_speed = new OrganSwitch(false, main_font, tmp_x,
 					tmp_y, 80, 60, "Fast", "Slow");
-			rotary_speed->property.bind(rotary->preset.fast, handler);
+			rotary_speed->property.bind(rotary->preset.fast, lock);
 			controls.push_back(rotary_speed);
 
 			tmp_y -= 25;
@@ -193,7 +192,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rotary_stereo = new DragBox<double>(0, 0, 1,
 					main_font, 16, tmp_x, tmp_y, 80, 60);
-			rotary_stereo->property.bind(rotary->preset.stereo_mix, handler);
+			rotary_stereo->property.bind(rotary->preset.stereo_mix, lock);
 			controls.push_back(rotary_stereo);
 
 			tmp_y -= 25;
@@ -209,7 +208,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *rotary_type = new OrganSwitch(false, main_font, tmp_x,
 					tmp_y, 80, 60, "1", "2");
-			rotary_type->property.bind(rotary->preset.type, handler);
+			rotary_type->property.bind(rotary->preset.type, lock);
 			controls.push_back(rotary_type);
 
 			tmp_y -= 25;
@@ -225,7 +224,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rotary_stereo = new DragBox<double>(0, 0, 0.002,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			rotary_stereo->property.bind(rotary->preset.max_delay, handler);
+			rotary_stereo->property.bind(rotary->preset.max_delay, lock);
 			rotary_stereo->drag_step = 2;
 			controls.push_back(rotary_stereo);
 
@@ -241,7 +240,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rotary_stereo = new DragBox<double>(0, 0, 1,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			rotary_stereo->property.bind(rotary->preset.min_amplitude, handler);
+			rotary_stereo->property.bind(rotary->preset.min_amplitude, lock);
 			controls.push_back(rotary_stereo);
 
 			tmp_y -= 25;
@@ -256,7 +255,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rotary_stereo = new DragBox<double>(0, 0, 1,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			rotary_stereo->property.bind(rotary->preset.mix, handler);
+			rotary_stereo->property.bind(rotary->preset.mix, lock);
 			controls.push_back(rotary_stereo);
 
 			tmp_y -= 25;
@@ -274,7 +273,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 10,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			value->property.bind(rotary->preset.horn_slow_frequency, handler);
+			value->property.bind(rotary->preset.horn_slow_frequency, lock);
 			value->drag_step = 2;
 			controls.push_back(value);
 
@@ -290,7 +289,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 10,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			value->property.bind(rotary->preset.horn_fast_frequency, handler);
+			value->property.bind(rotary->preset.horn_fast_frequency, lock);
 			value->drag_step = 2;
 			controls.push_back(value);
 
@@ -306,7 +305,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 10,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			value->property.bind(rotary->preset.bass_slow_frequency, handler);
+			value->property.bind(rotary->preset.bass_slow_frequency, lock);
 			value->drag_step = 2;
 			controls.push_back(value);
 
@@ -322,7 +321,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 10,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			value->property.bind(rotary->preset.bass_fast_frequency, handler);
+			value->property.bind(rotary->preset.bass_fast_frequency, lock);
 			value->drag_step = 2;
 			controls.push_back(value);
 
@@ -341,7 +340,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 10,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			value->property.bind(rotary->preset.horn_slow_ramp, handler);
+			value->property.bind(rotary->preset.horn_slow_ramp, lock);
 			value->drag_step = 2;
 			controls.push_back(value);
 
@@ -357,7 +356,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 10,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			value->property.bind(rotary->preset.horn_fast_ramp, handler);
+			value->property.bind(rotary->preset.horn_fast_ramp, lock);
 			value->drag_step = 2;
 			controls.push_back(value);
 
@@ -373,7 +372,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 10,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			value->property.bind(rotary->preset.bass_slow_ramp, handler);
+			value->property.bind(rotary->preset.bass_slow_ramp, lock);
 			value->drag_step = 2;
 			controls.push_back(value);
 
@@ -389,7 +388,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 10,
 				main_font, 16, tmp_x, tmp_y, 80, 60);
-			value->property.bind(rotary->preset.bass_fast_ramp, handler);
+			value->property.bind(rotary->preset.bass_fast_ramp, lock);
 			value->drag_step = 2;
 			controls.push_back(value);
 
@@ -413,7 +412,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
 					tmp_y, 180, 120);
-			on->property.bind(reverb->preset.on, handler);
+			on->property.bind(reverb->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -428,7 +427,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *delay = new DragBox<double>(0, 0, 2, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			delay->property.bind(reverb->preset.delay, handler);
+			delay->property.bind(reverb->preset.delay, lock);
 			controls.push_back(delay);
 
 			tmp_y -= 25;
@@ -443,7 +442,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *decay = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			decay->property.bind(reverb->preset.decay, handler);
+			decay->property.bind(reverb->preset.decay, lock);
 			controls.push_back(decay);
 
 			tmp_y -= 25;
@@ -459,7 +458,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *mix = new DragBox<double>(0, 0, 1, main_font,
 				24, tmp_x, tmp_y, 180, 120);
-			mix->property.bind(reverb->preset.mix, handler);
+			mix->property.bind(reverb->preset.mix, lock);
 			controls.push_back(mix);
 
 			tmp_y -= 25;
@@ -477,7 +476,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *tone = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			tone->property.bind(reverb->preset.tone, handler);
+			tone->property.bind(reverb->preset.tone, lock);
 			controls.push_back(tone);
 
 			tmp_y -= 25;
@@ -492,7 +491,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *resonance = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			resonance->property.bind(reverb->preset.resonance, handler);
+			resonance->property.bind(reverb->preset.resonance, lock);
 			controls.push_back(resonance);
 
 			tmp_y -= 25;
@@ -507,7 +506,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *stereo = new DragBox<double>(0, -1, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			stereo->property.bind(reverb->preset.stereo, handler);
+			stereo->property.bind(reverb->preset.stereo, lock);
 			controls.push_back(stereo);
 
 			tmp_y -= 25;
@@ -531,7 +530,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
 					tmp_y, 180, 120);
-			on->property.bind(chorus->preset.on, handler);
+			on->property.bind(chorus->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -546,7 +545,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rate = new DragBox<double>(0, 0, 8, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			rate->property.bind(chorus->preset.vibrato_rate, handler);
+			rate->property.bind(chorus->preset.vibrato_rate, lock);
 			controls.push_back(rate);
 
 			tmp_y -= 25;
@@ -562,7 +561,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *depth = new DragBox<double>(0, 0, 1, main_font,
 					24, tmp_x, tmp_y, 180, 120);
-			depth->property.bind(chorus->preset.vibrato_depth, handler);
+			depth->property.bind(chorus->preset.vibrato_depth, lock);
 			controls.push_back(depth);
 
 			tmp_y -= 25;
@@ -578,7 +577,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *mix = new DragBox<double>(0, 0, 1, main_font,
 				24, tmp_x, tmp_y, 180, 120);
-			mix->property.bind(chorus->preset.mix, handler);
+			mix->property.bind(chorus->preset.mix, lock);
 			controls.push_back(mix);
 
 			tmp_y -= 25;
@@ -596,7 +595,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0.0, 0.03, main_font,
 				24, tmp_x, tmp_y, 180, 120);
-			value->property.bind(chorus->preset.delay, handler);
+			value->property.bind(chorus->preset.delay, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -612,7 +611,7 @@ Scene EffectView::create(Frame &frame) {
 			std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle"};
 
 			ComboBox* waveform = new ComboBox(4, waveforms, main_font, 24, 0, tmp_x , tmp_y, 180, 120);
-			waveform->property.bind_cast(chorus->preset.vibrato_waveform, handler);
+			waveform->property.bind_cast(chorus->preset.vibrato_waveform, lock);
 			controls.push_back(waveform);
 
 			tmp_y -= 25;
@@ -637,7 +636,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
 					tmp_y, 180, 120);
-			on->property.bind(bitcrusher->preset.on, handler);
+			on->property.bind(bitcrusher->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -653,7 +652,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<int> *rate = new DragBox<int>(16, 1, 32, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			rate->property.bind(bitcrusher->preset.bits, handler);
+			rate->property.bind(bitcrusher->preset.bits, lock);
 			controls.push_back(rate);
 
 			tmp_y -= 25;
@@ -678,7 +677,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
 					tmp_y, 180, 120);
-			on->property.bind(vocoder->preset.on, handler);
+			on->property.bind(vocoder->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -694,7 +693,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			rate->property.bind(vocoder->preset.modulator_mix, handler);
+			rate->property.bind(vocoder->preset.modulator_mix, lock);
 			controls.push_back(rate);
 
 			tmp_y -= 25;
@@ -709,7 +708,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			rate->property.bind(vocoder->preset.mix, handler);
+			rate->property.bind(vocoder->preset.mix, lock);
 			controls.push_back(rate);
 
 			tmp_y -= 25;
@@ -725,7 +724,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 21000, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.mod_highpass, handler);
+			value->property.bind(vocoder->preset.mod_highpass, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -743,7 +742,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.gate, handler);
+			value->property.bind(vocoder->preset.gate, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -758,7 +757,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 10, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.modulator_amplification, handler);
+			value->property.bind(vocoder->preset.modulator_amplification, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -774,7 +773,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 10, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.post_amplification, handler);
+			value->property.bind(vocoder->preset.post_amplification, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -790,7 +789,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 0.2, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.slope, handler);
+			value->property.bind(vocoder->preset.slope, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -806,7 +805,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.normalization, handler);
+			value->property.bind(vocoder->preset.normalization, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -825,7 +824,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *formant = new OrganSwitch(true, main_font, tmp_x,
 				tmp_y, 180, 120);
-			formant->property.bind(vocoder->preset.formant_mode, handler);
+			formant->property.bind(vocoder->preset.formant_mode, lock);
 			controls.push_back(formant);
 
 			tmp_y -= 25;
@@ -841,7 +840,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 21000, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.min_freq, handler);
+			value->property.bind(vocoder->preset.min_freq, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -857,7 +856,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 21000, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.max_freq, handler);
+			value->property.bind(vocoder->preset.max_freq, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -873,7 +872,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(vocoder->preset.resonance, handler);
+			value->property.bind(vocoder->preset.resonance, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -896,7 +895,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
 				tmp_y, 180, 120);
-			on->property.bind(tremolo->preset.on, handler);
+			on->property.bind(tremolo->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -911,7 +910,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rate = new DragBox<double>(0, 0, 8, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			rate->property.bind(tremolo->preset.rate, handler);
+			rate->property.bind(tremolo->preset.rate, lock);
 			controls.push_back(rate);
 
 			tmp_y -= 25;
@@ -927,7 +926,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *depth = new DragBox<double>(0, 0, 1, main_font,
 				24, tmp_x, tmp_y, 180, 120);
-			depth->property.bind(tremolo->preset.depth, handler);
+			depth->property.bind(tremolo->preset.depth, lock);
 			controls.push_back(depth);
 
 			tmp_y -= 25;
@@ -944,7 +943,7 @@ Scene EffectView::create(Frame &frame) {
 			std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle"};
 
 			ComboBox* waveform = new ComboBox(4, waveforms, main_font, 24, 0, tmp_x , tmp_y, 180, 120);
-			waveform->property.bind_cast(tremolo->preset.waveform, handler);
+			waveform->property.bind_cast(tremolo->preset.waveform, lock);
 			controls.push_back(waveform);
 
 			tmp_y -= 25;
@@ -971,7 +970,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
 				tmp_y, 180, 120);
-			on->property.bind(delay->preset.on, handler);
+			on->property.bind(delay->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -986,7 +985,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(delay->preset.left_delay, handler);
+			value->property.bind(delay->preset.left_delay, lock);
 			value->drag_step = 4;
 			controls.push_back(value);
 
@@ -1002,7 +1001,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			value->property.bind(delay->preset.left_init_delay_offset, handler);
+			value->property.bind(delay->preset.left_init_delay_offset, lock);
 			value->drag_step = 4;
 			controls.push_back(value);
 
@@ -1018,7 +1017,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(delay->preset.left_feedback, handler);
+			value->property.bind(delay->preset.left_feedback, lock);
 			value->drag_step = 4;
 			controls.push_back(value);
 
@@ -1034,7 +1033,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(delay->preset.mix, handler);
+			value->property.bind(delay->preset.mix, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1056,7 +1055,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *stereo = new OrganSwitch(false, main_font, tmp_x,
 				tmp_y, 180, 120);
-			stereo->property.bind(delay->preset.stereo, handler);
+			stereo->property.bind(delay->preset.stereo, lock);
 			controls.push_back(stereo);
 
 			tmp_y -= 25;
@@ -1071,7 +1070,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(delay->preset.right_delay, handler);
+			value->property.bind(delay->preset.right_delay, lock);
 			value->drag_step = 4;
 			controls.push_back(value);
 
@@ -1087,7 +1086,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			value->property.bind(delay->preset.right_init_delay_offset, handler);
+			value->property.bind(delay->preset.right_init_delay_offset, lock);
 			value->drag_step = 4;
 			controls.push_back(value);
 
@@ -1103,7 +1102,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(delay->preset.right_feedback, handler);
+			value->property.bind(delay->preset.right_feedback, lock);
 			value->drag_step = 4;
 			controls.push_back(value);
 
@@ -1128,7 +1127,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
 					180, 120);
-			on->property.bind(flanger->preset.on, handler);
+			on->property.bind(flanger->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -1144,7 +1143,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rate = new DragBox<double>(0, 0, 8, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			rate->property.bind(flanger->preset.vibrato_rate, handler);
+			rate->property.bind(flanger->preset.vibrato_rate, lock);
 			controls.push_back(rate);
 
 			tmp_y -= 25;
@@ -1160,7 +1159,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *depth = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			depth->property.bind(flanger->preset.vibrato_depth, handler);
+			depth->property.bind(flanger->preset.vibrato_depth, lock);
 			controls.push_back(depth);
 
 			tmp_y -= 25;
@@ -1175,7 +1174,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *mix = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			mix->property.bind(flanger->preset.mix, handler);
+			mix->property.bind(flanger->preset.mix, lock);
 			controls.push_back(mix);
 
 			tmp_y -= 25;
@@ -1192,7 +1191,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0.0, 0.02,
 					main_font, 24, tmp_x, tmp_y, 180, 120);
-			value->property.bind(flanger->preset.delay, handler);
+			value->property.bind(flanger->preset.delay, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1209,7 +1208,7 @@ Scene EffectView::create(Frame &frame) {
 
 			ComboBox *waveform = new ComboBox(4, waveforms, main_font, 24, 0,
 					tmp_x, tmp_y, 180, 120);
-			waveform->property.bind_cast(flanger->preset.vibrato_waveform, handler);
+			waveform->property.bind_cast(flanger->preset.vibrato_waveform, lock);
 			controls.push_back(waveform);
 
 			tmp_y -= 25;
@@ -1223,7 +1222,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0.0, 1,
 					main_font, 24, tmp_x, tmp_y, 180, 120);
-			value->property.bind(flanger->preset.feedback, handler);
+			value->property.bind(flanger->preset.feedback, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1246,7 +1245,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
 					tmp_y, 180, 120);
-			on->property.bind(phaser->preset.on, handler);
+			on->property.bind(phaser->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -1261,7 +1260,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rate = new DragBox<double>(0, 0, 8, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			rate->property.bind(phaser->preset.lfo_rate, handler);
+			rate->property.bind(phaser->preset.lfo_rate, lock);
 			controls.push_back(rate);
 
 			tmp_y -= 25;
@@ -1277,7 +1276,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *depth = new DragBox<double>(0, 0, 1, main_font,
 					24, tmp_x, tmp_y, 180, 120);
-			depth->property.bind(phaser->preset.lfo_depth, handler);
+			depth->property.bind(phaser->preset.lfo_depth, lock);
 			controls.push_back(depth);
 
 			tmp_y -= 25;
@@ -1293,7 +1292,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *mix = new DragBox<double>(0, 0, 1, main_font,
 				24, tmp_x, tmp_y, 180, 120);
-			mix->property.bind(phaser->preset.mix, handler);
+			mix->property.bind(phaser->preset.mix, lock);
 			controls.push_back(mix);
 
 			tmp_y -= 25;
@@ -1311,7 +1310,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0.0, 1, main_font,
 				24, tmp_x, tmp_y, 180, 120);
-			value->property.bind(phaser->preset.center_cutoff, handler);
+			value->property.bind(phaser->preset.center_cutoff, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1327,7 +1326,7 @@ Scene EffectView::create(Frame &frame) {
 			std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle"};
 
 			ComboBox* waveform = new ComboBox(4, waveforms, main_font, 24, 0, tmp_x , tmp_y, 180, 120);
-			waveform->property.bind_cast(phaser->preset.vibrato_waveform, handler);
+			waveform->property.bind_cast(phaser->preset.vibrato_waveform, lock);
 			controls.push_back(waveform);
 
 			tmp_y -= 25;
@@ -1350,7 +1349,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x,
 					tmp_y, 180, 120);
-			on->property.bind(wahwah->preset.on, handler);
+			on->property.bind(wahwah->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -1365,7 +1364,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
 					180, 120);
-			on->property.bind(wahwah->preset.auto_wah, handler);
+			on->property.bind(wahwah->preset.auto_wah, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -1380,7 +1379,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *rate = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			rate->property.bind(wahwah->preset.cutoff, handler);
+			rate->property.bind(wahwah->preset.cutoff, lock);
 			controls.push_back(rate);
 
 			tmp_y -= 25;
@@ -1396,7 +1395,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *depth = new DragBox<double>(0, 0, 1, main_font,
 					24, tmp_x, tmp_y, 180, 120);
-			depth->property.bind(wahwah->preset.resonance, handler);
+			depth->property.bind(wahwah->preset.resonance, lock);
 			controls.push_back(depth);
 
 			tmp_y -= 25;
@@ -1412,7 +1411,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *mix = new DragBox<double>(0, 0, 1, main_font,
 				24, tmp_x, tmp_y, 180, 120);
-			mix->property.bind(wahwah->preset.mix, handler);
+			mix->property.bind(wahwah->preset.mix, lock);
 			controls.push_back(mix);
 
 			tmp_y -= 25;
@@ -1430,7 +1429,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0.0, 10, main_font,
 				24, tmp_x, tmp_y, 180, 120);
-			value->property.bind(wahwah->preset.amount, handler);
+			value->property.bind(wahwah->preset.amount, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1445,7 +1444,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0.0, 1, main_font,
 				24, tmp_x, tmp_y, 180, 120);
-			value->property.bind(wahwah->pedal, handler);
+			value->property.bind(wahwah->pedal, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1470,7 +1469,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
 					180, 120);
-			on->property.bind(equalizer->preset.on, handler);
+			on->property.bind(equalizer->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -1497,7 +1496,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->border = 0;
-			value->property.bind(equalizer->preset.low_gain, handler);
+			value->property.bind(equalizer->preset.low_gain, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1514,7 +1513,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->border = 0;
-			value->property.bind(equalizer->preset.low_mid_gain, handler);
+			value->property.bind(equalizer->preset.low_mid_gain, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1531,7 +1530,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->border = 0;
-			value->property.bind(equalizer->preset.mid_gain, handler);
+			value->property.bind(equalizer->preset.mid_gain, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1548,7 +1547,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->border = 0;
-			value->property.bind(equalizer->preset.high_gain, handler);
+			value->property.bind(equalizer->preset.high_gain, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1567,7 +1566,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 20, 400, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			value->property.bind(equalizer->preset.low_freq, handler);
+			value->property.bind(equalizer->preset.low_freq, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1583,7 +1582,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 100, 1000, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			value->property.bind(equalizer->preset.low_mid_freq, handler);
+			value->property.bind(equalizer->preset.low_mid_freq, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1599,7 +1598,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 200, 8000, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			value->property.bind(equalizer->preset.mid_freq, handler);
+			value->property.bind(equalizer->preset.mid_freq, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1615,7 +1614,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 1000, 20000, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			value->property.bind(equalizer->preset.high_freq, handler);
+			value->property.bind(equalizer->preset.high_freq, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1640,7 +1639,7 @@ Scene EffectView::create(Frame &frame) {
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
 					180, 120);
-			on->property.bind(compressor->preset.on, handler);
+			on->property.bind(compressor->preset.on, lock);
 			controls.push_back(on);
 
 			tmp_y -= 25;
@@ -1656,7 +1655,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, -50, 0, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			value->property.bind(compressor->preset.threshold, handler);
+			value->property.bind(compressor->preset.threshold, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1672,7 +1671,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(1, 1, 15, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
-			value->property.bind(compressor->preset.ratio, handler);
+			value->property.bind(compressor->preset.ratio, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1690,7 +1689,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			value->property.bind(compressor->preset.attack, handler);
+			value->property.bind(compressor->preset.attack, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1706,7 +1705,7 @@ Scene EffectView::create(Frame &frame) {
 
 			DragBox<double> *value = new DragBox<double>(0, 0, 1, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
-			value->property.bind(compressor->preset.release, handler);
+			value->property.bind(compressor->preset.release, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1722,7 +1721,7 @@ Scene EffectView::create(Frame &frame) {
 			DragBox<double> *value = new DragBox<double>(0, 0, 5, main_font, 24,
 				tmp_x, tmp_y, 180, 120);
 			value->border = 0;
-			value->property.bind(compressor->preset.makeup_gain, handler);
+			value->property.bind(compressor->preset.makeup_gain, lock);
 			controls.push_back(value);
 
 			tmp_y -= 25;
@@ -1732,17 +1731,9 @@ Scene EffectView::create(Frame &frame) {
 
 	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
 
-	//Exit Button
-	Button *exit = new Button("Back", main_font, 18, frame.get_width() - 70,
-			frame.get_height() - 40, 70, 40);
-	exit->set_on_click([&frame, this]() {
-		frame.change_view(this->back());
-	});
-	exit->rect.setFillColor(sf::Color::Yellow);
-	controls.push_back(exit);
 
 
-	frame.cube.lock.unlock();
+	lock.unlock();
 	return {controls};
 }
 

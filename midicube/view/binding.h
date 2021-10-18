@@ -18,7 +18,7 @@ class BindingGUIHandler {
 private:
 	Button* button = nullptr;
 	bool edit = false;
-	Frame* frame = nullptr;
+	ViewHost* frame = nullptr;
 	std::function<ViewController*()> view_factory;
 
 public:
@@ -87,7 +87,7 @@ public:
 		return true;
 	}
 
-	Button* create_button(int x, int y, Frame* frame) {
+	Button* create_button(int x, int y, ViewHost* frame) {
 		if (button) {
 			throw "Button can only be created once!";
 		}

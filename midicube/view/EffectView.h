@@ -10,20 +10,19 @@
 
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
-#include "../effect/effect.h"
+#include "../framework/core/plugin.h"
 #include "../soundengine/soundengine.h"
 #include "../view/binding.h"
 
 class EffectView : public ViewController {
 private:
-	Effect* effect = nullptr;
-	std::function<ViewController* ()> back;
+	PluginInstance* effect = nullptr;
 	BindingGUIHandler binder;
 	bool edit_midi = false;
 
 public:
-	EffectView(Effect* effect, std::function<ViewController* ()> b);
-	virtual Scene create(Frame &frame);
+	EffectView(PluginInstance* effect);
+	virtual Scene create(ViewHost &frame);
 
 	virtual ~EffectView();
 	virtual bool on_action(Control *control);

@@ -62,7 +62,6 @@ src = [
 	'midicube/view/EffectView.cpp',
 	'midicube/view/LooperView.cpp',
 	'midicube/view/MasterEffectView.cpp',
-	'midicube/view/MotionSequencerView.cpp',
 	'midicube/view/ProgramRenameView.cpp',
 	'midicube/view/ProgramView.cpp',
 	'midicube/view/SamplerView.cpp',
