@@ -20,12 +20,13 @@
 
 class ProgramView : public ViewController {
 private:
+	MidiCube& cube;
 	size_t bank = 0;
 	size_t page = 0;
 public:
-	ProgramView(size_t bank = 0, size_t page = 0);
+	ProgramView(MidiCube& cube, size_t bank = 0, size_t page = 0);
 	virtual ~ProgramView();
-	virtual Scene create(Frame &frame);
+	virtual Scene create(ViewHost &frame);
 };
 
 #endif /* MIDICUBE_GUI_VIEW_PROGRAMVIEW_H_ */

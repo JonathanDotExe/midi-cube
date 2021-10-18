@@ -13,7 +13,7 @@
 SamplerView::SamplerView(Sampler &s) : sampler(s) {
 }
 
-Scene SamplerView::create(Frame &frame) {
+Scene SamplerView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 	SpinLock& lock = sampler.get_lock();
 	//Background

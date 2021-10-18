@@ -21,7 +21,7 @@ private:
 
 public:
 	SoundEngineChannelView(MidiCube& c, SoundEngineChannel& channel, int channel_index);
-	virtual Scene create(Frame &frame);
+	virtual Scene create(ViewHost &frame);
 	virtual ~SoundEngineChannelView();
 	virtual bool on_action(Control *control);
 };

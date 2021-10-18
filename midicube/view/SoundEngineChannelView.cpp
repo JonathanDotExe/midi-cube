@@ -23,7 +23,7 @@ SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& 
 	this->channel_index = channel_index;
 }
 
-Scene SoundEngineChannelView::create(Frame &frame) {
+Scene SoundEngineChannelView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
 	//Background

@@ -17,7 +17,7 @@ class SamplerView: public ViewController {
 	Sampler& sampler;
 public:
 	SamplerView(Sampler& s);
-	virtual Scene create(Frame &frame);
+	virtual Scene create(ViewHost &frame);
 	virtual ~SamplerView();
 };
 

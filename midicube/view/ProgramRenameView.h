@@ -20,9 +20,10 @@ private:
 	std::string name;
 	std::vector<char> chars;
 	std::function<void(std::string name)> action = nullptr;
+	MidiCube& cube;
 public:
-	ProgramRenameView(std::string name, std::function<void(std::string name)> action);
-	virtual Scene create(Frame &frame);
+	ProgramRenameView(MidiCube& cube, std::string name, std::function<void(std::string name)> action);
+	virtual Scene create(ViewHost &frame);
 	virtual ~ProgramRenameView();
 };
 

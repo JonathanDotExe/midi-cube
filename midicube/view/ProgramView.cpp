@@ -10,15 +10,16 @@
 #include "../view/ProgramRenameView.h"
 #include "../view/SoundEngineView.h"
 
-ProgramView::ProgramView(size_t bank, size_t page) {
+ProgramView::ProgramView(MidiCube& c, size_t bank, size_t page) : cube(c){
 	this->bank = bank;
 	this->page = page;
 }
 
-Scene ProgramView::create(Frame &frame) {
+//FIXME program locks
+Scene ProgramView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
-	ProgramManager* prog_mgr = &frame.cube.prog_mgr;
+	ProgramManager* prog_mgr = &cube.prog_mgr;
 
 	prog_mgr->lock();
 	{
@@ -67,21 +68,21 @@ Scene ProgramView::create(Frame &frame) {
 				prog_mgr->lock();
 				prog_mgr->apply_program(this->bank, start + i);
 				prog_mgr->unlock();
-				frame.change_view(new ProgramView(this->bank, page));
+				frame.change_view(new ProgramView(cube, this->bank, page));
 			});
 		}
 
 		//Previous bank
 		Button* previous_bank = new Button("<<", main_font, 18, 0, frame.get_height() - 40, 60, 40);
 		previous_bank->set_on_click([&frame, this]() {
-			frame.change_view(new ProgramView(std::max((ssize_t)this->bank - 1, (ssize_t) 0), 0));
+			frame.change_view(new ProgramView(cube, std::max((ssize_t)this->bank - 1, (ssize_t) 0), 0));
 		});
 		previous_bank->rect.setFillColor(sf::Color(200, 200, 200));
 		controls.push_back(previous_bank);
 		//Previous page
 		Button* previous_page = new Button("<", main_font, 18, 60, frame.get_height() - 40, 60, 40);
 		previous_page->set_on_click([&frame, this]() {
-			frame.change_view(new ProgramView(this->bank, std::max((ssize_t) page - 1, (ssize_t) 0)));
+			frame.change_view(new ProgramView(cube, this->bank, std::max((ssize_t) page - 1, (ssize_t) 0)));
 		});
 		controls.push_back(previous_page);
 
@@ -91,7 +92,7 @@ Scene ProgramView::create(Frame &frame) {
 			prog_mgr->lock();
 			std::string name = prog_mgr->program_name;
 			prog_mgr->unlock();
-			frame.change_view(new ProgramRenameView(name, [prog_mgr](std::string name) {
+			frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
 				prog_mgr->lock();
 				prog_mgr->program_name = name;
 				prog_mgr->overwrite_program();
@@ -106,7 +107,7 @@ Scene ProgramView::create(Frame &frame) {
 			prog_mgr->lock();
 			std::string name = prog_mgr->program_name;
 			prog_mgr->unlock();
-			frame.change_view(new ProgramRenameView(name, [prog_mgr](std::string name) {
+			frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
 				prog_mgr->lock();
 				prog_mgr->program_name = name;
 				prog_mgr->save_new_program();
@@ -121,7 +122,7 @@ Scene ProgramView::create(Frame &frame) {
 			prog_mgr->lock();
 			std::string name = prog_mgr->program_name;
 			prog_mgr->unlock();
-			frame.change_view(new ProgramRenameView(name, [prog_mgr](std::string name) {
+			frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
 				prog_mgr->lock();
 				prog_mgr->program_name = name;
 				prog_mgr->save_init_program();
@@ -136,7 +137,7 @@ Scene ProgramView::create(Frame &frame) {
 			prog_mgr->lock();
 			prog_mgr->delete_program();
 			prog_mgr->unlock();
-			frame.change_view(new ProgramView(this->bank, page));
+			frame.change_view(new ProgramView(cube, this->bank, page));
 		});
 		controls.push_back(del);
 
@@ -146,7 +147,7 @@ Scene ProgramView::create(Frame &frame) {
 			prog_mgr->lock();
 			std::string name = prog_mgr->bank_name;
 			prog_mgr->unlock();
-			frame.change_view(new ProgramRenameView(name, [prog_mgr](std::string name) {
+			frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
 				prog_mgr->lock();
 				prog_mgr->bank_name = name;
 				prog_mgr->overwrite_bank();
@@ -161,7 +162,7 @@ Scene ProgramView::create(Frame &frame) {
 			prog_mgr->lock();
 			std::string name = prog_mgr->bank_name;
 			prog_mgr->unlock();
-			frame.change_view(new ProgramRenameView(name, [prog_mgr](std::string name) {
+			frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
 				prog_mgr->lock();
 				prog_mgr->bank_name = name;
 				prog_mgr->save_new_bank();
@@ -174,7 +175,7 @@ Scene ProgramView::create(Frame &frame) {
 		Button* next_page = new Button(">", main_font, 18, frame.get_width() - 70 - 60 * 2, frame.get_height() - 40, 60, 40);
 		if (start + size < bank->programs.size()) {
 			next_page->set_on_click([&frame, this]() {
-				frame.change_view(new ProgramView(this->bank, page + 1));
+				frame.change_view(new ProgramView(cube, this->bank, page + 1));
 			});
 		}
 		controls.push_back(next_page);
@@ -182,7 +183,7 @@ Scene ProgramView::create(Frame &frame) {
 		//Next bank
 		Button* next_bank = new Button(">>", main_font, 18, frame.get_width() - 70 - 60, frame.get_height() - 40, 60, 40);
 		next_bank->set_on_click([&frame, this]() {
-			frame.change_view(new ProgramView(this->bank + 1, 0));
+			frame.change_view(new ProgramView(cube, this->bank + 1, 0));
 		});
 		next_bank->rect.setFillColor(sf::Color(200, 200, 200));
 		controls.push_back(next_bank);
@@ -190,7 +191,7 @@ Scene ProgramView::create(Frame &frame) {
 		//Back Button
 		Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 		back->set_on_click([&frame]() {
-			frame.change_view(new SoundEngineView());
+			frame.change_view(new SoundEngineView(cube));
 		});
 		back->rect.setFillColor(sf::Color::Yellow);
 		controls.push_back(back);
