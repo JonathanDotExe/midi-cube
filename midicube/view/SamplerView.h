@@ -15,10 +15,8 @@
 class SamplerView: public ViewController {
 	private:
 	Sampler& sampler;
-	SoundEngineChannel& channel;
-	int channel_index;
 public:
-	SamplerView(Sampler& s, SoundEngineChannel& c, int channel_index);
+	SamplerView(Sampler& s);
 	virtual Scene create(Frame &frame);
 	virtual ~SamplerView();
 };

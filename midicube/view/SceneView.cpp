@@ -47,7 +47,7 @@ Scene SceneView::create(Frame &frame) {
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	exit->set_on_click([&frame]() {
-		frame.change_view(new SoundEngineView(engine->get_cube()));
+		frame.change_view(new SoundEngineView(*engine->get_cube()));
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);
@@ -62,14 +62,15 @@ SceneView::~SceneView() {
 }
 
 void SceneView::update_properties() {
-	handler->queue_action(new GetValueAction<size_t, size_t>(this->engine->scene, [this](size_t s) {
-		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
-			if (s == i) {
-				scenes[i]->rect.setFillColor(sf::Color(0, 180, 255));
-			}
-			else {
-				scenes[i]->rect.setFillColor(sf::Color(200, 200, 200));
-			}
+	engine->get_cube()->lock.lock();
+	size_t s = engine->scene;
+	engine->get_cube()->lock.unlock();
+	for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
+		if (s == i) {
+			scenes[i]->rect.setFillColor(sf::Color(0, 180, 255));
 		}
-	}));
+		else {
+			scenes[i]->rect.setFillColor(sf::Color(200, 200, 200));
+		}
+	}
 }
