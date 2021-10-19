@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_GUI_VIEW_LOOPERVIEW_H_
 #define MIDICUBE_GUI_VIEW_LOOPERVIEW_H_
 
+#include "../effect/looper.h"
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
 
@@ -17,15 +18,14 @@ private:
 	std::array<Button*, LOOPER_CHANNELS> solos;
 	ssize_t record_index = -1;
 	ssize_t solo_index = -1;
-	ActionHandler* handler = nullptr;
-	SoundEngineDevice* engine = nullptr;
+	Looper& looper;
 	void update_record();
 	void update_solo();
 public:
-	LooperView();
+	LooperView(Looper& looper);
 	virtual void update_properties();
 	virtual ~LooperView();
-	virtual Scene create(Frame &frame);
+	virtual Scene create(ViewHost &frame);
 };
 
 #endif /* MIDICUBE_GUI_VIEW_LOOPERVIEW_H_ */
