@@ -16,15 +16,13 @@
 class AnalogSynthOperatorView : public ViewController {
 private:
 	AdvancedSynth& synth;
-	SoundEngineChannel& channel;
-	int channel_index;
 	size_t part;
 	bool edit_source = false;
 	BindingGUIHandler binder;
 public:
-	AnalogSynthOperatorView(AdvancedSynth& s, SoundEngineChannel& c, int channel_index, size_t part);
+	AnalogSynthOperatorView(AdvancedSynth& s, size_t part);
 	virtual ~AnalogSynthOperatorView();
-	virtual Scene create(Frame &frame);
+	virtual Scene create(ViewHost &frame);
 	virtual bool on_action(Control *control);
 };
 
