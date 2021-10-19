@@ -16,7 +16,7 @@
 #include "../view/SamplerView.h"
 #include "../view/SoundEngineView.h"
 
-SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{[&ch, channel_index]() {
+SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{c.lock, [&ch, channel_index]() {
 	return new SoundEngineChannelView(c, ch, channel_index);
 }} {
 

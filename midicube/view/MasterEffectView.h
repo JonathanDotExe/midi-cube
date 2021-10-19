@@ -11,12 +11,15 @@
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
 #include "../view/resources.h"
+#include "../midicube.h"
 
 class MasterEffectView : public ViewController {
+private:
+	MidiCube& cube;
 public:
-	MasterEffectView();
+	MasterEffectView(MidiCube& cube);
 	virtual ~MasterEffectView();
-	virtual Scene create(Frame &frame);
+	virtual Scene create(ViewHost &frame);
 };
 
 #endif /* MIDICUBE_GUI_VIEW_MASTEREFFECTVIEW_H_ */

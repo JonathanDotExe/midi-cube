@@ -10,25 +10,23 @@
 #include "../view/EffectView.h"
 #include "../view/SoundEngineView.h"
 
-MasterEffectView::MasterEffectView() {
-	// TODO Auto-generated constructor stub
+MasterEffectView::MasterEffectView(MidiCube& c): cube(c) {
+
 
 }
 
 MasterEffectView::~MasterEffectView() {
-	// TODO Auto-generated destructor stub
+
 }
 
-Scene MasterEffectView::create(Frame &frame) {
+Scene MasterEffectView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
-
-	ActionHandler& handler = frame.cube.action_handler;
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
 
-	SoundEngineDevice& sound_engine = frame.cube.engine;
+	SoundEngineDevice& sound_engine = cube.engine;
 
 	//Channels
 	int rows = 2;
@@ -56,13 +54,13 @@ Scene MasterEffectView::create(Frame &frame) {
 		controls.push_back(e);*/
 		//Edit
 		Button* edit_effect = new Button("Edit", main_font, 12, x + 5, y + 65, pane_width - 15, 30);
-		edit_effect->set_on_click([this, &frame, i, &effect]() {
-			frame.cube.lock.lock();
-			Plugin* eff = effect.effect.get_plugin();
+		edit_effect->set_on_click([this, i, &effect]() {
+			cube.lock.lock();
+			PluginInstance* eff = effect.effect.get_plugin();
 			if (eff) {
 				frame.change_view(eff->create_view());
 			}
-			frame.cube.lock.unlock();
+			cube.lock.unlock();
 		});
 		controls.push_back(edit_effect);
 
@@ -72,7 +70,7 @@ Scene MasterEffectView::create(Frame &frame) {
 			controls.push_back(octave_label);
 
 			DragBox<int>* master_send = new DragBox<int>(0, -1, SOUND_ENGINE_MASTER_EFFECT_AMOUNT - 1, main_font, 12, x + 5, y + 125, pane_width - 15, 30);
-			master_send->property.bind(effect.next_effect, handler);
+			master_send->property.bind(effect.next_effect, cube.lock);
 			controls.push_back(master_send);
 		}
 	}
@@ -80,7 +78,7 @@ Scene MasterEffectView::create(Frame &frame) {
 	//Back Button
 	Button* exit = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	exit->set_on_click([&frame, this]() {
-		frame.change_view(new SoundEngineView());
+		frame.change_view(new SoundEngineView(cube));
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);
