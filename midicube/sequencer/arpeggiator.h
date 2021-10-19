@@ -70,9 +70,8 @@ public:
 };
 
 class ArpeggiatorInstance : public PluginInstance {
-private:
-	Arpeggiator arp;
 public:
+	Arpeggiator arp;
 
 	ArpeggiatorInstance(PluginHost& h, Plugin& p);
 	void apply_program(PluginProgram *prog);

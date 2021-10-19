@@ -427,7 +427,7 @@ public:
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
 		int old_val = MAX * progress;
-		progress += (double)y_motion/height;
+		progress += (double)y_motion/get_height();
 
 		if (progress < 0) {
 			progress = 0;
@@ -441,7 +441,7 @@ public:
 			if (property.is_bound()) {
 				property.set(value);
 			}
-			update_position(this->x, this->y, width, height);
+			update_position(this->get_x(), this->get_y(), get_width(), get_height());
 		}
 	}
 
@@ -449,7 +449,7 @@ public:
 		if (property.is_bound()) {
 			property.get([this](int v) {
 				progress = (double) v / MAX;
-				update_position(x, y, width, height);
+				update_position(this->get_x(), this->get_y(), get_width(), get_height());
 			});
 		}
 	}

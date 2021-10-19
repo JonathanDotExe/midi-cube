@@ -10,15 +10,15 @@
 
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
+#include "../sequencer/arpeggiator.h"
 
 class ArpeggiatorView: public ViewController {
 private:
-	SoundEngineChannel& channel;
-	int channel_index;
+	ArpeggiatorInstance& arp;
 
 public:
-	ArpeggiatorView(SoundEngineChannel& channel, int channel_index);
-	virtual Scene create(Frame &frame);
+	ArpeggiatorView(ArpeggiatorInstance& arp);
+	virtual Scene create(ViewHost &frame);
 	virtual ~ArpeggiatorView();
 };
 
