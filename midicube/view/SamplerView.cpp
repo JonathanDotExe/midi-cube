@@ -28,7 +28,7 @@ Scene SamplerView::create(ViewHost &frame) {
 	//Sample Button
 	Button* engine = new Button(sample ? sample->name : "None", main_font, 24, 10, 30, 300, 80);
 	engine->rect.setFillColor(sf::Color(0, 180, 255));
-	engine->set_on_click([this, index, &lock]() {
+	engine->set_on_click([this, index, &lock, &frame]() {
 		size_t sample_amount = sampler.store.get_sounds().size();
 		if (index < (ssize_t) sample_amount - 1) {
 			lock.lock();

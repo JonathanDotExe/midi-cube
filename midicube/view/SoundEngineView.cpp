@@ -10,7 +10,6 @@
 #include <iostream>
 #include "../view/LooperView.h"
 #include "../view/MasterEffectView.h"
-#include "../view/MotionSequencerView.h"
 #include "../view/ProgramView.h"
 #include "../view/SceneView.h"
 #include "../view/SoundEngineChannelView.h"
@@ -90,40 +89,33 @@ Scene SoundEngineView::create(ViewHost& frame) {
 
 	//Effects
 	Button* effects = new Button("Effects", main_font, 18, 440, frame.get_height() - 45, 100, 40);
-	effects->set_on_click([&frame]() {
-		frame.change_view(new MasterEffectView());
+	effects->set_on_click([&frame, this]() {
+		frame.change_view(new MasterEffectView(cube));
 	});
 	controls.push_back(effects);
 
 	//Sources
 	Button* sources = new Button("Sources", main_font, 18, frame.get_width() - 475, frame.get_height() - 45, 100, 40);
-	sources->set_on_click([&frame]() {
-		frame.change_view(new SourceView());
+	sources->set_on_click([&frame, this]() {
+		frame.change_view(new SourceView(cube));
 	});
 	controls.push_back(sources);
 
-	//Looper
-	Button* looper = new Button("Looper", main_font, 18, frame.get_width() - 375, frame.get_height() - 45, 100, 40);
-	looper->set_on_click([&frame]() {
-		frame.change_view(new LooperView());
-	});
-	controls.push_back(looper);
-
 	//Scene
 	Button* scene = new Button("Scenes", main_font, 18, frame.get_width() - 275, frame.get_height() - 45, 100, 40);
-	scene->set_on_click([&frame]() {
-		frame.change_view(new SceneView());
+	scene->set_on_click([&frame, this]() {
+		frame.change_view(new SceneView(&cube.engine));
 	});
 	controls.push_back(scene);
 
 	//Program Button
 	Button* program = new Button("Programs", main_font, 18, frame.get_width() - 175, frame.get_height() - 45, 100, 40);
-	program->set_on_click([&frame]() {
+	program->set_on_click([&frame, this]() {
 		cube.prog_mgr.lock();
 		size_t bank = cube.prog_mgr.get_curr_bank_index();
 		size_t page = cube.prog_mgr.get_curr_program_index()/(PROGRAM_VIEW_ROWS * PROGRAM_VIEW_COLS);
 		cube.prog_mgr.unlock();
-		frame.change_view(new ProgramView(bank, page));
+		frame.change_view(new ProgramView(cube, bank, page));
 	});
 	controls.push_back(program);
 

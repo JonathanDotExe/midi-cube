@@ -88,7 +88,7 @@ Scene ProgramView::create(ViewHost &frame) {
 
 		//Save
 		Button* save = new Button("Save", main_font, 18, 125, frame.get_height() - 40, 100, 40);
-		save->set_on_click([&frame, prog_mgr]() {
+		save->set_on_click([&frame, prog_mgr, this]() {
 			prog_mgr->lock();
 			std::string name = prog_mgr->program_name;
 			prog_mgr->unlock();
@@ -103,7 +103,7 @@ Scene ProgramView::create(ViewHost &frame) {
 
 		//New
 		Button* new_prog = new Button("New", main_font, 18, 230, frame.get_height() - 40, 100, 40);
-		new_prog->set_on_click([&frame, prog_mgr]() {
+		new_prog->set_on_click([&frame, prog_mgr, this]() {
 			prog_mgr->lock();
 			std::string name = prog_mgr->program_name;
 			prog_mgr->unlock();
@@ -118,7 +118,7 @@ Scene ProgramView::create(ViewHost &frame) {
 
 		//New
 		Button* init_prog = new Button("New Init", main_font, 18, 335, frame.get_height() - 40, 100, 40);
-		init_prog->set_on_click([&frame, prog_mgr]() {
+		init_prog->set_on_click([&frame, prog_mgr, this]() {
 			prog_mgr->lock();
 			std::string name = prog_mgr->program_name;
 			prog_mgr->unlock();
@@ -143,7 +143,7 @@ Scene ProgramView::create(ViewHost &frame) {
 
 		//Rename Bank
 		Button* rename = new Button("Rename", main_font, 18, frame.get_width() - 70 - 60 * 2 - 210, frame.get_height() - 40, 100, 40);
-		rename->set_on_click([&frame, prog_mgr]() {
+		rename->set_on_click([&frame, prog_mgr, this]() {
 			prog_mgr->lock();
 			std::string name = prog_mgr->bank_name;
 			prog_mgr->unlock();
@@ -158,7 +158,7 @@ Scene ProgramView::create(ViewHost &frame) {
 
 		//New Bank
 		Button* new_bank = new Button("New Bank", main_font, 18, frame.get_width() - 70 - 60 * 2 - 105, frame.get_height() - 40, 100, 40);
-		new_bank->set_on_click([&frame, prog_mgr]() {
+		new_bank->set_on_click([&frame, prog_mgr, this]() {
 			prog_mgr->lock();
 			std::string name = prog_mgr->bank_name;
 			prog_mgr->unlock();
@@ -190,7 +190,7 @@ Scene ProgramView::create(ViewHost &frame) {
 
 		//Back Button
 		Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
-		back->set_on_click([&frame]() {
+		back->set_on_click([&frame, this]() {
 			frame.change_view(new SoundEngineView(cube));
 		});
 		back->rect.setFillColor(sf::Color::Yellow);

@@ -16,7 +16,7 @@
 #include "../view/SamplerView.h"
 #include "../view/SoundEngineView.h"
 
-SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{c.lock, [&ch, channel_index]() {
+SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{c.lock, [&c, &ch, channel_index]() {
 	return new SoundEngineChannelView(c, ch, channel_index);
 }} {
 
@@ -57,13 +57,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		cube.lock.unlock();
 	});
 	controls.push_back(edit_engine);
-
-	//Arpeggiator
-	Button* arpeggiator = new Button("Arpeggiator", main_font, 18, 10, 195, 300, 60);
-	arpeggiator->set_on_click([&frame, this]() {
-		frame.change_view(new ArpeggiatorView(channel, channel_index));
-	});
-	controls.push_back(arpeggiator);
+	//TODO sequencer edit button
 	int tmp_y = 260;
 	//Effects
 	for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
@@ -227,7 +221,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	{
 		tmp_y += 5;
 		CheckBox* cc = new CheckBox(true, "Aftertouch", main_font, 18, 790, tmp_y, 40, 40);
-		cc->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_channel_aftertouch, &channel), std::bind(&SoundEngineChannel::set_transfer_channel_aftertouch, &channel, std::placeholders::_1), handler);
+		cc->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_channel_aftertouch, &channel), std::bind(&SoundEngineChannel::set_transfer_channel_aftertouch, &channel, std::placeholders::_1), cube.lock);
 		tmp_y += 40;
 		controls.push_back(cc);
 	}
@@ -288,7 +282,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
-	back->set_on_click([&frame]() {
+	back->set_on_click([&frame, this]() {
 		frame.change_view(new SoundEngineView(cube));
 	});
 	controls.push_back(back);

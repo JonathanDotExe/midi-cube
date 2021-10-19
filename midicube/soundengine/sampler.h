@@ -241,7 +241,6 @@ class Sampler : public SoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 private:
 	SampleSound* sample;
 	SampleRegionIndex index;
-	SampleSoundStore& store;
 
 	void set_sample (SampleSound* sample);
 
@@ -250,6 +249,7 @@ private:
 	bool alternate = false;
 
 public:
+	SampleSoundStore& store;
 	std::array<double, MIDI_CONTROL_COUNT> cc;
 
 	void control_change(unsigned int control, unsigned int value);

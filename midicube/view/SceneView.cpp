@@ -46,7 +46,7 @@ Scene SceneView::create(Frame &frame) {
 
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
-	exit->set_on_click([&frame]() {
+	exit->set_on_click([&frame, this]() {
 		frame.change_view(new SoundEngineView(*engine->get_cube()));
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
