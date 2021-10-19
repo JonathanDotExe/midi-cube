@@ -11,20 +11,18 @@
 #include "../view/AnalogSynthView.h"
 #include "../view/resources.h"
 
-AnalogSynthModulatorView::AnalogSynthModulatorView(AdvancedSynth &s,
-		SoundEngineChannel &c, int channel_index, size_t part) : synth(s), channel(c), binder{[&s, &c, channel_index, part]() {
-			return new AnalogSynthModulatorView(s, c, channel_index, part);
+AnalogSynthModulatorView::AnalogSynthModulatorView(AdvancedSynth &s, size_t part) : synth(s), binder{s.get_lock(), [&s, part]() {
+			return new AnalogSynthModulatorView(s, part);
 		}} {
-	this->channel_index = channel_index;
 	this->part = part;
 }
 
-Scene AnalogSynthModulatorView::create(Frame &frame) {
+Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
 
-	ActionHandler& handler = frame.cube.action_handler;
+	SpinLock& lock = synth.get_lock();
 	ModEnvelopeEntity& env = synth.preset.mod_envs.at(this->part);
 	LFOEntity& lfo = synth.preset.lfos.at(this->part);
 
@@ -46,10 +44,10 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 	}
 	tmp_y += 30;
 	//Envelope
-	adsr_controls(&controls, tmp_x, tmp_y, env.env, handler);
+	adsr_controls(&controls, tmp_x, tmp_y, env.env, lock);
 	tmp_y += 225;
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, env.volume, handler, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, env.volume, lock, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Col 2 - LFO
@@ -68,7 +66,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 50, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul *= 0.25;
-		value->property.bind(lfo.freq, handler);
+		value->property.bind(lfo.freq, lock);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -78,19 +76,19 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
-		waveform->property.bind_cast(lfo.waveform, handler);
+		waveform->property.bind_cast(lfo.waveform, lock);
 		controls.push_back(waveform);
 	}
 	tmp_x = 500;
 	tmp_y += 60;
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, lfo.volume, handler, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, lfo.volume, lock, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Master Sync
 	{
 		CheckBox* value = new CheckBox(false, "Master Sync", main_font, 16, tmp_x, tmp_y, 40, 40);
-		value->property.bind(lfo.sync_master, handler);
+		value->property.bind(lfo.sync_master, lock);
 		controls.push_back(value);
 	}
 	tmp_x += 160;
@@ -101,7 +99,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 
 		DragBox<int>* value = new DragBox<int>(0, -32, 32, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul *= 0.5;
-		value->property.bind(lfo.clock_value, handler);
+		value->property.bind(lfo.clock_value, lock);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -111,7 +109,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 		controls.push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->property.bind(lfo.sync_phase, handler);
+		value->property.bind(lfo.sync_phase, lock);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -122,7 +120,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 
 		DragBox<int>* value = new DragBox<int>(0, -32, 32, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul *= 0.5;
-		value->property.bind(lfo.motion_sequencer, handler);
+		value->property.bind(lfo.motion_sequencer, lock);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -146,7 +144,7 @@ Scene AnalogSynthModulatorView::create(Frame &frame) {
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
 	back->set_on_click([&frame, this]() {
-		frame.change_view(new AnalogSynthView(synth, channel, channel_index));
+		frame.change_view(new AnalogSynthView(synth));
 	});
 	controls.push_back(back);
 

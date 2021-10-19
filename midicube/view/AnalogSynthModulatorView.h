@@ -16,15 +16,13 @@
 class AnalogSynthModulatorView : public ViewController{
 private:
 	AdvancedSynth& synth;
-	SoundEngineChannel& channel;
-	int channel_index;
 	size_t part;
 	bool edit_source = false;
 	BindingGUIHandler binder;
 public:
-	AnalogSynthModulatorView(AdvancedSynth& s, SoundEngineChannel& c, int channel_index, size_t part);
+	AnalogSynthModulatorView(AdvancedSynth& s, size_t part);
 	virtual ~AnalogSynthModulatorView();
-	virtual Scene create(Frame &frame);
+	virtual Scene create(ViewHost &frame);
 	virtual bool on_action(Control *control);
 };
 

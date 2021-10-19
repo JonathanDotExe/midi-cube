@@ -10,14 +10,14 @@
 #include "../view/AnalogSynthOscilatorView.h"
 #include "../view/AnalogSynthView.h"
 
-AnalogSynthFMView::AnalogSynthFMView(AdvancedSynth& s, SoundEngineChannel& c, int channel_index) : synth(s), channel(c) {
-	this->channel_index = channel_index;
+AnalogSynthFMView::AnalogSynthFMView(AdvancedSynth& s) : synth(s) {
+
 }
 
-Scene AnalogSynthFMView::create(Frame &frame) {
+Scene AnalogSynthFMView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
-	ActionHandler& handler = frame.cube.action_handler;
+	SpinLock& lock = synth.get_lock();
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -57,7 +57,7 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 			int x = tmp_x + j * 85 + 35;
 			DragBox<double>* value = new DragBox<double>(0, 0, 2, main_font, 16, x, y, 80, 40);
 			value->border = 0;
-			value->property.bind(op.fm.at(j), handler);
+			value->property.bind(op.fm.at(j), lock);
 			//Color if feedback
 			if (i >= j) {
 				value->rect.setFillColor(sf::Color(180, 180, 180));
@@ -66,14 +66,14 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 		}
 		//Audible
 		CheckBox* audible = new CheckBox(false, "", main_font, 16, tmp_x + ASYNTH_PART_COUNT * 85 + 35, y, 40, 40);
-		audible->property.bind(op.audible, handler);
+		audible->property.bind(op.audible, lock);
 		controls.push_back(audible);
 
 		//Edit
 		Button* edit = new Button("Edit", main_font, 16, tmp_x + ASYNTH_PART_COUNT * 85 + 35 + 45, y, 80, 40);
 		edit->rect.setFillColor(sf::Color(0, 180, 255));
 		edit->set_on_click([&frame, this, i]{
-			frame.change_view(new AnalogSynthOscilatorView(synth, channel, channel_index, i));
+			frame.change_view(new AnalogSynthOscilatorView(synth, i));
 		});
 		controls.push_back(edit);
 	}
@@ -82,7 +82,7 @@ Scene AnalogSynthFMView::create(Frame &frame) {
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
 	back->set_on_click([&frame, this]() {
-		frame.change_view(new AnalogSynthView(synth, channel, channel_index));
+		frame.change_view(new AnalogSynthView(synth));
 	});
 	controls.push_back(back);
 

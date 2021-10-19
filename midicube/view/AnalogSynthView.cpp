@@ -55,14 +55,14 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 		Button* osc = new Button("Oscilator", main_font, 14, x + 5, y + 30,  pane_width - 15, 30);
 		osc->rect.setFillColor(sf::Color(0, 180, 255));
 		osc->set_on_click([&frame, this, i]{
-			frame.change_view(new AnalogSynthOscilatorView(synth, channel, channel_index, i));
+			frame.change_view(new AnalogSynthOscilatorView(synth, i));
 		});
 		controls.push_back(osc);
 		//Operator
 		Button* op = new Button("Operator", main_font, 14, x + 5, y + 70, pane_width - 15, 30);
 		op->rect.setFillColor(sf::Color(0, 180, 255));
 		op->set_on_click([&frame, this, i]{
-			frame.change_view(new AnalogSynthOperatorView(synth, channel, channel_index, i));
+			frame.change_view(new AnalogSynthOperatorView(synth, i));
 		});
 		operators[i] = op;
 		controls.push_back(op);
@@ -70,7 +70,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 		Button* mod = new Button("Modulation", main_font, 14, x + 5, y + 110,  pane_width - 15, 30);
 		mod->rect.setFillColor(sf::Color(0, 180, 255));
 		mod->set_on_click([&frame, this, i]{
-			frame.change_view(new AnalogSynthModulatorView(synth, channel, channel_index, i));
+			frame.change_view(new AnalogSynthModulatorView(synth, i));
 		});
 		controls.push_back(mod);
 	}
@@ -182,18 +182,10 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 	Button* fm = new Button("FM Algorithm", main_font, 14, tmp_x, tmp_y,  pane_width - 15, 30);
 	fm->rect.setFillColor(sf::Color(0, 180, 255));
 	fm->set_on_click([&frame, this]{
-		frame.change_view(new AnalogSynthFMView(synth, channel, channel_index));
+		frame.change_view(new AnalogSynthFMView(synth));
 	});
 	controls.push_back(fm);
-
 	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
-	//Back Button
-	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
-	back->rect.setFillColor(sf::Color::Yellow);
-	back->set_on_click([&frame, this]() {
-		frame.change_view(new SoundEngineChannelView(channel, channel_index));
-	});
-	controls.push_back(back);
 
 	return {controls};
 }
