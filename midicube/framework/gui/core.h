@@ -140,6 +140,8 @@ public:
 
 	virtual void request_redraw() = 0;
 
+	virtual void close() = 0;
+
 	virtual Control* on_mouse_pressed (int x, int y, sf::Mouse::Button button);
 
 	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);

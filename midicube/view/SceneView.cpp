@@ -13,10 +13,9 @@ SceneView::SceneView(SoundEngineDevice* engine) {
 	this->engine = engine;
 }
 
-Scene SceneView::create(Frame &frame) {
+Scene SceneView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
-	SpinLock& lock = engine->get_cube()->lock;
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);

@@ -54,7 +54,7 @@ Scene MasterEffectView::create(ViewHost &frame) {
 		controls.push_back(e);*/
 		//Edit
 		Button* edit_effect = new Button("Edit", main_font, 12, x + 5, y + 65, pane_width - 15, 30);
-		edit_effect->set_on_click([this, i, &effect]() {
+		edit_effect->set_on_click([this, i, &effect, &frame]() {
 			cube.lock.lock();
 			PluginInstance* eff = effect.effect.get_plugin();
 			if (eff) {

@@ -21,7 +21,7 @@ private:
 public:
 	SceneView(SoundEngineDevice* engine);
 	virtual ~SceneView();
-	virtual Scene create(Frame &frame);
+	virtual Scene create(ViewHost &frame);
 	virtual void update_properties();
 };
 
