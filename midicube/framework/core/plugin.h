@@ -14,6 +14,7 @@
 #include "../dsp/envelope.h"
 #include "../data/binding.h"
 #include "../util/util.h"
+#include "../gui/core.h"
 //#include "../gui/core.h"
 #include <map>
 #include <algorithm>
@@ -124,9 +125,9 @@ public:
 
 	virtual void save_program(PluginProgram** prog) = 0;
 
-	/*virtual ViewController* create_view() {
-		return nullptr; //FIXME
-	}*/
+	virtual ViewController* create_view() {
+		return nullptr;
+	}
 
 	virtual ~PluginInstance() {
 		delete inputs;

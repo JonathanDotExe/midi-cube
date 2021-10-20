@@ -7,10 +7,6 @@
 
 #include "vocoder.h"
 
-VocoderEffect::VocoderEffect() {
-
-}
-
 void VocoderEffect::process(const SampleInfo& info) {
 	outputs[0] = inputs[0];
 	outputs[1] = inputs[1];

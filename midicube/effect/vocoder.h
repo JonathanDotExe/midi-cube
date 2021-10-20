@@ -92,7 +92,9 @@ public:
 
 	void save_program(PluginProgram **prog);
 	void apply_program(PluginProgram *prog);
-	VocoderEffect();
+	~VocoderEffect() {
+
+	}
 
 	void process(const SampleInfo& info);
 

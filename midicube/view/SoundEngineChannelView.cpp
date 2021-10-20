@@ -50,7 +50,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	edit_engine->set_on_click([this, &frame]() {
 		//TODO not optimal solution
 		cube.lock.lock();
-		Plugin* engine = channel.engine.get_plugin();
+		PluginInstance* engine = channel.engine.get_plugin();
 		if (engine) {
 			frame.change_view(engine->create_view()); //TODO make back function
 		}
@@ -72,7 +72,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 
 		edit_effect->set_on_click([this, &frame, i]() {
 			cube.lock.lock();
-			Plugin* effect = channel.effects[i].get_plugin();
+			PluginInstance* effect = channel.effects[i].get_plugin();
 			if (effect) {
 				frame.change_view(effect->create_view()); //TODO make back function
 			}
