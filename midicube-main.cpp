@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "midicube/view/SoundEngineView.h"
-#include "midicube/midicube.h"
+#include "midicube/workstation/view/SoundEngineView.h"
+#include "midicube/workstation/midicube.h"
 
 using namespace std;
 

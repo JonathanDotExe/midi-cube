@@ -6,9 +6,6 @@
  */
 
 #include "program.h"
-#include "soundengine/sampler.h"
-#include "soundengine/organ.h"
-#include "soundengine/asynth.h"
 #include <boost/filesystem.hpp>
 #include <regex>
 #include <iostream>

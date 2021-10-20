@@ -8,7 +8,7 @@
 #ifndef MIDICUBE_MIDIIO_H_
 #define MIDICUBE_MIDIIO_H_
 
-#include "framework/core/midi.h"
+#include "../framework/core/midi.h"
 #include <rtmidi/RtMidi.h>
 #include <vector>
 #include <exception>

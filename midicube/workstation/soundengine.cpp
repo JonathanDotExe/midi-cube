@@ -6,7 +6,7 @@
  */
 
 #include "soundengine.h"
-#include "../midicube.cpp"
+#include "midicube.cpp"
 
 #include <algorithm>
 

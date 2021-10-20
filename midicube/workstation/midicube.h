@@ -11,12 +11,12 @@
 #include "audio.h"
 #include "program.h"
 #include "midiio.h"
-#include "framework/core/audio.h"
-#include "framework/data/data.h"
-#include "soundengine/soundengine.h"
-#include "framework/util/audioloader.h"
-#include "framework/util/util.h"
-#include "framework/core/plugin.h"
+#include "../framework/core/audio.h"
+#include "../framework/data/data.h"
+#include "soundengine.h"
+#include "../framework/util/audioloader.h"
+#include "../framework/util/util.h"
+#include "../framework/core/plugin.h"
 
 struct MidiCubeInput {
 	MidiInput* in = nullptr;

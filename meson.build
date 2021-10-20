@@ -35,19 +35,19 @@ src = [
 	'midicube/framework/gui/control.cpp',
 	'midicube/framework/gui/core.cpp',
 	'midicube/framework/gui/util.cpp',
-	'midicube/framework/gui/view/BooleanMidiBindingView.cpp',
-	'midicube/framework/gui/view/TemplateMidiBindingView.cpp',
+	'midicube/framework/gui/binding/BooleanMidiBindingView.cpp',
+	'midicube/framework/gui/binding/TemplateMidiBindingView.cpp',
 	
 	'midicube/workstation/audio.cpp',
 	'midicube/workstation/midicube.cpp',
 	'midicube/workstation/midiio.cpp',
 	'midicube/workstation/program.cpp',
+	'midicube/workstation/soundengine.cpp',
 
 	'midicube/plugins/soundengine/asynth.cpp',
 	'midicube/plugins/soundengine/drums.cpp',
 	'midicube/plugins/soundengine/organ.cpp',
 	'midicube/plugins/soundengine/sampler.cpp',
-	'midicube/plugins/soundengine/soundengine.cpp',
 	'midicube/plugins/sequencer/arpeggiator.cpp',
 	
 	'midicube/resources.cpp',
@@ -98,8 +98,8 @@ sampler_deps = [
 
 sampler_src = [
 	'autosampler-main.cpp',
-	'midicube/autosampler.cpp',
-	'midicube/audio.cpp',
+	'midicube/workstation/autosampler.cpp',
+	'midicube/workstation/audio.cpp',
 	'midicube/framework/util/audiofile.cpp',
 	'midicube/framework/dsp/filter.cpp',
 	'midicube/framework/util/sfz.cpp',

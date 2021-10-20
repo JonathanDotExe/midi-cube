@@ -10,7 +10,7 @@
 
 #include "../framework/core/midi.h"
 #include "../framework/dsp/envelope.h"
-#include "../audio.h"
+#include "audio.h"
 #include "../framework/dsp/synthesis.h"
 #include "../framework/core/metronome.h"
 #include "../framework/core/plugin.h"

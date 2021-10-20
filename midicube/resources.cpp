@@ -4,7 +4,7 @@
  *  Created on: Dec 20, 2020
  *      Author: jojo
  */
-#include "../view/resources.h"
+#include "resources.h"
 
 sf::Font main_font;
 

@@ -20,8 +20,8 @@
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "midiio.h"
-#include "framework/data/data.h"
-#include "soundengine/soundengine.h"
+#include "../framework/data/data.h"
+#include "soundengine.h"
 
 namespace pt = boost::property_tree;
 
