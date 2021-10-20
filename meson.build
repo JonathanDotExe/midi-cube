@@ -35,6 +35,8 @@ src = [
 	'midicube/framework/gui/control.cpp',
 	'midicube/framework/gui/core.cpp',
 	'midicube/framework/gui/util.cpp',
+	'midicube/framework/gui/view/BooleanMidiBindingView.cpp',
+	'midicube/framework/gui/view/TemplateMidiBindingView.cpp',
 	
 	'midicube/workstation/audio.cpp',
 	'midicube/workstation/midicube.cpp',
@@ -46,29 +48,16 @@ src = [
 	'midicube/plugins/soundengine/organ.cpp',
 	'midicube/plugins/soundengine/sampler.cpp',
 	'midicube/plugins/soundengine/soundengine.cpp',
-	
 	'midicube/plugins/sequencer/arpeggiator.cpp',
 	
-	'midicube/workstation/view/resources.cpp',
-	'midicube/workstation/view/AnalogSynthFMView.cpp',
-	'midicube/workstation/view/AnalogSynthModulatorView.cpp',
-	'midicube/workstation/view/AnalogSynthOperatorView.cpp',
-	'midicube/workstation/view/AnalogSynthOscilatorView.cpp',
-	'midicube/workstation/view/AnalogSynthView.cpp',
-	'midicube/workstation/view/ArpeggiatorView.cpp',
-	'midicube/workstation/view/B3OrganView.cpp',
-	'midicube/workstation/view/BooleanMidiBindingView.cpp',
-	'midicube/workstation/view/EffectView.cpp',
-	'midicube/workstation/view/LooperView.cpp',
+	'midicube/resources.cpp',
 	'midicube/workstation/view/MasterEffectView.cpp',
 	'midicube/workstation/view/ProgramRenameView.cpp',
 	'midicube/workstation/view/ProgramView.cpp',
-	'midicube/workstation/view/SamplerView.cpp',
 	'midicube/workstation/view/SceneView.cpp',
 	'midicube/workstation/view/SoundEngineChannelView.cpp',
 	'midicube/workstation/view/SoundEngineView.cpp',
 	'midicube/workstation/view/SourceView.cpp',
-	'midicube/workstation/view/TemplateMidiBindingView.cpp',
 	
 	'midicube/plugins/effect/amplifier_simulation.cpp',
 	'midicube/plugins/effect/bitcrusher.cpp',
@@ -83,7 +72,18 @@ src = [
 	'midicube/plugins/effect/rotary_speaker.cpp',
 	'midicube/plugins/effect/tremolo.cpp',
 	'midicube/plugins/effect/vocoder.cpp',
-	'midicube/plugins/effect/wahwah.cpp'
+	'midicube/plugins/effect/wahwah.cpp',
+	
+	'midicube/plugins/view/AnalogSynthFMView.cpp',
+	'midicube/plugins/view/AnalogSynthModulatorView.cpp',
+	'midicube/plugins/view/AnalogSynthOperatorView.cpp',
+	'midicube/plugins/view/AnalogSynthOscilatorView.cpp',
+	'midicube/plugins/view/AnalogSynthView.cpp',
+	'midicube/plugins/view/ArpeggiatorView.cpp',
+	'midicube/plugins/view/B3OrganView.cpp',
+	'midicube/plugins/view/EffectView.cpp',
+	'midicube/plugins/view/LooperView.cpp',
+	'midicube/plugins/view/SamplerView.cpp'
 ]
 
 executable('midi-cube', src, dependencies: deps, link_args: '-latomic')
