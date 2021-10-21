@@ -8,9 +8,9 @@
 #ifndef MIDICUBE_SOUNDENGINE_ORGAN_H_
 #define MIDICUBE_SOUNDENGINE_ORGAN_H_
 
-#include "../framework/data/binding.h"
-#include "../framework/core/plugins/soundengine.h"
-#include "../framework/dsp/synthesis.h"
+#include "../../framework/data/binding.h"
+#include "../../framework/core/plugins/soundengine.h"
+#include "../../framework/dsp/synthesis.h"
 
 #define ORGAN_DRAWBAR_COUNT 9
 #define ORGAN_DRAWBAR_MAX 8

@@ -9,25 +9,25 @@
 #include <iostream>
 
 
-#include "soundengine/organ.h"
-#include "soundengine/drums.h"
-#include "soundengine/sampler.h"
-#include "soundengine/asynth.h"
+#include "../plugins/soundengine/organ.h"
+#include "../plugins/soundengine/drums.h"
+#include "../plugins/soundengine/sampler.h"
+#include "../plugins/soundengine/asynth.h"
 
-#include "effect/amplifier_simulation.h"
-#include "effect/bitcrusher.h"
-#include "effect/chorus.h"
-#include "effect/compressor.h"
-#include "effect/delay.h"
-#include "effect/equalizer.h"
-#include "effect/flanger.h"
-#include "effect/looper.h"
-#include "effect/phaser.h"
-#include "effect/reverb.h"
-#include "effect/rotary_speaker.h"
-#include "effect/tremolo.h"
-#include "effect/vocoder.h"
-#include "effect/wahwah.h"
+#include "../plugins/effect/amplifier_simulation.h"
+#include "../plugins/effect/bitcrusher.h"
+#include "../plugins/effect/chorus.h"
+#include "../plugins/effect/compressor.h"
+#include "../plugins/effect/delay.h"
+#include "../plugins/effect/equalizer.h"
+#include "../plugins/effect/flanger.h"
+#include "../plugins/effect/looper.h"
+#include "../plugins/effect/phaser.h"
+#include "../plugins/effect/reverb.h"
+#include "../plugins/effect/rotary_speaker.h"
+#include "../plugins/effect/tremolo.h"
+#include "../plugins/effect/vocoder.h"
+#include "../plugins/effect/wahwah.h"
 
 
 static void process_func(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info, void* user_data) {

@@ -8,10 +8,10 @@
 #ifndef MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 #define MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 
-#include "../framework/core/plugins/soundengine.h"
-#include "../framework/dsp/oscilator.h"
-#include "../framework/dsp/filter.h"
-#include "../framework/util/util.h"
+#include "../../framework/core/plugins/soundengine.h"
+#include "../../framework/dsp/oscilator.h"
+#include "../../framework/dsp/filter.h"
+#include "../../framework/util/util.h"
 
 #define ASYNTH_PART_COUNT 8
 #define ANALOG_CONTROL_COUNT 128

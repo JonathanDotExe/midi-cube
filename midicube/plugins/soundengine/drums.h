@@ -8,8 +8,8 @@
 #ifndef MIDICUBE_SOUNDENGINE_DRUMS_H_
 #define MIDICUBE_SOUNDENGINE_DRUMS_H_
 
-#include "../framework/core/plugins/soundengine.h"
-#include "../framework/util/audiofile.h"
+#include "../../framework/core/plugins/soundengine.h"
+#include "../../framework/util/audiofile.h"
 #include <unordered_map>
 
 #define SAMPLE_DRUMS_IDENTIFIER "midicube_sample_drums"
