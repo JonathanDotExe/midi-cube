@@ -6,8 +6,6 @@
  */
 
 #include "../view/MasterEffectView.h"
-
-#include "../view/EffectView.h"
 #include "../view/SoundEngineView.h"
 
 MasterEffectView::MasterEffectView(MidiCube& c): cube(c) {

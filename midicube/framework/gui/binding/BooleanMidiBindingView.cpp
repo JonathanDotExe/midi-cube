@@ -5,4 +5,4 @@
  *      Author: jojo
  */
 
-#include "../view/BooleanMidiBindingView.h"
+#include "BooleanMidiBindingView.h"

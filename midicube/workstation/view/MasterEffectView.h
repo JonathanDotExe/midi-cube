@@ -8,9 +8,9 @@
 #ifndef MIDICUBE_GUI_VIEW_MASTEREFFECTVIEW_H_
 #define MIDICUBE_GUI_VIEW_MASTEREFFECTVIEW_H_
 
-#include "../framework/gui/core.h"
-#include "../framework/gui/control.h"
-#include "../view/resources.h"
+#include "../../framework/gui/core.h"
+#include "../../framework/gui/control.h"
+#include "../../resources.h"
 #include "../midicube.h"
 
 class MasterEffectView : public ViewController {

@@ -11,8 +11,6 @@
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
 #include "../midicube.h"
-#include "../soundengine/soundengine.h"
-#include "../view/resources.h"
 #include "../view/SoundEngineView.h"
 
 template<typename T>
@@ -21,9 +19,10 @@ private:
 	SpinLock& lock;
 	BindableTemplateValue<T>& value;
 	std::function<ViewController*()> view_factory;
+	sf::Font font;
 
 public:
-	TemplateMidiBindingView(BindableTemplateValue<T>& val, std::function<ViewController*()> f, SpinLock& l) : lock(l), value(val), view_factory(f) {
+	TemplateMidiBindingView(BindableTemplateValue<T>& val, std::function<ViewController*()> f, SpinLock& l, sf::Font fo) : lock(l), value(val), view_factory(f), font(fo) {
 
 	}
 

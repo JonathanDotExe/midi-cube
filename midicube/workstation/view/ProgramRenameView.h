@@ -11,9 +11,9 @@
 #include "../framework/gui/core.h"
 #include "../framework/gui/control.h"
 #include "../midicube.h"
-#include "../soundengine/soundengine.h"
+#include "../soundengine.h"
 #include <functional>
-#include "../view/resources.h"
+#include "../../resources.h"
 
 class ProgramRenameView : public ViewController {
 private:

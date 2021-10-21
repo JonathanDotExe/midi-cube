@@ -5,4 +5,4 @@
  *      Author: jojo
  */
 
-#include "../view/TemplateMidiBindingView.h"
+#include "TemplateMidiBindingView.h"

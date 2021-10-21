@@ -6,9 +6,7 @@
  */
 
 #include "../control.h"
-#include "../soundengine/organ.h"
 #include "BooleanMidiBindingView.h"
-#include "../view/resources.h"
 #include "TemplateMidiBindingView.h"
 
 #ifndef MIDICUBE_GUI_VIEW_BINDING_H_
