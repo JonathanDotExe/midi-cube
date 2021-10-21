@@ -8,11 +8,11 @@
 #ifndef MIDICUBE_GUI_VIEW_PROGRAMVIEW_H_
 #define MIDICUBE_GUI_VIEW_PROGRAMVIEW_H_
 
-#include "../framework/gui/core.h"
-#include "../framework/gui/control.h"
+#include "../../framework/gui/core.h"
+#include "../../framework/gui/control.h"
 #include "../midicube.h"
-#include "../soundengine/soundengine.h"
-#include "../view/resources.h"
+#include "../soundengine.h"
+#include "../../resources.h"
 
 #define PROGRAM_VIEW_ROWS 4
 #define PROGRAM_VIEW_COLS 8

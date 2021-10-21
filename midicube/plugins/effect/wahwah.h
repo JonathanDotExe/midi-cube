@@ -8,9 +8,9 @@
 #ifndef MIDICUBE_EFFECT_WAH_WAH_H_
 #define MIDICUBE_EFFECT_WAH_WAH_H_
 
-#include "../framework/core/audio.h"
-#include "../framework/dsp/oscilator.h"
-#include "../framework/core/plugins/effect.h"
+#include "../../framework/core/audio.h"
+#include "../../framework/dsp/oscilator.h"
+#include "../../framework/core/plugins/effect.h"
 
 #define WAH_WAH_IDENTIFIER "midicube_wah_wah"
 

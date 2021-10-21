@@ -9,9 +9,9 @@
 #define MIDICUBE_SEQUENCER_ARPEGGIATOR_H_
 
 
-#include "../framework/core/plugin.h"
-#include "../framework/util/audiofile.h"
-#include "../framework/util/voice.h"
+#include "../../framework/core/plugin.h"
+#include "../../framework/util/audiofile.h"
+#include "../../framework/util/voice.h"
 #include <unordered_map>
 
 #define ARPEGGIATOR_IDENTIFIER "midicube_arpeggiator"

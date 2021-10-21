@@ -12,7 +12,7 @@
 #include "../view/ArpeggiatorView.h"
 #include "../view/B3OrganView.h"
 #include "../view/EffectView.h"
-#include "../view/resources.h"
+#include "../../resources.h"
 #include "../view/SamplerView.h"
 #include "../view/SoundEngineView.h"
 

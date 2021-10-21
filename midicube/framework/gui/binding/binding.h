@@ -5,11 +5,11 @@
  *      Author: jojo
  */
 
-#include "../framework/gui/control.h"
+#include "../control.h"
 #include "../soundengine/organ.h"
-#include "../view/BooleanMidiBindingView.h"
+#include "BooleanMidiBindingView.h"
 #include "../view/resources.h"
-#include "../view/TemplateMidiBindingView.h"
+#include "TemplateMidiBindingView.h"
 
 #ifndef MIDICUBE_GUI_VIEW_BINDING_H_
 #define MIDICUBE_GUI_VIEW_BINDING_H_

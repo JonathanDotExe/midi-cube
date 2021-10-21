@@ -8,7 +8,6 @@
 #include "../view/SoundEngineView.h"
 
 #include <iostream>
-#include "../view/LooperView.h"
 #include "../view/MasterEffectView.h"
 #include "../view/ProgramView.h"
 #include "../view/SceneView.h"

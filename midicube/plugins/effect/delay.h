@@ -8,9 +8,9 @@
 #ifndef MIDICUBE_EFFECT_DELAY_H_
 #define MIDICUBE_EFFECT_DELAY_H_
 
-#include "../framework/core/audio.h"
-#include "../framework/dsp/oscilator.h"
-#include "../framework/core/plugins/effect.h"
+#include "../../framework/core/audio.h"
+#include "../../framework/dsp/oscilator.h"
+#include "../../framework/core/plugins/effect.h"
 
 #define DELAY_IDENTIFIER "midicube_delay"
 

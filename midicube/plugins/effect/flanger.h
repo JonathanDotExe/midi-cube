@@ -8,9 +8,9 @@
 #ifndef MIDICUBE_EFFECT_FLANGER_H_
 #define MIDICUBE_EFFECT_FLANGER_H_
 
-#include "../framework/core/audio.h"
-#include "../framework/dsp/oscilator.h"
-#include "../framework/core/plugins/effect.h"
+#include "../../framework/core/audio.h"
+#include "../../framework/dsp/oscilator.h"
+#include "../../framework/core/plugins/effect.h"
 
 #define FLANGER_IDENTIFIER "midicube_flanger"
 

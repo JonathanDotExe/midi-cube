@@ -8,9 +8,9 @@
 #ifndef MIDICUBE_EFFECT_REVERB_H_
 #define MIDICUBE_EFFECT_REVERB_H_
 
-#include "../framework/core/plugins/effect.h"
-#include "../framework/core/audio.h"
-#include "../framework/dsp/synthesis.h"
+#include "../../framework/core/plugins/effect.h"
+#include "../../framework/core/audio.h"
+#include "../../framework/dsp/synthesis.h"
 
 #define REVERB_COMB_FILTERS 4
 #define REVERB_ALLPASS_FILTERS 2

@@ -8,8 +8,8 @@
 #ifndef MIDICUBE_EFFECT_BITCRUSHER_H_
 #define MIDICUBE_EFFECT_BITCRUSHER_H_
 
-#include "../framework/core/plugins/effect.h"
-#include "../framework/core/audio.h"
+#include "../../framework/core/plugins/effect.h"
+#include "../../framework/core/audio.h"
 
 #define BIT_CRUSHER_IDENTIFIER "midicube_bit_crusher"
 

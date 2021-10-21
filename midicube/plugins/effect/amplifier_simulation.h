@@ -8,10 +8,10 @@
 #ifndef MIDICUBE_EFFECT_AMPLIFIER_SIMULATION_H_
 #define MIDICUBE_EFFECT_AMPLIFIER_SIMULATION_H_
 
-#include "../framework/core/plugins/effect.h"
-#include "../framework/core/audio.h"
-#include "../framework/dsp/filter.h"
-#include "../framework/dsp/synthesis.h"
+#include "../../framework/core/plugins/effect.h"
+#include "../../framework/core/audio.h"
+#include "../../framework/dsp/filter.h"
+#include "../../framework/dsp/synthesis.h"
 
 #define AMP_OVERSAMPLING 2
 #define AMPLIFIER_SIMULATION_IDENTIFIER "midicube_overdrive_amp"

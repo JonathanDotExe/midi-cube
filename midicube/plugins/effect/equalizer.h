@@ -9,9 +9,9 @@
 #define MIDICUBE_EFFECT_EQUALIZER_H_
 
 #include <string>
-#include "../framework/core/audio.h"
-#include "../framework/dsp/oscilator.h"
-#include "../framework/core/plugins/effect.h"
+#include "../../framework/core/audio.h"
+#include "../../framework/dsp/oscilator.h"
+#include "../../framework/core/plugins/effect.h"
 
 #define EQUALIZER_IDENTIFIER "midicube_4_band_eq"
 

@@ -8,10 +8,10 @@
 #ifndef MIDICUBE_EFFECT_ROTARY_SPEAKER_H_
 #define MIDICUBE_EFFECT_ROTARY_SPEAKER_H_
 
-#include "../framework/core/audio.h"
-#include "../framework/dsp/filter.h"
-#include "../framework/dsp/synthesis.h"
-#include "../framework/core/plugins/effect.h"
+#include "../../framework/core/audio.h"
+#include "../../framework/dsp/filter.h"
+#include "../../framework/dsp/synthesis.h"
+#include "../../framework/core/plugins/effect.h"
 
 #define ROTARY_SPEAKER_IDENTIFIER "midicube_rotary_speaker"
 

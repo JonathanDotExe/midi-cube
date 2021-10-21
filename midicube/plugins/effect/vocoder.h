@@ -10,10 +10,10 @@
 
 #include <array>
 
-#include "../framework/dsp/synthesis.h"
-#include "../framework/dsp/envelope.h"
-#include "../framework/dsp/filter.h"
-#include "../framework/core/plugins/effect.h"
+#include "../../framework/dsp/synthesis.h"
+#include "../../framework/dsp/envelope.h"
+#include "../../framework/dsp/filter.h"
+#include "../../framework/core/plugins/effect.h"
 
 #define VOCODER_BAND_COUNT 32
 #define VOCODER_IDENTIFIER "midicube_vocoder"

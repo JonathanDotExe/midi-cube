@@ -9,9 +9,9 @@
 #define MIDICUBE_EFFECT_CHORUS_H_
 
 
-#include "../framework/core/audio.h"
-#include "../framework/dsp/oscilator.h"
-#include "../framework/core/plugins/effect.h"
+#include "../../framework/core/audio.h"
+#include "../../framework/dsp/oscilator.h"
+#include "../../framework/core/plugins/effect.h"
 
 
 #define CHORUS_IDENTIFIER "midicube_chorus"
