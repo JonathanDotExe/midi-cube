@@ -7,8 +7,7 @@
 
 #include "../view/SamplerView.h"
 
-#include "../view/resources.h"
-#include "../view/SoundEngineChannelView.h"
+#include "../../resources.h"
 
 SamplerView::SamplerView(Sampler &s) : sampler(s) {
 }

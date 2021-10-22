@@ -9,11 +9,11 @@
 
 #include "../view/AnalogSynthOscilatorView.h"
 #include "../view/AnalogSynthView.h"
-#include "../view/resources.h"
+#include "../../resources.h"
 
 AnalogSynthModulatorView::AnalogSynthModulatorView(AdvancedSynth &s, size_t part) : synth(s), binder{s.get_lock(), [&s, part]() {
 			return new AnalogSynthModulatorView(s, part);
-		}} {
+		}, main_font} {
 	this->part = part;
 }
 

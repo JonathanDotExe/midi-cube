@@ -20,13 +20,12 @@
 #include "../effect/tremolo.h"
 #include "../effect/vocoder.h"
 #include "../effect/wahwah.h"
-#include "../view/resources.h"
-#include "../view/SoundEngineView.h"
+#include "../../resources.h"
 
 EffectView::EffectView(PluginInstance* e) :
 		effect(e), binder{e->get_lock(), [e]() {
 			return new EffectView(e);
-		}} {
+		}, main_font} {
 
 }
 

@@ -8,8 +8,8 @@
 #ifndef MIDICUBE_GUI_VIEW_SAMPLERVIEW_H_
 #define MIDICUBE_GUI_VIEW_SAMPLERVIEW_H_
 
-#include "../framework/gui/core.h"
-#include "../framework/gui/control.h"
+#include "../../framework/gui/core.h"
+#include "../../framework/gui/control.h"
 #include "../soundengine/sampler.h"
 
 class SamplerView: public ViewController {

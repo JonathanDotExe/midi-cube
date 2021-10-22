@@ -11,12 +11,12 @@
 #include "../view/AnalogSynthModulatorView.h"
 #include "../view/AnalogSynthOperatorView.h"
 #include "../view/AnalogSynthOscilatorView.h"
-#include "../view/resources.h"
-#include "../view/SoundEngineChannelView.h"
+#include "../../resources.h"
+
 
 AnalogSynthView::AnalogSynthView(AdvancedSynth& s) : synth(s), binder{s.get_lock(), [&s]() {
 	return new AnalogSynthView(s);
-}} {
+}, main_font} {
 
 }
 
