@@ -7,7 +7,7 @@
 
 #include "../view/SoundEngineChannelView.h"
 
-#include "../soundengine/organ.h"
+#include "../../plugins/soundengine/organ.h"
 #include "../view/AnalogSynthView.h"
 #include "../view/ArpeggiatorView.h"
 #include "../view/B3OrganView.h"

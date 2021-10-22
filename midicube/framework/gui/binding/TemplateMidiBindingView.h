@@ -8,10 +8,8 @@
 #ifndef MIDICUBE_GUI_VIEW_TEMPLATEMIDIBINDINGVIEW_H_
 #define MIDICUBE_GUI_VIEW_TEMPLATEMIDIBINDINGVIEW_H_
 
-#include "../framework/gui/core.h"
-#include "../framework/gui/control.h"
-#include "../midicube.h"
-#include "../view/SoundEngineView.h"
+#include "../core.h"
+#include "../control.h"
 
 template<typename T>
 class TemplateMidiBindingView : public ViewController {
@@ -47,40 +45,40 @@ public:
 			size_t index = 0;
 			//CC
 			{
-				Label* title = new Label("CC", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				Label* title = new Label("CC", font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
 				value->property.bind(this->value.cc, lock);
 				controls.push_back(value);
 			}
 			++index;
 			//Persistent
 			{
-				Label* title = new Label("Persistent", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				Label* title = new Label("Persistent", font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				OrganSwitch* value = new OrganSwitch(true, main_font, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				OrganSwitch* value = new OrganSwitch(true, font, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
 				value->property.bind(this->value.persistent, lock);
 				controls.push_back(value);
 			}
 			++index;
 			//Min
 			{
-				Label* title = new Label("Min", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				Label* title = new Label("Min", font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				DragBox<T>* value = new DragBox<T>(0, this->value.total_min, this->value.total_max, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				DragBox<T>* value = new DragBox<T>(0, this->value.total_min, this->value.total_max, font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
 				value->property.bind(this->value.binding_min, lock);
 				controls.push_back(value);
 			}
 			++index;
 			//Max
 			{
-				Label* title = new Label("Max", main_font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
+				Label* title = new Label("Max", font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				DragBox<T>* value = new DragBox<T>(0, this->value.total_min, this->value.total_max, main_font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				DragBox<T>* value = new DragBox<T>(0, this->value.total_min, this->value.total_max, font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
 				value->property.bind(this->value.binding_max, lock);
 				controls.push_back(value);
 			}
@@ -88,7 +86,7 @@ public:
 
 
 			//Back Button
-			Button* back = new Button("Back", main_font, 18, frame.get_width() - 100, frame.get_height() - 40, 100, 40);
+			Button* back = new Button("Back", font, 18, frame.get_width() - 100, frame.get_height() - 40, 100, 40);
 			back->set_on_click([&frame, boxes, this]() {
 				//Change view
 				frame.change_view(view_factory());

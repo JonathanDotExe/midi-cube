@@ -7,7 +7,7 @@
 
 #include "../view/B3OrganView.h"
 
-#include "../view/resources.h"
+#include "../../resources.h"
 #include "../view/SoundEngineChannelView.h"
 
 B3OrganView::B3OrganView(B3Organ& o) : organ(o), binder{o.get_lock(), [&o]() {
@@ -127,7 +127,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 	};
 
 	for (size_t i = 0; i < colors.size(); ++i) {
-		Drawbar<ORGAN_DRAWBAR_MAX>* drawbar = new Drawbar<ORGAN_DRAWBAR_MAX>(0, main_font, titles[i], tmp_x, 60, 60, 300, colors[i]);
+		Drawbar* drawbar = new Drawbar(0, ORGAN_DRAWBAR_MAX, main_font, titles[i], tmp_x, 60, 60, 300, colors[i]);
 		drawbar->text.setFillColor(sf::Color::White);
 		drawbar->title_text.setFillColor(sf::Color::Yellow);
 		drawbar->property.bind(organ.data.preset.drawbars.at(i), lock);

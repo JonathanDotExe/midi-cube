@@ -357,7 +357,6 @@ public:
 	}
 };
 
-template<int MAX>
 class Drawbar : public Control {
 
 private:
@@ -365,6 +364,7 @@ private:
 
 	double slider_width;
 	int button_height;
+	int max;
 
 public:
 	sf::RectangleShape slider_rect;
@@ -373,8 +373,8 @@ public:
 	sf::Text text;
 	PropertyBinding<unsigned int> property;
 
-	Drawbar(int value, sf::Font& font, std::string title, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : Control (x, y, width, height) {
-		this->progress = (double) value/MAX;
+	Drawbar(int value, int max, sf::Font& font, std::string title, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : Control (x, y, width, height) {
+		this->progress = (double) value/max;
 
 		this->slider_width = slider_width;
 		this->button_height = button_height;
@@ -400,8 +400,8 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height) {
 		Control::update_position(x, y, width, height);
-		int value = MAX * progress;
-		double real_prog = (double) value/MAX;
+		int value = max * progress;
+		double real_prog = (double) value/max;
 		//Slider
 		double range = height - button_height;
 		slider_rect.setPosition(x  + get_host()->get_x_offset() + width/2 - width * slider_width / 2, y + get_host()->get_y_offset());
@@ -426,7 +426,7 @@ public:
 	}
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {
-		int old_val = MAX * progress;
+		int old_val = max * progress;
 		progress += (double)y_motion/get_height();
 
 		if (progress < 0) {
@@ -436,7 +436,7 @@ public:
 			progress = 1;
 		}
 
-		int value = MAX * progress;
+		int value = max * progress;
 		if (old_val != value) {
 			if (property.is_bound()) {
 				property.set(value);
@@ -448,7 +448,7 @@ public:
 	virtual void update_properties() {
 		if (property.is_bound()) {
 			property.get([this](int v) {
-				progress = (double) v / MAX;
+				progress = (double) v / max;
 				update_position(this->get_x(), this->get_y(), get_width(), get_height());
 			});
 		}
