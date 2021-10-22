@@ -9,8 +9,8 @@
 #define MIDICUBE_GUI_VIEW_LOOPERVIEW_H_
 
 #include "../effect/looper.h"
-#include "../framework/gui/core.h"
-#include "../framework/gui/control.h"
+#include "../../framework/gui/core.h"
+#include "../../framework/gui/control.h"
 
 class LooperView : public ViewController {
 private:

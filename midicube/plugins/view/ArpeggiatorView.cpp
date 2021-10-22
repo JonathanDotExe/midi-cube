@@ -7,7 +7,7 @@
 
 #include "../view/ArpeggiatorView.h"
 
-#include "../view/resources.h"
+#include "../../resources.h"
 #include "../view/SoundEngineChannelView.h"
 
 ArpeggiatorView::ArpeggiatorView(ArpeggiatorInstance& a) : arp(a) {

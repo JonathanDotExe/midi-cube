@@ -8,8 +8,8 @@
 #ifndef MIDICUBE_GUI_VIEW_PROGRAMRENAMEVIEW_H_
 #define MIDICUBE_GUI_VIEW_PROGRAMRENAMEVIEW_H_
 
-#include "../framework/gui/core.h"
-#include "../framework/gui/control.h"
+#include "../../framework/gui/core.h"
+#include "../../framework/gui/control.h"
 #include "../midicube.h"
 #include "../soundengine.h"
 #include <functional>

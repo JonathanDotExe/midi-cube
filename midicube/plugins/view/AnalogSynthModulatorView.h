@@ -8,10 +8,10 @@
 #ifndef MIDICUBE_GUI_VIEW_ANALOGSYNTHMODULATORVIEW_H_
 #define MIDICUBE_GUI_VIEW_ANALOGSYNTHMODULATORVIEW_H_
 
-#include "../framework/gui/core.h"
-#include "../framework/gui/control.h"
+#include "../../framework/gui/core.h"
+#include "../../framework/gui/control.h"
 #include "../soundengine/asynth.h"
-#include "../view/binding.h"
+#include "../../framework/gui/binding/binding.h"
 
 class AnalogSynthModulatorView : public ViewController{
 private:

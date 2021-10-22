@@ -8,11 +8,10 @@
 #ifndef MIDICUBE_GUI_VIEW_EFFECT_EFFECTVIEW_H_
 #define MIDICUBE_GUI_VIEW_EFFECT_EFFECTVIEW_H_
 
-#include "../framework/gui/core.h"
-#include "../framework/gui/control.h"
-#include "../framework/core/plugin.h"
-#include "../soundengine/soundengine.h"
-#include "../view/binding.h"
+#include "../../framework/gui/core.h"
+#include "../../framework/gui/control.h"
+#include "../../framework/core/plugin.h"
+#include "../../framework/gui/binding/binding.h"
 
 class EffectView : public ViewController {
 private:

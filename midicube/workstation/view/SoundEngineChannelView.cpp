@@ -5,20 +5,15 @@
  *      Author: jojo
  */
 
-#include "../view/SoundEngineChannelView.h"
+#include "SoundEngineChannelView.h"
 
 #include "../../plugins/soundengine/organ.h"
-#include "../view/AnalogSynthView.h"
-#include "../view/ArpeggiatorView.h"
-#include "../view/B3OrganView.h"
-#include "../view/EffectView.h"
 #include "../../resources.h"
-#include "../view/SamplerView.h"
-#include "../view/SoundEngineView.h"
+#include "SoundEngineView.h"
 
 SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{c.lock, [&c, &ch, channel_index]() {
 	return new SoundEngineChannelView(c, ch, channel_index);
-}} {
+}, main_font} {
 
 	this->channel_index = channel_index;
 }
