@@ -55,17 +55,17 @@ class PluginHost {
 
 public:
 
-	virtual const KeyboardEnvironment& get_environment();
+	virtual const KeyboardEnvironment& get_environment() = 0;
 
-	virtual const Metronome& get_metronome();
+	virtual const Metronome& get_metronome() = 0;
 
-	virtual SpinLock& get_lock();
+	virtual SpinLock& get_lock() = 0;
 
-	virtual MidiBindingHandler* get_binding_handler();
+	virtual MidiBindingHandler* get_binding_handler() = 0;
 
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info, void* source) = 0;
 
-	virtual Plugin* get_plugin(std::string identifier);
+	virtual Plugin* get_plugin(std::string identifier) = 0;
 
 	virtual ~PluginHost() {
 
