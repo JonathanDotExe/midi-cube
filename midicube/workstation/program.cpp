@@ -180,7 +180,7 @@ void save_program(Program* program, pt::ptree& tree) {
 		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
 			pt::ptree t;
 			PluginSlotProgram& effect = program->channels[i].effects[j];
-			t.put("effect", effect.save());
+			t.put_child("effect", effect.save());
 		}
 
 		tree.add_child("channels.channel", c);

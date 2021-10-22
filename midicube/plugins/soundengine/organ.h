@@ -141,6 +141,10 @@ public:
 
 	void apply_program(PluginProgram *prog);
 
+	~B3Organ() {
+
+	}
+
 };
 
 class OrganPlugin : public Plugin {

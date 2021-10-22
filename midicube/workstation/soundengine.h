@@ -222,6 +222,10 @@ class SoundEngineDeviceHost : public PluginHost {
 private:
 	SoundEngineDevice* device = nullptr;
 public:
+	SoundEngineDeviceHost() : PluginHost() {
+
+	}
+
 	void init(SoundEngineDevice* device);
 	void recieve_midi(const MidiMessage &message,
 			const SampleInfo &info, void* src);
@@ -230,6 +234,9 @@ public:
 	const Metronome& get_metronome();
 	const KeyboardEnvironment& get_environment();
 	SpinLock& get_lock();
+	~SoundEngineDeviceHost() {
+
+	}
 };
 
 

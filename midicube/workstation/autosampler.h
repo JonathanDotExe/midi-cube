@@ -16,8 +16,8 @@
 #include <rtmidi/RtMidi.h>
 #include <rtaudio/RtAudio.h>
 
-#include "framework/util/audiofile.h"
-#include "framework/util/sfz.h"
+#include "../framework/util/audiofile.h"
+#include "../framework/util/sfz.h"
 
 #define AUTOSAMPLER_CHANNELS 2
 

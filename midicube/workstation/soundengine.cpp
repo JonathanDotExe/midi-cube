@@ -6,13 +6,13 @@
  */
 
 #include "soundengine.h"
-#include "midicube.cpp"
+#include "midicube.h"
 
 #include <algorithm>
 
 
 //SoundEngineChannel
-SoundEngineChannel::SoundEngineChannel() {
+SoundEngineChannel::SoundEngineChannel() : PluginHost() {
 	binder.add_binding(&volume);
 	binder.add_binding(&panning);
 }

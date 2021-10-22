@@ -10,7 +10,7 @@
 #include <thread>
 #include <chrono>
 
-#include "midicube/autosampler.h"
+#include "midicube/workstation/autosampler.h"
 
 
 int main(int argc, char **argv) {

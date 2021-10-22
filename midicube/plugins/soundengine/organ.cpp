@@ -307,3 +307,11 @@ boost::property_tree::ptree B3OrganProgram::save() {
 std::string B3OrganProgram::get_plugin_name() {
 	return B3_ORGAN_IDENTIFIER;
 }
+
+PluginProgram* OrganPlugin::create_program() {
+	return new B3OrganProgram();
+}
+
+PluginInstance* OrganPlugin::create(PluginHost *host) {
+	return new B3Organ(*host, *this);
+}
