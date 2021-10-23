@@ -14,7 +14,7 @@ void Label::update_position(int x, int y, int width, int height) {
 	text.setPosition(x + get_host()->get_x_offset(), y + get_host()->get_y_offset());
 }
 
-void Label::draw(sf::RenderWindow& window, bool selected) {
+void Label::draw(sf::RenderWindow& window, Control* selected) {
 	window.draw(text);
 }
 
@@ -25,7 +25,7 @@ void Pane::update_position(int x, int y, int width, int height) {
 	rect.setSize(sf::Vector2<float>(width, height));
 }
 
-void Pane::draw(sf::RenderWindow& window, bool selected) {
+void Pane::draw(sf::RenderWindow& window, Control* selected) {
 	window.draw(rect);
 }
 
@@ -37,7 +37,7 @@ void Button::update_position(int x, int y, int width, int height) {
 	center_text(text, x + get_host()->get_x_offset(), y + get_host()->get_y_offset(), width, height);
 }
 
-void Button::draw(sf::RenderWindow& window, bool selected) {
+void Button::draw(sf::RenderWindow& window, Control* selected) {
 	window.draw(rect);
 	window.draw(text);
 }
@@ -75,7 +75,7 @@ void Slider::update_position(int x, int y, int width, int height) {
 	context_rect.setSize(sf::Vector2<float>(bounds.left + bounds.width + 2, bounds.top + bounds.height + 2));
 }
 
-void Slider::draw(sf::RenderWindow& window, bool selected) {
+void Slider::draw(sf::RenderWindow& window, Control* selected) {
 	window.draw(slider_rect);
 	window.draw(button_rect);
 	if (selected) {
@@ -124,7 +124,7 @@ void CheckBox::update_position(int x, int y, int width, int height) {
 	center_text_left(text, x + width + 5 + get_host()->get_x_offset(), y + get_host()->get_y_offset(), height);
 }
 
-void CheckBox::draw(sf::RenderWindow& window, bool selected) {
+void CheckBox::draw(sf::RenderWindow& window, Control* selected) {
 	window.draw(rect);
 	if (checked) {
 		window.draw(inner_rect);
@@ -158,7 +158,7 @@ void ComboBox::update_position(int x, int y, int width, int height) {
 	center_text(text, x + get_host()->get_x_offset(), y + get_host()->get_y_offset(), width, height);
 }
 
-void ComboBox::draw(sf::RenderWindow& window, bool selected) {
+void ComboBox::draw(sf::RenderWindow& window, Control* selected) {
 	window.draw(rect);
 	window.draw(text);
 }
@@ -207,7 +207,7 @@ void OrganSwitch::update_position(int x, int y, int width, int height) {
 	center_text(off_text, x + get_host()->get_x_offset(), y + upper + get_host()->get_y_offset(), width, lower);
 }
 
-void OrganSwitch::draw(sf::RenderWindow& window, bool selected) {
+void OrganSwitch::draw(sf::RenderWindow& window, Control* selected) {
 	window.draw(activated_rect);
 	window.draw(deactivated_rect);
 	window.draw(on_text);
@@ -297,10 +297,14 @@ void ViewContainer::update_properties() {
 	}
 }
 
-void ViewContainer::draw(sf::RenderWindow &window, bool selected) {
+void ViewContainer::draw(sf::RenderWindow &window, Control* selected) {
+	//Switch view
 	if (next_view) {
 		switch_view(next_view);
 		next_view = nullptr;
 	}
-	//TODO draw
+	//Draw all
+	for (Control* control : get_controls()) {
+		control->draw(window, selected);
+	}
 }

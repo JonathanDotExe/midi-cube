@@ -28,7 +28,7 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw(sf::RenderWindow& window, bool selected);
+	virtual void draw(sf::RenderWindow& window, Control* selected);
 
 	virtual ~Label() {
 
@@ -49,7 +49,7 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw(sf::RenderWindow& window, bool selected);
+	virtual void draw(sf::RenderWindow& window, Control* selected);
 
 	virtual ~Pane() {
 
@@ -77,7 +77,7 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw(sf::RenderWindow& window, bool selected);
+	virtual void draw(sf::RenderWindow& window, Control* selected);
 
 	virtual void on_mouse_action();
 
@@ -135,7 +135,7 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw(sf::RenderWindow& window, bool selected);
+	virtual void draw(sf::RenderWindow& window, Control* selected);
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion);
 
@@ -209,7 +209,7 @@ public:
 		center_text(text, x + get_host()->get_x_offset(), y + get_host()->get_y_offset(), width, height);
 	}
 
-	virtual void draw(sf::RenderWindow& window, bool selected) {
+	virtual void draw(sf::RenderWindow& window, Control* selected) {
 		window.draw(rect);
 		window.draw(text);
 	}
@@ -300,7 +300,7 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw(sf::RenderWindow& window, bool selected);
+	virtual void draw(sf::RenderWindow& window, Control* selected);
 
 	virtual void on_mouse_action();
 
@@ -344,7 +344,7 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw(sf::RenderWindow& window, bool selected);
+	virtual void draw(sf::RenderWindow& window, Control* selected);
 
 	virtual void on_mouse_action();
 
@@ -418,7 +418,7 @@ public:
 		center_text_top(title_text, x + get_host()->get_x_offset(), y + get_host()->get_y_offset() - 40, width, 40);
 	}
 
-	virtual void draw(sf::RenderWindow& window, bool selected) {
+	virtual void draw(sf::RenderWindow& window, Control* selected) {
 		window.draw(slider_rect);
 		window.draw(button_rect);
 		window.draw(text);
@@ -498,7 +498,7 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw(sf::RenderWindow& window, bool selected);
+	virtual void draw(sf::RenderWindow& window, Control* selected);
 
 	virtual void on_mouse_action();
 
@@ -535,7 +535,7 @@ public:
 	virtual void update_position(int x, int y, int width, int height);
 	virtual Control* on_mouse_pressed(int x, int y, sf::Mouse::Button button);
 	virtual void update_properties();
-	virtual void draw(sf::RenderWindow &window, bool selected);
+	virtual void draw(sf::RenderWindow &window, Control* selected);
 
 	virtual ~ViewContainer() {
 		delete next_view;

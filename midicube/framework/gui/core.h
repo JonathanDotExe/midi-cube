@@ -36,7 +36,7 @@ public:
 
 	virtual void update_position(int x, int y, int width, int height);
 
-	virtual void draw(sf::RenderWindow& window, bool selected) = 0;
+	virtual void draw(sf::RenderWindow& window, Control* selected) = 0;
 
 	bool collides (int x, int y);
 
