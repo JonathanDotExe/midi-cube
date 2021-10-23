@@ -10,6 +10,7 @@
 #include "../../plugins/soundengine/organ.h"
 #include "../../resources.h"
 #include "SoundEngineView.h"
+#include "PluginView.h"
 
 SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{c.lock, [&c, &ch, channel_index]() {
 	return new SoundEngineChannelView(c, ch, channel_index);
@@ -47,7 +48,12 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		cube.lock.lock();
 		PluginInstance* engine = channel.engine.get_plugin();
 		if (engine) {
-			frame.change_view(engine->create_view()); //TODO make back function
+			MidiCube& c = cube;
+			SoundEngineChannel& ch = channel;
+			int index = channel_index;
+			frame.change_view(new PluginView(*engine, [&c, &ch, index]() {
+				return new SoundEngineChannelView(c, ch, index);
+			}));
 		}
 		cube.lock.unlock();
 	});
@@ -69,7 +75,12 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 			cube.lock.lock();
 			PluginInstance* effect = channel.effects[i].get_plugin();
 			if (effect) {
-				frame.change_view(effect->create_view()); //TODO make back function
+				MidiCube& c = cube;
+				SoundEngineChannel& ch = channel;
+				int index = channel_index;
+				frame.change_view(new PluginView(*effect, [&c, &ch, index]() {
+					return new SoundEngineChannelView(c, ch, index);
+				}));
 			}
 			cube.lock.unlock();
 		});

@@ -5,8 +5,9 @@
  *      Author: jojo
  */
 
-#include "../view/MasterEffectView.h"
-#include "../view/SoundEngineView.h"
+#include "MasterEffectView.h"
+#include "SoundEngineView.h"
+#include "PluginView.h"
 
 MasterEffectView::MasterEffectView(MidiCube& c): cube(c) {
 
@@ -56,7 +57,10 @@ Scene MasterEffectView::create(ViewHost &frame) {
 			cube.lock.lock();
 			PluginInstance* eff = effect.effect.get_plugin();
 			if (eff) {
-				frame.change_view(eff->create_view());
+				MidiCube& c = cube;
+				frame.change_view(new PluginView(*eff, [&c]() {
+					return new MasterEffectView(c);
+				}));
 			}
 			cube.lock.unlock();
 		});
