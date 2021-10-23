@@ -161,6 +161,7 @@ public:
 		else {
 			throw "Can't add same control to frame twice!";
 		}
+		request_redraw();
 	}
 
 	virtual ~ViewHost() {

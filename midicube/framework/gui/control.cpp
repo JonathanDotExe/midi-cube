@@ -237,7 +237,9 @@ int ViewContainer::get_width() const {
 }
 
 void ViewContainer::change_view(ViewController *view) {
-	//TODO
+	delete next_view;
+	next_view = view;
+	request_redraw();
 }
 
 int ViewContainer::get_y_offset() const {
@@ -296,5 +298,9 @@ void ViewContainer::update_properties() {
 }
 
 void ViewContainer::draw(sf::RenderWindow &window, bool selected) {
-	//TODO
+	if (next_view) {
+		switch_view(next_view);
+		next_view = nullptr;
+	}
+	//TODO draw
 }

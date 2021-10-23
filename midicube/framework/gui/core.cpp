@@ -67,7 +67,7 @@ void ViewHost::switch_view(ViewController *view) {
 Control* ViewHost::on_mouse_pressed (int x, int y, sf::Mouse::Button button) {
 	Control* selected = nullptr;
 	for (Control* control : controls) {
-		if (control->is_visible() && control->selectable() && control->collides(x - get_x_offset(), y - get_y_offset())) {
+		if (control->is_visible() && control->collides(x - get_x_offset(), y - get_y_offset())) {
 			selected = control->on_mouse_pressed(x - get_x_offset(), y - get_y_offset(), button);
 			break; //Only click first control
 		}
@@ -77,7 +77,7 @@ Control* ViewHost::on_mouse_pressed (int x, int y, sf::Mouse::Button button) {
 
 void ViewHost::on_mouse_released(int x, int y, sf::Mouse::Button button) {
 	for (Control* control : controls) {
-		if (control->is_visible() && control->selectable() && control->collides(x - get_x_offset(), y - get_y_offset())) {
+		if (control->is_visible() && control->collides(x - get_x_offset(), y - get_y_offset())) {
 			control->on_mouse_released(x - get_x_offset(), y - get_y_offset(), button);
 			break;
 		}

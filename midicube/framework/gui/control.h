@@ -513,6 +513,9 @@ public:
 };
 
 class ViewContainer : public Control, public ViewHost {
+private:
+	ViewController* next_view = nullptr;
+
 public:
 
 	ViewContainer(int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height), ViewHost() {
@@ -523,20 +526,20 @@ public:
 	virtual void change_view(ViewController *view);
 	virtual int get_y_offset() const;
 	virtual int get_x_offset() const;
-	virtual std::vector<Control*, std::allocator<Control*> > get_controls();
 	virtual void request_redraw();
 	virtual void add_control(Control *control);
 	virtual int get_height() const;
 	virtual void close();
 	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
-	virtual void on_mouse_action();
 	virtual bool selectable() const;
 	virtual void update_position(int x, int y, int width, int height);
 	virtual Control* on_mouse_pressed(int x, int y, sf::Mouse::Button button);
 	virtual void update_properties();
-	virtual void init(ViewHost *host);
 	virtual void draw(sf::RenderWindow &window, bool selected);
-	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion);
+
+	virtual ~ViewContainer() {
+		delete next_view;
+	}
 };
 
 
