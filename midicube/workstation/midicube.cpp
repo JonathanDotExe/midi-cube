@@ -67,9 +67,11 @@ void MidiCube::init(int out_device, int in_device) {
 		engine.channels[i].scenes[0].source.input = 1;
 	}
 	//Load programs
+	prog_mgr.lock();
 	prog_mgr.init_user(this);
 	prog_mgr.load_all(&plugin_mgr);
 	prog_mgr.apply_program(0, 0);
+	prog_mgr.unlock();
 
 	//MIDI Inputs
 	//Input-Devices

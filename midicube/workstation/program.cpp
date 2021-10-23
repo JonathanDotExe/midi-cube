@@ -243,7 +243,6 @@ ProgramManager::ProgramManager(std::string path) {
 }
 
 void ProgramManager::apply_program(size_t bank, size_t program) {
-	lock();
 	Bank* b = get_bank(bank);
 	Program* prog = b->programs.at(program);
 	user->apply_program(prog);
@@ -251,11 +250,9 @@ void ProgramManager::apply_program(size_t bank, size_t program) {
 	curr_program = program;
 	program_name = prog->name;
 	bank_name = b->name;
-	unlock();
 }
 
 void ProgramManager::delete_program() {
-	lock();
 	//Delete
 	Bank* bank = get_curr_bank();
 	bank->programs.erase(bank->programs.begin() + curr_program);
@@ -270,11 +267,9 @@ void ProgramManager::delete_program() {
 	Program* prog = bank->programs.at(curr_program);
 	user->apply_program(prog);
 	program_name = prog->name;
-	unlock();
 }
 
 void ProgramManager::save_new_program() {
-	lock();
 	Bank* bank = get_curr_bank();
 	Program* prog = new Program();
 	prog->name = program_name;
@@ -284,11 +279,9 @@ void ProgramManager::save_new_program() {
 	curr_program = bank->programs.size() - 1;
 
 	save_all();
-	unlock();
 }
 
 void ProgramManager::save_init_program() {
-	lock();
 	Bank* bank = get_curr_bank();
 	Program* prog = new Program();
 	prog->name = program_name;
@@ -297,17 +290,14 @@ void ProgramManager::save_init_program() {
 	bank->programs.push_back(prog);
 	curr_program = bank->programs.size() - 1;
 	save_all();
-	unlock();
 }
 
 void ProgramManager::overwrite_program() {
-	lock();
 	Program* prog = get_bank(curr_bank)->programs.at(curr_program);
 
 	prog->name = program_name;
 	user->save_program(prog);
 	save_all();
-	unlock();
 }
 
 void ProgramManager::save_new_bank() {
@@ -330,7 +320,6 @@ void ProgramManager::overwrite_bank() {
 }
 
 void ProgramManager::load_all(PluginManager* mgr) {
-	lock();
 	boost::filesystem::create_directory(path);
 	std::regex reg(".*\\.xml");
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
@@ -351,7 +340,6 @@ void ProgramManager::load_all(PluginManager* mgr) {
 		bank->programs.push_back(new Program{"Init"});
 		banks.push_back(bank);
 	}
-	unlock();
 }
 
 void ProgramManager::save_all() {

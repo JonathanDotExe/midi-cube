@@ -88,6 +88,7 @@ public:
 	size_t bank_count() {
 		return banks.size();
 	}
+	//Mutex has to be locked by user
 	void apply_program(size_t bank, size_t program);
 	//Mutex has to be locked by user
 	void delete_program();
@@ -129,6 +130,7 @@ public:
 		return curr_program;
 	}
 
+	//Mutex has to be locked by user
 	void load_all(PluginManager* mgr);
 	//Mutex has to be locked by user
 	void save_all();
