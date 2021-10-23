@@ -308,3 +308,7 @@ void ViewContainer::draw(sf::RenderWindow &window, Control* selected) {
 		control->draw(window, selected);
 	}
 }
+
+void ViewContainer::notify_remove(Control *control) {
+	get_host()->notify_remove(control);
+}

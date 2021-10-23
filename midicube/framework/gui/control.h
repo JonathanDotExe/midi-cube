@@ -537,9 +537,12 @@ public:
 	virtual void update_properties();
 	virtual void draw(sf::RenderWindow &window, Control* selected);
 
+
 	virtual ~ViewContainer() {
 		delete next_view;
 	}
+
+	virtual void notify_remove(Control *control);
 };
 
 

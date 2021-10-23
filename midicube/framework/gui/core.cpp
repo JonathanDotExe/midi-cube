@@ -54,10 +54,9 @@ void ViewHost::switch_view(ViewController *view) {
 	this->view = view;
 	//Controls
 	Scene scene = view->create(*this);
-	for (Control* control : controls) {
-		delete control;
+	for (Control* control : get_controls()) {
+		remove_control(control);
 	}
-	controls.clear();
 	for (Control* control : scene.controls) {
 		add_control(control);
 	}
@@ -194,3 +193,8 @@ Frame::~Frame() {
 	delete next_view;
 }
 
+void Frame::notify_remove(Control *control) {
+	if (selected == control) {
+		selected = nullptr;
+	}
+}

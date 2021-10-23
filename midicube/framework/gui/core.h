@@ -10,6 +10,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <functional>
+#include <algorithm>
 #include "../util/util.h"
 #include "../data/data.h"
 
@@ -140,6 +141,8 @@ public:
 
 	virtual void request_redraw() = 0;
 
+	virtual void notify_remove(Control* control) = 0;
+
 	virtual void close() = 0;
 
 	virtual Control* on_mouse_pressed (int x, int y, sf::Mouse::Button button);
@@ -161,6 +164,21 @@ public:
 		else {
 			throw "Can't add same control to frame twice!";
 		}
+		request_redraw();
+	}
+
+	//Not safe during render loop
+	virtual void remove_control(Control* control) {
+		for (size_t i = 0; i < controls.size(); ) {
+			if (controls[i] == control) {
+				controls.erase(controls.begin() + i);
+			}
+			else {
+				++i;
+			}
+		}
+		notify_remove(control);
+		delete control;
 		request_redraw();
 	}
 
@@ -234,6 +252,8 @@ public:
 	int get_x_offset() const {
 		return 0;
 	}
+
+	void notify_remove(Control *control);
 };
 
 #endif /* MIDICUBE_GUI_ENGINE_CORE_H_ */
