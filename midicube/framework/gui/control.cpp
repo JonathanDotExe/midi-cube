@@ -232,3 +232,69 @@ void OrganSwitch::update_properties(){
 	}
 }
 
+int ViewContainer::get_width() const {
+	return Control::get_width();
+}
+
+void ViewContainer::change_view(ViewController *view) {
+	//TODO
+}
+
+int ViewContainer::get_y_offset() const {
+	return get_host()->get_y_offset() + get_y();
+}
+
+int ViewContainer::get_x_offset() const {
+	return get_host()->get_x_offset() + get_x();
+}
+
+void ViewContainer::request_redraw() {
+	get_host()->request_redraw();
+}
+
+void ViewContainer::add_control(Control *control) {
+	ViewHost::add_control(control);
+}
+
+int ViewContainer::get_height() const {
+	return Control::get_height();
+}
+
+void ViewContainer::close() {
+	get_host()->close();
+}
+
+void ViewContainer::on_mouse_released(int x, int y, sf::Mouse::Button button) {
+	Control::on_mouse_released(x, y, button);
+	ViewHost::on_mouse_released(x, y, button);
+}
+
+bool ViewContainer::selectable() const {
+	return false;
+}
+
+void ViewContainer::update_position(int x, int y, int width, int height) {
+	Control::update_position(x, y, width, height);
+	for (Control* control : get_controls()) {
+		control->update_position(control->get_x(), control->get_y(), control->get_width(), control->get_height());
+	}
+}
+
+Control* ViewContainer::on_mouse_pressed(int x, int y,
+		sf::Mouse::Button button) {
+	Control* control = ViewHost::on_mouse_pressed(x, y, button);
+	if (!control) {
+		control = Control::on_mouse_pressed(x, y, button);
+	}
+	return control;
+}
+
+void ViewContainer::update_properties() {
+	for (Control* control : get_controls()) {
+		control->update_properties();
+	}
+}
+
+void ViewContainer::draw(sf::RenderWindow &window, bool selected) {
+	//TODO
+}

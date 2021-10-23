@@ -95,6 +95,6 @@ Scene SamplerView::create(ViewHost &frame) {
 }
 
 SamplerView::~SamplerView() {
-	// TODO Auto-generated destructor stub
+
 }
 

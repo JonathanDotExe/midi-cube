@@ -15,7 +15,6 @@ ProgramView::ProgramView(MidiCube& c, size_t bank, size_t page) : cube(c){
 	this->page = page;
 }
 
-//FIXME program locks
 Scene ProgramView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
@@ -202,5 +201,5 @@ Scene ProgramView::create(ViewHost &frame) {
 }
 
 ProgramView::~ProgramView() {
-	// TODO Auto-generated destructor stub
+
 }

@@ -110,5 +110,5 @@ bool write_audio_file(AudioSample& audio, std::string fname) {
 	SndfileHandle file = SndfileHandle(fname.c_str(), SFM_WRITE, SF_FORMAT_WAV | SF_FORMAT_PCM_24, audio.channels, audio.sample_rate);
 	file.write(&audio.samples[0], audio.samples.size());
 
-	return true; //TODO
+	return true;
 }

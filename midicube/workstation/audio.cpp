@@ -88,7 +88,6 @@ int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned 
 			++input_buffer;
 		}
 
-		//TODO array safety
 		*output_buffer++ = lsample;
 		*output_buffer++ = rsample;
 

@@ -84,7 +84,7 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 
 
 RotarySpeakerEffect::~RotarySpeakerEffect() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {

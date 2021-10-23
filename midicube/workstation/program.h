@@ -63,7 +63,6 @@ enum ProgramManagerProperty {
 	pProgramManagerProgram,
 };
 
-//TODO program manager thread safety
 class ProgramManager {
 private:
 	std::string path;

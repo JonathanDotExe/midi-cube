@@ -212,7 +212,7 @@ void Sampler::press_note(const SampleInfo& info, unsigned int note, double veloc
 				size_t slot = this->voice_mgr.press_note(info, note, note, velocity, 0); //FIXME parameters
 				SamplerVoice& voice = this->voice_mgr.note[slot];
 				voice.region = region;
-				voice.layer_amp = sample->volume; //FIXME
+				voice.layer_amp = sample->volume;
 				voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
 				voice.unirand = (double) rand()/RAND_MAX;
 				voice.birand = (double) rand()/RAND_MAX * 2 - 1.0;
@@ -505,7 +505,7 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 		if (tree.get_child_optional("sound")) {
 			load_region(tree.get_child("sound"), master, false, folder, pool);
 		}
-		if (sound->default_path.rfind("/", 0) == 0) { //FIXME
+		if (sound->default_path.rfind("/", 0) == 0) { //FIXME might be better options
 			folder = sound->default_path;
 		}
 		else {

@@ -84,5 +84,5 @@ Scene ProgramRenameView::create(ViewHost &frame) {
 
 
 ProgramRenameView::~ProgramRenameView() {
-	// TODO Auto-generated destructor stub
+
 }

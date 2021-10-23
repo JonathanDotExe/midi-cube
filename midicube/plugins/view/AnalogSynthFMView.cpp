@@ -90,5 +90,5 @@ Scene AnalogSynthFMView::create(ViewHost &frame) {
 }
 
 AnalogSynthFMView::~AnalogSynthFMView() {
-	// TODO Auto-generated destructor stub
+
 }

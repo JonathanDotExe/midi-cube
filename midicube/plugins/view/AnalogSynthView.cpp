@@ -214,7 +214,7 @@ void AnalogSynthView::position_operators() {
 }
 
 AnalogSynthView::~AnalogSynthView() {
-	// TODO Auto-generated destructor stub
+
 }
 
 bool AnalogSynthView::on_action(Control *control) {
