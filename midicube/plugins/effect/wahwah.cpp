@@ -34,7 +34,7 @@ void WahWahEffect::process(const SampleInfo &info) {
 			rdata = {FilterType::LP_6, scale_cutoff(preset.cutoff + renv.volume() * amount), preset.resonance};
 		}
 		else {
-			ldata = {FilterType::LP_6, scale_cutoff(preset.cutoff + pedal * amount), preset.resonance};
+			ldata = {FilterType::LP_6, scale_cutoff(preset.cutoff + amount), preset.resonance};
 			rdata = ldata;
 		}
 

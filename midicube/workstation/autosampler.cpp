@@ -320,7 +320,6 @@ void SampleSoundCreator::generate_sound() {
 			//Smooth velocity
 			if (smoothen_layers) {
 				//Calc velocity amount
-				//TODO seperate volumes for sustain
 				double last = v > 0 ? vols.at(v - 1).at(n) : 0;
 				velocity_amount = fmax(1 - last/vol, 0);
 

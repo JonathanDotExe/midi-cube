@@ -46,7 +46,6 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 
 		if (s.active) { //FIXME maintain when notes pressed
 			//Process
-			//TODO take input
 			engine->take_inputs(inputs, input_count);
 			engine->process(info);
 			engine->playback_outputs_stereo(lsample, rsample);

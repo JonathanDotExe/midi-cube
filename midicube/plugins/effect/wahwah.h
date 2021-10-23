@@ -47,7 +47,6 @@ private:
 
 public:
 	WahWahPreset preset;
-	double pedal = 0; //TODO remove
 
 	WahWahEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
