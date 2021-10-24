@@ -58,8 +58,25 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		cube.lock.unlock();
 	});
 	controls.push_back(edit_engine);
-	//TODO sequencer edit button
 	int tmp_y = 260;
+	//Sequencer
+	Button* edit_sequencer = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
+	edit_sequencer->set_on_click([this, &frame]() {
+		cube.lock.lock();
+		PluginInstance* sequencer = channel.sequencer.get_plugin();
+		if (sequencer) {
+			MidiCube& c = cube;
+			SoundEngineChannel& ch = channel;
+			int index = channel_index;
+			frame.change_view(new PluginView(*sequencer, [&c, &ch, index]() {
+				return new SoundEngineChannelView(c, ch, index);
+			}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
+		}
+		cube.lock.unlock();
+	});
+	controls.push_back(edit_sequencer);
+	tmp_y += 65;
+
 	//Effects
 	for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 		//Effect
