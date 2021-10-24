@@ -17,8 +17,11 @@ class PluginView: public ViewController {
 private:
 	PluginInstance& plugin;
 	std::function<ViewController* ()> back;
+	bool* play_metronome;
+	Metronome* metronome;
+	double* master_volume;
 public:
-	PluginView(PluginInstance& plugin, std::function<ViewController* ()> back);
+	PluginView(PluginInstance& plugin, std::function<ViewController* ()> back, Metronome* metronome, bool* play_metronome, double* master_volume);
 	virtual ~PluginView();
 	virtual Scene create(ViewHost &frame);
 };

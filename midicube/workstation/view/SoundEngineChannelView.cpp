@@ -53,7 +53,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 			int index = channel_index;
 			frame.change_view(new PluginView(*engine, [&c, &ch, index]() {
 				return new SoundEngineChannelView(c, ch, index);
-			}));
+			}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
 		}
 		cube.lock.unlock();
 	});
@@ -80,7 +80,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 				int index = channel_index;
 				frame.change_view(new PluginView(*effect, [&c, &ch, index]() {
 					return new SoundEngineChannelView(c, ch, index);
-				}));
+				}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
 			}
 			cube.lock.unlock();
 		});

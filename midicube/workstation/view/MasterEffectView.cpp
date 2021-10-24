@@ -60,7 +60,7 @@ Scene MasterEffectView::create(ViewHost &frame) {
 				MidiCube& c = cube;
 				frame.change_view(new PluginView(*eff, [&c]() {
 					return new MasterEffectView(c);
-				}));
+				}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
 			}
 			cube.lock.unlock();
 		});
