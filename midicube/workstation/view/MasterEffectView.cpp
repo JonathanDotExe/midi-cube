@@ -7,6 +7,7 @@
 
 #include "MasterEffectView.h"
 #include "SoundEngineView.h"
+#include "PluginSelectView.h"
 #include "PluginView.h"
 
 MasterEffectView::MasterEffectView(MidiCube& c): cube(c) {
@@ -51,6 +52,16 @@ Scene MasterEffectView::create(ViewHost &frame) {
 		e->rect.setFillColor(sf::Color(128, 255, 255));
 		e->property.bind_function<ssize_t>(std::bind(&MasterEffect::get_effect_index, &effect), std::bind(&MasterEffect::set_effect_index, &effect, std::placeholders::_1), frame.cube.lock);
 		controls.push_back(e);*/
+		cube.lock.lock();
+		std::string effect_name = effect.effect.get_plugin() ? effect.effect.get_plugin()->get_plugin().info.name : "None";
+		cube.lock.unlock();
+		Button* e = new Button(effect_name, main_font, 12, x + 5, y + 30, pane_width - 15, 30);
+		e->rect.setFillColor(sf::Color(128, 255, 255));
+		e->set_on_click([this, &frame, &effect]() {
+			MidiCube& c = cube;
+			frame.change_view(new PluginSelectView(effect.effect, cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), cube.lock, [&c]() { return new MasterEffectView(c); }));
+		});
+		controls.push_back(e);
 		//Edit
 		Button* edit_effect = new Button("Edit", main_font, 12, x + 5, y + 65, pane_width - 15, 30);
 		edit_effect->set_on_click([this, i, &effect, &frame]() {

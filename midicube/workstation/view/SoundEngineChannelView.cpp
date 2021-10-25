@@ -36,7 +36,6 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 
 	//Col 1
 	//Engine
-	//TODO engine selector
 	cube.lock.lock();
 	std::string engine_name = channel.engine.get_plugin() ? channel.engine.get_plugin()->get_plugin().info.name : "None";
 	cube.lock.unlock();
@@ -69,6 +68,19 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	controls.push_back(edit_engine);
 	int tmp_y = 260;
 	//Sequencer
+	cube.lock.lock();
+	std::string sequencer_name = channel.sequencer.get_plugin() ? channel.sequencer.get_plugin()->get_plugin().info.name : "None";
+	cube.lock.unlock();
+	Button* sequencer = new Button(sequencer_name, main_font, 18, 10, tmp_y, 200, 60);
+	sequencer->rect.setFillColor(sf::Color(128, 255, 255));
+	sequencer->set_on_click([this, &frame]() {
+		MidiCube& c = cube;
+		SoundEngineChannel& ch = channel;
+		int index = channel_index;
+		frame.change_view(new PluginSelectView(channel.sequencer, cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SEQUENCER), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }));
+	});
+	controls.push_back(sequencer);
+	
 	Button* edit_sequencer = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
 	edit_sequencer->set_on_click([this, &frame]() {
 		cube.lock.lock();
@@ -89,11 +101,18 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	//Effects
 	for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 		//Effect
-		//TODO Effect selector
-		/*ComboBox* effect = new ComboBox(0, effect_names, main_font, 18, -1, 10, tmp_y, 200, 60);
+		cube.lock.lock();
+		std::string effect_name = channel.effects[i].get_plugin() ? channel.effects[i].get_plugin()->get_plugin().info.name : "None";
+		cube.lock.unlock();
+		Button* effect = new Button(effect_name, main_font, 18, 10, tmp_y, 200, 60);
 		effect->rect.setFillColor(sf::Color(128, 255, 255));
-		effect->property.bind_function<ssize_t>(std::bind(&InsertEffect::get_effect_index, &channel.effects[i]), std::bind(&InsertEffect::set_effect_index, &channel.effects[i], std::placeholders::_1), frame.cube.lock);
-		controls.push_back(effect);*/
+		effect->set_on_click([this, &frame, i]() {
+			MidiCube& c = cube;
+			SoundEngineChannel& ch = channel;
+			int index = channel_index;
+			frame.change_view(new PluginSelectView(channel.effects[i], cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }));
+		});
+		controls.push_back(effect);
 		//Edit
 		Button* edit_effect = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
 
