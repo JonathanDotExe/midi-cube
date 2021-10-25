@@ -10,6 +10,7 @@
 #include "../../plugins/soundengine/organ.h"
 #include "../../resources.h"
 #include "SoundEngineView.h"
+#include "PluginSelectView.h"
 #include "PluginView.h"
 
 SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{c.lock, [&c, &ch, channel_index]() {
@@ -36,10 +37,18 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	//Col 1
 	//Engine
 	//TODO engine selector
-	/*ComboBox* engine = new ComboBox(0, engine_names, main_font, 24, -1, 10, 45, 300, 80);
+	cube.lock.lock();
+	std::string engine_name = channel.engine.get_plugin() ? channel.engine.get_plugin()->get_plugin().info.name : "None";
+	cube.lock.unlock();
+	Button* engine = new Button(engine_name, main_font, 24, 10, 45, 300, 80);
 	engine->rect.setFillColor(sf::Color(0, 180, 255));
-	engine->property.bind_function<ssize_t>(std::bind(&SoundEngineChannel::get_engine_index, &channel), std::bind(&SoundEngineChannel::set_engine_index, &channel, std::placeholders::_1), frame.cube.lock);
-	controls.push_back(engine);*/
+	engine->set_on_click([this, &frame]() {
+		MidiCube& c = cube;
+		SoundEngineChannel& ch = channel;
+		int index = channel_index;
+		frame.change_view(new PluginSelectView(channel.engine, cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SOUND_ENGINE), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }));
+	});
+	controls.push_back(engine);
 
 	//Edit
 	Button* edit_engine = new Button("Edit", main_font, 18, 10, 130, 300, 60);

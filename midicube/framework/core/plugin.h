@@ -228,6 +228,24 @@ private:
 
 public:
 
+	std::vector<Plugin*> get_plugins() {
+		std::vector<Plugin*> plugins;
+		for (auto plugin : this->plugins) {
+			plugins.push_back(plugin.second);
+		}
+		return plugins;
+	}
+
+	std::vector<Plugin*> get_plugins(PluginType type) {
+		std::vector<Plugin*> plugins;
+		for (auto plugin : this->plugins) {
+			if (plugin.second->info.type == type) {
+				plugins.push_back(plugin.second);
+			}
+		}
+		return plugins;
+	}
+
 	std::vector<PluginInfo> get_infos() {
 		std::vector<PluginInfo> infos;
 		for (auto plugin : plugins) {
