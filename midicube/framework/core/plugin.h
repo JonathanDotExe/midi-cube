@@ -342,6 +342,19 @@ public:
 		}
 	}
 
+	void set_plugin_locked(Plugin* plugin, SpinLock& lock) {
+		PluginInstance* inst = nullptr;
+		if (plugin) {
+			inst = plugin->create(host);
+		}
+		lock.lock();
+		PluginInstance* old = this->plugin;
+		this->plugin = inst;
+		lock.unlock();
+
+		delete old;
+	}
+
 	void load(PluginSlotProgram& prog, PluginManager* mgr) {
 		if (prog.get_program()) {
 			Plugin* p = mgr->get_plugin(prog.get_program()->get_plugin_name());

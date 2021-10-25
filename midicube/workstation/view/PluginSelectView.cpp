@@ -65,7 +65,12 @@ Scene PluginSelectView::create(ViewHost &frame) {
 		}
 		controls.push_back(button);
 		button->set_on_click([i, start, &frame, this]() {
-			//TODO change
+			Plugin* plugin = nullptr;
+			if (start + i > 0) {
+				plugin = plugins.at(start + i - 1);
+			}
+			this->plugin.set_plugin_locked(plugin, lock);
+			frame.change_view(new PluginSelectView(this->plugin, plugins, lock, back, page));
 		});
 	}
 	lock.unlock();
