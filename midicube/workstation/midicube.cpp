@@ -66,12 +66,14 @@ void MidiCube::init(int out_device, int in_device) {
 	for (size_t i = 0; i < engine.channels.size(); ++i) {
 		engine.channels[i].scenes[0].source.input = 1;
 	}
+	std::cout << "Loaded engines" << std::endl;
 	//Load programs
 	prog_mgr.lock();
 	prog_mgr.init_user(this);
 	prog_mgr.load_all(&plugin_mgr);
 	prog_mgr.apply_program(0, 0);
 	prog_mgr.unlock();
+	std::cout << "Loaded programs" << std::endl;
 
 	//MIDI Inputs
 	//Input-Devices

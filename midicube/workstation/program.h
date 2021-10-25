@@ -102,14 +102,13 @@ public:
 	//Mutex has to be locked by user
 	void overwrite_bank();
 
+	//Mutex has to be locked by user
 	bool init_user(ProgramUser* user) {
 		bool success = false;
-		lock();
 		if (!this->user) {
 			this->user = user;
 			success = true;
 		}
-		unlock();
 		return success;
 	}
 	//Mutex has to be locked by user

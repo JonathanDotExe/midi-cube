@@ -77,7 +77,7 @@ void StreamedAudioPool::run_gc() {
 	for (auto sample : samples) {
 		keys.push_back(sample.first);
 	}
-	while (running) {
+	while (running && keys.size()) {
 		//Garbage collect
 		unsigned int time = TIME_NOW();
 		gc_index %= keys.size();
