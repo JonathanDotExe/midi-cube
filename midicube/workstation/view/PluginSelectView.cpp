@@ -57,7 +57,7 @@ Scene PluginSelectView::create(ViewHost &frame) {
 
 		//Button
 		Button* button = new Button(pl->info.name, main_font, 16, x, y,  pane_width - 5, pane_height - 5);
-		if (plugin.get_plugin() == pl) {
+		if ((plugin.get_plugin() == nullptr) ? (pl == nullptr) : (pl == &plugin.get_plugin()->get_plugin())) {
 			button->rect.setFillColor(sf::Color(0, 180, 255));
 		}
 		else {
@@ -73,15 +73,15 @@ Scene PluginSelectView::create(ViewHost &frame) {
 	//Previous page
 	Button* previous_page = new Button("<", main_font, 18, 00, frame.get_height() - 40, 60, 40);
 	previous_page->set_on_click([&frame, this]() {
-		frame.change_view(new ProgramView(cube, this->bank, std::max((ssize_t) page - 1, (ssize_t) 0)));
+		frame.change_view(new PluginSelectView(plugin, plugins, lock, back, std::max((ssize_t) page - 1, (ssize_t) 0)));
 	});
 	controls.push_back(previous_page);
 
 	//Next page
 	Button* next_page = new Button(">", main_font, 18, frame.get_width() - 70 - 60, frame.get_height() - 40, 60, 40);
-	if (start + size < bank->programs.size()) {
+	if (start + size < plugins.size()) {
 		next_page->set_on_click([&frame, this]() {
-			frame.change_view(new ProgramView(cube, this->bank, page + 1));
+			frame.change_view(new PluginSelectView(plugin, plugins, lock, back, std::max((ssize_t) page + 1, (ssize_t) 0)));
 		});
 	}
 	controls.push_back(next_page);
@@ -89,7 +89,7 @@ Scene PluginSelectView::create(ViewHost &frame) {
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->set_on_click([&frame, this]() {
-		frame.change_view(new SoundEngineView(cube));
+		frame.change_view(this->back());
 	});
 	back->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(back);

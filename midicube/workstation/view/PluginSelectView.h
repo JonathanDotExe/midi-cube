@@ -17,9 +17,9 @@ class PluginSelectView : public ViewController {
 private:
 	PluginSlot& plugin;
 	std::vector<Plugin*> plugins;
+	SpinLock& lock;
 	std::function<ViewController* ()> back;
 	size_t page = 0;
-	SpinLock& lock;
 public:
 	PluginSelectView(PluginSlot& plugin, std::vector<Plugin*> plugins, SpinLock& lock, std::function<ViewController* ()> back, size_t page = 0);
 	virtual ~PluginSelectView();
