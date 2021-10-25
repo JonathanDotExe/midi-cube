@@ -10,7 +10,10 @@
 
 //Control
 Control::Control(int x, int y, int width, int height) {
-	update_position(x, y, width, height);
+	this->x = x;
+	this->y = y;
+	this->width = width;
+	this->height = height;
 }
 
 void Control::init(ViewHost* host) {

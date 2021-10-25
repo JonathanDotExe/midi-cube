@@ -22,8 +22,6 @@ public:
 		this->text.setString(text);
 		this->text.setCharacterSize(text_size);
 		this->text.setFillColor(sf::Color::Black);
-
-		update_position(x, y, width, height);
 	}
 
 	virtual void update_position(int x, int y, int width, int height);
@@ -43,8 +41,6 @@ public:
 
 	Pane(sf::Color color, int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height) {
 		rect.setFillColor(color);
-
-		update_position(x, y, width, height);
 	}
 
 	virtual void update_position(int x, int y, int width, int height);
@@ -71,8 +67,6 @@ public:
 		this->text.setCharacterSize(text_size);
 		this->text.setFillColor(sf::Color::Black);
 		rect.setFillColor(sf::Color(220, 220, 220));
-
-		update_position(x, y, width, height);
 	}
 
 	virtual void update_position(int x, int y, int width, int height);
@@ -129,8 +123,6 @@ public:
 
 		this->context_rect.setFillColor(sf::Color::White);
 		this->context_rect.setOutlineColor(sf::Color::Black);
-
-		update_position(x, y, width, height);
 	}
 
 	virtual void update_position(int x, int y, int width, int height);
@@ -196,8 +188,6 @@ public:
 		this->text.setFont(font);
 		this->text.setFillColor(sf::Color::Black);
 		this->text.setCharacterSize(text_size);
-
-		update_position(x, y, width, height);
 	}
 
 	virtual void update_position(int x, int y, int width, int height) {
@@ -294,8 +284,6 @@ public:
 
 		rect.setFillColor(sf::Color(220, 220, 220));
 		inner_rect.setFillColor(sf::Color(50, 50, 50));
-
-		update_position(x, y, width, height);
 	}
 
 	virtual void update_position(int x, int y, int width, int height);
@@ -334,8 +322,6 @@ public:
 		this->text.setCharacterSize(text_size);
 		this->text.setFillColor(sf::Color::Black);
 		rect.setFillColor(sf::Color(220, 220, 220));
-
-		update_position(x, y, width, height);
 	}
 
 	int get_value() {
@@ -375,6 +361,7 @@ public:
 
 	Drawbar(int value, int max, sf::Font& font, std::string title, int x = 0, int y = 0, int width = 0, int height = 0, sf::Color button_color = sf::Color::White, double slider_width = 0.7, int button_height = 60) : Control (x, y, width, height) {
 		this->progress = (double) value/max;
+		this->max = max;
 
 		this->slider_width = slider_width;
 		this->button_height = button_height;
@@ -394,8 +381,6 @@ public:
 		this->text.setFont(font);
 		this->text.setFillColor(sf::Color::Black);
 		this->text.setCharacterSize(24);
-
-		update_position(x, y, width, height);
 	}
 
 	virtual void update_position(int x, int y, int width, int height) {
@@ -492,8 +477,6 @@ public:
 		this->off_text.setString(off_text);
 		this->off_text.setCharacterSize(switch_text_size);
 		this->off_text.setFillColor(sf::Color::Black);
-
-		update_position(x, y, width, height);
 	}
 
 	virtual void update_position(int x, int y, int width, int height);

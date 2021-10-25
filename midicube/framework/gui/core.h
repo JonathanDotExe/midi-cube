@@ -159,6 +159,7 @@ public:
 		}
 		else if (std::find(controls.begin(), controls.end(), control) == controls.end()) {
 			control->init(this);
+			control->update_position(control->get_x(), control->get_y(), control->get_width(), control->get_height());
 			controls.push_back(control);
 		}
 		else {
