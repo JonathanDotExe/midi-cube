@@ -27,7 +27,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
 
-	Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 50);
+	Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 55);
 	controls.push_back(pane);
 
 	//Title
@@ -66,7 +66,9 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		cube.lock.unlock();
 	});
 	controls.push_back(edit_engine);
-	int tmp_y = 260;
+	Label* seq_title = new Label("Sequencer", main_font, 18, 10, 200);
+	controls.push_back(seq_title);
+	int tmp_y = 225;
 	//Sequencer
 	cube.lock.lock();
 	std::string sequencer_name = channel.sequencer.get_plugin() ? channel.sequencer.get_plugin()->get_plugin().info.name : "None";
@@ -98,6 +100,9 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	controls.push_back(edit_sequencer);
 	tmp_y += 65;
 
+	Label* effect_title = new Label("Effects", main_font, 18, 10, tmp_y);
+	controls.push_back(effect_title);
+	tmp_y += 25;
 	//Effects
 	for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 		//Effect
@@ -161,7 +166,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	}
 
 
-	CheckBox* active = new CheckBox(true, "Active", main_font, 18, 10, frame.get_height() - 95, 40, 40);
+	CheckBox* active = new CheckBox(true, "Active", main_font, 18, 10, frame.get_height() - 45, 40, 40);
 	active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), cube.lock);
 	controls.push_back(active);
 	//Col 2
