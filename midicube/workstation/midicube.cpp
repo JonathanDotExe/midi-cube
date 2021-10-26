@@ -29,6 +29,8 @@
 #include "../plugins/effect/vocoder.h"
 #include "../plugins/effect/wahwah.h"
 
+#include "../plugins/sequencer/arpeggiator.h"
+
 
 static void process_func(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info, void* user_data) {
 	((MidiCube*) user_data)->process(lsample, rsample, inputs, input_count, info);
@@ -60,6 +62,8 @@ void MidiCube::init(int out_device, int in_device) {
 	plugin_mgr.add_plugin(new RotarySpeakerPlugin());
 	plugin_mgr.add_plugin(new VocoderPlugin());
 	plugin_mgr.add_plugin(new LooperPlugin());
+	//Sequencers
+	plugin_mgr.add_plugin(new ArpeggiatorPlugin());
 	//Default engines
 	engine.channels[0].scenes[0].active = true;
 

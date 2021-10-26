@@ -68,7 +68,7 @@ public:
 class LooperPlugin : public EffectPlugin<Looper, LooperProgram> {
 public:
 	LooperPlugin() : EffectPlugin({
-		"LOOPER",
+		"Looper",
 		LOOPER_IDENTIFIER,
 		PluginType::PLUGIN_TYPE_EFFECT,
 		2,
