@@ -50,7 +50,7 @@ public:
 	}
 
 	virtual Control* on_mouse_pressed(int x, int y, sf::Mouse::Button button) {
-		return button == sf::Mouse::Button::Left && selectable() ? this : nullptr;
+		return (button == sf::Mouse::Button::Left && selectable()) ? this : nullptr;
 	}
 
 	virtual void on_mouse_drag(int x, int y, int x_motion, int y_motion) {

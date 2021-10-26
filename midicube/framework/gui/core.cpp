@@ -71,7 +71,9 @@ Control* ViewHost::on_mouse_pressed (int x, int y, sf::Mouse::Button button) {
 	for (Control* control : controls) {
 		if (control->is_visible() && control->collides(x - get_x_offset(), y - get_y_offset())) {
 			selected = control->on_mouse_pressed(x - get_x_offset(), y - get_y_offset(), button);
-			break; //Only click first control
+			if (selected) {
+				break; //Only click first control
+			}
 		}
 	}
 	return selected;
@@ -131,7 +133,7 @@ void Frame::run(ViewController* v) {
 					last_mouse_y = event.mouseButton.y;
 				}
 
-				on_mouse_pressed(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
+				selected = on_mouse_pressed(event.mouseButton.x, event.mouseButton.y, event.mouseButton.button);
 				request_redraw();
 			}
 				break;
@@ -148,8 +150,10 @@ void Frame::run(ViewController* v) {
 			case sf::Event::MouseButtonReleased:
 				if (event.mouseButton.button == sf::Mouse::Left) {
 					mouse_pressed = false;
+					std::cout << "Event: " << selected << std::endl;
 					if (selected) {
 						ViewController* view = selected->get_host()->get_view();
+						std::cout << view << std::endl;
 						if (view && selected->collides(event.mouseButton.x - selected->get_host()->get_x_offset(), event.mouseButton.y - selected->get_host()->get_y_offset()) && view->on_action(selected)) {
 							selected->on_mouse_action();
 						}
