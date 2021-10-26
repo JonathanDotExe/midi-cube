@@ -78,7 +78,7 @@ void Slider::update_position(int x, int y, int width, int height) {
 void Slider::draw(sf::RenderWindow& window, Control* selected) {
 	window.draw(slider_rect);
 	window.draw(button_rect);
-	if (selected) {
+	if (selected == this) {
 		window.draw(context_rect);
 		window.draw(text);
  	}
