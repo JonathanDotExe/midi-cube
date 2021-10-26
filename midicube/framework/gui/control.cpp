@@ -239,7 +239,6 @@ int ViewContainer::get_width() const {
 void ViewContainer::change_view(ViewController *view) {
 	delete next_view;
 	next_view = view;
-	request_redraw();
 }
 
 int ViewContainer::get_y_offset() const {
@@ -251,7 +250,9 @@ int ViewContainer::get_x_offset() const {
 }
 
 void ViewContainer::request_redraw() {
-	get_host()->request_redraw();
+	if (get_host()) {
+		get_host()->request_redraw();
+	}
 }
 
 void ViewContainer::add_control(Control *control) {
@@ -302,6 +303,7 @@ void ViewContainer::draw(sf::RenderWindow &window, Control* selected) {
 	if (next_view) {
 		switch_view(next_view);
 		next_view = nullptr;
+		request_redraw();
 	}
 	//Draw all
 	for (Control* control : get_controls()) {

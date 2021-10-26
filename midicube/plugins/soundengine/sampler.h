@@ -348,7 +348,7 @@ private:
 
 public:
 	SamplerPlugin() : Plugin({
-		"B3 Organ",
+		"Sampler",
 		SAMPLER_INDENTIFIER,
 		PluginType::PLUGIN_TYPE_SOUND_ENGINE,
 		0,
