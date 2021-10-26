@@ -7,6 +7,7 @@
 
 #include "tremolo.h"
 #include <cmath>
+#include "../view/EffectView.h"
 
 TremoloEffect::TremoloEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
@@ -27,6 +28,10 @@ void TremoloEffect::process(const SampleInfo& info) {
 		outputs[0] *= mul;
 		outputs[1] *= mul;
 	}
+}
+
+ViewController* TremoloEffect::create_view() {
+	return new EffectView(this);
 }
 
 TremoloEffect::~TremoloEffect() {

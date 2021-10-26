@@ -7,6 +7,7 @@
 
 #include "chorus.h"
 #include <cmath>
+#include "../view/EffectView.h"
 
 ChorusEffect::ChorusEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
@@ -89,6 +90,11 @@ void ChorusEffect::apply_program(PluginProgram *prog) {
 		preset = {};
 	}
 }
+
+ViewController* ChorusEffect::create_view() {
+	return new EffectView(this);
+}
+
 
 std::string ChorusProgram::get_plugin_name() {
 	return CHORUS_IDENTIFIER;

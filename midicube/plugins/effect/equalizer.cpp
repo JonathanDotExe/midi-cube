@@ -7,6 +7,7 @@
 
 #include "equalizer.h"
 #include <cmath>
+#include "../view/EffectView.h"
 
 EqualizerEffect::EqualizerEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
@@ -44,6 +45,11 @@ void EqualizerEffect::process(const SampleInfo& info) {
 		outputs[1] += rlow * preset.low_gain + rlow_mid * preset.low_mid_gain + rmid * preset.mid_gain + rhigh * preset.high_gain;
 	}
 }
+
+ViewController* EqualizerEffect::create_view() {
+	return new EffectView(this);
+}
+
 
 EqualizerEffect::~EqualizerEffect() {
 

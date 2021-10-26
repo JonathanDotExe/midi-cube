@@ -7,6 +7,7 @@
 
 #include "phaser.h"
 #include <cmath>
+#include "../view/EffectView.h"
 
 PhaserEffect::PhaserEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
@@ -42,6 +43,10 @@ void PhaserEffect::process(const SampleInfo& info) {
 		outputs[0] += l * fmin(0.5, preset.mix) * 2;
 		outputs[1] += r * fmin(0.5, preset.mix) * 2;
 	}
+}
+
+ViewController* PhaserEffect::create_view() {
+	return new EffectView(this);
 }
 
 PhaserEffect::~PhaserEffect() {

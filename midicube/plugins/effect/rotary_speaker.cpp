@@ -6,6 +6,7 @@
  */
 
 #include "rotary_speaker.h"
+#include "../view/EffectView.h"
 
 static inline double sound_delay(double rotation, double max_delay, unsigned int sample_rate) {
 	return (1 + rotation) * max_delay * 0.5 * sample_rate;
@@ -82,6 +83,9 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 	}
 }
 
+ViewController* RotarySpeakerEffect::create_view() {
+	return new EffectView(this);
+}
 
 RotarySpeakerEffect::~RotarySpeakerEffect() {
 

@@ -6,6 +6,7 @@
  */
 
 #include "vocoder.h"
+#include "../view/EffectView.h"
 
 void VocoderEffect::process(const SampleInfo& info) {
 	outputs[0] = inputs[0];
@@ -74,6 +75,11 @@ void VocoderEffect::process(const SampleInfo& info) {
 		outputs[1] *= preset.post_amplification;
 	}
 }
+
+ViewController* VocoderEffect::create_view() {
+	return new EffectView(this);
+}
+
 
 void VocoderProgram::load(boost::property_tree::ptree tree) {
 	preset.on = tree.get<bool>("on", true);

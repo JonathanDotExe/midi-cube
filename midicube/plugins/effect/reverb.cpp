@@ -8,6 +8,7 @@
 #include "reverb.h"
 
 #include <cmath>
+#include "../view/EffectView.h"
 
 double ReverbCombFilter::process(double in, double gain, unsigned int delay) {
 	double out = this->delay.process();
@@ -93,6 +94,10 @@ void ReverbEffect::apply_program(PluginProgram *prog) {
 		
 		preset = {};
 	}
+}
+
+ViewController* ReverbEffect::create_view() {
+	return new EffectView(this);
 }
 
 ReverbEffect::~ReverbEffect() {

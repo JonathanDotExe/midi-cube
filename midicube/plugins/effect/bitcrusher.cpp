@@ -8,6 +8,7 @@
 
 #include "bitcrusher.h"
 #include <cmath>
+#include "../view/EffectView.h"
 
 BitCrusherEffect::BitCrusherEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
@@ -62,6 +63,11 @@ void BitCrusherEffect::apply_program(PluginProgram *prog) {
 		preset = {};
 	}
 }
+
+ViewController* BitCrusherEffect::create_view() {
+	return new EffectView(this);
+}
+
 
 std::string BitCrusherProgram::get_plugin_name() {
 	return BIT_CRUSHER_IDENTIFIER;

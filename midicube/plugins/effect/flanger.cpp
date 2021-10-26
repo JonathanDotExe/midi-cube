@@ -7,6 +7,7 @@
 
 #include "flanger.h"
 #include <cmath>
+#include "../view/EffectView.h"
 
 FlangerEffect::FlangerEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
@@ -40,6 +41,11 @@ void FlangerEffect::process(const SampleInfo& info) {
 		outputs[1] += r * fmin(0.5, preset.mix) * 2;
 	}
 }
+
+ViewController* FlangerEffect::create_view() {
+	return new EffectView(this);
+}
+
 
 FlangerEffect::~FlangerEffect() {
 

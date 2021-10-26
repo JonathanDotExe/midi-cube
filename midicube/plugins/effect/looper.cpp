@@ -8,6 +8,7 @@
 #include "looper.h"
 #include <cstddef>
 #include <algorithm>
+#include "../view/EffectView.h"
 
 void LooperChannel::apply(double& lout, double& rout, const Metronome& metronome, const SampleInfo& info) {
 	//Play
@@ -59,6 +60,10 @@ void Looper::process(const SampleInfo &info) {
 			channels[record_channel].record(inputs[0], inputs[1], metronome, info);
 		}
 	}
+}
+
+ViewController* Looper::create_view() {
+	return new EffectView(this);
 }
 
 void Looper::save_program(PluginProgram **prog) {

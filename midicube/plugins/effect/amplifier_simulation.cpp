@@ -6,6 +6,7 @@
  */
 
 #include "amplifier_simulation.h"
+#include "../view/EffectView.h"
 
 AmplifierSimulationEffect::AmplifierSimulationEffect(PluginHost& h, Plugin& plugin) : Effect(h, plugin) {
 	cc.add_binding(&preset.on);
@@ -88,6 +89,10 @@ void AmplifierSimulationEffect::process(const SampleInfo &info) {
 	}
 	outputs[0] = lsample;
 	outputs[1] = rsample;
+}
+
+ViewController* AmplifierSimulationEffect::create_view() {
+	return new EffectView(this);
 }
 
 AmplifierSimulationEffect::~AmplifierSimulationEffect() {

@@ -7,6 +7,7 @@
 
 #include "compressor.h"
 #include <cmath>
+#include "../view/EffectView.h"
 
 CompressorEffect::CompressorEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
@@ -103,6 +104,11 @@ void CompressorEffect::apply_program(PluginProgram *prog) {
 		preset = {};
 	}
 }
+
+ViewController* CompressorEffect::create_view() {
+	return new EffectView(this);
+}
+
 
 std::string CompressorProgram::get_plugin_name() {
 	return COMPRESSOR_IDENTIFIER;
