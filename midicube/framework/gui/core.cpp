@@ -150,10 +150,8 @@ void Frame::run(ViewController* v) {
 			case sf::Event::MouseButtonReleased:
 				if (event.mouseButton.button == sf::Mouse::Left) {
 					mouse_pressed = false;
-					std::cout << "Event: " << selected << std::endl;
 					if (selected) {
 						ViewController* view = selected->get_host()->get_view();
-						std::cout << view << std::endl;
 						if (view && selected->collides(event.mouseButton.x - selected->get_host()->get_x_offset(), event.mouseButton.y - selected->get_host()->get_y_offset()) && view->on_action(selected)) {
 							selected->on_mouse_action();
 						}

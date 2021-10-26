@@ -49,14 +49,14 @@ Scene PluginSelectView::create(ViewHost &frame) {
 	for (size_t i = 0; i < size; ++i) {
 		Plugin* pl = nullptr;
 		if (start + i > 0) {
-			pl = plugins[start + i];
+			pl = plugins.at(start + i - 1);
 		}
 
 		int x = 10 + pane_width * (i % cols);
 		int y = 50 + pane_height * (i / cols);
 
 		//Button
-		Button* button = new Button(pl->info.name, main_font, 16, x, y,  pane_width - 5, pane_height - 5);
+		Button* button = new Button(pl ? pl->info.name : "None", main_font, 16, x, y,  pane_width - 5, pane_height - 5);
 		if ((plugin.get_plugin() == nullptr) ? (pl == nullptr) : (pl == &plugin.get_plugin()->get_plugin())) {
 			button->rect.setFillColor(sf::Color(0, 180, 255));
 		}
