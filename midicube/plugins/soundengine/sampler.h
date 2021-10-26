@@ -278,6 +278,8 @@ public:
 
 	void apply_program(PluginProgram *prog);
 
+	ViewController* create_view();
+
 	~Sampler();
 
 	size_t get_preset_index() const {

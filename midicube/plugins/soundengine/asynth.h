@@ -284,6 +284,8 @@ public:
 
 	void apply_program(PluginProgram *prog);
 
+	ViewController* create_view();
+
 	~AdvancedSynth();
 
 };

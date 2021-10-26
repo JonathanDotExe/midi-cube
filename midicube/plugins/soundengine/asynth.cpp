@@ -7,6 +7,7 @@
 #include "asynth.h"
 #include <cmath>
 #include <iostream>
+#include "../view/AnalogSynthView.h"
 
 #define OSC_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
@@ -732,6 +733,10 @@ boost::property_tree::ptree AdvancedSynthProgram::save() {
 	}
 
 	return tree;
+}
+
+ViewController* AdvancedSynth::create_view()  {
+	return new AnalogSynthView(*this);
 }
 
 AdvancedSynth::~AdvancedSynth() {

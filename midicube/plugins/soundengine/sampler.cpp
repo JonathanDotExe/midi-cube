@@ -14,6 +14,7 @@
 #include <boost/filesystem.hpp>
 #include <regex>
 #include <boost/algorithm/string.hpp>
+#include "../view/SamplerView.h"
 
 namespace pt = boost::property_tree;
 
@@ -330,6 +331,10 @@ void Sampler::set_sample(SampleSound *sample) {
 			}
 		}
 	}
+}
+
+ViewController* Sampler::create_view() {
+	return new SamplerView(*this);
 }
 
 Sampler::~Sampler() {

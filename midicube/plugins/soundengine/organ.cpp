@@ -8,6 +8,7 @@
 
 #include "organ.h"
 #include "../../framework/dsp/oscilator.h"
+#include "../view/B3OrganView.h"
 #include <cmath>
 
 //B3OrganTonewheel
@@ -314,4 +315,8 @@ PluginProgram* OrganPlugin::create_program() {
 
 PluginInstance* OrganPlugin::create(PluginHost *host) {
 	return new B3Organ(*host, *this);
+}
+
+ViewController* B3Organ::create_view() {
+	return new B3OrganView(*this);
 }
