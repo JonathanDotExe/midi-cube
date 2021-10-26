@@ -65,7 +65,7 @@ enum ProgramManagerProperty {
 
 class ProgramManager {
 private:
-	std::string path;
+	std::string path = "";
 	size_t curr_bank = 0;
 	size_t curr_program = 0;
 	std::vector<Bank*> banks;

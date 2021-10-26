@@ -153,11 +153,11 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 
 MidiCube::~MidiCube() {
 	lock.lock();
-	//Load programs
+	audio_handler.close();
+	//Save programs
 	prog_mgr.lock();
 	prog_mgr.save_all();
 	prog_mgr.unlock();
-	audio_handler.close();
 	for (MidiCubeInput in : inputs) {
 		delete in.in;
 	}

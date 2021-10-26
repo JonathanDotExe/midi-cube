@@ -318,7 +318,7 @@ public:
 
 	pt::ptree save() {
 		pt::ptree tree;
-		tree.put("plugin", program ? program->get_plugin_name() : nullptr);
+		tree.put("plugin", program ? program->get_plugin_name() : "");
 		if (program) {
 			tree.add_child("data", program->save());
 		}

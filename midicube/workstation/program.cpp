@@ -10,6 +10,7 @@
 #include <regex>
 #include <iostream>
 #include <cctype>
+#include <string>
 
 std::string bank_filename(std::string name) {
 	std::string filename = "";
@@ -229,6 +230,7 @@ void save_bank(Bank& bank, std::string path) {
 		save_program(program, p);
 		tree.add_child("bank.programs.program", p);
 	}
+	std::cout << "Saved programs" << std::endl;
 	//Write
 	try {
 		pt::write_xml(path, tree);
@@ -343,8 +345,8 @@ void ProgramManager::load_all(PluginManager* mgr) {
 }
 
 void ProgramManager::save_all() {
-	std::vector<std::string> filenames;
-	for (auto b : banks) {
+	std::vector<std::string> filenames{};
+	for (Bank* b : banks) {
 		while (std::find(filenames.begin(), filenames.end(), b->filename) != filenames.end()) {
 			b->filename += "_";
 		}
