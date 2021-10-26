@@ -73,11 +73,13 @@ class ArpeggiatorInstance : public PluginInstance {
 public:
 	Arpeggiator arp;
 
+	virtual ViewController* create_view();
 	ArpeggiatorInstance(PluginHost& h, Plugin& p);
 	void apply_program(PluginProgram *prog);
 	void process(const SampleInfo &info);
 	void save_program(PluginProgram **prog);
 	void recieve_midi(const MidiMessage &message, const SampleInfo &info);
+
 	~ArpeggiatorInstance();
 };
 

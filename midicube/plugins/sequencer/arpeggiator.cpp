@@ -6,6 +6,7 @@
  */
 
 #include "arpeggiator.h"
+#include "../view/ArpeggiatorView.h"
 
 //Arpeggiator
 Arpeggiator::Arpeggiator() {
@@ -406,4 +407,8 @@ PluginProgram* ArpeggiatorPlugin::create_program() {
 
 PluginInstance* ArpeggiatorPlugin::create(PluginHost *host) {
 	return new ArpeggiatorInstance(*host, *this);
+}
+
+ViewController* ArpeggiatorInstance::create_view() {
+	return new ArpeggiatorView(*this);
 }
