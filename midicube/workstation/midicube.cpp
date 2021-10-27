@@ -180,4 +180,5 @@ void MidiCube::apply_program(Program *prog) {
 }
 
 void MidiCube::notify_property_update(void *source, void *prop) {
+	property_callback(source, prop);
 }

@@ -223,6 +223,8 @@ public:
 
 	void update_properties();
 
+	void propterty_change(void* source, void* prop);
+
 	void request_redraw() {
 		redraw = true;
 	}

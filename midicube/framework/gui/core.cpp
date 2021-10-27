@@ -203,3 +203,6 @@ void Frame::notify_remove(Control *control) {
 		selected = nullptr;
 	}
 }
+
+void Frame::propterty_change(void *source, void *prop) {
+}

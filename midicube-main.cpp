@@ -32,11 +32,14 @@ int main(int argc, char **argv) {
 	//Create MIDICube
 	MidiCubePtr ptr;
 	try {
-		ptr.cube = new MidiCube();
-		ptr.cube->init(out_device, in_device);
-		load_resources();
 		//View
 		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation", screen_sleep);
+
+		ptr.cube = new MidiCube([&frame](void* source, void* prop) {
+			frame.propterty_change(source, prop);
+		});
+		ptr.cube->init(out_device, in_device);
+		load_resources();
 		//Run frame
 		frame.run(new SoundEngineView(*ptr.cube));
 	}

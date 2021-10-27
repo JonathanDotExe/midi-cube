@@ -31,6 +31,7 @@ struct MidiMessageWithInput {
 class MidiCube : public ProgramUser {
 private:
 	AudioHandler audio_handler;
+	std::function<void(void*, void*)> property_callback;
 	std::vector<MidiCubeInput> inputs;
 
 	inline void process_midi(MidiMessage& message, size_t input);
@@ -45,6 +46,10 @@ public:
 	std::atomic<bool> updated{false};
 
 	SpinLock lock;
+
+	MidiCube(std::function<void(void*, void*)> c) : property_callback(c) {
+
+	}
 
 	void save_program(Program *prog);
 	void apply_program(Program *prog);
