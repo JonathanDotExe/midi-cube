@@ -83,14 +83,6 @@ Scene SamplerView::create(ViewHost &frame) {
 		}
 	}
 
-	//Back Button
-	/*Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
-	back->rect.setFillColor(sf::Color::Yellow);
-	back->set_on_click([&frame, this]() {
-		frame.change_view(new SoundEngineChannelView(channel, channel_index));
-	});
-	controls.push_back(back);*/
-
 	return {controls};
 }
 

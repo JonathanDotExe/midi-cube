@@ -21,10 +21,7 @@ Scene ArpeggiatorView::create(ViewHost &frame) {
 	std::vector<std::string> patterns{"Up", "Down", "Random", "Up/Down", "Down/Up"};
 
 	//Background
-	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
-	controls.push_back(bg);
-
-	Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 50);
+	Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 5);
 	controls.push_back(pane);
 
 	//Title

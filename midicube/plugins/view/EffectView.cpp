@@ -1713,7 +1713,7 @@ Scene EffectView::create(ViewHost &frame) {
 		}
 	}
 
-	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
+	controls.push_back(binder.create_button(frame.get_width() - 100, frame.get_height() - 40, &frame));
 
 
 

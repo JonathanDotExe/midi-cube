@@ -117,10 +117,8 @@ Scene LooperView::create(ViewHost &frame) {
 		controls.push_back(clear);
 	}
 
-	//TODO metronome and volume controls
-
 	//Looper
-	CheckBox* looper = new CheckBox(false, "Looper", main_font, 18, 440, frame.get_height() - 45, 40, 40);
+	CheckBox* looper = new CheckBox(false, "Looper", main_font, 18, 10, frame.get_height() - 45, 40, 40);
 	looper->property.bind(this->looper.active, lock);
 	controls.push_back(looper);
 

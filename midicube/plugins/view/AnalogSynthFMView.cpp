@@ -20,10 +20,7 @@ Scene AnalogSynthFMView::create(ViewHost &frame) {
 	SpinLock& lock = synth.get_lock();
 
 	//Background
-	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
-	controls.push_back(bg);
-
-	Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 50);
+	Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 5);
 	controls.push_back(pane);
 
 	int tmp_x = 10;
@@ -79,7 +76,7 @@ Scene AnalogSynthFMView::create(ViewHost &frame) {
 	}
 
 	//Back Button
-	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
+	Button* back = new Button("Back", main_font, 18, 0, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
 	back->set_on_click([&frame, this]() {
 		frame.change_view(new AnalogSynthView(synth));
