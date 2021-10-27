@@ -21,6 +21,7 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	if (!this->device) {
 		this->device = device;
 		engine.init(this);
+		sequencer.init(this);
 		for (size_t i = 0; i < effects.size(); ++i) {
 			effects[i].init(this);
 		}
