@@ -215,6 +215,7 @@ private:
 	bool request_close = false;
 
 	bool render_sleep = true;
+	std::atomic<bool> update = false;
 
 public:
 	Frame(int width, int height, std::string title, bool render_sleep = true);

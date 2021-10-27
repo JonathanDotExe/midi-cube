@@ -111,13 +111,14 @@ void Frame::run(ViewController* v) {
 
 	while (window.isOpen()) {
 		//Property changes
-		/*
-		TODO property updates
-		for (Control* control : controls) {
-			control->update_properties();
+		if (update) {
+			update = false;
+			for (Control* control : controls) {
+				control->update_properties();
+			}
+			view->update_properties();
 		}
-		view->update_properties();
-		*/
+
 		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -205,4 +206,6 @@ void Frame::notify_remove(Control *control) {
 }
 
 void Frame::propterty_change(void *source, void *prop) {
+	update = true;
+	//check for source and prop
 }
