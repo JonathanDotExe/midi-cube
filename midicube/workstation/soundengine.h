@@ -79,6 +79,7 @@ public:
 	ChannelInfo info;
 	size_t polyphony_limit = 0;
 
+	void notify_property_update(void *source, void *prop);
 	virtual SpinLock& get_lock();
 	void recieve_midi(const MidiMessage &message,
 			const SampleInfo &info, void* src);
@@ -234,9 +235,12 @@ public:
 	const Metronome& get_metronome();
 	const KeyboardEnvironment& get_environment();
 	SpinLock& get_lock();
+
 	~SoundEngineDeviceHost() {
 
 	}
+
+	void notify_property_update(void *source, void *prop);
 };
 
 

@@ -201,6 +201,11 @@ SpinLock& SoundEngineChannel::get_lock() {
 	return device->get_cube()->lock;
 }
 
+
+void SoundEngineChannel::notify_property_update(void *source, void *prop) {
+	device->get_cube()->notify_property_update(source, prop);
+}
+
 //SoundEngineDevice
 SoundEngineDevice::SoundEngineDevice() : metronome(120){
 	host.init(this);
@@ -541,4 +546,8 @@ void SoundEngineDeviceHost::init(SoundEngineDevice *device) {
 
 SpinLock& SoundEngineDeviceHost::get_lock() {
 	return this->device->get_cube()->lock;
+}
+
+void SoundEngineDeviceHost::notify_property_update(void *source, void *prop) {
+	device->get_cube()->notify_property_update(source, prop);
 }

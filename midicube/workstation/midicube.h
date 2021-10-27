@@ -46,8 +46,9 @@ public:
 
 	SpinLock lock;
 
-	virtual void save_program(Program *prog);
-	virtual void apply_program(Program *prog);
+	void save_program(Program *prog);
+	void apply_program(Program *prog);
+	void notify_property_update(void* source, void* prop);
 	MidiCube();
 	void init(int out_device = -1, int in_device = -1);
 	inline void process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info);

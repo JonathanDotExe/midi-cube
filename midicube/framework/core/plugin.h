@@ -67,6 +67,8 @@ public:
 
 	virtual Plugin* get_plugin(std::string identifier) = 0;
 
+	virtual void notify_property_update(void* source, void* prop) = 0;
+
 	virtual ~PluginHost() {
 
 	}
@@ -144,6 +146,10 @@ public:
 
 	inline SpinLock& get_lock() const {
 		return host.get_lock();
+	}
+
+	inline void notify_property_update(void* prop) {
+		get_host().notify_property_update(this, prop);
 	}
 
 	inline void take_input_mono(double sample) {

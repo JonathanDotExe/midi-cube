@@ -178,3 +178,6 @@ void MidiCube::apply_program(Program *prog) {
 	engine.apply_program(prog);
 	std::cout << "Selected program: " << prog->name << std::endl;
 }
+
+void MidiCube::notify_property_update(void *source, void *prop) {
+}
