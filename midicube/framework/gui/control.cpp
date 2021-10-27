@@ -307,7 +307,9 @@ void ViewContainer::draw(sf::RenderWindow &window, Control* selected) {
 	}
 	//Draw all
 	for (Control* control : get_controls()) {
-		control->draw(window, selected);
+		if (control->is_visible()) {
+			control->draw(window, selected);
+		}
 	}
 }
 
