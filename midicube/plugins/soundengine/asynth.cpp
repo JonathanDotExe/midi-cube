@@ -13,7 +13,7 @@
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
 AdvancedSynth::AdvancedSynth(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
-	binder.init(get_host().get_binding_handler());
+	binder.init(get_host().get_binding_handler(), this);
 	//Parts
 	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
 		LFOEntity& lfo = preset.lfos[i];

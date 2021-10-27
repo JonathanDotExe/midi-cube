@@ -226,12 +226,12 @@ class MidiBindingHandler {
 private:
 	/*std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> persistent;
 	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> temp;*/
-	std::vector<BindableValue*> bindings;
+	std::vector<std::pair<void*, BindableValue*>> bindings;
 
 public:
 
-	void bind(BindableValue* value) {
-		bindings.push_back(value);
+	void bind(void* source, BindableValue* value) {
+		bindings.push_back({source, value});
 		/*//Unbind
 		if (value->persistent_cc < MIDI_CONTROL_COUNT) {
 			std::vector<BindableValue*>& vec = persistent[value->persistent_cc];
@@ -265,18 +265,18 @@ public:
 			std::vector<BindableValue*>& vec = temp[value->temp_cc];
 			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
 		}*/
-		bindings.erase(std::remove_if(bindings.begin(), bindings.end(), [value](BindableValue* v) { return v == value; }), bindings.end());
+		bindings.erase(std::remove_if(bindings.begin(), bindings.end(), [value](std::pair<void*, BindableValue*> v) { return v.second == value; }), bindings.end());
 	}
 
-	bool on_cc(unsigned int control, double value) {
-		bool updated = false;
-		for (BindableValue* val : bindings) {
-			if (val->cc == control) {
-				val->change(value);
+	std::vector<std::pair<void*, void*>> on_cc(unsigned int control, double value) {
+		std::vector<std::pair<void*, void*>> changes;
+		for (std::pair<void*, BindableValue*> val : bindings) {
+			if (val.second->cc == control) {
+				val.second->change(value);
+				changes.push_back(val); //TODO
 			}
-			updated = true;
 		}
-		return updated;
+		return changes;
 	}
 
 };
@@ -284,6 +284,7 @@ public:
 class LocalMidiBindingHandler {
 private:
 	std::vector<BindableValue*> values;
+	void* source = nullptr;
 	MidiBindingHandler* handler = nullptr;
 
 public:
@@ -292,14 +293,15 @@ public:
 		values.push_back(value);
 	}
 
-	void init(MidiBindingHandler* handler) {
-		if (this->handler) {
+	void init(MidiBindingHandler* handler, void* source) {
+		if (this->handler || this->source) {
 			throw "Binding handler already initialized";
 		}
+		this->source = source;
 		this->handler = handler;
 		//Init values
 		for (BindableValue* value : values) {
-			handler->bind(value);
+			handler->bind(this->source, value);
 		}
 	}
 

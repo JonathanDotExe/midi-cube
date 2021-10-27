@@ -49,7 +49,7 @@ B3Organ::B3Organ(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	binder.add_binding(&data.preset.vibrato_mix);
 	binder.add_binding(&data.preset.swell);
 
-	binder.init(h.get_binding_handler());
+	binder.init(h.get_binding_handler(), this);
 
 
 	drawbar_notes = {-12, 7, 0, 12, 19, 24, 28, 31, 36};

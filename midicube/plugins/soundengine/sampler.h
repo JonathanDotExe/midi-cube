@@ -306,11 +306,11 @@ public:
 			case 129:
 				return env.aftertouch;
 			case 130:
-				return env.aftertouch; //FIXME support poly at
+				return env.aftertouch; //TODO support poly at
 			case 131:
 				return voice->velocity; //Note on velocity
 			case 132:
-				return voice->velocity; //Note off velocity FIXME
+				return voice->velocity; //Note off velocity TODO
 			case 133:
 				return voice->note/127.0;
 			case 134:

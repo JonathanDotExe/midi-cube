@@ -47,14 +47,10 @@ public:
 
 	SpinLock lock;
 
-	MidiCube(std::function<void(void*, void*)> c) : property_callback(c) {
-
-	}
-
 	void save_program(Program *prog);
 	void apply_program(Program *prog);
 	void notify_property_update(void* source, void* prop);
-	MidiCube();
+	MidiCube(std::function<void(void*, void*)> c);
 	void init(int out_device = -1, int in_device = -1);
 	inline void process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info);
 	std::vector<MidiCubeInput> get_inputs();

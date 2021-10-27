@@ -26,7 +26,7 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 			effects[i].init(this);
 		}
 
-		binder.init(&device->binding_handler);
+		binder.init(&device->binding_handler, this);
 	}
 }
 
@@ -268,7 +268,6 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, double*
 }
 
 void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& source, SampleInfo& info) {
-	bool updated = false;
 	double pitch;
 
 	//Global values
@@ -300,11 +299,13 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
 			if (scene_ccs[i] == message.control()) {
 				scene = i;
-				updated = true;
+				cube->notify_property_update(this, &scene);
 			}
 		}
 		//Binding handler
-		updated = binding_handler.on_cc(message.control(), message.value()/127.0) || updated;
+		for (auto binding : binding_handler.on_cc(message.control(), message.value()/127.0)) {
+			cube->notify_property_update(binding.first, binding.second);
+		}
 		break;
 	case MessageType::PROGRAM_CHANGE:
 		break;
@@ -324,7 +325,7 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 						unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
 						metronome.set_bpm(bpm);
 						if (bpm != old_bpm) {
-							updated = true;
+							cube->notify_property_update(this, &scene);
 						}
 						metronome.init(first_beat_time);
 					}
@@ -385,7 +386,6 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 			}
 		}
 	}
-	//TODO refresh GUI
 }
 
 

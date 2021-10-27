@@ -113,10 +113,10 @@ void Frame::run(ViewController* v) {
 		//Property changes
 		if (update) {
 			update = false;
-			for (Control* control : controls) {
+			for (Control* control : get_controls()) {
 				control->update_properties();
 			}
-			view->update_properties();
+			get_view()->update_properties();
 		}
 
 		//Events

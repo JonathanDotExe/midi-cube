@@ -214,7 +214,7 @@ void Sampler::press_note(const SampleInfo& info, unsigned int note, double veloc
 				SamplerVoice& voice = this->voice_mgr.note[slot];
 				voice.region = region;
 				voice.layer_amp = sample->volume;
-				voice.sample = /*(sustain && voice.region->sustain_sample.sample.samples.size()) ? &voice.region->sustain_sample : &voice.region->sample*/ &voice.region->sample; //FIXME
+				voice.sample = &voice.region->sample;
 				voice.unirand = (double) rand()/RAND_MAX;
 				voice.birand = (double) rand()/RAND_MAX * 2 - 1.0;
 				voice.alternate = alternate;
@@ -588,5 +588,4 @@ void Sampler::control_change(unsigned int control, unsigned int value) {
 	if (std::find(index.controls.begin(), index.controls.end(), control) == index.controls.end()) {
 		cc[control] = value/127.0;
 	}
-	//FIXME update notifications
 }
