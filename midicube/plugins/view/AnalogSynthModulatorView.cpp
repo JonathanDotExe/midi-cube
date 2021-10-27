@@ -123,7 +123,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 	tmp_x += 90;
 
 	//Edit Sources
-	Button* edit = new Button("Edit Sources", main_font, 18, 120, frame.get_height() - 40, 120, 40);
+	Button* edit = new Button("Edit Sources", main_font, 18, 75, frame.get_height() - 40, 120, 40);
 	edit->rect.setFillColor(sf::Color::Yellow);
 	edit->set_on_click([&frame, show_amount, show_source, this]() {
 		edit_source = !edit_source;
@@ -136,9 +136,9 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 	});
 	controls.push_back(edit);
 
-	controls.push_back(binder.create_button(70 + 120, frame.get_height() - 40, &frame));
+	controls.push_back(binder.create_button(75 + 120, frame.get_height() - 40, &frame));
 	//Back Button
-	Button* back = new Button("Back", main_font, 18, 0, frame.get_height() - 40, 70, 40);
+	Button* back = new Button("Back", main_font, 18, 5, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
 	back->set_on_click([&frame, this]() {
 		frame.change_view(new AnalogSynthView(synth));

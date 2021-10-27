@@ -185,7 +185,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 		frame.change_view(new AnalogSynthFMView(synth));
 	});
 	controls.push_back(fm);
-	controls.push_back(binder.create_button(frame.get_width() - 100, frame.get_height() - 40, &frame));
+	controls.push_back(binder.create_button(5, frame.get_height() - 40, &frame));
 
 	return {controls};
 }
