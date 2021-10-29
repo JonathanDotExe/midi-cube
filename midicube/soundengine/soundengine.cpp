@@ -499,7 +499,7 @@ bool SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = channels[i];
 		ChannelSource& s = channel.scenes[scene].source;
-		if (input == s.input) {
+		if (s.input < 0 || input == static_cast<size_t>(s.input)) {
 			//Filter
 			bool pass = true;
 			switch (message.type) {
