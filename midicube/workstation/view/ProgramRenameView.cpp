@@ -51,12 +51,11 @@ Scene ProgramRenameView::create(ViewHost &frame) {
 				}
 			}
 
-			DragBox<int>* box = new DragBox<int>(index, 0, chars.size() - 1, main_font, 30, 0, 0, 0, 0);
+			DragBox<int>* box = new DragBox<int>(index, 0, chars.size() - 1, main_font, 30, frame.get_width()/2 - width/2 + 45 * i, 150, 40, 40);
 			box->drag_step = 4;
 			box->to_string = [this](int i) {
 				return std::string{chars.at(i)};
 			};
-			box->update_position(frame.get_width()/2 - width/2 + 45 * i, 150, 40, 40);
 			boxes.push_back(box);
 			controls.push_back(box);
 		}

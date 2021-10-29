@@ -17,7 +17,7 @@
 #define SELECTABLE virtual bool selectable() const { return true; };
 
 
-
+//TODO pseudo host for controls
 class ViewHost;
 
 class Control {

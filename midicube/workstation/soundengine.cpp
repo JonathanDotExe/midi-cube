@@ -439,7 +439,7 @@ void SoundEngineDevice::save_program(Program* program) {
 		//Effects
 		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
 			PluginSlotProgram& p = prog.effects[j];
-			ch.effects[i].save(p);
+			ch.effects[j].save(p);
 		}
 	}
 	//Master Effects
