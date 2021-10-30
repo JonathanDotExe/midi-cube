@@ -326,7 +326,7 @@ public:
 		pt::ptree tree;
 		tree.put("plugin", program ? program->get_plugin_name() : "");
 		if (program) {
-			tree.add_child("data", program->save());
+			tree.put_child("data", program->save());
 		}
 		return tree;
 	}

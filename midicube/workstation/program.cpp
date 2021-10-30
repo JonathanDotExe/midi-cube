@@ -116,12 +116,17 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 	//Effects
 	const auto& effects = tree.get_child_optional("master_effects");
 	if (effects) {
+		std::cout << "Found effects" << std::endl;
 		size_t j = 0;
 		for (pt::ptree::value_type& s : effects.get()) {
 			if (j >= SOUND_ENGINE_MASTER_EFFECT_AMOUNT) {
 				break;
 			}
-			program->effects[j].prog.load(s.second, mgr);
+			program->effects[j].next_effect = s.second.get<ssize_t>("next_effect", -1);
+			const auto& effect = s.second.get_child_optional("effect");
+			if (effect) {
+				program->effects[j].prog.load(effect.get(), mgr);
+			}
 			++j;
 		}
 	}
