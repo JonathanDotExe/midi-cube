@@ -179,9 +179,8 @@ void save_program(Program* program, pt::ptree& tree) {
 		c.put("send_master", program->channels[i].send_master);
 		//Effects
 		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
-			pt::ptree t;
 			PluginSlotProgram& effect = program->channels[i].effects[j];
-			t.put_child("effect", effect.save());
+			c.add_child("insert_effects.effect", effect.save());
 		}
 
 		tree.add_child("channels.channel", c);

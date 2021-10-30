@@ -40,7 +40,7 @@ struct ChannelInfo {
 };
 
 struct ChannelSource {
-	ssize_t input = 1;
+	ssize_t input = 0;
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
 	unsigned int start_velocity = 0;
