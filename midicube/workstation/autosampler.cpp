@@ -433,6 +433,30 @@ void ProgramConverter::convert() {
 			if (channel.get_child_optional("preset")) {
 				channel.put_child("engine.preset", channel.get_child("preset"));
 			}
+
+			//Insert Effects
+			for (auto& e : prog.get_child("insert_effects")) {
+				pt::ptree& effect = e.second;
+				ssize_t effect_type = channel.get<ssize_t>("effect_type", -1);
+				std::vector<std::string> types{
+					"midicube_overdrive_amp",
+					"midicube_rotary_speaker",
+					"midicube_reverb",
+					"midicube_chorus",
+					"midicube_bit_crusher",
+					"midicube_vocoder",
+					"midicube_tremolo",
+					"midicube_delay",
+					"midicube_flanger",
+					"midicube_phaser",
+					"midicube_wah_wah",
+					"midicube_4_band_eq",
+					"midicube_compressor",
+				};
+				if (effect_type >= 0 && effect_type < types.size()) {
+					effect.put("plugin", types[effect_type]);
+				}
+			}
 		}
 	}
 }
