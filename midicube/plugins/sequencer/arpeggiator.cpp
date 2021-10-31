@@ -318,8 +318,8 @@ std::string ArpeggiatorProgram::get_plugin_name() {
 
 boost::property_tree::ptree ArpeggiatorProgram::save() {
 	boost::property_tree::ptree tree;
-	tree.put("arpeggiator.on", on);
-	tree.put("arpeggiator.bpm", bpm);
+	tree.put("on", on);
+	tree.put("bpm", bpm);
 	tree.put("pattern", static_cast<size_t>(preset.pattern));
 	tree.put("octaves", preset.octaves);
 	tree.put("note_value", preset.value);

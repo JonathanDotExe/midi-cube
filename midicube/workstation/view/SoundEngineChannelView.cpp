@@ -70,35 +70,37 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	controls.push_back(seq_title);
 	int tmp_y = 225;
 	//Sequencer
-	cube.lock.lock();
-	std::string sequencer_name = channel.sequencers.get_plugin() ? channel.sequencers.get_plugin()->get_plugin().info.name : "None";
-	cube.lock.unlock();
-	Button* sequencer = new Button(sequencer_name, main_font, 18, 10, tmp_y, 200, 60);
-	sequencer->rect.setFillColor(sf::Color(128, 255, 255));
-	sequencer->set_on_click([this, &frame]() {
-		MidiCube& c = cube;
-		SoundEngineChannel& ch = channel;
-		int index = channel_index;
-		frame.change_view(new PluginSelectView(channel.sequencers, cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SEQUENCER), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }));
-	});
-	controls.push_back(sequencer);
-	
-	Button* edit_sequencer = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
-	edit_sequencer->set_on_click([this, &frame]() {
+	for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
 		cube.lock.lock();
-		PluginInstance* sequencer = channel.sequencers.get_plugin();
-		if (sequencer) {
+		std::string sequencer_name = channel.sequencers[i].get_plugin() ? channel.sequencers[i].get_plugin()->get_plugin().info.name : "None";
+		cube.lock.unlock();
+		Button* sequencer = new Button(sequencer_name, main_font, 18, 10, tmp_y, 200, 60);
+		sequencer->rect.setFillColor(sf::Color(128, 255, 255));
+		sequencer->set_on_click([this, &frame, i]() {
 			MidiCube& c = cube;
 			SoundEngineChannel& ch = channel;
 			int index = channel_index;
-			frame.change_view(new PluginView(*sequencer, [&c, &ch, index]() {
-				return new SoundEngineChannelView(c, ch, index);
-			}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
-		}
-		cube.lock.unlock();
-	});
-	controls.push_back(edit_sequencer);
-	tmp_y += 65;
+			frame.change_view(new PluginSelectView(channel.sequencers[i], cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SEQUENCER), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }));
+		});
+		controls.push_back(sequencer);
+
+		Button* edit_sequencer = new Button("Edit", main_font, 18, 220, tmp_y, 90, 60);
+		edit_sequencer->set_on_click([this, &frame, i]() {
+			cube.lock.lock();
+			PluginInstance* sequencer = channel.sequencers[i].get_plugin();
+			if (sequencer) {
+				MidiCube& c = cube;
+				SoundEngineChannel& ch = channel;
+				int index = channel_index;
+				frame.change_view(new PluginView(*sequencer, [&c, &ch, index]() {
+					return new SoundEngineChannelView(c, ch, index);
+				}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
+			}
+			cube.lock.unlock();
+		});
+		controls.push_back(edit_sequencer);
+		tmp_y += 65;
+	}
 
 	Label* effect_title = new Label("Effects", main_font, 18, 10, tmp_y);
 	controls.push_back(effect_title);

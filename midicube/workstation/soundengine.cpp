@@ -89,8 +89,9 @@ void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info
 		for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
 			PluginInstance* seq = sequencers[i].get_plugin();
 			if (seq) {
-				if (found) {
+				if (found || src == nullptr) {
 					next = seq;
+					break;
 				}
 				else if (src == seq) {
 					found = true;
@@ -455,7 +456,7 @@ void SoundEngineDevice::save_program(Program* program) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
 		ch.engine.save(prog.engine_program);
-		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
+		for (size_t j = 0; j < CHANNEL_SEQUENCER_AMOUNT; ++j) {
 			PluginSlotProgram& p = prog.sequencers[j];
 			ch.sequencers[j].save(p);
 		}

@@ -164,7 +164,7 @@ void save_program(Program* program, pt::ptree& tree) {
 		//Channel
 		c.put_child("engine", program->channels[i].engine_program.save());
 		//Effects
-		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
+		for (size_t j = 0; j < CHANNEL_SEQUENCER_AMOUNT; ++j) {
 			PluginSlotProgram& seq = program->channels[i].sequencers[j];
 			c.add_child("sequencers.sequencers", seq.save());
 		}
