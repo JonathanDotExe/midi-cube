@@ -51,6 +51,13 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 			engine->process(info);
 			engine->playback_outputs_stereo(lsample, rsample);
 		}
+		//Sequencer
+		PluginInstance* seq = sequencer.get_plugin();
+		if (seq) {
+			seq->take_inputs(nullptr, 0);
+			seq->process(info);
+			//seq->playback_outputs_stereo(lsample, rsample); TODO
+		}
 		//Effects
 		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 			if (effects[i].get_plugin()) {
