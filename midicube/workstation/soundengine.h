@@ -68,7 +68,7 @@ private:
 
 	LocalMidiBindingHandler binder;
 public:
-	std::array<PluginSlot, CHANNEL_SEQUENCER_AMOUNT> sequencer;
+	std::array<PluginSlot, CHANNEL_SEQUENCER_AMOUNT> sequencers;
 	PluginSlot engine;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double> panning{0, -1, 1};
@@ -177,7 +177,7 @@ struct ChannelProgram {
 	size_t polyphony_limit = 0;
 
 	PluginSlotProgram engine_program;
-	PluginSlotProgram sequencer_program;
+	std::array<PluginSlotProgram, CHANNEL_SEQUENCER_AMOUNT> sequencers;
 };
 
 struct MasterEffectProgram {

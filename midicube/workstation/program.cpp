@@ -60,8 +60,17 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 				if (c.second.get_child_optional("engine")) {
 					program->channels[i].engine_program.load(c.second.get_child("engine"), mgr);
 				}
-				if (c.second.get_child_optional("sequencer")) {
-					program->channels[i].sequencer_program.load(c.second.get_child("sequencer"), mgr);
+				//Sequencer
+				const auto& sequencers = c.second.get_child_optional("sequencers");
+				if (sequencers) {
+					size_t j = 0;
+					for (pt::ptree::value_type& s : sequencers.get()) {
+						if (j >= CHANNEL_SEQUENCER_AMOUNT) {
+							break;
+						}
+						program->channels[i].sequencers[j].load(s.second, mgr);
+						++j;
+					}
 				}
 				program->channels[i].polyphony_limit = c.second.get<size_t>("polyphony_limit", 0);
 				const auto& scenes = c.second.get_child_optional("scenes");
@@ -154,7 +163,11 @@ void save_program(Program* program, pt::ptree& tree) {
 		pt::ptree c;
 		//Channel
 		c.put_child("engine", program->channels[i].engine_program.save());
-		c.put_child("sequencer", program->channels[i].sequencer_program.save());
+		//Effects
+		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
+			PluginSlotProgram& seq = program->channels[i].sequencers[j];
+			c.add_child("sequencers.sequencers", seq.save());
+		}
 		c.put("polyphony_limit", program->channels[i].polyphony_limit);
 		for (size_t j = 0; j < SOUND_ENGINE_SCENE_AMOUNT; ++j) {
 			pt::ptree s;

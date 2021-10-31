@@ -21,8 +21,8 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	if (!this->device) {
 		this->device = device;
 		engine.init(this);
-		for (size_t i = 0; i < sequencer.size(); ++i) {
-			sequencer[i].init(this);
+		for (size_t i = 0; i < sequencers.size(); ++i) {
+			sequencers[i].init(this);
 		}
 		for (size_t i = 0; i < effects.size(); ++i) {
 			effects[i].init(this);
@@ -55,7 +55,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 		}
 		//Sequencer
 		for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
-			PluginInstance* seq = sequencer[i].get_plugin();
+			PluginInstance* seq = sequencers[i].get_plugin();
 			if (seq) {
 				seq->take_inputs(nullptr, 0);
 				seq->process(info);
@@ -87,7 +87,7 @@ void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info
 		bool found = false;
 		//Find nex seq
 		for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
-			PluginInstance* seq = sequencer[i].get_plugin();
+			PluginInstance* seq = sequencers[i].get_plugin();
 			if (seq) {
 				if (found) {
 					next = seq;
@@ -423,7 +423,10 @@ void SoundEngineDevice::apply_program(Program* program) {
 		SoundEngineChannel& ch = channels[i];
 
 		ch.engine.load(prog.engine_program, &cube->plugin_mgr);
-		ch.sequencer.load(prog.sequencer_program, &cube->plugin_mgr);
+		for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
+			PluginSlotProgram& p = prog.sequencers[i];
+			ch.sequencers[i].load(p, &cube->plugin_mgr);
+		}
 		ch.volume = prog.volume;
 		ch.panning = prog.panning;
 		ch.scenes = prog.scenes;
@@ -452,7 +455,10 @@ void SoundEngineDevice::save_program(Program* program) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
 		ch.engine.save(prog.engine_program);
-		ch.sequencer.save(prog.sequencer_program);
+		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
+			PluginSlotProgram& p = prog.sequencers[j];
+			ch.sequencers[j].save(p);
+		}
 		prog.volume = ch.volume;
 		prog.panning = ch.panning;
 		prog.scenes = ch.scenes;
