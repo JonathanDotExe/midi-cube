@@ -391,3 +391,48 @@ void SfzSampleConverter::convert() {
 	boost::filesystem::path p(src);
 	convert_sfz_to_sampler(src, p.parent_path().string(), dst, name);
 }
+
+void ProgramConverter::request_params() {
+	std::cout << "Enter input file path!" << std::endl;
+	std::cin >> src;
+	std::cout << "Enter output file path!" << std::endl;
+	std::cin >> dst;
+}
+
+void ProgramConverter::convert() {
+	//Load
+	pt::ptree tree;
+	try {
+		pt::read_xml(src, tree);
+	}
+	catch (pt::xml_parser_error& e) {
+		std::cerr << "Couldn't load bank " << src << std::endl;
+		return;
+	}
+
+	//Convert
+	//Programs
+	for (pt::ptree::value_type& p : tree.get_child("bank.programs")) {
+		pt::ptree& prog = p.second;
+		for (auto& c : prog.get_child("channels")) {
+			pt::ptree& channel = c.second;
+			//Engine
+			ssize_t engine_index = channel.get<ssize_t>("engine", -1);
+			if (engine_index == 0) {
+				channel.put("engine.plugin", "midicube_sample_player");
+			}
+			else if (engine_index == 1) {
+				channel.put("engine.plugin", "midicube_b3_organ");
+			}
+			else if (engine_index == 2) {
+				channel.put("engine.plugin", "midicube_advanced_synth");
+			}
+			else if (engine_index == 3) {
+				channel.put("engine.plugin", "midicube_sample_drums");
+			}
+			if (channel.get_child_optional("preset")) {
+				channel.put_child("engine.preset", channel.get_child("preset"));
+			}
+		}
+	}
+}

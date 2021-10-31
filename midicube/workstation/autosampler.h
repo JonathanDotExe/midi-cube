@@ -110,4 +110,18 @@ public:
 
 };
 
+class ProgramConverter {
+
+private:
+	std::string src;
+	std::string dst;
+
+public:
+
+	void request_params();
+
+	void convert();
+
+};
+
 #endif /* MIDICUBE_AUTOSAMPLER_H_ */
