@@ -21,6 +21,8 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+#define CHANNEL_SEQUENCER_AMOUNT 1
+
 #define MOTION_SEQUENCER_AMOUNT 4
 #define MOTION_SEQUENCER_LENGTH 16
 
@@ -66,7 +68,7 @@ private:
 
 	LocalMidiBindingHandler binder;
 public:
-	PluginSlot sequencer;
+	std::array<PluginSlot, CHANNEL_SEQUENCER_AMOUNT> sequencer;
 	PluginSlot engine;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double> panning{0, -1, 1};

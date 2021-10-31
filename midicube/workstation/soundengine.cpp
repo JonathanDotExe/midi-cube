@@ -21,7 +21,9 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	if (!this->device) {
 		this->device = device;
 		engine.init(this);
-		sequencer.init(this);
+		for (size_t i = 0; i < sequencer.size(); ++i) {
+			sequencer[i].init(this);
+		}
 		for (size_t i = 0; i < effects.size(); ++i) {
 			effects[i].init(this);
 		}
@@ -52,11 +54,13 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 			engine->playback_outputs_stereo(lsample, rsample);
 		}
 		//Sequencer
-		PluginInstance* seq = sequencer.get_plugin();
-		if (seq) {
-			seq->take_inputs(nullptr, 0);
-			seq->process(info);
-			//seq->playback_outputs_stereo(lsample, rsample); TODO
+		for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
+			PluginInstance* seq = sequencer[i].get_plugin();
+			if (seq) {
+				seq->take_inputs(nullptr, 0);
+				seq->process(info);
+				//seq->playback_outputs_stereo(lsample, rsample); TODO
+			}
 		}
 		//Effects
 		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
@@ -79,18 +83,31 @@ void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info
 	size_t scene = device->scene;
 	PluginInstance* engine = this->engine.get_plugin();
 	if (scenes[scene].active /* || (status.pressed_notes && message.type != MessageType::NOTE_ON)*/) { //FIXME send when channel is deactivated
+		PluginInstance* next = nullptr;
+		bool found = false;
+		//Find nex seq
+		for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
+			PluginInstance* seq = sequencer[i].get_plugin();
+			if (seq) {
+				if (found) {
+					next = seq;
+				}
+				else if (src == seq) {
+					found = true;
+				}
+			}
+		}
 		//Recieve midi
-		PluginInstance* seq = sequencer.get_plugin();
-		if (seq == nullptr || src == seq) {
+		if (next) {
+			next->recieve_midi(message, info);
+		}
+		//Sequencer
+		else {
 			//Aftertouch
 			if (message.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 				this->info.aftertouch = message.monophonic_aftertouch()/127.0;
 			}
 			engine->recieve_midi(message, info); //FIXME transpose not working
-		}
-		//Sequencer
-		else if (seq != nullptr){
-			seq->recieve_midi(message, info);
 		}
 	}
 }
