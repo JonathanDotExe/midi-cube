@@ -297,6 +297,10 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, double*
 			effect.effect.get_plugin()->process(info);
 			effect.effect.get_plugin()->playback_outputs_stereo(l, r);
 		}
+		else {
+			l += effect.lsample;
+			r += effect.rsample;
+		}
 		effect.lsample = 0;
 		effect.rsample = 0;
 
