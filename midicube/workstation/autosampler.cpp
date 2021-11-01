@@ -434,10 +434,16 @@ void ProgramConverter::convert() {
 				channel.put_child("engine.preset", channel.get_child("preset"));
 			}
 
+			//Arpeggiator
+			if (channel.get<bool>("arpeggiator.on", false)) {
+				channel.put("sequencers.sequencer.plugin", "midicube_arpeggiator");
+				channel.put_child("sequencers.sequencer.preset", channel.get_child("arpeggiator"));
+			}
+
 			//Insert Effects
-			for (auto& e : prog.get_child("insert_effects")) {
+			for (auto& e : channel.get_child("insert_effects")) {
 				pt::ptree& effect = e.second;
-				ssize_t effect_type = channel.get<ssize_t>("effect_type", -1);
+				ssize_t effect_type = effect.get<ssize_t>("effect_type", -1);
 				std::vector<std::string> types{
 					"midicube_overdrive_amp",
 					"midicube_rotary_speaker",
@@ -456,6 +462,32 @@ void ProgramConverter::convert() {
 				if (effect_type >= 0 && static_cast<size_t>(effect_type) < types.size()) {
 					effect.put("plugin", types[effect_type]);
 				}
+			}
+		}
+		//Master Effects
+		for (auto& e : prog.get_child("master_effects")) {
+			pt::ptree& effect = e.second;
+			ssize_t effect_type = effect.get<ssize_t>("effect_type", -1);
+			std::vector<std::string> types{
+				"midicube_overdrive_amp",
+				"midicube_rotary_speaker",
+				"midicube_reverb",
+				"midicube_chorus",
+				"midicube_bit_crusher",
+				"midicube_vocoder",
+				"midicube_tremolo",
+				"midicube_delay",
+				"midicube_flanger",
+				"midicube_phaser",
+				"midicube_wah_wah",
+				"midicube_4_band_eq",
+				"midicube_compressor",
+			};
+			if (effect_type >= 0 && static_cast<size_t>(effect_type) < types.size()) {
+				effect.put("effect.plugin", types[effect_type]);
+			}
+			if (effect.get_child_optional("preset")) {
+				effect.put_child("effect.preset", effect.get_child("preset"));
 			}
 		}
 	}
