@@ -328,7 +328,7 @@ bool AdvancedSynth::note_finished(const SampleInfo &info, AdvancedSynthVoice &no
 }
 
 void AdvancedSynth::press_note(const SampleInfo& info, unsigned int note, double velocity) {
-	AdvancedSynthVoice& voice = this->voice_mgr.note[this->voice_mgr.press_note(info, note, note, velocity, 0)]; //FIXME parameters
+	AdvancedSynthVoice& voice = this->voice_mgr.note[this->voice_mgr.press_note(info, note, note + get_host().get_transpose(), velocity, 0)];
 	voice.aftertouch = 0;
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();

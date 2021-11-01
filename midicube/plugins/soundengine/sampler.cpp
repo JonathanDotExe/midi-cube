@@ -210,7 +210,7 @@ void Sampler::press_note(const SampleInfo& info, unsigned int note, double veloc
 				}
 			}
 			if (trigger && preset_number >= region->min_preset && preset_number <= region->max_preset) {
-				size_t slot = this->voice_mgr.press_note(info, note, note, velocity, 0); //FIXME parameters
+				size_t slot = this->voice_mgr.press_note(info, note, note + get_host().get_transpose(), velocity, 0);
 				SamplerVoice& voice = this->voice_mgr.note[slot];
 				voice.region = region;
 				voice.layer_amp = sample->volume;

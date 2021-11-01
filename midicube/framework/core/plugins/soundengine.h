@@ -77,11 +77,11 @@ public:
 	}
 
 	virtual void press_note(const SampleInfo& info, unsigned int note, double velocity) {
-		voice_mgr.press_note(info, note, note, velocity, 0); //FIXME parameters
+		voice_mgr.press_note(info, note, note + get_host().get_transpose(), velocity, 0);
 	}
 
 	virtual void release_note(const SampleInfo& info, unsigned int note, double velocity) {
-		voice_mgr.release_note(info, note); //FIXME parameters
+		voice_mgr.release_note(info, note);
 	}
 
 	virtual void control_change(unsigned int cc, unsigned int value) {
