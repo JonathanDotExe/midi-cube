@@ -41,6 +41,7 @@ private:
 	std::size_t note_index = 0;
 	bool restart = true;
 	bool second = false;
+	bool note_change = false;
 	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
 
 public:

@@ -23,11 +23,11 @@ void Arpeggiator::apply(const SampleInfo& info, const Metronome& master, std::fu
 		}
 	}
 	//Reset if no keys are pressed
+	bool released = true;
+	for (size_t i = 0; i < this->note.note.size() && released; ++i) {
+		released = !this->note.note[i].valid;
+	}
 	if (!restart) {
-		bool released = true;
-		for (size_t i = 0; i < this->note.note.size() && released; ++i) {
-			released = !this->note.note[i].valid;
-		}
 		restart = released;
 	}
 	if (restart) {
@@ -38,7 +38,7 @@ void Arpeggiator::apply(const SampleInfo& info, const Metronome& master, std::fu
 		}
 	}
 	//Pattern
-	if (preset.master_sync ? master.is_beat(info.sample_time, info.sample_rate, preset.value) : metronome.is_beat(info.sample_time, info.sample_rate, preset.value)) {
+	if ((preset.master_sync ? master.is_beat(info.sample_time, info.sample_rate, preset.value) : metronome.is_beat(info.sample_time, info.sample_rate, preset.value))) {
 		int next_note = 128;
 		long int next_index = -1;
 
@@ -253,7 +253,10 @@ void Arpeggiator::apply(const SampleInfo& info, const Metronome& master, std::fu
 			break;
 		}
 		//Press note
-		release(info, curr_note, 0);
+		if (!released || note_change) {
+			note_change = false;
+			release(info, curr_note, 0);
+		}
 		if (next_index >= 0) {
 			curr_note = next_note;
 			this->note_index = next_index;
@@ -271,6 +274,7 @@ void Arpeggiator::apply(const SampleInfo& info, const Metronome& master, std::fu
 						this->note.note[i].valid = false;
 					}
 				}
+				note_change = true;
 			}
 		}
 	}
@@ -289,11 +293,13 @@ void Arpeggiator::press_note(const SampleInfo& info, unsigned int note, double v
 			}
 		}
 	}
+	note_change = true;
 	this->note.press_note(info, note, note, velocity);
 }
 
 void Arpeggiator::release_note(const SampleInfo& info, unsigned int note, bool sustain) {
 	this->note.release_note(info, note, !preset.hold && (!sustain || !preset.sustain));
+	note_change = true;
 }
 
 
@@ -360,19 +366,21 @@ void ArpeggiatorInstance::save_program(PluginProgram **prog) {
 }
 
 void ArpeggiatorInstance::process(const SampleInfo &info) {
-	arp.apply(info, get_host().get_metronome(), [this](const SampleInfo& info, unsigned int note, double velocity) {
-		MidiMessage msg;
-		msg.type = MessageType::NOTE_ON;
-		msg.set_note(note);
-		msg.set_velocity(velocity * 127);
-		this->send_midi(msg, info);
-	}, [this](const SampleInfo& info, unsigned int note, double velocity) {
-		MidiMessage msg;
-		msg.type = MessageType::NOTE_OFF;
-		msg.set_note(note);
-		msg.set_velocity(velocity * 127);
-		this->send_midi(msg, info);
-	}, get_host().get_environment().sustain);
+	if (arp.on) {
+		arp.apply(info, get_host().get_metronome(), [this](const SampleInfo& info, unsigned int note, double velocity) {
+			MidiMessage msg;
+			msg.type = MessageType::NOTE_ON;
+			msg.set_note(note);
+			msg.set_velocity(velocity * 127);
+			this->send_midi(msg, info);
+		}, [this](const SampleInfo& info, unsigned int note, double velocity) {
+			MidiMessage msg;
+			msg.type = MessageType::NOTE_OFF;
+			msg.set_note(note);
+			msg.set_velocity(velocity * 127);
+			this->send_midi(msg, info);
+		}, get_host().get_environment().sustain);
+	}
 }
 
 ArpeggiatorInstance::ArpeggiatorInstance(PluginHost &h, Plugin &p) : PluginInstance(h, p){
