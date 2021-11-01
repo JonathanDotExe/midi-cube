@@ -491,4 +491,13 @@ void ProgramConverter::convert() {
 			}
 		}
 	}
+
+	//Save to file
+	try {
+		pt::write_xml(dst, tree);
+		std::cout << "Finished converting bank " << src;
+	}
+	catch (pt::xml_parser_error& e) {
+		std::cerr << "Couldn't save file " << dst << "!" << std::endl;
+	}
 }
