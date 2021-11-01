@@ -27,7 +27,7 @@
 #define ORGAN_VIBRATO_RATE 7
 #define ORGAN_VIBRATO_DELAY_STAGES 9
 
-#define B3_ORGAN_IDENTIFIER "midicue_b3_organ"
+#define B3_ORGAN_IDENTIFIER "midicube_b3_organ"
 
 enum OrganChorusVibratoType {
 	B3_NONE, B3_CHORUS_1, B3_CHORUS_2, B3_CHORUS_3, B3_VIBRATO_1, B3_VIBRATO_2, B3_VIBRATO_3

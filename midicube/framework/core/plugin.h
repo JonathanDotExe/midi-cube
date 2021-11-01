@@ -322,8 +322,8 @@ public:
 				delete program;
 			}
 			program = plugin->create_program();
-			if (tree.get_child_optional("data")) {
-				program->load(tree.get_child("data"));
+			if (tree.get_child_optional("preset")) {
+				program->load(tree.get_child("preset"));
 			}
 		}
 	}
@@ -332,7 +332,7 @@ public:
 		pt::ptree tree;
 		tree.put("plugin", program ? program->get_plugin_name() : "");
 		if (program) {
-			tree.put_child("data", program->save());
+			tree.put_child("preset", program->save());
 		}
 		return tree;
 	}

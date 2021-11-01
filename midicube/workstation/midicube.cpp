@@ -165,12 +165,16 @@ MidiCube::~MidiCube() {
 }
 
 void MidiCube::save_program(Program *prog) {
+	lock.lock();
 	engine.save_program(prog);
+	lock.unlock();
 	std::cout << "Saved program: " << prog->name << std::endl;
 }
 
 void MidiCube::apply_program(Program *prog) {
+	lock.lock();
 	engine.apply_program(prog);
+	lock.unlock();
 	std::cout << "Selected program: " << prog->name << std::endl;
 }
 
