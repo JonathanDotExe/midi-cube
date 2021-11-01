@@ -73,6 +73,7 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 					}
 				}
 				program->channels[i].polyphony_limit = c.second.get<size_t>("polyphony_limit", 0);
+				program->channels[i].input = c.second.get<ssize_t>("input", 0);
 				const auto& scenes = c.second.get_child_optional("scenes");
 				if (scenes) {
 					size_t j = 0;
@@ -84,7 +85,6 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 						program->channels[i].scenes[j].sustain = s.second.get<bool>("sustain", true);
 						program->channels[i].scenes[j].pitch_bend = s.second.get<bool>("pitch_bend", true);
 						//Source
-						program->channels[i].scenes[j].source.input = s.second.get<ssize_t>("source.input", 1);
 						program->channels[i].scenes[j].source.start_note = s.second.get<unsigned int>("source.start_note", 0);
 						program->channels[i].scenes[j].source.end_note = s.second.get<unsigned int>("source.end_note", 127);
 						program->channels[i].scenes[j].source.start_velocity = s.second.get<unsigned int>("source.start_velocity", 0);
@@ -169,6 +169,7 @@ void save_program(Program* program, pt::ptree& tree) {
 			c.add_child("sequencers.sequencers", seq.save());
 		}
 		c.put("polyphony_limit", program->channels[i].polyphony_limit);
+		c.put("input", program->channels[i].input);
 		for (size_t j = 0; j < SOUND_ENGINE_SCENE_AMOUNT; ++j) {
 			pt::ptree s;
 
@@ -176,7 +177,6 @@ void save_program(Program* program, pt::ptree& tree) {
 			s.put("sustain", program->channels[i].scenes[j].sustain);
 			s.put("pitch_bend", program->channels[i].scenes[j].pitch_bend);
 			//Source
-			s.put("source.input", program->channels[i].scenes[j].source.input);
 			s.put("source.start_note", program->channels[i].scenes[j].source.start_note);
 			s.put("source.end_note", program->channels[i].scenes[j].source.end_note);
 			s.put("source.start_velocity", program->channels[i].scenes[j].source.start_velocity);

@@ -47,7 +47,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 			env.pitch_bend = 1;
 		}*/
 
-		if (s.active) { //FIXME maintain when notes pressed
+		if (s.active || engine->keep_active()) { //FIXME maintain when notes pressed
 			//Process
 			engine->take_inputs(inputs, input_count);
 			engine->process(info);
@@ -82,7 +82,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info, void* src) {
 	size_t scene = device->scene;
 	PluginInstance* engine = this->engine.get_plugin();
-	if (scenes[scene].active /* || (status.pressed_notes && message.type != MessageType::NOTE_ON)*/) { //FIXME send when channel is deactivated
+	if (engine && (scenes[scene].active || message.type != MessageType::NOTE_ON)) {
 		PluginInstance* next = nullptr;
 		bool found = false;
 		//Find nex seq
@@ -98,17 +98,17 @@ void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info
 				}
 			}
 		}
-		//Recieve midi
+		//Sequencer
 		if (next) {
 			next->recieve_midi(message, info);
 		}
-		//Sequencer
+		//Recieve MIDI
 		else {
 			//Aftertouch
 			if (message.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 				this->info.aftertouch = message.monophonic_aftertouch()/127.0;
 			}
-			engine->recieve_midi(message, info); //FIXME transpose not working
+			engine->recieve_midi(message, info);
 		}
 	}
 }
@@ -139,14 +139,6 @@ unsigned int SoundEngineChannel::get_end_velocity() const {
 
 void SoundEngineChannel::set_end_velocity(unsigned int endVelocity) {
 	scenes[device->scene].source.end_velocity = endVelocity;
-}
-
-ssize_t SoundEngineChannel::get_input() const {
-	return scenes[device->scene].source.input;
-}
-
-void SoundEngineChannel::set_input(ssize_t input) {
-	scenes[device->scene].source.input = input;
 }
 
 int SoundEngineChannel::get_octave() const {
@@ -375,7 +367,7 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = channels[i];
 		ChannelSource& s = channel.scenes[scene].source;
-		if (s.input < 0 || input == static_cast<size_t>(s.input)) {
+		if (channel.input < 0 || input == static_cast<size_t>(channel.input)) {
 			//Filter
 			bool pass = true;
 			switch (message.type) {
@@ -432,6 +424,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ch.panning = prog.panning;
 		ch.scenes = prog.scenes;
 		ch.polyphony_limit = prog.polyphony_limit;
+		ch.input = prog.input;
 
 		//Engine
 		ch.master_send = prog.send_master;
@@ -464,6 +457,7 @@ void SoundEngineDevice::save_program(Program* program) {
 		prog.panning = ch.panning;
 		prog.scenes = ch.scenes;
 		prog.polyphony_limit = ch.polyphony_limit;
+		prog.input = ch.input;
 
 		//Engine
 		prog.send_master = ch.master_send;

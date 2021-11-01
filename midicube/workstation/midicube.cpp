@@ -66,10 +66,6 @@ void MidiCube::init(int out_device, int in_device) {
 	plugin_mgr.add_plugin(new ArpeggiatorPlugin());
 	//Default engines
 	engine.channels[0].scenes[0].active = true;
-
-	for (size_t i = 0; i < engine.channels.size(); ++i) {
-		engine.channels[i].scenes[0].source.input = 1;
-	}
 	std::cout << "Loaded engines" << std::endl;
 	//Load programs
 	prog_mgr.lock();

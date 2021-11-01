@@ -386,8 +386,7 @@ void ArpeggiatorInstance::recieve_midi(const MidiMessage &message, const SampleI
 			break;
 		case MessageType::NOTE_OFF:
 			arp.release_note(info, message.note(), get_host().get_environment().sustain);
-			//Maybe pass as well TODO
-			break;
+			/* no break */
 		default:
 			this->send_midi(message, info);
 			break;

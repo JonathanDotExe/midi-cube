@@ -129,6 +129,10 @@ public:
 
 	virtual void save_program(PluginProgram** prog) = 0;
 
+	virtual bool keep_active() {
+		return false;
+	}
+
 	virtual ViewController* create_view() {
 		return nullptr;
 	}

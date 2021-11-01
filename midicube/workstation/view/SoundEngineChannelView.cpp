@@ -201,7 +201,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		controls.push_back(source_label);
 
 		DragBox<int>* source = new DragBox<int>(0, -1, 15, main_font, 18, 470, tmp_y, 150, 60);
-		source->property.bind_function<ssize_t>(std::bind(&SoundEngineChannel::get_input, &channel), std::bind(&SoundEngineChannel::set_input, &channel, std::placeholders::_1), cube.lock);
+		source->property.bind<ssize_t>(channel.input, cube.lock);
 		tmp_y += 60;
 		controls.push_back(source);
 	}

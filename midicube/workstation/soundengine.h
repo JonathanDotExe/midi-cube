@@ -42,7 +42,6 @@ struct ChannelInfo {
 };
 
 struct ChannelSource {
-	ssize_t input = 0;
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
 	unsigned int start_velocity = 0;
@@ -73,6 +72,7 @@ public:
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double> panning{0, -1, 1};
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
+	ssize_t input = 0;
 
 	//Effects
 	std::array<PluginSlot, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
@@ -111,10 +111,6 @@ public:
 	unsigned int get_end_velocity() const;
 
 	void set_end_velocity(unsigned int endVelocity = 127);
-
-	ssize_t get_input() const;
-
-	void set_input(ssize_t input = 1);
 
 	int get_octave() const;
 
@@ -176,6 +172,7 @@ struct ChannelProgram {
 	std::array<PluginSlotProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t send_master = -1;
 	size_t polyphony_limit = 0;
+	ssize_t input = 0;
 
 	PluginSlotProgram engine_program;
 	std::array<PluginSlotProgram, CHANNEL_SEQUENCER_AMOUNT> sequencers;
