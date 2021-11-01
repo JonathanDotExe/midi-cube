@@ -453,7 +453,7 @@ void ProgramConverter::convert() {
 					"midicube_4_band_eq",
 					"midicube_compressor",
 				};
-				if (effect_type >= 0 && effect_type < types.size()) {
+				if (effect_type >= 0 && static_cast<size_t>(effect_type) < types.size()) {
 					effect.put("plugin", types[effect_type]);
 				}
 			}

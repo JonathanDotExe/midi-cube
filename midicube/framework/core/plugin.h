@@ -69,6 +69,8 @@ public:
 
 	virtual void notify_property_update(void* source, void* prop) = 0;
 
+	virtual int get_transpose() = 0;
+
 	virtual ~PluginHost() {
 
 	}

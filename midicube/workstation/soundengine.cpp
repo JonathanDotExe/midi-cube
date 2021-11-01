@@ -509,6 +509,10 @@ void SoundEngineChannel::set_pitch_bend(bool pitch_bend) {
 	scenes[device->scene].pitch_bend = pitch_bend;
 }
 
+int SoundEngineChannel::get_transpose() {
+	return 12 * get_octave();
+}
+
 void SoundEngineDevice::init(MidiCube *cube) {
 	if (this->cube) {
 		throw "MidiCube already initialized";
@@ -582,3 +586,8 @@ SpinLock& SoundEngineDeviceHost::get_lock() {
 void SoundEngineDeviceHost::notify_property_update(void *source, void *prop) {
 	device->get_cube()->notify_property_update(source, prop);
 }
+
+int SoundEngineDeviceHost::get_transpose() {
+	return 0;
+}
+
