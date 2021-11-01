@@ -39,7 +39,6 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 	if (engine) {
 		SoundEngineScene& s = scenes[scene];
 		//Pitch and Sustain
-		//FIXME customize environment
 		/*if (!s.sustain) {
 			env.sustain = false;
 		}
@@ -47,7 +46,7 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 			env.pitch_bend = 1;
 		}*/
 
-		if (s.active || engine->keep_active()) { //FIXME maintain when notes pressed
+		if (s.active || engine->keep_active()) {
 			//Process
 			engine->take_inputs(inputs, input_count);
 			engine->process(info);
@@ -104,9 +103,51 @@ void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info
 		}
 		//Recieve MIDI
 		else {
-			//Aftertouch
-			if (message.type == MessageType::MONOPHONIC_AFTERTOUCH) {
-				this->info.aftertouch = message.monophonic_aftertouch()/127.0;
+			double pitch = 0;
+			//Environment
+			switch (message.type) {
+			case MessageType::MONOPHONIC_AFTERTOUCH:
+				this->env.aftertouch = message.monophonic_aftertouch()/127.0;
+				break;
+			case MessageType::POLYPHONIC_AFTERTOUCH:
+				break;
+			case MessageType::NOTE_ON:
+				break;
+			case MessageType::NOTE_OFF:
+				break;
+			case MessageType::CONTROL_CHANGE:
+				//Sustain
+				if (message.control() == device->sustain_control) {
+					bool new_sustain = message.value() != 0;
+					if (new_sustain != env.sustain) {
+						if (new_sustain) {
+							env.sustain_time = info.time;
+						}
+						else {
+							env.sustain_release_time = info.time;
+						}
+						env.sustain = new_sustain;
+					}
+					if (!scenes[scene].sustain) {
+						env.sustain = false;
+					}
+				}
+				break;
+			case MessageType::PROGRAM_CHANGE:
+				break;
+			case MessageType::PITCH_BEND:
+				env.pitch_bend_percent = message.pitch_bend()/8192.0 - 1.0;
+				pitch = env.pitch_bend_percent * 2;
+				env.pitch_bend = note_to_freq_transpose(pitch);
+				if (!scenes[scene].pitch_bend) {
+					env.pitch_bend = 1;
+					env.pitch_bend_percent = 0.5;
+				}
+				break;
+			case MessageType::SYSEX:
+				break;
+			case MessageType::INVALID:
+				break;
 			}
 			engine->recieve_midi(message, info);
 		}
@@ -285,8 +326,6 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, double*
 }
 
 void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& source, SampleInfo& info) {
-	double pitch;
-
 	//Global values
 	switch (message.type) {
 	case MessageType::MONOPHONIC_AFTERTOUCH:
@@ -298,20 +337,6 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	case MessageType::NOTE_OFF:
 		break;
 	case MessageType::CONTROL_CHANGE:
-		env.ccs[message.control()] = message.value()/127.0;
-		//Sustain
-		if (message.control() == sustain_control) {
-			bool new_sustain = message.value() != 0;
-			if (new_sustain != env.sustain) {
-				if (new_sustain) {
-					env.sustain_time = info.time;
-				}
-				else {
-					env.sustain_release_time = info.time;
-				}
-				env.sustain = new_sustain;
-			}
-		}
 		//Update scene
 		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
 			if (scene_ccs[i] == message.control()) {
@@ -327,9 +352,6 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	case MessageType::PROGRAM_CHANGE:
 		break;
 	case MessageType::PITCH_BEND:
-		env.pitch_bend_percent = message.pitch_bend()/8192.0 - 1.0;
-		pitch = env.pitch_bend_percent * 2;
-		env.pitch_bend = note_to_freq_transpose(pitch);
 		break;
 	case MessageType::SYSEX:
 		//Clock
@@ -541,7 +563,7 @@ const Metronome& SoundEngineChannel::get_metronome() {
 }
 
 const KeyboardEnvironment& SoundEngineChannel::get_environment() {
-	return device->env; //TODO channel aftertouch
+	return env;
 }
 
 //SoundEngineDeviceHost
@@ -563,7 +585,7 @@ const Metronome& SoundEngineDeviceHost::get_metronome() {
 }
 
 const KeyboardEnvironment& SoundEngineDeviceHost::get_environment() {
-	return device->env; //TODO channel aftertouch
+	return env; //TODO just a dummy env
 }
 
 void SoundEngineDeviceHost::init(SoundEngineDevice *device) {

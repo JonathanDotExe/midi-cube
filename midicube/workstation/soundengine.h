@@ -37,10 +37,6 @@ class MidiCube;
 class SoundEngineDevice;
 class SoundEngineChannel;
 
-struct ChannelInfo {
-	double aftertouch = 0;
-};
-
 struct ChannelSource {
 	unsigned int start_note = 0;
 	unsigned int end_note = 127;
@@ -66,6 +62,7 @@ private:
 	SoundEngineDevice* device = nullptr;
 
 	LocalMidiBindingHandler binder;
+	KeyboardEnvironment env;
 public:
 	std::array<PluginSlot, CHANNEL_SEQUENCER_AMOUNT> sequencers;
 	PluginSlot engine;
@@ -78,7 +75,6 @@ public:
 	std::array<PluginSlot, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t master_send = -1;
 
-	ChannelInfo info;
 	size_t polyphony_limit = 0;
 
 	int get_transpose();
@@ -221,6 +217,7 @@ class SoundEngineDevice;
 
 class SoundEngineDeviceHost : public PluginHost {
 private:
+	KeyboardEnvironment env;
 	SoundEngineDevice* device = nullptr;
 public:
 	SoundEngineDeviceHost() : PluginHost() {
@@ -261,7 +258,6 @@ private:
 
 public:
 	MidiBindingHandler binding_handler;
-	KeyboardEnvironment env;
 
 	Metronome metronome;
 	bool play_metronome{false};
