@@ -31,6 +31,7 @@ struct MidiMessageWithInput {
 class MidiCube : public ProgramUser {
 private:
 	AudioHandler audio_handler;
+	ActionHandler action_handler;
 	std::function<void(void*, void*)> property_callback;
 	std::vector<MidiCubeInput> inputs;
 

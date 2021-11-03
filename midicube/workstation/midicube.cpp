@@ -101,6 +101,8 @@ void MidiCube::init(int out_device, int in_device) {
 
 void MidiCube::process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info) {
 	if (lock.try_lock()) {
+		//Actions
+		action_handler.execute_realtime_actions();
 		//Messages
 		size_t i = 0;
 		for (MidiCubeInput in : this->inputs) {
