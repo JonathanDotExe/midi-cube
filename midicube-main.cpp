@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 	MidiCubePtr ptr;
 	try {
 		//View
-		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation", screen_sleep);
+		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation", , screen_sleep);
 
 		ptr.cube = new MidiCube([&frame](void* source, void* prop) {
 			frame.propterty_change(source, prop);

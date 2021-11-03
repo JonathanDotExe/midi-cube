@@ -34,6 +34,7 @@ src = [
 	'midicube/framework/util/util.cpp',
 	'midicube/framework/gui/control.cpp',
 	'midicube/framework/gui/core.cpp',
+	'midicube/framework/gui/frame.cpp',
 	'midicube/framework/gui/util.cpp',
 	'midicube/framework/gui/binding/BooleanMidiBindingView.cpp',
 	'midicube/framework/gui/binding/TemplateMidiBindingView.cpp',
