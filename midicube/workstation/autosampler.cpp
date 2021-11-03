@@ -447,7 +447,7 @@ void ProgramConverter::convert() {
 				std::vector<std::string> types{
 					"midicube_overdrive_amp",
 					"midicube_rotary_speaker",
-					"midicube_reverb",
+					"midicube_schroeder_reverb",
 					"midicube_chorus",
 					"midicube_bit_crusher",
 					"midicube_vocoder",
@@ -471,7 +471,7 @@ void ProgramConverter::convert() {
 			std::vector<std::string> types{
 				"midicube_overdrive_amp",
 				"midicube_rotary_speaker",
-				"midicube_reverb",
+				"midicube_schroeder_reverb",
 				"midicube_chorus",
 				"midicube_bit_crusher",
 				"midicube_vocoder",
