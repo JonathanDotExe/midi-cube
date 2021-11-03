@@ -183,3 +183,11 @@ void MidiCube::apply_program(Program *prog) {
 void MidiCube::notify_property_update(void *source, void *prop) {
 	property_callback(source, prop);
 }
+
+PluginManager& MidiCube::get_plugin_manager() {
+	return plugin_mgr;
+}
+
+ActionHandler& MidiCube::get_action_handler() {
+	return action_handler;
+}
