@@ -16,6 +16,9 @@ Frame::Frame(int width, int height, std::string title, MasterPluginHost& h, bool
 	this->render_sleep = render_sleep;
 
 	this->selected = nullptr;
+	h.set_property_change_callback([this](void* source, void* prop) {
+		this->propterty_change(source, prop);
+	});
 }
 
 void Frame::run(ViewController* v) {

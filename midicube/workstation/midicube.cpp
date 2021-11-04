@@ -36,7 +36,7 @@ static void process_func(double& lsample, double& rsample, double* inputs, const
 	((MidiCube*) user_data)->process(lsample, rsample, inputs, input_count, info);
 }
 
-MidiCube::MidiCube(std::function<void(void*, void*)> c) : property_callback(c), prog_mgr("./data/programs") {
+MidiCube::MidiCube() : prog_mgr("./data/programs") {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
@@ -181,7 +181,9 @@ void MidiCube::apply_program(Program *prog) {
 }
 
 void MidiCube::notify_property_update(void *source, void *prop) {
-	property_callback(source, prop);
+	if (property_callback) {
+		property_callback(source, prop);
+	}
 }
 
 PluginManager& MidiCube::get_plugin_manager() {
@@ -190,4 +192,8 @@ PluginManager& MidiCube::get_plugin_manager() {
 
 ActionHandler& MidiCube::get_action_handler() {
 	return action_handler;
+}
+
+void MidiCube::set_property_change_callback(std::function<void(void*, void*)> cb) {
+	property_callback = cb;
 }

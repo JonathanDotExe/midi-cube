@@ -28,7 +28,7 @@ struct MidiMessageWithInput {
 	MidiMessage msg;
 };
 
-class MidiCube : public ProgramUser, MasterPluginHost {
+class MidiCube : public ProgramUser, public MasterPluginHost {
 private:
 	AudioHandler audio_handler;
 	ActionHandler action_handler;
@@ -48,16 +48,17 @@ public:
 
 	SpinLock lock;
 
+	void set_property_change_callback(
+			std::function<void(void*, void*)> cb);
 	PluginManager& get_plugin_manager();
 	ActionHandler& get_action_handler();
 	void save_program(Program *prog);
 	void apply_program(Program *prog);
 	void notify_property_update(void* source, void* prop);
-	MidiCube(std::function<void(void*, void*)> c);
+	MidiCube();
 	void init(int out_device = -1, int in_device = -1);
 	inline void process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info);
 	std::vector<MidiCubeInput> get_inputs();
-
 
 	~MidiCube();
 };
