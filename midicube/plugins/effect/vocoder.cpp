@@ -83,7 +83,7 @@ ViewController* VocoderEffect::create_view() {
 
 void VocoderProgram::load(boost::property_tree::ptree tree) {
 	preset.on = tree.get<bool>("on", true);
-	preset.modulator_amplification = tree.get<double>("modulation_amplification", 5);
+	preset.modulator_amplification = tree.get<double>("modulator_amplification", 5);
 	preset.post_amplification = tree.get<double>("post_amplification", 10);
 
 	preset.modulator_mix = tree.get<double>("modulator_mix", 0.2);
