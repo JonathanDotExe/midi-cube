@@ -6,6 +6,7 @@
  */
 
 #include "core.h"
+#include "../core/plugin.h"
 #include <iostream>
 
 //Control
@@ -52,6 +53,14 @@ void Control::set_visible(bool visible) {
 
 //ViewHost
 void ViewHost::switch_view(ViewController *view) {
+	//Wait for tasks
+	while (get_master_host().get_action_handler().remaining_realtime_actions()) {
+		std::this_thread::yield();
+	}
+	while (get_master_host().get_action_handler().remaining_return_actions()) {
+		get_master_host().get_action_handler().execute_return_actions();
+		std::this_thread::yield();
+	}
 	//Init view
 	delete this->view;
 	this->view = view;

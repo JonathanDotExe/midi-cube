@@ -41,7 +41,8 @@ void Frame::run(ViewController* v) {
 			}
 			get_view()->update_properties();
 		}
-
+		//Execute return actions
+		get_master_host().get_action_handler().execute_return_actions();
 		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {
