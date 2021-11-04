@@ -273,6 +273,45 @@ public:
 		object = nullptr;
 	}
 
+	template <typename E>
+	void bind(E& e, ActionHandler& handler) {
+		get_func = [&e, &handler](std::function<void (T)> callback) {
+			handler.queue_action(new GetValueAction<E, T>(e, callback));
+		};
+		set_func = [&e, &handler](T t) {
+			handler.queue_action(new SetValueAction<E, T>(e, t));
+		};
+		if (std::is_base_of<BindableValue, E>()) {
+			object = (BindableValue*) (&e); //FIXME
+		}
+	}
+
+	template <typename E>
+	void bind_cast(E& e, ActionHandler& handler) {
+		get_func = [&e, &handler](std::function<void (T)> callback) {
+			handler.queue_action(new GetValueAction<E, T>(e, callback));
+		};
+		set_func = [&e, &handler](T t) {
+			handler.queue_action(new SetValueCastAction<E, T>(e, t));
+		};
+
+		if (std::is_base_of<BindableValue, E>()) {
+			object = (BindableValue*)(&e); //FIXME
+		}
+	}
+
+	template <typename E>
+	void bind_function(std::function<E ()> get, std::function<void (E)> set, ActionHandler& handler) {
+		get_func = [get, &handler](std::function<void (T)> callback) {
+			handler.queue_action(new GetFunctionAction<E, T>(get, callback));
+		};
+		set_func = [set, &handler](T t) {
+			handler.queue_action(new SetFunctionAction<E, T>(set, t));
+		};
+		object = nullptr;
+	}
+
+
 };
 
 #endif /* MIDICUBE_DATA_H_ */
