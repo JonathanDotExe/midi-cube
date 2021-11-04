@@ -18,7 +18,7 @@ B3OrganView::B3OrganView(B3Organ& o) : organ(o), binder{o.get_lock(), [&o]() {
 
 Scene B3OrganView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
-	SpinLock& lock = organ.get_lock();
+	ActionHandler& handler = frame.get_master_host().get_action_handler();
 
 	//Background
 	Pane* bg = new Pane(sf::Color(0x53, 0x32, 0x00), 0, 0, frame.get_width(), frame.get_height());
@@ -37,7 +37,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 25;
 
 		DragBox<double>* vibrato = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		vibrato->property.bind(organ.data.preset.vibrato_mix, lock);
+		vibrato->property.bind(organ.data.preset.vibrato_mix, handler);
 		controls.push_back(vibrato);
 
 		tmp_y += 65;
@@ -51,7 +51,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 25;
 
 		ComboBox* organ_type = new ComboBox(0, {"B3", "Transistor"}, main_font, 16, 0, tmp_x, tmp_y, 80, 60);
-				organ_type->property.bind_cast(organ.data.preset.type, lock);
+				organ_type->property.bind_cast(organ.data.preset.type, handler);
 				controls.push_back(organ_type);
 
 		tmp_y += 65;
@@ -66,7 +66,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 0.0005, main_font, 16, tmp_x, tmp_y, 80, 60);
 		value->drag_step = 2;
-		value->property.bind(organ.data.preset.click_attack, lock);
+		value->property.bind(organ.data.preset.click_attack, handler);
 		controls.push_back(value);
 
 		tmp_y += 65;
@@ -79,7 +79,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 25;
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		value->property.bind(organ.data.preset.high_gain_reduction, lock);
+		value->property.bind(organ.data.preset.high_gain_reduction, handler);
 		controls.push_back(value);
 
 		tmp_y += 65;
@@ -94,7 +94,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 25;
 
 		DragBox<double>* value = new DragBox<double>(1, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-				value->property.bind(organ.data.preset.swell, lock);
+				value->property.bind(organ.data.preset.swell, handler);
 				controls.push_back(value);
 		tmp_y += 65;
 	}
@@ -129,7 +129,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		Drawbar* drawbar = new Drawbar(0, ORGAN_DRAWBAR_MAX, main_font, titles[i], tmp_x, 60, 60, 300, colors[i]);
 		drawbar->text.setFillColor(sf::Color::White);
 		drawbar->title_text.setFillColor(sf::Color::Yellow);
-		drawbar->property.bind(organ.data.preset.drawbars.at(i), lock);
+		drawbar->property.bind(organ.data.preset.drawbars.at(i), handler);
 		controls.push_back(drawbar);
 
 		tmp_x += 70;
@@ -146,7 +146,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 25;
 
 		OrganSwitch* percussion = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60);
-		percussion->property.bind(organ.data.preset.percussion, lock);
+		percussion->property.bind(organ.data.preset.percussion, handler);
 		controls.push_back(percussion);
 
 		tmp_y += 65;
@@ -159,7 +159,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 25;
 
 		OrganSwitch* percussion_decay = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "Fast", "Slow");
-		percussion_decay->property.bind(organ.data.preset.percussion_fast_decay, lock);
+		percussion_decay->property.bind(organ.data.preset.percussion_fast_decay, handler);
 		controls.push_back(percussion_decay);
 
 		tmp_y += 65;
@@ -172,7 +172,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 25;
 
 		OrganSwitch* percussion_volume = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "Soft", "Hard");
-		percussion_volume->property.bind(organ.data.preset.percussion_soft, lock);
+		percussion_volume->property.bind(organ.data.preset.percussion_soft, handler);
 		controls.push_back(percussion_volume);
 
 		tmp_y += 65;
@@ -185,7 +185,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 25;
 
 		OrganSwitch* percussion_harmonic = new OrganSwitch(false, main_font, tmp_x, tmp_y, 80, 60, "3rd", "2nd");
-		percussion_harmonic->property.bind(organ.data.preset.percussion_third_harmonic, lock);
+		percussion_harmonic->property.bind(organ.data.preset.percussion_third_harmonic, handler);
 		controls.push_back(percussion_harmonic);
 
 		tmp_y += 85;
@@ -199,7 +199,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 25;
 
 		DragBox<double>* foldback = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		foldback->property.bind(organ.data.preset.harmonic_foldback_volume, lock);
+		foldback->property.bind(organ.data.preset.harmonic_foldback_volume, handler);
 		controls.push_back(foldback);
 
 		tmp_y += 65;
@@ -212,7 +212,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 25;
 
 		DragBox<double>* gain = new DragBox<double>(0.5, 0.5, 1, main_font, 16, tmp_x, tmp_y, 80, 60);
-		gain->property.bind(organ.data.preset.multi_note_gain, lock);
+		gain->property.bind(organ.data.preset.multi_note_gain, handler);
 		controls.push_back(gain);
 
 		tmp_y += 65;

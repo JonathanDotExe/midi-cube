@@ -26,8 +26,8 @@ public:
 	virtual bool on_action(Control *control);
 };
 
-std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyModulation& mod, SpinLock& lock, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source);
+std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyModulation& mod, ActionHandler& handler, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source);
 
-void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREnvelopeData& data, SpinLock& lock);
+void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREnvelopeData& data, ActionHandler& handler);
 
 #endif /* MIDICUBE_GUI_VIEW_ANALOGSYNTHOSCILATORVIEW_H_ */

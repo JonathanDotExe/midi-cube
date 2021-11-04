@@ -45,6 +45,7 @@ void LooperView::update_solo() {
 Scene LooperView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 	SpinLock& lock = looper.get_lock();
+	ActionHandler& handler = frame.get_master_host().get_action_handler();
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -69,11 +70,11 @@ Scene LooperView::create(ViewHost &frame) {
 
 		//Play
 		CheckBox* active = new CheckBox(false, "Play", main_font, 12, x + 5, y + 30, 30, 30);
-		active->property.bind<bool>(looper.channels[i].play, lock);
+		active->property.bind<bool>(looper.channels[i].play, handler);
 		controls.push_back(active);
 		//Bars
 		DragBox<int>* bars = new DragBox<int>(4, 1, 16, main_font, 12, x + 5, y + 65, pane_width - 15, 30);
-		bars->property.bind<unsigned int>(looper.channels[i].preset.bars, lock);
+		bars->property.bind<unsigned int>(looper.channels[i].preset.bars, handler);
 		controls.push_back(bars);
 		//Record
 		Button* record = new Button("Record", main_font, 12, x + 5, y + 100, pane_width - 15, 30);
@@ -119,7 +120,7 @@ Scene LooperView::create(ViewHost &frame) {
 
 	//Looper
 	CheckBox* looper = new CheckBox(false, "Looper", main_font, 18, 10, frame.get_height() - 45, 40, 40);
-	looper->property.bind(this->looper.active, lock);
+	looper->property.bind(this->looper.active, handler);
 	controls.push_back(looper);
 
 	return {controls};

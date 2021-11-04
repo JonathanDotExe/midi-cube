@@ -16,7 +16,7 @@ AnalogSynthOscilatorView::AnalogSynthOscilatorView(AdvancedSynth& s, size_t part
 	this->part = part;
 }
 
-std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyModulation& mod, SpinLock& lock, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source) {
+std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyModulation& mod, ActionHandler& handler, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source) {
 	std::vector<DragBox<double>*> boxes;
 	//Value
 	{
@@ -24,7 +24,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		controls->push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
-		value->property.bind(mod.value, lock);
+		value->property.bind(mod.value, handler);
 		controls->push_back(value);
 		boxes.push_back(value);
 	}
@@ -37,13 +37,13 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
 		amount->border = 0;
-		amount->property.bind(mod.mod_env_amount, lock);
+		amount->property.bind(mod.mod_env_amount, handler);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 		boxes.push_back(amount);
 
 		DragBox<int>* source = new DragBox<int>(0, 0, ASYNTH_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
-		source->property.bind(mod.mod_env, lock);
+		source->property.bind(mod.mod_env, handler);
 		controls->push_back(source);
 		show_source->push_back(source);
 	}
@@ -56,13 +56,13 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
 		amount->border = 0;
-		amount->property.bind(mod.lfo_amount, lock);
+		amount->property.bind(mod.lfo_amount, handler);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 		boxes.push_back(amount);
 
 		DragBox<int>* source = new DragBox<int>(0, 0, ASYNTH_PART_COUNT - 1, main_font, 16, x, y + 15, 80, 40);
-		source->property.bind(mod.lfo, lock);
+		source->property.bind(mod.lfo, handler);
 		controls->push_back(source);
 		show_source->push_back(source);
 	}
@@ -81,7 +81,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		DragBox<double>* amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		amount->drag_mul /= 2;
 		amount->border = 0;
-		amount->property.bind(mod.velocity_amount, lock);
+		amount->property.bind(mod.velocity_amount, handler);
 		controls->push_back(amount);
 		show_amount->push_back(amount);
 		boxes.push_back(amount);
@@ -89,7 +89,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 		DragBox<double>* at_amount = new DragBox<double>(0, -1, 1, main_font, 16, x, y + 15, 80, 40);
 		at_amount->drag_mul /= 2;
 		at_amount->border = 0;
-		at_amount->property.bind(mod.aftertouch_amount, lock);
+		at_amount->property.bind(mod.aftertouch_amount, handler);
 		controls->push_back(at_amount);
 		show_source->push_back(at_amount);
 		boxes.push_back(at_amount);
@@ -100,7 +100,7 @@ std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* contr
 }
 
 
-void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREnvelopeData& data, SpinLock& lock) {
+void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREnvelopeData& data, ActionHandler& handler) {
 	DragBoxScale<double> scale = {
 			[](double progress, double min, double max) {
 				progress *= progress;
@@ -117,7 +117,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 
 		DragBox<double>* value = new DragBox<double>(0, 0.0005, 5, main_font, 16, x, y + 15, 80, 40, scale);
 		value->drag_step = 4;
-		value->property.bind(data.attack, lock);
+		value->property.bind(data.attack, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -128,7 +128,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 10, main_font, 16, x, y + 15, 80, 40, scale);
 		value->drag_step = 4;
-		value->property.bind(data.pre_decay, lock);
+		value->property.bind(data.pre_decay, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -139,7 +139,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 10, main_font, 16, x, y + 15, 80, 40, scale);
 		value->drag_step = 4;
-		value->property.bind(data.decay, lock);
+		value->property.bind(data.decay, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -150,7 +150,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
 		value->drag_step = 2;
-		value->property.bind(data.sustain, lock);
+		value->property.bind(data.sustain, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -161,7 +161,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 
 		DragBox<double>* value = new DragBox<double>(0, 0.0005, 10, main_font, 16, x, y + 15, 80, 40, scale);
 		value->drag_step = 4;
-		value->property.bind(data.release, lock);
+		value->property.bind(data.release, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -175,7 +175,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0.0, 5, main_font, 16, x, y + 15, 80, 40, scale);
-		value->property.bind(data.attack_hold, lock);
+		value->property.bind(data.attack_hold, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -186,7 +186,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
-		value->property.bind(data.peak_volume, lock);
+		value->property.bind(data.peak_volume, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -197,7 +197,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
-		value->property.bind(data.decay_volume, lock);
+		value->property.bind(data.decay_volume, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -208,7 +208,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 20, main_font, 16, x, y + 15, 80, 40, scale);
 		value->drag_step = 2;
-		value->property.bind(data.sustain_time, lock);
+		value->property.bind(data.sustain_time, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -218,7 +218,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, x, y + 15, 80, 40);
-		value->property.bind(data.release_volume, lock);
+		value->property.bind(data.release_volume, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -232,7 +232,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x , y + 15, 80, 40);
-		shape->property.bind_cast(data.attack_shape, lock);
+		shape->property.bind_cast(data.attack_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -242,7 +242,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
-		shape->property.bind_cast(data.pre_decay_shape, lock);
+		shape->property.bind_cast(data.pre_decay_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -252,7 +252,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
-		shape->property.bind_cast(data.decay_shape, lock);
+		shape->property.bind_cast(data.decay_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -263,7 +263,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 10, main_font, 16, x, y + 15, 80, 40, scale);
 		value->drag_step = 4;
-		value->property.bind(data.hold, lock);
+		value->property.bind(data.hold, handler);
 		controls->push_back(value);
 	}
 	x += 90;
@@ -273,7 +273,7 @@ void adsr_controls(std::vector<Control*>* controls, int x, int y, BindableADSREn
 		controls->push_back(title);
 
 		ComboBox* shape = new ComboBox(0, shapes, main_font, 16, 0, x, y + 15, 80, 40);
-		shape->property.bind_cast(data.release_shape, lock);
+		shape->property.bind_cast(data.release_shape, handler);
 		controls->push_back(shape);
 	}
 	x += 90;
@@ -284,7 +284,7 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
 
-	SpinLock& lock = synth.get_lock();
+	ActionHandler& handler = frame.get_master_host().get_action_handler();
 	OscilatorEntity& osc = synth.preset.oscilators.at(this->part);
 
 	//Background
@@ -300,49 +300,49 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
-		waveform->property.bind_cast(osc.waveform, lock);
+		waveform->property.bind_cast(osc.waveform, handler);
 		controls.push_back(waveform);
 	}
 	//Fixed Freq
 	{
 		CheckBox* audible = new CheckBox(false, "Fixed", main_font, 16, tmp_x + 160, tmp_y, 40, 40);
-		audible->property.bind(osc.fixed_freq, lock);
+		audible->property.bind(osc.fixed_freq, handler);
 		controls.push_back(audible);
 	}
 	//Note
 	{
 		DragBox<unsigned int>* value = new DragBox<unsigned int>(0, 0, 127, main_font, 16, tmp_x + 320, tmp_y, 80, 40);
-		value->property.bind(osc.note, lock);
+		value->property.bind(osc.note, handler);
 		controls.push_back(value);
 	}
 	tmp_y += 50;
 	//Reset
 	{
 		CheckBox* reset = new CheckBox(false, "Reset", main_font, 16, tmp_x, tmp_y, 40, 40);
-		reset->property.bind(osc.reset, lock);
+		reset->property.bind(osc.reset, handler);
 		controls.push_back(reset);
 	}
 	//Phase
 	{
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x + 160, tmp_y, 80, 40);
-		value->property.bind(osc.phase, lock);
+		value->property.bind(osc.phase, handler);
 		controls.push_back(value);
 	}
 	tmp_y += 50;
 	//Randomize and sync
 	{
 		CheckBox* reset = new CheckBox(false, "Randomize", main_font, 16, tmp_x, tmp_y, 40, 40);
-		reset->property.bind(osc.randomize, lock);
+		reset->property.bind(osc.randomize, handler);
 		controls.push_back(reset);
 	}
 	{
 		CheckBox* audible = new CheckBox(false, "Sync", main_font, 16, tmp_x + 160, tmp_y, 40, 40);
-		audible->property.bind(osc.sync, lock);
+		audible->property.bind(osc.sync, handler);
 		controls.push_back(audible);
 		tmp_y += 50;
 	}
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, osc.volume, lock, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, osc.volume, handler, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Unison
@@ -351,7 +351,7 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, 0, 7, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->property.bind(osc.unison_amount, lock);
+		value->property.bind(osc.unison_amount, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -361,7 +361,7 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, -48, 48, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->property.bind(osc.semi, lock);
+		value->property.bind(osc.semi, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -372,7 +372,7 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 50, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul /= 10;
-		value->property.bind(osc.transpose, lock);
+		value->property.bind(osc.transpose, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -381,10 +381,10 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 	tmp_x = 500;
 	tmp_y = 10;
 	//Pulse Width
-	property_mod_controls(&controls, tmp_x, tmp_y, osc.pulse_width, lock, "Shape/PW", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, osc.pulse_width, handler, "Shape/PW", &show_amount, &show_source);
 	tmp_y += 75;
 	//Pitch
-	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, osc.pitch, lock, "Pitch", &show_amount, &show_source)) {
+	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, osc.pitch, handler, "Pitch", &show_amount, &show_source)) {
 		c->border = 0.5;
 		c->drag_mul /= 2;
 		c->to_string = [](double val) {
@@ -394,7 +394,7 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 	}
 	tmp_y += 75;
 	//Sync
-	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, osc.sync_mul, lock, "Sync", &show_amount, &show_source)) {
+	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, osc.sync_mul, handler, "Sync", &show_amount, &show_source)) {
 		c->to_string = [](double val) {
 			return std::to_string(val >= 0 ? SYNC_SCALE.value(val) : -SYNC_SCALE.value(-val));
 		};
@@ -402,7 +402,7 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 	}
 	tmp_y += 75;
 	//Unison Detune
-	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, osc.unison_detune, lock, "Unison Det.", &show_amount, &show_source)) {
+	for (auto c : property_mod_controls(&controls, tmp_x, tmp_y, osc.unison_detune, handler, "Unison Det.", &show_amount, &show_source)) {
 		c->to_string = [](double val) {
 			return std::to_string(val >= 0 ? UNISON_DETUNE_SCALE.value(val) : -UNISON_DETUNE_SCALE.value(-val));
 		};

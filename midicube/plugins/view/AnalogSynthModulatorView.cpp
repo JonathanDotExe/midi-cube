@@ -22,7 +22,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
 
-	SpinLock& lock = synth.get_lock();
+	ActionHandler& handler = frame.get_master_host().get_action_handler();
 	ModEnvelopeEntity& env = synth.preset.mod_envs.at(this->part);
 	LFOEntity& lfo = synth.preset.lfos.at(this->part);
 
@@ -41,10 +41,10 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 	}
 	tmp_y += 30;
 	//Envelope
-	adsr_controls(&controls, tmp_x, tmp_y, env.env, lock);
+	adsr_controls(&controls, tmp_x, tmp_y, env.env, handler);
 	tmp_y += 225;
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, env.volume, lock, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, env.volume, handler, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Col 2 - LFO
@@ -63,7 +63,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 50, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul *= 0.25;
-		value->property.bind(lfo.freq, lock);
+		value->property.bind(lfo.freq, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -73,19 +73,19 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
-		waveform->property.bind_cast(lfo.waveform, lock);
+		waveform->property.bind_cast(lfo.waveform, handler);
 		controls.push_back(waveform);
 	}
 	tmp_x = 500;
 	tmp_y += 60;
 	//Volume
-	property_mod_controls(&controls, tmp_x, tmp_y, lfo.volume, lock, "Volume", &show_amount, &show_source);
+	property_mod_controls(&controls, tmp_x, tmp_y, lfo.volume, handler, "Volume", &show_amount, &show_source);
 	tmp_y += 75;
 
 	//Master Sync
 	{
 		CheckBox* value = new CheckBox(false, "Master Sync", main_font, 16, tmp_x, tmp_y, 40, 40);
-		value->property.bind(lfo.sync_master, lock);
+		value->property.bind(lfo.sync_master, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 160;
@@ -96,7 +96,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 
 		DragBox<int>* value = new DragBox<int>(0, -32, 32, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul *= 0.5;
-		value->property.bind(lfo.clock_value, lock);
+		value->property.bind(lfo.clock_value, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -106,7 +106,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 		controls.push_back(title);
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->property.bind(lfo.sync_phase, lock);
+		value->property.bind(lfo.sync_phase, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -117,7 +117,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 
 		DragBox<int>* value = new DragBox<int>(0, -32, 32, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul *= 0.5;
-		value->property.bind(lfo.motion_sequencer, lock);
+		value->property.bind(lfo.motion_sequencer, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;

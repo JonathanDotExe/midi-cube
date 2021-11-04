@@ -23,8 +23,7 @@ AnalogSynthView::AnalogSynthView(AdvancedSynth& s) : synth(s), binder{s.get_lock
 Scene AnalogSynthView::create(ViewHost &frame) {
 	this->frame = &frame;
 	std::vector<Control*> controls;
-
-	SpinLock& lock = synth.get_lock();
+	ActionHandler& handler = frame.get_master_host().get_action_handler();
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -84,7 +83,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, 0, ASYNTH_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->property.bind(synth.preset.op_count, lock);
+		value->property.bind(synth.preset.op_count, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -94,7 +93,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 		controls.push_back(title);
 
 		DragBox<int>* value = new DragBox<int>(0, 0, ASYNTH_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->property.bind(synth.preset.mod_env_count, lock);
+		value->property.bind(synth.preset.mod_env_count, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;
@@ -102,7 +101,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 		Label* title = new Label("LFO Count", main_font, 12, tmp_x, tmp_y);
 		controls.push_back(title);
 		DragBox<int>* value = new DragBox<int>(0, 0, ASYNTH_PART_COUNT, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->property.bind(synth.preset.lfo_count, lock);
+		value->property.bind(synth.preset.lfo_count, handler);
 		controls.push_back(value);
 	}
 	tmp_y += 75;
@@ -112,14 +111,14 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 	//Mono
 	{
 		CheckBox* mono = new CheckBox(false, "Mono", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
-		mono->property.bind(synth.preset.mono, lock);
+		mono->property.bind(synth.preset.mono, handler);
 		controls.push_back(mono);
 	}
 	tmp_x += 120;
 	//Legato
 	{
 		CheckBox* legato = new CheckBox(false, "Legato", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
-		legato->property.bind(synth.preset.legato, lock);
+		legato->property.bind(synth.preset.legato, handler);
 		controls.push_back(legato);
 	}
 	tmp_x += 120;
@@ -130,7 +129,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul /= 5;
-		value->property.bind(synth.preset.portamendo, lock);
+		value->property.bind(synth.preset.portamendo, handler);
 		controls.push_back(value);
 	}
 	tmp_x = 10;
@@ -143,7 +142,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul /= 5;
-		value->property.bind(synth.preset.aftertouch_attack, lock);
+		value->property.bind(synth.preset.aftertouch_attack, handler);
 		controls.push_back(value);
 		tmp_x += 120;
 	}
@@ -153,7 +152,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul /= 5;
-		value->property.bind(synth.preset.aftertouch_release, lock);
+		value->property.bind(synth.preset.aftertouch_release, handler);
 		controls.push_back(value);
 		tmp_x += 120;
 	}
@@ -164,14 +163,14 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 5, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->drag_mul /= 5;
-		value->property.bind(synth.preset.velocity_aftertouch_amount, lock);
+		value->property.bind(synth.preset.velocity_aftertouch_amount, handler);
 		controls.push_back(value);
 		tmp_x += 120;
 	}
 	//Max Aftertouch
 	{
 		CheckBox* mono = new CheckBox(false, "Max Aftertouch", main_font, 16, tmp_x, tmp_y + 15, 40, 40);
-		mono->property.bind(synth.preset.max_aftertouch, lock);
+		mono->property.bind(synth.preset.max_aftertouch, handler);
 		controls.push_back(mono);
 	}
 	tmp_x += 120;

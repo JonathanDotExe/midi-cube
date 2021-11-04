@@ -17,7 +17,7 @@ AnalogSynthFMView::AnalogSynthFMView(AdvancedSynth& s) : synth(s) {
 Scene AnalogSynthFMView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
-	SpinLock& lock = synth.get_lock();
+	ActionHandler& handler = frame.get_master_host().get_action_handler();
 
 	//Background
 	Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 5);
@@ -54,7 +54,7 @@ Scene AnalogSynthFMView::create(ViewHost &frame) {
 			int x = tmp_x + j * 85 + 35;
 			DragBox<double>* value = new DragBox<double>(0, 0, 2, main_font, 16, x, y, 80, 40);
 			value->border = 0;
-			value->property.bind(op.fm.at(j), lock);
+			value->property.bind(op.fm.at(j), handler);
 			//Color if feedback
 			if (i >= j) {
 				value->rect.setFillColor(sf::Color(180, 180, 180));
@@ -63,7 +63,7 @@ Scene AnalogSynthFMView::create(ViewHost &frame) {
 		}
 		//Audible
 		CheckBox* audible = new CheckBox(false, "", main_font, 16, tmp_x + ASYNTH_PART_COUNT * 85 + 35, y, 40, 40);
-		audible->property.bind(op.audible, lock);
+		audible->property.bind(op.audible, handler);
 		controls.push_back(audible);
 
 		//Edit
