@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "midicube/gui/view/SoundEngineView.h"
-#include "midicube/midicube.h"
-#include "midicube/effect/effect.h"
+#include "midicube/workstation/view/SoundEngineView.h"
+#include "midicube/framework/gui/frame.h"
+#include "midicube/workstation/midicube.h"
 
 using namespace std;
 
@@ -34,12 +34,12 @@ int main(int argc, char **argv) {
 	MidiCubePtr ptr;
 	try {
 		ptr.cube = new MidiCube();
+		//View
+		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation", *ptr.cube, screen_sleep);
 		ptr.cube->init(out_device, in_device);
 		load_resources();
-		//View
-		Frame frame(*ptr.cube, 1024, 600, "MIDICube - universal MIDI and synthesis workstation", screen_sleep);
 		//Run frame
-		frame.run(new SoundEngineView());
+		frame.run(new SoundEngineView(*ptr.cube));
 	}
 	catch (AudioException& e) {
 		cerr << e.what() << endl;

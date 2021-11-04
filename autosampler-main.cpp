@@ -10,7 +10,7 @@
 #include <thread>
 #include <chrono>
 
-#include "midicube/autosampler.h"
+#include "midicube/workstation/autosampler.h"
 
 
 int main(int argc, char **argv) {
@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
 	std::cout << "1: Record samples from a MIDI device" << std::endl;
 	std::cout << "2: Configure a sound using recorded samples" << std::endl;
 	std::cout << "3: Convert an sfz file to a midi cube sample" << std::endl;
+	std::cout << "4: Convert an old program to a new one" << std::endl;
 	int in = 0;
 	std::cin >> in;
 	switch (in) {
@@ -46,6 +47,13 @@ int main(int argc, char **argv) {
 		SfzSampleConverter conv;
 		conv.request_params();
 		conv.convert();
+	}
+	break;
+	case 4:
+	{
+		ProgramConverter prog;
+		prog.request_params();
+		prog.convert();
 	}
 	break;
 	}
