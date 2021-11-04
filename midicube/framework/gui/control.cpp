@@ -316,3 +316,7 @@ void ViewContainer::draw(sf::RenderWindow &window, Control* selected) {
 void ViewContainer::notify_remove(Control *control) {
 	get_host()->notify_remove(control);
 }
+
+MasterPluginHost& ViewContainer::get_master_host() {
+	return get_host()->get_master_host();
+}

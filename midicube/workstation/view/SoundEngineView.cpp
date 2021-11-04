@@ -20,6 +20,7 @@ SoundEngineView::SoundEngineView(MidiCube& c) : ViewController(), cube(c) {
 
 Scene SoundEngineView::create(ViewHost& frame) {
 	std::vector<Control*> controls;
+	ActionHandler& handler = frame.get_master_host().get_action_handler();
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -50,7 +51,7 @@ Scene SoundEngineView::create(ViewHost& frame) {
 
 		//Active
 		CheckBox* active = new CheckBox(false, "", main_font, 12, x + pane_width - 30, y + 5, 20, 20);
-		active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), cube.lock);
+		active->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_active, &channel), std::bind(&SoundEngineChannel::set_active, &channel, std::placeholders::_1), handler);
 		controls.push_back(active);
 		//Engine
 		cube.lock.lock();
@@ -67,23 +68,23 @@ Scene SoundEngineView::create(ViewHost& frame) {
 
 		//Volume
 		Slider* volume = new Slider(0, 0, 1, main_font, x + (pane_width - 5)/2 - 20, y + 70, 40, 180);
-		volume->property.bind(channel.volume, cube.lock);
+		volume->property.bind(channel.volume, handler);
 		controls.push_back(volume);
 	}
 
 	//Metronome
 	CheckBox* metronome = new CheckBox(false, "Metronome", main_font, 18, 10, frame.get_height() - 45, 40, 40);
-	metronome->property.bind(engine->play_metronome, cube.lock);
+	metronome->property.bind(engine->play_metronome, handler);
 	controls.push_back(metronome);
 
 	DragBox<int>* bpm = new DragBox<int>(120, 10, 480, main_font, 18, 200, frame.get_height() - 45, 100, 40);
 	bpm->drag_mul = 0.00125;
-	bpm->property.bind_function<unsigned int>(std::bind(&Metronome::get_bpm, &engine->metronome), std::bind(&Metronome::set_bpm, &engine->metronome, std::placeholders::_1), cube.lock);
+	bpm->property.bind_function<unsigned int>(std::bind(&Metronome::get_bpm, &engine->metronome), std::bind(&Metronome::set_bpm, &engine->metronome, std::placeholders::_1), handler);
 	controls.push_back(bpm);
 
 	//Volume
 	DragBox<double>* volume = new DragBox<double>(0, 0, 1, main_font, 18, 330, frame.get_height() - 45, 100, 40);
-	volume->property.bind(engine->volume, cube.lock);
+	volume->property.bind(engine->volume, handler);
 	controls.push_back(volume);
 
 	//Effects

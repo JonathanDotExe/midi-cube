@@ -16,6 +16,8 @@ SourceView::SourceView(MidiCube& c) : cube(c) {
 Scene SourceView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
+	ActionHandler& handler = frame.get_master_host().get_action_handler();
+
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
@@ -41,7 +43,7 @@ Scene SourceView::create(ViewHost &frame) {
 		//Device
 		{
 			DragBox<int>* value = new DragBox<int>(0, -1, SOUND_ENGINE_MIDI_CHANNELS - 1, main_font, 12, x + 5, y, pane_width/2 - 5, 30);
-			value->property.bind(source.device, cube.lock);
+			value->property.bind(source.device, handler);
 			controls.push_back(value);
 
 			Label* label = new Label("Device", main_font, 12, x + 5 + pane_width/2, y + 5);
@@ -51,7 +53,7 @@ Scene SourceView::create(ViewHost &frame) {
 		//Channel
 		{
 			DragBox<int>* value = new DragBox<int>(0, -1, SOUND_ENGINE_MIDI_CHANNELS - 1, main_font, 12, x + 5, y, pane_width/2 - 5, 30);
-			value->property.bind(source.channel, cube.lock);
+			value->property.bind(source.channel, handler);
 			controls.push_back(value);
 
 			Label* label = new Label("Channel", main_font, 12, x + 5 + pane_width/2, y + 5);
@@ -61,28 +63,28 @@ Scene SourceView::create(ViewHost &frame) {
 		//CC
 		{
 			CheckBox* value = new CheckBox(true, "CC", main_font, 12, x + 5, y, 30, 30);
-			value->property.bind(source.transfer_cc, cube.lock);
+			value->property.bind(source.transfer_cc, handler);
 			controls.push_back(value);
 		}
 		y += 40;
 		//Pitch Bend
 		{
 			CheckBox* value = new CheckBox(true, "Pitch Bend", main_font, 12, x + 5, y, 30, 30);
-			value->property.bind(source.transfer_pitch_bend, cube.lock);
+			value->property.bind(source.transfer_pitch_bend, handler);
 			controls.push_back(value);
 		}
 		y += 40;
 		//Program
 		{
 			CheckBox* value = new CheckBox(true, "Program", main_font, 12, x + 5, y, 30, 30);
-			value->property.bind(source.transfer_prog_change, cube.lock);
+			value->property.bind(source.transfer_prog_change, handler);
 			controls.push_back(value);
 		}
 		y += 40;
 		//Clock
 		{
 			CheckBox* value = new CheckBox(true, "Clock In", main_font, 12, x + 5, y, 30, 30);
-			value->property.bind(source.clock_in, cube.lock);
+			value->property.bind(source.clock_in, handler);
 			controls.push_back(value);
 		}
 		y += 40;
@@ -91,7 +93,7 @@ Scene SourceView::create(ViewHost &frame) {
 	//Used Sources
 	{
 		DragBox<int>* value = new DragBox<int>(0, 0, SOUND_ENGINE_MIDI_CHANNELS, main_font, 18, 5, frame.get_height() - 45, 60, 40);
-		value->property.bind(cube.used_sources, cube.lock);
+		value->property.bind(cube.used_sources, handler);
 		controls.push_back(value);
 
 		Label* label = new Label("Sources", main_font, 18, 70, frame.get_height() - 37);

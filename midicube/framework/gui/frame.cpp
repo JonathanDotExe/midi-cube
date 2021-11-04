@@ -122,6 +122,10 @@ Frame::~Frame() {
 	delete next_view;
 }
 
+MasterPluginHost& Frame::get_master_host() {
+	return host;
+}
+
 void Frame::notify_remove(Control *control) {
 	if (selected == control) {
 		selected = nullptr;

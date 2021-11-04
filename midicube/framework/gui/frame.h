@@ -42,6 +42,8 @@ public:
 
 	void propterty_change(void* source, void* prop);
 
+	MasterPluginHost& get_master_host();
+
 	void request_redraw() {
 		redraw = true;
 	}

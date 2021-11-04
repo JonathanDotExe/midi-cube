@@ -519,6 +519,8 @@ public:
 	virtual Control* on_mouse_pressed(int x, int y, sf::Mouse::Button button);
 	virtual void update_properties();
 	virtual void draw(sf::RenderWindow &window, Control* selected);
+	MasterPluginHost& get_master_host();
+
 
 
 	virtual ~ViewContainer() {

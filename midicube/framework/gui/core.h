@@ -16,6 +16,7 @@
 
 #define SELECTABLE virtual bool selectable() const { return true; };
 
+class MasterPluginHost;
 
 //TODO pseudo host for controls
 class ViewHost;
@@ -182,6 +183,8 @@ public:
 		delete control;
 		request_redraw();
 	}
+
+	virtual MasterPluginHost& get_master_host() = 0;
 
 	virtual ~ViewHost() {
 		delete view;
