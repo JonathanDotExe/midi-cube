@@ -70,6 +70,7 @@ public:
 	void save_program(Program *prog);
 	void apply_program(Program *prog);
 	void notify_property_update(void* source, void* prop);
+	const MidiCubeConfig& get_config() const;
 	MidiCube();
 	void init();
 	inline void process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info);

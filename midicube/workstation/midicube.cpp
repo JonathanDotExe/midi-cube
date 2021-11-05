@@ -106,6 +106,11 @@ void MidiCube::init() {
 		}
 	}
 	srand(time(NULL));
+	//Sources
+	used_sources = std::min(config.default_sources.size(), (size_t) SOUND_ENGINE_MIDI_CHANNELS);
+	for (size_t i = 0; i < used_sources; ++i) {
+		sources[i] = config.default_sources[i];
+	}
 	//Init audio
 	audio_handler.init(config.sample_rate, config.buffer_size, config.output_device, config.input_device, config.input_channels);
 }
@@ -161,6 +166,10 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 			}
 		}
 	}
+}
+
+const MidiCubeConfig& MidiCube::get_config() const {
+	return config;
 }
 
 MidiCube::~MidiCube() {
