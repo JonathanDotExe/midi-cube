@@ -197,3 +197,28 @@ ActionHandler& MidiCube::get_action_handler() {
 void MidiCube::set_property_change_callback(std::function<void(void*, void*)> cb) {
 	property_callback = cb;
 }
+
+void MidiCubeConfig::load(pt::ptree tree) {
+
+}
+
+pt::ptree MidiCubeConfig::save() {
+	pt::ptree tree;
+	tree.put("sample_rate", sample_rate);
+	tree.put("buffer_size", buffer_size);
+	tree.put("input_channels", input_channels);
+	tree.put("output_device", output_device);
+	tree.put("input_device", input_device);
+	tree.put("screen_sleep", screen_sleep);
+	for (MidiSource source : default_sources) {
+		pt::ptree s;
+		s.put("device", source.device);
+		s.put("channel", source.channel);
+		s.put("transfer_cc", source.transfer_cc);
+		s.put("transfer_pitch_bend", source.transfer_pitch_bend);
+		s.put("transfer_prog_change", source.transfer_prog_change);
+		s.put("clock_in", source.clock_in);
+		tree.add_child("default_sources.source", s);
+	}
+	return tree;
+}

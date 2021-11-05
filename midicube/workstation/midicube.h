@@ -36,6 +36,10 @@ struct MidiCubeConfig {
 	size_t input_device = 0;
 	bool screen_sleep = false;
 	std::vector<MidiSource> default_sources = {{}};
+
+	void load(pt::ptree tree);
+
+	pt::ptree save();
 };
 
 class MidiCube : public ProgramUser, public MasterPluginHost {
