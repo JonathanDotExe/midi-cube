@@ -28,6 +28,16 @@ struct MidiMessageWithInput {
 	MidiMessage msg;
 };
 
+struct MidiCubeConfig {
+	unsigned int sample_rate = 48000;
+	unsigned int buffer_size = 256;
+	unsigned int input_channels = 2;
+	size_t output_device = 0;
+	size_t input_device = 0;
+	bool screen_sleep = false;
+	std::vector<MidiSource> default_sources = {{}};
+};
+
 class MidiCube : public ProgramUser, public MasterPluginHost {
 private:
 	AudioHandler audio_handler;
