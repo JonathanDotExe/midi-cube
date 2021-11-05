@@ -199,7 +199,26 @@ void MidiCube::set_property_change_callback(std::function<void(void*, void*)> cb
 }
 
 void MidiCubeConfig::load(pt::ptree tree) {
+	sample_rate = tree.get("sample_rate", sample_rate);
+	buffer_size = tree.get("buffer_size", buffer_size);
+	input_channels = tree.get("input_channels", input_channels);
+	output_device = tree.get("output_device", output_device);
+	input_device = tree.get("input_device", input_device);
+	screen_sleep = tree.get("screen_sleep", screen_sleep);
 
+	if (tree.get_child_optional("default_sources")) {
+		default_sources = {};
+		for (auto s : tree.get_child("default_sources")) {
+			MidiSource source;
+			source.device = s.second.get("device", source.device);
+			source.channel = s.second.get("channel", source.channel);
+			source.transfer_cc = s.second.get("transfer_cc", source.transfer_cc);
+			source.transfer_pitch_bend = s.second.get("transfer_pitch_bend", source.transfer_pitch_bend);
+			source.transfer_prog_change = s.second.get("transfer_prog_change", source.transfer_prog_change);
+			source.clock_in = s.second.get("clock_in", source.clock_in);
+			default_sources.push_back(source);
+		}
+	}
 }
 
 pt::ptree MidiCubeConfig::save() {
