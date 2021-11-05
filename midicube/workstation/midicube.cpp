@@ -71,7 +71,9 @@ void MidiCube::init() {
 	try {
 		pt::ptree tree;
 		pt::read_xml(MIDICUBE_CONFIG_PATH, tree);
-		config.load(tree);
+		if (tree.get_child_optional("config")) {
+			config.load(tree);
+		}
 	}
 	catch (pt::xml_parser_error& e) { }
 
@@ -181,7 +183,9 @@ MidiCube::~MidiCube() {
 	prog_mgr.unlock();
 	//Save config
 	try {
-		pt::write_xml(MIDICUBE_CONFIG_PATH, config.save());
+		pt::ptree tree;
+		tree.put_child("config", config.save());
+		pt::write_xml(MIDICUBE_CONFIG_PATH, tree);
 	}
 	catch (pt::xml_parser_error& e) {
 		std::cerr << "Couldn't save config !" << std::endl;
