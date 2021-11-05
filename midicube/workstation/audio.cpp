@@ -17,7 +17,7 @@ int g_process(void* output_buffer, void* input_buffer, unsigned int buffer_size,
 	return handler->process((double*) output_buffer, (double*) input_buffer, buffer_size, time);
 }
 
-void AudioHandler::init(int out_device, int in_device) {
+void AudioHandler::init(unsigned int sample_rate, unsigned int buffer_size, int out_device, int in_device, int input_amount) {
 	if ((int) audio.getDeviceCount() <= std::max(std::max(out_device, in_device), 0)) {
 		throw AudioException("No audio devices detected");
 	}
@@ -41,14 +41,14 @@ void AudioHandler::init(int out_device, int in_device) {
 	//Set up input
 	RtAudio::StreamParameters input_params;
 	input_params.deviceId = in_device >= 0 ? in_device : audio.getDefaultInputDevice();
-	input_params.nChannels = 2;
+	input_params.nChannels = input_amount;
 	input_params.firstChannel = 0;
 
-	sample_rate = 48000;
-	time_step = 1.0/sample_rate;
-	buffer_size = 256;
+	this->sample_rate = sample_rate;
+	time_step = 1.0/this->sample_rate;
+	this->buffer_size = buffer_size;
 
-	inputs = in_device >= 0 ? 2 : 0; //TODO custom input amount
+	inputs = in_device >= 0 ? input_amount : 0;
 
 	RtAudio::DeviceInfo out_info = audio.getDeviceInfo(params.deviceId);
 	std::cout << "Using output device " << out_info.name << " with two channels" << std::endl;
@@ -62,11 +62,11 @@ void AudioHandler::init(int out_device, int in_device) {
 	}
 
 	try {
-		audio.openStream(&params, inputs ? &input_params : nullptr, RTAUDIO_FLOAT64, sample_rate, &buffer_size, &g_process, this);
+		audio.openStream(&params, inputs ? &input_params : nullptr, RTAUDIO_FLOAT64, this->sample_rate, &this->buffer_size, &g_process, this);
 		audio.startStream();
-		sample_rate = audio.getStreamSampleRate();
-		time_step = 1.0/sample_rate;
-		std::cout << "Opened audio stream Sample Rate: " << sample_rate << " Hz ... Buffer Size: " << buffer_size << std::endl;
+		this->sample_rate = audio.getStreamSampleRate();
+		time_step = 1.0/this->sample_rate;
+		std::cout << "Opened audio stream Sample Rate: " << this->sample_rate << " Hz ... Buffer Size: " << this->buffer_size << std::endl;
 	}
 	catch (RtAudioError& e) {
 		throw AudioException(e.getMessage().c_str());

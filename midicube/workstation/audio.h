@@ -62,7 +62,7 @@ public:
 
 	void set_sample_callback(void (* get_sample) (double&, double&, double*, const size_t, SampleInfo&, void*), void* user_data);
 
-	void init(int out_device = -1, int in_device = -1);
+	void init(unsigned int sample_rate, unsigned int buffer_size, int out_device, int in_device, int input_amount);
 
 	void close();
 

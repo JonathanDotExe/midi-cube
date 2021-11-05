@@ -31,6 +31,9 @@
 
 #include "../plugins/sequencer/arpeggiator.h"
 
+#include <boost/property_tree/xml_parser.hpp>
+
+#define MIDICUBE_CONFIG_PATH "./data/config.xml"
 
 static void process_func(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info, void* user_data) {
 	((MidiCube*) user_data)->process(lsample, rsample, inputs, input_count, info);
@@ -40,7 +43,7 @@ MidiCube::MidiCube() : prog_mgr("./data/programs") {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
-void MidiCube::init(int out_device, int in_device) {
+void MidiCube::init() {
 	engine.init(this);
 	//Sound Engines
 	plugin_mgr.add_plugin(new AdvancedSynthPlugin());
@@ -64,6 +67,14 @@ void MidiCube::init(int out_device, int in_device) {
 	plugin_mgr.add_plugin(new LooperPlugin());
 	//Sequencers
 	plugin_mgr.add_plugin(new ArpeggiatorPlugin());
+	//Load config
+	try {
+		pt::ptree tree;
+		pt::read_xml(MIDICUBE_CONFIG_PATH, tree);
+		config.load(tree);
+	}
+	catch (pt::xml_parser_error& e) { }
+
 	//Default engines
 	engine.channels[0].scenes[0].active = true;
 	std::cout << "Loaded engines" << std::endl;
@@ -96,7 +107,7 @@ void MidiCube::init(int out_device, int in_device) {
 	}
 	srand(time(NULL));
 	//Init audio
-	audio_handler.init(out_device, in_device);
+	audio_handler.init(config.sample_rate, config.buffer_size, config.output_device, config.input_device, config.input_channels);
 }
 
 void MidiCube::process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info) {
@@ -159,6 +170,14 @@ MidiCube::~MidiCube() {
 	prog_mgr.lock();
 	prog_mgr.save_all();
 	prog_mgr.unlock();
+	//Save config
+	try {
+		pt::write_xml(MIDICUBE_CONFIG_PATH, config.save());
+	}
+	catch (pt::xml_parser_error& e) {
+		std::cerr << "Couldn't save config !" << std::endl;
+	}
+	//Delete ins
 	for (MidiCubeInput in : inputs) {
 		delete in.in;
 	}

@@ -46,6 +46,7 @@ class MidiCube : public ProgramUser, public MasterPluginHost {
 private:
 	AudioHandler audio_handler;
 	ActionHandler action_handler;
+	MidiCubeConfig config;
 	std::function<void(void*, void*)> property_callback;
 	std::vector<MidiCubeInput> inputs;
 
@@ -70,7 +71,7 @@ public:
 	void apply_program(Program *prog);
 	void notify_property_update(void* source, void* prop);
 	MidiCube();
-	void init(int out_device = -1, int in_device = -1);
+	void init();
 	inline void process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info);
 	std::vector<MidiCubeInput> get_inputs();
 
