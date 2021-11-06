@@ -8,10 +8,10 @@
 #ifndef MIDICUBE_UTIL_H_
 #define MIDICUBE_UTIL_H_
 
+#include <atomic>
 #include <array>
 #include <vector>
 #include <mutex>
-#include <boost/smart_ptr/detail/spinlock.hpp>
 #include <thread>
 #include <chrono>
 #include <emmintrin.h>

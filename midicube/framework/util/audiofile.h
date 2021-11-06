@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_AUDIOFILE_H_
 #define MIDICUBE_AUDIOFILE_H_
 
+#include <atomic>
 #include <cstdint>
 #include <vector>
 #include <string>

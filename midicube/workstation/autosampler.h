@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_AUTOSAMPLER_H_
 #define MIDICUBE_AUTOSAMPLER_H_
 
+#include <atomic>
 #include <iostream>
 #include <vector>
 #include <atomic>

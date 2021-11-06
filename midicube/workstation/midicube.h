@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_MIDICUBE_H_
 #define MIDICUBE_MIDICUBE_H_
 
+#include <atomic>
 #include "audio.h"
 #include "program.h"
 #include "midiio.h"

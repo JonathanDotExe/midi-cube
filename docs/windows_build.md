@@ -6,6 +6,9 @@ If any mingw packages are missing install them using the ming isntallation manag
 Furthermore, kg-config needs to be isntalled: https://stackoverflow.com/questions/1710922/how-to-install-pkg-config-in-windows
 The environment variable PKG_CONFIG_PATH must be set to "C:\Program Files (x86)"
 
+python -m pip install meson
+python -m pip install ninja
+
 # Install libraries
 ## RtAudio
 Download: https://github.com/thestk/rtaudio/releases/tag/5.1.0
@@ -87,3 +90,8 @@ Cflags: -I${includedir}
 ```
 
 ## Boost
+Download: https://sourceforge.net/projects/boost/files/boost-binaries/1.77.0/
+Install
+cd /C/local/boost_1_77_0/lib32-msvc-11.0
+mkdir pdb
+mv *.pdb pdb

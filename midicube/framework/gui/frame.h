@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_FRAMEWORK_GUI_FRAME_H_
 #define MIDICUBE_FRAMEWORK_GUI_FRAME_H_
 
+#include <atomic>
 #include "../util/util.h"
 #include "../data/data.h"
 #include "../core/plugin.h"
