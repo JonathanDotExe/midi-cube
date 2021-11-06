@@ -1,0 +1,2 @@
+export PKG_CONFIG_PATH="C:\Program Files (x86)\RtAudio\lib\pkgconfig;C:\Program Files (x86)\RtMidi\lib\pkgconfig;C:\Program Files (x86)\libsndfile\lib\pkgconfig;C:\Program Files (x86)\SFML\lib\pkgconfig"
+meson . build
