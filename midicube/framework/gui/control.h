@@ -143,8 +143,8 @@ public:
 
 template <typename T>
 struct DragBoxScale {
-	std::function<T (double, T, T)> value;
-	std::function<double (T, T, T)> progress;
+	std::function<T (double, T, T)> value = nullptr;
+	std::function<double (T, T, T)> progress = nullptr;
 };
 
 template <typename T>

@@ -5,12 +5,12 @@
  *      Author: jojo
  */
 
+#ifndef MIDICUBE_GUI_VIEW_BINDING_H_
+#define MIDICUBE_GUI_VIEW_BINDING_H_
+
 #include "../control.h"
 #include "BooleanMidiBindingView.h"
 #include "TemplateMidiBindingView.h"
-
-#ifndef MIDICUBE_GUI_VIEW_BINDING_H_
-#define MIDICUBE_GUI_VIEW_BINDING_H_
 
 class BindingGUIHandler {
 private:
