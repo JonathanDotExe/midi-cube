@@ -143,8 +143,12 @@ public:
 
 template <typename T>
 struct DragBoxScale {
-	std::function<T (double, T, T)> value = nullptr;
-	std::function<double (T, T, T)> progress = nullptr;
+	std::function<T (double, T, T)> value = [](double progress, T min, T max) {
+				return progress * (max - min) + min;
+			};
+	std::function<double (T, T, T)> progress = [](T value, T min, T max) {
+				return ((double) value - min)/(max - min);
+			};
 };
 
 template <typename T>
@@ -169,14 +173,7 @@ public:
 	DragBoxScale<T> scale;
 	PropertyBinding<T> property;
 
-	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0, DragBoxScale<T> scale = {
-			[](double progress, T min, T max) {
-				return progress * (max - min) + min;
-			},
-			[](T value, T min, T max) {
-				return ((double) value - min)/(max - min);
-			}
-		}) : Control (x, y, width, height) {
+	DragBox(T value, T min, T max, sf::Font& font, int text_size = 12, int x = 0, int y = 0, int width = 0, int height = 0, DragBoxScale<T> scale = {}) : Control (x, y, width, height) {
 		this->scale = scale;
 		this->min = min;
 		this->max = max;
