@@ -9,7 +9,9 @@ deps = [
 	dependency('sfml-window'),
 	dependency('sfml-graphics'),
 	dependency('threads'),
-	dependency('boost')
+	dependency('boost'),
+	cxx.find_library('boost_system', required: false),
+	cxx.find_library('boost_filesystem', required: false)
 ]
 
 src = [
@@ -94,7 +96,9 @@ sampler_deps = [
 	dependency('rtaudio'),
 	dependency('rtmidi'),
 	dependency('sndfile'),
-	dependency('boost')
+	dependency('boost'),
+	cxx.find_library('boost_system', required: false),
+	cxx.find_library('boost_filesystem', required: false)
 ]
 
 sampler_src = [
