@@ -173,6 +173,10 @@ struct ChannelProgram  : public Copyable {
 
 	PluginSlotProgram engine_program;
 	std::array<PluginSlotProgram, CHANNEL_SEQUENCER_AMOUNT> sequencers;
+
+	ChannelProgram() : Copyable() {
+
+	}
 };
 
 struct MasterEffectProgram {
@@ -201,8 +205,12 @@ public:
 struct Program : public Copyable {
 	std::string name;
 	unsigned int metronome_bpm = 120;
-	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{true}};
+	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {};
 	std::array<MasterEffectProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
+
+	Program(std::string name) : Copyable() {
+		this->name = name;
+	}
 };
 
 struct MidiSource {

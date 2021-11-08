@@ -26,7 +26,7 @@ std::string bank_filename(std::string name) {
 }
 
 Program* load_program(pt::ptree& tree, PluginManager* mgr) {
-	Program* program = new Program();
+	Program* program = new Program("");
 	program->name = tree.get<std::string>("name", "Init");
 	program->metronome_bpm = tree.get<unsigned int>("metronome_bpm", 120);
 	//Motion Sequencers
@@ -276,7 +276,7 @@ void ProgramManager::delete_program() {
 	Bank* bank = get_curr_bank();
 	bank->programs.erase(bank->programs.begin() + curr_program);
 	if (bank->programs.size() == 0) {
-		bank->programs.push_back(new Program{"Init"});
+		bank->programs.push_back(new Program("Init"));
 	}
 	if (curr_program >= bank->programs.size()) {
 		curr_program--;
@@ -290,7 +290,7 @@ void ProgramManager::delete_program() {
 
 void ProgramManager::save_new_program() {
 	Bank* bank = get_curr_bank();
-	Program* prog = new Program();
+	Program* prog = new Program("");
 	prog->name = program_name;
 
 	user->save_program(prog);
@@ -302,7 +302,7 @@ void ProgramManager::save_new_program() {
 
 void ProgramManager::save_init_program() {
 	Bank* bank = get_curr_bank();
-	Program* prog = new Program();
+	Program* prog = new Program("");
 	prog->name = program_name;
 
 	user->apply_program(prog);
@@ -323,7 +323,7 @@ void ProgramManager::save_new_bank() {
 	Bank* bank = new Bank();
 	bank->name = bank_name;
 	bank->filename = bank_filename(bank_name);
-	bank->programs.push_back(new Program{"Init"});
+	bank->programs.push_back(new Program("Init"));
 	if (std::any_of(banks.begin(), banks.end(), [bank](Bank* b){ return b->filename == bank->filename; })) {
 		delete bank;
 	}
@@ -356,7 +356,7 @@ void ProgramManager::load_all(PluginManager* mgr) {
 		Bank* bank = new Bank();
 		bank->name = "Default";
 		bank->filename = "default";
-		bank->programs.push_back(new Program{"Init"});
+		bank->programs.push_back(new Program("Init"));
 		banks.push_back(bank);
 	}
 }
