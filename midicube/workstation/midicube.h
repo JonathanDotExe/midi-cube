@@ -17,6 +17,7 @@
 #include "soundengine.h"
 #include "../framework/util/audioloader.h"
 #include "../framework/util/util.h"
+#include "../framework/util/clipboard.h"
 #include "../framework/core/plugin.h"
 
 struct MidiCubeInput {
@@ -59,6 +60,7 @@ public:
 	ProgramManager prog_mgr;
 	SoundEngineDevice engine;
 	PluginManager plugin_mgr;
+	Clipboard clipboard;
 
 	std::atomic<bool> updated{false};
 

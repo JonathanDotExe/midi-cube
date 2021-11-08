@@ -31,6 +31,7 @@ src = [
 	'midicube/framework/dsp/wavetable.cpp',
 	'midicube/framework/util/audiofile.cpp',
 	'midicube/framework/util/audioloader.cpp',
+	'midicube/framework/util/clipboard.cpp',
 	'midicube/framework/util/sfz.cpp',
 	'midicube/framework/util/util.cpp',
 	'midicube/framework/gui/control.cpp',
