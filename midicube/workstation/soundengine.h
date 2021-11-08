@@ -18,6 +18,7 @@
 #include <string>
 #include <array>
 #include <functional>
+#include "../framework/util/clipboard.h"
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -160,7 +161,7 @@ public:
 
 };
 
-struct ChannelProgram {
+struct ChannelProgram  : public Copyable {
 	bool active = true;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double>  panning{0, -1, 1};
@@ -197,7 +198,7 @@ public:
 	}
 };
 
-struct Program {
+struct Program : public Copyable {
 	std::string name;
 	unsigned int metronome_bpm = 120;
 	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {{true}};

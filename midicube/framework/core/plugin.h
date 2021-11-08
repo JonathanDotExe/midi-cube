@@ -14,6 +14,7 @@
 #include "../dsp/envelope.h"
 #include "../data/binding.h"
 #include "../util/util.h"
+#include "../util/clipboard.h"
 #include "../gui/core.h"
 //#include "../gui/core.h"
 #include <map>
@@ -292,7 +293,7 @@ public:
 
 };
 
-class PluginSlotProgram {
+class PluginSlotProgram : public Copyable {
 private:
 	PluginProgram* program = nullptr;
 

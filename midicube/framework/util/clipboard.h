@@ -8,7 +8,16 @@
 #ifndef MIDICUBE_FRAMEWORK_UTIL_CLIPBOARD_H_
 #define MIDICUBE_FRAMEWORK_UTIL_CLIPBOARD_H_
 
-class Copyable {
+struct Copyable {
+
+public:
+	Copyable() {
+
+	}
+
+	~Copyable() {
+
+	}
 
 };
 
