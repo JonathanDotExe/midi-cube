@@ -441,24 +441,7 @@ void SoundEngineDevice::apply_program(Program* program) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
 
-		ch.engine.load(prog.engine_program, &cube->plugin_mgr);
-		for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
-			PluginSlotProgram& p = prog.sequencers[i];
-			ch.sequencers[i].load(p, &cube->plugin_mgr);
-		}
-		ch.volume = prog.volume;
-		ch.panning = prog.panning;
-		ch.scenes = prog.scenes;
-		ch.polyphony_limit = prog.polyphony_limit;
-		ch.input = prog.input;
-
-		//Engine
-		ch.master_send = prog.send_master;
-		//Effects
-		for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
-			PluginSlotProgram& p = prog.effects[i];
-			ch.effects[i].load(p, &cube->plugin_mgr);
-		}
+		ch.apply_program(&prog, &cube->plugin_mgr);
 	}
 	//Master Effects
 	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
@@ -474,24 +457,7 @@ void SoundEngineDevice::save_program(Program* program) {
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		ChannelProgram& prog = program->channels[i];
 		SoundEngineChannel& ch = channels[i];
-		ch.engine.save(prog.engine_program);
-		for (size_t j = 0; j < CHANNEL_SEQUENCER_AMOUNT; ++j) {
-			PluginSlotProgram& p = prog.sequencers[j];
-			ch.sequencers[j].save(p);
-		}
-		prog.volume = ch.volume;
-		prog.panning = ch.panning;
-		prog.scenes = ch.scenes;
-		prog.polyphony_limit = ch.polyphony_limit;
-		prog.input = ch.input;
-
-		//Engine
-		prog.send_master = ch.master_send;
-		//Effects
-		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
-			PluginSlotProgram& p = prog.effects[j];
-			ch.effects[j].save(p);
-		}
+		ch.save_program(&prog);
 	}
 	//Master Effects
 	for (size_t i = 0; i < SOUND_ENGINE_MASTER_EFFECT_AMOUNT; ++i) {
@@ -611,3 +577,57 @@ int SoundEngineDeviceHost::get_transpose() {
 	return 0;
 }
 
+void SoundEngineChannel::copy_channel() {
+	ChannelProgram* prog = new ChannelProgram();
+	save_program(prog);
+	device->get_cube()->clipboard.copy(prog);
+}
+
+void SoundEngineChannel::paste_channel() {
+	ChannelProgram* prog = device->get_cube()->clipboard.paste<ChannelProgram>();
+	if (prog) {
+		apply_program(prog, &device->get_cube()->plugin_mgr);
+	}
+}
+
+void SoundEngineChannel::apply_program(ChannelProgram *program, PluginManager* mgr) {
+	engine.load(program->engine_program, mgr);
+	for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
+		PluginSlotProgram& p = program->sequencers[i];
+		sequencers[i].load(p, mgr);
+	}
+	volume = program->volume;
+	panning = program->panning;
+	scenes = program->scenes;
+	polyphony_limit = program->polyphony_limit;
+	input = program->input;
+
+	//Engine
+	master_send = program->send_master;
+	//Effects
+	for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
+		PluginSlotProgram& p = program->effects[i];
+		effects[i].load(p, mgr);
+	}
+}
+
+void SoundEngineChannel::save_program(ChannelProgram *program) {
+	engine.save(program->engine_program);
+	for (size_t j = 0; j < CHANNEL_SEQUENCER_AMOUNT; ++j) {
+		PluginSlotProgram& p = program->sequencers[j];
+		sequencers[j].save(p);
+	}
+	program->volume = volume;
+	program->panning = panning;
+	program->scenes = scenes;
+	program->polyphony_limit = polyphony_limit;
+	program->input = input;
+
+	//Engine
+	program->send_master = master_send;
+	//Effects
+	for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
+		PluginSlotProgram& p = program->effects[j];
+		effects[j].save(p);
+	}
+}

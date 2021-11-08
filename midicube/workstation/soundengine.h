@@ -58,6 +58,24 @@ struct SoundEngineScene {
 	ChannelSource source;
 };
 
+struct ChannelProgram  : public Copyable {
+	bool active = true;
+	BindableTemplateValue<double> volume{0.5, 0, 1};
+	BindableTemplateValue<double>  panning{0, -1, 1};
+	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
+	std::array<PluginSlotProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
+	ssize_t send_master = -1;
+	size_t polyphony_limit = 0;
+	ssize_t input = 0;
+
+	PluginSlotProgram engine_program;
+	std::array<PluginSlotProgram, CHANNEL_SEQUENCER_AMOUNT> sequencers;
+
+	ChannelProgram() : Copyable() {
+
+	}
+};
+
 class SoundEngineChannel : public PluginHost {
 private:
 	SoundEngineDevice* device = nullptr;
@@ -154,29 +172,18 @@ public:
 
 	void set_active(bool active = false);
 
+	void copy_channel();
+
+	void paste_channel();
+
 	SoundEngineDevice* get_device() const {
 		return device;
 	}
 
+	void apply_program(ChannelProgram* program, PluginManager* mgr);
 
-};
+	void save_program(ChannelProgram* program);
 
-struct ChannelProgram  : public Copyable {
-	bool active = true;
-	BindableTemplateValue<double> volume{0.5, 0, 1};
-	BindableTemplateValue<double>  panning{0, -1, 1};
-	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
-	std::array<PluginSlotProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
-	ssize_t send_master = -1;
-	size_t polyphony_limit = 0;
-	ssize_t input = 0;
-
-	PluginSlotProgram engine_program;
-	std::array<PluginSlotProgram, CHANNEL_SEQUENCER_AMOUNT> sequencers;
-
-	ChannelProgram() : Copyable() {
-
-	}
 };
 
 struct MasterEffectProgram {

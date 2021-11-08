@@ -39,6 +39,10 @@ public:
 		return dynamic_cast<T*>(value);
 	}
 
+	~Clipboard() {
+		delete value;
+	}
+
 };
 
 
