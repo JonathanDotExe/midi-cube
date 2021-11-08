@@ -339,6 +339,27 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		controls.push_back(end_velocity);
 	}
 
+	//Copy
+	Button* copy = new Button("Copy", main_font, 18, frame.get_width() - 370, frame.get_height() - 40, 100, 40);
+	copy->set_on_click([&frame, this]() {
+		cube.lock.lock();
+		channel.copy_channel();
+		cube.lock.unlock();
+	});
+	controls.push_back(copy);
+
+	//Paste
+	Button* paste = new Button("Paste", main_font, 18, frame.get_width() - 270, frame.get_height() - 40, 100, 40);
+	paste->set_on_click([&frame, this]() {
+		cube.lock.lock();
+		bool pasted = channel.paste_channel();
+		cube.lock.unlock();
+		if (pasted) {
+			frame.change_view(new SoundEngineChannelView(cube, channel, channel_index)); //FIXME proper refresh
+		}
+	});
+	controls.push_back(paste);
+	//Binder
 	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);

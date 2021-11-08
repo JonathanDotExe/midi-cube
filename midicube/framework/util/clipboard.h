@@ -15,7 +15,7 @@ public:
 
 	}
 
-	~Copyable() {
+	virtual ~Copyable() {
 
 	}
 

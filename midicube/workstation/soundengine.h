@@ -58,7 +58,7 @@ struct SoundEngineScene {
 	ChannelSource source;
 };
 
-struct ChannelProgram  : public Copyable {
+struct ChannelProgram : public Copyable {
 	bool active = true;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double>  panning{0, -1, 1};
@@ -174,7 +174,7 @@ public:
 
 	void copy_channel();
 
-	void paste_channel();
+	bool paste_channel();
 
 	SoundEngineDevice* get_device() const {
 		return device;

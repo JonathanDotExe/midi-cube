@@ -583,11 +583,13 @@ void SoundEngineChannel::copy_channel() {
 	device->get_cube()->clipboard.copy(prog);
 }
 
-void SoundEngineChannel::paste_channel() {
+bool SoundEngineChannel::paste_channel() {
 	ChannelProgram* prog = device->get_cube()->clipboard.paste<ChannelProgram>();
 	if (prog) {
 		apply_program(prog, &device->get_cube()->plugin_mgr);
+		return true;
 	}
+	return false;
 }
 
 void SoundEngineChannel::apply_program(ChannelProgram *program, PluginManager* mgr) {
