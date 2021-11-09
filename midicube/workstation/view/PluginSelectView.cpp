@@ -96,6 +96,7 @@ Scene PluginSelectView::create(ViewHost &frame) {
 				frame.change_view(this->back());
 			}
 		});
+		controls.push_back(paste);
 	}
 
 	//Previous page

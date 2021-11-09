@@ -77,25 +77,46 @@ Scene SoundEngineView::create(ViewHost& frame) {
 	metronome->property.bind(engine->play_metronome, handler);
 	controls.push_back(metronome);
 
-	DragBox<int>* bpm = new DragBox<int>(120, 10, 480, main_font, 18, 200, frame.get_height() - 45, 100, 40);
+	DragBox<int>* bpm = new DragBox<int>(120, 10, 480, main_font, 18, 160, frame.get_height() - 45, 100, 40);
 	bpm->drag_mul = 0.00125;
 	bpm->property.bind_function<unsigned int>(std::bind(&Metronome::get_bpm, &engine->metronome), std::bind(&Metronome::set_bpm, &engine->metronome, std::placeholders::_1), handler);
 	controls.push_back(bpm);
 
 	//Volume
-	DragBox<double>* volume = new DragBox<double>(0, 0, 1, main_font, 18, 330, frame.get_height() - 45, 100, 40);
+	DragBox<double>* volume = new DragBox<double>(0, 0, 1, main_font, 18, 270, frame.get_height() - 45, 100, 40);
 	volume->property.bind(engine->volume, handler);
 	controls.push_back(volume);
 
 	//Effects
-	Button* effects = new Button("Effects", main_font, 18, 440, frame.get_height() - 45, 100, 40);
+	Button* effects = new Button("Effects", main_font, 18, 370, frame.get_height() - 45, 100, 40);
 	effects->set_on_click([&frame, this]() {
 		frame.change_view(new MasterEffectView(cube));
 	});
 	controls.push_back(effects);
 
+	//Copy
+	Button* copy = new Button("Copy", main_font, 18, 470, frame.get_height() - 45, 100, 40);
+	copy->set_on_click([&frame, this]() {
+		cube.lock.lock();
+		cube.copy_program();
+		cube.lock.unlock();
+	});
+	controls.push_back(copy);
+
+	//Paste
+	Button* paste = new Button("Paste", main_font, 18, 570, frame.get_height() - 45, 100, 40);
+	paste->set_on_click([&frame, this]() {
+		cube.lock.lock();
+		bool pasted = cube.paste_program();
+		cube.lock.unlock();
+		if (pasted) {
+			frame.change_view(new SoundEngineView(cube)); //FIXME proper refresh
+		}
+	});
+	controls.push_back(paste);
+
 	//Sources
-	Button* sources = new Button("Sources", main_font, 18, frame.get_width() - 475, frame.get_height() - 45, 100, 40);
+	Button* sources = new Button("Sources", main_font, 18, frame.get_width() - 375, frame.get_height() - 45, 100, 40);
 	sources->set_on_click([&frame, this]() {
 		frame.change_view(new SourceView(cube));
 	});
@@ -118,27 +139,6 @@ Scene SoundEngineView::create(ViewHost& frame) {
 		frame.change_view(new ProgramView(cube, bank, page));
 	});
 	controls.push_back(program);
-
-	//Copy
-	Button* copy = new Button("Copy", main_font, 18, frame.get_width() - 370, frame.get_height() - 40, 100, 40);
-	copy->set_on_click([&frame, this]() {
-		cube.lock.lock();
-		cube.copy_program();
-		cube.lock.unlock();
-	});
-	controls.push_back(copy);
-
-	//Paste
-	Button* paste = new Button("Paste", main_font, 18, frame.get_width() - 270, frame.get_height() - 40, 100, 40);
-	paste->set_on_click([&frame, this]() {
-		cube.lock.lock();
-		bool pasted = cube.paste_program();
-		cube.lock.unlock();
-		if (pasted) {
-			frame.change_view(new SoundEngineView(cube)); //FIXME proper refresh
-		}
-	});
-	controls.push_back(paste);
 
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
