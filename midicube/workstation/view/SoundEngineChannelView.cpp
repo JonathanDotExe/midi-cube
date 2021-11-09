@@ -47,7 +47,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		MidiCube& c = cube;
 		SoundEngineChannel& ch = channel;
 		int index = channel_index;
-		frame.change_view(new PluginSelectView(channel.engine, cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SOUND_ENGINE), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }));
+		frame.change_view(new PluginSelectView(channel.engine, cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SOUND_ENGINE), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }, cube.plugin_mgr, &cube.clipboard));
 	});
 	controls.push_back(engine);
 
@@ -82,7 +82,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 			MidiCube& c = cube;
 			SoundEngineChannel& ch = channel;
 			int index = channel_index;
-			frame.change_view(new PluginSelectView(channel.sequencers[i], cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SEQUENCER), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }));
+			frame.change_view(new PluginSelectView(channel.sequencers[i], cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SEQUENCER), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }, cube.plugin_mgr, &cube.clipboard));
 		});
 		controls.push_back(sequencer);
 
@@ -119,7 +119,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 			MidiCube& c = cube;
 			SoundEngineChannel& ch = channel;
 			int index = channel_index;
-			frame.change_view(new PluginSelectView(channel.effects[i], cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }));
+			frame.change_view(new PluginSelectView(channel.effects[i], cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }, cube.plugin_mgr, &cube.clipboard));
 		});
 		controls.push_back(effect);
 		//Edit

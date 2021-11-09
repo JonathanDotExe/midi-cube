@@ -9,7 +9,8 @@
 
 
 PluginSelectView::PluginSelectView(PluginSlot &p, std::vector<Plugin*> pl, SpinLock& l,
-		std::function<ViewController* ()> b, size_t page) : plugin(p), plugins(pl), lock(l), back(b){
+		std::function<ViewController* ()> b, PluginManager& m, Clipboard* clipboard, size_t page) : plugin(p), plugins(pl), lock(l), back(b), mgr(m){
+	this->clipboard = clipboard;
 	this->page = page;
 }
 
@@ -70,15 +71,37 @@ Scene PluginSelectView::create(ViewHost &frame) {
 				plugin = plugins.at(start + i - 1);
 			}
 			this->plugin.set_plugin_locked(plugin, lock);
-			frame.change_view(new PluginSelectView(this->plugin, plugins, lock, back, page));
+			frame.change_view(new PluginSelectView(this->plugin, plugins, lock, back, mgr, clipboard, page));
 		});
 	}
 	lock.unlock();
 
+	if (clipboard) {
+		//Copy
+		Button* copy = new Button("Copy", main_font, 18, frame.get_width() - 390, frame.get_height() - 40, 100, 40);
+		copy->set_on_click([&frame, this]() {
+			lock.lock();
+			plugin.copy_plugin(*clipboard);
+			lock.unlock();
+		});
+		controls.push_back(copy);
+
+		//Paste
+		Button* paste = new Button("Paste", main_font, 18, frame.get_width() - 290, frame.get_height() - 40, 100, 40);
+		paste->set_on_click([&frame, this]() {
+			lock.lock();
+			bool pasted = plugin.paste_plugin(*clipboard, mgr);	//FIXME execute new without lock
+			lock.unlock();
+			if (pasted) {
+				frame.change_view(this->back());
+			}
+		});
+	}
+
 	//Previous page
 	Button* previous_page = new Button("<", main_font, 18, 00, frame.get_height() - 40, 60, 40);
 	previous_page->set_on_click([&frame, this]() {
-		frame.change_view(new PluginSelectView(plugin, plugins, lock, back, std::max((ssize_t) page - 1, (ssize_t) 0)));
+		frame.change_view(new PluginSelectView(plugin, plugins, lock, back, mgr, clipboard, std::max((ssize_t) page - 1, (ssize_t) 0)));
 	});
 	controls.push_back(previous_page);
 
@@ -86,7 +109,7 @@ Scene PluginSelectView::create(ViewHost &frame) {
 	Button* next_page = new Button(">", main_font, 18, frame.get_width() - 70 - 60, frame.get_height() - 40, 60, 40);
 	if (start + size < plugins.size()) {
 		next_page->set_on_click([&frame, this]() {
-			frame.change_view(new PluginSelectView(plugin, plugins, lock, back, std::max((ssize_t) page + 1, (ssize_t) 0)));
+			frame.change_view(new PluginSelectView(plugin, plugins, lock, back, mgr, clipboard, std::max((ssize_t) page + 1, (ssize_t) 0)));
 		});
 	}
 	controls.push_back(next_page);
