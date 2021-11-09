@@ -218,6 +218,7 @@ struct Program : public Copyable {
 	Program(std::string name) : Copyable() {
 		this->name = name;
 	}
+
 };
 
 struct MidiSource {

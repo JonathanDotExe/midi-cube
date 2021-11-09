@@ -273,3 +273,21 @@ pt::ptree MidiCubeConfig::save() {
 	}
 	return tree;
 }
+
+void MidiCube::copy_program() {
+	Program* prog = new Program("");
+	save_program(prog);
+	clipboard.copy(prog);
+}
+
+bool MidiCube::paste_program() {
+	bool success = false;
+	prog_mgr.lock();
+	Program* prog = clipboard.paste<Program>();
+	if (prog) {
+		apply_program(prog);
+		success = true;
+	}
+	prog_mgr.unlock();
+	return success;
+}

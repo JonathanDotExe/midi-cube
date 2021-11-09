@@ -119,6 +119,13 @@ public:
 	Bank* get_curr_bank() {
 		return get_bank(curr_bank);
 	}
+
+	//Mutex has to be locked by user
+	Program* get_curr_program() {
+		Bank* bank = get_bank(curr_bank);
+		return bank ? bank->programs.at(curr_program) : nullptr;
+	}
+
 	//Mutex has to be locked by user
 	size_t get_curr_bank_index() {
 		return curr_bank;

@@ -70,6 +70,8 @@ public:
 			std::function<void(void*, void*)> cb);
 	PluginManager& get_plugin_manager();
 	ActionHandler& get_action_handler();
+	void copy_program();
+	bool paste_program();
 	void save_program(Program *prog);
 	void apply_program(Program *prog);
 	void notify_property_update(void* source, void* prop);
