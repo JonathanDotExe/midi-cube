@@ -16,7 +16,6 @@
 #include "../util/util.h"
 #include "../util/clipboard.h"
 #include "../gui/core.h"
-//#include "../gui/core.h"
 #include <map>
 #include <algorithm>
 
@@ -37,8 +36,13 @@ struct PluginInfo {
 	bool output_midi = false;
 };
 
-class PluginProgram {
+class PluginProgram : public Copyable {
 public:
+
+	PluginProgram() : Copyable() {
+
+	}
+
 	virtual void load(pt::ptree tree) = 0;
 
 	virtual pt::ptree save() = 0;
@@ -142,6 +146,10 @@ public:
 		delete inputs;
 		delete outputs;
 	}
+
+	virtual void copy_plugin(Clipboard& clipboard);
+
+	virtual bool paste_plugin(Clipboard& clipboard);
 
 	PluginHost& get_host() const {
 		return host;
@@ -293,15 +301,11 @@ public:
 
 };
 
-class PluginSlotProgram : public Copyable {
+class PluginSlotProgram {
 private:
 	PluginProgram* program = nullptr;
 
 public:
-	PluginSlotProgram() {
-
-	}
-
 	void save_program(PluginInstance* plugin) {
 		if (plugin) {
 			plugin->save_program(&program); //FIXME ensure deletion of pointer in save_program
