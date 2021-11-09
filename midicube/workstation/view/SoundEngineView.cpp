@@ -119,6 +119,27 @@ Scene SoundEngineView::create(ViewHost& frame) {
 	});
 	controls.push_back(program);
 
+	//Copy
+	Button* copy = new Button("Copy", main_font, 18, frame.get_width() - 370, frame.get_height() - 40, 100, 40);
+	copy->set_on_click([&frame, this]() {
+		cube.lock.lock();
+		cube.copy_program();
+		cube.lock.unlock();
+	});
+	controls.push_back(copy);
+
+	//Paste
+	Button* paste = new Button("Paste", main_font, 18, frame.get_width() - 270, frame.get_height() - 40, 100, 40);
+	paste->set_on_click([&frame, this]() {
+		cube.lock.lock();
+		bool pasted = cube.paste_program();
+		cube.lock.unlock();
+		if (pasted) {
+			frame.change_view(new SoundEngineView(cube)); //FIXME proper refresh
+		}
+	});
+	controls.push_back(paste);
+
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
 	exit->set_on_click([&frame]() {
