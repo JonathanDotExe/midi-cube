@@ -36,12 +36,8 @@ struct PluginInfo {
 	bool output_midi = false;
 };
 
-class PluginProgram : public Copyable {
+class PluginProgram {
 public:
-
-	PluginProgram() : Copyable() {
-
-	}
 
 	virtual void load(pt::ptree tree) = 0;
 
@@ -146,10 +142,6 @@ public:
 		delete inputs;
 		delete outputs;
 	}
-
-	virtual void copy_plugin(Clipboard& clipboard);
-
-	virtual bool paste_plugin(Clipboard& clipboard);
 
 	PluginHost& get_host() const {
 		return host;
@@ -301,11 +293,16 @@ public:
 
 };
 
-class PluginSlotProgram {
+class PluginSlotProgram : public Copyable  {
 private:
 	PluginProgram* program = nullptr;
 
 public:
+
+	PluginSlotProgram() {
+
+	}
+
 	void save_program(PluginInstance* plugin) {
 		if (plugin) {
 			plugin->save_program(&program); //FIXME ensure deletion of pointer in save_program
@@ -362,6 +359,10 @@ public:
 		}
 		this->host = host;
 	}
+
+	void copy_plugin(Clipboard& clipboard);
+
+	bool paste_plugin(Clipboard& clipboard, PluginManager& mgr);
 
 	PluginInstance* get_plugin() const {
 		return plugin;

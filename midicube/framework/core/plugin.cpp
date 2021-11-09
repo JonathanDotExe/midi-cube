@@ -7,19 +7,17 @@
 #include "plugin.h"
 
 
-void PluginInstance::copy_plugin(Clipboard &clipboard) {
-	PluginProgram* prog = nullptr;
-	save_program(&prog);
-	if (prog) {
-		clipboard.copy(prog);
-	}
+void PluginSlot::copy_plugin(Clipboard &clipboard) {
+	PluginSlotProgram* prog = new PluginSlotProgram();
+	save(*prog);
+	clipboard.copy(prog);
 }
 
-bool PluginInstance::paste_plugin(Clipboard &clipboard) {
-	PluginProgram* prog = clipboard.paste<PluginProgram>();
+bool PluginSlot::paste_plugin(Clipboard &clipboard, PluginManager& mgr) {
+	PluginSlotProgram* prog = clipboard.paste<PluginSlotProgram>();
 	bool success = false;
 	if (prog) {
-		apply_program(prog);
+		load(*prog, &mgr);
 		success = true;
 	}
 	return success;
