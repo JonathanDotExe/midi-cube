@@ -257,8 +257,9 @@ void save_bank(Bank& bank, std::string path) {
 	}
 }
 
-ProgramManager::ProgramManager(std::string path) {
+ProgramManager::ProgramManager(std::string path, std::string index_path) {
 	this->path = path;
+	this->index_path = index_path;
 }
 
 void ProgramManager::apply_program(size_t bank, size_t program) {
@@ -339,6 +340,21 @@ void ProgramManager::overwrite_bank() {
 }
 
 void ProgramManager::load_all(PluginManager* mgr) {
+	//Load index
+	pt::ptree tree;
+	std::vector<std::string> index;
+	try {
+		pt::read_xml(path, tree);
+		if (tree.get_child_optional("index")) {
+			for (auto child : tree.get_child("index")) {
+				index.push_back(child.second.get_value<std::string>());
+			}
+		}
+	}
+	catch (pt::xml_parser_error& e) {
+		std::cerr << "Couldn't load program index " << path << std::endl;
+	}
+	//Load banks
 	boost::filesystem::create_directory(path);
 	std::regex reg(".*\\.xml");
 	for (const auto& f : boost::filesystem::directory_iterator(path)) {
@@ -358,6 +374,11 @@ void ProgramManager::load_all(PluginManager* mgr) {
 		bank->filename = "default";
 		bank->programs.push_back(new Program("Init"));
 		banks.push_back(bank);
+	}
+	//Reorder
+	size_t i = 0;
+	for (std::string name : index) {
+
 	}
 }
 
