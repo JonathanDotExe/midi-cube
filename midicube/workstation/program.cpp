@@ -344,7 +344,7 @@ void ProgramManager::load_all(PluginManager* mgr) {
 	pt::ptree tree;
 	std::vector<std::string> index;
 	try {
-		pt::read_xml(path, tree);
+		pt::read_xml(index_path, tree);
 		if (tree.get_child_optional("index")) {
 			for (auto child : tree.get_child("index")) {
 				index.push_back(child.second.get_value<std::string>());
@@ -378,11 +378,22 @@ void ProgramManager::load_all(PluginManager* mgr) {
 	//Reorder
 	size_t i = 0;
 	for (std::string name : index) {
-
+		//Find bank
+		for (size_t j = i; j < banks.size(); ++j) {
+			if (name == banks[j]->filename) {
+				//Swap
+				Bank* bank = banks[j];
+				banks.erase(banks.begin() + j);
+				banks.insert(banks.begin() + i, bank);
+				++i;
+				break;
+			}
+		}
 	}
 }
 
 void ProgramManager::save_all() {
+	//Save programs
 	std::vector<std::string> filenames{};
 	for (Bank* b : banks) {
 		while (std::find(filenames.begin(), filenames.end(), b->filename) != filenames.end()) {
@@ -390,6 +401,18 @@ void ProgramManager::save_all() {
 		}
 		save_bank(*b, path + "/" + b->filename + ".xml");
 		filenames.push_back(b->filename);
+	}
+	//Save index
+	pt::ptree tree;
+	for (std::string name : filenames) {
+		tree.add("index.filename", name);
+	}
+	//Write
+	try {
+		pt::write_xml(index_path, tree);
+	}
+	catch (pt::xml_parser_error& e) {
+		std::cerr << "Couldn't save bank " << path << std::endl;
 	}
 }
 
