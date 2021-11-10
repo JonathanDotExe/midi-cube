@@ -272,52 +272,69 @@ void ProgramManager::apply_program(size_t bank, size_t program) {
 	bank_name = b->name;
 }
 
-void ProgramManager::delete_program() {
+bool ProgramManager::delete_program() {
 	//Delete
 	Bank* bank = get_curr_bank();
-	bank->programs.erase(bank->programs.begin() + curr_program);
-	if (bank->programs.size() == 0) {
-		bank->programs.push_back(new Program("Init"));
+	if (!bank->preset) {
+		bank->programs.erase(bank->programs.begin() + curr_program);
+		if (bank->programs.size() == 0) {
+			bank->programs.push_back(new Program("Init"));
+		}
+		if (curr_program >= bank->programs.size()) {
+			curr_program--;
+		}
+
+		//Apply
+		Program* prog = bank->programs.at(curr_program);
+		user->apply_program(prog);
+		program_name = prog->name;
+		return true;
 	}
-	if (curr_program >= bank->programs.size()) {
-		curr_program--;
+	return false;
+}
+
+bool ProgramManager::save_new_program() {
+	Bank* bank = get_curr_bank();
+	if (!bank->preset) {
+		Program* prog = new Program("");
+		prog->name = program_name;
+
+		user->save_program(prog);
+		bank->programs.push_back(prog);
+		curr_program = bank->programs.size() - 1;
+
+		save_all();
+		return true;
 	}
-
-	//Apply
-	Program* prog = bank->programs.at(curr_program);
-	user->apply_program(prog);
-	program_name = prog->name;
+	return false;
 }
 
-void ProgramManager::save_new_program() {
+bool ProgramManager::save_init_program() {
 	Bank* bank = get_curr_bank();
-	Program* prog = new Program("");
-	prog->name = program_name;
+	if (!bank->preset) {
+		Program* prog = new Program("");
+		prog->name = program_name;
 
-	user->save_program(prog);
-	bank->programs.push_back(prog);
-	curr_program = bank->programs.size() - 1;
-
-	save_all();
+		user->apply_program(prog);
+		bank->programs.push_back(prog);
+		curr_program = bank->programs.size() - 1;
+		save_all();
+		return true;
+	}
+	return false;
 }
 
-void ProgramManager::save_init_program() {
-	Bank* bank = get_curr_bank();
-	Program* prog = new Program("");
-	prog->name = program_name;
+bool ProgramManager::overwrite_program() {
+	Bank* bank = get_bank(curr_bank);
+	if (!bank->preset) {
+		Program* prog = get_bank(curr_bank)->programs.at(curr_program);
 
-	user->apply_program(prog);
-	bank->programs.push_back(prog);
-	curr_program = bank->programs.size() - 1;
-	save_all();
-}
-
-void ProgramManager::overwrite_program() {
-	Program* prog = get_bank(curr_bank)->programs.at(curr_program);
-
-	prog->name = program_name;
-	user->save_program(prog);
-	save_all();
+		prog->name = program_name;
+		user->save_program(prog);
+		save_all();
+		return true;
+	}
+	return false;
 }
 
 void ProgramManager::save_new_bank() {
@@ -333,10 +350,14 @@ void ProgramManager::save_new_bank() {
 	}
 }
 
-void ProgramManager::overwrite_bank() {
+bool ProgramManager::overwrite_bank() {
 	Bank* bank = get_bank(curr_bank);
-	bank->name = bank_name;
-	//Don't update filename
+	if (!bank->preset) {
+		bank->name = bank_name;
+		//Don't update filename
+		return true;
+	}
+	return false;
 }
 
 void ProgramManager::load_all(PluginManager* mgr) {

@@ -31,6 +31,7 @@ namespace pt = boost::property_tree;
 struct Bank {
 	std::string name = "";
 	std::string filename = "";
+	bool preset = false;
 	std::vector<Program*> programs;
 	~Bank() {
 		std::remove_if(programs.begin(), programs.end(), [](Program* p) {
@@ -91,17 +92,17 @@ public:
 	//Mutex has to be locked by user
 	void apply_program(size_t bank, size_t program);
 	//Mutex has to be locked by user
-	void delete_program();
+	bool delete_program();
 	//Mutex has to be locked by user
-	void save_new_program();
+	bool save_new_program();
 	//Mutex has to be locked by user
-	void save_init_program();
+	bool save_init_program();
 	//Mutex has to be locked by user
-	void overwrite_program();
+	bool overwrite_program();
 	//Mutex has to be locked by user
 	void save_new_bank();
 	//Mutex has to be locked by user
-	void overwrite_bank();
+	bool overwrite_bank();
 
 	//Mutex has to be locked by user
 	bool init_user(ProgramUser* user) {
