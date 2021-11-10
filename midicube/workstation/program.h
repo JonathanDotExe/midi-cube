@@ -68,6 +68,7 @@ class ProgramManager {
 private:
 	std::string path = "";
 	std::string index_path = "";
+	std::string preset_path = "";
 	size_t curr_bank = 0;
 	size_t curr_program = 0;
 	std::vector<Bank*> banks;
@@ -78,7 +79,7 @@ public:
 	std::string bank_name = "";
 	std::string program_name = "";
 
-	ProgramManager(std::string path, std::string index_path);
+	ProgramManager(std::string path, std::string index_path, std::string preset_path);
 	inline void lock() {
 		mutex.lock();
 	}

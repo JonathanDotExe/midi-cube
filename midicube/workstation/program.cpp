@@ -257,9 +257,10 @@ void save_bank(Bank& bank, std::string path) {
 	}
 }
 
-ProgramManager::ProgramManager(std::string path, std::string index_path) {
+ProgramManager::ProgramManager(std::string path, std::string index_path, std::string preset_path) {
 	this->path = path;
 	this->index_path = index_path;
+	this->preset_path = preset_path;
 }
 
 void ProgramManager::apply_program(size_t bank, size_t program) {
@@ -361,9 +362,19 @@ bool ProgramManager::overwrite_bank() {
 }
 
 void ProgramManager::load_all(PluginManager* mgr) {
+	//Load presets
+	std::vector<std::string> presets = {"preset_synths"};
+	for (std::string filename : presets) {
+		Bank* bank = load_bank(preset_path + "/" + filename + ".xml", filename, mgr);
+		if (bank) {
+			bank->preset = true;
+			banks.push_back(bank);
+			std::cout << "Loaded preset bank " << bank->name << std::endl;
+		}
+	}
 	//Load index
 	pt::ptree tree;
-	std::vector<std::string> index;
+	std::vector<std::string> index = {};
 	try {
 		pt::read_xml(index_path, tree);
 		if (tree.get_child_optional("index")) {
@@ -397,7 +408,7 @@ void ProgramManager::load_all(PluginManager* mgr) {
 		banks.push_back(bank);
 	}
 	//Reorder
-	size_t i = 0;
+	size_t i = presets.size();
 	for (std::string name : index) {
 		//Find bank
 		for (size_t j = i; j < banks.size(); ++j) {
@@ -417,11 +428,13 @@ void ProgramManager::save_all() {
 	//Save programs
 	std::vector<std::string> filenames{};
 	for (Bank* b : banks) {
-		while (std::find(filenames.begin(), filenames.end(), b->filename) != filenames.end()) {
-			b->filename += "_";
+		if (!b->preset) {
+			while (std::find(filenames.begin(), filenames.end(), b->filename) != filenames.end()) {
+				b->filename += "_";
+			}
+			save_bank(*b, path + "/" + b->filename + ".xml");
+			filenames.push_back(b->filename);
 		}
-		save_bank(*b, path + "/" + b->filename + ".xml");
-		filenames.push_back(b->filename);
 	}
 	//Save index
 	pt::ptree tree;
