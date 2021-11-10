@@ -60,7 +60,7 @@ public:
 class ChorusPlugin : public EffectPlugin<ChorusEffect, ChorusProgram> {
 public:
 	ChorusPlugin() : EffectPlugin({
-		"Bit Crusher",
+		"Chorus",
 		CHORUS_IDENTIFIER,
 		PluginType::PLUGIN_TYPE_EFFECT,
 		2,
