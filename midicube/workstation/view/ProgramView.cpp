@@ -34,9 +34,8 @@ Scene ProgramView::create(ViewHost &frame) {
 		Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 		controls.push_back(bg);
 
-		Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 50);
+		Pane* pane = new Pane(bank->preset ? sf::Color(190, 190, 190) : sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 50);
 		controls.push_back(pane);
-
 
 		//Title
 		Label* title = new Label(bank->name + " - Page " + std::to_string(page + 1), main_font, 24, 10, 10);
@@ -87,72 +86,82 @@ Scene ProgramView::create(ViewHost &frame) {
 
 		//Save
 		Button* save = new Button("Save", main_font, 18, 125, frame.get_height() - 40, 100, 40);
-		save->set_on_click([&frame, prog_mgr, this]() {
-			prog_mgr->lock();
-			std::string name = prog_mgr->program_name;
-			prog_mgr->unlock();
-			frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
+		if (!bank->preset) {
+			save->set_on_click([&frame, prog_mgr, this]() {
 				prog_mgr->lock();
-				prog_mgr->program_name = name;
-				prog_mgr->overwrite_program();
+				std::string name = prog_mgr->program_name;
 				prog_mgr->unlock();
-			}));
-		});
-		controls.push_back(save);
+				frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
+					prog_mgr->lock();
+					prog_mgr->program_name = name;
+					prog_mgr->overwrite_program();
+					prog_mgr->unlock();
+				}));
+			});
+			controls.push_back(save);
+		}
 
 		//New
 		Button* new_prog = new Button("New", main_font, 18, 230, frame.get_height() - 40, 100, 40);
-		new_prog->set_on_click([&frame, prog_mgr, this]() {
-			prog_mgr->lock();
-			std::string name = prog_mgr->program_name;
-			prog_mgr->unlock();
-			frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
+		if (!bank->preset) {
+			new_prog->set_on_click([&frame, prog_mgr, this]() {
 				prog_mgr->lock();
-				prog_mgr->program_name = name;
-				prog_mgr->save_new_program();
+				std::string name = prog_mgr->program_name;
 				prog_mgr->unlock();
-			}));
-		});
+				frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
+					prog_mgr->lock();
+					prog_mgr->program_name = name;
+					prog_mgr->save_new_program();
+					prog_mgr->unlock();
+				}));
+			});
+		}
 		controls.push_back(new_prog);
 
 		//New
 		Button* init_prog = new Button("New Init", main_font, 18, 335, frame.get_height() - 40, 100, 40);
-		init_prog->set_on_click([&frame, prog_mgr, this]() {
-			prog_mgr->lock();
-			std::string name = prog_mgr->program_name;
-			prog_mgr->unlock();
-			frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
+		if (!bank->preset) {
+			init_prog->set_on_click([&frame, prog_mgr, this]() {
 				prog_mgr->lock();
-				prog_mgr->program_name = name;
-				prog_mgr->save_init_program();
+				std::string name = prog_mgr->program_name;
 				prog_mgr->unlock();
-			}));
-		});
+				frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
+					prog_mgr->lock();
+					prog_mgr->program_name = name;
+					prog_mgr->save_init_program();
+					prog_mgr->unlock();
+				}));
+			});
+		}
 		controls.push_back(init_prog);
 
 		//Delete
 		Button* del = new Button("Delete", main_font, 18, 440, frame.get_height() - 40, 100, 40);
-		del->set_on_click([&frame, prog_mgr, this]() {
-			prog_mgr->lock();
-			prog_mgr->delete_program();
-			prog_mgr->unlock();
-			frame.change_view(new ProgramView(cube, this->bank, page));
-		});
+		if (!bank->preset) {
+			del->set_on_click([&frame, prog_mgr, this]() {
+				prog_mgr->lock();
+				prog_mgr->delete_program();
+				prog_mgr->unlock();
+				frame.change_view(new ProgramView(cube, this->bank, page));
+			});
+		}
 		controls.push_back(del);
 
 		//Rename Bank
 		Button* rename = new Button("Rename", main_font, 18, frame.get_width() - 70 - 60 * 2 - 210, frame.get_height() - 40, 100, 40);
-		rename->set_on_click([&frame, prog_mgr, this]() {
-			prog_mgr->lock();
-			std::string name = prog_mgr->bank_name;
-			prog_mgr->unlock();
-			frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
+		if (!bank->preset) {
+			rename->set_on_click([&frame, prog_mgr, this]() {
 				prog_mgr->lock();
-				prog_mgr->bank_name = name;
-				prog_mgr->overwrite_bank();
+				std::string name = prog_mgr->bank_name;
 				prog_mgr->unlock();
-			}));
-		});
+				frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
+					prog_mgr->lock();
+					prog_mgr->bank_name = name;
+					prog_mgr->overwrite_bank();
+					prog_mgr->unlock();
+				}));
+			});
+		}
 		controls.push_back(rename);
 
 		//New Bank
