@@ -72,6 +72,8 @@ public:
 
 	virtual int get_transpose() = 0;
 
+	virtual MidiControls& get_controls() = 0;
+
 	virtual ~PluginHost() {
 
 	}
@@ -129,6 +131,8 @@ public:
 	virtual void apply_program(PluginProgram* prog) = 0;
 
 	virtual void save_program(PluginProgram** prog) = 0;
+
+	virtual bool on_midi_control(unsigned int control, unsigned int value) = 0;
 
 	virtual bool keep_active() {
 		return false;
