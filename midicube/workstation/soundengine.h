@@ -56,6 +56,22 @@ struct SoundEngineScene {
 	bool sustain = true;
 	bool pitch_bend = true;
 	ChannelSource source;
+
+	bool is_default() {
+		return active == false &&
+				sustain == true &&
+				pitch_bend == true &&
+				source.start_note == 0 &&
+				source.end_note == 127 &&
+				source.start_velocity == 0 &&
+				source.end_velocity == 127 &&
+				source.octave == 0 &&
+				source.transfer_channel_aftertouch == true &&
+				source.transfer_pitch_bend == true &&
+				source.transfer_cc == true &&
+				source.transfer_prog_change == true &&
+				source.transfer_other == true;
+	}
 };
 
 struct ChannelProgram : public Copyable {
@@ -73,6 +89,10 @@ struct ChannelProgram : public Copyable {
 
 	ChannelProgram() : Copyable() {
 
+	}
+
+	bool is_default() {
+		return engine_program.get_program() == nullptr;
 	}
 };
 

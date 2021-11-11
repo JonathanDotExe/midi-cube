@@ -161,44 +161,50 @@ void save_program(Program* program, pt::ptree& tree) {
 	//Channels
 	for (size_t i = 0; i < program->channels.size(); ++i) {
 		pt::ptree c;
-		//Channel
-		c.put_child("engine", program->channels[i].engine_program.save());
-		//Effects
-		for (size_t j = 0; j < CHANNEL_SEQUENCER_AMOUNT; ++j) {
-			PluginSlotProgram& seq = program->channels[i].sequencers[j];
-			c.add_child("sequencers.sequencers", seq.save());
-		}
-		c.put("polyphony_limit", program->channels[i].polyphony_limit);
-		c.put("input", program->channels[i].input);
-		for (size_t j = 0; j < SOUND_ENGINE_SCENE_AMOUNT; ++j) {
-			pt::ptree s;
+		ChannelProgram default_channel;
+		if (!program->channels[i].is_default()) {
+			//Channel
+			c.put_child("engine", program->channels[i].engine_program.save());
+			//Effects
+			for (size_t j = 0; j < CHANNEL_SEQUENCER_AMOUNT; ++j) {
+				PluginSlotProgram& seq = program->channels[i].sequencers[j];
+				c.add_child("sequencers.sequencers", seq.save());
+			}
+			c.put("polyphony_limit", program->channels[i].polyphony_limit);
+			c.put("input", program->channels[i].input);
+			for (size_t j = 0; j < SOUND_ENGINE_SCENE_AMOUNT; ++j) {
+				pt::ptree s;
 
-			s.put("active", program->channels[i].scenes[j].active);
-			s.put("sustain", program->channels[i].scenes[j].sustain);
-			s.put("pitch_bend", program->channels[i].scenes[j].pitch_bend);
-			//Source
-			s.put("source.start_note", program->channels[i].scenes[j].source.start_note);
-			s.put("source.end_note", program->channels[i].scenes[j].source.end_note);
-			s.put("source.start_velocity", program->channels[i].scenes[j].source.start_velocity);
-			s.put("source.end_velocity", program->channels[i].scenes[j].source.end_velocity);
-			s.put("source.octave", program->channels[i].scenes[j].source.octave);
-			s.put("source.transfer_channel_aftertouch", program->channels[i].scenes[j].source.transfer_channel_aftertouch);
-			s.put("source.transfer_pitch_bend", program->channels[i].scenes[j].source.transfer_pitch_bend);
-			s.put("source.transfer_cc", program->channels[i].scenes[j].source.transfer_cc);
-			s.put("source.transfer_prog_change", program->channels[i].scenes[j].source.transfer_prog_change);
-			s.put("source.transfer_other", program->channels[i].scenes[j].source.transfer_other);
+				SoundEngineScene default_scene;
+				if (!program->channels[i].scenes[j].is_default()) {
+					s.put("active", program->channels[i].scenes[j].active);
+					s.put("sustain", program->channels[i].scenes[j].sustain);
+					s.put("pitch_bend", program->channels[i].scenes[j].pitch_bend);
+					//Source
+					s.put("source.start_note", program->channels[i].scenes[j].source.start_note);
+					s.put("source.end_note", program->channels[i].scenes[j].source.end_note);
+					s.put("source.start_velocity", program->channels[i].scenes[j].source.start_velocity);
+					s.put("source.end_velocity", program->channels[i].scenes[j].source.end_velocity);
+					s.put("source.octave", program->channels[i].scenes[j].source.octave);
+					s.put("source.transfer_channel_aftertouch", program->channels[i].scenes[j].source.transfer_channel_aftertouch);
+					s.put("source.transfer_pitch_bend", program->channels[i].scenes[j].source.transfer_pitch_bend);
+					s.put("source.transfer_cc", program->channels[i].scenes[j].source.transfer_cc);
+					s.put("source.transfer_prog_change", program->channels[i].scenes[j].source.transfer_prog_change);
+					s.put("source.transfer_other", program->channels[i].scenes[j].source.transfer_other);
+				}
 
-			c.add_child("scenes.scene", s);
-		}
-		program->channels[i].volume.save(c, "volume");
-		program->channels[i].panning.save(c, "panning");
-		//Arpeggiator
+				c.add_child("scenes.scene", s);
+			}
+			program->channels[i].volume.save(c, "volume");
+			program->channels[i].panning.save(c, "panning");
+			//Arpeggiator
 
-		c.put("send_master", program->channels[i].send_master);
-		//Effects
-		for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
-			PluginSlotProgram& effect = program->channels[i].effects[j];
-			c.add_child("insert_effects.effect", effect.save());
+			c.put("send_master", program->channels[i].send_master);
+			//Effects
+			for (size_t j = 0; j < CHANNEL_INSERT_EFFECT_AMOUNT; ++j) {
+				PluginSlotProgram& effect = program->channels[i].effects[j];
+				c.add_child("insert_effects.effect", effect.save());
+			}
 		}
 
 		tree.add_child("channels.channel", c);
