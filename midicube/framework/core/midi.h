@@ -158,5 +158,23 @@ public:
 
 };
 
+struct ControlBank {
+	std::vector<unsigned int> sliders;
+	std::vector<unsigned int> knobs;
+	std::vector<unsigned int> buttons;
+};
+
+struct MidiControls {
+	std::vector<ControlBank> slider_banks;
+	std::vector<unsigned int> scene_buttons;
+	unsigned int mod_wheel = 1;
+	unsigned int breath_controller = 2;
+	unsigned int volume_pedal = 7;
+	unsigned int expresion_pedal = 11;
+	unsigned int sustain_pedal = 64;
+	unsigned int sostenuto_pedal = 66;
+	unsigned int soft_pedal = 67;
+};
+
 
 #endif /* MIDICUBE_MIDI_H_ */
