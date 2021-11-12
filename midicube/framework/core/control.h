@@ -9,6 +9,7 @@
 #define MIDICUBE_FRAMEWORK_CORE_CONTROL_H_
 
 #include <vector>
+#include <unordered_map>
 
 struct ControlBank {
 	std::vector<unsigned int> sliders;
@@ -105,6 +106,52 @@ public:
 
 };
 
+struct ControlBind {
+	ControlType type;
+	size_t index = 0;
+	size_t bank = 0;
+
+	IParameter* param = nullptr;
+};
+
+class ControlHost {
+
+	virtual void notify_property_change(void* property) = 0;
+
+	virtual const MidiControls& get_controls() = 0;
+
+	virtual ~ControlHost() {
+
+	}
+
+};
+
+class ControlView {
+private:
+	std::vector<ControlBind> params;
+	ControlHost* plugin = nullptr;
+
+public:
+	bool on_cc(unsigned int cc, double val) {
+		return false;
+	}
+
+	ControlView& bind(IParameter* param, ControlType type, size_t index, size_t bank) {
+		if (plugin) {
+			throw "ControlView is closed for further bindings";
+		}
+		params.push_back({type, index, bank, param});
+		return *this;
+	}
+
+	void init(ControlHost* plugin) {
+		if (this->plugin) {
+			throw "ControlView is already initialized";
+		}
+		this->plugin = plugin;
+	}
+
+};
 
 
 #endif /* MIDICUBE_FRAMEWORK_CORE_CONTROL_H_ */
