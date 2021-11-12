@@ -32,11 +32,11 @@ struct MidiControls {
 	unsigned int sostenuto_pedal = 66;
 	unsigned int soft_pedal = 67;
 
-	unsigned int get_cc(ControlType type, size_t index, size_t bank) {
+	unsigned int get_cc(ControlType type, size_t index, size_t bank) const {
 		switch (type) {
 		case SLIDER:
 			if (bank < control_banks.size()) {
-				ControlBank& b = control_banks[bank];
+				const ControlBank& b = control_banks[bank];
 				if (index < b.sliders.size()) {
 					return b.sliders[index];
 				}
@@ -44,7 +44,7 @@ struct MidiControls {
 			return 128;
 		case KNOB:
 			if (bank < control_banks.size()) {
-				ControlBank& b = control_banks[bank];
+				const ControlBank& b = control_banks[bank];
 				if (index < b.knobs.size()) {
 					return b.knobs[index];
 				}
@@ -52,7 +52,7 @@ struct MidiControls {
 			return 128;
 		case BUTTON:
 			if (bank < control_banks.size()) {
-				ControlBank& b = control_banks[bank];
+				const ControlBank& b = control_banks[bank];
 				if (index < b.buttons.size()) {
 					return b.buttons[index];
 				}
@@ -87,6 +87,8 @@ public:
 
 	virtual void change(double val) = 0;
 
+	virtual void* get_property() = 0;
+
 	virtual ~IParameter() {
 
 	}
@@ -116,6 +118,7 @@ struct ControlBind {
 
 class ControlHost {
 
+public:
 	virtual void notify_property_change(void* property) = 0;
 
 	virtual const MidiControls& get_controls() = 0;
@@ -130,10 +133,25 @@ class ControlView {
 private:
 	std::vector<ControlBind> params;
 	ControlHost* plugin = nullptr;
+	std::string name = "";
 
 public:
+
+	ControlView(std::string name) {
+		this->name = name;
+	}
+
 	bool on_cc(unsigned int cc, double val) {
-		return false;
+		bool changed = false;
+		const MidiControls& controls = plugin->get_controls();
+		for (ControlBind& bind : params) {
+			if (cc == controls.get_cc(bind.type, bind.index, bind.bank)) {
+				bind.param->change(val);
+				plugin->notify_property_change(bind.param->get_property());
+				changed = true;
+			}
+		}
+		return changed;
 	}
 
 	ControlView& bind(IParameter* param, ControlType type, size_t index, size_t bank) {
@@ -149,6 +167,10 @@ public:
 			throw "ControlView is already initialized";
 		}
 		this->plugin = plugin;
+	}
+
+	std::string get_name() const {
+		return name;
 	}
 
 };

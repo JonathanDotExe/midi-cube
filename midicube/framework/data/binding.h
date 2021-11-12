@@ -52,6 +52,10 @@ public:
 	T binding_min;
 	T binding_max;
 
+	void* get_property() {
+		return this;
+	}
+
 	BindableTemplateValue(T val, T min, T max) : total_min(min), total_max(max) {
 		this->value = val;
 		this->default_value = val;
@@ -161,6 +165,10 @@ private:
 	bool default_value;
 
 public:
+
+	void* get_property() {
+		return this;
+	}
 
 	BindableBooleanValue(bool val = false) {
 		this->value = val;
