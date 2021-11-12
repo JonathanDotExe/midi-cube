@@ -13,13 +13,14 @@
 #include <unordered_map>
 #include <algorithm>
 #include "../core/midi.h"
+#include "../core/control.h"
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 namespace pt = boost::property_tree;
 
-class BindableValue {
+class BindableValue : public IParameter {
 
 public:
 
@@ -36,7 +37,7 @@ public:
 
 //TODO boundary checks
 template<typename T>
-class BindableTemplateValue : public BindableValue {
+class BindableTemplateValue : public BindableValue, public ITemplateParameter<T> {
 private:
 	T value;
 	T default_value;
@@ -141,8 +142,15 @@ public:
 		tree.put("cc", cc);
 		tree.put("persistent", persistent);
 
-
 		return tree;
+	}
+
+	T get_min() const {
+		return binding_min;
+	}
+
+	T get_max() const {
+		return binding_max;
 	}
 
 };

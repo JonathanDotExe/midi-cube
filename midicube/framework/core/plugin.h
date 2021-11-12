@@ -11,6 +11,7 @@
 #include <string>
 #include "midi.h"
 #include "audio.h"
+#include "control.h"
 #include "../dsp/envelope.h"
 #include "../data/binding.h"
 #include "../util/util.h"
