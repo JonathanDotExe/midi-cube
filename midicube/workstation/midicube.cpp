@@ -265,6 +265,7 @@ pt::ptree MidiCubeConfig::save() {
 	tree.put("output_device", output_device);
 	tree.put("input_device", input_device);
 	tree.put("screen_sleep", screen_sleep);
+	//Sources
 	for (MidiSource source : default_sources) {
 		pt::ptree s;
 		s.put("device", source.device);
@@ -275,6 +276,36 @@ pt::ptree MidiCubeConfig::save() {
 		s.put("clock_in", source.clock_in);
 		tree.add_child("default_sources.source", s);
 	}
+	//Controls
+	for (ControlBank& bank : controls.control_banks) {
+		pt::ptree sliders;
+		pt::ptree knobs;
+		pt::ptree buttons;
+		for (unsigned int slider : bank.sliders) {
+			sliders.add("slider", slider);
+		}
+		for (unsigned int knob : bank.knobs) {
+			knobs.add("knob", knob);
+		}
+		for (unsigned int button : bank.buttons) {
+			buttons.add("button", button);
+		}
+		tree.put_child("controls.sliders", sliders);
+		tree.put_child("controls.knobs", knobs);
+		tree.put_child("controls.buttons", buttons);
+	}
+	for (unsigned int button : controls.scene_buttons) {
+		tree.add("controls.scene_buttons.button", button);
+	}
+	tree.put("controls.mod_wheel", controls.mod_wheel);
+	tree.put("controls.breath_controller", controls.breath_controller);
+	tree.put("controls.volume_pedal", controls.volume_pedal);
+	tree.put("controls.expression_pedal", controls.expresion_pedal);
+	tree.put("controls.sustain_pedal", controls.sustain_pedal);
+	tree.put("controls.sostenute_pedal", controls.sostenuto_pedal);
+	tree.put("controls.soft_pedal", controls.soft_pedal);
+
+
 	return tree;
 }
 
