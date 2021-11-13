@@ -49,6 +49,7 @@ class MidiCube : public ProgramUser, public MasterPluginHost {
 private:
 	AudioHandler audio_handler;
 	ActionHandler action_handler;
+	ControlView* view = nullptr;
 	MidiCubeConfig config;
 	std::function<void(void*, void*)> property_callback;
 	std::vector<MidiCubeInput> inputs;
@@ -67,6 +68,7 @@ public:
 
 	SpinLock lock;
 
+	void change_control_view(ControlView *view);
 	void set_property_change_callback(
 			std::function<void(void*, void*)> cb);
 	PluginManager& get_plugin_manager();

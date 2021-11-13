@@ -37,46 +37,49 @@ private:
 public:
 	Frame(int width, int height, std::string title, MasterPluginHost& host, bool render_sleep = true);
 
-	void run(ViewController* v);
+	virtual void run(ViewController* v);
 
-	void update_properties();
+	virtual void update_properties();
 
-	void propterty_change(void* source, void* prop);
+	virtual void propterty_change(void* source, void* prop);
 
-	MasterPluginHost& get_master_host();
+	virtual MasterPluginHost& get_master_host();
 
 	void request_redraw() {
 		redraw = true;
 	}
 
-	void close() {
+	virtual void close() {
 		request_close = true;
 	}
 
-	void change_view(ViewController* view) {
+	virtual void change_view(ViewController* view) {
 		delete next_view;
 		next_view = view;
 	}
 
 	virtual ~Frame();
 
-	int get_height() const {
+	virtual int get_height() const {
 		return height;
 	}
 
-	int get_width() const {
+	virtual int get_width() const {
 		return width;
 	}
 
-	int get_y_offset() const {
+	virtual int get_y_offset() const {
 		return 0;
 	}
 
-	int get_x_offset() const {
+	virtual int get_x_offset() const {
 		return 0;
 	}
 
-	void notify_remove(Control *control);
+	virtual void notify_remove(Control *control);
+
+protected:
+	virtual void switch_view(ViewController *view);
 };
 
 

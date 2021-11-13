@@ -152,6 +152,9 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 			switch (message.type) {
 			case CONTROL_CHANGE:
 				pass = source.transfer_cc;
+				if (pass && view) {
+					pass = !view->on_cc(message.control(), message.value()/127.0);
+				}
 				break;
 			case PROGRAM_CHANGE:
 				pass = source.transfer_prog_change;
@@ -162,7 +165,7 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 			default:
 				break;
 			}
-			//Type
+			//Send
 			if (pass) {
 				engine.send(message, i, source, info);
 			}
@@ -196,6 +199,7 @@ MidiCube::~MidiCube() {
 	}
 	inputs.clear();
 	lock.unlock();
+	delete view;
 }
 
 void MidiCube::save_program(Program *prog) {
@@ -290,4 +294,9 @@ bool MidiCube::paste_program() {
 	}
 	prog_mgr.unlock();
 	return success;
+}
+
+void MidiCube::change_control_view(ControlView *view) {
+	delete this->view;
+	this->view = view;
 }

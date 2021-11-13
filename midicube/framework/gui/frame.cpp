@@ -135,5 +135,10 @@ void Frame::notify_remove(Control *control) {
 
 void Frame::propterty_change(void *source, void *prop) {
 	update = true;
-	//check for source and prop
+	//TODO check for source and prop
+}
+
+void Frame::switch_view(ViewController *view) {
+	ViewHost::switch_view(view);
+	host.change_control_view(view->create_control_view());
 }

@@ -440,6 +440,8 @@ public:
 
 	virtual void set_property_change_callback(std::function<void(void*, void*)> cb) = 0;
 
+	virtual void change_control_view(ControlView* view) = 0;
+
 	virtual ~MasterPluginHost() {
 
 	}
