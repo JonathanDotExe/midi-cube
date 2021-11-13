@@ -22,8 +22,17 @@ enum ControlType {
 };
 
 struct MidiControls {
-	std::vector<ControlBank> control_banks;
-	std::vector<unsigned int> scene_buttons;
+	std::vector<ControlBank> control_banks = {{
+			{67, 68, 69, 70, 87, 88, 89, 90, 92},
+			{35, 36, 37, 38, 39, 40, 41, 42, 43},
+			{22, 23, 24, 25, 26, 27, 28, 29, 30}
+	},
+	{
+			{73, 75, 79, 72, 80, 81, 82, 83, 84},
+			{74, 71, 76, 77, 93, 18, 19, 16, 17},
+			{128, 128, 128, 128, 128, 128, 128, 128, 128}
+	}};
+	std::vector<unsigned int> scene_buttons = {52, 53, 54, 55, 56, 57, 58, 59, 60, 61};
 	unsigned int mod_wheel = 1;
 	unsigned int breath_controller = 2;
 	unsigned int volume_pedal = 7;
