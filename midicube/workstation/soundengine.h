@@ -204,6 +204,8 @@ public:
 
 	void save_program(ChannelProgram* program);
 
+	const MidiControls& get_controls();
+
 };
 
 struct MasterEffectProgram {
@@ -276,6 +278,7 @@ public:
 	}
 
 	void notify_property_update(void *source, void *prop);
+	const MidiControls& get_controls();
 };
 
 

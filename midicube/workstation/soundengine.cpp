@@ -536,46 +536,6 @@ const KeyboardEnvironment& SoundEngineChannel::get_environment() {
 	return env;
 }
 
-//SoundEngineDeviceHost
-void SoundEngineDeviceHost::recieve_midi(const MidiMessage &message,
-		const SampleInfo &info, void* src) {
-	//TODO
-}
-
-Plugin* SoundEngineDeviceHost::get_plugin(std::string identifier) {
-	return device->get_cube()->plugin_mgr.get_plugin(identifier);
-}
-
-MidiBindingHandler* SoundEngineDeviceHost::get_binding_handler() {
-	return &device->binding_handler;
-}
-
-const Metronome& SoundEngineDeviceHost::get_metronome() {
-	return device->metronome;
-}
-
-const KeyboardEnvironment& SoundEngineDeviceHost::get_environment() {
-	return env; //TODO just a dummy env
-}
-
-void SoundEngineDeviceHost::init(SoundEngineDevice *device) {
-	if (this->device) {
-		throw "Device already intialized!";
-	}
-	this->device = device;
-}
-
-SpinLock& SoundEngineDeviceHost::get_lock() {
-	return this->device->get_cube()->lock;
-}
-
-void SoundEngineDeviceHost::notify_property_update(void *source, void *prop) {
-	device->get_cube()->notify_property_update(source, prop);
-}
-
-int SoundEngineDeviceHost::get_transpose() {
-	return 0;
-}
 
 void SoundEngineChannel::copy_channel() {
 	ChannelProgram* prog = new ChannelProgram();
@@ -632,4 +592,53 @@ void SoundEngineChannel::save_program(ChannelProgram *program) {
 		PluginSlotProgram& p = program->effects[j];
 		effects[j].save(p);
 	}
+}
+
+const MidiControls& SoundEngineChannel::get_controls() {
+	return device->get_cube()->get_config().controls;
+}
+
+//SoundEngineDeviceHost
+void SoundEngineDeviceHost::recieve_midi(const MidiMessage &message,
+		const SampleInfo &info, void* src) {
+	//TODO
+}
+
+Plugin* SoundEngineDeviceHost::get_plugin(std::string identifier) {
+	return device->get_cube()->plugin_mgr.get_plugin(identifier);
+}
+
+MidiBindingHandler* SoundEngineDeviceHost::get_binding_handler() {
+	return &device->binding_handler;
+}
+
+const Metronome& SoundEngineDeviceHost::get_metronome() {
+	return device->metronome;
+}
+
+const KeyboardEnvironment& SoundEngineDeviceHost::get_environment() {
+	return env; //TODO just a dummy env
+}
+
+void SoundEngineDeviceHost::init(SoundEngineDevice *device) {
+	if (this->device) {
+		throw "Device already intialized!";
+	}
+	this->device = device;
+}
+
+SpinLock& SoundEngineDeviceHost::get_lock() {
+	return this->device->get_cube()->lock;
+}
+
+void SoundEngineDeviceHost::notify_property_update(void *source, void *prop) {
+	device->get_cube()->notify_property_update(source, prop);
+}
+
+int SoundEngineDeviceHost::get_transpose() {
+	return 0;
+}
+
+const MidiControls& SoundEngineDeviceHost::get_controls() {
+	return device->get_cube()->get_config().controls;
 }

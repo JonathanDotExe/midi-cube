@@ -57,12 +57,16 @@ class PluginHost {
 
 public:
 
+	//Pointer should always stay the same
 	virtual const KeyboardEnvironment& get_environment() = 0;
 
+	//Pointer should always stay the same
 	virtual const Metronome& get_metronome() = 0;
 
+	//Pointer should always stay the same
 	virtual SpinLock& get_lock() = 0;
 
+	//Pointer should always stay the same
 	virtual MidiBindingHandler* get_binding_handler() = 0;
 
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info, void* source) = 0;
@@ -73,7 +77,8 @@ public:
 
 	virtual int get_transpose() = 0;
 
-	virtual MidiControls& get_controls() = 0;
+	//Pointer should always stay the same
+	virtual const MidiControls& get_controls() = 0;
 
 	virtual ~PluginHost() {
 
@@ -104,11 +109,12 @@ public:
 
 };
 
-class PluginInstance {
+class PluginInstance : public ControlHost {
 
 private:
 	PluginHost& host;
 	Plugin& plugin;
+	const MidiControls& controls; //Cache pointer
 
 protected:
 
@@ -120,7 +126,7 @@ public:
 	double* inputs;
 	double* outputs;
 
-	PluginInstance(PluginHost& h, Plugin& p) : host(h), plugin(p) {
+	PluginInstance(PluginHost& h, Plugin& p) : host(h), plugin(p), controls(h.get_controls()) {
 		inputs = new double[p.info.input_channels];
 		outputs = new double[p.info.output_channels];
 	}
@@ -133,10 +139,12 @@ public:
 
 	virtual void save_program(PluginProgram** prog) = 0;
 
-	virtual bool on_midi_control(unsigned int control, unsigned int value) = 0;
-
 	virtual bool keep_active() {
 		return false;
+	}
+
+	const virtual MidiControls& get_controls() {
+		return controls;
 	}
 
 	virtual ViewController* create_view() {
@@ -148,11 +156,11 @@ public:
 		delete outputs;
 	}
 
-	PluginHost& get_host() const {
+	inline PluginHost& get_host() const {
 		return host;
 	}
 
-	Plugin& get_plugin() const {
+	inline Plugin& get_plugin() const {
 		return plugin;
 	}
 

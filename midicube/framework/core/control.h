@@ -119,7 +119,7 @@ struct ControlBind {
 class ControlHost {
 
 public:
-	virtual void notify_property_change(void* property) = 0;
+	virtual void notify_property_update(void* property) = 0;
 
 	virtual const MidiControls& get_controls() = 0;
 
@@ -147,7 +147,7 @@ public:
 		for (ControlBind& bind : params) {
 			if (cc == controls.get_cc(bind.type, bind.index, bind.bank)) {
 				bind.param->change(val);
-				plugin->notify_property_change(bind.param->get_property());
+				plugin->notify_property_update(bind.param->get_property());
 				changed = true;
 			}
 		}
