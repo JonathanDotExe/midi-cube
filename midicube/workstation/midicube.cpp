@@ -72,10 +72,16 @@ void MidiCube::init() {
 		pt::ptree tree;
 		pt::read_xml(MIDICUBE_CONFIG_PATH, tree);
 		if (tree.get_child_optional("config")) {
-			config.load(tree);
+			std::cout << "Loading config" << std::endl;
+			config.load(tree.get_child("config"));
+		}
+		else {
+			std::cout << "Couldn't load config file" << std::endl;
 		}
 	}
-	catch (pt::xml_parser_error& e) { }
+	catch (pt::xml_parser_error& e) {
+		std::cout << "Couldn't load config file" << std::endl;
+	}
 
 	//Default engines
 	engine.channels[0].scenes[0].active = true;
@@ -188,7 +194,8 @@ MidiCube::~MidiCube() {
 	try {
 		pt::ptree tree;
 		tree.put_child("config", config.save());
-		pt::write_xml(MIDICUBE_CONFIG_PATH, tree);
+		pt::xml_writer_settings<std::string>settings ('\t', 1);
+		pt::write_xml(MIDICUBE_CONFIG_PATH, tree, std::locale(), settings);
 	}
 	catch (pt::xml_parser_error& e) {
 		std::cerr << "Couldn't save config !" << std::endl;
@@ -242,6 +249,8 @@ void MidiCubeConfig::load(pt::ptree tree) {
 	input_device = tree.get("input_device", input_device);
 	screen_sleep = tree.get("screen_sleep", screen_sleep);
 
+	std::cout << "Buffer Size " << buffer_size << std::endl;
+
 	//Sources
 	if (tree.get_child_optional("default_sources")) {
 		default_sources = {};
@@ -263,17 +272,17 @@ void MidiCubeConfig::load(pt::ptree tree) {
 		for (auto b : tree.get_child("controls.banks")) {
 			ControlBank bank;
 			if (b.second.get_child_optional("sliders")) {
-				for (auto slider : tree.get_child("sliders")) {
+				for (auto slider :b.second.get_child("sliders")) {
 					bank.sliders.push_back(slider.second.get_value<unsigned int>(128));
 				}
 			}
 			if (b.second.get_child_optional("knobs")) {
-				for (auto knob : tree.get_child("knobs")) {
+				for (auto knob : b.second.get_child("knobs")) {
 					bank.knobs.push_back(knob.second.get_value<unsigned int>(128));
 				}
 			}
 			if (b.second.get_child_optional("buttons")) {
-				for (auto button : tree.get_child("buttons")) {
+				for (auto button : b.second.get_child("buttons")) {
 					bank.buttons.push_back(button.second.get_value<unsigned int>(128));
 				}
 			}
@@ -290,7 +299,7 @@ void MidiCubeConfig::load(pt::ptree tree) {
 		controls.volume_pedal = tree.get<unsigned int>("controls.volume_pedal", 128);
 		controls.expresion_pedal = tree.get<unsigned int>("controls.expression_pedal", 128);
 		controls.sustain_pedal = tree.get<unsigned int>("controls.sustain_pedal", 128);
-		controls.sostenuto_pedal = tree.get<unsigned int>("controls.sostenute_pedal", 128);
+		controls.sostenuto_pedal = tree.get<unsigned int>("controls.sostenuto_pedal", 128);
 		controls.soft_pedal = tree.get<unsigned int>("controls.soft_pedal", 128);
 	}
 }
@@ -343,7 +352,7 @@ pt::ptree MidiCubeConfig::save() {
 	tree.put("controls.volume_pedal", controls.volume_pedal);
 	tree.put("controls.expression_pedal", controls.expresion_pedal);
 	tree.put("controls.sustain_pedal", controls.sustain_pedal);
-	tree.put("controls.sostenute_pedal", controls.sostenuto_pedal);
+	tree.put("controls.sostenuto_pedal", controls.sostenuto_pedal);
 	tree.put("controls.soft_pedal", controls.soft_pedal);
 
 
