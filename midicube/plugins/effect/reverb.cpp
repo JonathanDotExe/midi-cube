@@ -32,6 +32,8 @@ ReverbEffect::ReverbEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.tone);
 	cc.add_binding(&preset.resonance);
 	cc.add_binding(&preset.stereo);
+
+	cc.init(get_host().get_binding_handler(), this);
 }
 
 void ReverbEffect::process(const SampleInfo &info) {

@@ -13,7 +13,6 @@
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
 AdvancedSynth::AdvancedSynth(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
-	binder.init(get_host().get_binding_handler(), this);
 	//Parts
 	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
 		LFOEntity& lfo = preset.lfos[i];
@@ -46,6 +45,7 @@ AdvancedSynth::AdvancedSynth(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	}
 	//Global
 	binder.add_binding(&preset.portamendo);
+	binder.init(get_host().get_binding_handler(), this);
 }
 
 inline double AdvancedSynth::apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ASYNTH_PART_COUNT>& lfo_val) {

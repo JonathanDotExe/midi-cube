@@ -19,6 +19,8 @@ DelayEffect::DelayEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.right_feedback);
 	cc.add_binding(&preset.stereo);
 	cc.add_binding(&preset.mix);
+
+	cc.init(get_host().get_binding_handler(), this);
 }
 
 void DelayEffect::process(const SampleInfo& info) {

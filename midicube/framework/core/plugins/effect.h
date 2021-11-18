@@ -16,7 +16,7 @@ protected:
 
 public:
 	Effect(PluginHost& h, Plugin& plugin) : PluginInstance(h, plugin) {
-		cc.init(get_host().get_binding_handler(), this);
+
 	}
 
 	virtual void apply_program(PluginProgram *prog);
