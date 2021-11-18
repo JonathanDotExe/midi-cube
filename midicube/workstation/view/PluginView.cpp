@@ -27,6 +27,7 @@ Scene PluginView::create(ViewHost &frame) {
 
 	//Plugin View
 	ViewContainer* container = new ViewContainer(0, 0, frame.get_width(), frame.get_height() - 50);
+	this->host = container;
 	container->change_view(plugin.create_view());
 	controls.push_back(container);
 
@@ -61,4 +62,11 @@ Scene PluginView::create(ViewHost &frame) {
 
 
 	return {controls};
+}
+
+ControlView* PluginView::create_control_view() {
+	if (host && host->get_view()) {
+		return host->get_view()->create_control_view();
+	}
+	return nullptr;
 }

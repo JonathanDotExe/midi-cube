@@ -16,6 +16,7 @@
 class PluginView: public ViewController {
 private:
 	PluginInstance& plugin;
+	ViewHost* host = nullptr;
 	std::function<ViewController* ()> back;
 	bool* play_metronome;
 	Metronome* metronome;
@@ -24,6 +25,7 @@ public:
 	PluginView(PluginInstance& plugin, std::function<ViewController* ()> back, Metronome* metronome, bool* play_metronome, double* master_volume);
 	virtual ~PluginView();
 	virtual Scene create(ViewHost &frame);
+	virtual ControlView* create_control_view();
 };
 
 #endif /* MIDICUBE_WORKSTATION_VIEW_PLUGINVIEW_H_ */
