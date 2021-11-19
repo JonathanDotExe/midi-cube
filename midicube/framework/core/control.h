@@ -118,6 +118,97 @@ public:
 
 };
 
+template<typename T>
+class TemplateParameter : public ITemplateParameter<T> {
+private:
+	T value;
+
+public:
+
+	//DONT CHANGE
+	T total_min;
+	//DONT CHANGE
+	T total_max;
+
+	void* get_property() {
+		return this;
+	}
+
+	TemplateParameter(T val, T min, T max) : total_min(min), total_max(max) {
+		this->value = val;
+	}
+
+	TemplateParameter(const TemplateParameter<T>& other) {
+		this->value = other.value;
+		this->total_min = other.total_min;
+		this->total_max = other.total_max;
+	}
+
+	inline TemplateParameter<T>& operator=(const TemplateParameter<T>& other) {
+		if (&other != this) {
+			this->value = other.value;
+			this->total_min = other.total_min;
+			this->total_max = other.total_max;
+		}
+		return *this;
+	}
+
+	inline T& operator=(const T& other) {
+		this->value = other;
+		return value;
+	}
+
+	inline operator T() const {
+		return value;
+	}
+
+	void change(double val) {
+		value = total_min + (total_max - total_min) * val;
+	}
+
+	T get_min() const {
+		return total_min;
+	}
+
+	T get_max() const {
+		return total_max;
+	}
+
+};
+
+class BooleanParameter : public IParameter {
+private:
+	bool value;
+
+public:
+
+	void* get_property() {
+		return this;
+	}
+
+	BooleanParameter(bool val = false) {
+		this->value = val;
+	}
+
+	BooleanParameter(const BooleanParameter& other) {
+		this->value = other.value;
+	}
+
+	inline bool operator=(const bool other) {
+		value = other;
+		return value;
+	}
+
+	inline operator bool() const {
+		return value;
+	}
+	void change(double val) {
+		value = val > 0;
+	}
+
+};
+
+
 struct ControlBind {
 	ControlType type;
 	size_t index = 0;

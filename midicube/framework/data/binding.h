@@ -150,11 +150,11 @@ public:
 	}
 
 	T get_min() const {
-		return binding_min;
+		return total_min;
 	}
 
 	T get_max() const {
-		return binding_max;
+		return total_max;
 	}
 
 };
