@@ -20,7 +20,7 @@
 
 namespace pt = boost::property_tree;
 
-class BindableValue : public IParameter {
+class BindableValue {
 
 public:
 
@@ -159,7 +159,7 @@ public:
 
 };
 
-class BindableBooleanValue : public BindableValue {
+class BindableBooleanValue : public BindableValue, public IParameter {
 private:
 	bool value;
 	bool default_value;

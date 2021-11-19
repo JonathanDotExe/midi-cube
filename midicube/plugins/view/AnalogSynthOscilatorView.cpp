@@ -450,3 +450,9 @@ AnalogSynthOscilatorView::~AnalogSynthOscilatorView() {
 bool AnalogSynthOscilatorView::on_action(Control *control) {
 	return binder.on_action(control);
 }
+
+ControlView* AnalogSynthOscilatorView::create_control_view() {
+	ControlView* view = new ControlView("Analog Synth Oscillator " + part);
+
+	return view;
+}

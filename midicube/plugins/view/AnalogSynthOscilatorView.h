@@ -24,6 +24,7 @@ public:
 	virtual ~AnalogSynthOscilatorView();
 	virtual Scene create(ViewHost &frame);
 	virtual bool on_action(Control *control);
+	virtual ControlView* create_control_view();
 };
 
 std::vector<DragBox<double>*> property_mod_controls(std::vector<Control*>* controls, int x, int y, PropertyModulation& mod, ActionHandler& handler, std::string name, std::vector<Control*>* show_amount, std::vector<Control*>* show_source);

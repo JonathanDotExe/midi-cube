@@ -107,9 +107,9 @@ template<typename T>
 class ITemplateParameter : public IParameter {
 public:
 
-	virtual T get_min() const;
+	virtual T get_min() const = 0;
 
-	virtual T get_max() const;
+	virtual T get_max() const = 0;
 
 	virtual ~ITemplateParameter() {
 
