@@ -320,3 +320,12 @@ void ViewContainer::notify_remove(Control *control) {
 MasterPluginHost& ViewContainer::get_master_host() {
 	return get_host()->get_master_host();
 }
+
+void ViewContainer::init(ViewHost *host) {
+	Control::init(host);
+	if (next_view) {
+		switch_view(next_view);
+		next_view = nullptr;
+		request_redraw();
+	}
+}

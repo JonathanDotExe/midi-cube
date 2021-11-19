@@ -498,8 +498,8 @@ private:
 
 public:
 
-	ViewContainer(int x = 0, int y = 0, int width = 0, int height = 0) : Control (x, y, width, height), ViewHost() {
-
+	ViewContainer(int x = 0, int y = 0, int width = 0, int height = 0, ViewController* view = nullptr) : Control (x, y, width, height), ViewHost() {
+		next_view = view;
 	}
 
 	virtual int get_width() const;
@@ -525,6 +525,7 @@ public:
 	}
 
 	virtual void notify_remove(Control *control);
+	virtual void init(ViewHost *host);
 };
 
 

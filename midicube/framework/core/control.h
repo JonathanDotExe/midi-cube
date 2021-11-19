@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <iostream>
 
 struct ControlBank {
 	std::vector<unsigned int> sliders;

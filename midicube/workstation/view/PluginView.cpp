@@ -26,10 +26,9 @@ Scene PluginView::create(ViewHost &frame) {
 	controls.push_back(bg);
 
 	//Plugin View
-	ViewContainer* container = new ViewContainer(0, 0, frame.get_width(), frame.get_height() - 50);
-	this->host = container;
-	container->change_view(plugin.create_view());
+	ViewContainer* container = new ViewContainer(0, 0, frame.get_width(), frame.get_height() - 50, plugin.create_view());
 	controls.push_back(container);
+	this->host = container;
 
 	//Metronome
 	if (this->play_metronome) {
@@ -66,6 +65,7 @@ Scene PluginView::create(ViewHost &frame) {
 
 ControlView* PluginView::create_control_view() {
 	if (host && host->get_view()) {
+		std::cout << "Setting view" << std::endl;
 		return host->get_view()->create_control_view();
 	}
 	return nullptr;
