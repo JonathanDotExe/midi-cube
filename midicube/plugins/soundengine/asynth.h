@@ -8,6 +8,7 @@
 #ifndef MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 #define MIDICUBE_SOUNDENGINE_PRESETSYNTH_H_
 
+#include "../../framework/core/control.h"
 #include "../../framework/core/plugins/soundengine.h"
 #include "../../framework/dsp/oscilator.h"
 #include "../../framework/dsp/filter.h"
@@ -151,20 +152,20 @@ struct FilterEntity {
 };
 
 struct OperatorEntity {
-	bool audible = true;
+	BooleanParameter audible = true;
 	BindableADSREnvelopeData env{0.0005, 0, 1, 0.0005};
-	double amp_kb_track_upper = 0;
-	double amp_kb_track_lower = 0;
-	unsigned int amp_kb_track_note = 60;
+	TemplateParameter<double> amp_kb_track_upper{0, -1, 1};
+	TemplateParameter<double> amp_kb_track_lower{0, -1, 1};
+	TemplateParameter<unsigned int> amp_kb_track_note{60, 0, 127};
 
 	PropertyModulation volume = {1};
 	PropertyModulation panning = {0.5};
 
 	FilterEntity first_filter;
 	FilterEntity second_filter;
-	bool filter_parallel = false;
+	BooleanParameter filter_parallel = false;
 
-	unsigned int oscilator_count = 1;
+	TemplateParameter<unsigned int> oscilator_count{1, 0, ASYNTH_PART_COUNT};
 	std::array<double, ASYNTH_PART_COUNT> fm;
 
 };
@@ -178,11 +179,10 @@ struct ModEnvelopeEntity {
 struct LFOEntity {
 	PropertyModulation volume = {1};
 	BindableTemplateValue<double> freq{1, 0, 50};
-	bool sync_master = false;
-	int clock_value = 1;
-	double sync_phase = 0;
-	AnalogWaveForm waveform = AnalogWaveForm::SINE_WAVE;
-	int motion_sequencer = -1;
+	BooleanParameter sync_master = false;
+	TemplateParameter<int> clock_value{1, 1, 16};
+	TemplateParameter<double> sync_phase{0, 0, 1};
+	TemplateParameter<AnalogWaveForm> waveform{AnalogWaveForm::SINE_WAVE, AnalogWaveForm::SINE_WAVE, AnalogWaveForm::NOISE_WAVE};
 };
 
 struct AdvancedSynthPreset {
@@ -191,18 +191,18 @@ struct AdvancedSynthPreset {
 	std::array<OscilatorEntity, ASYNTH_PART_COUNT> oscilators;
 	std::array<OperatorEntity, ASYNTH_PART_COUNT> operators;
 
-	size_t lfo_count = 0;
-	size_t mod_env_count = 0;
-	size_t op_count = 1;
+	TemplateParameter<size_t> lfo_count{0, 0, ASYNTH_PART_COUNT};
+	TemplateParameter<size_t> mod_env_count{0, 0, ASYNTH_PART_COUNT};
+	TemplateParameter<size_t> op_count{1, 0, ASYNTH_PART_COUNT};
 
-	bool mono = false;
-	bool legato = false;
+	BooleanParameter mono{false};
+	BooleanParameter legato{false};
 	BindableTemplateValue<double> portamendo{0, 0, 10};
 
-	double aftertouch_attack = 0;
-	double aftertouch_release = 0;
-	bool max_aftertouch = false;
-	double velocity_aftertouch_amount = 0;
+	BindableTemplateValue<double> aftertouch_attack{0, 0, 2};
+	BindableTemplateValue<double> aftertouch_release{0, 0, 2};
+	BooleanParameter max_aftertouch{false};
+	BindableTemplateValue<double> velocity_aftertouch_amount{0, 0, 1};
 };
 
 struct AdvancedSynthPart {
