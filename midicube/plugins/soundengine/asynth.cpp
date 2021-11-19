@@ -288,7 +288,7 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 		if (lfo.sync_master) {
 			double value = lfo.clock_value;
 			if (lfo.clock_value <= 0) {
-				value = 1.0/(-fmin(lfo.clock_value, -1));
+				value = 1.0/(-fmin(static_cast<int>(lfo.clock_value), -1));
 			}
 			const Metronome& metronome = get_host().get_metronome();
 			freq = metronome.get_bpm()/60.0 * value;
@@ -543,7 +543,6 @@ void AdvancedSynthProgram::load(boost::property_tree::ptree tree) {
 			preset.lfos[i].clock_value = lfo.second.get<int>("clock_value", 1);
 			preset.lfos[i].sync_phase = lfo.second.get<double>("sync_phase", 0);
 			preset.lfos[i].waveform = (AnalogWaveForm) lfo.second.get<int>("waveform", 0);
-			preset.lfos[i].motion_sequencer = lfo.second.get<int>("motion_sequencer", -1);
 			++i;
 		}
 	}
@@ -663,7 +662,6 @@ boost::property_tree::ptree AdvancedSynthProgram::save() {
 		lfo.put("clock_value", preset.lfos[i].clock_value);
 		lfo.put("sync_phase", preset.lfos[i].sync_phase);
 		lfo.put("waveform", (int) preset.lfos[i].waveform);
-		lfo.put("motion_sequencer", preset.lfos[i].motion_sequencer);
 
 		tree.add_child("lfos.lfo", lfo);
 	}
@@ -742,7 +740,6 @@ ViewController* AdvancedSynth::create_view()  {
 AdvancedSynth::~AdvancedSynth() {
 
 }
-
 
 std::string AdvancedSynthProgram::get_plugin_name() {
 	return ASYNTH_IDENTIFIER;

@@ -73,7 +73,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
-		waveform->property.bind_cast(lfo.waveform, handler);
+		waveform->property.bind(lfo.waveform, handler);
 		controls.push_back(waveform);
 	}
 	tmp_x = 500;
@@ -107,17 +107,6 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 
 		DragBox<double>* value = new DragBox<double>(0, 0, 1, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
 		value->property.bind(lfo.sync_phase, handler);
-		controls.push_back(value);
-	}
-	tmp_x += 90;
-	//Motion Sequencer
-	{
-		Label* title = new Label("Motion Sequencer", main_font, 12, tmp_x, tmp_y);
-		controls.push_back(title);
-
-		DragBox<int>* value = new DragBox<int>(0, -32, 32, main_font, 16, tmp_x, tmp_y + 15, 80, 40);
-		value->drag_mul *= 0.5;
-		value->property.bind(lfo.motion_sequencer, handler);
 		controls.push_back(value);
 	}
 	tmp_x += 90;

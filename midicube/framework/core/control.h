@@ -176,6 +176,73 @@ public:
 
 };
 
+template<typename T>
+class TemplateEnumParameter : public ITemplateParameter<T> {
+private:
+	T value;
+
+public:
+
+	//DONT CHANGE
+	T total_min;
+	//DONT CHANGE
+	T total_max;
+
+	void* get_property() {
+		return this;
+	}
+
+	TemplateEnumParameter(T val, T min, T max) : total_min(min), total_max(max) {
+		this->value = val;
+	}
+
+	TemplateEnumParameter(const TemplateParameter<T>& other) {
+		this->value = other.value;
+		this->total_min = other.total_min;
+		this->total_max = other.total_max;
+	}
+
+	inline TemplateParameter<T>& operator=(const TemplateParameter<T>& other) {
+		if (&other != this) {
+			this->value = other.value;
+			this->total_min = other.total_min;
+			this->total_max = other.total_max;
+		}
+		return *this;
+	}
+
+	inline T& operator=(const T& other) {
+		this->value = other;
+		return value;
+	}
+
+	inline int operator=(const int& other) {
+		this->value = static_cast<T>(other);
+		return other;
+	}
+
+	inline operator T() const {
+		return value;
+	}
+
+	inline operator int() const {
+		return static_cast<int>(value);
+	}
+
+	void change(double val) {
+		value = static_cast<T>(static_cast<int>(total_min) + (static_cast<int>(total_max) - static_cast<int>(total_min)) * val);
+	}
+
+	T get_min() const {
+		return total_min;
+	}
+
+	T get_max() const {
+		return total_max;
+	}
+
+};
+
 class BooleanParameter : public IParameter {
 private:
 	bool value;

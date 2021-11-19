@@ -13,7 +13,7 @@
 #include "../soundengine/asynth.h"
 #include "../../framework/gui/binding/binding.h"
 
-class AnalogSynthView: public ViewController {
+class AnalogSynthView : public ViewController {
 private:
 	AdvancedSynth& synth;
 	std::array<size_t, ASYNTH_PART_COUNT> part_sizes = {1, 1, 1, 1, 1, 1, 1, 1};

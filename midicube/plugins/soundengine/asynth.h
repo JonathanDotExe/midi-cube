@@ -182,7 +182,7 @@ struct LFOEntity {
 	BooleanParameter sync_master = false;
 	TemplateParameter<int> clock_value{1, 1, 16};
 	TemplateParameter<double> sync_phase{0, 0, 1};
-	TemplateParameter<AnalogWaveForm> waveform{AnalogWaveForm::SINE_WAVE, AnalogWaveForm::SINE_WAVE, AnalogWaveForm::NOISE_WAVE};
+	TemplateEnumParameter<AnalogWaveForm> waveform{AnalogWaveForm::SINE_WAVE, AnalogWaveForm::SINE_WAVE, AnalogWaveForm::NOISE_WAVE};
 };
 
 struct AdvancedSynthPreset {
