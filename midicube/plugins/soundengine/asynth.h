@@ -120,35 +120,35 @@ struct FrequencyModulatotion {
 };
 
 struct OscilatorEntity {
-	AnalogWaveForm waveform = AnalogWaveForm::SAW_DOWN_WAVE;
-	bool analog = true;
-	bool sync = false;
-	bool reset = false;
-	bool randomize = false;
-	double phase = 0;
+	TemplateEnumParameter<AnalogWaveForm> waveform{AnalogWaveForm::SAW_DOWN_WAVE, AnalogWaveForm::SINE_WAVE, AnalogWaveForm::NOISE_WAVE};
+	BooleanParameter analog{true};
+	BooleanParameter sync{false};
+	BooleanParameter reset{false};
+	BooleanParameter randomize{false};
+	TemplateParameter<double> phase{0, 0, 1};
 
-	size_t unison_amount = 0;
+	TemplateParameter<size_t> unison_amount{0, 0, 7};
 	PropertyModulation volume = {1};
 	PropertyModulation sync_mul = {0.0};
 	PropertyModulation pulse_width = {1.0};
 	PropertyModulation unison_detune = {0.1};
-	int semi = 0;
-	double transpose = 1;
+	TemplateParameter<int> semi{0, -48, 48};
+	TemplateParameter<double> transpose{1, 0, 50};
 	PropertyModulation pitch = {0.5};
 
-	bool fixed_freq = false;
-	unsigned int note = 60;
+	BooleanParameter fixed_freq = false;
+	TemplateParameter<unsigned int> note{60, 0, 127};
 };
 
 struct FilterEntity {
-	bool on = false;
-	bool drive = false;
-	double drive_amount = 0;
-	FilterType type = FilterType::LP_12;
+	BooleanParameter on{false};
+	BooleanParameter drive{false};
+	TemplateParameter<double> drive_amount{0, 0, 1};
+	TemplateEnumParameter<FilterType> type{FilterType::LP_12, FilterType::LP_12, FilterType::BP_12};
 	PropertyModulation cutoff = {1};
 	PropertyModulation resonance = {0};
 	BindableTemplateValue<double> kb_track{0, 0, 1};
-	unsigned int kb_track_note = 36;
+	TemplateParameter<unsigned int> kb_track_note{36, 0, 127};
 };
 
 struct OperatorEntity {
@@ -167,7 +167,6 @@ struct OperatorEntity {
 
 	TemplateParameter<unsigned int> oscilator_count{1, 0, ASYNTH_PART_COUNT};
 	std::array<double, ASYNTH_PART_COUNT> fm;
-
 };
 
 
