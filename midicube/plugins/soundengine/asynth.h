@@ -101,12 +101,12 @@ struct BindableADSREnvelopeData {
 
 struct PropertyModulation {
 	BindableTemplateValue<double> value{0, 0, 1};
-	size_t mod_env = 0;
-	double mod_env_amount = 0;
-	size_t lfo = 0;
-	double lfo_amount = 0;
-	double velocity_amount = 0;
-	double aftertouch_amount = 0;
+	TemplateParameter<size_t> mod_env{0, 0, ASYNTH_PART_COUNT};
+	TemplateParameter<double> mod_env_amount{0, 0, 1};
+	TemplateParameter<size_t> lfo{0, 0, ASYNTH_PART_COUNT};
+	TemplateParameter<double> lfo_amount{0, 0, 1};
+	TemplateParameter<double> velocity_amount{0, 0, 1};
+	TemplateParameter<double> aftertouch_amount{0, 0, 1};
 
 	PropertyModulation(double val) {
 		value = val;

@@ -300,7 +300,7 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 		std::vector<std::string> waveforms = {"Sine", "Saw Down", "Saw Up", "Square", "Triangle", "Noise"};
 
 		ComboBox* waveform = new ComboBox(1, waveforms, main_font, 16, 0, tmp_x , tmp_y, 150, 40);
-		waveform->property.bind_cast(osc.waveform, handler);
+		waveform->property.bind(osc.waveform, handler);
 		controls.push_back(waveform);
 	}
 	//Fixed Freq
