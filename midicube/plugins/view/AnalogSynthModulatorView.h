@@ -24,6 +24,7 @@ public:
 	virtual ~AnalogSynthModulatorView();
 	virtual Scene create(ViewHost &frame);
 	virtual bool on_action(Control *control);
+	virtual ControlView* create_control_view();
 };
 
 
