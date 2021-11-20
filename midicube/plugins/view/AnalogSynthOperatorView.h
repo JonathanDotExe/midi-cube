@@ -24,6 +24,7 @@ public:
 	virtual ~AnalogSynthOperatorView();
 	virtual Scene create(ViewHost &frame);
 	virtual bool on_action(Control *control);
+	virtual ControlView* create_control_view();
 };
 
 #endif /* MIDICUBE_GUI_VIEW_ANALOGSYNTHOPERATORVIEW_H_ */

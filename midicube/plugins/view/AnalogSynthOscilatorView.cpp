@@ -493,5 +493,6 @@ ControlView* AnalogSynthOscilatorView::create_control_view() {
 	view->bind(&osc.fixed_freq, ControlType::BUTTON, 1, 0);
 	view->bind(&osc.sync, ControlType::BUTTON, 3, 0);
 
+	view->init(&synth);
 	return view;
 }
