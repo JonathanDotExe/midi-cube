@@ -11,7 +11,9 @@ file(GLOB_RECURSE WORKSTATION_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/wor
 add_executable(midi-cube-workstation ${FRAMEWORK_SOURCES} ${PLUGINS_SOURCES} ${WORKSTATION_SOURCES} "${CMAKE_SOURCE_DIR}/midicube/resources.h" "${CMAKE_SOURCE_DIR}/midicube/resources.cpp" "${CMAKE_SOURCE_DIR}/midicube-main.cpp")
 add_executable(midi-cube-autosampler ${FRAMEWORK_SOURCES} ${PLUGINS_SOURCES} ${WORKSTATION_SOURCES} "${CMAKE_SOURCE_DIR}/midicube/resources.h" "${CMAKE_SOURCE_DIR}/midicube/resources.cpp" "${CMAKE_SOURCE_DIR}/autosampler-main.cpp")
 
+set(THREAD_PREFER_PTHREAD_FLAG ON)
 find_package(Boost REQUIRED COMPONENTS filesystem)
+find_package(Threads REQUIRED)
 
 target_link_libraries(midi-cube-workstation PUBLIC rtaudio)
 target_link_libraries(midi-cube-workstation PUBLIC rtmidi)
@@ -20,6 +22,7 @@ target_link_libraries(midi-cube-workstation PUBLIC sfml-system)
 target_link_libraries(midi-cube-workstation PUBLIC sfml-window)
 target_link_libraries(midi-cube-workstation PUBLIC sfml-graphics)
 target_link_libraries(midi-cube-workstation PUBLIC Boost::filesystem)
+target_link_libraries(midi-cube-workstation PUBLIC Threads::Threads)
 
 target_link_libraries(midi-cube-autosampler PUBLIC rtaudio)
 target_link_libraries(midi-cube-autosampler PUBLIC rtmidi)
@@ -28,6 +31,7 @@ target_link_libraries(midi-cube-autosampler PUBLIC sfml-system)
 target_link_libraries(midi-cube-autosampler PUBLIC sfml-window)
 target_link_libraries(midi-cube-autosampler PUBLIC sfml-graphics)
 target_link_libraries(midi-cube-autosampler PUBLIC Boost::filesystem)
+target_link_libraries(midi-cube-autosampler PUBLIC Threads::Threads)
 
 target_compile_features(midi-cube-workstation PUBLIC cxx_std_17)
 target_compile_features(midi-cube-autosampler PUBLIC cxx_std_17)
