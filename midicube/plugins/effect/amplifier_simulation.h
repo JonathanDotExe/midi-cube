@@ -11,15 +11,11 @@
 #include "../../framework/core/plugins/effect.h"
 #include "../../framework/core/audio.h"
 #include "../../framework/dsp/filter.h"
+#include "../../framework/dsp/distortion.h"
 #include "../../framework/dsp/synthesis.h"
 
 #define AMP_OVERSAMPLING 2
 #define AMPLIFIER_SIMULATION_IDENTIFIER "midicube_overdrive_amp"
-
-enum DistortionType {
-	DIGITAL_DISTORTION, POLYNOMAL_DISTORTION, ARCTAN_DISTORTION, CUBIC_DISTORTION, FUZZ_DISTORTION
-};
-
 
 struct AmplifierSimulationPreset {
 	BindableBooleanValue on{true};
@@ -45,8 +41,8 @@ public:
 
 class AmplifierSimulationEffect : public Effect {
 private:
-	Filter lfilter;
-	Filter rfilter;
+	AmplifierSimulation lamp;
+	AmplifierSimulation ramp;
 public:
 	AmplifierSimulationPreset preset;
 

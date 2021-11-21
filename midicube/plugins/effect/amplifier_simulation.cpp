@@ -16,77 +16,17 @@ AmplifierSimulationEffect::AmplifierSimulationEffect(PluginHost& h, Plugin& plug
 	cc.init(get_host().get_binding_handler(), this);
 }
 
-static inline double cubic_distortion(double sample) {
-	if (sample < 0) {
-		double t = sample + 1;
-		sample = t * t * t - 1;
-	}
-	else {
-		double t = sample - 1;
-		sample = t * t * t + 1;
-	}
-	return sample;
-}
 
-static double apply_distortion(double sample, double drive, DistortionType type) {
-	switch (type) {
-	/*case DistortionType::TUBE_AMP_DISTORTION:
-	{
-		double a = sin((drive * 100.0 + 1)/102 * (M_PI/2.0));
-		double k = 2 * a/(1 - a);
-		sample = (1 + k) * sample / (1 + k * abs(sample));
-	}
-		break;*/
-	case DistortionType::DIGITAL_DISTORTION:
-	{
-		double clip = (1 - drive);
-		sample = fmax(fmin(sample, clip), -clip);
-		sample *= clip ? 1/clip : 0;
-	}
-		break;
-	case DistortionType::POLYNOMAL_DISTORTION:
-	{
-		sample -= (sample * sample * sample) * drive;
-	}
-		break;
-	case DistortionType::ARCTAN_DISTORTION:
-	{
-		sample = atan(sample * (1 + drive * 4));
-	}
-		break;
-	case DistortionType::CUBIC_DISTORTION:
-	{
-		sample = cubic_distortion(sample * (0.3 + drive * 4.5));
-	}
-	break;
-	case DistortionType::FUZZ_DISTORTION:
-	{
-		sample = cubic_distortion(cubic_distortion(cubic_distortion(sample * (0.3 + drive * 2)))) / 3.0;
-	}
-	break;
-	}
-	return sample;
-}
+
+
 
 void AmplifierSimulationEffect::process(const SampleInfo &info) {
 	double lsample = inputs[0];
 	double rsample = inputs[1];
 	if (preset.on) {
-		//Distortion
-		lsample = apply_distortion(lsample, preset.drive, preset.type);
-		rsample = apply_distortion(rsample, preset.drive, preset.type);
-
-		//Low-pass
-		FilterData data;
-		data.type = FilterType::LP_24;
-		data.cutoff = 200 + preset.tone * 20000;
-		lsample = lfilter.apply(data, lsample, info.time_step);
-		rsample = rfilter.apply(data, rsample, info.time_step);
-
-		//Gain
-		double gain = preset.post_gain + 1;
-		lsample *= gain;
-		rsample *= gain;
+		AmplifierSimulationData data = {preset.drive, preset.post_gain, preset.tone, preset.type};
+		lsample = lamp.apply(lsample, data, info.time_step);
+		rsample = ramp.apply(rsample, data, info.time_step);
 	}
 	outputs[0] = lsample;
 	outputs[1] = rsample;
