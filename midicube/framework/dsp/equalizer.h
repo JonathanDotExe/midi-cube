@@ -15,26 +15,31 @@
 struct EqualizerPoint {
 	double freq;
 	double mul;
+	FilterType type;
 };
 
 template<size_t N>
 struct NBandEqualizerData {
-	EqualizerPoint low;
-	std::array<EqualizerPoint, N> mids;
-	EqualizerPoint high;
+	std::array<EqualizerPoint, N> points;
 };
 
 template<size_t N>
 class NBandEqualizer {
 private:
-	Filter low;
 	std::array<Filter, N> filter;
-	Filter high;
 
 public:
 
-	double apply(double sample, const NBandEqualizerData<N>) {
-		return sample;
+	double apply(double sample, const NBandEqualizerData<N>& data, double time_step) {
+		double out = sample;
+		for (size_t i = 0; i < N; ++i) {
+			FilterData f = {data.points[i].type, data.points[i].freq};
+			double filtered = filter[i].apply(data, sample, time_step);
+
+			//Apply
+			out += filtered * data.points[i].mul;
+		}
+		return out;
 	}
 
 
