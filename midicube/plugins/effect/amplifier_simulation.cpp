@@ -16,10 +16,6 @@ AmplifierSimulationEffect::AmplifierSimulationEffect(PluginHost& h, Plugin& plug
 	cc.init(get_host().get_binding_handler(), this);
 }
 
-
-
-
-
 void AmplifierSimulationEffect::process(const SampleInfo &info) {
 	double lsample = inputs[0];
 	double rsample = inputs[1];
