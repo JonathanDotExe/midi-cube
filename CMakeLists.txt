@@ -30,8 +30,9 @@ target_link_libraries(midi-cube-workstation PUBLIC midi-cube-plugins)
 target_link_libraries(midi-cube-workstation PUBLIC rtaudio)
 target_link_libraries(midi-cube-workstation PUBLIC rtmidi)
 
-add_executable(midi-cube-autosampler ${WORKSTATION_SOURCES} ${CMAKE_SOURCE_DIR} "midicube-autosampler.cpp")
-target_link_libraries(midi-cube-workstation PUBLIC midi-cube-autosampler)
+add_executable(midi-cube-autosampler ${WORKSTATION_SOURCES} ${CMAKE_SOURCE_DIR} "autosampler-main.cpp")
+target_link_libraries(midi-cube-autosampler PUBLIC midi-cube-framework)
+target_link_libraries(midi-cube-autosampler PUBLIC midi-cube-plugins)
 target_link_libraries(midi-cube-autosampler PUBLIC rtaudio)
 target_link_libraries(midi-cube-autosampler PUBLIC rtmidi)
 
