@@ -11,6 +11,7 @@
 #include <string>
 #include "../../framework/core/audio.h"
 #include "../../framework/dsp/oscilator.h"
+#include "../../framework/dsp/equalizer.h"
 #include "../../framework/core/plugins/effect.h"
 
 #define EQUALIZER_IDENTIFIER "midicube_4_band_eq"
@@ -41,16 +42,12 @@ public:
 	}
 };
 
+#define EQ_4_BANDS 4
+
 class EqualizerEffect : public Effect {
 private:
-	Filter llowfilter;
-	Filter rlowfilter;
-	Filter llow_midfilter;
-	Filter rlow_midfilter;
-	Filter lmidfilter;
-	Filter rmidfilter;
-	Filter lhighfilter;
-	Filter rhighfilter;
+	NBandEqualizer<EQ_4_BANDS> leq;
+	NBandEqualizer<EQ_4_BANDS> req;
 
 public:
 	EqualizerPreset preset;

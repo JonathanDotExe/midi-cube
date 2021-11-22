@@ -12,7 +12,7 @@
 #include <array>
 #include "filter.h"
 
-struct EqualizerPoint {
+struct EqualizerBand {
 	double freq;
 	double mul;
 	FilterType type;
@@ -20,7 +20,7 @@ struct EqualizerPoint {
 
 template<size_t N>
 struct NBandEqualizerData {
-	std::array<EqualizerPoint, N> points;
+	std::array<EqualizerBand, N> bands;
 };
 
 template<size_t N>
@@ -33,11 +33,11 @@ public:
 	double apply(double sample, const NBandEqualizerData<N>& data, double time_step) {
 		double out = sample;
 		for (size_t i = 0; i < N; ++i) {
-			FilterData f = {data.points[i].type, data.points[i].freq};
-			double filtered = filter[i].apply(data, sample, time_step);
+			FilterData f = {data.bands[i].type, data.bands[i].freq};
+			double filtered = filter[i].apply(f, sample, time_step);
 
 			//Apply
-			out += filtered * data.points[i].mul;
+			out += filtered * data.bands[i].mul;
 		}
 		return out;
 	}

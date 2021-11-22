@@ -28,23 +28,15 @@ void EqualizerEffect::process(const SampleInfo& info) {
 	outputs[1] = inputs[1];
 	if (preset.on) {
 		//Filters
-		FilterData lowdata = {FilterType::LP_6, preset.low_freq};
-		FilterData low_middata = {FilterType::BP_12, preset.low_mid_freq};
-		FilterData middata = {FilterType::BP_12, preset.mid_freq};
-		FilterData highdata = {FilterType::HP_6, preset.high_freq};
+		NBandEqualizerData<EQ_4_BANDS> bands = {{
+				EqualizerBand{preset.low_freq, preset.low_gain, FilterType::LP_6},
+				EqualizerBand{preset.low_mid_freq, preset.low_mid_gain, FilterType::BP_12},
+				EqualizerBand{preset.mid_freq, preset.mid_gain, FilterType::BP_12},
+				EqualizerBand{preset.high_freq, preset.high_gain, FilterType::HP_6}
+			}};
 
-		double llow = llowfilter.apply(lowdata, inputs[0], info.time_step);
-		double rlow = rlowfilter.apply(lowdata, inputs[1], info.time_step);
-		double llow_mid = llow_midfilter.apply(low_middata, inputs[0], info.time_step);
-		double rlow_mid = rlow_midfilter.apply(low_middata, inputs[1], info.time_step);
-		double lmid = lmidfilter.apply(middata, inputs[0], info.time_step);
-		double rmid = rmidfilter.apply(middata, inputs[1], info.time_step);
-		double lhigh = lhighfilter.apply(highdata, inputs[0], info.time_step);
-		double rhigh = rhighfilter.apply(highdata, inputs[1], info.time_step);
-
-		//Apply
-		outputs[0] += llow * preset.low_gain + llow_mid * preset.low_mid_gain + lmid * preset.mid_gain + lhigh * preset.high_gain;
-		outputs[1] += rlow * preset.low_gain + rlow_mid * preset.low_mid_gain + rmid * preset.mid_gain + rhigh * preset.high_gain;
+		outputs[0] = leq.apply(outputs[0], bands, info.time_step);
+		outputs[1] = req.apply(outputs[1], bands, info.time_step);
 	}
 }
 
