@@ -4,34 +4,39 @@ project(midi-cube VERSION 1.0
     DESCRIPTION "A C++ synthesizer workstation"
     LANGUAGES CXX)
 
-file(GLOB_RECURSE FRAMEWORK_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/framework/*.cpp")
-file(GLOB_RECURSE PLUGINS_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/plugins/*.cpp")
-file(GLOB_RECURSE WORKSTATION_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/workstation/*.cpp")
-
-add_executable(midi-cube-workstation ${FRAMEWORK_SOURCES} ${PLUGINS_SOURCES} ${WORKSTATION_SOURCES} "${CMAKE_SOURCE_DIR}/midicube/resources.h" "${CMAKE_SOURCE_DIR}/midicube/resources.cpp" "${CMAKE_SOURCE_DIR}/midicube-main.cpp")
-add_executable(midi-cube-autosampler ${FRAMEWORK_SOURCES} ${PLUGINS_SOURCES} ${WORKSTATION_SOURCES} "${CMAKE_SOURCE_DIR}/midicube/resources.h" "${CMAKE_SOURCE_DIR}/midicube/resources.cpp" "${CMAKE_SOURCE_DIR}/autosampler-main.cpp")
 
 set(THREAD_PREFER_PTHREAD_FLAG ON)
 find_package(Boost REQUIRED COMPONENTS filesystem)
 find_package(Threads REQUIRED)
 
+file(GLOB_RECURSE FRAMEWORK_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/framework/*.cpp")
+file(GLOB_RECURSE PLUGINS_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/plugins/*.cpp")
+file(GLOB_RECURSE WORKSTATION_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/workstation/*.cpp")
+
+add_library(midi-cube-framework ${FRAMEWORK_SOURCES})
+target_link_libraries(midi-cube-framework PUBLIC sndfile)
+target_link_libraries(midi-cube-framework PUBLIC sfml-system)
+target_link_libraries(midi-cube-framework PUBLIC sfml-window)
+target_link_libraries(midi-cube-framework PUBLIC sfml-graphics)
+target_link_libraries(midi-cube-framework PUBLIC Boost::filesystem)
+target_link_libraries(midi-cube-framework PUBLIC Threads::Threads)
+
+add_library(midi-cube-plugins ${PLUGINS_SOURCES})
+target_link_libraries(midi-cube-plugins PUBLIC midi-cube-framework)
+
+add_executable(midi-cube-workstation ${WORKSTATION_SOURCES} ${CMAKE_SOURCE_DIR} "midicube-main.cpp")
+target_link_libraries(midi-cube-workstation PUBLIC midi-cube-framework)
+target_link_libraries(midi-cube-workstation PUBLIC midi-cube-plugins)
 target_link_libraries(midi-cube-workstation PUBLIC rtaudio)
 target_link_libraries(midi-cube-workstation PUBLIC rtmidi)
-target_link_libraries(midi-cube-workstation PUBLIC sndfile)
-target_link_libraries(midi-cube-workstation PUBLIC sfml-system)
-target_link_libraries(midi-cube-workstation PUBLIC sfml-window)
-target_link_libraries(midi-cube-workstation PUBLIC sfml-graphics)
-target_link_libraries(midi-cube-workstation PUBLIC Boost::filesystem)
-target_link_libraries(midi-cube-workstation PUBLIC Threads::Threads)
 
+add_executable(midi-cube-autosampler ${WORKSTATION_SOURCES} ${CMAKE_SOURCE_DIR} "midicube-autosampler.cpp")
+target_link_libraries(midi-cube-workstation PUBLIC midi-cube-autosampler)
 target_link_libraries(midi-cube-autosampler PUBLIC rtaudio)
 target_link_libraries(midi-cube-autosampler PUBLIC rtmidi)
-target_link_libraries(midi-cube-autosampler PUBLIC sndfile)
-target_link_libraries(midi-cube-autosampler PUBLIC sfml-system)
-target_link_libraries(midi-cube-autosampler PUBLIC sfml-window)
-target_link_libraries(midi-cube-autosampler PUBLIC sfml-graphics)
-target_link_libraries(midi-cube-autosampler PUBLIC Boost::filesystem)
-target_link_libraries(midi-cube-autosampler PUBLIC Threads::Threads)
 
+
+target_compile_features(midi-cube-framework PUBLIC cxx_std_17)
+target_compile_features(midi-cube-plugins PUBLIC cxx_std_17)
 target_compile_features(midi-cube-workstation PUBLIC cxx_std_17)
 target_compile_features(midi-cube-autosampler PUBLIC cxx_std_17)
