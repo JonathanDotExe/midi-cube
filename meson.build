@@ -54,7 +54,7 @@ src = [
 	'midicube/plugins/soundengine/sampler.cpp',
 	'midicube/plugins/sequencer/arpeggiator.cpp',
 	
-	'midicube/resources.cpp',
+	'midicube/plugins/resources.cpp',
 	'midicube/workstation/view/MasterEffectView.cpp',
 	'midicube/workstation/view/PluginSelectView.cpp',
 	'midicube/workstation/view/PluginView.cpp',

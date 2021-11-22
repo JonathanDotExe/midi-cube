@@ -9,7 +9,7 @@
 
 #include "../view/AnalogSynthOscilatorView.h"
 #include "../view/AnalogSynthView.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 
 AnalogSynthOperatorView::AnalogSynthOperatorView(AdvancedSynth &s, size_t part) : synth(s), binder{s.get_lock(), [&s, part]() {

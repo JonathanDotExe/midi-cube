@@ -11,7 +11,7 @@
 #include "../../framework/gui/core.h"
 #include "../../framework/gui/control.h"
 #include "../../framework/core/plugin.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 class PluginView: public ViewController {
 private:

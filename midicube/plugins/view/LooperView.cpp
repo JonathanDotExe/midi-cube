@@ -6,7 +6,7 @@
  */
 
 #include "../view/LooperView.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 LooperView::LooperView(Looper& l) : looper(l){
 
