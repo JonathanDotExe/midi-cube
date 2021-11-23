@@ -14,8 +14,8 @@
 #include <atomic>
 #include <array>
 #include <string>
-#include <rtmidi/RtMidi.h>
-#include <rtaudio/RtAudio.h>
+#include <RtMidi.h>
+#include <RtAudio.h>
 
 #include "../framework/util/audiofile.h"
 #include "../framework/util/sfz.h"
