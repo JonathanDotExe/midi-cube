@@ -11,7 +11,7 @@
 #include <exception>
 #include <atomic>
 #include <array>
-#include <RtAudio.h>
+#include <rtaudio/RtAudio.h>
 #include "../framework/core/midi.h"
 #include "../framework/core/audio.h"
 

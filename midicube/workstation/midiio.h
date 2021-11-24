@@ -9,7 +9,7 @@
 #define MIDICUBE_MIDIIO_H_
 
 #include "../framework/core/midi.h"
-#include <RtMidi.h>
+#include <rtmidi/RtMidi.h>
 #include <vector>
 #include <exception>
 #include <functional>
