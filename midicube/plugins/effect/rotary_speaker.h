@@ -10,6 +10,7 @@
 
 #include "../../framework/core/audio.h"
 #include "../../framework/dsp/filter.h"
+#include "../../framework/dsp/distortion.h"
 #include "../../framework/dsp/synthesis.h"
 #include "../../framework/core/plugins/effect.h"
 
@@ -35,6 +36,7 @@
 struct RotarySpeakerPreset {
 	BindableBooleanValue on = true;
 	BindableBooleanValue fast = false;
+	BindableTemplateValue<double> drive{0, 0, 1};
 
 	double stereo_mix{0.7};
 	bool type{false};
