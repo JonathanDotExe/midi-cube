@@ -87,6 +87,9 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 			bass_speed.set(preset.bass_slow_frequency, info.time, preset.bass_slow_ramp);
 		}
 	}
+	if (curr_rotary_stop != preset.stop) {
+
+	}
 }
 
 ViewController* RotarySpeakerEffect::create_view() {

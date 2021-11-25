@@ -35,6 +35,7 @@
 
 struct RotarySpeakerPreset {
 	BindableBooleanValue on = true;
+	BindableBooleanValue stop = false;
 	BindableBooleanValue fast = false;
 	BindableTemplateValue<double> drive{0, 0, 1};
 
@@ -76,7 +77,8 @@ private:
 
 	DelayBuffer left_delay;
 	DelayBuffer right_delay;
-	bool curr_rotary_fast = 0;
+	bool curr_rotary_fast = false;
+	bool curr_rotary_stop = false;
 	PortamendoBuffer horn_speed{ROTARY_HORN_SLOW_FREQUENCY, ROTARY_HORN_SLOW_RAMP};
 	PortamendoBuffer bass_speed{ROTARY_BASS_SLOW_FREQUENCY, ROTARY_BASS_SLOW_RAMP};
 	double horn_rotation = 0;

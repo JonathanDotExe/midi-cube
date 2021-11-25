@@ -123,7 +123,7 @@ class PortamendoBuffer {
 private:
 	double value;
 	double last_value;
-	double slope_time;
+	double step;
 	double last_time;
 public:
 	PortamendoBuffer(double value, double slope_time);

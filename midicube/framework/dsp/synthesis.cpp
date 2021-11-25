@@ -45,15 +45,15 @@ double DelayBuffer::process() {
 }
 
 //PortamendoBuffer
-PortamendoBuffer::PortamendoBuffer(double value, double slope_time) {
+PortamendoBuffer::PortamendoBuffer(double value, double step) {
 	this->last_value = value;
 	this->value = value;
 	this->last_time = 0;
-	this->slope_time = slope_time;
+	this->step = step;
 }
 
 double PortamendoBuffer::get(double time) {
-	if (last_time + slope_time <= time) {
+	if (last_time + post <= time) {
 		return value;
 	}
 	else {
