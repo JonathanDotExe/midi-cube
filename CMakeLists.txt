@@ -17,6 +17,9 @@ file(GLOB_RECURSE FRAMEWORK_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/frame
 file(GLOB_RECURSE PLUGINS_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/plugins/*.cpp")
 file(GLOB_RECURSE WORKSTATION_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/workstation/*.cpp")
 
+set(CMAKE_CXX_STANDARD_LIBRARIES " -static-libgcc -static-libstdc++ -lwsock32 -lws2_32 ${CMAKE_CXX_STANDARD_LIBRARIES}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive")
+
 add_library(midi-cube-framework ${FRAMEWORK_SOURCES})
 target_link_libraries(midi-cube-framework PUBLIC SndFile::sndfile)
 target_link_libraries(midi-cube-framework PUBLIC sfml-system)
@@ -24,7 +27,6 @@ target_link_libraries(midi-cube-framework PUBLIC sfml-window)
 target_link_libraries(midi-cube-framework PUBLIC sfml-graphics)
 target_link_libraries(midi-cube-framework PUBLIC Boost::filesystem)
 target_link_libraries(midi-cube-framework PUBLIC Threads::Threads)
-
 add_library(midi-cube-plugins ${PLUGINS_SOURCES})
 target_link_libraries(midi-cube-plugins PUBLIC midi-cube-framework)
 
@@ -46,3 +48,4 @@ target_compile_features(midi-cube-framework PUBLIC cxx_std_17)
 target_compile_features(midi-cube-plugins PUBLIC cxx_std_17)
 target_compile_features(midi-cube-workstation PUBLIC cxx_std_17)
 target_compile_features(midi-cube-autosampler PUBLIC cxx_std_17)
+
