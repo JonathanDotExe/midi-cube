@@ -53,3 +53,5 @@ MingW Download: https://nuwen.net/mingw.html
 * Create rtaudio and rtmidi folders in the project include folder and copy the headers of the libraries into them
 * Execute make in your build folder
 * Copy the dll files of the libraries into the build folder (librtaudio.dll librtmidi.dll sfml-graphics-2.dll sfml-system-2.dll sfml-window-2.dll sndfile.dll)
+* Copy libgcc_s_seh-1.dll, libstc++-6.dll and libwinpthread-1.dll bin/mingw64 from your Git for Windows Installation
+* Copy the same DLLs into the midi-cube/lib folder
