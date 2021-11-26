@@ -50,7 +50,10 @@ target_compile_features(midi-cube-workstation PUBLIC cxx_std_17)
 target_compile_features(midi-cube-autosampler PUBLIC cxx_std_17)
 
 file(GLOB DLL_FILES ABSOLUTE "${CMAKE_SOURCE_DIR}/lib/*.dll")
+file(GLOB_RECURSE RESOURCE_FILES ABSOLUTE "${CMAKE_SOURCE_DIR}/resources/*.*")
+
 set(CMAKE_INSTALL_BINDIR ".")
 set(CMAKE_INSTALL_LIBDIR ".")
 install(TARGETS midi-cube-framework midi-cube-plugins midi-cube-workstation midi-cube-autosampler)
 install(FILES ${DLL_FILES} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(FILES ${RESOURCE_FILES} DESTINATION ${CMAKE_INSTALL_BINDIR}/resources)
