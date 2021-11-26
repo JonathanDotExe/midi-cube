@@ -369,7 +369,7 @@ bool ProgramManager::overwrite_bank() {
 
 void ProgramManager::load_all(PluginManager* mgr) {
 	//Load presets
-	std::vector<std::string> presets = {"preset_synths"};
+	std::vector<std::string> presets = {"preset_synth_pad", "preset_synth_lead", "preset_bass", "preset_synth_keys", "preset_organ", "preset_combi", "preset_special"};
 	for (std::string filename : presets) {
 		Bank* bank = load_bank(preset_path + "/" + filename + ".xml", filename, mgr);
 		if (bank) {

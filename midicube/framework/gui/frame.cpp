@@ -23,7 +23,7 @@ Frame::Frame(int width, int height, std::string title, MasterPluginHost& h, bool
 
 void Frame::run(ViewController* v) {
 	//Main loop
-	sf::RenderWindow window(sf::VideoMode(width, height), title);
+	sf::RenderWindow window(sf::VideoMode(width, height), title, sf::Style::Titlebar | sf::Style::Close);
 	window.setFramerateLimit(30);
 	#ifndef MIDICUBE_NO_WINDOW_ORIGIN
 		window.setPosition(sf::Vector2i(0, 0));
