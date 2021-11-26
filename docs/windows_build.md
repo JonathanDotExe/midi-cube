@@ -13,7 +13,7 @@ MingW Download: https://nuwen.net/mingw.html
     * Including math.h is not necessary
     * Choose "MinGW Makefiles" when configuring
     * Select buildtype release
-    * Set RTAUDIO_ASIO to true and RTAUDIO_WASAPI to false
+    * Set RTAUDIO_DS to true and RTAUDIO_WASAPI to false
     * Then execute mingw32-cmake install (as admin)
 * Add newlines in share\rtaudio\RtAudioConfig.cmake after each include
 
