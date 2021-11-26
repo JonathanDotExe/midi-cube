@@ -1535,5 +1535,344 @@
                 </effect>
             </master_effects>
         </program>
+        <program>
+            <name>Hard Perc Organ</name>
+            <metronome_bpm>120</metronome_bpm>
+            <channels>
+                <channel>
+                    <engine>
+                        <plugin>midicube_b3_organ</plugin>
+                        <preset>
+                            <drawbars>
+                                <drawbar>
+                                    <value>8</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>8</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </drawbar>
+                                <drawbar>
+                                    <value>4</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>8</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </drawbar>
+                                <drawbar>
+                                    <value>8</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>8</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </drawbar>
+                                <drawbar>
+                                    <value>8</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>8</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </drawbar>
+                                <drawbar>
+                                    <value>4</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>8</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </drawbar>
+                                <drawbar>
+                                    <value>8</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>8</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </drawbar>
+                                <drawbar>
+                                    <value>0</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>8</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </drawbar>
+                                <drawbar>
+                                    <value>2</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>8</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </drawbar>
+                                <drawbar>
+                                    <value>3</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>8</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </drawbar>
+                            </drawbars>
+                            <harmonic_foldback_volume>1</harmonic_foldback_volume>
+                            <multi_note_gain>0.80000000000000004</multi_note_gain>
+                            <click_attack>5.0000000000000004e-06</click_attack>
+                            <high_gain_reduction>0.5</high_gain_reduction>
+                            <percussion>
+                                <value>false</value>
+                                <cc>128</cc>
+                                <persistent>true</persistent>
+                            </percussion>
+                            <percussion_third_harmonic>
+                                <value>true</value>
+                                <cc>128</cc>
+                                <persistent>true</persistent>
+                            </percussion_third_harmonic>
+                            <percussion_soft>
+                                <value>false</value>
+                                <cc>128</cc>
+                                <persistent>true</persistent>
+                            </percussion_soft>
+                            <percussion_fast_decay>
+                                <value>true</value>
+                                <cc>128</cc>
+                                <persistent>true</persistent>
+                            </percussion_fast_decay>
+                            <vibrato_mix>
+                                <value>0</value>
+                                <binding_min>0</binding_min>
+                                <binding_max>1</binding_max>
+                                <cc>128</cc>
+                                <persistent>true</persistent>
+                            </vibrato_mix>
+                            <swell>
+                                <value>1</value>
+                                <binding_min>0</binding_min>
+                                <binding_max>1</binding_max>
+                                <cc>128</cc>
+                                <persistent>true</persistent>
+                            </swell>
+                        </preset>
+                    </engine>
+                    <sequencers>
+                        <sequencers>
+                            <plugin />
+                        </sequencers>
+                    </sequencers>
+                    <polyphony_limit>0</polyphony_limit>
+                    <input>0</input>
+                    <scenes>
+                        <scene>
+                            <active>true</active>
+                            <sustain>true</sustain>
+                            <pitch_bend>true</pitch_bend>
+                            <source>
+                                <start_note>0</start_note>
+                                <end_note>127</end_note>
+                                <start_velocity>0</start_velocity>
+                                <end_velocity>127</end_velocity>
+                                <octave>0</octave>
+                                <transfer_channel_aftertouch>true</transfer_channel_aftertouch>
+                                <transfer_pitch_bend>true</transfer_pitch_bend>
+                                <transfer_cc>true</transfer_cc>
+                                <transfer_prog_change>true</transfer_prog_change>
+                                <transfer_other>true</transfer_other>
+                            </source>
+                        </scene>
+                        <scene />
+                        <scene />
+                        <scene />
+                        <scene />
+                        <scene />
+                        <scene />
+                        <scene />
+                    </scenes>
+                    <volume>
+                        <value>0.995</value>
+                        <binding_min>0</binding_min>
+                        <binding_max>1</binding_max>
+                        <cc>128</cc>
+                        <persistent>true</persistent>
+                    </volume>
+                    <panning>
+                        <value>0</value>
+                        <binding_min>-1</binding_min>
+                        <binding_max>1</binding_max>
+                        <cc>128</cc>
+                        <persistent>true</persistent>
+                    </panning>
+                    <send_master>-1</send_master>
+                    <insert_effects>
+                        <effect>
+                            <plugin>midicube_overdrive_amp</plugin>
+                            <preset>
+                                <on>
+                                    <value>true</value>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </on>
+                                <post_gain>
+                                    <value>0.44250000000000012</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>1</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </post_gain>
+                                <drive>
+                                    <value>1</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>1</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </drive>
+                                <tone>
+                                    <value>0.59842519685039375</value>
+                                    <binding_min>0</binding_min>
+                                    <binding_max>1</binding_max>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </tone>
+                            </preset>
+                        </effect>
+                        <effect>
+                            <plugin>midicube_rotary_speaker</plugin>
+                            <preset>
+                                <on>
+                                    <value>true</value>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </on>
+                                <fast>
+                                    <value>false</value>
+                                    <cc>128</cc>
+                                    <persistent>true</persistent>
+                                </fast>
+                                <stereo_mix>0.47499999999999992</stereo_mix>
+                                <type>false</type>
+                                <max_delay>0.00050000000000000001</max_delay>
+                                <min_amplitude>0.5</min_amplitude>
+                                <mix>1</mix>
+                                <horn_slow_frequency>2</horn_slow_frequency>
+                                <horn_fast_frequency>8.3000000000000007</horn_fast_frequency>
+                                <bass_slow_frequency>2</bass_slow_frequency>
+                                <bass_fast_frequency>5</bass_fast_frequency>
+                                <horn_slow_ramp>1.6000000000000001</horn_slow_ramp>
+                                <horn_fast_ramp>1</horn_fast_ramp>
+                                <bass_slow_ramp>1.6000000000000001</bass_slow_ramp>
+                                <bass_fast_ramp>5.5</bass_fast_ramp>
+                            </preset>
+                        </effect>
+                    </insert_effects>
+                </channel>
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+                <channel />
+            </channels>
+            <master_effects>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+                <effect>
+                    <effect>
+                        <plugin />
+                    </effect>
+                    <next_effect>-1</next_effect>
+                </effect>
+            </master_effects>
+        </program>
+
     </programs>
 </bank>
