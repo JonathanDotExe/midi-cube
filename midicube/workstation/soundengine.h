@@ -222,6 +222,8 @@ public:
 
 	void load(MasterEffectProgram& prog, PluginManager* mgr) {
 		next_effect = prog.next_effect;
+		lsample = 0;
+		rsample = 0;
 		effect.load(prog.prog, mgr);
 	}
 

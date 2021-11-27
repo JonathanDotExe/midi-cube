@@ -43,11 +43,11 @@ void DelayEffect::process(const SampleInfo& info) {
 		}
 
 		//Delay
-		ldelay.add_sample(outputs[0], left_init_delay);
-		rdelay.add_sample(outputs[1], right_init_delay);
+		ldelay.add_isample(outputs[0], left_init_delay);
+		rdelay.add_isample(outputs[1], right_init_delay);
 		//Feedback
-		ldelay.add_sample(l * left_feedback, left_delay);
-		rdelay.add_sample(r * right_feedback, right_delay);
+		ldelay.add_isample(l * left_feedback, left_delay);
+		rdelay.add_isample(r * right_feedback, right_delay);
 
 		//Mix
 		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
