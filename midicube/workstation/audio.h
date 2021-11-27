@@ -52,13 +52,13 @@ static RtAudio::Api get_api(std::string driver) {
 		return RtAudio::Api::WINDOWS_WASAPI;
 	}
 	else if (driver == "ASIO") {
-		return RtAudio::Api::WINDOWS_WASAPI;
+		return RtAudio::Api::WINDOWS_ASIO;
 	}
 	else if (driver == "DS") {
-		return RtAudio::Api::WINDOWS_WASAPI;
+		return RtAudio::Api::WINDOWS_DS;
 	}
 	else if (driver == "DUMMY") {
-		return RtAudio::Api::WINDOWS_WASAPI;
+		return RtAudio::Api::RTAUDIO_DUMMY;
 	}
 	return RtAudio::Api::UNSPECIFIED;
 }
@@ -66,7 +66,7 @@ static RtAudio::Api get_api(std::string driver) {
 class AudioHandler {
 
 private:
-	RtAudio audio;
+	RtAudio* audio = nullptr;
 	size_t inputs = 0;
 	void* user_data = nullptr;
 	void (* get_sample) (double&, double&, double*, const size_t, SampleInfo&, void*) = nullptr;
