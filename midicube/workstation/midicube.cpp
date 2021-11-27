@@ -120,7 +120,7 @@ void MidiCube::init() {
 		sources[i] = config.default_sources[i];
 	}
 	//Init audio
-	audio_handler.init(config.sample_rate, config.buffer_size, config.output_device, config.input_device, config.input_channels);
+	audio_handler.init(config.driver, config.sample_rate, config.buffer_size, config.output_device, config.input_device, config.input_channels);
 }
 
 void MidiCube::process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info) {
@@ -242,14 +242,13 @@ void MidiCube::set_property_change_callback(std::function<void(void*, void*)> cb
 }
 
 void MidiCubeConfig::load(pt::ptree tree) {
+	driver = tree.get("driver", driver);
 	sample_rate = tree.get("sample_rate", sample_rate);
 	buffer_size = tree.get("buffer_size", buffer_size);
 	input_channels = tree.get("input_channels", input_channels);
 	output_device = tree.get("output_device", output_device);
 	input_device = tree.get("input_device", input_device);
 	screen_sleep = tree.get("screen_sleep", screen_sleep);
-
-	std::cout << "Buffer Size " << buffer_size << std::endl;
 
 	//Sources
 	if (tree.get_child_optional("default_sources")) {
@@ -306,6 +305,7 @@ void MidiCubeConfig::load(pt::ptree tree) {
 
 pt::ptree MidiCubeConfig::save() {
 	pt::ptree tree;
+	tree.put("driver", driver);
 	tree.put("sample_rate", sample_rate);
 	tree.put("buffer_size", buffer_size);
 	tree.put("input_channels", input_channels);
