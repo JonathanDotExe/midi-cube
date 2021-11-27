@@ -4,7 +4,7 @@ project(midi-cube VERSION 1.0
     DESCRIPTION "A C++ synthesizer workstation"
     LANGUAGES CXX)
 
-
+set(CMAKE_BUILD_TYPE Release)
 set(THREAD_PREFER_PTHREAD_FLAG ON)
 find_package(Boost REQUIRED COMPONENTS filesystem)
 find_package(Threads REQUIRED)

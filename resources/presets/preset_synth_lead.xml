@@ -33,8 +33,8 @@
                                             <value>0</value>
                                             <binding_min>0</binding_min>
                                             <binding_max>1</binding_max>
-                                            <cc>128</cc>
-                                            <persistent>true</persistent>
+                                            <cc>1</cc>
+                                            <persistent>false</persistent>
                                         </value>
                                         <mod_env>0</mod_env>
                                         <mod_env_amount>0</mod_env_amount>

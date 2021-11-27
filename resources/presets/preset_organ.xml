@@ -399,7 +399,7 @@
                             </on>
                             <fast>
                                 <value>false</value>
-                                <cc>23</cc>
+                                <cc>1</cc>
                                 <persistent>true</persistent>
                             </fast>
                             <stereo_mix>0.5</stereo_mix>
@@ -957,7 +957,7 @@
                             </on>
                             <fast>
                                 <value>false</value>
-                                <cc>128</cc>
+                                <cc>1</cc>
                                 <persistent>true</persistent>
                             </fast>
                             <stereo_mix>0.69999999999999996</stereo_mix>
@@ -1435,7 +1435,7 @@
                             </on>
                             <fast>
                                 <value>false</value>
-                                <cc>23</cc>
+                                <cc>1</cc>
                                 <persistent>true</persistent>
                             </fast>
                             <stereo_mix>0.69999999999999996</stereo_mix>
@@ -1738,7 +1738,7 @@
                                 </on>
                                 <fast>
                                     <value>false</value>
-                                    <cc>128</cc>
+                                    <cc>1</cc>
                                     <persistent>true</persistent>
                                 </fast>
                                 <stereo_mix>0.47499999999999992</stereo_mix>
@@ -1873,6 +1873,5 @@
                 </effect>
             </master_effects>
         </program>
-
     </programs>
 </bank>
