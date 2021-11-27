@@ -12,7 +12,7 @@
 #include "../../framework/gui/control.h"
 #include "../midicube.h"
 #include "../soundengine.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 #define PROGRAM_VIEW_ROWS 4
 #define PROGRAM_VIEW_COLS 8

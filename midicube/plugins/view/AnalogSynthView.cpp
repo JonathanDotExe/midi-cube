@@ -11,7 +11,7 @@
 #include "../view/AnalogSynthModulatorView.h"
 #include "../view/AnalogSynthOperatorView.h"
 #include "../view/AnalogSynthOscilatorView.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 
 AnalogSynthView::AnalogSynthView(AdvancedSynth& s) : synth(s), binder{s.get_lock(), [&s]() {

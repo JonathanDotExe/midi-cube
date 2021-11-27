@@ -11,7 +11,7 @@
 #include "../../framework/core/plugin.h"
 #include "../../framework/gui/core.h"
 #include "../../framework/gui/control.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 class PluginSelectView : public ViewController {
 private:

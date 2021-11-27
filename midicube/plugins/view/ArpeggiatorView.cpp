@@ -7,7 +7,7 @@
 
 #include "../view/ArpeggiatorView.h"
 
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 ArpeggiatorView::ArpeggiatorView(ArpeggiatorInstance& a) : arp(a) {
 

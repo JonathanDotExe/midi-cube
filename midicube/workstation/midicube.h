@@ -31,6 +31,7 @@ struct MidiMessageWithInput {
 };
 
 struct MidiCubeConfig {
+	std::string driver = "UNSPECIFIED";
 	unsigned int sample_rate = 48000;
 	unsigned int buffer_size = 256;
 	unsigned int input_channels = 2;

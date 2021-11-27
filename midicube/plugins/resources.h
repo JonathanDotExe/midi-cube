@@ -1,5 +1,5 @@
 /*
- * resources.h
+ * plugins/resources.h
  *
  *  Created on: Dec 20, 2020
  *      Author: jojo

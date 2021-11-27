@@ -17,7 +17,9 @@ int g_process(void* output_buffer, void* input_buffer, unsigned int buffer_size,
 	return handler->process((double*) output_buffer, (double*) input_buffer, buffer_size, time);
 }
 
-void AudioHandler::init(unsigned int sample_rate, unsigned int buffer_size, int out_device, int in_device, int input_amount) {
+void AudioHandler::init(std::string driver, unsigned int sample_rate, unsigned int buffer_size, int out_device, int in_device, int input_amount) {
+	audio = RtAudio(get_api(driver));
+	
 	if ((int) audio.getDeviceCount() <= std::max(std::max(out_device, in_device), 0)) {
 		throw AudioException("No audio devices detected");
 	}

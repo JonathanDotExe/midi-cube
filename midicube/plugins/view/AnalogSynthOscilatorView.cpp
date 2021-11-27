@@ -8,7 +8,7 @@
 #include "../view/AnalogSynthOscilatorView.h"
 
 #include "../view/AnalogSynthView.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 AnalogSynthOscilatorView::AnalogSynthOscilatorView(AdvancedSynth& s, size_t part) : synth(s), binder{s.get_lock(), [&s, part]() {
 	return new AnalogSynthOscilatorView(s, part);
