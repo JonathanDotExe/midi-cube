@@ -1,4 +1,4 @@
 git pull
 cd build
-ninja
+make
 cd ..
