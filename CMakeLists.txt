@@ -13,14 +13,15 @@ if (WIN32)
     find_package(rtmidi REQUIRED COMPONENTS rtmidi)
     find_package(sndfile REQUIRED COMPONENTS sndfile)
     find_package(SFML REQUIRED COMPONENTS system window graphics)
+    
+	set(CMAKE_CXX_STANDARD_LIBRARIES " -static-libgcc -static-libstdc++ -lwsock32 -lws2_32 ${CMAKE_CXX_STANDARD_LIBRARIES}")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive")
 endif()
 
 file(GLOB_RECURSE FRAMEWORK_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/framework/*.cpp")
 file(GLOB_RECURSE PLUGINS_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/plugins/*.cpp")
 file(GLOB_RECURSE WORKSTATION_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/workstation/*.cpp")
 
-set(CMAKE_CXX_STANDARD_LIBRARIES " -static-libgcc -static-libstdc++ -lwsock32 -lws2_32 ${CMAKE_CXX_STANDARD_LIBRARIES}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive")
 
 add_library(midi-cube-framework ${FRAMEWORK_SOURCES})
 target_link_libraries(midi-cube-framework PUBLIC sndfile)
