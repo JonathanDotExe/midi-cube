@@ -8,7 +8,7 @@
 #include "SoundEngineChannelView.h"
 
 #include "../../plugins/soundengine/organ.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 #include "SoundEngineView.h"
 #include "PluginSelectView.h"
 #include "PluginView.h"

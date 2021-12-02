@@ -7,7 +7,7 @@
 
 #include "../view/B3OrganView.h"
 
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 B3OrganView::B3OrganView(B3Organ& o) : organ(o), binder{o.get_lock(), [&o]() {
 	return new B3OrganView(o);

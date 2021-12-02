@@ -11,7 +11,7 @@
 #include "../../framework/gui/core.h"
 #include "../../framework/gui/control.h"
 #include "../soundengine/asynth.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 class AnalogSynthFMView : public ViewController{
 private:

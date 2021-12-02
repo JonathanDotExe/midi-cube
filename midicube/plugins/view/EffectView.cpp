@@ -20,7 +20,7 @@
 #include "../effect/tremolo.h"
 #include "../effect/vocoder.h"
 #include "../effect/wahwah.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 EffectView::EffectView(PluginInstance* e) :
 		effect(e), binder{e->get_lock(), [e]() {

@@ -120,7 +120,7 @@ void MidiCube::init() {
 		sources[i] = config.default_sources[i];
 	}
 	//Init audio
-	audio_handler.init(config.sample_rate, config.buffer_size, config.output_device, config.input_device, config.input_channels);
+	audio_handler.init(config.driver, config.sample_rate, config.buffer_size, config.output_device, config.input_device, config.input_channels);
 }
 
 void MidiCube::process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info) {
@@ -242,14 +242,13 @@ void MidiCube::set_property_change_callback(std::function<void(void*, void*)> cb
 }
 
 void MidiCubeConfig::load(pt::ptree tree) {
+	driver = tree.get("driver", driver);
 	sample_rate = tree.get("sample_rate", sample_rate);
 	buffer_size = tree.get("buffer_size", buffer_size);
 	input_channels = tree.get("input_channels", input_channels);
 	output_device = tree.get("output_device", output_device);
 	input_device = tree.get("input_device", input_device);
 	screen_sleep = tree.get("screen_sleep", screen_sleep);
-
-	std::cout << "Buffer Size " << buffer_size << std::endl;
 
 	//Sources
 	if (tree.get_child_optional("default_sources")) {
@@ -272,7 +271,7 @@ void MidiCubeConfig::load(pt::ptree tree) {
 		for (auto b : tree.get_child("controls.banks")) {
 			ControlBank bank;
 			if (b.second.get_child_optional("sliders")) {
-				for (auto slider :b.second.get_child("sliders")) {
+				for (auto slider : b.second.get_child("sliders")) {
 					bank.sliders.push_back(slider.second.get_value<unsigned int>(128));
 				}
 			}
@@ -288,24 +287,25 @@ void MidiCubeConfig::load(pt::ptree tree) {
 			}
 			controls.control_banks.push_back(bank);
 		}
-		if (tree.get_child_optional("controls.scene_buttons")) {
-			controls.scene_buttons = {};
-			for (auto button : tree.get_child("controls.scene_buttons")) {
-				controls.scene_buttons.push_back(button.second.get_value<unsigned int>(128));
-			}
-		}
-		controls.mod_wheel = tree.get<unsigned int>("controls.mod_wheel", 128);
-		controls.breath_controller = tree.get<unsigned int>("controls.breath_controller", 128);
-		controls.volume_pedal = tree.get<unsigned int>("controls.volume_pedal", 128);
-		controls.expresion_pedal = tree.get<unsigned int>("controls.expression_pedal", 128);
-		controls.sustain_pedal = tree.get<unsigned int>("controls.sustain_pedal", 128);
-		controls.sostenuto_pedal = tree.get<unsigned int>("controls.sostenuto_pedal", 128);
-		controls.soft_pedal = tree.get<unsigned int>("controls.soft_pedal", 128);
 	}
+	if (tree.get_child_optional("controls.scene_buttons")) {
+		controls.scene_buttons = {};
+		for (auto button : tree.get_child("controls.scene_buttons")) {
+			controls.scene_buttons.push_back(button.second.get_value<unsigned int>(128));
+		}
+	}
+	controls.mod_wheel = tree.get<unsigned int>("controls.mod_wheel", 128);
+	controls.breath_controller = tree.get<unsigned int>("controls.breath_controller", 128);
+	controls.volume_pedal = tree.get<unsigned int>("controls.volume_pedal", 128);
+	controls.expresion_pedal = tree.get<unsigned int>("controls.expression_pedal", 128);
+	controls.sustain_pedal = tree.get<unsigned int>("controls.sustain_pedal", 128);
+	controls.sostenuto_pedal = tree.get<unsigned int>("controls.sostenuto_pedal", 128);
+	controls.soft_pedal = tree.get<unsigned int>("controls.soft_pedal", 128);
 }
 
 pt::ptree MidiCubeConfig::save() {
 	pt::ptree tree;
+	tree.put("driver", driver);
 	tree.put("sample_rate", sample_rate);
 	tree.put("buffer_size", buffer_size);
 	tree.put("input_channels", input_channels);
@@ -338,11 +338,11 @@ pt::ptree MidiCubeConfig::save() {
 		for (unsigned int button : bank.buttons) {
 			buttons.add("button", button);
 		}
-		b.put_child("controls.sliders", sliders);
-		b.put_child("controls.knobs", knobs);
-		b.put_child("controls.buttons", buttons);
+		b.put_child("sliders", sliders);
+		b.put_child("knobs", knobs);
+		b.put_child("buttons", buttons);
 
-		tree.add_child("controls.banks", b);
+		tree.add_child("controls.banks.bank", b);
 	}
 	for (unsigned int button : controls.scene_buttons) {
 		tree.add("controls.scene_buttons.button", button);

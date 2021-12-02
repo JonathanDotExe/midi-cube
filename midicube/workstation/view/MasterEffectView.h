@@ -10,7 +10,7 @@
 
 #include "../../framework/gui/core.h"
 #include "../../framework/gui/control.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 #include "../midicube.h"
 
 class MasterEffectView : public ViewController {
