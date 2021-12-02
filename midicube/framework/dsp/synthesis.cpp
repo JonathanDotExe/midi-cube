@@ -45,15 +45,15 @@ double DelayBuffer::process() {
 }
 
 //PortamendoBuffer
-PortamendoBuffer::PortamendoBuffer(double value, double step) {
+PortamendoBuffer::PortamendoBuffer(double value, double slope_time) {
 	this->last_value = value;
 	this->value = value;
 	this->last_time = 0;
-	this->step = step;
+	this->slope_time = slope_time;
 }
 
 double PortamendoBuffer::get(double time) {
-	if (last_time + post <= time) {
+	if (last_time + slope_time <= time) {
 		return value;
 	}
 	else {
@@ -62,11 +62,19 @@ double PortamendoBuffer::get(double time) {
 	}
 }
 
-void PortamendoBuffer::set(double value, double time, double slope_time) {
+void PortamendoBuffer::set(double value, double time, double slope_time, double slope_step) {
 	last_value = get(time);
+	double diff = abs((double) value - last_value);
+
+	if (slope_step <= 0) {
+		slope_step = diff;
+	}
+
+	slope_time *= diff/slope_step;
 	last_time = time;
 	this->value = value;
 	this->slope_time = slope_time;
 }
+
 
 
