@@ -225,7 +225,7 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 			AdvancedSynthVoice& voice = this->voice_mgr.note[get_status().latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
-				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo * std::abs((double) ((int) voice.note) - mono_voice.note) / 50.0);
+				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo / 50.0, 127.0);
 
 			}
 			if (!preset.legato || !mono_voice.valid) {
@@ -307,10 +307,10 @@ void AdvancedSynth::recieve_midi(const MidiMessage& msg, const SampleInfo& info)
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 		double at = msg.monophonic_aftertouch()/127.0;
 		if (at > aftertouch.get(info.time)) {
-			aftertouch.set(at, info.time, preset.aftertouch_attack);
+			aftertouch.set(at, info.time, preset.aftertouch_attack, 1);
 		}
 		else {
-			aftertouch.set(at, info.time, preset.aftertouch_release);
+			aftertouch.set(at, info.time, preset.aftertouch_release, 1);
 		}
 	}
 }

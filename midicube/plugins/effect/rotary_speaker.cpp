@@ -79,12 +79,12 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 	if (curr_rotary_fast != preset.fast) {
 		curr_rotary_fast = preset.fast;
 		if (curr_rotary_fast) {
-			horn_speed.set(preset.horn_fast_frequency, info.time, preset.horn_fast_ramp);
-			bass_speed.set(preset.bass_fast_frequency, info.time, preset.horn_slow_frequency);
+			horn_speed.set(preset.horn_fast_frequency, info.time, preset.horn_fast_ramp, preset.horn_fast_frequency - preset.horn_slow_frequency);
+			bass_speed.set(preset.bass_fast_frequency, info.time, preset.horn_slow_frequency, preset.bass_fast_frequency - preset.bass_slow_frequency);
 		}
 		else {
-			horn_speed.set(preset.horn_slow_frequency, info.time, preset.horn_slow_ramp);
-			bass_speed.set(preset.bass_slow_frequency, info.time, preset.bass_slow_ramp);
+			horn_speed.set(preset.horn_slow_frequency, info.time, preset.horn_slow_ramp, preset.horn_fast_frequency - preset.horn_slow_frequency);
+			bass_speed.set(preset.bass_slow_frequency, info.time, preset.bass_slow_ramp, preset.bass_fast_frequency - preset.bass_slow_frequency);
 		}
 	}
 	if (curr_rotary_stop != preset.stop) {
