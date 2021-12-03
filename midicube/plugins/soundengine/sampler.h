@@ -29,7 +29,7 @@ struct ModulateableProperty {
 	unsigned int cc = 0;
 	double cc_amount = 0;
 	double cc_multiplier = 1;
-	double velocity_amount = 0;
+	double velocity_amount = 1;
 
 	inline double apply_modulation(SamplerVoice* voice, Sampler* sampler);
 
