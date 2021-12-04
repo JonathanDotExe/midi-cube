@@ -26,6 +26,7 @@ public:
 
 	bool persistent = true;
 	unsigned int cc = 128;
+	unsigned int bank = 0;
 	ControlType type;
 
 	virtual void change(double val) = 0;
@@ -123,6 +124,7 @@ public:
 			binding_min = total_min;
 			binding_max = total_max;
 			cc = 128;
+			bank = 0;
 			persistent = true;
 			type = ControlType::CC;
 		}
@@ -134,6 +136,7 @@ public:
 		binding_min = tree.get("binding_min", binding_min);
 		binding_max = tree.get("binding_max", binding_max);
 		cc = tree.get("cc", cc);
+		bank = tree.get("bank", bank);
 		persistent = tree.get("persistent", persistent);
 		type = static_cast<ControlType>(tree.get<int>("type", type));
 	}
@@ -149,6 +152,7 @@ public:
 		tree.put("binding_min", binding_min);
 		tree.put("binding_max", binding_max);
 		tree.put("cc", cc);
+		tree.put("bank", bank);
 		tree.put("persistent", persistent);
 		tree.put("type", static_cast<int>(type));
 
@@ -218,6 +222,7 @@ public:
 			value = parent.get<bool>(path, def);
 			default_value = value;
 			cc = 128;
+			bank = 0;
 			persistent = true;
 			type = ControlType::CC;
 		}
@@ -227,6 +232,7 @@ public:
 		value = tree.get("value", default_value);
 		default_value = value;
 		cc = tree.get("cc", cc);
+		bank = tree.get("bank", bank);
 		persistent = tree.get("persistent", persistent);
 		type = static_cast<ControlType>(tree.get<int>("type", type));
 
@@ -240,6 +246,7 @@ public:
 		boost::property_tree::ptree tree;
 		tree.put("value", default_value);
 		tree.put("cc", cc);
+		tree.put("bank", bank);
 		tree.put("persistent", persistent);
 		tree.put("type", static_cast<int>(type));
 
