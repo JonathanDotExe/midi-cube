@@ -19,6 +19,7 @@
 #include "../framework/util/util.h"
 #include "../framework/util/clipboard.h"
 #include "../framework/core/plugin.h"
+#include "../framework/core/ui.h"
 
 struct MidiCubeInput {
 	MidiInput* in = nullptr;
