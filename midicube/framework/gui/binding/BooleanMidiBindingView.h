@@ -56,7 +56,7 @@ public:
 				Label* title = new Label("Bank", font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				DragBox<unsigned int>* value = new DragBox<unsigned int>(0, 0, 16, font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
 				value->property.bind(this->value.bank, lock);
 				controls.push_back(value);
 			}
@@ -66,9 +66,7 @@ public:
 				Label* title = new Label("Type", font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				//CC, SLIDER, KNOB, BUTTON, SCENE_BUTTON, MOD_WHEEL, BREATH_CONTROLLER, VOLUME_PEDAL, EXPRESSION_PEDAL, SUSTAIN_PEDAL, SOSTENUTO_PEDAL, SOFT_PEDAL
-
-				ComboBox* value = new ComboBox(0, {"CC", "Slider", "Knob", "Scene Button", "Mod Wheel", "Breath Controller", "Volume Pedal", "Expression Pedal", "Sustain Pedal", "Sostenuto Pedal", "Soft Pedal"}, font, 16, 0, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				ComboBox* value = new ComboBox(0, {"CC", "Slider", "Knob", "Scene", "Mod", "Breath", "Vol. Ped.", "Expression", "Sustain", "Sostenuto", "Soft"}, font, 16, 0, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
 				value->property.bind_cast(this->value.type, lock);
 				controls.push_back(value);
 			}
