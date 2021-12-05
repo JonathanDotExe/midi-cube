@@ -294,13 +294,13 @@ void MidiCubeConfig::load(pt::ptree tree) {
 			controls.scene_buttons.push_back(button.second.get_value<unsigned int>(128));
 		}
 	}
-	controls.mod_wheel = tree.get<unsigned int>("controls.mod_wheel", 128);
-	controls.breath_controller = tree.get<unsigned int>("controls.breath_controller", 128);
-	controls.volume_pedal = tree.get<unsigned int>("controls.volume_pedal", 128);
-	controls.expresion_pedal = tree.get<unsigned int>("controls.expression_pedal", 128);
-	controls.sustain_pedal = tree.get<unsigned int>("controls.sustain_pedal", 128);
-	controls.sostenuto_pedal = tree.get<unsigned int>("controls.sostenuto_pedal", 128);
-	controls.soft_pedal = tree.get<unsigned int>("controls.soft_pedal", 128);
+	controls.mod_wheel = tree.get<unsigned int>("controls.mod_wheel", controls.mod_wheel);
+	controls.breath_controller = tree.get<unsigned int>("controls.breath_controller", controls.breath_controller);
+	controls.volume_pedal = tree.get<unsigned int>("controls.volume_pedal", controls.volume_pedal);
+	controls.expresion_pedal = tree.get<unsigned int>("controls.expression_pedal", controls.expresion_pedal);
+	controls.sustain_pedal = tree.get<unsigned int>("controls.sustain_pedal", controls.sustain_pedal);
+	controls.sostenuto_pedal = tree.get<unsigned int>("controls.sostenuto_pedal", controls.sostenuto_pedal);
+	controls.soft_pedal = tree.get<unsigned int>("controls.soft_pedal", controls.soft_pedal);
 }
 
 pt::ptree MidiCubeConfig::save() {

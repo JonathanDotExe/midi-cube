@@ -27,7 +27,7 @@ public:
 	bool persistent = true;
 	unsigned int cc = 128;
 	unsigned int bank = 0;
-	ControlType type;
+	ControlType type = ControlType::CC;
 
 	virtual void change(double val) = 0;
 
@@ -207,7 +207,7 @@ public:
 	}
 
 	void change(double val) {
-		value = val > 0;
+		value = val >= 0.5;
 		if (persistent) {
 			default_value = value;
 		}
