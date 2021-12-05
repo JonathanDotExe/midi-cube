@@ -124,7 +124,7 @@ void MidiCube::init() {
 }
 
 void MidiCube::process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info) {
-	if (lock.try_lock()) {
+	if (lock.try_lock_quick()) {
 		//Actions
 		action_handler.execute_realtime_actions();
 		//Messages
