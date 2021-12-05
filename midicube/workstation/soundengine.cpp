@@ -642,3 +642,7 @@ int SoundEngineDeviceHost::get_transpose() {
 const MidiControls& SoundEngineDeviceHost::get_controls() {
 	return device->get_cube()->get_config().controls;
 }
+
+void SoundEngineChannel::notify_property_update(void *property) {
+	notify_property_update(this, property);
+}

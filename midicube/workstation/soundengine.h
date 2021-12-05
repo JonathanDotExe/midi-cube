@@ -96,7 +96,7 @@ struct ChannelProgram : public Copyable {
 	}
 };
 
-class SoundEngineChannel : public PluginHost {
+class SoundEngineChannel : public PluginHost, public ControlHost {
 private:
 	SoundEngineDevice* device = nullptr;
 
@@ -116,6 +116,7 @@ public:
 
 	size_t polyphony_limit = 0;
 
+	void notify_property_update(void *property);
 	int get_transpose();
 	void notify_property_update(void *source, void *prop);
 	virtual SpinLock& get_lock();
