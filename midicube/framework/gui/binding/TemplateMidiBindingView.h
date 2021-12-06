@@ -14,13 +14,13 @@
 template<typename T>
 class TemplateMidiBindingView : public ViewController {
 private:
-	SpinLock& lock;
+	ActionHandler& handler;
 	BindableTemplateValue<T>& value;
 	std::function<ViewController*()> view_factory;
 	sf::Font font;
 
 public:
-	TemplateMidiBindingView(BindableTemplateValue<T>& val, std::function<ViewController*()> f, SpinLock& l, sf::Font fo) : lock(l), value(val), view_factory(f), font(fo) {
+	TemplateMidiBindingView(BindableTemplateValue<T>& val, std::function<ViewController*()> f, ActionHandler& h, sf::Font fo) : handler(h), value(val), view_factory(f), font(fo) {
 
 	}
 
@@ -49,7 +49,7 @@ public:
 				controls.push_back(title);
 
 				DragBox<unsigned int>* value = new DragBox<unsigned int>(128, 0, 128, font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.cc, lock);
+				value->property.bind(this->value.cc, handler);
 				controls.push_back(value);
 			}
 			++index;
@@ -59,7 +59,7 @@ public:
 				controls.push_back(title);
 
 				DragBox<unsigned int>* value = new DragBox<unsigned int>(0, 0, 16, font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.bank, lock);
+				value->property.bind(this->value.bank, handler);
 				controls.push_back(value);
 			}
 			++index;
@@ -69,7 +69,7 @@ public:
 				controls.push_back(title);
 
 				ComboBox* value = new ComboBox(0, {"CC", "Slider", "Knob", "Button", "Scene", "Mod", "Breath", "Vol. Ped.", "Expression", "Sustain", "Sostenuto", "Soft"}, font, 16, 0, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind_cast(this->value.type, lock);
+				value->property.bind_cast(this->value.type, handler);
 				controls.push_back(value);
 			}
 			++index;
@@ -79,7 +79,7 @@ public:
 				controls.push_back(title);
 
 				OrganSwitch* value = new OrganSwitch(true, font, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.persistent, lock);
+				value->property.bind(this->value.persistent, handler);
 				controls.push_back(value);
 			}
 			++index;
@@ -89,7 +89,7 @@ public:
 				controls.push_back(title);
 
 				DragBox<T>* value = new DragBox<T>(0, this->value.total_min, this->value.total_max, font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.binding_min, lock);
+				value->property.bind(this->value.binding_min, handler);
 				controls.push_back(value);
 			}
 			++index;
@@ -99,7 +99,7 @@ public:
 				controls.push_back(title);
 
 				DragBox<T>* value = new DragBox<T>(0, this->value.total_min, this->value.total_max, font, 16, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
-				value->property.bind(this->value.binding_max, lock);
+				value->property.bind(this->value.binding_max, handler);
 				controls.push_back(value);
 			}
 			++index;
