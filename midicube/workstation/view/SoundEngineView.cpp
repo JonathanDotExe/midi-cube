@@ -14,7 +14,7 @@
 #include "../view/SoundEngineChannelView.h"
 #include "../view/SourceView.h"
 
-SoundEngineView::SoundEngineView(MidiCube& c) : ViewController(), cube(c) {
+SoundEngineView::SoundEngineView(MidiCubeWorkstation& c) : ViewController(), cube(c) {
 
 }
 

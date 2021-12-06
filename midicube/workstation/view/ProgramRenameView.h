@@ -10,19 +10,19 @@
 
 #include "../../framework/gui/core.h"
 #include "../../framework/gui/control.h"
-#include "../midicube.h"
 #include "../soundengine.h"
 #include <functional>
 #include "../../plugins/resources.h"
+#include "../midicube.h"
 
 class ProgramRenameView : public ViewController {
 private:
 	std::string name;
 	std::vector<char> chars;
 	std::function<void(std::string name)> action = nullptr;
-	MidiCube& cube;
+	MidiCubeWorkstation& cube;
 public:
-	ProgramRenameView(MidiCube& cube, std::string name, std::function<void(std::string name)> action);
+	ProgramRenameView(MidiCubeWorkstation& cube, std::string name, std::function<void(std::string name)> action);
 	virtual Scene create(ViewHost &frame);
 	virtual ~ProgramRenameView();
 };

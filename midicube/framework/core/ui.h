@@ -35,7 +35,9 @@ private:
 	ViewHost* view_host = nullptr;
 public:
 
-	MenuHandler(ViewHost* view_host, ControlViewHost* control_host);
+	MenuHandler();
+
+	void init(ViewHost* view_host, ControlViewHost* control_host);
 
 	void change_menu(Menu* menu, bool append_history = true);
 

@@ -1,13 +1,13 @@
+#include <midicube/workstation/midicube.h>
 #include <iostream>
 
 #include "midicube/workstation/view/SoundEngineView.h"
 #include "midicube/framework/gui/frame.h"
-#include "midicube/workstation/midicube.h"
 
 using namespace std;
 
 struct MidiCubePtr {
-	MidiCube* cube = nullptr;
+	MidiCubeWorkstation* cube = nullptr;
 	~MidiCubePtr() {
 		delete cube;
 	}
@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 	//Create MIDICube
 	MidiCubePtr ptr;
 	try {
-		ptr.cube = new MidiCube();
+		ptr.cube = new MidiCubeWorkstation();
 		ptr.cube->init();
 		//View
 		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation", *ptr.cube, ptr.cube->get_config().screen_sleep);

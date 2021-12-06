@@ -40,6 +40,11 @@ bool MenuHandler::back() {
 	return false;
 }
 
+void MenuHandler::init(ViewHost *view_host, ControlViewHost *control_host) {
+	this->view_host = view_host;
+	this->control_host = control_host;
+}
+
 MenuHandler::~MenuHandler() {
 	delete curr_menu;
 	for (Menu* menu : history) {

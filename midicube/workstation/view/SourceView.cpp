@@ -9,7 +9,7 @@
 
 #include "../view/SoundEngineView.h"
 
-SourceView::SourceView(MidiCube& c) : cube(c) {
+SourceView::SourceView(MidiCubeWorkstation& c) : cube(c) {
 
 }
 

@@ -10,7 +10,7 @@
 #include "../view/ProgramRenameView.h"
 #include "../view/SoundEngineView.h"
 
-ProgramView::ProgramView(MidiCube& c, size_t bank, size_t page) : cube(c){
+ProgramView::ProgramView(MidiCubeWorkstation& c, size_t bank, size_t page) : cube(c){
 	this->bank = bank;
 	this->page = page;
 }

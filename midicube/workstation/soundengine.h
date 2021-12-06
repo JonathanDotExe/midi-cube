@@ -34,7 +34,7 @@ namespace pt = boost::property_tree;
 #define CHANNEL_INSERT_EFFECT_AMOUNT 2
 #define SOUND_ENGINE_MASTER_EFFECT_AMOUNT 16
 
-class MidiCube;
+class MidiCubeWorkstation;
 class SoundEngineDevice;
 class SoundEngineChannel;
 
@@ -296,7 +296,7 @@ private:
 	size_t clock_beat_count = 0;
 	double first_beat_time = 0;
 
-	MidiCube* cube = nullptr;
+	MidiCubeWorkstation* cube = nullptr;
 	SoundEngineDeviceHost host;
 
 public:
@@ -311,7 +311,7 @@ public:
 
 	SoundEngineDevice();
 
-	void init(MidiCube* cube);
+	void init(MidiCubeWorkstation* cube);
 
 	void send(MidiMessage& message, size_t input, MidiSource& source, SampleInfo& info);
 
@@ -321,7 +321,7 @@ public:
 
 	void save_program(Program* program);
 
-	MidiCube* get_cube() {
+	MidiCubeWorkstation* get_cube() {
 		return cube;
 	}
 

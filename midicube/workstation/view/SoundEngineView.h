@@ -10,18 +10,18 @@
 
 #include "../../framework/gui/core.h"
 #include "../../framework/gui/control.h"
-#include "../midicube.h"
 #include "../soundengine.h"
 #include "../../plugins/resources.h"
+#include "../midicube.h"
 
 class SoundEngineView : public ViewController {
 private:
 	std::array<Button*, SOUND_ENGINE_MIDI_CHANNELS> engine_buttons;
-	MidiCube& cube;
+	MidiCubeWorkstation& cube;
 	SoundEngineDevice* engine = nullptr;
 
 public:
-	SoundEngineView(MidiCube& c);
+	SoundEngineView(MidiCubeWorkstation& c);
 
 	virtual Scene create(ViewHost& frame);
 

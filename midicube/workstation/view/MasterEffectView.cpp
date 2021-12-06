@@ -10,7 +10,7 @@
 #include "PluginSelectView.h"
 #include "PluginView.h"
 
-MasterEffectView::MasterEffectView(MidiCube& c): cube(c) {
+MasterEffectView::MasterEffectView(MidiCubeWorkstation& c): cube(c) {
 
 
 }
@@ -58,7 +58,7 @@ Scene MasterEffectView::create(ViewHost &frame) {
 		Button* e = new Button(effect_name, main_font, 12, x + 5, y + 30, pane_width - 15, 30);
 		e->rect.setFillColor(sf::Color(128, 255, 255));
 		e->set_on_click([this, &frame, &effect]() {
-			MidiCube& c = cube;
+			MidiCubeWorkstation& c = cube;
 			frame.change_view(new PluginSelectView(effect.effect, cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), cube.lock, [&c]() { return new MasterEffectView(c); }, cube.plugin_mgr, &cube.clipboard));
 		});
 		controls.push_back(e);
@@ -68,7 +68,7 @@ Scene MasterEffectView::create(ViewHost &frame) {
 			cube.lock.lock();
 			PluginInstance* eff = effect.effect.get_plugin();
 			if (eff) {
-				MidiCube& c = cube;
+				MidiCubeWorkstation& c = cube;
 				frame.change_view(new PluginView(*eff, [&c]() {
 					return new MasterEffectView(c);
 				}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
