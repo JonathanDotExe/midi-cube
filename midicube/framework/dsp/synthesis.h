@@ -128,7 +128,7 @@ private:
 public:
 	PortamendoBuffer(double value, double slope_time);
 	double get(double time);
-	void set(double value, double time, double slope_time);
+	void set(double value, double time, double slope_time, double slope_step);
 };
 
 template<size_t N>

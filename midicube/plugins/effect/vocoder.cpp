@@ -39,7 +39,7 @@ void VocoderEffect::process(const SampleInfo& info) {
 			band.env.apply(m, info.time_step);
 			double vol = band.env.volume();
 
-			band.port.set(vol, info.time, preset.slope);
+			band.port.set(vol, info.time, preset.slope, 1);
 			vol = band.port.get(info.time);
 			vol_sum += vol;
 

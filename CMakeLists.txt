@@ -23,14 +23,15 @@ file(GLOB_RECURSE PLUGINS_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/plugins
 file(GLOB_RECURSE WORKSTATION_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "midicube/workstation/*.cpp")
 
 
-add_library(midi-cube-framework ${FRAMEWORK_SOURCES})
+add_library(midi-cube-framework SHARED ${FRAMEWORK_SOURCES})
 target_link_libraries(midi-cube-framework PUBLIC sndfile)
 target_link_libraries(midi-cube-framework PUBLIC sfml-system)
 target_link_libraries(midi-cube-framework PUBLIC sfml-window)
 target_link_libraries(midi-cube-framework PUBLIC sfml-graphics)
 target_link_libraries(midi-cube-framework PUBLIC Boost::filesystem)
 target_link_libraries(midi-cube-framework PUBLIC Threads::Threads)
-add_library(midi-cube-plugins ${PLUGINS_SOURCES})
+
+add_library(midi-cube-plugins SHARED ${PLUGINS_SOURCES})
 target_link_libraries(midi-cube-plugins PUBLIC midi-cube-framework)
 
 add_executable(midi-cube-workstation ${WORKSTATION_SOURCES} ${CMAKE_SOURCE_DIR} "midicube-main.cpp")
@@ -57,6 +58,6 @@ file(GLOB_RECURSE RESOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} "resources/*.*")
 
 set(CMAKE_INSTALL_BINDIR ".")
 set(CMAKE_INSTALL_LIBDIR ".")
-install(TARGETS midi-cube-framework midi-cube-plugins midi-cube-workstation midi-cube-autosampler)
+install(TARGETS midi-cube-framework midi-cube-plugins midi-cube-workstation midi-cube-autosampler LIBRARY DESTINATION "." RUNTIME DESTINATION ".")
 install(FILES ${DLL_FILES} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/" DESTINATION ${CMAKE_INSTALL_BINDIR}/resources)

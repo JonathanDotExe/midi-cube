@@ -48,8 +48,8 @@ void CompressorEffect::process(const SampleInfo& info) {
 		}
 
 		//Volume
-		lvol.set(lcomp, info.time, lslope);
-		rvol.set(rcomp, info.time, rslope);
+		lvol.set(lcomp, info.time, lslope, 1);
+		rvol.set(rcomp, info.time, rslope, 1);
 
 		//Apply
 		outputs[0] *= lvol.get(info.time) * preset.makeup_gain;
