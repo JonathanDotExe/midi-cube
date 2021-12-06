@@ -8,9 +8,9 @@
 #include "../view/AnalogSynthOscilatorView.h"
 
 #include "../view/AnalogSynthView.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
-AnalogSynthOscilatorView::AnalogSynthOscilatorView(AdvancedSynth& s, size_t part) : synth(s), binder{s.get_lock(), [&s, part]() {
+AnalogSynthOscilatorView::AnalogSynthOscilatorView(AdvancedSynth& s, size_t part) : synth(s), binder{[&s, part]() {
 	return new AnalogSynthOscilatorView(s, part);
 }, main_font} {
 	this->part = part;

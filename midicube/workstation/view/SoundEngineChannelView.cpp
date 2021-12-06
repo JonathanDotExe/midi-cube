@@ -8,12 +8,12 @@
 #include "SoundEngineChannelView.h"
 
 #include "../../plugins/soundengine/organ.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 #include "SoundEngineView.h"
 #include "PluginSelectView.h"
 #include "PluginView.h"
 
-SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{c.lock, [&c, &ch, channel_index]() {
+SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{[&c, &ch, channel_index]() {
 	return new SoundEngineChannelView(c, ch, channel_index);
 }, main_font} {
 

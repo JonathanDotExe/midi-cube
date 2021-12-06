@@ -13,14 +13,14 @@
 double ReverbCombFilter::process(double in, double gain, unsigned int delay) {
 	double out = this->delay.process();
 	out += in;
-	this->delay.add_sample(out * gain, delay);
+	this->delay.add_isample(out * gain, delay);
 	return out;
 }
 
 double ReverbAllPassFilter::process(double in, double gain, unsigned int delay) {
 	double out = in + this->indelay.process() + this->delay.process();
-	this->indelay.add_sample(out * -gain, delay);
-	this->delay.add_sample(out * gain, delay - 20);
+	this->indelay.add_isample(out * -gain, delay);
+	this->delay.add_isample(out * gain, delay - 20);
 	return out;
 }
 

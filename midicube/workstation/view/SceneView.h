@@ -12,12 +12,13 @@
 #include "../../framework/gui/control.h"
 #include "../midicube.h"
 #include "../soundengine.h"
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 class SceneView : public ViewController {
 private:
 	SoundEngineDevice* engine = nullptr;
 	std::array<Button*, SOUND_ENGINE_SCENE_AMOUNT> scenes;
+	ActionHandler* handler = nullptr;
 public:
 	SceneView(SoundEngineDevice* engine);
 	virtual ~SceneView();

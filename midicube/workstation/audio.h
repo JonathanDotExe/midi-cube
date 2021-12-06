@@ -12,6 +12,7 @@
 #include <atomic>
 #include <array>
 #include <rtaudio/RtAudio.h>
+#include <boost/algorithm/string.hpp>
 #include "../framework/core/midi.h"
 #include "../framework/core/audio.h"
 
@@ -33,7 +34,7 @@ public:
 class AudioHandler {
 
 private:
-	RtAudio audio;
+	RtAudio* audio = nullptr;
 	size_t inputs = 0;
 	void* user_data = nullptr;
 	void (* get_sample) (double&, double&, double*, const size_t, SampleInfo&, void*) = nullptr;
@@ -47,12 +48,7 @@ private:
 	unsigned int sample_time{0};
 public:
 
-	AudioHandler() :
-		audio(
-			#ifdef MIDICUBE_USE_JACK
-				RtAudio::Api::UNIX_JACK
-			#endif
-		)  {
+	AudioHandler()  {
 
 	}
 
@@ -62,7 +58,7 @@ public:
 
 	void set_sample_callback(void (* get_sample) (double&, double&, double*, const size_t, SampleInfo&, void*), void* user_data);
 
-	void init(unsigned int sample_rate, unsigned int buffer_size, int out_device, int in_device, int input_amount);
+	void init(std::string driver, unsigned int sample_rate, unsigned int buffer_size, int out_device, int in_device, int input_amount);
 
 	void close();
 

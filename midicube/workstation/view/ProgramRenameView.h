@@ -13,7 +13,7 @@
 #include "../midicube.h"
 #include "../soundengine.h"
 #include <functional>
-#include "../../resources.h"
+#include "../../plugins/resources.h"
 
 class ProgramRenameView : public ViewController {
 private:

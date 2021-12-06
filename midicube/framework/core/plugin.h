@@ -127,8 +127,8 @@ public:
 	double* outputs;
 
 	PluginInstance(PluginHost& h, Plugin& p) : host(h), plugin(p), controls(h.get_controls()) {
-		inputs = new double[p.info.input_channels];
-		outputs = new double[p.info.output_channels];
+		inputs = new double[p.info.input_channels]();
+		outputs = new double[p.info.output_channels]();
 	}
 
 	virtual void process(const SampleInfo& info) = 0;
