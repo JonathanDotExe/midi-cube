@@ -166,6 +166,23 @@ public:
 		}
 	}
 
+	inline bool try_lock_quick() {
+		//Spin
+		for (int i = 0; i < 10; ++i) {
+			if (try_lock()) {
+				return true;
+			}
+		}
+		//Spin with pause
+		for (int i = 0; i < 1000; ++i) {
+			_mm_pause();
+			if (try_lock()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	inline bool try_lock() {
 		return !flag.test_and_set(std::memory_order_acquire);
 	}

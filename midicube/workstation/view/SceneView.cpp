@@ -14,6 +14,7 @@ SceneView::SceneView(SoundEngineDevice* engine) {
 }
 
 Scene SceneView::create(ViewHost &frame) {
+	this->handler = &frame.get_master_host().get_action_handler();
 	std::vector<Control*> controls;
 
 	//Background
@@ -61,15 +62,14 @@ SceneView::~SceneView() {
 }
 
 void SceneView::update_properties() {
-	engine->get_cube()->lock.lock();
-	size_t s = engine->scene;
-	engine->get_cube()->lock.unlock();
-	for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
-		if (s == i) {
-			scenes[i]->rect.setFillColor(sf::Color(0, 180, 255));
+	this->handler->queue_action(new GetValueAction<size_t, size_t>(engine->scene, [this](size_t s) {
+		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
+			if (s == i) {
+				scenes[i]->rect.setFillColor(sf::Color(0, 180, 255));
+			}
+			else {
+				scenes[i]->rect.setFillColor(sf::Color(200, 200, 200));
+			}
 		}
-		else {
-			scenes[i]->rect.setFillColor(sf::Color(200, 200, 200));
-		}
-	}
+	}));
 }
