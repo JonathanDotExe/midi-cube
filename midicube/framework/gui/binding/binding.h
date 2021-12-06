@@ -9,12 +9,12 @@
 #define MIDICUBE_GUI_VIEW_BINDING_H_
 
 #include "../control.h"
+#include "../../core/plugin.h"
 #include "BooleanMidiBindingView.h"
 #include "TemplateMidiBindingView.h"
 
 class BindingGUIHandler {
 private:
-	ActionHandler& handler;
 	Button* button = nullptr;
 	bool edit = false;
 	ViewHost* frame = nullptr;
@@ -23,12 +23,13 @@ private:
 
 public:
 
-	BindingGUIHandler(ActionHandler& h, std::function<ViewController*()> f, sf::Font fo) : handler(h), view_factory(f), font(fo) {
+	BindingGUIHandler(std::function<ViewController*()> f, sf::Font fo) : view_factory(f), font(fo) {
 
 	}
 
 	bool on_action(Control* control) {
 		if (edit) {
+			ActionHandler& handler = frame->get_master_host().get_action_handler();
 			if (dynamic_cast<OrganSwitch*>(control)) {
 				OrganSwitch* cast = dynamic_cast<OrganSwitch*>(control);
 				BindableBooleanValue* val = dynamic_cast<BindableBooleanValue*> (cast->property.get_object());

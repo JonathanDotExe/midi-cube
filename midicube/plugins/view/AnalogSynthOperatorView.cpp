@@ -12,7 +12,7 @@
 #include "../../plugins/resources.h"
 
 
-AnalogSynthOperatorView::AnalogSynthOperatorView(AdvancedSynth &s, size_t part) : synth(s), binder{s.get_lock(), [&s, part]() {
+AnalogSynthOperatorView::AnalogSynthOperatorView(AdvancedSynth &s, size_t part) : synth(s), binder{[&s, part]() {
 			return new AnalogSynthOperatorView(s, part);
 		}, main_font} {
 	this->part = part;
