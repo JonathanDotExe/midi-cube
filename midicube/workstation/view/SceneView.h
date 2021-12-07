@@ -12,7 +12,7 @@
 #include "../../framework/gui/control.h"
 #include "../soundengine.h"
 #include "../../plugins/resources.h"
-#include "../midicubeworkstation.h"
+#include "../midicube.h"
 
 class SceneView : public ViewController {
 private:

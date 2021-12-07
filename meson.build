@@ -22,6 +22,7 @@ src = [
 	'midicube/framework/core/metronome.cpp',
 	'midicube/framework/core/midi.cpp',
 	'midicube/framework/core/plugin.cpp',
+	'midicube/framework/core/ui.cpp',
 	'midicube/framework/data/binding.cpp',
 	'midicube/framework/data/data.cpp',
 	'midicube/framework/dsp/envelope.cpp',

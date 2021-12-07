@@ -388,7 +388,7 @@ SpinLock& MidiCubeWorkstation::get_lock() {
 }
 
 MidiBindingHandler* MidiCubeWorkstation::get_binding_handler() {
-	return engine.binding_handler;
+	return &engine.binding_handler;
 }
 
 MenuHandler& MidiCubeWorkstation::get_menu_handler() {

@@ -116,6 +116,7 @@ public:
 
 	size_t polyphony_limit = 0;
 
+	MasterPluginHost& get_master_host();
 	void notify_property_update(void *property);
 	int get_transpose();
 	void notify_property_update(void *source, void *prop);
@@ -276,12 +277,14 @@ public:
 	SpinLock& get_lock();
 	int get_transpose();
 
+
 	~SoundEngineDeviceHost() {
 
 	}
 
 	void notify_property_update(void *source, void *prop);
 	const MidiControls& get_controls();
+	MasterPluginHost& get_master_host();
 };
 
 

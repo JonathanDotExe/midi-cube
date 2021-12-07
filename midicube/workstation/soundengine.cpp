@@ -645,3 +645,11 @@ const MidiControls& SoundEngineDeviceHost::get_controls() {
 void SoundEngineChannel::notify_property_update(void *property) {
 	notify_property_update(this, property);
 }
+
+MasterPluginHost& SoundEngineDeviceHost::get_master_host() {
+	return *device->get_cube();
+}
+
+MasterPluginHost& SoundEngineChannel::get_master_host() {
+	return *device->get_cube();
+}
