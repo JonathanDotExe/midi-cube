@@ -50,6 +50,7 @@ src = [
 
 	'midicube/plugins/soundengine/asynth.cpp',
 	'midicube/plugins/soundengine/drums.cpp',
+	'midicube/plugins/soundengine/drum_synth.cpp',
 	'midicube/plugins/soundengine/organ.cpp',
 	'midicube/plugins/soundengine/sampler.cpp',
 	'midicube/plugins/sequencer/arpeggiator.cpp',
