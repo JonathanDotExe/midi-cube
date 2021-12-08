@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 		ptr.cube->init();
 		//View
 		load_resources();
-		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation", *ptr.cube, ptr.cube->get_config().screen_sleep);
+		Frame frame(1024, 600, "MIDICube - universal MIDI and synthesis workstation", ptr.cube->get_config().screen_sleep);
 		ptr.cube->get_menu_handler().init(&frame, ptr.cube);
 		//Run frame
 		frame.run(new SoundEngineView(*ptr.cube));

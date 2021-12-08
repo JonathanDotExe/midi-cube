@@ -31,19 +31,16 @@ private:
 
 	bool render_sleep = true;
 	std::atomic<bool> update{false};
-
-	MasterPluginHost& host;
+	ActionHandler action_handler;
 
 public:
-	Frame(int width, int height, std::string title, MasterPluginHost& host, bool render_sleep = true);
+	Frame(int width, int height, std::string title, bool render_sleep = true);
 
 	virtual void run(ViewController* v);
 
 	virtual void update_properties();
 
 	virtual void propterty_change(void* source, void* prop);
-
-	virtual MasterPluginHost& get_master_host();
 
 	void request_redraw() {
 		redraw = true;
@@ -77,6 +74,7 @@ public:
 	}
 
 	virtual void notify_remove(Control *control);
+	virtual ActionHandler& get_action_handler();
 
 protected:
 	virtual void switch_view(ViewController *view);

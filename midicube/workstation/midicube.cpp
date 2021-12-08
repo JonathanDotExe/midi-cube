@@ -127,7 +127,7 @@ void MidiCubeWorkstation::init() {
 void MidiCubeWorkstation::process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info) {
 	if (lock.try_lock_quick()) {
 		//Actions
-		action_handler.execute_realtime_actions();
+		menu_handler.realtime_process();
 		//Messages
 		size_t i = 0;
 		for (MidiCubeInput in : this->inputs) {
@@ -232,10 +232,6 @@ void MidiCubeWorkstation::notify_property_update(void *source, void *prop) {
 
 PluginManager& MidiCubeWorkstation::get_plugin_manager() {
 	return plugin_mgr;
-}
-
-ActionHandler& MidiCubeWorkstation::get_action_handler() {
-	return action_handler;
 }
 
 void MidiCubeWorkstation::set_property_change_callback(std::function<void(void*, void*)> cb) {

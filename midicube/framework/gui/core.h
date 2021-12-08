@@ -158,6 +158,8 @@ public:
 		return controls;
 	}
 
+	virtual ActionHandler& get_action_handler() = 0;
+
 	virtual void add_control(Control* control) {
 		if (control == nullptr) {
 			throw "Can't add nullptr control!";
@@ -187,8 +189,6 @@ public:
 		delete control;
 		request_redraw();
 	}
-
-	virtual MasterPluginHost& get_master_host() = 0;
 
 	virtual ~ViewHost() {
 		delete view;

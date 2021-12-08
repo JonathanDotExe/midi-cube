@@ -41,6 +41,8 @@ public:
 
 	void change_menu(Menu* menu, bool append_history = true);
 
+	void realtime_process();
+
 	bool back();
 
 	~MenuHandler();

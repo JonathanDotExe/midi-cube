@@ -317,10 +317,6 @@ void ViewContainer::notify_remove(Control *control) {
 	get_host()->notify_remove(control);
 }
 
-MasterPluginHost& ViewContainer::get_master_host() {
-	return get_host()->get_master_host();
-}
-
 void ViewContainer::init(ViewHost *host) {
 	Control::init(host);
 	if (next_view) {
@@ -328,4 +324,8 @@ void ViewContainer::init(ViewHost *host) {
 		next_view = nullptr;
 		request_redraw();
 	}
+}
+
+ActionHandler& ViewContainer::get_action_handler() {
+	return get_host()->get_action_handler();
 }

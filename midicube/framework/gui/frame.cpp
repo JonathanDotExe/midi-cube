@@ -9,16 +9,12 @@
 #include "core.h"
 
 //Frame
-Frame::Frame(int width, int height, std::string title, MasterPluginHost& h, bool render_sleep) : ViewHost(), host(h){
+Frame::Frame(int width, int height, std::string title, bool render_sleep) : ViewHost() {
 	this->width = width;
 	this->height = height;
 	this->title = title;
 	this->render_sleep = render_sleep;
-
 	this->selected = nullptr;
-	h.set_property_change_callback([this](void* source, void* prop) {
-		this->propterty_change(source, prop);
-	});
 }
 
 void Frame::run(ViewController* v) {
@@ -42,7 +38,7 @@ void Frame::run(ViewController* v) {
 			get_view()->update_properties();
 		}
 		//Execute return actions
-		get_master_host().get_action_handler().execute_return_actions();
+		action_handler.execute_return_actions();
 		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -123,10 +119,6 @@ Frame::~Frame() {
 	delete next_view;
 }
 
-MasterPluginHost& Frame::get_master_host() {
-	return host;
-}
-
 void Frame::notify_remove(Control *control) {
 	if (selected == control) {
 		selected = nullptr;
@@ -140,5 +132,8 @@ void Frame::propterty_change(void *source, void *prop) {
 
 void Frame::switch_view(ViewController *view) {
 	ViewHost::switch_view(view);
-	host.change_control_view(view->create_control_view());
+}
+
+ActionHandler& Frame::get_action_handler() {
+	return action_handler;
 }

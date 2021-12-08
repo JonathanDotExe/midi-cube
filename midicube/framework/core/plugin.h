@@ -437,7 +437,6 @@ public:
 class MasterPluginHost : public ControlViewHost {
 
 public:
-	virtual ActionHandler& get_action_handler() = 0;
 
 	virtual PluginManager& get_plugin_manager() = 0;
 

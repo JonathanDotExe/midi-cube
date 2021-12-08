@@ -51,3 +51,9 @@ MenuHandler::~MenuHandler() {
 		delete menu;
 	}
 }
+
+void MenuHandler::realtime_process() {
+	if (view_host) {
+		view_host->get_action_handler().execute_realtime_actions();
+	}
+}
