@@ -7,9 +7,8 @@
 
 #include "ui.h"
 
-MenuHandler::MenuHandler(ViewHost *view_host, ControlViewHost *control_host) {
-	this->view_host = view_host;
-	this->control_host = control_host;
+MenuHandler::MenuHandler() {
+
 }
 
 void MenuHandler::change_menu(Menu *menu, bool append_history) {
@@ -33,7 +32,8 @@ void MenuHandler::change_menu(Menu *menu, bool append_history) {
 
 bool MenuHandler::back() {
 	if (!history.empty()) {
-		Menu* next = history.pop_back();
+		Menu* next = history.back();
+		history.pop_back();
 		change_menu(next, false);
 		return true;
 	}
