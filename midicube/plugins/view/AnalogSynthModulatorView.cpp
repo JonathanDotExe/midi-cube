@@ -22,7 +22,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
 
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 	ModEnvelopeEntity& env = synth.preset.mod_envs.at(this->part);
 	LFOEntity& lfo = synth.preset.lfos.at(this->part);
 

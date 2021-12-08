@@ -284,7 +284,7 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
 
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 	OscilatorEntity& osc = synth.preset.oscilators.at(this->part);
 
 	//Background

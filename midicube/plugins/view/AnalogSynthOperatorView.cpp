@@ -101,7 +101,7 @@ Scene AnalogSynthOperatorView::create(ViewHost &frame) {
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
 
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 	OperatorEntity& op = synth.preset.operators.at(this->part);
 
 	//Background

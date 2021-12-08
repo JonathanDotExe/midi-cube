@@ -17,7 +17,7 @@ AnalogSynthFMView::AnalogSynthFMView(AdvancedSynth& s) : synth(s) {
 Scene AnalogSynthFMView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 
 	//Background
 	Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 5);

@@ -15,7 +15,7 @@ ArpeggiatorView::ArpeggiatorView(ArpeggiatorInstance& a) : arp(a) {
 
 Scene ArpeggiatorView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 
 	//Sound engines
 	std::vector<std::string> patterns{"Up", "Down", "Random", "Up/Down", "Down/Up"};
