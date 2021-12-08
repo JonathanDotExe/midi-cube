@@ -13,13 +13,12 @@
 
 class BooleanMidiBindingView : public ViewController {
 private:
-	ActionHandler& handler;
 	BindableBooleanValue& value;
 	std::function<ViewController*()> view_factory;
 	sf::Font font;
 
 public:
-	BooleanMidiBindingView(BindableBooleanValue& val, std::function<ViewController*()> f, ActionHandler& h, sf::Font fo) : handler(h), value(val), view_factory(f), font(fo) {
+	BooleanMidiBindingView(BindableBooleanValue& val, std::function<ViewController*()> f, sf::Font fo) : value(val), view_factory(f), font(fo) {
 
 	}
 
@@ -28,6 +27,7 @@ public:
 	}
 
 	virtual Scene create(ViewHost &frame) {
+		ActionHandler& handler = frame.get_action_handler();
 		std::vector<Control*> controls;
 		{
 

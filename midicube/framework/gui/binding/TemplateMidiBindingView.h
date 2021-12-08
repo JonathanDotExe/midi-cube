@@ -14,13 +14,12 @@
 template<typename T>
 class TemplateMidiBindingView : public ViewController {
 private:
-	ActionHandler& handler;
 	BindableTemplateValue<T>& value;
 	std::function<ViewController*()> view_factory;
 	sf::Font font;
 
 public:
-	TemplateMidiBindingView(BindableTemplateValue<T>& val, std::function<ViewController*()> f, ActionHandler& h, sf::Font fo) : handler(h), value(val), view_factory(f), font(fo) {
+	TemplateMidiBindingView(BindableTemplateValue<T>& val, std::function<ViewController*()> f, sf::Font fo) : value(val), view_factory(f), font(fo) {
 
 	}
 
@@ -29,6 +28,7 @@ public:
 	}
 
 	virtual Scene create(ViewHost &frame) {
+		ActionHandler& handler = frame.get_action_handler();
 		std::vector<Control*> controls;
 
 		{

@@ -23,7 +23,7 @@ SoundEngineChannelView::SoundEngineChannelView(MidiCubeWorkstation& c, SoundEngi
 Scene SoundEngineChannelView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());

@@ -14,7 +14,7 @@ SceneView::SceneView(SoundEngineDevice* engine) {
 }
 
 Scene SceneView::create(ViewHost &frame) {
-	this->handler = &frame.get_master_host().get_action_handler();
+	this->handler = &frame.get_action_handler();
 	std::vector<Control*> controls;
 
 	//Background
