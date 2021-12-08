@@ -733,8 +733,23 @@ boost::property_tree::ptree AdvancedSynthProgram::save() {
 	return tree;
 }
 
-ViewController* AdvancedSynth::create_view()  {
-	return new AnalogSynthView(*this);
+class AdvancedSynthMenu : public Menu {
+public:
+	AdvancedSynth& p;
+
+	AdvancedSynthMenu(AdvancedSynth& _p) : p(_p) {}
+
+	virtual ViewController* create_gui_view() {
+		return AnalogSynthView(p);
+	}
+
+	virtual ControlView* create_control_view() {
+		return nullptr;
+	}
+};
+
+Menu* AdvancedSynth::create_menu()  {
+	return new AdvancedSynthMenu(*this);
 }
 
 AdvancedSynth::~AdvancedSynth() {

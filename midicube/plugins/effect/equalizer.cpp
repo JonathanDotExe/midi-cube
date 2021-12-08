@@ -48,7 +48,7 @@ void EqualizerEffect::process(const SampleInfo& info) {
 	}
 }
 
-ViewController* EqualizerEffect::create_view() {
+ViewController* EqualizerEffect::create_menu() {
 	return new EffectView(this);
 }
 

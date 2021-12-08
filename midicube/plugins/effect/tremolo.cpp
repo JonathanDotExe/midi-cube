@@ -32,7 +32,7 @@ void TremoloEffect::process(const SampleInfo& info) {
 	}
 }
 
-ViewController* TremoloEffect::create_view() {
+ViewController* TremoloEffect::create_menu() {
 	return new EffectView(this);
 }
 

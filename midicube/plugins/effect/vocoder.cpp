@@ -76,7 +76,7 @@ void VocoderEffect::process(const SampleInfo& info) {
 	}
 }
 
-ViewController* VocoderEffect::create_view() {
+ViewController* VocoderEffect::create_menu() {
 	return new EffectView(this);
 }
 

@@ -62,7 +62,7 @@ void Looper::process(const SampleInfo &info) {
 	}
 }
 
-ViewController* Looper::create_view() {
+ViewController* Looper::create_menu() {
 	return new LooperView(*this);
 }
 

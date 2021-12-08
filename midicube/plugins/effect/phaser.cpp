@@ -47,7 +47,7 @@ void PhaserEffect::process(const SampleInfo& info) {
 	}
 }
 
-ViewController* PhaserEffect::create_view() {
+ViewController* PhaserEffect::create_menu() {
 	return new EffectView(this);
 }
 

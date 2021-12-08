@@ -92,7 +92,7 @@ void ChorusEffect::apply_program(PluginProgram *prog) {
 	}
 }
 
-ViewController* ChorusEffect::create_view() {
+ViewController* ChorusEffect::create_menu() {
 	return new EffectView(this);
 }
 

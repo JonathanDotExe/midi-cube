@@ -85,7 +85,7 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 	}
 }
 
-ViewController* RotarySpeakerEffect::create_view() {
+ViewController* RotarySpeakerEffect::create_menu() {
 	return new EffectView(this);
 }
 

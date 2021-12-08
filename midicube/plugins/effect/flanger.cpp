@@ -44,7 +44,7 @@ void FlangerEffect::process(const SampleInfo& info) {
 	}
 }
 
-ViewController* FlangerEffect::create_view() {
+ViewController* FlangerEffect::create_menu() {
 	return new EffectView(this);
 }
 

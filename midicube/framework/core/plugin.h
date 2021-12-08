@@ -146,11 +146,11 @@ public:
 		return false;
 	}
 
-	const virtual MidiControls& get_controls() {
+	const virtual MidiControls& get_source_controls() {
 		return controls;
 	}
 
-	virtual ViewController* create_view() {
+	virtual Menu* create_menu() {
 		return nullptr;
 	}
 

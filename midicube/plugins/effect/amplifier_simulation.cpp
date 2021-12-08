@@ -92,7 +92,7 @@ void AmplifierSimulationEffect::process(const SampleInfo &info) {
 	outputs[1] = rsample;
 }
 
-ViewController* AmplifierSimulationEffect::create_view() {
+ViewController* AmplifierSimulationEffect::create_menu() {
 	return new EffectView(this);
 }
 

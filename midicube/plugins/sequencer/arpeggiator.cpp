@@ -416,6 +416,6 @@ PluginInstance* ArpeggiatorPlugin::create(PluginHost *host) {
 	return new ArpeggiatorInstance(*host, *this);
 }
 
-ViewController* ArpeggiatorInstance::create_view() {
+ViewController* ArpeggiatorInstance::create_menu() {
 	return new ArpeggiatorView(*this);
 }

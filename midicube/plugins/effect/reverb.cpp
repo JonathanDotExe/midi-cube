@@ -98,7 +98,7 @@ void ReverbEffect::apply_program(PluginProgram *prog) {
 	}
 }
 
-ViewController* ReverbEffect::create_view() {
+ViewController* ReverbEffect::create_menu() {
 	return new EffectView(this);
 }
 

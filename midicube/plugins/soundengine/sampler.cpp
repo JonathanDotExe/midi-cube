@@ -333,7 +333,7 @@ void Sampler::set_sample(SampleSound *sample) {
 	}
 }
 
-ViewController* Sampler::create_view() {
+ViewController* Sampler::create_menu() {
 	return new SamplerView(*this);
 }
 

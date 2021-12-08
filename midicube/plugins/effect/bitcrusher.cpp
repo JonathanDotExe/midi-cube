@@ -65,7 +65,7 @@ void BitCrusherEffect::apply_program(PluginProgram *prog) {
 	}
 }
 
-ViewController* BitCrusherEffect::create_view() {
+ViewController* BitCrusherEffect::create_menu() {
 	return new EffectView(this);
 }
 

@@ -89,7 +89,7 @@ public:
 	VocoderEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 
 	}
-	ViewController* create_view();
+	ViewController* create_menu();
 	void save_program(PluginProgram **prog);
 	void apply_program(PluginProgram *prog);
 	~VocoderEffect() {

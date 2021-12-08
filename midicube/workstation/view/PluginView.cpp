@@ -26,7 +26,7 @@ Scene PluginView::create(ViewHost &frame) {
 	controls.push_back(bg);
 
 	//Plugin View
-	ViewContainer* container = new ViewContainer(0, 0, frame.get_width(), frame.get_height() - 50, plugin.create_view());
+	ViewContainer* container = new ViewContainer(0, 0, frame.get_width(), frame.get_height() - 50, plugin.create_menu());
 	controls.push_back(container);
 	this->host = container;
 
