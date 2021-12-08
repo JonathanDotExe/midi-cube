@@ -40,7 +40,7 @@ public:
 
 	virtual void update_properties();
 
-	virtual void propterty_change(void* source, void* prop);
+	virtual void property_change(void* source, void* prop);
 
 	void request_redraw() {
 		redraw = true;

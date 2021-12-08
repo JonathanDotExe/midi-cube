@@ -440,8 +440,6 @@ public:
 
 	virtual PluginManager& get_plugin_manager() = 0;
 
-	virtual void set_property_change_callback(std::function<void(void*, void*)> cb) = 0;
-
 	virtual MenuHandler& get_menu_handler() = 0;
 
 	//Pointer should always stay the same

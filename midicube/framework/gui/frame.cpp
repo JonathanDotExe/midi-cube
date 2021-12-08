@@ -125,7 +125,7 @@ void Frame::notify_remove(Control *control) {
 	}
 }
 
-void Frame::propterty_change(void *source, void *prop) {
+void Frame::property_change(void *source, void *prop) {
 	update = true;
 	//TODO check for source and prop
 }

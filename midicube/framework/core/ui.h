@@ -9,7 +9,7 @@
 #define MIDICUBE_FRAMEWORK_CORE_UI_H_
 
 #include "control.h"
-#include "../gui/core.h"
+#include "../gui/frame.h"
 #include <vector>
 
 
@@ -32,18 +32,20 @@ private:
 	Menu* curr_menu = nullptr;
 
 	ControlViewHost* control_host = nullptr;
-	ViewHost* view_host = nullptr;
+	Frame* view_host = nullptr;
 public:
 
 	MenuHandler();
 
-	void init(ViewHost* view_host, ControlViewHost* control_host);
+	void init(Frame* view_host, ControlViewHost* control_host);
 
 	void change_menu(Menu* menu, bool append_history = true);
 
 	void realtime_process();
 
 	bool back();
+
+	void propterty_change(void* source, void* prop);
 
 	~MenuHandler();
 

@@ -52,7 +52,6 @@ private:
 	AudioHandler audio_handler;
 	MenuHandler menu_handler;
 	MidiCubeConfig config;
-	std::function<void(void*, void*)> property_callback;
 	std::vector<MidiCubeInput> inputs;
 	ControlView* view = nullptr;
 
@@ -74,8 +73,6 @@ public:
 	MidiBindingHandler* get_binding_handler();
 	MenuHandler& get_menu_handler();
 	void change_control_view(ControlView *view);
-	void set_property_change_callback(
-			std::function<void(void*, void*)> cb);
 	PluginManager& get_plugin_manager();
 	void copy_program();
 	bool paste_program();

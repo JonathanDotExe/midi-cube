@@ -40,9 +40,15 @@ bool MenuHandler::back() {
 	return false;
 }
 
-void MenuHandler::init(ViewHost *view_host, ControlViewHost *control_host) {
+void MenuHandler::init(Frame *view_host, ControlViewHost *control_host) {
 	this->view_host = view_host;
 	this->control_host = control_host;
+}
+
+void MenuHandler::propterty_change(void *source, void *prop) {
+	if (view_host) {
+		view_host->property_change(source, prop);
+	}
 }
 
 MenuHandler::~MenuHandler() {

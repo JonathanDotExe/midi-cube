@@ -225,17 +225,11 @@ void MidiCubeWorkstation::apply_program(Program *prog) {
 }
 
 void MidiCubeWorkstation::notify_property_update(void *source, void *prop) {
-	if (property_callback) {
-		property_callback(source, prop);
-	}
+	menu_handler.propterty_change(source, prop);
 }
 
 PluginManager& MidiCubeWorkstation::get_plugin_manager() {
 	return plugin_mgr;
-}
-
-void MidiCubeWorkstation::set_property_change_callback(std::function<void(void*, void*)> cb) {
-	property_callback = cb;
 }
 
 void MidiCubeConfig::load(pt::ptree tree) {
