@@ -317,21 +317,6 @@ PluginInstance* OrganPlugin::create(PluginHost *host) {
 	return new B3Organ(*host, *this);
 }
 
-class B3OrganMenu : public Menu {
-public:
-	B3Organ& p;
-
-	B3OrganMenu(B3Organ& _p) : p(_p) {}
-
-	virtual ViewController* create_gui_view() {
-		return B3OrganView(p);
-	}
-
-	virtual ControlView* create_control_view() {
-		return nullptr;
-	}
-};
-
 Menu* B3Organ::create_menu() {
-	return new B3OrganMenu(*this);
+	return new FunctionMenu([this]() { return new B3OrganView(*this); }, nullptr);
 }

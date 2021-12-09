@@ -11,6 +11,7 @@
 #include "control.h"
 #include "../gui/frame.h"
 #include <vector>
+#include <functional>
 
 
 class Menu {
@@ -22,6 +23,25 @@ public:
 
 	virtual ~Menu() {
 
+	}
+
+};
+
+class FunctionMenu : public Menu {
+public:
+	std::function<ViewController* ()> gui;
+	std::function<ControlView* ()> control;
+
+	FunctionMenu(std::function<ViewController* ()> g, std::function<ControlView* ()> c) : gui(g), control(c) {
+
+	}
+
+	ViewController* create_gui_view() {
+		return gui ? gui() : nullptr;
+	}
+
+	ControlView* create_control_view() {
+		return control ? control : nullptr;
 	}
 
 };
