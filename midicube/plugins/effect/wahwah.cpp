@@ -54,8 +54,8 @@ void WahWahEffect::process(const SampleInfo &info) {
 	}
 }
 
-ViewController* WahWahEffect::create_menu() {
-	return new EffectView(this);
+Menu* WahWahEffect::create_menu() {
+	return new FunctionMenu([this](){ return new EffectView(this); }, nullptr);
 }
 
 WahWahEffect::~WahWahEffect() {
