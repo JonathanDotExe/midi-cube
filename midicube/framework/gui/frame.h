@@ -11,7 +11,6 @@
 #include <atomic>
 #include "../util/util.h"
 #include "../data/data.h"
-#include "../core/plugin.h"
 #include "core.h"
 
 class Frame : public ViewHost {

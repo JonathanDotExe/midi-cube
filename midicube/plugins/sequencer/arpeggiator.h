@@ -74,7 +74,7 @@ class ArpeggiatorInstance : public PluginInstance {
 public:
 	Arpeggiator arp;
 
-	virtual ViewController* create_menu();
+	virtual Menu* create_menu();
 	ArpeggiatorInstance(PluginHost& h, Plugin& p);
 	void apply_program(PluginProgram *prog);
 	void process(const SampleInfo &info);
