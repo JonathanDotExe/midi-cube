@@ -41,7 +41,7 @@ public:
 	}
 
 	ControlView* create_control_view() {
-		return control ? control : nullptr;
+		return control ? control() : nullptr;
 	}
 
 };

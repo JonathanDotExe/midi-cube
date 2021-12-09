@@ -53,7 +53,7 @@ public:
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);
 	void apply_program(PluginProgram *prog);
-	ViewController* create_menu();
+	Menu* create_menu();
 	~ChorusEffect();
 };
 
