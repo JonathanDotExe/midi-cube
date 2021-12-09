@@ -291,7 +291,7 @@ class ControlHost {
 public:
 	virtual void notify_property_update(void* property) = 0;
 
-	virtual const MidiControls& get_source_controls() = 0;
+	virtual const MidiControls& get_controls() = 0;
 
 	virtual ~ControlHost() {
 
@@ -313,7 +313,7 @@ public:
 
 	bool on_cc(unsigned int cc, double val) {
 		bool changed = false;
-		const MidiControls& controls = plugin->get_source_controls();
+		const MidiControls& controls = plugin->get_controls();
 		for (ControlBind& bind : params) {
 			if (cc == controls.get_cc(bind.type, bind.index, bind.bank)) {
 				bind.param->change(val);

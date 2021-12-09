@@ -146,7 +146,7 @@ public:
 		return false;
 	}
 
-	const virtual MidiControls& get_source_controls() {
+	const virtual MidiControls& get_controls() {
 		return controls;
 	}
 

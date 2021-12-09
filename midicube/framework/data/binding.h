@@ -304,7 +304,7 @@ public:
 	std::vector<std::pair<void*, void*>> on_cc(unsigned int control, double value) {
 		std::vector<std::pair<void*, void*>> changes;
 		for (std::pair<ControlHost*, BindableValue*> val : bindings) {
-			if (val.first->get_source_controls().get_cc(val.second->type, val.second->cc, val.second->bank) == control) {
+			if (val.first->get_controls().get_cc(val.second->type, val.second->cc, val.second->bank) == control) {
 				val.second->change(value);
 				changes.push_back(val); //TODO
 			}
