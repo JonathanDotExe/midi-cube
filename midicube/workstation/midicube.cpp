@@ -369,8 +369,10 @@ bool MidiCubeWorkstation::paste_program() {
 }
 
 void MidiCubeWorkstation::change_control_view(ControlView *view) {
+	lock.lock();
 	delete this->view;
 	this->view = view;
+	lock.unlock();
 }
 
 SpinLock& MidiCubeWorkstation::get_lock() {

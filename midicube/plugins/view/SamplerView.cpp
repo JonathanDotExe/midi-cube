@@ -40,7 +40,8 @@ Scene SamplerView::create(ViewHost &frame) {
 			sampler.set_sound_index(-1);
 			lock.unlock();
 		}
-		frame.change_view(new SamplerView(sampler));
+		Sampler& s = sampler;
+		frame.change_menu(new FunctionMenu([s]() { return new SamplerView(s); }, nullptr), false);
 	});
 	controls.push_back(engine);
 
