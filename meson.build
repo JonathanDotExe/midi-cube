@@ -58,7 +58,6 @@ src = [
 	'midicube/plugins/resources.cpp',
 	'midicube/workstation/view/MasterEffectView.cpp',
 	'midicube/workstation/view/PluginSelectView.cpp',
-	'midicube/workstation/view/PluginView.cpp',
 	'midicube/workstation/view/ProgramRenameView.cpp',
 	'midicube/workstation/view/ProgramView.cpp',
 	'midicube/workstation/view/SceneView.cpp',

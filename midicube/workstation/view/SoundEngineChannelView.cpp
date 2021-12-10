@@ -11,7 +11,6 @@
 #include "../../plugins/resources.h"
 #include "SoundEngineView.h"
 #include "PluginSelectView.h"
-#include "PluginView.h"
 
 SoundEngineChannelView::SoundEngineChannelView(MidiCubeWorkstation& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{[&c, &ch, channel_index]() {
 	return new SoundEngineChannelView(c, ch, channel_index);
@@ -58,12 +57,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		cube.lock.lock();
 		PluginInstance* engine = channel.engine.get_plugin();
 		if (engine) {
-			MidiCubeWorkstation& c = cube;
-			SoundEngineChannel& ch = channel;
-			int index = channel_index;
-			frame.change_view(new PluginView(*engine, [&c, &ch, index]() {
-				return new SoundEngineChannelView(c, ch, index);
-			}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
+			frame.change_menu(engine->create_menu());
 		}
 		cube.lock.unlock();
 	});
@@ -91,12 +85,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 			cube.lock.lock();
 			PluginInstance* sequencer = channel.sequencers[i].get_plugin();
 			if (sequencer) {
-				MidiCubeWorkstation& c = cube;
-				SoundEngineChannel& ch = channel;
-				int index = channel_index;
-				frame.change_view(new PluginView(*sequencer, [&c, &ch, index]() {
-					return new SoundEngineChannelView(c, ch, index);
-				}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
+				frame.change_menu(sequencer->create_menu());
 			}
 			cube.lock.unlock();
 		});
@@ -129,12 +118,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 			cube.lock.lock();
 			PluginInstance* effect = channel.effects[i].get_plugin();
 			if (effect) {
-				MidiCubeWorkstation& c = cube;
-				SoundEngineChannel& ch = channel;
-				int index = channel_index;
-				frame.change_view(new PluginView(*effect, [&c, &ch, index]() {
-					return new SoundEngineChannelView(c, ch, index);
-				}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
+				frame.change_menu(effect->create_menu());
 			}
 			cube.lock.unlock();
 		});

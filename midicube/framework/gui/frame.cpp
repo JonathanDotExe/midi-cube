@@ -139,6 +139,18 @@ ActionHandler& Frame::get_action_handler() {
 	return action_handler;
 }
 
-void Frame::change_menu(Menu *menu, bool append_history) {
-	menu_handler->change_menu(menu, append_history);
+bool Frame::change_menu(Menu *menu, bool append_history) {
+	if (menu_handler) {
+		menu_handler->change_menu(menu, append_history);
+		return true;
+	}
+	return false;
+}
+
+bool Frame::menu_back() {
+	if (menu_handler) {
+		menu_handler->back();
+		return true;
+	}
+	return false;
 }

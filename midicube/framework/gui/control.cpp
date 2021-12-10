@@ -331,8 +331,13 @@ ActionHandler& ViewContainer::get_action_handler() {
 	return get_host()->get_action_handler();
 }
 
-void ViewContainer::change_menu(Menu *menu, bool append_history) {
+bool ViewContainer::change_menu(Menu *menu, bool append_history) {
 	ViewController* view = menu->create_gui_view();
 	delete menu;
 	change_view(view);
+	return true;
+}
+
+bool ViewContainer::menu_back() {
+	return false;
 }

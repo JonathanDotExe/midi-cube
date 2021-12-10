@@ -8,7 +8,6 @@
 #include "MasterEffectView.h"
 #include "SoundEngineView.h"
 #include "PluginSelectView.h"
-#include "PluginView.h"
 
 MasterEffectView::MasterEffectView(MidiCubeWorkstation& c): cube(c) {
 
@@ -68,10 +67,7 @@ Scene MasterEffectView::create(ViewHost &frame) {
 			cube.lock.lock();
 			PluginInstance* eff = effect.effect.get_plugin();
 			if (eff) {
-				MidiCubeWorkstation& c = cube;
-				frame.change_view(new PluginView(*eff, [&c]() {
-					return new MasterEffectView(c);
-				}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
+				frame.change_menu(eff->create_menu());
 			}
 			cube.lock.unlock();
 		});

@@ -151,7 +151,9 @@ public:
 
 	virtual void close() = 0;
 
-	virtual void change_menu(Menu* menu, bool append_history=true) = 0;
+	virtual bool change_menu(Menu* menu, bool append_history=true) = 0;
+
+	virtual bool menu_back() = 0;
 
 	virtual Control* on_mouse_pressed (int x, int y, sf::Mouse::Button button);
 
