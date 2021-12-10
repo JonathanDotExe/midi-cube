@@ -16,6 +16,7 @@
 
 #define SELECTABLE virtual bool selectable() const { return true; };
 
+class Menu;
 class MasterPluginHost;
 
 //TODO pseudo host for controls
@@ -149,6 +150,8 @@ public:
 	virtual void notify_remove(Control* control) = 0;
 
 	virtual void close() = 0;
+
+	virtual void change_menu(Menu* menu, bool append_history=true) = 0;
 
 	virtual Control* on_mouse_pressed (int x, int y, sf::Mouse::Button button);
 

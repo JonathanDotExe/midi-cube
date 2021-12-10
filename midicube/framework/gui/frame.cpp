@@ -7,6 +7,7 @@
 
 #include "frame.h"
 #include "core.h"
+#include "../core/ui.h"
 
 //Frame
 Frame::Frame(int width, int height, std::string title, bool render_sleep) : ViewHost() {
@@ -136,4 +137,8 @@ void Frame::switch_view(ViewController *view) {
 
 ActionHandler& Frame::get_action_handler() {
 	return action_handler;
+}
+
+void Frame::change_menu(Menu *menu, bool append_history) {
+	menu_handler->change_menu(menu, append_history);
 }

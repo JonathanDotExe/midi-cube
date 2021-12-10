@@ -524,6 +524,7 @@ public:
 	virtual void notify_remove(Control *control);
 	virtual void init(ViewHost *host);
 	virtual ActionHandler& get_action_handler();
+	virtual void change_menu(Menu *menu, bool append_history);
 };
 
 

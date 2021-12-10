@@ -13,6 +13,8 @@
 #include "../data/data.h"
 #include "core.h"
 
+class MenuHandler;
+
 class Frame : public ViewHost {
 private:
 	int width;
@@ -31,6 +33,8 @@ private:
 	bool render_sleep = true;
 	std::atomic<bool> update{false};
 	ActionHandler action_handler;
+
+	MenuHandler* menu_handler = nullptr;
 
 public:
 	Frame(int width, int height, std::string title, bool render_sleep = true);
@@ -74,6 +78,7 @@ public:
 
 	virtual void notify_remove(Control *control);
 	virtual ActionHandler& get_action_handler();
+	virtual void change_menu(Menu *menu, bool append_history=true);
 
 protected:
 	virtual void switch_view(ViewController *view);
