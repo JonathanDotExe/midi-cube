@@ -140,7 +140,7 @@ Scene SoundEngineView::create(ViewHost& frame) {
 		size_t page = cube.prog_mgr.get_curr_program_index()/(PROGRAM_VIEW_ROWS * PROGRAM_VIEW_COLS);
 		cube.prog_mgr.unlock();
 		MidiCubeWorkstation& cube = this->cube;
-		frame.change_menu(VIEW_MENU(new ProgramView(cube, bank, page), &cube));
+		frame.change_menu(VIEW_MENU(new ProgramView(cube, bank, page), &cube, bank, page));
 	});
 	controls.push_back(program);
 

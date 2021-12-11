@@ -58,7 +58,7 @@ Scene MasterEffectView::create(ViewHost &frame) {
 		e->rect.setFillColor(sf::Color(128, 255, 255));
 		e->set_on_click([this, &frame, &effect]() {
 			MidiCubeWorkstation& c = cube;
-			frame.change_menu(VIEW_MENU(new PluginSelectView(effect.effect, c.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), c.lock, c.plugin_mgr, &c.clipboard), &c, &efffect));
+			frame.change_menu(VIEW_MENU(new PluginSelectView(effect.effect, c.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), c.lock, c.plugin_mgr, &c.clipboard), &c, &effect));
 		});
 		controls.push_back(e);
 		//Edit
