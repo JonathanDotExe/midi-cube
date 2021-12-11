@@ -72,7 +72,8 @@ Scene ProgramRenameView::create(ViewHost &frame) {
 			//Update name
 			action(name);
 			//Change view
-			frame.change_view(new ProgramView(cube));
+			MidiCubeWorkstation& cube = this->cube;
+			frame.menu_back();
 		});
 		back->rect.setFillColor(sf::Color::Yellow);
 		controls.push_back(back);

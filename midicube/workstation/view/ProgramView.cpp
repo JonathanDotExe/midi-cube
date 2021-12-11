@@ -170,12 +170,13 @@ Scene ProgramView::create(ViewHost &frame) {
 			prog_mgr->lock();
 			std::string name = prog_mgr->bank_name;
 			prog_mgr->unlock();
-			frame.change_view(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
+			MidiCubeWorkstation& cube = this->cube;
+			frame.change_menu(VIEW_MENU(new ProgramRenameView(cube, name, [prog_mgr](std::string name) {
 				prog_mgr->lock();
 				prog_mgr->bank_name = name;
 				prog_mgr->save_new_bank();
 				prog_mgr->unlock();
-			}));
+			}), &cube, name, prog_mgr));
 		});
 		controls.push_back(new_bank);
 
@@ -199,7 +200,7 @@ Scene ProgramView::create(ViewHost &frame) {
 		//Back Button
 		Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 		back->set_on_click([&frame, this]() {
-			frame.change_view(new SoundEngineView(cube));
+			frame.menu_back();
 		});
 		back->rect.setFillColor(sf::Color::Yellow);
 		controls.push_back(back);

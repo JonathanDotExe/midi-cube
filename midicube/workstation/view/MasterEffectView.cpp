@@ -58,7 +58,7 @@ Scene MasterEffectView::create(ViewHost &frame) {
 		e->rect.setFillColor(sf::Color(128, 255, 255));
 		e->set_on_click([this, &frame, &effect]() {
 			MidiCubeWorkstation& c = cube;
-			frame.change_view(new PluginSelectView(effect.effect, cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), cube.lock, [&c]() { return new MasterEffectView(c); }, cube.plugin_mgr, &cube.clipboard));
+			frame.change_menu(VIEW_MENU(new PluginSelectView(effect.effect, c.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), c.lock, c.plugin_mgr, &c.clipboard), &c, &efffect));
 		});
 		controls.push_back(e);
 		//Edit
@@ -87,7 +87,7 @@ Scene MasterEffectView::create(ViewHost &frame) {
 	//Back Button
 	Button* exit = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	exit->set_on_click([&frame, this]() {
-		frame.change_view(new SoundEngineView(cube));
+		frame.menu_back();
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);

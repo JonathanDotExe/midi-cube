@@ -8,8 +8,7 @@
 #include "PluginSelectView.h"
 
 
-PluginSelectView::PluginSelectView(PluginSlot &p, std::vector<Plugin*> pl, SpinLock& l,
-		std::function<ViewController* ()> b, PluginManager& m, Clipboard* clipboard, size_t page) : plugin(p), plugins(pl), lock(l), back(b), mgr(m){
+PluginSelectView::PluginSelectView(PluginSlot &p, std::vector<Plugin*> pl, SpinLock& l, PluginManager& m, Clipboard* clipboard, size_t page) : plugin(p), plugins(pl), lock(l), mgr(m){
 	this->clipboard = clipboard;
 	this->page = page;
 }
@@ -71,7 +70,7 @@ Scene PluginSelectView::create(ViewHost &frame) {
 				plugin = plugins.at(start + i - 1);
 			}
 			this->plugin.set_plugin_locked(plugin, lock);
-			frame.change_view(new PluginSelectView(this->plugin, plugins, lock, back, mgr, clipboard, page));
+			frame.change_view(new PluginSelectView(this->plugin, plugins, lock, mgr, clipboard, page));
 		});
 	}
 	lock.unlock();
@@ -93,7 +92,7 @@ Scene PluginSelectView::create(ViewHost &frame) {
 			bool pasted = plugin.paste_plugin(*clipboard, mgr);	//FIXME execute new without lock
 			lock.unlock();
 			if (pasted) {
-				frame.change_view(this->back());
+				frame.menu_back();
 			}
 		});
 		controls.push_back(paste);
@@ -102,7 +101,7 @@ Scene PluginSelectView::create(ViewHost &frame) {
 	//Previous page
 	Button* previous_page = new Button("<", main_font, 18, 00, frame.get_height() - 40, 60, 40);
 	previous_page->set_on_click([&frame, this]() {
-		frame.change_view(new PluginSelectView(plugin, plugins, lock, back, mgr, clipboard, std::max((ssize_t) page - 1, (ssize_t) 0)));
+		frame.change_view(new PluginSelectView(plugin, plugins, lock, mgr, clipboard, std::max((ssize_t) page - 1, (ssize_t) 0)));
 	});
 	controls.push_back(previous_page);
 
@@ -110,7 +109,7 @@ Scene PluginSelectView::create(ViewHost &frame) {
 	Button* next_page = new Button(">", main_font, 18, frame.get_width() - 70 - 60, frame.get_height() - 40, 60, 40);
 	if (start + size < plugins.size()) {
 		next_page->set_on_click([&frame, this]() {
-			frame.change_view(new PluginSelectView(plugin, plugins, lock, back, mgr, clipboard, std::max((ssize_t) page + 1, (ssize_t) 0)));
+			frame.change_view(new PluginSelectView(plugin, plugins, lock, mgr, clipboard, std::max((ssize_t) page + 1, (ssize_t) 0)));
 		});
 	}
 	controls.push_back(next_page);
@@ -118,7 +117,7 @@ Scene PluginSelectView::create(ViewHost &frame) {
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->set_on_click([&frame, this]() {
-		frame.change_view(this->back());
+		frame.menu_back();
 	});
 	back->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(back);

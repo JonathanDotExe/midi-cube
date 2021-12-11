@@ -63,7 +63,8 @@ Scene SoundEngineView::create(ViewHost& frame) {
 		controls.push_back(engine);
 		engine_buttons[i] = engine;
 		engine->set_on_click([this, &channel, i, &frame]() {
-			frame.change_view(new SoundEngineChannelView(cube, channel, i));
+			MidiCubeWorkstation& cube = this->cube;
+			frame.change_menu(VIEW_MENU(new SoundEngineChannelView(cube, channel, i), &cube, &channel, i));
 		});
 
 		//Volume
@@ -118,14 +119,16 @@ Scene SoundEngineView::create(ViewHost& frame) {
 	//Sources
 	Button* sources = new Button("Sources", main_font, 18, frame.get_width() - 375, frame.get_height() - 45, 100, 40);
 	sources->set_on_click([&frame, this]() {
-		frame.change_view(new SourceView(cube));
+		MidiCubeWorkstation& cube = this->cube;
+		frame.change_menu(VIEW_MENU(new SourceView(cube), &cube));
 	});
 	controls.push_back(sources);
 
 	//Scene
 	Button* scene = new Button("Scenes", main_font, 18, frame.get_width() - 275, frame.get_height() - 45, 100, 40);
 	scene->set_on_click([&frame, this]() {
-		frame.change_view(new SceneView(&cube.engine));
+		MidiCubeWorkstation& cube = this->cube;
+		frame.change_menu(VIEW_MENU(new SceneView(&cube.engine), &cube));
 	});
 	controls.push_back(scene);
 
@@ -136,7 +139,8 @@ Scene SoundEngineView::create(ViewHost& frame) {
 		size_t bank = cube.prog_mgr.get_curr_bank_index();
 		size_t page = cube.prog_mgr.get_curr_program_index()/(PROGRAM_VIEW_ROWS * PROGRAM_VIEW_COLS);
 		cube.prog_mgr.unlock();
-		frame.change_view(new ProgramView(cube, bank, page));
+		MidiCubeWorkstation& cube = this->cube;
+		frame.change_menu(VIEW_MENU(new ProgramView(cube, bank, page), &cube));
 	});
 	controls.push_back(program);
 
