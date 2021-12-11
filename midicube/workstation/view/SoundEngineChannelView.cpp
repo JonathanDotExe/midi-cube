@@ -72,7 +72,6 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		sequencer->set_on_click([this, &frame, i]() {
 			MidiCubeWorkstation& c = cube;
 			SoundEngineChannel& ch = channel;
-			int index = channel_index;
 			frame.change_menu(VIEW_MENU(new PluginSelectView(ch.sequencers[i], c.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SEQUENCER), c.lock, c.plugin_mgr, &c.clipboard), &ch, &c, i));
 		});
 		controls.push_back(sequencer);

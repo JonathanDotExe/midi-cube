@@ -116,10 +116,6 @@ public:
 		return true;
 	}
 
-	virtual ControlView* create_control_view() {
-		return nullptr;
-	}
-
 	virtual ~ViewController() {
 
 	}

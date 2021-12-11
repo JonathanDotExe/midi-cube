@@ -52,8 +52,39 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 		Button* osc = new Button("Oscilator", main_font, 14, x + 5, y + 30,  pane_width - 15, 30);
 		osc->rect.setFillColor(sf::Color(0, 180, 255));
 		osc->set_on_click([&frame, this, i]{
-			AdvancedSynth& s = synth;
-			frame.change_menu(VIEW_MENU(new AnalogSynthOscilatorView(s, i), &s, i));
+			AdvancedSynth& synth = this->synth;
+			frame.change_menu(VIEW_CONTROL_MENU(new AnalogSynthOscilatorView(synth, i), {
+					ControlView* view = new ControlView("Analog Synth Modulation " + i);
+					ModEnvelopeEntity& env = synth.preset.mod_envs.at(i);
+					LFOEntity& lfo = synth.preset.lfos.at(i);
+					view->bind(&env.volume.velocity_amount, ControlType::KNOB, 0, 0);
+					view->bind(&env.env.hold, ControlType::KNOB, 1, 0);
+					view->bind(&env.env.pre_decay, ControlType::KNOB, 2, 0);
+					view->bind(&env.env.attack_hold, ControlType::KNOB, 3, 0);
+					view->bind(&lfo.volume.mod_env_amount, ControlType::KNOB, 4, 0);
+					view->bind(&lfo.volume.velocity_amount, ControlType::KNOB, 5, 0);
+					view->bind(&lfo.clock_value, ControlType::KNOB, 8, 0);
+
+					view->bind(&env.volume.value, ControlType::SLIDER, 0, 0);
+					view->bind(&env.env.attack, ControlType::SLIDER, 1, 0);
+					view->bind(&env.env.decay, ControlType::SLIDER, 2, 0);
+					view->bind(&env.env.sustain, ControlType::SLIDER, 3, 0);
+					view->bind(&env.env.release, ControlType::SLIDER, 4, 0);
+					view->bind(&lfo.volume.value, ControlType::SLIDER, 5, 0);
+					view->bind(&lfo.freq, ControlType::SLIDER, 6, 0);
+					view->bind(&lfo.waveform, ControlType::SLIDER, 7, 0);
+					view->bind(&lfo.sync_phase, ControlType::SLIDER, 8, 0);
+
+					view->bind(&lfo.sync_master, ControlType::BUTTON, 8, 0);
+
+					view->bind(&env.env.peak_volume, ControlType::SLIDER, 1, 1);
+					view->bind(&env.env.decay_volume, ControlType::SLIDER, 2, 1);
+					view->bind(&env.env.sustain_time, ControlType::SLIDER, 3, 1);
+					view->bind(&env.env.release_volume, ControlType::SLIDER, 4, 1);
+
+					view->init(&synth);
+					return view;
+				}, &synth, i));
 		});
 		controls.push_back(osc);
 		//Operator
