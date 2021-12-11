@@ -8,6 +8,10 @@
 #include <cmath>
 #include <iostream>
 #include "../view/AnalogSynthView.h"
+#include "../view/AnalogSynthOperatorView.h"
+#include "../view/AnalogSynthFMView.h"
+#include "../view/AnalogSynthModulatorView.h"
+#include "../view/AnalogSynthOscilatorView.h"
 
 #define OSC_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
@@ -735,6 +739,148 @@ boost::property_tree::ptree AdvancedSynthProgram::save() {
 
 Menu* AdvancedSynth::create_menu()  {
 	return new FunctionMenu([this]() { return new AnalogSynthView(*this); }, nullptr);
+}
+
+Menu* AdvancedSynth::create_operator_menu(size_t part) {
+	return new FunctionMenu([this, part]() { return new AnalogSynthOperatorView(*this, part);}, [this, part]() {
+		ControlView* view = new ControlView("Analog Synth Operator " + part);
+		OperatorEntity& op = preset.operators.at(part);
+		view->bind(&op.volume.velocity_amount, ControlType::KNOB, 0, 0);
+		view->bind(&op.env.hold, ControlType::KNOB, 1, 0);
+		view->bind(&op.env.pre_decay, ControlType::KNOB, 2, 0);
+		view->bind(&op.env.attack_hold, ControlType::KNOB, 3, 0);
+		view->bind(&op.panning.value, ControlType::KNOB, 4, 0);
+		view->bind(&op.first_filter.cutoff.mod_env_amount, ControlType::KNOB, 5, 0);
+		view->bind(&op.first_filter.cutoff.lfo_amount, ControlType::KNOB, 6, 0);
+		view->bind(&op.first_filter.cutoff.aftertouch_amount, ControlType::KNOB, 7, 0);
+		view->bind(&op.first_filter.drive_amount, ControlType::KNOB, 8, 0);
+
+		view->bind(&op.volume.value, ControlType::SLIDER, 0, 0);
+		view->bind(&op.env.attack, ControlType::SLIDER, 1, 0);
+		view->bind(&op.env.decay, ControlType::SLIDER, 2, 0);
+		view->bind(&op.env.sustain, ControlType::SLIDER, 3, 0);
+		view->bind(&op.env.release, ControlType::SLIDER, 4, 0);
+		view->bind(&op.first_filter.cutoff.value, ControlType::SLIDER, 5, 0);
+		view->bind(&op.first_filter.cutoff.velocity_amount, ControlType::SLIDER, 6, 0);
+		view->bind(&op.first_filter.resonance.value, ControlType::SLIDER, 7, 0);
+		view->bind(&op.first_filter.type, ControlType::SLIDER, 8, 0);
+
+		view->bind(&op.audible, ControlType::BUTTON, 0, 0);
+		view->bind(&op.first_filter.on, ControlType::BUTTON, 5, 0);
+		view->bind(&op.filter_parallel, ControlType::BUTTON, 6, 0);
+
+		view->bind(&op.amp_kb_track_note, ControlType::KNOB, 0, 1);
+		view->bind(&op.amp_kb_track_lower, ControlType::KNOB, 1, 1);
+		view->bind(&op.amp_kb_track_upper, ControlType::KNOB, 2, 1);
+		view->bind(&op.first_filter.kb_track, ControlType::KNOB, 3, 1);
+		view->bind(&op.second_filter.kb_track, ControlType::KNOB, 4, 1);
+		view->bind(&op.second_filter.cutoff.mod_env_amount, ControlType::KNOB, 5, 1);
+		view->bind(&op.second_filter.cutoff.lfo_amount, ControlType::KNOB, 6, 1);
+		view->bind(&op.second_filter.cutoff.aftertouch_amount, ControlType::KNOB, 7, 1);
+		view->bind(&op.second_filter.drive_amount, ControlType::KNOB, 8, 1);
+
+		view->bind(&op.oscilator_count, ControlType::SLIDER, 0, 1);
+		view->bind(&op.env.peak_volume, ControlType::SLIDER, 1, 1);
+		view->bind(&op.env.decay_volume, ControlType::SLIDER, 2, 1);
+		view->bind(&op.env.sustain_time, ControlType::SLIDER, 3, 1);
+		view->bind(&op.env.release_volume, ControlType::SLIDER, 4, 1);
+		view->bind(&op.second_filter.cutoff.value, ControlType::SLIDER, 5, 1);
+		view->bind(&op.second_filter.cutoff.velocity_amount, ControlType::SLIDER, 6, 1);
+		view->bind(&op.second_filter.resonance.value, ControlType::SLIDER, 7, 1);
+		view->bind(&op.second_filter.type, ControlType::SLIDER, 8, 1);
+
+		view->bind(&op.second_filter.on, ControlType::BUTTON, 5, 1);
+
+		view->init(this);
+		return view;
+	});
+}
+
+Menu* AdvancedSynth::create_oscillator_menu(size_t part) {
+	return new FunctionMenu([this, part]() { return new AnalogSynthOscilatorView(*this, part);}, [this, part]() {
+		ControlView* view = new ControlView("Analog Synth Oscillator " + part);
+		OscilatorEntity& osc = preset.oscilators.at(part);
+		view->bind(&osc.waveform, ControlType::KNOB, 0, 0);
+		view->bind(&osc.volume.velocity_amount, ControlType::KNOB, 1, 0);
+		view->bind(&osc.note, ControlType::KNOB, 2, 0);
+		view->bind(&osc.sync_mul.mod_env_amount, ControlType::KNOB, 3, 0);
+		view->bind(&osc.pitch.mod_env_amount, ControlType::KNOB, 4, 0);
+		view->bind(&osc.pulse_width.mod_env_amount, ControlType::KNOB, 5, 0);
+		view->bind(&osc.pulse_width.lfo_amount, ControlType::KNOB, 6, 0);
+		view->bind(&osc.unison_amount, ControlType::KNOB, 7, 0);
+		view->bind(&osc.semi, ControlType::KNOB, 8, 0);
+
+		view->bind(&osc.phase, ControlType::SLIDER, 0, 0);
+		view->bind(&osc.volume.value, ControlType::SLIDER, 1, 0);
+		view->bind(&osc.sync_mul.value, ControlType::SLIDER, 2, 0);
+		view->bind(&osc.sync_mul.lfo_amount, ControlType::SLIDER, 3, 0);
+		view->bind(&osc.pitch.value, ControlType::SLIDER, 4, 0);
+		view->bind(&osc.pitch.lfo_amount, ControlType::SLIDER, 5, 0);
+		view->bind(&osc.pulse_width.value, ControlType::SLIDER, 6, 0);
+		view->bind(&osc.unison_detune.value, ControlType::SLIDER, 7, 0);
+		view->bind(&osc.transpose, ControlType::SLIDER, 8, 0);
+
+		view->bind(&osc.sync_mul.velocity_amount, ControlType::SLIDER, 2, 1);
+		view->bind(&osc.sync_mul.aftertouch_amount, ControlType::SLIDER, 3, 1);
+		view->bind(&osc.pitch.velocity_amount, ControlType::SLIDER, 4, 1);
+		view->bind(&osc.pitch.aftertouch_amount, ControlType::SLIDER, 5, 1);
+		view->bind(&osc.pulse_width.velocity_amount, ControlType::SLIDER, 6, 1);
+		view->bind(&osc.pulse_width.aftertouch_amount, ControlType::SLIDER, 7, 1);
+
+		view->bind(&osc.sync_mul.mod_env, ControlType::KNOB, 2, 1);
+		view->bind(&osc.sync_mul.lfo, ControlType::KNOB, 3, 1);
+		view->bind(&osc.pitch.mod_env, ControlType::KNOB, 4, 1);
+		view->bind(&osc.pitch.lfo, ControlType::KNOB, 5, 1);
+		view->bind(&osc.pulse_width.mod_env, ControlType::KNOB, 6, 1);
+		view->bind(&osc.pulse_width.lfo, ControlType::KNOB, 7, 1);
+
+		view->bind(&osc.reset, ControlType::BUTTON, 0, 0);
+		view->bind(&osc.randomize, ControlType::BUTTON, 1, 0);
+		view->bind(&osc.fixed_freq, ControlType::BUTTON, 1, 0);
+		view->bind(&osc.sync, ControlType::BUTTON, 3, 0);
+
+		view->init(this);
+		return view;
+	});
+}
+
+Menu* AdvancedSynth::create_modulation_menu(size_t part) {
+	return new FunctionMenu([this, part]() { return new AnalogSynthModulatorView(*this, part);}, [this, part]() {
+		ControlView* view = new ControlView("Analog Synth Modulation " + part);
+		ModEnvelopeEntity& env = preset.mod_envs.at(part);
+		LFOEntity& lfo = preset.lfos.at(part);
+		view->bind(&env.volume.velocity_amount, ControlType::KNOB, 0, 0);
+		view->bind(&env.env.hold, ControlType::KNOB, 1, 0);
+		view->bind(&env.env.pre_decay, ControlType::KNOB, 2, 0);
+		view->bind(&env.env.attack_hold, ControlType::KNOB, 3, 0);
+		view->bind(&lfo.volume.mod_env_amount, ControlType::KNOB, 4, 0);
+		view->bind(&lfo.volume.velocity_amount, ControlType::KNOB, 5, 0);
+		view->bind(&lfo.clock_value, ControlType::KNOB, 8, 0);
+
+		view->bind(&env.volume.value, ControlType::SLIDER, 0, 0);
+		view->bind(&env.env.attack, ControlType::SLIDER, 1, 0);
+		view->bind(&env.env.decay, ControlType::SLIDER, 2, 0);
+		view->bind(&env.env.sustain, ControlType::SLIDER, 3, 0);
+		view->bind(&env.env.release, ControlType::SLIDER, 4, 0);
+		view->bind(&lfo.volume.value, ControlType::SLIDER, 5, 0);
+		view->bind(&lfo.freq, ControlType::SLIDER, 6, 0);
+		view->bind(&lfo.waveform, ControlType::SLIDER, 7, 0);
+		view->bind(&lfo.sync_phase, ControlType::SLIDER, 8, 0);
+
+		view->bind(&lfo.sync_master, ControlType::BUTTON, 8, 0);
+
+		view->bind(&env.env.peak_volume, ControlType::SLIDER, 1, 1);
+		view->bind(&env.env.decay_volume, ControlType::SLIDER, 2, 1);
+		view->bind(&env.env.sustain_time, ControlType::SLIDER, 3, 1);
+		view->bind(&env.env.release_volume, ControlType::SLIDER, 4, 1);
+
+		view->init(this);
+		return view;
+	});
+}
+
+Menu* AdvancedSynth::create_fm_menu() {
+	return new FunctionMenu([this]() { return new AnalogSynthFMView(*this);}, nullptr);
 }
 
 AdvancedSynth::~AdvancedSynth() {
