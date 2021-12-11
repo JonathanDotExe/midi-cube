@@ -216,9 +216,14 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 65;
 	}
 
-	controls.push_back(binder.create_button(frame.get_width() - 100, frame.get_height() - 40, &frame));
-
-
+	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
+	//Back Button
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
+	back->rect.setFillColor(sf::Color::Yellow);
+	back->set_on_click([&frame, this]() {
+		frame.menu_back();
+	});
+	controls.push_back(back);
 
 	return {controls};
 }
