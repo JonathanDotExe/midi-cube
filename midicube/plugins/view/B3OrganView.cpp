@@ -232,17 +232,3 @@ bool B3OrganView::on_action(Control *control) {
 	return binder.on_action(control);
 }
 
-ControlView* B3OrganView::create_control_view() {
-	ControlView* view = new ControlView("B3 Organ");
-	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		view->bind(&organ.data.preset.drawbars[i], ControlType::SLIDER, i, 0);
-	}
-	view->bind(&organ.data.preset.percussion, ControlType::BUTTON, 2, 0);
-	view->bind(&organ.data.preset.percussion_fast_decay, ControlType::BUTTON, 3, 0);
-	view->bind(&organ.data.preset.percussion_soft, ControlType::BUTTON, 4, 0);
-	view->bind(&organ.data.preset.percussion_third_harmonic, ControlType::BUTTON, 4, 0);
-
-	view->bind(&organ.data.preset.vibrato_mix, ControlType::KNOB, 1, 0);
-	view->init(&organ);
-	return view;
-}
