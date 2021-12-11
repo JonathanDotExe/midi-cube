@@ -103,7 +103,7 @@ Scene SourceView::create(ViewHost &frame) {
 	//Exit Button
 	Button* exit = new Button("Back", main_font, 18, frame.get_width() - 75, frame.get_height() - 45, 70, 40);
 	exit->set_on_click([&frame, this]() {
-		frame.change_view(new SoundEngineView(cube));
+		frame.menu_back();
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);

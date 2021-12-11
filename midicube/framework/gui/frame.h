@@ -39,7 +39,14 @@ private:
 public:
 	Frame(int width, int height, std::string title, bool render_sleep = true);
 
-	virtual void run(ViewController* v);
+	void init_menu_handler(MenuHandler* menu_handler) {
+		if (this->menu_handler) {
+			throw "Menu Handler already initialized!";
+		}
+		this->menu_handler = menu_handler;
+	}
+
+	virtual void run(Menu* m);
 
 	virtual void update_properties();
 

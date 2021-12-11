@@ -343,7 +343,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->set_on_click([&frame, this]() {
-		frame.change_view(new SoundEngineView(cube));
+		frame.menu_back();
 	});
 	controls.push_back(back);
 

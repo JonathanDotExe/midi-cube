@@ -41,8 +41,14 @@ bool MenuHandler::back() {
 }
 
 void MenuHandler::init(Frame *view_host, ControlViewHost *control_host) {
+	if (this->view_host || this->control_host) {
+		throw "Already initilized!";
+	}
 	this->view_host = view_host;
 	this->control_host = control_host;
+	if (view_host) {
+		view_host->init_menu_handler(this);
+	}
 }
 
 void MenuHandler::propterty_change(void *source, void *prop) {

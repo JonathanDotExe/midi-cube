@@ -18,7 +18,7 @@ Frame::Frame(int width, int height, std::string title, bool render_sleep) : View
 	this->selected = nullptr;
 }
 
-void Frame::run(ViewController* v) {
+void Frame::run(Menu* m) {
 	//Main loop
 	sf::RenderWindow window(sf::VideoMode(width, height), title, sf::Style::Titlebar | sf::Style::Close);
 	window.setFramerateLimit(30);
@@ -27,7 +27,11 @@ void Frame::run(ViewController* v) {
 	#endif
 
 	//View
-	switch_view(v);
+	change_menu(m, true);
+	if (next_view) {
+		switch_view(next_view);
+		next_view = nullptr;
+	}
 
 	while (window.isOpen()) {
 		//Property changes
@@ -149,8 +153,7 @@ bool Frame::change_menu(Menu *menu, bool append_history) {
 
 bool Frame::menu_back() {
 	if (menu_handler) {
-		menu_handler->back();
-		return true;
+		return menu_handler->back();
 	}
 	return false;
 }
