@@ -18,22 +18,22 @@ private:
 	Button* button = nullptr;
 	bool edit = false;
 	ViewHost* frame = nullptr;
-	std::function<ViewController*()> view_factory;
 	sf::Font font;
 
 public:
 
-	BindingGUIHandler(std::function<ViewController*()> f, sf::Font fo) : view_factory(f), font(fo) {
+	BindingGUIHandler(sf::Font fo) : font(fo) {
 
 	}
 
 	bool on_action(Control* control) {
+		sf::Font f = font;
 		if (edit) {
 			if (dynamic_cast<OrganSwitch*>(control)) {
 				OrganSwitch* cast = dynamic_cast<OrganSwitch*>(control);
 				BindableBooleanValue* val = dynamic_cast<BindableBooleanValue*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new BooleanMidiBindingView(*val, view_factory, font));
+					frame->change_menu(VIEW_MENU(new BooleanMidiBindingView(*val, f), val, f));
 				}
 			}
 			else if (dynamic_cast<CheckBox*>(control)) {

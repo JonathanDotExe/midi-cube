@@ -71,7 +71,7 @@ Scene AnalogSynthFMView::create(ViewHost &frame) {
 		edit->rect.setFillColor(sf::Color(0, 180, 255));
 		edit->set_on_click([&frame, this, i]{
 			AdvancedSynth& s = synth;
-			frame.change_menu(new FunctionMenu([s]() { return new AnalogSynthOscilatorView(s, i); }, nullptr));
+			frame.change_menu();
 		});
 		controls.push_back(edit);
 	}

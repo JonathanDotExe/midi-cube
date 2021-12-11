@@ -71,5 +71,6 @@ public:
 
 };
 
+#define VIEW_MENU(creator, ...) new FunctionMenu([ __VA_ARGS__ ]() { return creator; }, nullptr)
 
 #endif /* MIDICUBE_FRAMEWORK_CORE_UI_H_ */

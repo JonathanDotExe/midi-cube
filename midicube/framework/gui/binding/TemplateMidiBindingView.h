@@ -107,9 +107,9 @@ public:
 
 			//Back Button
 			Button* back = new Button("Back", font, 18, frame.get_width() - 100, frame.get_height() - 40, 100, 40);
-			back->set_on_click([&frame, boxes, this]() {
+			back->set_on_click([&frame]() {
 				//Change view
-				frame.change_view(view_factory());
+				frame.menu_back();
 			});
 			back->rect.setFillColor(sf::Color::Yellow);
 			controls.push_back(back);
