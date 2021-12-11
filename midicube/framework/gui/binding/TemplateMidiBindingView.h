@@ -15,11 +15,10 @@ template<typename T>
 class TemplateMidiBindingView : public ViewController {
 private:
 	BindableTemplateValue<T>& value;
-	std::function<ViewController*()> view_factory;
 	sf::Font font;
 
 public:
-	TemplateMidiBindingView(BindableTemplateValue<T>& val, std::function<ViewController*()> f, sf::Font fo) : value(val), view_factory(f), font(fo) {
+	TemplateMidiBindingView(BindableTemplateValue<T>& val, sf::Font fo) : value(val), font(fo) {
 
 	}
 
