@@ -11,9 +11,7 @@
 #include "../view/AnalogSynthView.h"
 #include "../../plugins/resources.h"
 
-AnalogSynthModulatorView::AnalogSynthModulatorView(AdvancedSynth &s, size_t part) : synth(s), binder{[&s, part]() {
-			return new AnalogSynthModulatorView(s, part);
-		}, main_font} {
+AnalogSynthModulatorView::AnalogSynthModulatorView(AdvancedSynth &s, size_t part) : synth(s), binder{main_font} {
 	this->part = part;
 }
 

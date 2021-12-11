@@ -14,9 +14,7 @@
 #include "../../plugins/resources.h"
 
 
-AnalogSynthView::AnalogSynthView(AdvancedSynth& s) : synth(s), binder{[&s]() {
-	return new AnalogSynthView(s);
-}, main_font} {
+AnalogSynthView::AnalogSynthView(AdvancedSynth& s) : synth(s), binder{main_font} {
 
 }
 
@@ -55,7 +53,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 		osc->rect.setFillColor(sf::Color(0, 180, 255));
 		osc->set_on_click([&frame, this, i]{
 			AdvancedSynth& s = synth;
-			frame.change_menu(new FunctionMenu([]() { return new AnalogSynthOscilatorView(s, i); }, nullptr));
+			frame.change_menu(VIEW_MENU(new AnalogSynthOscilatorView(s, i), s));
 		});
 		controls.push_back(osc);
 		//Operator
@@ -63,7 +61,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 		op->rect.setFillColor(sf::Color(0, 180, 255));
 		op->set_on_click([&frame, this, i]{
 			AdvancedSynth& s = synth;
-			frame.change_menu(new FunctionMenu([]() { return new AnalogSynthOperatorView(s, i); }, nullptr));
+			frame.change_menu(VIEW_MENU(new AnalogSynthOperatorView(s, i), s));
 		});
 		operators[i] = op;
 		controls.push_back(op);
@@ -72,7 +70,7 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 		mod->rect.setFillColor(sf::Color(0, 180, 255));
 		mod->set_on_click([&frame, this, i]{
 			AdvancedSynth& s = synth;
-			frame.change_menu(new FunctionMenu([]() { return new AnalogSynthModulatorView(s, i); }, nullptr));
+			frame.change_menu(VIEW_MENU(new AnalogSynthModulatorView(s, i), s));
 		});
 		controls.push_back(mod);
 	}

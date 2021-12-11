@@ -23,9 +23,7 @@
 #include "../../plugins/resources.h"
 
 EffectView::EffectView(PluginInstance* e) :
-		effect(e), binder{[e]() {
-			return new EffectView(e);
-		}, main_font} {
+		effect(e), binder{main_font} {
 
 }
 

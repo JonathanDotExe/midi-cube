@@ -12,9 +12,7 @@
 #include "SoundEngineView.h"
 #include "PluginSelectView.h"
 
-SoundEngineChannelView::SoundEngineChannelView(MidiCubeWorkstation& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{[&c, &ch, channel_index]() {
-	return new SoundEngineChannelView(c, ch, channel_index);
-}, main_font} {
+SoundEngineChannelView::SoundEngineChannelView(MidiCubeWorkstation& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{main_font} {
 
 	this->channel_index = channel_index;
 }

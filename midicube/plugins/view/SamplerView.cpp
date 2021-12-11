@@ -41,7 +41,7 @@ Scene SamplerView::create(ViewHost &frame) {
 			lock.unlock();
 		}
 		Sampler& s = sampler;
-		frame.change_menu(new FunctionMenu([s]() { return new SamplerView(s); }, nullptr), false);
+		frame.change_menu(VIEW_MENU(new SamplerView(s), s));
 	});
 	controls.push_back(engine);
 

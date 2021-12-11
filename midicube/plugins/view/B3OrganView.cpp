@@ -9,9 +9,7 @@
 
 #include "../../plugins/resources.h"
 
-B3OrganView::B3OrganView(B3Organ& o) : organ(o), binder{[&o]() {
-	return new B3OrganView(o);
-}, main_font} {
+B3OrganView::B3OrganView(B3Organ& o) : organ(o), binder{main_font} {
 
 }
 
