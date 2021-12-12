@@ -139,7 +139,7 @@ void LooperView::update_properties() {
 	lock.lock();
 	record_index = looper.record_channel;
 	solo_index = looper.solo_channel;
-	lock.lock();
+	lock.unlock();
 	update_record();
 	update_solo();
 }
