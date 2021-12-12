@@ -15,9 +15,9 @@
 
 class MasterEffectView : public ViewController {
 private:
-	MidiCube& cube;
+	MidiCubeWorkstation& cube;
 public:
-	MasterEffectView(MidiCube& cube);
+	MasterEffectView(MidiCubeWorkstation& cube);
 	virtual ~MasterEffectView();
 	virtual Scene create(ViewHost &frame);
 };

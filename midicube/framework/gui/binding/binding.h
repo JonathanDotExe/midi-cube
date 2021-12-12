@@ -18,65 +18,64 @@ private:
 	Button* button = nullptr;
 	bool edit = false;
 	ViewHost* frame = nullptr;
-	std::function<ViewController*()> view_factory;
 	sf::Font font;
 
 public:
 
-	BindingGUIHandler(std::function<ViewController*()> f, sf::Font fo) : view_factory(f), font(fo) {
+	BindingGUIHandler(sf::Font fo) : font(fo) {
 
 	}
 
 	bool on_action(Control* control) {
+		sf::Font f = font;
 		if (edit) {
-			ActionHandler& handler = frame->get_master_host().get_action_handler();
 			if (dynamic_cast<OrganSwitch*>(control)) {
 				OrganSwitch* cast = dynamic_cast<OrganSwitch*>(control);
 				BindableBooleanValue* val = dynamic_cast<BindableBooleanValue*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new BooleanMidiBindingView(*val, view_factory, handler, font));
+					frame->change_menu(VIEW_MENU(new BooleanMidiBindingView(*val, f), val, f));
 				}
 			}
 			else if (dynamic_cast<CheckBox*>(control)) {
 				CheckBox* cast = dynamic_cast<CheckBox*>(control);
 				BindableBooleanValue* val = dynamic_cast<BindableBooleanValue*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new BooleanMidiBindingView(*val, view_factory, handler, font));
+					frame->change_menu(VIEW_MENU(new BooleanMidiBindingView(*val, f), val, f));
 				}
 			}
 			else if (dynamic_cast<DragBox<double>*>(control)) {
 				DragBox<double>* cast = dynamic_cast<DragBox<double>*>(control);
 				BindableTemplateValue<double>* val = dynamic_cast<BindableTemplateValue<double>*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new TemplateMidiBindingView<double>(*val, view_factory, handler, font));
+					frame->change_menu(VIEW_MENU(new TemplateMidiBindingView<double>(*val, f), val, f));
 				}
 			}
 			else if (dynamic_cast<DragBox<int>*>(control)) {
 				DragBox<int>* cast = dynamic_cast<DragBox<int>*>(control);
 				BindableTemplateValue<int>* val = dynamic_cast<BindableTemplateValue<int>*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new TemplateMidiBindingView<int>(*val, view_factory, handler, font));
+					frame->change_menu(VIEW_MENU(new TemplateMidiBindingView<int>(*val, f), val, f));
 				}
 			}
 			else if (dynamic_cast<DragBox<unsigned int>*>(control)) {
 				DragBox<unsigned int>* cast = dynamic_cast<DragBox<unsigned int>*>(control);
 				BindableTemplateValue<unsigned int>* val = dynamic_cast<BindableTemplateValue<unsigned int>*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new TemplateMidiBindingView<unsigned int>(*val, view_factory, handler, font));
+					frame->change_menu(VIEW_MENU(new TemplateMidiBindingView<unsigned int>(*val, f), val, f));
 				}
 			}
 			else if (dynamic_cast<Drawbar*>(control)) {
 				Drawbar* cast = dynamic_cast<Drawbar*>(control);
 				BindableTemplateValue<unsigned int>* val = dynamic_cast<BindableTemplateValue<unsigned int>*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new TemplateMidiBindingView<unsigned int>(*val, view_factory, handler, font));
+					frame->change_menu(VIEW_MENU(new TemplateMidiBindingView<unsigned int>(*val, f), val, f));
 				}
 			}
 			else if (dynamic_cast<Slider*>(control)) {
 				Slider* cast = dynamic_cast<Slider*>(control);
 				BindableTemplateValue<double>* val = dynamic_cast<BindableTemplateValue<double>*> (cast->property.get_object());
 				if (val) {
-					frame->change_view(new TemplateMidiBindingView<double>(*val, view_factory, handler, font));
+					frame->change_menu(VIEW_MENU(new TemplateMidiBindingView<double>(*val, f), val, f));
 				}
 			}
 			else {
@@ -89,7 +88,7 @@ public:
 	}
 
 	Button* create_button(int x, int y, ViewHost* frame) {
-		if (button) {
+		if (this->button) {
 			throw "Button can only be created once!";
 		}
 		this->frame = frame;

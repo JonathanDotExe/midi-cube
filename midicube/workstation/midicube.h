@@ -19,6 +19,7 @@
 #include "../framework/util/util.h"
 #include "../framework/util/clipboard.h"
 #include "../framework/core/plugin.h"
+#include "../framework/core/ui.h"
 
 struct MidiCubeInput {
 	MidiInput* in = nullptr;
@@ -46,14 +47,13 @@ struct MidiCubeConfig {
 	pt::ptree save();
 };
 
-class MidiCube : public ProgramUser, public MasterPluginHost {
+class MidiCubeWorkstation : public ProgramUser, public MasterPluginHost {
 private:
 	AudioHandler audio_handler;
-	ActionHandler action_handler;
-	ControlView* view = nullptr;
+	MenuHandler menu_handler;
 	MidiCubeConfig config;
-	std::function<void(void*, void*)> property_callback;
 	std::vector<MidiCubeInput> inputs;
+	ControlView* view = nullptr;
 
 	inline void process_midi(MidiMessage& message, size_t input);
 public:
@@ -69,23 +69,24 @@ public:
 
 	SpinLock lock;
 
+	SpinLock& get_lock();
+	MidiBindingHandler* get_binding_handler();
+	MenuHandler& get_menu_handler();
 	void change_control_view(ControlView *view);
-	void set_property_change_callback(
-			std::function<void(void*, void*)> cb);
 	PluginManager& get_plugin_manager();
-	ActionHandler& get_action_handler();
 	void copy_program();
 	bool paste_program();
 	void save_program(Program *prog);
 	void apply_program(Program *prog);
 	void notify_property_update(void* source, void* prop);
 	const MidiCubeConfig& get_config() const;
-	MidiCube();
+	MidiCubeWorkstation();
 	void init();
 	inline void process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info);
 	std::vector<MidiCubeInput> get_inputs();
 
-	~MidiCube();
+
+	~MidiCubeWorkstation();
 };
 
 

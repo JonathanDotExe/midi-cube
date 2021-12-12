@@ -92,8 +92,8 @@ void ChorusEffect::apply_program(PluginProgram *prog) {
 	}
 }
 
-ViewController* ChorusEffect::create_view() {
-	return new EffectView(this);
+Menu* ChorusEffect::create_menu() {
+	return new FunctionMenu([this](){ return new EffectView(this); }, nullptr);
 }
 
 

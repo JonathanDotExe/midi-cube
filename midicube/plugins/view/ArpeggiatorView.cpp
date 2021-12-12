@@ -15,7 +15,7 @@ ArpeggiatorView::ArpeggiatorView(ArpeggiatorInstance& a) : arp(a) {
 
 Scene ArpeggiatorView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 
 	//Sound engines
 	std::vector<std::string> patterns{"Up", "Down", "Random", "Up/Down", "Down/Up"};
@@ -106,6 +106,14 @@ Scene ArpeggiatorView::create(ViewHost &frame) {
 	sustain->property.bind(arp.arp.preset.sustain, handler);
 	controls.push_back(sustain);
 	tmp_y += 50;
+
+	//Back Button
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
+	back->rect.setFillColor(sf::Color::Yellow);
+	back->set_on_click([&frame, this]() {
+		frame.menu_back();
+	});
+	controls.push_back(back);
 
 	return {controls};
 }

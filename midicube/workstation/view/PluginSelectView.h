@@ -18,12 +18,11 @@ private:
 	PluginSlot& plugin;
 	std::vector<Plugin*> plugins;
 	SpinLock& lock;
-	std::function<ViewController* ()> back;
 	PluginManager& mgr;
 	Clipboard* clipboard;
 	size_t page = 0;
 public:
-	PluginSelectView(PluginSlot& plugin, std::vector<Plugin*> plugins, SpinLock& lock, std::function<ViewController* ()> back, PluginManager& mgr, Clipboard* clipboard = nullptr, size_t page = 0);
+	PluginSelectView(PluginSlot& plugin, std::vector<Plugin*> plugins, SpinLock& lock, PluginManager& mgr, Clipboard* clipboard = nullptr, size_t page = 0);
 	virtual ~PluginSelectView();
 	virtual Scene create(ViewHost &frame);
 };

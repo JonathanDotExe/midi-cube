@@ -5,9 +5,8 @@
  *      Author: jojo
  */
 
+#include <midicube/workstation/midicube.h>
 #include "soundengine.h"
-#include "midicube.h"
-
 #include <algorithm>
 
 
@@ -499,7 +498,7 @@ int SoundEngineChannel::get_transpose() {
 	return 12 * get_octave();
 }
 
-void SoundEngineDevice::init(MidiCube *cube) {
+void SoundEngineDevice::init(MidiCubeWorkstation *cube) {
 	if (this->cube) {
 		throw "MidiCube already initialized";
 	}
@@ -645,4 +644,12 @@ const MidiControls& SoundEngineDeviceHost::get_controls() {
 
 void SoundEngineChannel::notify_property_update(void *property) {
 	notify_property_update(this, property);
+}
+
+MasterPluginHost& SoundEngineDeviceHost::get_master_host() {
+	return *device->get_cube();
+}
+
+MasterPluginHost& SoundEngineChannel::get_master_host() {
+	return *device->get_cube();
 }

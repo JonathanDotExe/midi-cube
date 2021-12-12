@@ -10,9 +10,7 @@
 #include "../view/AnalogSynthView.h"
 #include "../../plugins/resources.h"
 
-AnalogSynthOscilatorView::AnalogSynthOscilatorView(AdvancedSynth& s, size_t part) : synth(s), binder{[&s, part]() {
-	return new AnalogSynthOscilatorView(s, part);
-}, main_font} {
+AnalogSynthOscilatorView::AnalogSynthOscilatorView(AdvancedSynth& s, size_t part) : synth(s), binder{main_font} {
 	this->part = part;
 }
 
@@ -284,7 +282,7 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
 
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 	OscilatorEntity& osc = synth.preset.oscilators.at(this->part);
 
 	//Background
@@ -411,7 +409,7 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 	tmp_y += 75;
 
 	//Edit Sources
-	Button* edit = new Button("Edit Sources", main_font, 18, 75, frame.get_height() - 40, 120, 40);
+	Button* edit = new Button("Edit Sources", main_font, 18, frame.get_width() - 290, frame.get_height() - 40, 120, 40);
 	edit->rect.setFillColor(sf::Color::Yellow);
 	edit->set_on_click([&frame, show_amount, show_source, this]() {
 		edit_source = !edit_source;
@@ -424,12 +422,12 @@ Scene AnalogSynthOscilatorView::create(ViewHost &frame) {
 	});
 	controls.push_back(edit);
 
-	controls.push_back(binder.create_button(75 + 120, frame.get_height() - 40, &frame));
+	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
 	//Back Button
-	Button* back = new Button("Back", main_font, 18, 5, frame.get_height() - 40, 70, 40);
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
 	back->set_on_click([&frame, this]() {
-		frame.change_view(new AnalogSynthView(synth));
+		frame.menu_back();
 	});
 	controls.push_back(back);
 
@@ -451,48 +449,3 @@ bool AnalogSynthOscilatorView::on_action(Control *control) {
 	return binder.on_action(control);
 }
 
-ControlView* AnalogSynthOscilatorView::create_control_view() {
-	ControlView* view = new ControlView("Analog Synth Oscillator " + part);
-	OscilatorEntity& osc = synth.preset.oscilators.at(part);
-	view->bind(&osc.waveform, ControlType::KNOB, 0, 0);
-	view->bind(&osc.volume.velocity_amount, ControlType::KNOB, 1, 0);
-	view->bind(&osc.note, ControlType::KNOB, 2, 0);
-	view->bind(&osc.sync_mul.mod_env_amount, ControlType::KNOB, 3, 0);
-	view->bind(&osc.pitch.mod_env_amount, ControlType::KNOB, 4, 0);
-	view->bind(&osc.pulse_width.mod_env_amount, ControlType::KNOB, 5, 0);
-	view->bind(&osc.pulse_width.lfo_amount, ControlType::KNOB, 6, 0);
-	view->bind(&osc.unison_amount, ControlType::KNOB, 7, 0);
-	view->bind(&osc.semi, ControlType::KNOB, 8, 0);
-
-	view->bind(&osc.phase, ControlType::SLIDER, 0, 0);
-	view->bind(&osc.volume.value, ControlType::SLIDER, 1, 0);
-	view->bind(&osc.sync_mul.value, ControlType::SLIDER, 2, 0);
-	view->bind(&osc.sync_mul.lfo_amount, ControlType::SLIDER, 3, 0);
-	view->bind(&osc.pitch.value, ControlType::SLIDER, 4, 0);
-	view->bind(&osc.pitch.lfo_amount, ControlType::SLIDER, 5, 0);
-	view->bind(&osc.pulse_width.value, ControlType::SLIDER, 6, 0);
-	view->bind(&osc.unison_detune.value, ControlType::SLIDER, 7, 0);
-	view->bind(&osc.transpose, ControlType::SLIDER, 8, 0);
-
-	view->bind(&osc.sync_mul.velocity_amount, ControlType::SLIDER, 2, 1);
-	view->bind(&osc.sync_mul.aftertouch_amount, ControlType::SLIDER, 3, 1);
-	view->bind(&osc.pitch.velocity_amount, ControlType::SLIDER, 4, 1);
-	view->bind(&osc.pitch.aftertouch_amount, ControlType::SLIDER, 5, 1);
-	view->bind(&osc.pulse_width.velocity_amount, ControlType::SLIDER, 6, 1);
-	view->bind(&osc.pulse_width.aftertouch_amount, ControlType::SLIDER, 7, 1);
-
-	view->bind(&osc.sync_mul.mod_env, ControlType::KNOB, 2, 1);
-	view->bind(&osc.sync_mul.lfo, ControlType::KNOB, 3, 1);
-	view->bind(&osc.pitch.mod_env, ControlType::KNOB, 4, 1);
-	view->bind(&osc.pitch.lfo, ControlType::KNOB, 5, 1);
-	view->bind(&osc.pulse_width.mod_env, ControlType::KNOB, 6, 1);
-	view->bind(&osc.pulse_width.lfo, ControlType::KNOB, 7, 1);
-
-	view->bind(&osc.reset, ControlType::BUTTON, 0, 0);
-	view->bind(&osc.randomize, ControlType::BUTTON, 1, 0);
-	view->bind(&osc.fixed_freq, ControlType::BUTTON, 1, 0);
-	view->bind(&osc.sync, ControlType::BUTTON, 3, 0);
-
-	view->init(&synth);
-	return view;
-}

@@ -23,7 +23,6 @@ public:
 
 	virtual ~B3OrganView();
 	virtual bool on_action(Control *control);
-	virtual ControlView* create_control_view();
 };
 
 #endif /* MIDICUBE_GUI_VIEW_B3ORGANVIEW_H_ */

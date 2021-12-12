@@ -7,21 +7,18 @@
 
 #include "frame.h"
 #include "core.h"
+#include "../core/ui.h"
 
 //Frame
-Frame::Frame(int width, int height, std::string title, MasterPluginHost& h, bool render_sleep) : ViewHost(), host(h){
+Frame::Frame(int width, int height, std::string title, bool render_sleep) : ViewHost() {
 	this->width = width;
 	this->height = height;
 	this->title = title;
 	this->render_sleep = render_sleep;
-
 	this->selected = nullptr;
-	h.set_property_change_callback([this](void* source, void* prop) {
-		this->propterty_change(source, prop);
-	});
 }
 
-void Frame::run(ViewController* v) {
+void Frame::run(Menu* m) {
 	//Main loop
 	sf::RenderWindow window(sf::VideoMode(width, height), title, sf::Style::Titlebar | sf::Style::Close);
 	window.setFramerateLimit(30);
@@ -30,7 +27,11 @@ void Frame::run(ViewController* v) {
 	#endif
 
 	//View
-	switch_view(v);
+	change_menu(m, true);
+	if (next_view) {
+		switch_view(next_view);
+		next_view = nullptr;
+	}
 
 	while (window.isOpen()) {
 		//Property changes
@@ -42,7 +43,7 @@ void Frame::run(ViewController* v) {
 			get_view()->update_properties();
 		}
 		//Execute return actions
-		get_master_host().get_action_handler().execute_return_actions();
+		action_handler.execute_return_actions();
 		//Events
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -123,22 +124,36 @@ Frame::~Frame() {
 	delete next_view;
 }
 
-MasterPluginHost& Frame::get_master_host() {
-	return host;
-}
-
 void Frame::notify_remove(Control *control) {
 	if (selected == control) {
 		selected = nullptr;
 	}
 }
 
-void Frame::propterty_change(void *source, void *prop) {
+void Frame::property_change(void *source, void *prop) {
 	update = true;
 	//TODO check for source and prop
 }
 
 void Frame::switch_view(ViewController *view) {
 	ViewHost::switch_view(view);
-	host.change_control_view(view->create_control_view());
+}
+
+ActionHandler& Frame::get_action_handler() {
+	return action_handler;
+}
+
+bool Frame::change_menu(Menu *menu, bool append_history) {
+	if (menu_handler) {
+		menu_handler->change_menu(menu, append_history);
+		return true;
+	}
+	return false;
+}
+
+bool Frame::menu_back() {
+	if (menu_handler) {
+		return menu_handler->back();
+	}
+	return false;
 }

@@ -11,11 +11,8 @@
 #include "../../plugins/resources.h"
 #include "SoundEngineView.h"
 #include "PluginSelectView.h"
-#include "PluginView.h"
 
-SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{[&c, &ch, channel_index]() {
-	return new SoundEngineChannelView(c, ch, channel_index);
-}, main_font} {
+SoundEngineChannelView::SoundEngineChannelView(MidiCubeWorkstation& c, SoundEngineChannel& ch, int channel_index) : cube(c), channel(ch), binder{main_font} {
 
 	this->channel_index = channel_index;
 }
@@ -23,7 +20,7 @@ SoundEngineChannelView::SoundEngineChannelView(MidiCube& c, SoundEngineChannel& 
 Scene SoundEngineChannelView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -44,10 +41,9 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	Button* engine = new Button(engine_name, main_font, 24, 10, 45, 300, 80);
 	engine->rect.setFillColor(sf::Color(0, 180, 255));
 	engine->set_on_click([this, &frame]() {
-		MidiCube& c = cube;
+		MidiCubeWorkstation& c = cube;
 		SoundEngineChannel& ch = channel;
-		int index = channel_index;
-		frame.change_view(new PluginSelectView(channel.engine, cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SOUND_ENGINE), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }, cube.plugin_mgr, &cube.clipboard));
+		frame.change_menu(VIEW_MENU(new PluginSelectView(ch.engine, c.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SOUND_ENGINE), c.lock, c.plugin_mgr, &c.clipboard), &ch, &c));
 	});
 	controls.push_back(engine);
 
@@ -57,15 +53,10 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		//TODO not optimal solution
 		cube.lock.lock();
 		PluginInstance* engine = channel.engine.get_plugin();
-		if (engine) {
-			MidiCube& c = cube;
-			SoundEngineChannel& ch = channel;
-			int index = channel_index;
-			frame.change_view(new PluginView(*engine, [&c, &ch, index]() {
-				return new SoundEngineChannelView(c, ch, index);
-			}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
-		}
 		cube.lock.unlock();
+		if (engine) {
+			frame.change_menu(engine->create_menu());
+		}
 	});
 	controls.push_back(edit_engine);
 	Label* seq_title = new Label("Sequencer", main_font, 18, 10, 200);
@@ -79,10 +70,9 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		Button* sequencer = new Button(sequencer_name, main_font, 18, 10, tmp_y, 200, 60);
 		sequencer->rect.setFillColor(sf::Color(128, 255, 255));
 		sequencer->set_on_click([this, &frame, i]() {
-			MidiCube& c = cube;
+			MidiCubeWorkstation& c = cube;
 			SoundEngineChannel& ch = channel;
-			int index = channel_index;
-			frame.change_view(new PluginSelectView(channel.sequencers[i], cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SEQUENCER), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }, cube.plugin_mgr, &cube.clipboard));
+			frame.change_menu(VIEW_MENU(new PluginSelectView(ch.sequencers[i], c.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_SEQUENCER), c.lock, c.plugin_mgr, &c.clipboard), &ch, &c, i));
 		});
 		controls.push_back(sequencer);
 
@@ -90,15 +80,10 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		edit_sequencer->set_on_click([this, &frame, i]() {
 			cube.lock.lock();
 			PluginInstance* sequencer = channel.sequencers[i].get_plugin();
-			if (sequencer) {
-				MidiCube& c = cube;
-				SoundEngineChannel& ch = channel;
-				int index = channel_index;
-				frame.change_view(new PluginView(*sequencer, [&c, &ch, index]() {
-					return new SoundEngineChannelView(c, ch, index);
-				}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
-			}
 			cube.lock.unlock();
+			if (sequencer) {
+				frame.change_menu(sequencer->create_menu());
+			}
 		});
 		controls.push_back(edit_sequencer);
 		tmp_y += 65;
@@ -116,10 +101,9 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		Button* effect = new Button(effect_name, main_font, 18, 10, tmp_y, 200, 60);
 		effect->rect.setFillColor(sf::Color(128, 255, 255));
 		effect->set_on_click([this, &frame, i]() {
-			MidiCube& c = cube;
+			MidiCubeWorkstation& c = cube;
 			SoundEngineChannel& ch = channel;
-			int index = channel_index;
-			frame.change_view(new PluginSelectView(channel.effects[i], cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), cube.lock, [&c, &ch, index]() { return new SoundEngineChannelView(c, ch, index); }, cube.plugin_mgr, &cube.clipboard));
+			frame.change_menu(VIEW_MENU(new PluginSelectView(ch.effects[i], c.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), c.lock, c.plugin_mgr, &c.clipboard), &ch, &c, i));
 		});
 		controls.push_back(effect);
 		//Edit
@@ -128,15 +112,10 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		edit_effect->set_on_click([this, &frame, i]() {
 			cube.lock.lock();
 			PluginInstance* effect = channel.effects[i].get_plugin();
-			if (effect) {
-				MidiCube& c = cube;
-				SoundEngineChannel& ch = channel;
-				int index = channel_index;
-				frame.change_view(new PluginView(*effect, [&c, &ch, index]() {
-					return new SoundEngineChannelView(c, ch, index);
-				}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
-			}
 			cube.lock.unlock();
+			if (effect) {
+				frame.change_menu(effect->create_menu());
+			}
 		});
 		controls.push_back(edit_effect);
 		tmp_y += 65;
@@ -364,7 +343,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->set_on_click([&frame, this]() {
-		frame.change_view(new SoundEngineView(cube));
+		frame.menu_back();
 	});
 	controls.push_back(back);
 

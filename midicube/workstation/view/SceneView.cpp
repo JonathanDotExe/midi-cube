@@ -14,7 +14,7 @@ SceneView::SceneView(SoundEngineDevice* engine) {
 }
 
 Scene SceneView::create(ViewHost &frame) {
-	this->handler = &frame.get_master_host().get_action_handler();
+	this->handler = &frame.get_action_handler();
 	std::vector<Control*> controls;
 
 	//Background
@@ -47,7 +47,7 @@ Scene SceneView::create(ViewHost &frame) {
 	//Exit Button
 	Button* exit = new Button("Exit", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	exit->set_on_click([&frame, this]() {
-		frame.change_view(new SoundEngineView(*engine->get_cube()));
+		frame.menu_back();
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);

@@ -8,6 +8,7 @@
 #include "control.h"
 #include <iostream>
 #include <cmath>
+#include "../core/ui.h"
 
 //Label
 void Label::update_position(int x, int y, int width, int height) {
@@ -317,10 +318,6 @@ void ViewContainer::notify_remove(Control *control) {
 	get_host()->notify_remove(control);
 }
 
-MasterPluginHost& ViewContainer::get_master_host() {
-	return get_host()->get_master_host();
-}
-
 void ViewContainer::init(ViewHost *host) {
 	Control::init(host);
 	if (next_view) {
@@ -328,4 +325,19 @@ void ViewContainer::init(ViewHost *host) {
 		next_view = nullptr;
 		request_redraw();
 	}
+}
+
+ActionHandler& ViewContainer::get_action_handler() {
+	return get_host()->get_action_handler();
+}
+
+bool ViewContainer::change_menu(Menu *menu, bool append_history) {
+	ViewController* view = menu->create_gui_view();
+	delete menu;
+	change_view(view);
+	return true;
+}
+
+bool ViewContainer::menu_back() {
+	return false;
 }

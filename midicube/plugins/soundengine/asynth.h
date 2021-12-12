@@ -283,7 +283,15 @@ public:
 
 	void apply_program(PluginProgram *prog);
 
-	ViewController* create_view();
+	Menu* create_menu();
+
+	Menu* create_operator_menu(size_t part);
+
+	Menu* create_oscillator_menu(size_t part);
+
+	Menu* create_modulation_menu(size_t part);
+
+	Menu* create_fm_menu();
 
 	~AdvancedSynth();
 

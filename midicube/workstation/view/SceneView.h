@@ -10,9 +10,9 @@
 
 #include "../../framework/gui/core.h"
 #include "../../framework/gui/control.h"
-#include "../midicube.h"
 #include "../soundengine.h"
 #include "../../plugins/resources.h"
+#include "../midicube.h"
 
 class SceneView : public ViewController {
 private:

@@ -345,5 +345,13 @@ public:
 
 };
 
+class ControlViewHost {
+public:
+	virtual void change_control_view(ControlView* view) = 0;
+	virtual ~ControlViewHost() {
+
+	}
+};
+
 
 #endif /* MIDICUBE_FRAMEWORK_CORE_CONTROL_H_ */

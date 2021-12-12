@@ -11,8 +11,9 @@
 #include <atomic>
 #include "../util/util.h"
 #include "../data/data.h"
-#include "../core/plugin.h"
 #include "core.h"
+
+class MenuHandler;
 
 class Frame : public ViewHost {
 private:
@@ -31,19 +32,25 @@ private:
 
 	bool render_sleep = true;
 	std::atomic<bool> update{false};
+	ActionHandler action_handler;
 
-	MasterPluginHost& host;
+	MenuHandler* menu_handler = nullptr;
 
 public:
-	Frame(int width, int height, std::string title, MasterPluginHost& host, bool render_sleep = true);
+	Frame(int width, int height, std::string title, bool render_sleep = true);
 
-	virtual void run(ViewController* v);
+	void init_menu_handler(MenuHandler* menu_handler) {
+		if (this->menu_handler) {
+			throw "Menu Handler already initialized!";
+		}
+		this->menu_handler = menu_handler;
+	}
+
+	virtual void run(Menu* m);
 
 	virtual void update_properties();
 
-	virtual void propterty_change(void* source, void* prop);
-
-	virtual MasterPluginHost& get_master_host();
+	virtual void property_change(void* source, void* prop);
 
 	void request_redraw() {
 		redraw = true;
@@ -77,6 +84,9 @@ public:
 	}
 
 	virtual void notify_remove(Control *control);
+	virtual ActionHandler& get_action_handler();
+	virtual bool change_menu(Menu *menu, bool append_history=true);
+	virtual bool menu_back();
 
 protected:
 	virtual void switch_view(ViewController *view);
