@@ -1,4 +1,4 @@
-#include <midicube/workstation/midicube.h>
+#include "midicube/workstation/midicube.h"
 #include <iostream>
 
 #include "midicube/workstation/view/SoundEngineView.h"

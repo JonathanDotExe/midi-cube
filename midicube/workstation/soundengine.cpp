@@ -5,7 +5,7 @@
  *      Author: jojo
  */
 
-#include <midicube/workstation/midicube.h>
+#include "midicube.h"
 #include "soundengine.h"
 #include <algorithm>
 
