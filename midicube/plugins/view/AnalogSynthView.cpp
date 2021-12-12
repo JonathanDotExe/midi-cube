@@ -15,7 +15,7 @@
 
 
 AnalogSynthView::AnalogSynthView(AdvancedSynth& s) : synth(s), binder{main_font} {
-
+	std::cout << "Constructor " << this << std::endl;
 }
 
 Scene AnalogSynthView::create(ViewHost &frame) {
@@ -176,15 +176,17 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 	tmp_x = 10;
 	tmp_y += 75;
 
+	Button* midi = nullptr;
+	midi = binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame);
+	controls.push_back(midi);
+
 	Button* fm = new Button("FM Algorithm", main_font, 14, tmp_x, tmp_y,  pane_width - 15, 30);
 	fm->rect.setFillColor(sf::Color(0, 180, 255));
 	fm->set_on_click([&frame, this]{
 		frame.change_menu(synth.create_fm_menu());
 	});
 	controls.push_back(fm);
-	controls.push_back(binder.create_button(5, frame.get_height() - 40, &frame));
 
-	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);

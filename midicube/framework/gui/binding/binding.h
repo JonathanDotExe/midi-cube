@@ -88,7 +88,7 @@ public:
 	}
 
 	Button* create_button(int x, int y, ViewHost* frame) {
-		if (button) {
+		if (this->button) {
 			throw "Button can only be created once!";
 		}
 		this->frame = frame;
