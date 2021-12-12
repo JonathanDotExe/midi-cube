@@ -53,10 +53,10 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		//TODO not optimal solution
 		cube.lock.lock();
 		PluginInstance* engine = channel.engine.get_plugin();
+		cube.lock.unlock();
 		if (engine) {
 			frame.change_menu(engine->create_menu());
 		}
-		cube.lock.unlock();
 	});
 	controls.push_back(edit_engine);
 	Label* seq_title = new Label("Sequencer", main_font, 18, 10, 200);
@@ -80,10 +80,10 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		edit_sequencer->set_on_click([this, &frame, i]() {
 			cube.lock.lock();
 			PluginInstance* sequencer = channel.sequencers[i].get_plugin();
+			cube.lock.unlock();
 			if (sequencer) {
 				frame.change_menu(sequencer->create_menu());
 			}
-			cube.lock.unlock();
 		});
 		controls.push_back(edit_sequencer);
 		tmp_y += 65;
@@ -112,10 +112,10 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		edit_effect->set_on_click([this, &frame, i]() {
 			cube.lock.lock();
 			PluginInstance* effect = channel.effects[i].get_plugin();
+			cube.lock.unlock();
 			if (effect) {
 				frame.change_menu(effect->create_menu());
 			}
-			cube.lock.unlock();
 		});
 		controls.push_back(edit_effect);
 		tmp_y += 65;

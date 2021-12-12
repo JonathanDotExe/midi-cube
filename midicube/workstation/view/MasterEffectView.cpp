@@ -66,10 +66,10 @@ Scene MasterEffectView::create(ViewHost &frame) {
 		edit_effect->set_on_click([this, i, &effect, &frame]() {
 			cube.lock.lock();
 			PluginInstance* eff = effect.effect.get_plugin();
+			cube.lock.unlock();
 			if (eff) {
 				frame.change_menu(eff->create_menu());
 			}
-			cube.lock.unlock();
 		});
 		controls.push_back(edit_effect);
 
