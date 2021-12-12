@@ -110,7 +110,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 	tmp_x += 90;
 
 	//Edit Sources
-	Button* edit = new Button("Edit Sources", main_font, 18, 75, frame.get_height() - 40, 120, 40);
+	Button* edit = new Button("Edit Sources", main_font, 18, frame.get_width() - 290, frame.get_height() - 40, 120, 40);
 	edit->rect.setFillColor(sf::Color::Yellow);
 	edit->set_on_click([&frame, show_amount, show_source, this]() {
 		edit_source = !edit_source;
