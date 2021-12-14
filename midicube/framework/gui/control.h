@@ -516,9 +516,6 @@ public:
 	virtual Control* on_mouse_pressed(int x, int y, sf::Mouse::Button button);
 	virtual void update_properties();
 	virtual void draw(sf::RenderWindow &window, Control* selected);
-	MasterPluginHost& get_master_host();
-
-
 
 	virtual ~ViewContainer() {
 		delete next_view;
@@ -526,6 +523,9 @@ public:
 
 	virtual void notify_remove(Control *control);
 	virtual void init(ViewHost *host);
+	virtual ActionHandler& get_action_handler();
+	virtual bool change_menu(Menu *menu, bool append_history);
+	virtual bool menu_back();
 };
 
 

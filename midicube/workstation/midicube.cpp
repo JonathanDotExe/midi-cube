@@ -5,7 +5,6 @@
  *      Author: jojo
  */
 
-#include "midicube.h"
 #include <iostream>
 
 
@@ -33,17 +32,19 @@
 
 #include <boost/property_tree/xml_parser.hpp>
 
+#include "midicube.h"
+
 #define MIDICUBE_CONFIG_PATH "./data/config.xml"
 
 static void process_func(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info, void* user_data) {
-	((MidiCube*) user_data)->process(lsample, rsample, inputs, input_count, info);
+	((MidiCubeWorkstation*) user_data)->process(lsample, rsample, inputs, input_count, info);
 }
 
-MidiCube::MidiCube() : prog_mgr("./data/programs", "./data/program_index.xml", "./resources/presets") {
+MidiCubeWorkstation::MidiCubeWorkstation() : prog_mgr("./data/programs", "./data/program_index.xml", "./resources/presets") {
 	audio_handler.set_sample_callback(&process_func, this);
 }
 
-void MidiCube::init() {
+void MidiCubeWorkstation::init() {
 	engine.init(this);
 	//Sound Engines
 	plugin_mgr.add_plugin(new AdvancedSynthPlugin());
@@ -123,10 +124,10 @@ void MidiCube::init() {
 	audio_handler.init(config.driver, config.sample_rate, config.buffer_size, config.output_device, config.input_device, config.input_channels);
 }
 
-void MidiCube::process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info) {
-	if (lock.try_lock()) {
+void MidiCubeWorkstation::process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info) {
+	if (lock.try_lock_quick()) {
 		//Actions
-		action_handler.execute_realtime_actions();
+		menu_handler.realtime_process();
 		//Messages
 		size_t i = 0;
 		for (MidiCubeInput in : this->inputs) {
@@ -142,11 +143,11 @@ void MidiCube::process(double& lsample, double& rsample, double* inputs, const s
 	}
 }
 
-std::vector<MidiCubeInput> MidiCube::get_inputs() {
+std::vector<MidiCubeInput> MidiCubeWorkstation::get_inputs() {
 	return inputs;
 }
 
-inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
+inline void MidiCubeWorkstation::process_midi(MidiMessage& message, size_t input) {
 	SampleInfo info = audio_handler.sample_info();
 	size_t s = std::min((size_t) SOUND_ENGINE_MIDI_CHANNELS, used_sources);
 	//Sources
@@ -179,11 +180,11 @@ inline void MidiCube::process_midi(MidiMessage& message, size_t input) {
 	}
 }
 
-const MidiCubeConfig& MidiCube::get_config() const {
+const MidiCubeConfig& MidiCubeWorkstation::get_config() const {
 	return config;
 }
 
-MidiCube::~MidiCube() {
+MidiCubeWorkstation::~MidiCubeWorkstation() {
 	lock.lock();
 	audio_handler.close();
 	//Save programs
@@ -209,36 +210,26 @@ MidiCube::~MidiCube() {
 	delete view;
 }
 
-void MidiCube::save_program(Program *prog) {
+void MidiCubeWorkstation::save_program(Program *prog) {
 	lock.lock();
 	engine.save_program(prog);
 	lock.unlock();
 	std::cout << "Saved program: " << prog->name << std::endl;
 }
 
-void MidiCube::apply_program(Program *prog) {
+void MidiCubeWorkstation::apply_program(Program *prog) {
 	lock.lock();
 	engine.apply_program(prog);
 	lock.unlock();
 	std::cout << "Selected program: " << prog->name << std::endl;
 }
 
-void MidiCube::notify_property_update(void *source, void *prop) {
-	if (property_callback) {
-		property_callback(source, prop);
-	}
+void MidiCubeWorkstation::notify_property_update(void *source, void *prop) {
+	menu_handler.propterty_change(source, prop);
 }
 
-PluginManager& MidiCube::get_plugin_manager() {
+PluginManager& MidiCubeWorkstation::get_plugin_manager() {
 	return plugin_mgr;
-}
-
-ActionHandler& MidiCube::get_action_handler() {
-	return action_handler;
-}
-
-void MidiCube::set_property_change_callback(std::function<void(void*, void*)> cb) {
-	property_callback = cb;
 }
 
 void MidiCubeConfig::load(pt::ptree tree) {
@@ -294,13 +285,13 @@ void MidiCubeConfig::load(pt::ptree tree) {
 			controls.scene_buttons.push_back(button.second.get_value<unsigned int>(128));
 		}
 	}
-	controls.mod_wheel = tree.get<unsigned int>("controls.mod_wheel", 128);
-	controls.breath_controller = tree.get<unsigned int>("controls.breath_controller", 128);
-	controls.volume_pedal = tree.get<unsigned int>("controls.volume_pedal", 128);
-	controls.expresion_pedal = tree.get<unsigned int>("controls.expression_pedal", 128);
-	controls.sustain_pedal = tree.get<unsigned int>("controls.sustain_pedal", 128);
-	controls.sostenuto_pedal = tree.get<unsigned int>("controls.sostenuto_pedal", 128);
-	controls.soft_pedal = tree.get<unsigned int>("controls.soft_pedal", 128);
+	controls.mod_wheel = tree.get<unsigned int>("controls.mod_wheel", controls.mod_wheel);
+	controls.breath_controller = tree.get<unsigned int>("controls.breath_controller", controls.breath_controller);
+	controls.volume_pedal = tree.get<unsigned int>("controls.volume_pedal", controls.volume_pedal);
+	controls.expresion_pedal = tree.get<unsigned int>("controls.expression_pedal", controls.expresion_pedal);
+	controls.sustain_pedal = tree.get<unsigned int>("controls.sustain_pedal", controls.sustain_pedal);
+	controls.sostenuto_pedal = tree.get<unsigned int>("controls.sostenuto_pedal", controls.sostenuto_pedal);
+	controls.soft_pedal = tree.get<unsigned int>("controls.soft_pedal", controls.soft_pedal);
 }
 
 pt::ptree MidiCubeConfig::save() {
@@ -359,13 +350,13 @@ pt::ptree MidiCubeConfig::save() {
 	return tree;
 }
 
-void MidiCube::copy_program() {
+void MidiCubeWorkstation::copy_program() {
 	Program* prog = new Program("");
 	engine.save_program(prog);
 	clipboard.copy(prog);
 }
 
-bool MidiCube::paste_program() {
+bool MidiCubeWorkstation::paste_program() {
 	bool success = false;
 	prog_mgr.lock();
 	Program* prog = clipboard.paste<Program>();
@@ -377,7 +368,21 @@ bool MidiCube::paste_program() {
 	return success;
 }
 
-void MidiCube::change_control_view(ControlView *view) {
+void MidiCubeWorkstation::change_control_view(ControlView *view) {
+	lock.lock();
 	delete this->view;
 	this->view = view;
+	lock.unlock();
+}
+
+SpinLock& MidiCubeWorkstation::get_lock() {
+	return lock;
+}
+
+MidiBindingHandler* MidiCubeWorkstation::get_binding_handler() {
+	return &engine.binding_handler;
+}
+
+MenuHandler& MidiCubeWorkstation::get_menu_handler() {
+	return menu_handler;
 }

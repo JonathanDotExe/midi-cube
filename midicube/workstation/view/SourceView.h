@@ -16,10 +16,10 @@
 
 class SourceView : public ViewController {
 private:
-	MidiCube& cube;
+	MidiCubeWorkstation& cube;
 
 public:
-	SourceView(MidiCube& c);
+	SourceView(MidiCubeWorkstation& c);
 	virtual ~SourceView();
 	virtual Scene create(ViewHost &frame);
 	virtual void update_properties();

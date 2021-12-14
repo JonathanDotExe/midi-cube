@@ -278,7 +278,7 @@ public:
 
 	void apply_program(PluginProgram *prog);
 
-	ViewController* create_view();
+	Menu* create_menu();
 
 	~Sampler();
 

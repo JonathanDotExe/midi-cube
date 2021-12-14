@@ -23,9 +23,7 @@
 #include "../../plugins/resources.h"
 
 EffectView::EffectView(PluginInstance* e) :
-		effect(e), binder{e->get_lock(), [e]() {
-			return new EffectView(e);
-		}, main_font} {
+		effect(e), binder{main_font} {
 
 }
 
@@ -34,7 +32,7 @@ EffectView::~EffectView() {
 }
 
 Scene EffectView::create(ViewHost &frame) {
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 	SpinLock& lock = effect->get_host().get_lock();
 	lock.lock();
 	std::vector<Control*> controls;
@@ -1714,10 +1712,14 @@ Scene EffectView::create(ViewHost &frame) {
 		}
 	}
 
-	controls.push_back(binder.create_button(frame.get_width() - 100, frame.get_height() - 40, &frame));
-
-
-
+	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
+	//Back Button
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
+	back->rect.setFillColor(sf::Color::Yellow);
+	back->set_on_click([&frame, this]() {
+		frame.menu_back();
+	});
+	controls.push_back(back);
 	lock.unlock();
 	return {controls};
 }

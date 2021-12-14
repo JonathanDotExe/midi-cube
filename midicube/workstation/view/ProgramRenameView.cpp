@@ -10,7 +10,7 @@
 #include <boost/algorithm/string.hpp>
 #include "../view/ProgramView.h"
 
-ProgramRenameView::ProgramRenameView(MidiCube& c, std::string name, std::function<void(std::string name)> action) : cube(c) {
+ProgramRenameView::ProgramRenameView(MidiCubeWorkstation& c, std::string name, std::function<void(std::string name)> action) : cube(c) {
 	this->action = action;
 	this->name = name;
 }
@@ -72,7 +72,7 @@ Scene ProgramRenameView::create(ViewHost &frame) {
 			//Update name
 			action(name);
 			//Change view
-			frame.change_view(new ProgramView(cube));
+			frame.menu_back();
 		});
 		back->rect.setFillColor(sf::Color::Yellow);
 		controls.push_back(back);

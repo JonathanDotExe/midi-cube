@@ -58,8 +58,8 @@ void DelayEffect::process(const SampleInfo& info) {
 	}
 }
 
-ViewController* DelayEffect::create_view() {
-	return new EffectView(this);
+Menu* DelayEffect::create_menu() {
+	return new FunctionMenu([this](){ return new EffectView(this); }, nullptr);
 }
 
 

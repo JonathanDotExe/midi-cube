@@ -16,6 +16,7 @@
 
 #define SELECTABLE virtual bool selectable() const { return true; };
 
+class Menu;
 class MasterPluginHost;
 
 //TODO pseudo host for controls
@@ -115,10 +116,6 @@ public:
 		return true;
 	}
 
-	virtual ControlView* create_control_view() {
-		return nullptr;
-	}
-
 	virtual ~ViewController() {
 
 	}
@@ -150,6 +147,10 @@ public:
 
 	virtual void close() = 0;
 
+	virtual bool change_menu(Menu* menu, bool append_history=true) = 0;
+
+	virtual bool menu_back() = 0;
+
 	virtual Control* on_mouse_pressed (int x, int y, sf::Mouse::Button button);
 
 	virtual void on_mouse_released(int x, int y, sf::Mouse::Button button);
@@ -157,6 +158,8 @@ public:
 	virtual std::vector<Control*> get_controls() {
 		return controls;
 	}
+
+	virtual ActionHandler& get_action_handler() = 0;
 
 	virtual void add_control(Control* control) {
 		if (control == nullptr) {
@@ -187,8 +190,6 @@ public:
 		delete control;
 		request_redraw();
 	}
-
-	virtual MasterPluginHost& get_master_host() = 0;
 
 	virtual ~ViewHost() {
 		delete view;

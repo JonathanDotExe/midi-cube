@@ -107,8 +107,8 @@ void CompressorEffect::apply_program(PluginProgram *prog) {
 	}
 }
 
-ViewController* CompressorEffect::create_view() {
-	return new EffectView(this);
+Menu* CompressorEffect::create_menu() {
+	return new FunctionMenu([this](){ return new EffectView(this); }, nullptr);
 }
 
 

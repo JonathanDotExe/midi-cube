@@ -34,7 +34,7 @@ namespace pt = boost::property_tree;
 #define CHANNEL_INSERT_EFFECT_AMOUNT 2
 #define SOUND_ENGINE_MASTER_EFFECT_AMOUNT 16
 
-class MidiCube;
+class MidiCubeWorkstation;
 class SoundEngineDevice;
 class SoundEngineChannel;
 
@@ -96,7 +96,7 @@ struct ChannelProgram : public Copyable {
 	}
 };
 
-class SoundEngineChannel : public PluginHost {
+class SoundEngineChannel : public PluginHost, public ControlHost {
 private:
 	SoundEngineDevice* device = nullptr;
 
@@ -116,6 +116,8 @@ public:
 
 	size_t polyphony_limit = 0;
 
+	MasterPluginHost& get_master_host();
+	void notify_property_update(void *property);
 	int get_transpose();
 	void notify_property_update(void *source, void *prop);
 	virtual SpinLock& get_lock();
@@ -275,12 +277,14 @@ public:
 	SpinLock& get_lock();
 	int get_transpose();
 
+
 	~SoundEngineDeviceHost() {
 
 	}
 
 	void notify_property_update(void *source, void *prop);
 	const MidiControls& get_controls();
+	MasterPluginHost& get_master_host();
 };
 
 
@@ -295,7 +299,7 @@ private:
 	size_t clock_beat_count = 0;
 	double first_beat_time = 0;
 
-	MidiCube* cube = nullptr;
+	MidiCubeWorkstation* cube = nullptr;
 	SoundEngineDeviceHost host;
 
 public:
@@ -307,13 +311,10 @@ public:
 	std::array<MasterEffect, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
 	double volume{0.2};
 	size_t scene{0};
-	std::array<unsigned int, SOUND_ENGINE_SCENE_AMOUNT> scene_ccs = {52, 53, 54, 55, 57, 58, 59, 60};
-
-	unsigned int sustain_control{64};
 
 	SoundEngineDevice();
 
-	void init(MidiCube* cube);
+	void init(MidiCubeWorkstation* cube);
 
 	void send(MidiMessage& message, size_t input, MidiSource& source, SampleInfo& info);
 
@@ -323,7 +324,7 @@ public:
 
 	void save_program(Program* program);
 
-	MidiCube* get_cube() {
+	MidiCubeWorkstation* get_cube() {
 		return cube;
 	}
 

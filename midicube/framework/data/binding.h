@@ -26,6 +26,8 @@ public:
 
 	bool persistent = true;
 	unsigned int cc = 128;
+	unsigned int bank = 0;
+	ControlType type = ControlType::CC;
 
 	virtual void change(double val) = 0;
 
@@ -72,6 +74,7 @@ public:
 		this->total_max = other.total_max;
 		this->cc = other.cc;
 		this->persistent = other.persistent;
+		this->type = other.type;
 	}
 
 	inline BindableTemplateValue<T>& operator=(const BindableTemplateValue<T>& other) {
@@ -84,6 +87,7 @@ public:
 			this->total_max = other.total_max;
 			this->cc = other.cc;
 			this->persistent = other.persistent;
+			this->type = other.type;
 		}
 		return *this;
 	}
@@ -120,7 +124,9 @@ public:
 			binding_min = total_min;
 			binding_max = total_max;
 			cc = 128;
+			bank = 0;
 			persistent = true;
+			type = ControlType::CC;
 		}
 	}
 
@@ -130,7 +136,9 @@ public:
 		binding_min = tree.get("binding_min", binding_min);
 		binding_max = tree.get("binding_max", binding_max);
 		cc = tree.get("cc", cc);
+		bank = tree.get("bank", bank);
 		persistent = tree.get("persistent", persistent);
+		type = static_cast<ControlType>(tree.get<int>("type", type));
 	}
 
 	void save(boost::property_tree::ptree& tree, std::string path) {
@@ -144,7 +152,9 @@ public:
 		tree.put("binding_min", binding_min);
 		tree.put("binding_max", binding_max);
 		tree.put("cc", cc);
+		tree.put("bank", bank);
 		tree.put("persistent", persistent);
+		tree.put("type", static_cast<int>(type));
 
 		return tree;
 	}
@@ -197,7 +207,7 @@ public:
 	}
 
 	void change(double val) {
-		value = val > 0;
+		value = val >= 0.5;
 		if (persistent) {
 			default_value = value;
 		}
@@ -212,7 +222,9 @@ public:
 			value = parent.get<bool>(path, def);
 			default_value = value;
 			cc = 128;
+			bank = 0;
 			persistent = true;
+			type = ControlType::CC;
 		}
 	}
 
@@ -220,7 +232,10 @@ public:
 		value = tree.get("value", default_value);
 		default_value = value;
 		cc = tree.get("cc", cc);
+		bank = tree.get("bank", bank);
 		persistent = tree.get("persistent", persistent);
+		type = static_cast<ControlType>(tree.get<int>("type", type));
+
 	}
 
 	void save(boost::property_tree::ptree& tree, std::string path) {
@@ -231,7 +246,9 @@ public:
 		boost::property_tree::ptree tree;
 		tree.put("value", default_value);
 		tree.put("cc", cc);
+		tree.put("bank", bank);
 		tree.put("persistent", persistent);
+		tree.put("type", static_cast<int>(type));
 
 		return tree;
 	}
@@ -242,11 +259,11 @@ class MidiBindingHandler {
 private:
 	/*std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> persistent;
 	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> temp;*/
-	std::vector<std::pair<void*, BindableValue*>> bindings;
+	std::vector<std::pair<ControlHost*, BindableValue*>> bindings;
 
 public:
 
-	void bind(void* source, BindableValue* value) {
+	void bind(ControlHost* source, BindableValue* value) {
 		bindings.push_back({source, value});
 		/*//Unbind
 		if (value->persistent_cc < MIDI_CONTROL_COUNT) {
@@ -286,8 +303,8 @@ public:
 
 	std::vector<std::pair<void*, void*>> on_cc(unsigned int control, double value) {
 		std::vector<std::pair<void*, void*>> changes;
-		for (std::pair<void*, BindableValue*> val : bindings) {
-			if (val.second->cc == control) {
+		for (std::pair<ControlHost*, BindableValue*> val : bindings) {
+			if (val.first->get_controls().get_cc(val.second->type, val.second->cc, val.second->bank) == control) {
 				val.second->change(value);
 				changes.push_back(val); //TODO
 			}
@@ -300,8 +317,8 @@ public:
 class LocalMidiBindingHandler {
 private:
 	std::vector<BindableValue*> values;
-	void* source = nullptr;
 	MidiBindingHandler* handler = nullptr;
+	ControlHost* source = nullptr;
 
 public:
 
@@ -309,7 +326,7 @@ public:
 		values.push_back(value);
 	}
 
-	void init(MidiBindingHandler* handler, void* source) {
+	void init(MidiBindingHandler* handler, ControlHost* source) {
 		if (this->handler || this->source) {
 			throw "Binding handler already initialized";
 		}
