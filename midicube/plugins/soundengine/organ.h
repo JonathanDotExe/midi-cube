@@ -83,7 +83,7 @@ struct B3OrganTonewheelData {
 class B3OrganTonewheel {
 public:
 	double rotation = 0;
-	double volume = 0;
+	PortamendoBuffer volume{0, 0};
 	double compress_volume = 0;
 	double process(const SampleInfo& info, double freq, OrganType type);
 };
