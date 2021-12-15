@@ -181,6 +181,22 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_x += 90;
 		}
 
+		//Rotary Speed
+		{
+			Label *label = new Label("Stop", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *rotary_speed = new OrganSwitch(false, main_font, tmp_x,
+					tmp_y, 80, 60, "Stop", "Running");
+			rotary_speed->property.bind(rotary->preset.stop, handler);
+			controls.push_back(rotary_speed);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+
 		//Rotary Stereo Mix
 		{
 			Label *label = new Label("Stereo", main_font, 18, tmp_x, tmp_y);
@@ -244,6 +260,9 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_y -= 25;
 			tmp_x += 90;
 		}
+		tmp_y += 100;
+		tmp_x = 10;
+
 		//Mix
 		{
 			Label *label = new Label("Mix", main_font, 18, tmp_x, tmp_y);
@@ -259,8 +278,6 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_y -= 25;
 			tmp_x += 90;
 		}
-		tmp_y += 100;
-		tmp_x = 10;
 
 		//Horn Slow Freq
 		{

@@ -85,9 +85,9 @@ private:
 
 	DelayBuffer left_delay;
 	DelayBuffer right_delay;
-	RotaryState curr_rotary_state = RotaryState::ROTARY_SLOW;
-	PortamendoBuffer horn_speed{ROTARY_HORN_SLOW_FREQUENCY, ROTARY_HORN_SLOW_RAMP};
-	PortamendoBuffer bass_speed{ROTARY_BASS_SLOW_FREQUENCY, ROTARY_BASS_SLOW_RAMP};
+	RotaryState curr_rotary_state = RotaryState::ROTARY_STOP;
+	PortamendoBuffer horn_speed{0, 0};
+	PortamendoBuffer bass_speed{0, 0};
 	double horn_rotation = 0;
 	double bass_rotation = 0;
 public:

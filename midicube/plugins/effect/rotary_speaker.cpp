@@ -106,6 +106,7 @@ RotarySpeakerEffect::~RotarySpeakerEffect() {
 
 void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 	preset.on.load(tree, "on", true);
+	preset.stop.load(tree, "stop", false);
 	preset.fast.load(tree, "fast", false);
 
 	preset.stereo_mix = tree.get<double>("stereo_mix", 0.7);
@@ -128,6 +129,7 @@ void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 boost::property_tree::ptree RotarySpeakerProgram::save() {
 	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
+	tree.add_child("stop", preset.stop.save());
 	tree.add_child("fast", preset.fast.save());
 
 	tree.put("stereo_mix", preset.stereo_mix);
