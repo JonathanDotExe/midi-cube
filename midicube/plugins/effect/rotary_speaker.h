@@ -33,6 +33,10 @@
 #define ROTARY_BASS_SLOW_RAMP 5.5
 #define ROTARY_BASS_FAST_RAMP 5.5
 
+enum RotaryState {
+	ROTARY_STOP, ROTARY_SLOW, ROTARY_FAST
+};
+
 struct RotarySpeakerPreset {
 	BindableBooleanValue on = true;
 	BindableBooleanValue stop = false;
@@ -54,6 +58,10 @@ struct RotarySpeakerPreset {
 	double horn_fast_ramp = ROTARY_HORN_FAST_RAMP;
 	double bass_slow_ramp = ROTARY_BASS_SLOW_RAMP;
 	double bass_fast_ramp = ROTARY_BASS_FAST_RAMP;
+
+	inline RotaryState state() {
+		return fast ? RotaryState::ROTARY_FAST : (stop ? RotaryState::ROTARY_STOP : RotaryState::ROTARY_SLOW);
+	}
 };
 
 
@@ -77,8 +85,7 @@ private:
 
 	DelayBuffer left_delay;
 	DelayBuffer right_delay;
-	bool curr_rotary_fast = false;
-	bool curr_rotary_stop = false;
+	RotaryState curr_rotary_state = RotaryState::ROTARY_SLOW;
 	PortamendoBuffer horn_speed{ROTARY_HORN_SLOW_FREQUENCY, ROTARY_HORN_SLOW_RAMP};
 	PortamendoBuffer bass_speed{ROTARY_BASS_SLOW_FREQUENCY, ROTARY_BASS_SLOW_RAMP};
 	double horn_rotation = 0;

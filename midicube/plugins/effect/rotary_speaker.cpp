@@ -76,19 +76,23 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 	bass_rotation -= bass_speed.get(info.time) * info.time_step;
 
 	//Switch speaker speed
-	if (curr_rotary_fast != preset.fast) {
-		curr_rotary_fast = preset.fast;
-		if (curr_rotary_fast) {
-			horn_speed.set(preset.horn_fast_frequency, info.time, preset.horn_fast_ramp, preset.horn_fast_frequency - preset.horn_slow_frequency);
-			bass_speed.set(preset.bass_fast_frequency, info.time, preset.horn_slow_frequency, preset.bass_fast_frequency - preset.bass_slow_frequency);
-		}
-		else {
+	RotaryState state = preset.state();
+	if (curr_rotary_state != state) {
+		curr_rotary_state = state;
+		switch (state) {
+		case RotaryState::ROTARY_SLOW:
 			horn_speed.set(preset.horn_slow_frequency, info.time, preset.horn_slow_ramp, preset.horn_fast_frequency - preset.horn_slow_frequency);
 			bass_speed.set(preset.bass_slow_frequency, info.time, preset.bass_slow_ramp, preset.bass_fast_frequency - preset.bass_slow_frequency);
+			break;
+		case RotaryState::ROTARY_STOP:
+			horn_speed.set(0, info.time, preset.horn_slow_ramp, preset.horn_fast_frequency - preset.horn_slow_frequency);
+			bass_speed.set(0, info.time, preset.bass_slow_ramp, preset.bass_fast_frequency - preset.bass_slow_frequency);
+			break;
+		case RotaryState::ROTARY_FAST:
+			horn_speed.set(preset.horn_fast_frequency, info.time, preset.horn_fast_ramp, preset.horn_fast_frequency - preset.horn_slow_frequency);
+			bass_speed.set(preset.bass_fast_frequency, info.time, preset.bass_fast_ramp, preset.bass_fast_frequency - preset.bass_slow_frequency);
+			break;
 		}
-	}
-	if (curr_rotary_stop != preset.stop) {
-
 	}
 }
 
