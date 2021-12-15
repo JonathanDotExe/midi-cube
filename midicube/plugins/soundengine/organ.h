@@ -43,7 +43,7 @@ struct B3OrganPreset {
 	double harmonic_foldback_volume{1};
 	double multi_note_gain{0.8};
 	double high_gain_reduction = 0.5;
-	double click_attack = 0.00004;
+	double click_attack = 0.00001;
 
 	BindableBooleanValue percussion{false};
 	BindableBooleanValue percussion_third_harmonic{true};
@@ -83,9 +83,10 @@ struct B3OrganTonewheelData {
 class B3OrganTonewheel {
 public:
 	double rotation = 0;
-	PortamendoBuffer volume{0, 0};
+	double volume = 0;
 	double compress_volume = 0;
-	double process(const SampleInfo& info, double freq, OrganType type);
+	PortamendoBuffer volume_buffer{0, 0};
+	double process(const SampleInfo& info, double freq, OrganType type, double vol_mul, double click_time);
 };
 
 class B3OrganData {

@@ -12,9 +12,10 @@
 #include <cmath>
 
 //B3OrganTonewheel
-double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType type) {
+double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType type, double vol_mul, double click_time) {
 	//Rotation
-	double volume = this->volume;
+	this->volume_buffer.set(this->volume * vol_mul, info.time, click_time, 1);
+	double volume = this->volume_buffer.get(info.time);
 	rotation += freq * info.time_step;
 	this->volume = 0;
 	this->compress_volume = 0;
@@ -108,10 +109,10 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& 
 	if (tonewheel >= 0 &&
 			info.time >= note.start_time + tonewheel_data[tonewheel].press_delay) {
 		if (note.pressed || info.time <= note.release_time + tonewheel_data[tonewheel].release_delay) {
-			data.tonewheels[tonewheel].volume += volume * vol_mul * fmin(1, (info.time - note.start_time - tonewheel_data[tonewheel].press_delay)/data.preset.click_attack);
+			data.tonewheels[tonewheel].volume += volume * vol_mul;
 		}
 		else {
-			data.tonewheels[tonewheel].volume += volume * vol_mul * fmax(0, 1 - (info.time - note.release_time - tonewheel_data[tonewheel].release_delay)/data.preset.click_attack);
+			data.tonewheels[tonewheel].volume += volume * vol_mul;
 		}
 		data.tonewheels[tonewheel].compress_volume += compress_volume;
 	}
@@ -164,19 +165,22 @@ void B3Organ::process_sample(const SampleInfo &info) {
 	}
 
 	//Play organ sound
-	//Compute samples
+	//Compress
 	double sample = 0;
 	double volume = 0;
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
 		volume += data.tonewheels[i].compress_volume;
-		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend, data.preset.type) * (1 + (tonewheel_data[i].volume - 1) * data.preset.high_gain_reduction);
 	}
 	sample *= swell;
-	//Compress
+	double vol_mul = 1;
 	if (volume && data.preset.multi_note_gain != 1) {
-		//double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
-		sample *= pow(volume, data.preset.multi_note_gain)/volume;
+		vol_mul = pow(volume, data.preset.multi_note_gain)/volume;
 	}
+	//Compute samples
+	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
+		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend, data.preset.type, vol_mul, data.preset.click_attack) * (1 + (tonewheel_data[i].volume - 1) * data.preset.high_gain_reduction);
+	}
+	sample *= swell;
 
 	//Chorus/Vibrato
 	if (data.preset.vibrato_mix) {
