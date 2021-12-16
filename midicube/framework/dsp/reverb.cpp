@@ -33,9 +33,9 @@ double SchroederReverb::apply(double sample, const SchroederReverbData &data, co
 	//All pass filters
 	unsigned int allpass_delay = (this->allpass_delay) * info.sample_rate;
 	for (size_t i = 0; i < REVERB_ALLPASS_FILTERS; ++i) {
-		out = allpass_filters[i].process(sample, allpass_decay, allpass_delay);
+		out = allpass_filters[i].process(out, allpass_decay, allpass_delay);
 	}
 	//Apply
-	sample /= 3.0;
-	return sample;
+	out /= 3.0;
+	return out;
 }

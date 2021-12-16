@@ -36,9 +36,8 @@ public:
 };
 
 struct SchroederReverbData {
-	double delay;
-	double feedback;
-
+	double delay = 0;
+	double feedback = 0;
 };
 
 class SchroederReverb {

@@ -35,17 +35,15 @@ void ReverbEffect::process(const SampleInfo &info) {
 		l = lreverb.apply(outputs[0], data, info);
 		data.delay *= 1 + (preset.stereo * 0.2);
 		data.feedback *= 1 + (preset.stereo * 0.1); //TODO better stereo
+		r = rreverb.apply(outputs[1], data, info);
 
 		//Lowpass
 		FilterData d = {FilterType::LP_12, scale_cutoff(preset.tone), preset.resonance};
 		l = lfilter.apply(d, l, info.time_step);
 		r = lfilter.apply(d, r, info.time_step);
 		//Mix
-		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-
-		outputs[0] += l * fmin(0.5, preset.mix) * 2;
-		outputs[1] += r * fmin(0.5, preset.mix) * 2;
+		mix(outputs[0], l ,preset.mix);
+		mix(outputs[1], r ,preset.mix);
 	}
 }
 

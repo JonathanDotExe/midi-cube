@@ -29,6 +29,7 @@ src = [
 	'midicube/framework/dsp/distortion.cpp',
 	'midicube/framework/dsp/equalizer.cpp',
 	'midicube/framework/dsp/filter.cpp',
+	'midicube/framework/dsp/reverb.cpp',
 	'midicube/framework/dsp/oscilator.cpp',
 	'midicube/framework/dsp/pcm.cpp',
 	'midicube/framework/dsp/synthesis.cpp',
