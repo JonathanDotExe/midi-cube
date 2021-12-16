@@ -10,20 +10,6 @@
 #include <cmath>
 #include "../view/EffectView.h"
 
-double ReverbCombFilter::process(double in, double gain, unsigned int delay) {
-	double out = this->delay.process();
-	out += in;
-	this->delay.add_isample(out * gain, delay);
-	return out;
-}
-
-double ReverbAllPassFilter::process(double in, double gain, unsigned int delay) {
-	double out = in + this->indelay.process() + this->delay.process();
-	this->indelay.add_isample(out * -gain, delay);
-	this->delay.add_isample(out * gain, delay - 20);
-	return out;
-}
-
 ReverbEffect::ReverbEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.delay);
