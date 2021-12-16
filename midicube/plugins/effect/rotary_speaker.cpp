@@ -30,7 +30,7 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		double sample = (outputs[0] + outputs[1]) / 2.0;
 
 		//Drive
-		sample = apply_distortion(sample, preset.drive, DistortionType::CUBIC_DISTORTION);
+		//sample = apply_distortion(sample, preset.drive, DistortionType::CUBIC_DISTORTION);
 
 		//Filter
 		double bass_sample = filter.apply(filter_data, sample, info.time_step);

@@ -152,13 +152,13 @@ Scene EffectView::create(ViewHost &frame) {
 
 		//Rotary
 		{
-			Label *label = new Label("Mode", main_font, 18, tmp_x, tmp_y);
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
 			label->text.setFillColor(sf::Color::White);
 			controls.push_back(label);
 			tmp_y += 25;
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
-					80, 60, "Rotate", "Stop");
+					80, 60, "On", "Off");
 			on->property.bind(rotary->preset.on, handler);
 			controls.push_back(on);
 
@@ -181,7 +181,7 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_x += 90;
 		}
 
-		//Rotary Speed
+		//Rotary Stop
 		{
 			Label *label = new Label("Stop", main_font, 18, tmp_x, tmp_y);
 			label->text.setFillColor(sf::Color::White);
@@ -189,7 +189,7 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_y += 25;
 
 			OrganSwitch *rotary_speed = new OrganSwitch(false, main_font, tmp_x,
-					tmp_y, 80, 60, "Stop", "Running");
+					tmp_y, 80, 60, "Stop", "Rotate");
 			rotary_speed->property.bind(rotary->preset.stop, handler);
 			controls.push_back(rotary_speed);
 
