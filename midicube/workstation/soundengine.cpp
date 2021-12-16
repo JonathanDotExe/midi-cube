@@ -148,6 +148,10 @@ void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info
 			case MessageType::INVALID:
 				break;
 			}
+			MidiMessage msg = message;
+			if (scenes[scene].update_channel >= 0) {
+				msg.channel = scenes[scene].update_channel;
+			}
 			engine->recieve_midi(message, info);
 		}
 	}
