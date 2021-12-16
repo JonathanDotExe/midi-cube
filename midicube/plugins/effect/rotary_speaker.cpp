@@ -128,6 +128,9 @@ void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 	preset.horn_fast_ramp = tree.get<double>("horn_fast_ramp", ROTARY_HORN_FAST_RAMP);
 	preset.bass_slow_ramp = tree.get<double>("bass_slow_ramp", ROTARY_BASS_SLOW_RAMP);
 	preset.bass_fast_ramp = tree.get<double>("bass_fast_ramp", ROTARY_BASS_FAST_RAMP);
+
+	preset.room_amount = tree.get<double>("room_amount", 0.3);
+	preset.room_size = tree.get<double>("room_size", 0.3);
 }
 
 boost::property_tree::ptree RotarySpeakerProgram::save() {
@@ -151,6 +154,9 @@ boost::property_tree::ptree RotarySpeakerProgram::save() {
 	tree.put("horn_fast_ramp", preset.horn_fast_ramp);
 	tree.put("bass_slow_ramp", preset.horn_slow_ramp);
 	tree.put("bass_fast_ramp", preset.bass_fast_ramp);
+
+	tree.put("room_size", preset.room_size);
+	tree.put("room_amount", preset.room_amount);
 
 	return tree;
 }
