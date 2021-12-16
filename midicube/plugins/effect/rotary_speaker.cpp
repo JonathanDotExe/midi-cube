@@ -63,12 +63,16 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		ls *= 2.0/(1 + preset.stereo_mix);
 		rs *= 2.0/(1 + preset.stereo_mix);
 
-		//Mix
-		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		//Apply reverb
+		SchroederReverbData reverb_data;
+		reverb_data.delay = 0.07 + 0.13 * preset.room_size;
+		reverb_data.feedback = 0.3 + 0.5 * preset.room_size;
+		mix(ls, lreverb.apply(ls, reverb_data, info), preset.room_amount);
+		mix(rs, rreverb.apply(rs, reverb_data, info), preset.room_amount);
 
-		outputs[0] += ls * fmin(0.5, preset.mix) * 2;
-		outputs[1] += rs * fmin(0.5, preset.mix) * 2;
+		//Mix
+		mix(outputs[0], ls, preset.mix);
+		mix(outputs[1], rs, preset.mix);
 	}
 
 	//Rotate speakers
@@ -124,6 +128,9 @@ void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 	preset.horn_fast_ramp = tree.get<double>("horn_fast_ramp", ROTARY_HORN_FAST_RAMP);
 	preset.bass_slow_ramp = tree.get<double>("bass_slow_ramp", ROTARY_BASS_SLOW_RAMP);
 	preset.bass_fast_ramp = tree.get<double>("bass_fast_ramp", ROTARY_BASS_FAST_RAMP);
+
+	preset.room_amount = tree.get<double>("room_amount", 0.3);
+	preset.room_size = tree.get<double>("room_size", 0.3);
 }
 
 boost::property_tree::ptree RotarySpeakerProgram::save() {
@@ -147,6 +154,9 @@ boost::property_tree::ptree RotarySpeakerProgram::save() {
 	tree.put("horn_fast_ramp", preset.horn_fast_ramp);
 	tree.put("bass_slow_ramp", preset.horn_slow_ramp);
 	tree.put("bass_fast_ramp", preset.bass_fast_ramp);
+
+	tree.put("room_size", preset.room_size);
+	tree.put("room_amount", preset.room_amount);
 
 	return tree;
 }

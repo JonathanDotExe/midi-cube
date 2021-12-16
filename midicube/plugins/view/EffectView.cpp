@@ -410,6 +410,40 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_y -= 25;
 			tmp_x += 90;
 		}
+		tmp_y += 100;
+		tmp_x = 10;
+
+		//Room Amount
+		{
+			Label *label = new Label("Room Amount", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.room_amount, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+
+		//Room Size
+		{
+			Label *label = new Label("Room Size", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.room_size, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
 	}
 	//Reverb
 	else if (dynamic_cast<ReverbEffect*>(effect) != nullptr) {

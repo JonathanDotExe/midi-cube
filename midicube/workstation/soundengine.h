@@ -55,6 +55,7 @@ struct SoundEngineScene {
 	bool active = false;
 	bool sustain = true;
 	bool pitch_bend = true;
+	int update_channel = 0;
 	ChannelSource source;
 
 	bool is_default() {
@@ -70,7 +71,8 @@ struct SoundEngineScene {
 				source.transfer_pitch_bend == true &&
 				source.transfer_cc == true &&
 				source.transfer_prog_change == true &&
-				source.transfer_other == true;
+				source.transfer_other == true &&
+				update_channel == 0;
 	}
 };
 
