@@ -36,13 +36,15 @@ public:
 };
 
 struct SchroederReverbData {
+	double delay;
+	double feedback;
 
 };
 
 class SchroederReverb {
 private:
-	std::array<ReverbCombFilter, REVERB_COMB_FILTERS> lcomb_filters;
-	std::array<ReverbAllPassFilter, REVERB_ALLPASS_FILTERS> lallpass_filters;
+	std::array<ReverbCombFilter, REVERB_COMB_FILTERS> comb_filters;
+	std::array<ReverbAllPassFilter, REVERB_ALLPASS_FILTERS> allpass_filters;
 
 	Filter filter;
 
@@ -54,7 +56,7 @@ private:
 
 public:
 
-	double apply(double sample, const SchroederReverbData& data);
+	double apply(double sample, const SchroederReverbData& data, const SampleInfo& info);
 };
 
 
