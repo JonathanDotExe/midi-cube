@@ -87,10 +87,10 @@ double LookbackDelayBuffer::get_isample(double delay) {
 	unsigned int delay_int = (unsigned int) ceil(delay);
 	double delay_frac = delay_int - delay;
 	if (delay_int < DELAY_BUFFER_SIZE) {
-		unsigned int delay_index = (index + delay_int) % DELAY_BUFFER_SIZE;
+		unsigned int delay_index = ((int) index - delay_int) % DELAY_BUFFER_SIZE;
 		sample += buffer[delay_index] * (1 - delay_frac);
 		if (delay_int + 1 < DELAY_BUFFER_SIZE) {
-			unsigned int next_index= (delay_index + 1) % DELAY_BUFFER_SIZE;
+			unsigned int next_index= ((int) delay_index + 1) % DELAY_BUFFER_SIZE;
 			sample += buffer[next_index] * delay_frac;
 		}
 	}
