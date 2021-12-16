@@ -12,18 +12,18 @@
 
 //DelayBuffer
 void DelayBuffer::add_sample(double sample, unsigned int delay) {
-	if (delay < buffer.size()) {
-		buffer[(index + delay) % buffer.size()] += sample;
+	if (delay < DELAY_BUFFER_SIZE) {
+		buffer[(index + delay) % DELAY_BUFFER_SIZE] += sample;
 	}
 }
 
 void DelayBuffer::add_isample(double sample, double delay) {
 	unsigned int delay_int = (unsigned int) delay;
 	double delay_frac = delay - delay_int;
-	if (delay_int < buffer.size()) {
-		buffer[(index + delay_int) % buffer.size()] += sample * (1 - delay_frac);
-		if (delay_int + 1 < buffer.size()) {
-			buffer[(index + delay_int + 1) % buffer.size()] += sample * delay_frac;
+	if (delay_int < DELAY_BUFFER_SIZE) {
+		buffer[(index + delay_int) % DELAY_BUFFER_SIZE] += sample * (1 - delay_frac);
+		if (delay_int + 1 < DELAY_BUFFER_SIZE) {
+			buffer[(index + delay_int + 1) % DELAY_BUFFER_SIZE] += sample * delay_frac;
 		}
 	}
 }
@@ -40,7 +40,7 @@ double DelayBuffer::process() {
 	double sample = buffer[index];
 	buffer[index] = 0;
 	++index;
-	index %= buffer.size();
+	index %= DELAY_BUFFER_SIZE;
 	return sample;
 }
 
@@ -76,5 +76,23 @@ void PortamendoBuffer::set(double value, double time, double slope_time, double 
 	this->slope_time = slope_time;
 }
 
+void LookbackDelayBuffer::process(double sample) {
+	++index;
+	index %= DELAY_BUFFER_SIZE;
+	buffer[index] = sample;
+}
 
-
+double LookbackDelayBuffer::get_isample(double delay) {
+	double sample = 0;
+	unsigned int delay_int = (unsigned int) ceil(delay);
+	double delay_frac = delay_int - delay;
+	if (delay_int < DELAY_BUFFER_SIZE) {
+		unsigned int delay_index = (index + delay_int) % DELAY_BUFFER_SIZE;
+		sample += buffer[delay_index] * (1 - delay_frac);
+		if (delay_int + 1 < DELAY_BUFFER_SIZE) {
+			unsigned int next_index= (delay_index + 1) % DELAY_BUFFER_SIZE;
+			sample += buffer[next_index] * delay_frac;
+		}
+	}
+	return sample;
+}

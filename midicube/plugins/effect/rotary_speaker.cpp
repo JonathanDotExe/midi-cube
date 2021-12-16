@@ -37,6 +37,7 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		double horn_sample = sample - bass_sample;
 
 		//Horn
+		//TODO maybe apply sine at playback
 		double horn_pitch_rot = preset.type ? sin(freq_to_radians(horn_rotation)) : cos(freq_to_radians(horn_rotation));
 		double lhorn_delay = sound_delay(horn_pitch_rot, preset.max_delay, info.sample_rate);
 		double rhorn_delay = sound_delay(-horn_pitch_rot, preset.max_delay, info.sample_rate);

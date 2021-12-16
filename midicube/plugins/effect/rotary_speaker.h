@@ -60,8 +60,8 @@ struct RotarySpeakerPreset {
 	double bass_slow_ramp = ROTARY_BASS_SLOW_RAMP;
 	double bass_fast_ramp = ROTARY_BASS_FAST_RAMP;
 
-	double room_amount = 0.3;
-	double room_size = 0.3;
+	double room_amount = 0.15;
+	double room_size = 0.4;
 
 	inline RotaryState state() {
 		return fast ? RotaryState::ROTARY_FAST : (stop ? RotaryState::ROTARY_STOP : RotaryState::ROTARY_SLOW);

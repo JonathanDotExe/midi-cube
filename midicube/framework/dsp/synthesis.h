@@ -123,6 +123,18 @@ public:
 
 };
 
+class LookbackDelayBuffer {
+private:
+	std::array<double, DELAY_BUFFER_SIZE> buffer = {};
+	std::size_t index = 0;
+
+public:
+
+	void process(double sample);
+
+	double get_isample(double delay);
+
+};
 
 class PortamendoBuffer {
 private:
