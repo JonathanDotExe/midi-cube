@@ -36,11 +36,14 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		double bass_sample = filter.apply(filter_data, sample, info.time_step);
 		double horn_sample = sample - bass_sample;
 
+		horn_delay.process(horn_sample);
+		bass_delay.process(bass_sample);
+
 		//Horn
 		//TODO maybe apply sine at playback
 		double horn_pitch_rot = preset.type ? sin(freq_to_radians(horn_rotation)) : cos(freq_to_radians(horn_rotation));
-		double lhorn_delay = sound_delay(horn_pitch_rot, preset.max_delay, info.sample_rate);
-		double rhorn_delay = sound_delay(-horn_pitch_rot, preset.max_delay, info.sample_rate);
+		double lhorn_delay = sound_delay(horn_pitch_rot, preset.max_delay, info.sample_rate) + 1;
+		double rhorn_delay = sound_delay(-horn_pitch_rot, preset.max_delay, info.sample_rate) + 1;
 		//Bass
 		double bass_pitch_rot = preset.type ? sin(freq_to_radians(bass_rotation)) : cos(freq_to_radians(bass_rotation));
 		double lbass_delay = sound_delay(bass_pitch_rot, preset.max_delay, info.sample_rate);
@@ -50,15 +53,16 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		double horn_rot = sin(freq_to_radians(horn_rotation));
 		double bass_rot = sin(freq_to_radians(bass_rotation));
 
+		double l = 0;
+		double r = 0;
+
 		//Process
-		left_delay.add_isample(horn_sample * ((1 - preset.min_amplitude) + (0.5 + horn_rot * 0.5) * preset.min_amplitude), lhorn_delay);
-		left_delay.add_isample(bass_sample * ((1 - preset.min_amplitude) + (0.5 + bass_rot * 0.5) * preset.min_amplitude), lbass_delay);
-		right_delay.add_isample(horn_sample * ((1 - preset.min_amplitude) + (0.5 - horn_rot * 0.5) * preset.min_amplitude), rhorn_delay);
-		right_delay.add_isample(bass_sample * ((1 - preset.min_amplitude) + (0.5 - bass_rot * 0.5) * preset.min_amplitude), rbass_delay);
+		l += horn_delay.get_isample(lhorn_delay) * ((1 - preset.min_amplitude) + (0.5 + horn_rot * 0.5) * preset.min_amplitude);
+		l += bass_delay.get_isample(lbass_delay) * ((1 - preset.min_amplitude) + (0.5 + bass_rot * 0.5) * preset.min_amplitude);
+		r += horn_delay.get_isample(rhorn_delay) * ((1 - preset.min_amplitude) + (0.5 - horn_rot * 0.5) * preset.min_amplitude);
+		r += bass_delay.get_isample(rbass_delay) * ((1 - preset.min_amplitude) + (0.5 - bass_rot * 0.5) * preset.min_amplitude);
 
 		//Play delay
-		double l = left_delay.process();
-		double r = right_delay.process();
 		double ls = l + r * preset.stereo_mix;
 		double rs = r + l * preset.stereo_mix;
 		ls *= 2.0/(1 + preset.stereo_mix);
