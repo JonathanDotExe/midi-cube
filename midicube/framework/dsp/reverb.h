@@ -46,8 +46,6 @@ private:
 	std::array<ReverbCombFilter, REVERB_COMB_FILTERS> comb_filters;
 	std::array<ReverbAllPassFilter, REVERB_ALLPASS_FILTERS> allpass_filters;
 
-	Filter filter;
-
 	std::array<double, REVERB_COMB_FILTERS> comb_delay_mul = {1, 1.13287, 0.6812463, 0.622141};
 	std::array<double, REVERB_COMB_FILTERS> comb_decay_mul = {0.57962, 0.55271987, 0.981233, 1};
 

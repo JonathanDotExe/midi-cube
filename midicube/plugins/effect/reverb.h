@@ -11,6 +11,7 @@
 #include "../../framework/core/plugins/effect.h"
 #include "../../framework/core/audio.h"
 #include "../../framework/dsp/synthesis.h"
+#include "../../framework/dsp/reverb.h"
 
 
 #define REVERB_IDENTIFIER "midicube_schroeder_reverb"
@@ -43,7 +44,11 @@ public:
 
 class ReverbEffect : public Effect {
 private:
+	SchroederReverb lreverb;
+	SchroederReverb rreverb;
 
+	Filter lfilter;
+	Filter rfilter;
 
 public:
 	ReverbPreset preset;
@@ -59,7 +64,7 @@ public:
 class ReverbPlugin : public EffectPlugin<ReverbEffect, ReverbProgram> {
 public:
 	ReverbPlugin() : EffectPlugin({
-		"Reverb",
+		"Schroeder Reverb",
 		REVERB_IDENTIFIER,
 		PluginType::PLUGIN_TYPE_EFFECT,
 		2,
