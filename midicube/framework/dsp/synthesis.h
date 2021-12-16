@@ -100,6 +100,11 @@ inline extern double noise_wave() {
 	return ((double) rand())/RAND_MAX* 2 - 1;
 }
 
+inline void mix(double& dry, double wet, double mix) {
+	dry *= 1 - (fmax(0, mix - 0.5) * 2);
+	dry += wet * fmin(0.5, mix) * 2;
+}
+
 
 class DelayBuffer {
 private:

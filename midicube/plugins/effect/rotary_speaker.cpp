@@ -63,12 +63,16 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		ls *= 2.0/(1 + preset.stereo_mix);
 		rs *= 2.0/(1 + preset.stereo_mix);
 
-		//Mix
-		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		//Apply reverb
+		SchroederReverbData reverb_data;
+		reverb_data.delay = 0.07 + 0.13 * preset.room_size;
+		reverb_data.feedback = 0.3 + 0.5 * preset.room_size;
+		mix(ls, lreverb.apply(ls, reverb_data, info), preset.room_amount);
+		mix(rs, rreverb.apply(rs, reverb_data, info), preset.room_amount);
 
-		outputs[0] += ls * fmin(0.5, preset.mix) * 2;
-		outputs[1] += rs * fmin(0.5, preset.mix) * 2;
+		//Mix
+		mix(outputs[0], ls, preset.mix);
+		mix(outputs[1], rs, preset.mix);
 	}
 
 	//Rotate speakers

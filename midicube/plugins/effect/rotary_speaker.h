@@ -12,6 +12,7 @@
 #include "../../framework/dsp/filter.h"
 #include "../../framework/dsp/distortion.h"
 #include "../../framework/dsp/synthesis.h"
+#include "../../framework/dsp/reverb.h"
 #include "../../framework/core/plugins/effect.h"
 
 #define ROTARY_SPEAKER_IDENTIFIER "midicube_rotary_speaker"
@@ -59,6 +60,9 @@ struct RotarySpeakerPreset {
 	double bass_slow_ramp = ROTARY_BASS_SLOW_RAMP;
 	double bass_fast_ramp = ROTARY_BASS_FAST_RAMP;
 
+	double room_amount = 0.3;
+	double room_size = 0.3;
+
 	inline RotaryState state() {
 		return fast ? RotaryState::ROTARY_FAST : (stop ? RotaryState::ROTARY_STOP : RotaryState::ROTARY_SLOW);
 	}
@@ -85,9 +89,12 @@ private:
 
 	DelayBuffer left_delay;
 	DelayBuffer right_delay;
+
 	RotaryState curr_rotary_state = RotaryState::ROTARY_STOP;
 	PortamendoBuffer horn_speed{0, 0};
 	PortamendoBuffer bass_speed{0, 0};
+	SchroederReverb lreverb;
+	SchroederReverb rreverb;
 	double horn_rotation = 0;
 	double bass_rotation = 0;
 public:
