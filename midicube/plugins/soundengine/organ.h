@@ -19,7 +19,7 @@
 #define ORGAN_LOWEST_TONEWHEEL_NOTE 24
 
 #define ORGAN_MAX_DOWN_DELAY 0.0035
-#define ORGAN_MAX_UP_DELAY 0.0025
+#define ORGAN_MAX_UP_DELAY 0.005
 
 #define MIN_SWELL 0.1
 #define SWELL_RANGE (1 - MIN_SWELL)
@@ -43,7 +43,7 @@ struct B3OrganPreset {
 	double harmonic_foldback_volume{1};
 	double multi_note_gain{0.8};
 	double high_gain_reduction = 0.5;
-	double click_attack = 0.00001;
+	double click_attack = 0.0003;
 
 	BindableBooleanValue percussion{false};
 	BindableBooleanValue percussion_third_harmonic{true};

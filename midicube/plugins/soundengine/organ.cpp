@@ -14,14 +14,13 @@
 //B3OrganTonewheel
 double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType type, double vol_mul, double click_time) {
 	//Rotation
-	this->volume_buffer.set(this->volume * vol_mul, info.time, 1, 1);
+	this->volume_buffer.set(this->volume * vol_mul, info.time, click_time, 0.1);
 	double volume = this->volume_buffer.get(info.time);
 	rotation += freq * info.time_step;
 	this->volume = 0;
 	this->compress_volume = 0;
 	//Signal
 	if (volume) {
-
 		if (type == ORGAN_TYPE_B3) {
 			return sin(freq_to_radians(rotation)) * volume;
 		}

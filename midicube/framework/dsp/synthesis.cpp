@@ -64,13 +64,14 @@ double PortamendoBuffer::get(double time) {
 
 void PortamendoBuffer::set(double value, double time, double slope_time, double slope_step) {
 	this->last_value = get(time);
-	double diff = abs((double) value - last_value);
+	double diff = fabs((double) value - last_value);
 
 	if (slope_step <= 0) {
 		slope_step = diff;
 	}
 
 	slope_time *= diff/slope_step;
+
 	this->last_time = time;
 	this->value = value;
 	this->slope_time = slope_time;

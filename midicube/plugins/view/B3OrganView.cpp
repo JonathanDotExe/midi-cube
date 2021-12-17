@@ -62,7 +62,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		controls.push_back(label);
 		tmp_y += 25;
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 0.0005, main_font, 16, tmp_x, tmp_y, 80, 60);
+		DragBox<double>* value = new DragBox<double>(0, 0, 0.005, main_font, 16, tmp_x, tmp_y, 80, 60);
 		value->drag_step = 2;
 		value->property.bind(organ.data.preset.click_attack, handler);
 		controls.push_back(value);
