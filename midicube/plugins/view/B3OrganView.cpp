@@ -69,6 +69,20 @@ Scene B3OrganView::create(ViewHost &frame) {
 
 		tmp_y += 65;
 	}
+	//Click Release
+	{
+		Label* label = new Label("Click Release", main_font, 18, tmp_x, tmp_y);
+		label->text.setFillColor(sf::Color::White);
+		controls.push_back(label);
+		tmp_y += 25;
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 0.005, main_font, 16, tmp_x, tmp_y, 80, 60);
+		value->drag_step = 2;
+		value->property.bind(organ.data.preset.click_release, handler);
+		controls.push_back(value);
+
+		tmp_y += 65;
+	}
 	//High Gain Reduction
 	{
 		Label* label = new Label("High Gain Reduction", main_font, 18, tmp_x, tmp_y);

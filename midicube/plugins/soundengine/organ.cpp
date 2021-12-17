@@ -12,10 +12,9 @@
 #include <cmath>
 
 //B3OrganTonewheel
-double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType type, double vol_mul, double click_time) {
+double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType type, double vol_mul, double click_attack, double click_release) {
 	//Rotation
-	click_time = 1/click_time;
-	this->volume_buffer.set(this->volume * vol_mul, click_time, click_time);
+	this->volume_buffer.set(this->volume * vol_mul, 1/click_attack,1/click_release);
 	double volume = this->volume_buffer.process(info.time_step);
 	rotation += freq * info.time_step;
 	this->volume = 0;
@@ -83,12 +82,12 @@ B3Organ::B3Organ(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	}
 	//Press/Release delays
 	srand(888800000);
-	/*for (size_t i = 0; i < tonewheel_data.size(); ++i) {
+	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
 		tonewheel_data[i].press_delay = (double) rand()/RAND_MAX * ORGAN_MAX_DOWN_DELAY;
 	}
 	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
 		tonewheel_data[i].release_delay = (double) rand()/RAND_MAX * ORGAN_MAX_UP_DELAY;
-	}*/
+	}
 	//Tonewheel volumes
 	const size_t start_tw = 72;
 	for (size_t i = 0; i < tonewheel_data.size() - start_tw; ++i) {
@@ -179,7 +178,7 @@ void B3Organ::process_sample(const SampleInfo &info) {
 	}
 	//Compute samples
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
-		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend, data.preset.type, vol_mul, data.preset.click_attack) * (1 + (tonewheel_data[i].volume - 1) * data.preset.high_gain_reduction);
+		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend, data.preset.type, vol_mul, data.preset.click_attack, data.preset.click_release) * (1 + (tonewheel_data[i].volume - 1) * data.preset.high_gain_reduction);
 	}
 	sample *= swell;
 
@@ -269,7 +268,8 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	//Modeling
 	preset.harmonic_foldback_volume = tree.get<double>("harmonic_foldback_volume", 1);
 	preset.multi_note_gain = tree.get<double>("multi_note_gain", 0.8);
-	preset.click_attack = tree.get<double>("click_attack", 0.00004);
+	preset.click_attack = tree.get<double>("click_attack", 0.00015);
+	preset.click_release = tree.get<double>("click_release", 0.0005);
 	preset.high_gain_reduction = tree.get<double>("high_gain_reduction", 0.5);
 
 	//Percussion
@@ -295,6 +295,7 @@ boost::property_tree::ptree B3OrganProgram::save() {
 	tree.put("harmonic_foldback_volume", preset.harmonic_foldback_volume);
 	tree.put("multi_note_gain", preset.multi_note_gain);
 	tree.put("click_attack", preset.click_attack);
+	tree.put("click_release", preset.click_release);
 	tree.put("high_gain_reduction", preset.high_gain_reduction);
 
 	//Percussion
