@@ -84,8 +84,10 @@ public:
 
 class RotarySpeakerEffect : public Effect {
 private:
-	Filter filter;
-	FilterData filter_data;
+	Filter lfilter;
+	FilterData lfilter_data;
+	Filter hfilter;
+	FilterData hfilter_data;
 
 	DelayBuffer left_delay;
 	DelayBuffer right_delay;

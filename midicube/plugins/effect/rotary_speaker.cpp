@@ -18,8 +18,10 @@ RotarySpeakerEffect::RotarySpeakerEffect(PluginHost& h, Plugin& p) : Effect(h, p
 
 	cc.init(get_host().get_binding_handler(), this);
 
-	filter_data.type = FilterType::LP_24;
-	filter_data.cutoff = 800;
+	lfilter_data.type = FilterType::LP_24;
+	lfilter_data.cutoff = ROTARY_CUTOFF;
+	hfilter_data.type = FilterType::HP_24;
+	hfilter_data.cutoff = ROTARY_CUTOFF;
 }
 
 void RotarySpeakerEffect::process(const SampleInfo &info) {
@@ -33,8 +35,8 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		//sample = apply_distortion(sample, preset.drive, DistortionType::CUBIC_DISTORTION);
 
 		//Filter
-		double bass_sample = filter.apply(filter_data, sample, info.time_step);
-		double horn_sample = sample - bass_sample;
+		double bass_sample = lfilter.apply(lfilter_data, sample, info.time_step);
+		double horn_sample = sample - bass_sample /*hfilter.apply(hfilter_data, sample, info.time_step)*/;
 
 		//Horn
 		//TODO maybe apply sine at playback
@@ -44,7 +46,7 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		//Bass
 		double bass_pitch_rot = preset.type ? sin(freq_to_radians(bass_rotation)) : cos(freq_to_radians(bass_rotation));
 		double lbass_delay = sound_delay(bass_pitch_rot, preset.max_delay, info.sample_rate);
-		double rbass_delay = sound_delay(-bass_pitch_rot, preset.max_delay, info.sample_rate);
+		double rbass_delay = lbass_delay /*sound_delay(-bass_pitch_rot, preset.max_delay, info.sample_rate)*/;
 
 		//Rotations
 		double horn_rot = sin(freq_to_radians(horn_rotation));
@@ -52,9 +54,10 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 
 		//Process
 		left_delay.add_isample(horn_sample * ((1 - preset.min_amplitude) + (0.5 + horn_rot * 0.5) * preset.min_amplitude), lhorn_delay);
-		left_delay.add_isample(bass_sample * ((1 - preset.min_amplitude) + (0.5 + bass_rot * 0.5) * preset.min_amplitude), lbass_delay);
+		double delayed_bass = bass_sample * ((1 - preset.min_amplitude) + (0.5 + bass_rot * 0.5) * preset.min_amplitude);
+		left_delay.add_isample(delayed_bass, lbass_delay);
 		right_delay.add_isample(horn_sample * ((1 - preset.min_amplitude) + (0.5 - horn_rot * 0.5) * preset.min_amplitude), rhorn_delay);
-		right_delay.add_isample(bass_sample * ((1 - preset.min_amplitude) + (0.5 - bass_rot * 0.5) * preset.min_amplitude), rbass_delay);
+		right_delay.add_isample(delayed_bass /*bass_sample * ((1 - preset.min_amplitude) + (0.5 - bass_rot * 0.5) * preset.min_amplitude)*/, rbass_delay);
 
 		//Play delay
 		double l = left_delay.process();
