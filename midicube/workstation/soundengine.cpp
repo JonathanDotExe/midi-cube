@@ -438,7 +438,7 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 					//Redirect channel
 					MidiMessage msg = message;
 					msg.channel = channel.redirect.channel;
-					channels[channel.redirect.channel].send(message, info, nullptr);
+					channels[channel.redirect.channel].send(msg, info, nullptr);
 				}
 			}
 		}
@@ -669,4 +669,12 @@ MasterPluginHost& SoundEngineDeviceHost::get_master_host() {
 
 MasterPluginHost& SoundEngineChannel::get_master_host() {
 	return *device->get_cube();
+}
+
+int SoundEngineChannel::get_update_channel() const {
+	return scenes[device->scene].source.update_channel;
+}
+
+void SoundEngineChannel::set_update_channel(int update_channel) {
+	scenes[device->scene].source.update_channel = update_channel;
 }

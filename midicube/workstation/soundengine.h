@@ -166,6 +166,10 @@ public:
 
 	void set_start_note(unsigned int startNote = 0);
 
+	int get_update_channel() const;
+
+	void set_update_channel(int update_channel = 0);
+
 	unsigned int get_start_velocity() const;
 
 	void set_start_velocity(unsigned int startVelocity = 0);
