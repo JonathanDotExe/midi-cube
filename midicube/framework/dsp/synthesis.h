@@ -139,13 +139,12 @@ public:
 class PortamendoBuffer {
 private:
 	double value;
-	double last_value;
-	double slope_time;
-	double last_time;
+	double next_value;
+	double step;
 public:
-	PortamendoBuffer(double value, double slope_time);
-	double get(double time);
-	void set(double value, double time, double slope_time, double slope_step);
+	PortamendoBuffer(double value);
+	double process(double time_step);
+	void set(double value, double attack_step, double release_step;
 };
 
 template<size_t N>

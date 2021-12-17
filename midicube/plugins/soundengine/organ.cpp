@@ -82,12 +82,12 @@ B3Organ::B3Organ(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	}
 	//Press/Release delays
 	srand(888800000);
-	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
+	/*for (size_t i = 0; i < tonewheel_data.size(); ++i) {
 		tonewheel_data[i].press_delay = (double) rand()/RAND_MAX * ORGAN_MAX_DOWN_DELAY;
 	}
 	for (size_t i = 0; i < tonewheel_data.size(); ++i) {
 		tonewheel_data[i].release_delay = (double) rand()/RAND_MAX * ORGAN_MAX_UP_DELAY;
-	}
+	}*/
 	//Tonewheel volumes
 	const size_t start_tw = 72;
 	for (size_t i = 0; i < tonewheel_data.size() - start_tw; ++i) {

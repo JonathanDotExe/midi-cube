@@ -45,36 +45,34 @@ double DelayBuffer::process() {
 }
 
 //PortamendoBuffer
-PortamendoBuffer::PortamendoBuffer(double value, double slope_time) {
-	this->last_value = value;
+PortamendoBuffer::PortamendoBuffer(double value) {
+	this->next_value = value;
 	this->value = value;
-	this->last_time = 0;
-	this->slope_time = slope_time;
+	this->step = 0;
 }
 
-double PortamendoBuffer::get(double time) {
-	if (last_time + slope_time <= time) {
-		return value;
+double PortamendoBuffer::process(double time_step) {
+	if (step) {
+		double next = value + step * time_step;
+		if ((next > next_value) != (value > next_value)) {
+			value = next_value;
+			step = 0;
+		}
+		else {
+			value = next;
+		}
+	}
+	return value;
+}
+
+void PortamendoBuffer::set(double value, double attack_step, double release_step) {
+	next_value = value;
+	if (this->value > value) {
+		step = release_step;
 	}
 	else {
-		double prog = (time - last_time)/slope_time;
-		return last_value * (1 - prog) + value * prog;
+		step = attack_step;
 	}
-}
-
-void PortamendoBuffer::set(double value, double time, double slope_time, double slope_step) {
-	this->last_value = get(time);
-	double diff = fabs((double) value - last_value);
-
-	if (slope_step <= 0) {
-		slope_step = diff;
-	}
-
-	slope_time *= diff/slope_step;
-
-	this->last_time = time;
-	this->value = value;
-	this->slope_time = slope_time;
 }
 
 void LookbackDelayBuffer::process(double sample) {
