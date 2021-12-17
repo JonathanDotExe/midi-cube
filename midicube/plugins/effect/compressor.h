@@ -42,8 +42,8 @@ class CompressorEffect : public Effect {
 private:
 	EnvelopeFollower lenv;
 	EnvelopeFollower renv;
-	PortamendoBuffer lvol{1, 0};
-	PortamendoBuffer rvol{1, 0};
+	PortamendoBuffer lvol{1};
+	PortamendoBuffer rvol{1};
 
 public:
 	CompressorPreset preset;

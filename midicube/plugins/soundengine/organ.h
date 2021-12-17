@@ -85,7 +85,7 @@ public:
 	double rotation = 0;
 	double volume = 0;
 	double compress_volume = 0;
-	PortamendoBuffer volume_buffer{0, 0};
+	PortamendoBuffer volume_buffer{0};
 	double process(const SampleInfo& info, double freq, OrganType type, double vol_mul, double click_time);
 };
 

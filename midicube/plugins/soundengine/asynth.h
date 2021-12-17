@@ -242,10 +242,10 @@ private:
 	std::array<double, ASYNTH_PART_COUNT> lfo_mod = {};
 	std::array<double, ASYNTH_PART_COUNT> lfo_vol = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
-	PortamendoBuffer aftertouch{0, 0};
+	PortamendoBuffer aftertouch{0};
 
 	bool first_port = true;
-	PortamendoBuffer note_port{0, 0};
+	PortamendoBuffer note_port{0};
 	AdvancedSynthVoice mono_voice;
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;

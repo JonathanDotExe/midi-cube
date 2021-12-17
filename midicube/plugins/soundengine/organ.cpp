@@ -14,8 +14,9 @@
 //B3OrganTonewheel
 double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType type, double vol_mul, double click_time) {
 	//Rotation
-	this->volume_buffer.set(this->volume * vol_mul, info.time, click_time, 0.1);
-	double volume = this->volume_buffer.get(info.time);
+	click_time = 1/click_time;
+	this->volume_buffer.set(this->volume * vol_mul, click_time, click_time);
+	double volume = this->volume_buffer.process(info.time_step);
 	rotation += freq * info.time_step;
 	this->volume = 0;
 	this->compress_volume = 0;

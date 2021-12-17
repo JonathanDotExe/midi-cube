@@ -80,27 +80,33 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 	}
 
 	//Rotate speakers
-	horn_rotation += horn_speed.get(info.time) * info.time_step;
-	bass_rotation -= bass_speed.get(info.time) * info.time_step;
+	horn_rotation += horn_speed.process(info.time_step) * info.time_step;
+	bass_rotation -= bass_speed.process(info.time_step) * info.time_step;
 
 	//Switch speaker speed
 	RotaryState state = preset.state();
 	if (curr_rotary_state != state) {
 		curr_rotary_state = state;
+		double horn_attack = (preset.horn_fast_frequency - preset.horn_slow_frequency)/preset.horn_slow_ramp;
+		double horn_release = (preset.horn_fast_frequency - preset.horn_slow_frequency)/preset.horn_fast_ramp;
+		double bass_attack = (preset.bass_fast_frequency - preset.bass_slow_frequency)/preset.bass_slow_ramp;
+		double bass_release = (preset.bass_fast_frequency - preset.bass_slow_frequency)/preset.bass_fast_ramp;
+		double hspeed = 0;
+		double bspeed = 0;
 		switch (state) {
 		case RotaryState::ROTARY_SLOW:
-			horn_speed.set(preset.horn_slow_frequency, info.time, preset.horn_slow_ramp, preset.horn_fast_frequency - preset.horn_slow_frequency);
-			bass_speed.set(preset.bass_slow_frequency, info.time, preset.bass_slow_ramp, preset.bass_fast_frequency - preset.bass_slow_frequency);
+			hspeed = preset.horn_slow_frequency;
+			bspeed = preset.bass_slow_frequency;
 			break;
 		case RotaryState::ROTARY_STOP:
-			horn_speed.set(0, info.time, preset.horn_slow_ramp, preset.horn_fast_frequency - preset.horn_slow_frequency);
-			bass_speed.set(0, info.time, preset.bass_slow_ramp, preset.bass_fast_frequency - preset.bass_slow_frequency);
 			break;
 		case RotaryState::ROTARY_FAST:
-			horn_speed.set(preset.horn_fast_frequency, info.time, preset.horn_fast_ramp, preset.horn_fast_frequency - preset.horn_slow_frequency);
-			bass_speed.set(preset.bass_fast_frequency, info.time, preset.bass_fast_ramp, preset.bass_fast_frequency - preset.bass_slow_frequency);
+			hspeed = preset.horn_fast_frequency;
+			bspeed = preset.bass_fast_frequency;
 			break;
 		}
+		horn_speed.set(hspeed, 1/horn_attack, 1/horn_release);
+		bass_speed.set(bspeed, 1/bass_attack, 1/bass_release);
 	}
 }
 

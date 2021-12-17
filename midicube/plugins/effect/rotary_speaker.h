@@ -93,8 +93,8 @@ private:
 	DelayBuffer right_delay;
 
 	RotaryState curr_rotary_state = RotaryState::ROTARY_STOP;
-	PortamendoBuffer horn_speed{0, 0};
-	PortamendoBuffer bass_speed{0, 0};
+	PortamendoBuffer horn_speed{0};
+	PortamendoBuffer bass_speed{0};
 	SchroederReverb lreverb;
 	SchroederReverb rreverb;
 	double horn_rotation = 0;

@@ -65,6 +65,10 @@ double PortamendoBuffer::process(double time_step) {
 	return value;
 }
 
+double PortamendoBuffer::get() {
+	return value;
+}
+
 void PortamendoBuffer::set(double value, double attack_step, double release_step) {
 	next_value = value;
 	if (this->value > value) {

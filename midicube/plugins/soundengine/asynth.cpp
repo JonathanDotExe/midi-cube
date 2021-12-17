@@ -91,7 +91,7 @@ void AdvancedSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrie
 void AdvancedSynth::process_note(double& lsample, double& rsample,
 		const SampleInfo &info, AdvancedSynthVoice &note, const KeyboardEnvironment &env) {
 	//Aftertouch
-	double aftertouch = this->aftertouch.get(info.time);
+	double aftertouch = this->aftertouch.get();
 	double velocity = note.velocity;
 
 	if (aftertouch) {
@@ -223,14 +223,17 @@ void AdvancedSynth::process_note_sample(const SampleInfo &info,	AdvancedSynthVoi
 }
 
 void AdvancedSynth::process_sample(const SampleInfo &info) {
+	aftertouch.process(info.time_step);
+	note_port.process(info.time_step);
 	//Mono
 	if (preset.mono) {
 		if (get_status().pressed_notes) {
 			AdvancedSynthVoice& voice = this->voice_mgr.note[get_status().latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
-				note_port.set(voice.note, info.time, first_port ? 0 : preset.portamendo / 50.0, 127.0);
-
+				double port_step = 1/(first_port ? 0 : (preset.portamendo / 50.0 / 127.0));
+				note_port.set(voice.note, port_step, port_step);
+				first_port = false;
 			}
 			if (!preset.legato || !mono_voice.valid) {
 				mono_voice.velocity = voice.velocity;
@@ -268,7 +271,7 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 
 		//Playback
 		if (mono_voice.valid) {
-			double pitch = note_port.get(info.time);
+			double pitch = note_port.get();
 			KeyboardEnvironment e = get_host().get_environment();
 			e.pitch_bend *= note_to_freq_transpose(
 					pitch - mono_voice.note);
@@ -310,12 +313,7 @@ void AdvancedSynth::recieve_midi(const MidiMessage& msg, const SampleInfo& info)
 	SoundEngine::recieve_midi(msg, info);
 	if (msg.type == MessageType::MONOPHONIC_AFTERTOUCH) {
 		double at = msg.monophonic_aftertouch()/127.0;
-		if (at > aftertouch.get(info.time)) {
-			aftertouch.set(at, info.time, preset.aftertouch_attack, 1);
-		}
-		else {
-			aftertouch.set(at, info.time, preset.aftertouch_release, 1);
-		}
+		aftertouch.set(at, 1/preset.aftertouch_attack, 1/preset.aftertouch_release);
 	}
 }
 

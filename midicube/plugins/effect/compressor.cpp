@@ -36,24 +36,20 @@ void CompressorEffect::process(const SampleInfo& info) {
 		double threshold = db_to_amp(preset.threshold);
 
 		//Compress
-		double lslope = preset.release;
 		if (lv > threshold) {
-			lslope = preset.attack;
 			lcomp = pow(lv/threshold, 1/preset.ratio) * threshold / lv;
 		}
-		double rslope = preset.release;
 		if (rv > threshold) {
-			rslope = preset.attack;
 			rcomp = pow(rv/threshold, 1/preset.ratio) * threshold / rv;
 		}
 
 		//Volume
-		lvol.set(lcomp, info.time, lslope, 1);
-		rvol.set(rcomp, info.time, rslope, 1);
+		lvol.set(lcomp, 1/preset.attack, 1/preset.release);
+		rvol.set(rcomp, 1/preset.attack, 1/preset.release);
 
 		//Apply
-		outputs[0] *= lvol.get(info.time) * preset.makeup_gain;
-		outputs[1] *= rvol.get(info.time) * preset.makeup_gain;
+		outputs[0] *= lvol.process(info.time_step) * preset.makeup_gain;
+		outputs[1] *= rvol.process(info.time_step) * preset.makeup_gain;
 	}
 }
 

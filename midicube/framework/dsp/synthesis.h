@@ -144,7 +144,8 @@ private:
 public:
 	PortamendoBuffer(double value);
 	double process(double time_step);
-	void set(double value, double attack_step, double release_step;
+	double get();
+	void set(double value, double attack_step, double release_step);
 };
 
 template<size_t N>
