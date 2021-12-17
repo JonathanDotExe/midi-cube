@@ -72,7 +72,7 @@ double PortamendoBuffer::get() {
 void PortamendoBuffer::set(double value, double attack_step, double release_step) {
 	next_value = value;
 	if (this->value > value) {
-		step = release_step;
+		step = -release_step;
 	}
 	else {
 		step = attack_step;

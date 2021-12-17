@@ -105,8 +105,8 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 			bspeed = preset.bass_fast_frequency;
 			break;
 		}
-		horn_speed.set(hspeed, 1/horn_attack, 1/horn_release);
-		bass_speed.set(bspeed, 1/bass_attack, 1/bass_release);
+		horn_speed.set(hspeed, horn_attack, horn_release);
+		bass_speed.set(bspeed, bass_attack, bass_release);
 	}
 }
 

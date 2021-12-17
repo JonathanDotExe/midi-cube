@@ -231,7 +231,7 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 			AdvancedSynthVoice& voice = this->voice_mgr.note[get_status().latest_note_index];
 			//Update portamendo
 			if (voice.note != mono_voice.note) {
-				double port_step = 1/(first_port ? 0 : (preset.portamendo / 50.0 / 127.0));
+				double port_step = 1/(first_port ? 0 : (preset.portamendo / 50.0));
 				note_port.set(voice.note, port_step, port_step);
 				first_port = false;
 			}
