@@ -49,6 +49,7 @@ struct ChannelSource {
 	bool transfer_cc = true;
 	bool transfer_prog_change = true;
 	bool transfer_other = true;
+	int update_channel = 0;
 };
 
 struct ChannelRedirect {
@@ -60,7 +61,6 @@ struct SoundEngineScene {
 	bool active = false;
 	bool sustain = true;
 	bool pitch_bend = true;
-	int update_channel = 0;
 	ChannelSource source;
 
 	bool is_default() {
@@ -77,7 +77,7 @@ struct SoundEngineScene {
 				source.transfer_cc == true &&
 				source.transfer_prog_change == true &&
 				source.transfer_other == true &&
-				update_channel == 0;
+				source.update_channel == 0;
 	}
 };
 
@@ -85,6 +85,7 @@ struct ChannelProgram : public Copyable {
 	bool active = true;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double>  panning{0, -1, 1};
+	ChannelRedirect redirect;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	std::array<PluginSlotProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t send_master = -1;

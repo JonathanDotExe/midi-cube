@@ -148,11 +148,7 @@ void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info
 			case MessageType::INVALID:
 				break;
 			}
-			MidiMessage msg = message;
-			if (!src && scenes[scene].update_channel >= 0) {
-				msg.channel = scenes[scene].update_channel;
-			}
-			engine->recieve_midi(msg, info);
+			engine->recieve_midi(message, info);
 		}
 	}
 }
@@ -429,10 +425,20 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 			//Send
 			if (pass) {
 				if (channel.redirect.channel < 0 || channel.redirect.channel >= SOUND_ENGINE_MIDI_CHANNELS) {
-					channel.send(message, info, nullptr);
+					if (s.update_channel >= 0) {
+						MidiMessage msg = message;
+						msg.channel = s.update_channel;
+						channel.send(msg, info, nullptr);
+					}
+					else {
+						channel.send(message, info, nullptr);
+					}
 				}
 				else {
-					//TODO redirect
+					//Redirect channel
+					MidiMessage msg = message;
+					msg.channel = channel.redirect.channel;
+					channels[channel.redirect.channel].send(message, info, nullptr);
 				}
 			}
 		}
@@ -568,6 +574,7 @@ void SoundEngineChannel::apply_program(ChannelProgram *program, PluginManager* m
 	}
 	volume = program->volume;
 	panning = program->panning;
+	redirect = program->redirect;
 	scenes = program->scenes;
 	polyphony_limit = program->polyphony_limit;
 	input = program->input;
@@ -589,6 +596,7 @@ void SoundEngineChannel::save_program(ChannelProgram *program) {
 	}
 	program->volume = volume;
 	program->panning = panning;
+	program->redirect = redirect;
 	program->scenes = scenes;
 	program->polyphony_limit = polyphony_limit;
 	program->input = input;
