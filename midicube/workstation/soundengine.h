@@ -51,6 +51,11 @@ struct ChannelSource {
 	bool transfer_other = true;
 };
 
+struct ChannelRedirect {
+	int redirect_to = -1;
+	int channel = -1;
+};
+
 struct SoundEngineScene {
 	bool active = false;
 	bool sustain = true;
@@ -109,6 +114,7 @@ public:
 	PluginSlot engine;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double> panning{0, -1, 1};
+	ChannelRedirect redirect;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	ssize_t input = 0;
 
