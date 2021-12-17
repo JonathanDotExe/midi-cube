@@ -87,8 +87,8 @@ private:
 	Filter filter;
 	FilterData filter_data;
 
-	LookbackDelayBuffer horn_delay;
-	LookbackDelayBuffer bass_delay;
+	DelayBuffer left_delay;
+	DelayBuffer right_delay;
 
 	RotaryState curr_rotary_state = RotaryState::ROTARY_STOP;
 	PortamendoBuffer horn_speed{0, 0};
