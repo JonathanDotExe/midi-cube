@@ -30,6 +30,7 @@ target_link_libraries(midi-cube-framework PUBLIC sfml-window)
 target_link_libraries(midi-cube-framework PUBLIC sfml-graphics)
 target_link_libraries(midi-cube-framework PUBLIC Boost::filesystem)
 target_link_libraries(midi-cube-framework PUBLIC Threads::Threads)
+target_include_directories(midi-cube-framework PUBLIC include)
 add_library(midi-cube-plugins ${PLUGINS_SOURCES})
 target_link_libraries(midi-cube-plugins PUBLIC midi-cube-framework)
 

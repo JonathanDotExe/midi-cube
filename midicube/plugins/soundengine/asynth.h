@@ -144,7 +144,7 @@ struct FilterEntity {
 	BooleanParameter on{false};
 	BooleanParameter drive{false};
 	TemplateParameter<double> drive_amount{0, 0, 1};
-	TemplateEnumParameter<FilterType> type{FilterType::LP_12, FilterType::LP_12, FilterType::LP_BP_24};
+	TemplateEnumParameter<FilterType> type{FilterType::LP_12, FilterType::LP_12, FilterType::LP_24_BP};
 	PropertyModulation cutoff = {1};
 	PropertyModulation resonance = {0};
 	BindableTemplateValue<double> kb_track{0, 0, 1};
