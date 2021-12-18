@@ -17,7 +17,7 @@ AnalogSynthFMView::AnalogSynthFMView(AdvancedSynth& s) : synth(s) {
 Scene AnalogSynthFMView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 
 	//Background
 	Pane* pane = new Pane(sf::Color(120, 120, 120), 5, 5, frame.get_width() - 10, frame.get_height() - 5);
@@ -70,16 +70,17 @@ Scene AnalogSynthFMView::create(ViewHost &frame) {
 		Button* edit = new Button("Edit", main_font, 16, tmp_x + ASYNTH_PART_COUNT * 85 + 35 + 45, y, 80, 40);
 		edit->rect.setFillColor(sf::Color(0, 180, 255));
 		edit->set_on_click([&frame, this, i]{
-			frame.change_view(new AnalogSynthOscilatorView(synth, i));
+			AdvancedSynth& s = synth;
+			frame.change_menu(VIEW_MENU(new AnalogSynthOscilatorView(s, i), &s, i));
 		});
 		controls.push_back(edit);
 	}
 
 	//Back Button
-	Button* back = new Button("Back", main_font, 18, 5, frame.get_height() - 40, 70, 40);
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
 	back->set_on_click([&frame, this]() {
-		frame.change_view(new AnalogSynthView(synth));
+		frame.menu_back();
 	});
 	controls.push_back(back);
 

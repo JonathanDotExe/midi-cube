@@ -15,7 +15,7 @@ SamplerView::SamplerView(Sampler &s) : sampler(s) {
 Scene SamplerView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 	SpinLock& lock = sampler.get_lock();
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
 	controls.push_back(bg);
@@ -40,7 +40,8 @@ Scene SamplerView::create(ViewHost &frame) {
 			sampler.set_sound_index(-1);
 			lock.unlock();
 		}
-		frame.change_view(new SamplerView(sampler));
+		Sampler& s = sampler;
+		frame.change_menu(VIEW_MENU(new SamplerView(s), &s));
 	});
 	controls.push_back(engine);
 
@@ -83,6 +84,14 @@ Scene SamplerView::create(ViewHost &frame) {
 			}
 		}
 	}
+
+	//Back Button
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
+	back->rect.setFillColor(sf::Color::Yellow);
+	back->set_on_click([&frame, this]() {
+		frame.menu_back();
+	});
+	controls.push_back(back);
 
 	return {controls};
 }

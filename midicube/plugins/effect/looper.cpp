@@ -62,8 +62,8 @@ void Looper::process(const SampleInfo &info) {
 	}
 }
 
-ViewController* Looper::create_view() {
-	return new LooperView(*this);
+Menu* Looper::create_menu() {
+	return new FunctionMenu([this](){ return new LooperView(*this); }, nullptr);
 }
 
 void Looper::save_program(PluginProgram **prog) {

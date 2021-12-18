@@ -45,7 +45,7 @@ void LooperView::update_solo() {
 Scene LooperView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
 	SpinLock& lock = looper.get_lock();
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 
 	//Background
 	Pane* bg = new Pane(sf::Color(80, 80, 80), 0, 0, frame.get_width(), frame.get_height());
@@ -123,6 +123,14 @@ Scene LooperView::create(ViewHost &frame) {
 	looper->property.bind(this->looper.active, handler);
 	controls.push_back(looper);
 
+	//Back Button
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
+	back->rect.setFillColor(sf::Color::Yellow);
+	back->set_on_click([&frame, this]() {
+		frame.menu_back();
+	});
+	controls.push_back(back);
+
 	return {controls};
 }
 
@@ -131,7 +139,7 @@ void LooperView::update_properties() {
 	lock.lock();
 	record_index = looper.record_channel;
 	solo_index = looper.solo_channel;
-	lock.lock();
+	lock.unlock();
 	update_record();
 	update_solo();
 }

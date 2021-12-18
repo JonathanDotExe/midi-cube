@@ -19,7 +19,7 @@ struct ControlBank {
 };
 
 enum ControlType {
-	SLIDER, KNOB, BUTTON, SCENE_BUTTON, MOD_WHEEL, BREATH_CONTROLLER, VOLUME_PEDAL, EXPRESSION_PEDAL, SUSTAIN_PEDAL, SOSTENUTO_PEDAL, SOFT_PEDAL
+	CC, SLIDER, KNOB, BUTTON, SCENE_BUTTON, MOD_WHEEL, BREATH_CONTROLLER, VOLUME_PEDAL, EXPRESSION_PEDAL, SUSTAIN_PEDAL, SOSTENUTO_PEDAL, SOFT_PEDAL
 };
 
 struct MidiControls {
@@ -44,6 +44,8 @@ struct MidiControls {
 
 	unsigned int get_cc(ControlType type, size_t index, size_t bank) const {
 		switch (type) {
+		case CC:
+			return index;
 		case SLIDER:
 			if (bank < control_banks.size()) {
 				const ControlBank& b = control_banks[bank];
@@ -341,6 +343,14 @@ public:
 		return name;
 	}
 
+};
+
+class ControlViewHost {
+public:
+	virtual void change_control_view(ControlView* view) = 0;
+	virtual ~ControlViewHost() {
+
+	}
 };
 
 

@@ -11,9 +11,7 @@
 #include "../view/AnalogSynthView.h"
 #include "../../plugins/resources.h"
 
-AnalogSynthModulatorView::AnalogSynthModulatorView(AdvancedSynth &s, size_t part) : synth(s), binder{s.get_lock(), [&s, part]() {
-			return new AnalogSynthModulatorView(s, part);
-		}, main_font} {
+AnalogSynthModulatorView::AnalogSynthModulatorView(AdvancedSynth &s, size_t part) : synth(s), binder{main_font} {
 	this->part = part;
 }
 
@@ -22,7 +20,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
 
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 	ModEnvelopeEntity& env = synth.preset.mod_envs.at(this->part);
 	LFOEntity& lfo = synth.preset.lfos.at(this->part);
 
@@ -112,7 +110,7 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 	tmp_x += 90;
 
 	//Edit Sources
-	Button* edit = new Button("Edit Sources", main_font, 18, 75, frame.get_height() - 40, 120, 40);
+	Button* edit = new Button("Edit Sources", main_font, 18, frame.get_width() - 290, frame.get_height() - 40, 120, 40);
 	edit->rect.setFillColor(sf::Color::Yellow);
 	edit->set_on_click([&frame, show_amount, show_source, this]() {
 		edit_source = !edit_source;
@@ -125,12 +123,12 @@ Scene AnalogSynthModulatorView::create(ViewHost &frame) {
 	});
 	controls.push_back(edit);
 
-	controls.push_back(binder.create_button(75 + 120, frame.get_height() - 40, &frame));
+	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
 	//Back Button
-	Button* back = new Button("Back", main_font, 18, 5, frame.get_height() - 40, 70, 40);
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
 	back->set_on_click([&frame, this]() {
-		frame.change_view(new AnalogSynthView(synth));
+		frame.menu_back();
 	});
 	controls.push_back(back);
 
@@ -150,38 +148,5 @@ AnalogSynthModulatorView::~AnalogSynthModulatorView() {
 
 bool AnalogSynthModulatorView::on_action(Control *control) {
 	return binder.on_action(control);
-}
-
-ControlView* AnalogSynthModulatorView::create_control_view() {
-	ControlView* view = new ControlView("Analog Synth Modulation " + part);
-	ModEnvelopeEntity& env = synth.preset.mod_envs.at(part);
-	LFOEntity& lfo = synth.preset.lfos.at(part);
-	view->bind(&env.volume.velocity_amount, ControlType::KNOB, 0, 0);
-	view->bind(&env.env.hold, ControlType::KNOB, 1, 0);
-	view->bind(&env.env.pre_decay, ControlType::KNOB, 2, 0);
-	view->bind(&env.env.attack_hold, ControlType::KNOB, 3, 0);
-	view->bind(&lfo.volume.mod_env_amount, ControlType::KNOB, 4, 0);
-	view->bind(&lfo.volume.velocity_amount, ControlType::KNOB, 5, 0);
-	view->bind(&lfo.clock_value, ControlType::KNOB, 8, 0);
-
-	view->bind(&env.volume.value, ControlType::SLIDER, 0, 0);
-	view->bind(&env.env.attack, ControlType::SLIDER, 1, 0);
-	view->bind(&env.env.decay, ControlType::SLIDER, 2, 0);
-	view->bind(&env.env.sustain, ControlType::SLIDER, 3, 0);
-	view->bind(&env.env.release, ControlType::SLIDER, 4, 0);
-	view->bind(&lfo.volume.value, ControlType::SLIDER, 5, 0);
-	view->bind(&lfo.freq, ControlType::SLIDER, 6, 0);
-	view->bind(&lfo.waveform, ControlType::SLIDER, 7, 0);
-	view->bind(&lfo.sync_phase, ControlType::SLIDER, 8, 0);
-
-	view->bind(&lfo.sync_master, ControlType::BUTTON, 8, 0);
-
-	view->bind(&env.env.peak_volume, ControlType::SLIDER, 1, 1);
-	view->bind(&env.env.decay_volume, ControlType::SLIDER, 2, 1);
-	view->bind(&env.env.sustain_time, ControlType::SLIDER, 3, 1);
-	view->bind(&env.env.release_volume, ControlType::SLIDER, 4, 1);
-
-	view->init(&synth);
-	return view;
 }
 

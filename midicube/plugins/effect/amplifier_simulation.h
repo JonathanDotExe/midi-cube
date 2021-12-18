@@ -54,7 +54,7 @@ public:
 	void apply_program(PluginProgram *prog);
 	AmplifierSimulationEffect(PluginHost& h, Plugin& plugin);
 	void process(const SampleInfo& info);
-	ViewController* create_view();
+	Menu* create_menu();
 
 	~AmplifierSimulationEffect();
 };

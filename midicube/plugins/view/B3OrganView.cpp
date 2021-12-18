@@ -9,16 +9,14 @@
 
 #include "../../plugins/resources.h"
 
-B3OrganView::B3OrganView(B3Organ& o) : organ(o), binder{o.get_lock(), [&o]() {
-	return new B3OrganView(o);
-}, main_font} {
+B3OrganView::B3OrganView(B3Organ& o) : organ(o), binder{main_font} {
 
 }
 
 
 Scene B3OrganView::create(ViewHost &frame) {
 	std::vector<Control*> controls;
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 
 	//Background
 	Pane* bg = new Pane(sf::Color(0x53, 0x32, 0x00), 0, 0, frame.get_width(), frame.get_height());
@@ -218,9 +216,14 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 65;
 	}
 
-	controls.push_back(binder.create_button(frame.get_width() - 100, frame.get_height() - 40, &frame));
-
-
+	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
+	//Back Button
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
+	back->rect.setFillColor(sf::Color::Yellow);
+	back->set_on_click([&frame, this]() {
+		frame.menu_back();
+	});
+	controls.push_back(back);
 
 	return {controls};
 }
@@ -234,17 +237,3 @@ bool B3OrganView::on_action(Control *control) {
 	return binder.on_action(control);
 }
 
-ControlView* B3OrganView::create_control_view() {
-	ControlView* view = new ControlView("B3 Organ");
-	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		view->bind(&organ.data.preset.drawbars[i], ControlType::SLIDER, i, 0);
-	}
-	view->bind(&organ.data.preset.percussion, ControlType::BUTTON, 2, 0);
-	view->bind(&organ.data.preset.percussion_fast_decay, ControlType::BUTTON, 3, 0);
-	view->bind(&organ.data.preset.percussion_soft, ControlType::BUTTON, 4, 0);
-	view->bind(&organ.data.preset.percussion_third_harmonic, ControlType::BUTTON, 4, 0);
-
-	view->bind(&organ.data.preset.vibrato_mix, ControlType::KNOB, 1, 0);
-	view->init(&organ);
-	return view;
-}

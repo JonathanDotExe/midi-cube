@@ -31,38 +31,6 @@ public:
 	}
 };
 
-static RtAudio::Api get_api(std::string driver) {
-	boost::to_upper(driver);
-	if (driver == "ALSA") {
-		return RtAudio::Api::LINUX_ALSA;
-	}
-	else if (driver == "PULSE") {
-		return RtAudio::Api::LINUX_PULSE;
-	}
-	else if (driver == "OSS") {
-		return RtAudio::Api::LINUX_OSS;
-	}
-	else if (driver == "JACK") {
-		return RtAudio::Api::UNIX_JACK;
-	}
-	else if (driver == "CORE") {
-		return RtAudio::Api::MACOSX_CORE;
-	}
-	else if (driver == "WASAPI") {
-		return RtAudio::Api::WINDOWS_WASAPI;
-	}
-	else if (driver == "ASIO") {
-		return RtAudio::Api::WINDOWS_ASIO;
-	}
-	else if (driver == "DS") {
-		return RtAudio::Api::WINDOWS_DS;
-	}
-	else if (driver == "DUMMY") {
-		return RtAudio::Api::RTAUDIO_DUMMY;
-	}
-	return RtAudio::Api::UNSPECIFIED;
-}
-
 class AudioHandler {
 
 private:

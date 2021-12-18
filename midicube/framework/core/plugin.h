@@ -17,6 +17,7 @@
 #include "../util/util.h"
 #include "../util/clipboard.h"
 #include "../gui/core.h"
+#include "ui.h"
 #include <map>
 #include <algorithm>
 
@@ -79,6 +80,8 @@ public:
 
 	//Pointer should always stay the same
 	virtual const MidiControls& get_controls() = 0;
+
+	virtual MasterPluginHost& get_master_host() = 0;
 
 	virtual ~PluginHost() {
 
@@ -147,7 +150,7 @@ public:
 		return controls;
 	}
 
-	virtual ViewController* create_view() {
+	virtual Menu* create_menu() {
 		return nullptr;
 	}
 
@@ -431,16 +434,19 @@ public:
 
 };
 
-class MasterPluginHost {
+class MasterPluginHost : public ControlViewHost {
 
 public:
-	virtual ActionHandler& get_action_handler() = 0;
 
 	virtual PluginManager& get_plugin_manager() = 0;
 
-	virtual void set_property_change_callback(std::function<void(void*, void*)> cb) = 0;
+	virtual MenuHandler& get_menu_handler() = 0;
 
-	virtual void change_control_view(ControlView* view) = 0;
+	//Pointer should always stay the same
+	virtual SpinLock& get_lock() = 0;
+
+	//Pointer should always stay the same
+	virtual MidiBindingHandler* get_binding_handler() = 0;
 
 	virtual ~MasterPluginHost() {
 

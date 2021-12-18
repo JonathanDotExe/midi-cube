@@ -12,9 +12,7 @@
 #include "../../plugins/resources.h"
 
 
-AnalogSynthOperatorView::AnalogSynthOperatorView(AdvancedSynth &s, size_t part) : synth(s), binder{s.get_lock(), [&s, part]() {
-			return new AnalogSynthOperatorView(s, part);
-		}, main_font} {
+AnalogSynthOperatorView::AnalogSynthOperatorView(AdvancedSynth &s, size_t part) : synth(s), binder{main_font} {
 	this->part = part;
 }
 
@@ -101,7 +99,7 @@ Scene AnalogSynthOperatorView::create(ViewHost &frame) {
 	std::vector<Control*> show_amount;
 	std::vector<Control*> show_source;
 
-	ActionHandler& handler = frame.get_master_host().get_action_handler();
+	ActionHandler& handler = frame.get_action_handler();
 	OperatorEntity& op = synth.preset.operators.at(this->part);
 
 	//Background
@@ -187,7 +185,7 @@ Scene AnalogSynthOperatorView::create(ViewHost &frame) {
 	create_filter_view(tmp_x, tmp_y, op.second_filter, controls, show_amount, show_source, handler);
 
 	//Edit Sources
-	Button* edit = new Button("Edit Sources", main_font, 18, 75, frame.get_height() - 40, 120, 40);
+	Button* edit = new Button("Edit Sources", main_font, 18, frame.get_width() - 290, frame.get_height() - 40, 120, 40);
 	edit->rect.setFillColor(sf::Color::Yellow);
 	edit->set_on_click([&frame, show_amount, show_source, this]() {
 		edit_source = !edit_source;
@@ -200,12 +198,12 @@ Scene AnalogSynthOperatorView::create(ViewHost &frame) {
 	});
 	controls.push_back(edit);
 
-	controls.push_back(binder.create_button(75 + 120, frame.get_height() - 40, &frame));
+	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
 	//Back Button
-	Button* back = new Button("Back", main_font, 18, 5, frame.get_height() - 40, 70, 40);
+	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	back->rect.setFillColor(sf::Color::Yellow);
 	back->set_on_click([&frame, this]() {
-		frame.change_view(new AnalogSynthView(synth));
+		frame.menu_back();
 	});
 	controls.push_back(back);
 
@@ -223,55 +221,3 @@ bool AnalogSynthOperatorView::on_action(Control *control) {
 	return binder.on_action(control);
 }
 
-ControlView* AnalogSynthOperatorView::create_control_view() {
-	ControlView* view = new ControlView("Analog Synth Operator " + part);
-	OperatorEntity& op = synth.preset.operators.at(part);
-	view->bind(&op.volume.velocity_amount, ControlType::KNOB, 0, 0);
-	view->bind(&op.env.hold, ControlType::KNOB, 1, 0);
-	view->bind(&op.env.pre_decay, ControlType::KNOB, 2, 0);
-	view->bind(&op.env.attack_hold, ControlType::KNOB, 3, 0);
-	view->bind(&op.panning.value, ControlType::KNOB, 4, 0);
-	view->bind(&op.first_filter.cutoff.mod_env_amount, ControlType::KNOB, 5, 0);
-	view->bind(&op.first_filter.cutoff.lfo_amount, ControlType::KNOB, 6, 0);
-	view->bind(&op.first_filter.cutoff.aftertouch_amount, ControlType::KNOB, 7, 0);
-	view->bind(&op.first_filter.drive_amount, ControlType::KNOB, 8, 0);
-
-	view->bind(&op.volume.value, ControlType::SLIDER, 0, 0);
-	view->bind(&op.env.attack, ControlType::SLIDER, 1, 0);
-	view->bind(&op.env.decay, ControlType::SLIDER, 2, 0);
-	view->bind(&op.env.sustain, ControlType::SLIDER, 3, 0);
-	view->bind(&op.env.release, ControlType::SLIDER, 4, 0);
-	view->bind(&op.first_filter.cutoff.value, ControlType::SLIDER, 5, 0);
-	view->bind(&op.first_filter.cutoff.velocity_amount, ControlType::SLIDER, 6, 0);
-	view->bind(&op.first_filter.resonance.value, ControlType::SLIDER, 7, 0);
-	view->bind(&op.first_filter.type, ControlType::SLIDER, 8, 0);
-
-	view->bind(&op.audible, ControlType::BUTTON, 0, 0);
-	view->bind(&op.first_filter.on, ControlType::BUTTON, 5, 0);
-	view->bind(&op.filter_parallel, ControlType::BUTTON, 6, 0);
-
-	view->bind(&op.amp_kb_track_note, ControlType::KNOB, 0, 1);
-	view->bind(&op.amp_kb_track_lower, ControlType::KNOB, 1, 1);
-	view->bind(&op.amp_kb_track_upper, ControlType::KNOB, 2, 1);
-	view->bind(&op.first_filter.kb_track, ControlType::KNOB, 3, 1);
-	view->bind(&op.second_filter.kb_track, ControlType::KNOB, 4, 1);
-	view->bind(&op.second_filter.cutoff.mod_env_amount, ControlType::KNOB, 5, 1);
-	view->bind(&op.second_filter.cutoff.lfo_amount, ControlType::KNOB, 6, 1);
-	view->bind(&op.second_filter.cutoff.aftertouch_amount, ControlType::KNOB, 7, 1);
-	view->bind(&op.second_filter.drive_amount, ControlType::KNOB, 8, 1);
-
-	view->bind(&op.oscilator_count, ControlType::SLIDER, 0, 1);
-	view->bind(&op.env.peak_volume, ControlType::SLIDER, 1, 1);
-	view->bind(&op.env.decay_volume, ControlType::SLIDER, 2, 1);
-	view->bind(&op.env.sustain_time, ControlType::SLIDER, 3, 1);
-	view->bind(&op.env.release_volume, ControlType::SLIDER, 4, 1);
-	view->bind(&op.second_filter.cutoff.value, ControlType::SLIDER, 5, 1);
-	view->bind(&op.second_filter.cutoff.velocity_amount, ControlType::SLIDER, 6, 1);
-	view->bind(&op.second_filter.resonance.value, ControlType::SLIDER, 7, 1);
-	view->bind(&op.second_filter.type, ControlType::SLIDER, 8, 1);
-
-	view->bind(&op.second_filter.on, ControlType::BUTTON, 5, 1);
-
-	view->init(&synth);
-	return view;
-}

@@ -8,9 +8,8 @@
 #include "MasterEffectView.h"
 #include "SoundEngineView.h"
 #include "PluginSelectView.h"
-#include "PluginView.h"
 
-MasterEffectView::MasterEffectView(MidiCube& c): cube(c) {
+MasterEffectView::MasterEffectView(MidiCubeWorkstation& c): cube(c) {
 
 
 }
@@ -58,8 +57,8 @@ Scene MasterEffectView::create(ViewHost &frame) {
 		Button* e = new Button(effect_name, main_font, 12, x + 5, y + 30, pane_width - 15, 30);
 		e->rect.setFillColor(sf::Color(128, 255, 255));
 		e->set_on_click([this, &frame, &effect]() {
-			MidiCube& c = cube;
-			frame.change_view(new PluginSelectView(effect.effect, cube.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), cube.lock, [&c]() { return new MasterEffectView(c); }, cube.plugin_mgr, &cube.clipboard));
+			MidiCubeWorkstation& c = cube;
+			frame.change_menu(VIEW_MENU(new PluginSelectView(effect.effect, c.plugin_mgr.get_plugins(PluginType::PLUGIN_TYPE_EFFECT), c.lock, c.plugin_mgr, &c.clipboard), &c, &effect));
 		});
 		controls.push_back(e);
 		//Edit
@@ -67,13 +66,10 @@ Scene MasterEffectView::create(ViewHost &frame) {
 		edit_effect->set_on_click([this, i, &effect, &frame]() {
 			cube.lock.lock();
 			PluginInstance* eff = effect.effect.get_plugin();
-			if (eff) {
-				MidiCube& c = cube;
-				frame.change_view(new PluginView(*eff, [&c]() {
-					return new MasterEffectView(c);
-				}, &cube.engine.metronome, &cube.engine.play_metronome, &cube.engine.volume));
-			}
 			cube.lock.unlock();
+			if (eff) {
+				frame.change_menu(eff->create_menu());
+			}
 		});
 		controls.push_back(edit_effect);
 
@@ -91,7 +87,7 @@ Scene MasterEffectView::create(ViewHost &frame) {
 	//Back Button
 	Button* exit = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);
 	exit->set_on_click([&frame, this]() {
-		frame.change_view(new SoundEngineView(cube));
+		frame.menu_back();
 	});
 	exit->rect.setFillColor(sf::Color::Yellow);
 	controls.push_back(exit);

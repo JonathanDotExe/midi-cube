@@ -5,9 +5,8 @@
  *      Author: jojo
  */
 
-#include "soundengine.h"
 #include "midicube.h"
-
+#include "soundengine.h"
 #include <algorithm>
 
 
@@ -117,7 +116,7 @@ void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info
 				break;
 			case MessageType::CONTROL_CHANGE:
 				//Sustain
-				if (message.control() == device->sustain_control) {
+				if (message.control() == get_controls().sustain_pedal) {
 					bool new_sustain = message.value() != 0;
 					if (new_sustain != env.sustain) {
 						if (new_sustain) {
@@ -343,7 +342,7 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	case MessageType::CONTROL_CHANGE:
 		//Update scene
 		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
-			if (scene_ccs[i] == message.control()) {
+			if (cube->get_config().controls.scene_buttons[i] == message.control()) {
 				scene = i;
 				cube->notify_property_update(this, &scene);
 			}
@@ -499,7 +498,7 @@ int SoundEngineChannel::get_transpose() {
 	return 12 * get_octave();
 }
 
-void SoundEngineDevice::init(MidiCube *cube) {
+void SoundEngineDevice::init(MidiCubeWorkstation *cube) {
 	if (this->cube) {
 		throw "MidiCube already initialized";
 	}
@@ -641,4 +640,16 @@ int SoundEngineDeviceHost::get_transpose() {
 
 const MidiControls& SoundEngineDeviceHost::get_controls() {
 	return device->get_cube()->get_config().controls;
+}
+
+void SoundEngineChannel::notify_property_update(void *property) {
+	notify_property_update(this, property);
+}
+
+MasterPluginHost& SoundEngineDeviceHost::get_master_host() {
+	return *device->get_cube();
+}
+
+MasterPluginHost& SoundEngineChannel::get_master_host() {
+	return *device->get_cube();
 }

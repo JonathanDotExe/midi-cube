@@ -61,7 +61,7 @@ public:
 	void apply_program(PluginProgram *prog);
 	void process(const SampleInfo &info);
 	void save_program(PluginProgram **prog);
-	ViewController* create_view();
+	Menu* create_menu();
 	void recieve_midi(const MidiMessage &message, const SampleInfo &info);
 
 };
