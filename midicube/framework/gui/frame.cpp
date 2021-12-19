@@ -114,6 +114,7 @@ void Frame::run(Menu* m) {
 			next_view = nullptr;
 		}
 	}
+	get_action_handler().wait_till_finished_gui();
 }
 
 void Frame::update_properties() {

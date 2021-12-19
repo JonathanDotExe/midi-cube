@@ -13,9 +13,15 @@ ActionHandler::ActionHandler() : realtime_actions(2048), return_actions(2048) {
 }
 
 void ActionHandler::queue_action(Action *action) {
-	if (!realtime_actions.push(action)) {
+	if (closed || !realtime_actions.push(action)) {
 		delete action;
 		std::cout << "Warning: Lost requested action" << std::endl;
+	}
+	else if (closed) {
+		Action* action = nullptr;
+		while (realtime_actions.pop(action)) {
+			delete action;
+		}
 	}
 }
 
@@ -23,9 +29,14 @@ void ActionHandler::execute_realtime_actions() {
 	Action* action = nullptr;
 	while (realtime_actions.pop(action)) {
 		action->execute();
-		if (!return_actions.push(action)) {
+		if (closed || !return_actions.push(action)) {
 			delete action;
 			std::cout << "Warning: Lost returned action" << std::endl;
+		}
+		else if (closed) {
+			while (return_actions.pop(action)) {
+				delete action;
+			}
 		}
 	}
 }
@@ -59,5 +70,27 @@ void FunctionAction::execute() {
 void FunctionAction::returned() {
 	if (ret) {
 		ret();
+	}
+}
+
+ActionHandler::~ActionHandler() {
+	closed = true;
+	Action* action = nullptr;
+	while (realtime_actions.pop(action)) {
+		delete action;
+	}
+	while (return_actions.pop(action)) {
+		delete action;
+	}
+}
+
+void ActionHandler::wait_till_finished_gui() {
+	//Wait for tasks
+	while (remaining_realtime_actions()) {
+		std::this_thread::yield();
+	}
+	while (remaining_return_actions()) {
+		execute_return_actions();
+		std::this_thread::yield();
 	}
 }
