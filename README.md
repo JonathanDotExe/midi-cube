@@ -9,7 +9,7 @@ A Synthesizer-Workstation written in C++, intendend to both work on Single-Chip-
 * A touch responsive GUI
 * A web interface or a desktop client that allows uploading new sounds
 
-## Instalation
+## Installation
 On Windows the building process is quite complicated, which is why I supply Windows binaries with every released version.
 On Linux the build process is pretty straighforward. MidiCube supports two build systems: Meson and CMake. The Meson build file compiles everything into one executable and compiles faster. CMake is slower but separates the project into different modules (Note: only the compilation process takes longer, MidiCube will have the same performance with both). At the moment it doesn't matter which build system you use but in future I will add a plugin API and different "hosts" (like the workstation ui you know now, a stripped down ui for use as an fx device on a raspi or a DAW plugin) where it might be from advantage to use the modular CMake build. Furthermore, CMake allows you to install MidiCube with all the relevant files using make install.
 ### How to install with meson on Ubuntu/Debian
