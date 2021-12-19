@@ -46,10 +46,10 @@ enum ADSREnvelopeShape {
 };
 
 struct ADSREnvelopeData {
-	double attack;
-	double decay;
-	double sustain;
-	double release;
+	double attack = 0;
+	double decay = 0;
+	double sustain = 1;
+	double release = 0;
 
 	ADSREnvelopeShape attack_shape = ADSREnvelopeShape::LINEAR_ADSR;
 	ADSREnvelopeShape pre_decay_shape = ADSREnvelopeShape::ANALOG_ADSR;
