@@ -40,6 +40,7 @@ void SampleSoundStore::load_sounds(std::string folder) {
 	//Read folders
 	std::regex reg(".*\\.xml");
 	std::regex sfz_reg(".*\\.sfz");
+	boost::filesystem::create_directory(folder);
 	for (const auto& f : boost::filesystem::directory_iterator(folder)) {
 		std::string file = f.path().string();
 		if (boost::filesystem::is_directory(file)) {
