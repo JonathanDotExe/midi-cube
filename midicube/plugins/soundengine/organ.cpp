@@ -216,6 +216,7 @@ void B3Organ::process_sample(const SampleInfo &info) {
 		}
 		//Play back
 		sample = sample * (1 - fmax(0, data.preset.vibrato_mix - 0.5) * 2) + vibrato * (fmin(1, data.preset.vibrato_mix * 2));
+		sample *= 0.75;
 	}
 
 	//Play back
