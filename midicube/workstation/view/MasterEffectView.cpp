@@ -79,7 +79,7 @@ Scene MasterEffectView::create(ViewHost &frame) {
 			controls.push_back(octave_label);
 
 			DragBox<int>* master_send = new DragBox<int>(0, -1, SOUND_ENGINE_MASTER_EFFECT_AMOUNT - 1, main_font, 12, x + 5, y + 125, pane_width - 15, 30);
-			master_send->property.bind(effect.next_effect, cube.lock);
+			master_send->property.bind(effect.next_effect, frame.get_action_handler());
 			controls.push_back(master_send);
 		}
 	}

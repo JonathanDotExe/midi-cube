@@ -160,6 +160,10 @@ public:
 		return value;
 	}
 
+	inline operator T&() {
+		return value;
+	}
+
 	inline operator T() const {
 		return value;
 	}
@@ -227,6 +231,10 @@ public:
 		return value;
 	}
 
+	inline operator T&() {
+		return value;
+	}
+
 	inline operator int() const {
 		return static_cast<int>(value);
 	}
@@ -269,6 +277,10 @@ public:
 	}
 
 	inline operator bool() const {
+		return value;
+	}
+
+	inline operator bool&(){
 		return value;
 	}
 	void change(double val) {
