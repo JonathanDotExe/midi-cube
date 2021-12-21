@@ -380,7 +380,7 @@ public:
 
 	bool paste_plugin(Clipboard& clipboard, PluginManager& mgr);
 
-	PluginInstance* get_plugin() const {
+	inline PluginInstance* get_plugin() const {
 		return plugin;
 	}
 
