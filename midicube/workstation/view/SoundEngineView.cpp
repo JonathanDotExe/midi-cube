@@ -91,7 +91,8 @@ Scene SoundEngineView::create(ViewHost& frame) {
 	//Effects
 	Button* effects = new Button("Effects", main_font, 18, 370, frame.get_height() - 45, 100, 40);
 	effects->set_on_click([&frame, this]() {
-		frame.change_view(new MasterEffectView(cube));
+		MidiCubeWorkstation& cube = this->cube;
+		frame.change_menu(VIEW_MENU(new MasterEffectView(cube), &cube));
 	});
 	controls.push_back(effects);
 
