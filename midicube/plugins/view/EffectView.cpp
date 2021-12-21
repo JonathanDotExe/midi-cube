@@ -33,7 +33,7 @@ EffectView::~EffectView() {
 
 Scene EffectView::create(ViewHost &frame) {
 	ActionHandler& handler = frame.get_action_handler();
-	SpinLock& lock = effect->get_host().get_lock();
+	SpinLock& lock = effect->get_lock();
 	lock.lock();
 	std::vector<Control*> controls;
 

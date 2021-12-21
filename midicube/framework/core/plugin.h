@@ -114,11 +114,6 @@ public:
 
 class PluginInstance : public ControlHost {
 
-private:
-	PluginHost& host;
-	Plugin& plugin;
-	const MidiControls& controls; //Cache pointer
-
 protected:
 
 	void send_midi(const MidiMessage& msg, const SampleInfo& info) {
@@ -128,8 +123,13 @@ protected:
 public:
 	double* inputs;
 	double* outputs;
+	PluginHost& host;
+	Plugin& plugin;
+	const MidiControls& controls; //Cache pointer
+	const KeyboardEnvironment& host_environment; //Cache pointer
+	const Metronome& host_metronome; //Cache pointer
 
-	PluginInstance(PluginHost& h, Plugin& p) : host(h), plugin(p), controls(h.get_controls()) {
+	PluginInstance(PluginHost& h, Plugin& p) : host(h), plugin(p), controls(h.get_controls()), host_environment(h.get_environment()), host_metronome(h.get_metronome()) {
 		inputs = new double[p.info.input_channels]();
 		outputs = new double[p.info.output_channels]();
 	}
@@ -159,20 +159,12 @@ public:
 		delete outputs;
 	}
 
-	inline PluginHost& get_host() const {
-		return host;
-	}
-
-	inline Plugin& get_plugin() const {
-		return plugin;
-	}
-
 	inline SpinLock& get_lock() const {
 		return host.get_lock();
 	}
 
 	inline void notify_property_update(void* prop) {
-		get_host().notify_property_update(this, prop);
+		host.notify_property_update(this, prop);
 	}
 
 	inline void take_input_mono(double sample) {

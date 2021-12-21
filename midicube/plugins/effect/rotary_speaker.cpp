@@ -16,7 +16,7 @@ RotarySpeakerEffect::RotarySpeakerEffect(PluginHost& h, Plugin& p) : Effect(h, p
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.fast);
 
-	cc.init(get_host().get_binding_handler(), this);
+	cc.init(host.get_binding_handler(), this);
 
 	filter_data.type = FilterType::LP_24;
 	filter_data.cutoff = 800;

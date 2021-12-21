@@ -367,7 +367,7 @@ void ArpeggiatorInstance::save_program(PluginProgram **prog) {
 
 void ArpeggiatorInstance::process(const SampleInfo &info) {
 	if (arp.on) {
-		arp.apply(info, get_host().get_metronome(), [this](const SampleInfo& info, unsigned int note, double velocity) {
+		arp.apply(info, host_metronome, [this](const SampleInfo& info, unsigned int note, double velocity) {
 			MidiMessage msg;
 			msg.type = MessageType::NOTE_ON;
 			msg.set_note(note);
@@ -379,7 +379,7 @@ void ArpeggiatorInstance::process(const SampleInfo &info) {
 			msg.set_note(note);
 			msg.set_velocity(velocity * 127);
 			this->send_midi(msg, info);
-		}, get_host().get_environment().sustain);
+		}, host_environment.sustain);
 	}
 }
 
@@ -390,10 +390,10 @@ void ArpeggiatorInstance::recieve_midi(const MidiMessage &message, const SampleI
 	if (arp.on) {
 		switch (message.type) {
 		case MessageType::NOTE_ON:
-			arp.press_note(info, message.note(), message.velocity()/127.0, get_host().get_environment().sustain);
+			arp.press_note(info, message.note(), message.velocity()/127.0, host_environment.sustain);
 			break;
 		case MessageType::NOTE_OFF:
-			arp.release_note(info, message.note(), get_host().get_environment().sustain);
+			arp.release_note(info, message.note(), host_environment.sustain);
 			/* no break */
 		default:
 			this->send_midi(message, info);

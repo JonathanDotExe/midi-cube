@@ -36,7 +36,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	//Col 1
 	//Engine
 	cube.lock.lock();
-	std::string engine_name = channel.engine.get_plugin() ? channel.engine.get_plugin()->get_plugin().info.name : "None";
+	std::string engine_name = channel.engine.get_plugin() ? channel.engine.get_plugin()->plugin.info.name : "None";
 	cube.lock.unlock();
 	Button* engine = new Button(engine_name, main_font, 24, 10, 45, 300, 80);
 	engine->rect.setFillColor(sf::Color(0, 180, 255));
@@ -65,7 +65,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	//Sequencer
 	for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
 		cube.lock.lock();
-		std::string sequencer_name = channel.sequencers[i].get_plugin() ? channel.sequencers[i].get_plugin()->get_plugin().info.name : "None";
+		std::string sequencer_name = channel.sequencers[i].get_plugin() ? channel.sequencers[i].get_plugin()->plugin.info.name : "None";
 		cube.lock.unlock();
 		Button* sequencer = new Button(sequencer_name, main_font, 18, 10, tmp_y, 200, 60);
 		sequencer->rect.setFillColor(sf::Color(128, 255, 255));
@@ -96,7 +96,7 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	for (size_t i = 0; i < CHANNEL_INSERT_EFFECT_AMOUNT; ++i) {
 		//Effect
 		cube.lock.lock();
-		std::string effect_name = channel.effects[i].get_plugin() ? channel.effects[i].get_plugin()->get_plugin().info.name : "None";
+		std::string effect_name = channel.effects[i].get_plugin() ? channel.effects[i].get_plugin()->plugin.info.name : "None";
 		cube.lock.unlock();
 		Button* effect = new Button(effect_name, main_font, 18, 10, tmp_y, 200, 60);
 		effect->rect.setFillColor(sf::Color(128, 255, 255));

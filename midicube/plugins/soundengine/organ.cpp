@@ -150,7 +150,6 @@ bool B3Organ::note_finished(const SampleInfo& info, TriggeredNote& note, size_t 
 
 void B3Organ::process_sample(const SampleInfo &info) {
 	EngineStatus status = get_status();
-	const KeyboardEnvironment& env = get_host().get_environment();
 	//Update properties
 	double swell = this->data.swell * SWELL_RANGE + MIN_SWELL;
 
@@ -169,7 +168,7 @@ void B3Organ::process_sample(const SampleInfo &info) {
 	double volume = 0;
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
 		volume += data.tonewheels[i].compress_volume;
-		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * env.pitch_bend, data.preset.type) * (1 + (tonewheel_data[i].volume - 1) * data.preset.high_gain_reduction);
+		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * host_environment.pitch_bend, data.preset.type) * (1 + (tonewheel_data[i].volume - 1) * data.preset.high_gain_reduction);
 	}
 	sample *= swell;
 	//Compress

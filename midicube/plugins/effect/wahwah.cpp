@@ -17,7 +17,7 @@ WahWahEffect::WahWahEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.mix);
 	cc.add_binding(&preset.auto_wah);
 
-	cc.init(get_host().get_binding_handler(), this);
+	cc.init(host.get_binding_handler(), this);
 }
 
 void WahWahEffect::process(const SampleInfo &info) {

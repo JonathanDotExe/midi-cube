@@ -106,7 +106,6 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
 	double lsample = 0;
 	double rsample = 0;
-	const KeyboardEnvironment& env = get_host().get_environment();
 	if (note.region && note.sample) {
 		double vol = note.region->amplitude.apply_modulation(&note, this);
 		double vel_amount = 0;
@@ -168,7 +167,7 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 		if (!note.region->env.sustain_entire_sample) {
 			//Volume
 			ADSREnvelopeData data = note.region->env.env.apply(&note, this);
-			vol *= note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
+			vol *= note.env.amplitude(data, info.time_step, note.pressed, host_environment.sustain);
 		}
 		vel_amount = note.region->env.velocity_amount.apply_modulation(&note, this);
 
@@ -178,14 +177,14 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
 			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack);
-			note.time += freq/note_to_freq(note.region->note) * env.pitch_bend * info.time_step;
+			note.time += freq/note_to_freq(note.region->note) * host_environment.pitch_bend * info.time_step;
 			lsample += l * vol;
 			rsample += r * vol;
 		}
 	}
 	else {
 		ADSREnvelopeData data = {0, 0, 0, 0};
-		note.env.amplitude(data, info.time_step, note.pressed, env.sustain);
+		note.env.amplitude(data, info.time_step, note.pressed, host_environment.sustain);
 	}
 
 	//Playback
@@ -211,7 +210,7 @@ void Sampler::press_note(const SampleInfo& info, unsigned int note, double veloc
 				}
 			}
 			if (trigger && preset_number >= region->min_preset && preset_number <= region->max_preset) {
-				size_t slot = this->voice_mgr.press_note(info, note, note + get_host().get_transpose(), velocity, 0);
+				size_t slot = this->voice_mgr.press_note(info, note, note + host.get_transpose(), velocity, 0);
 				SamplerVoice& voice = this->voice_mgr.note[slot];
 				voice.region = region;
 				voice.layer_amp = sample->volume;

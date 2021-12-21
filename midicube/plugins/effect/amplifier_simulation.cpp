@@ -13,7 +13,7 @@ AmplifierSimulationEffect::AmplifierSimulationEffect(PluginHost& h, Plugin& plug
 	cc.add_binding(&preset.post_gain);
 	cc.add_binding(&preset.drive);
 	cc.add_binding(&preset.tone);
-	cc.init(get_host().get_binding_handler(), this);
+	cc.init(host.get_binding_handler(), this);
 }
 
 static inline double cubic_distortion(double sample) {
