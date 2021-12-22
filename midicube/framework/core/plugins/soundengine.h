@@ -32,7 +32,6 @@ public:
 
 	virtual void process(const SampleInfo& info) {
 		EngineStatus status = {0, 0};
-		const KeyboardEnvironment& env = get_host().get_environment();
 		//Notes
 		for (size_t i = 0; i < P; ++i) {
 			if (voice_mgr.note[i].valid) {
@@ -41,7 +40,7 @@ public:
 				}
 				else {
 					++status.pressed_notes;
-					voice_mgr.note[i].phase_shift += (env.pitch_bend - 1) * info.time_step;
+					voice_mgr.note[i].phase_shift += (host_environment.pitch_bend - 1) * info.time_step;
 					process_note_sample(info, voice_mgr.note[i], i);
 					if (!status.pressed_notes || voice_mgr.note[status.latest_note_index].start_time < voice_mgr.note[i].start_time) {
 						status.latest_note_index = i;
@@ -81,7 +80,7 @@ public:
 	}
 
 	virtual void press_note(const SampleInfo& info, unsigned int note, double velocity) {
-		voice_mgr.press_note(info, note, note + get_host().get_transpose(), velocity, 0);
+		voice_mgr.press_note(info, note, note + host.get_transpose(), velocity, 0);
 	}
 
 	virtual void release_note(const SampleInfo& info, unsigned int note, double velocity) {
@@ -93,8 +92,7 @@ public:
 	}
 
 	virtual bool note_finished(const SampleInfo& info, V& note, size_t note_index) {
-		const KeyboardEnvironment& env = get_host().get_environment();
-		return !note.pressed || (env.sustain && note.release_time >= env.sustain_time);
+		return !note.pressed || (host_environment.sustain && note.release_time >= host_environment.sustain_time);
 	};
 
 	virtual ~SoundEngine() {

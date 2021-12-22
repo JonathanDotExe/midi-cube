@@ -49,7 +49,7 @@ AdvancedSynth::AdvancedSynth(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	}
 	//Global
 	binder.add_binding(&preset.portamendo);
-	binder.init(get_host().get_binding_handler(), this);
+	binder.init(host.get_binding_handler(), this);
 }
 
 inline double AdvancedSynth::apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ASYNTH_PART_COUNT>& lfo_val) {
@@ -218,7 +218,7 @@ void AdvancedSynth::process_note(double& lsample, double& rsample,
 
 void AdvancedSynth::process_note_sample(const SampleInfo &info,	AdvancedSynthVoice &note, size_t note_index) {
 	if (!preset.mono) {
-		process_note(outputs[0], outputs[1], info, note, get_host().get_environment());
+		process_note(outputs[0], outputs[1], info, note, host_environment);
 	}
 }
 
@@ -272,7 +272,7 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 		//Playback
 		if (mono_voice.valid) {
 			double pitch = note_port.get();
-			KeyboardEnvironment e = get_host().get_environment();
+			KeyboardEnvironment e = host_environment;
 			e.pitch_bend *= note_to_freq_transpose(
 					pitch - mono_voice.note);
 
@@ -297,7 +297,7 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 			if (lfo.clock_value <= 0) {
 				value = 1.0/(-fmin(static_cast<int>(lfo.clock_value), -1));
 			}
-			const Metronome& metronome = get_host().get_metronome();
+			const Metronome& metronome = host_metronome;
 			freq = metronome.get_bpm()/60.0 * value;
 			if (metronome.is_beat(info.sample_time, info.sample_rate, value)) {
 				lfos[i].reset(lfo.sync_phase);
@@ -326,11 +326,11 @@ bool AdvancedSynth::note_finished(const SampleInfo &info, AdvancedSynthVoice &no
 	if (preset.mono) {
 		return !note.pressed;
 	}
-	return !note.pressed && amp_finished(info, note, get_host().get_environment());
+	return !note.pressed && amp_finished(info, note, host_environment);
 }
 
 void AdvancedSynth::press_note(const SampleInfo& info, unsigned int note, double velocity) {
-	AdvancedSynthVoice& voice = this->voice_mgr.note[this->voice_mgr.press_note(info, note, note + get_host().get_transpose(), velocity, 0)];
+	AdvancedSynthVoice& voice = this->voice_mgr.note[this->voice_mgr.press_note(info, note, note + host.get_transpose(), velocity, 0)];
 	voice.aftertouch = 0;
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();

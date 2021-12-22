@@ -14,7 +14,7 @@ TremoloEffect::TremoloEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.rate);
 	cc.add_binding(&preset.depth);
 
-	cc.init(get_host().get_binding_handler(), this);
+	cc.init(host.get_binding_handler(), this);
 }
 
 void TremoloEffect::process(const SampleInfo& info) {

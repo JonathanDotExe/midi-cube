@@ -130,7 +130,7 @@ struct SampleFilter {
 
 struct SampleEnvelope {
 	ModulatableADSREnvelopeData env = {0, 0, 1, 0.001, LINEAR_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR};
-	ModulateableProperty velocity_amount{0.0};
+	ModulateableProperty velocity_amount{1.0};
 	bool sustain_entire_sample = false;
 };
 
@@ -294,19 +294,17 @@ public:
 	}
 
 	inline double get_cc_value(unsigned int cc, SamplerVoice* voice) {
-		const KeyboardEnvironment& env = get_host().get_environment();
-
 		if (cc <= 127) {
 			return this->cc[cc];
 		}
 		else {
 			switch (cc) {
 			case 128:
-				return (env.pitch_bend_percent * 0.5) + 0.5;
+				return (host_environment.pitch_bend_percent * 0.5) + 0.5;
 			case 129:
-				return env.aftertouch;
+				return host_environment.aftertouch;
 			case 130:
-				return env.aftertouch; //TODO support poly at
+				return host_environment.aftertouch; //TODO support poly at
 			case 131:
 				return voice->velocity; //Note on velocity
 			case 132:

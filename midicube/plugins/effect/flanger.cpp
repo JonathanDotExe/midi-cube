@@ -18,7 +18,7 @@ FlangerEffect::FlangerEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.delay);
 	cc.add_binding(&preset.feedback);
 
-	cc.init(get_host().get_binding_handler(), this);
+	cc.init(host.get_binding_handler(), this);
 }
 
 void FlangerEffect::process(const SampleInfo& info) {

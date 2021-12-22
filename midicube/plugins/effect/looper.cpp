@@ -47,7 +47,7 @@ void Looper::process(const SampleInfo &info) {
 	outputs[0] = inputs[0];
 	outputs[1] = inputs[1];
 	if (active) {
-		const Metronome& metronome = get_host().get_metronome();
+		const Metronome& metronome = host_metronome;
 		if (solo_channel >= 0 && solo_channel < LOOPER_CHANNELS) {
 			channels[solo_channel].apply(outputs[0], outputs[1], metronome, info);
 		}

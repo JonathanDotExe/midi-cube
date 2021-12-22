@@ -23,6 +23,10 @@ MidiMessage::MidiMessage(std::vector<unsigned char> message) {
 			}
 		}
 	}
+	//Set type to note if if velocity is 0
+	if (type == MessageType::NOTE_ON && velocity() == 0) {
+		type = MessageType::NOTE_OFF;
+	}
 }
 
 std::string MidiMessage::to_string() {

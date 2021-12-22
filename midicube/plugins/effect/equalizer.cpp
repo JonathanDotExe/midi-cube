@@ -20,7 +20,7 @@ EqualizerEffect::EqualizerEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.high_freq);
 	cc.add_binding(&preset.high_gain);
 
-	cc.init(get_host().get_binding_handler(), this);
+	cc.init(host.get_binding_handler(), this);
 }
 
 void EqualizerEffect::process(const SampleInfo& info) {

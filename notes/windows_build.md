@@ -51,6 +51,7 @@ MingW Download: https://nuwen.net/mingw.html
 * Set CMAKE_PREFIX_PATH to E:\SDKs\SFML\lib\cmake\SFML;E:\SDKs\rtmidi\share\rtmidi;E:\SDKs\rtaudio\share\rtaudio;E:\SDKs\libsndfile\cmake;
 * Generate MingW Makefiles
 * Create rtaudio and rtmidi folders in the project include folder and copy the headers of the libraries into them
+* Copy the sndfile.h and sndfile.hh into the include directory
 * Execute make in your build folder
 * Copy the dll files of the libraries into the build folder (librtaudio.dll librtmidi.dll sfml-graphics-2.dll sfml-system-2.dll sfml-window-2.dll sndfile.dll)
 * Copy libgcc_s_seh-1.dll, libstc++-6.dll and libwinpthread-1.dll bin/mingw64 from your Git for Windows Installation

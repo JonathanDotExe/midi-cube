@@ -185,6 +185,7 @@ class ActionHandler {
 private:
 	boost::lockfree::queue<Action*> realtime_actions;
 	boost::lockfree::queue<Action*> return_actions;
+	std::atomic<bool> closed = false;
 public:
 	ActionHandler();
 	bool remaining_realtime_actions();
@@ -192,6 +193,8 @@ public:
 	void queue_action(Action* action);
 	void execute_realtime_actions();
 	void execute_return_actions();
+	void wait_till_finished_gui();
+	~ActionHandler();
 };
 
 
@@ -310,7 +313,6 @@ public:
 		};
 		object = nullptr;
 	}
-
 
 };
 

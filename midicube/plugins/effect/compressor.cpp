@@ -17,7 +17,7 @@ CompressorEffect::CompressorEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.release);
 	cc.add_binding(&preset.makeup_gain);
 
-	cc.init(get_host().get_binding_handler(), this);
+	cc.init(host.get_binding_handler(), this);
 }
 
 void CompressorEffect::process(const SampleInfo& info) {

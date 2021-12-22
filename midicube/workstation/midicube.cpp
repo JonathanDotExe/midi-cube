@@ -31,6 +31,7 @@
 #include "../plugins/sequencer/arpeggiator.h"
 
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/filesystem.hpp>
 
 #include "midicube.h"
 
@@ -45,6 +46,7 @@ MidiCubeWorkstation::MidiCubeWorkstation() : prog_mgr("./data/programs", "./data
 }
 
 void MidiCubeWorkstation::init() {
+	boost::filesystem::create_directory("./data");
 	engine.init(this);
 	//Sound Engines
 	plugin_mgr.add_plugin(new AdvancedSynthPlugin());

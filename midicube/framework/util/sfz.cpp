@@ -437,7 +437,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 					tree.put("filter.type", "BP_12");
 				}
 				else if (opcode.second == "bpf_4p") {
-					tree.put("filter.type", "LP_BP_24");
+					tree.put("filter.type", "LP_24_BP");
 					std::cout << "Filter type bpf_4p is implemented differently and may sound unexpected!" << std::endl;
 				}
 				else {

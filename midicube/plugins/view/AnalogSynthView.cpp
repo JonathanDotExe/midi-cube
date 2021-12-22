@@ -200,11 +200,12 @@ Scene AnalogSynthView::create(ViewHost &frame) {
 
 void AnalogSynthView::update_properties() {
 	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
-		SpinLock& lock = synth.get_lock();
-		lock.lock();
-		part_sizes[i] = synth.preset.operators[i].oscilator_count;
-		position_operators();
-		lock.unlock();
+		this->frame->get_action_handler().queue_action(new GetValueAction<unsigned int, unsigned int>(synth.preset.operators[i].oscilator_count, [this, i](unsigned int v) {
+			part_sizes[i] = v;
+			if (i == ASYNTH_PART_COUNT - 1) {
+				position_operators();
+			}
+		}));
 	}
 }
 

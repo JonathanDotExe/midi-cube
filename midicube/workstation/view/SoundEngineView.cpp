@@ -55,7 +55,7 @@ Scene SoundEngineView::create(ViewHost& frame) {
 		controls.push_back(active);
 		//Engine
 		cube.lock.lock();
-		std::string engine_name = channel.engine.get_plugin() ? channel.engine.get_plugin()->get_plugin().info.name : "None";
+		std::string engine_name = channel.engine.get_plugin() ? channel.engine.get_plugin()->plugin.info.name : "None";
 		cube.lock.unlock();
 
 		Button* engine = new Button(engine_name, main_font, 12, x + 5, y + 30,  pane_width - 15, 30);
@@ -91,7 +91,8 @@ Scene SoundEngineView::create(ViewHost& frame) {
 	//Effects
 	Button* effects = new Button("Effects", main_font, 18, 370, frame.get_height() - 45, 100, 40);
 	effects->set_on_click([&frame, this]() {
-		frame.change_view(new MasterEffectView(cube));
+		MidiCubeWorkstation& cube = this->cube;
+		frame.change_menu(VIEW_MENU(new MasterEffectView(cube), &cube));
 	});
 	controls.push_back(effects);
 

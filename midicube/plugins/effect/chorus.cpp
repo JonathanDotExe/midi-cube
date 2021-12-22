@@ -16,7 +16,7 @@ ChorusEffect::ChorusEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.mix);
 
 	cc.add_binding(&preset.delay);
-	cc.init(get_host().get_binding_handler(), this);
+	cc.init(host.get_binding_handler(), this);
 }
 
 void ChorusEffect::process(const SampleInfo& info) {
