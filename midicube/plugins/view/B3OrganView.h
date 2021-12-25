@@ -16,9 +16,10 @@
 class B3OrganView : public ViewController {
 private:
 	B3Organ& organ;
+	unsigned int channel;
 	BindingGUIHandler binder;
 public:
-	B3OrganView(B3Organ& organ);
+	B3OrganView(B3Organ& organ, unsigned int channel);
 	virtual Scene create(ViewHost &frame);
 
 	virtual ~B3OrganView();

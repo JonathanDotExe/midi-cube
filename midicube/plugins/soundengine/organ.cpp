@@ -410,25 +410,29 @@ PluginInstance* OrganPlugin::create(PluginHost *host) {
 }
 
 Menu* B3Organ::create_menu() {
-	return new FunctionMenu([this]() { return new B3OrganView(*this); }, [this]() {
-		ControlView* view = new ControlView("B3 Organ");
-		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-			view->bind(&data.preset.upper_drawbars[i], ControlType::SLIDER, i, 0);
-		}
-		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-			view->bind(&data.preset.lower_drawbars[i], ControlType::SLIDER, i, 1);
-		}
-		view->bind(&data.preset.percussion, ControlType::BUTTON, 2, 0);
-		view->bind(&data.preset.percussion_fast_decay, ControlType::BUTTON, 3, 0);
-		view->bind(&data.preset.percussion_soft, ControlType::BUTTON, 4, 0);
-		view->bind(&data.preset.percussion_third_harmonic, ControlType::BUTTON, 4, 0);
-
-		view->bind(&data.preset.vibrato_mix, ControlType::KNOB, 1, 0);
-		view->init(this);
-		return view;
-	});
+	return create_menu(0);
 }
 
 void B3Organ::press_note(const SampleInfo &info, unsigned int note,
 		double velocity) {
+}
+
+Menu* B3Organ::create_menu(unsigned int channel) {
+	return new FunctionMenu([this]() { return new B3OrganView(*this, channel); }, [this]() {
+			ControlView* view = new ControlView("B3 Organ");
+			for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+				view->bind(&data.preset.upper_drawbars[i], ControlType::SLIDER, i, 0);
+			}
+			for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+				view->bind(&data.preset.lower_drawbars[i], ControlType::SLIDER, i, 1);
+			}
+			view->bind(&data.preset.percussion, ControlType::BUTTON, 2, 0);
+			view->bind(&data.preset.percussion_fast_decay, ControlType::BUTTON, 3, 0);
+			view->bind(&data.preset.percussion_soft, ControlType::BUTTON, 4, 0);
+			view->bind(&data.preset.percussion_third_harmonic, ControlType::BUTTON, 4, 0);
+
+			view->bind(&data.preset.vibrato_mix, ControlType::KNOB, 1, 0);
+			view->init(this);
+			return view;
+		});
 }

@@ -163,6 +163,8 @@ public:
 
 	Menu* create_menu();
 
+	Menu* create_menu(unsigned int channel);
+
 	~B3Organ() {
 
 	}
