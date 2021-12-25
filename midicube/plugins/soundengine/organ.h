@@ -116,8 +116,6 @@ public:
 	double percussion_start = 0;
 	double scanner_phase = 0;
 	bool scanner_inverse = false;
-
-	double swell = 1;
 };
 
 class B3OrganProgram : public PluginProgram {
@@ -145,8 +143,6 @@ private:
 public:
 	B3OrganData data;
 
-	virtual void press_note(const SampleInfo &info, unsigned int note,
-			double velocity);
 	B3Organ(PluginHost& h, Plugin& p);
 
 	void process_note_sample(const SampleInfo& info, TriggeredNote& note, size_t note_index);

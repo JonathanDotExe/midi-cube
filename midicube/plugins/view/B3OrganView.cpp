@@ -160,8 +160,13 @@ Scene B3OrganView::create(ViewHost &frame) {
 		}
 	}
 	else if (channel == 2) {
+		std::vector<std::string> bass_titles{"16'", "8'"};
+		std::vector<sf::Color> bass_colors = {
+					sf::Color(150, 0, 0),
+					sf::Color::White,
+			};
 		for (size_t i = 0; i < ORGAN_BASS_DRAWBAR_COUNT; ++i) {
-			Drawbar* drawbar = new Drawbar(0, ORGAN_DRAWBAR_MAX, main_font, titles[i], tmp_x, 60, 60, 300, colors[i]);
+			Drawbar* drawbar = new Drawbar(0, ORGAN_DRAWBAR_MAX, main_font, bass_titles[i], tmp_x, 60, 60, 300, bass_colors[i]);
 			drawbar->text.setFillColor(sf::Color::White);
 			drawbar->title_text.setFillColor(sf::Color::Yellow);
 			drawbar->property.bind(organ.data.preset.bass_drawbars.at(i), handler);
@@ -255,21 +260,21 @@ Scene B3OrganView::create(ViewHost &frame) {
 	}
 
 	//Upper Button
-	Button* upper = new Button("Upper (CH 1)", main_font, 18, 0, frame.get_height() - 40, 100, 40);
+	Button* upper = new Button("Upper (CH 1)", main_font, 18, 0, frame.get_height() - 40, 120, 40);
 	upper->rect.setFillColor(sf::Color::Yellow);
 	upper->set_on_click([&frame, this]() {
 		frame.change_menu(organ.create_menu(0), false);
 	});
 	controls.push_back(upper);
 	//Lower Button
-	Button* lower = new Button("Lower (CH 2)", main_font, 18, 0, frame.get_height() - 40, 100, 40);
+	Button* lower = new Button("Lower (CH 2)", main_font, 18, 120, frame.get_height() - 40, 120, 40);
 	lower->rect.setFillColor(sf::Color::Yellow);
 	lower->set_on_click([&frame, this]() {
 		frame.change_menu(organ.create_menu(1), false);
 	});
 	controls.push_back(lower);
 	//Bass Button
-	Button* bass = new Button("Bass (CH 3)", main_font, 18, 0, frame.get_height() - 40, 100, 40);
+	Button* bass = new Button("Bass (CH 3)", main_font, 18, 240, frame.get_height() - 40, 120, 40);
 	bass->rect.setFillColor(sf::Color::Yellow);
 	bass->set_on_click([&frame, this]() {
 		frame.change_menu(organ.create_menu(2), false);

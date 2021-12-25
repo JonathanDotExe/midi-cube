@@ -188,7 +188,7 @@ bool B3Organ::note_finished(const SampleInfo& info, TriggeredNote& note, size_t 
 void B3Organ::process_sample(const SampleInfo &info) {
 	EngineStatus status = get_status();
 	//Update properties
-	double swell = db_to_amp(0 + this->data.swell * MIN_SWELL);
+	double swell = db_to_amp(0 + (1 - this->data.preset.swell) * MIN_SWELL);
 
 	//Percussion
 	if (status.pressed_notes == 0) {
@@ -250,8 +250,8 @@ void B3Organ::process_sample(const SampleInfo &info) {
 		}
 		//Play back
 		sample = sample * (1 - fmax(0, data.preset.vibrato_mix - 0.5) * 2) + vibrato * (fmin(1, data.preset.vibrato_mix * 2));
-		sample *= 0.75;
 	}
+	sample *= 0.75;
 
 	//Play back
 	outputs[0] = sample;
@@ -411,10 +411,6 @@ PluginInstance* OrganPlugin::create(PluginHost *host) {
 
 Menu* B3Organ::create_menu() {
 	return create_menu(0);
-}
-
-void B3Organ::press_note(const SampleInfo &info, unsigned int note,
-		double velocity) {
 }
 
 Menu* B3Organ::create_menu(unsigned int channel) {
