@@ -40,7 +40,13 @@ double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType 
 B3Organ::B3Organ(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	//Bind
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		binder.add_binding(&data.preset.drawbars[i]);
+		binder.add_binding(&data.preset.upper_drawbars[i]);
+	}
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		binder.add_binding(&data.preset.lower_drawbars[i]);
+	}
+	for (size_t i = 0; i < ORGAN_BASS_DRAWBAR_COUNT; ++i) {
+		binder.add_binding(&data.preset.bass_drawbars[i]);
 	}
 	binder.add_binding(&data.preset.percussion);
 	binder.add_binding(&data.preset.percussion_third_harmonic);
@@ -120,7 +126,13 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& 
 
 void B3Organ::process_note_sample(const SampleInfo &info, TriggeredNote& note, size_t note_index) {
 	//Organ sound
-	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
+	double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
+		double vol = data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
+		trigger_tonewheel(tonewheel, vol, info, note, vol);
+	}
+	double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
 		int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
 		double vol = data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
@@ -152,7 +164,7 @@ bool B3Organ::note_finished(const SampleInfo& info, TriggeredNote& note, size_t 
 void B3Organ::process_sample(const SampleInfo &info) {
 	EngineStatus status = get_status();
 	//Update properties
-	double swell = this->data.swell * SWELL_RANGE + MIN_SWELL;
+	double swell = db_to_amp(0 + this->data.swell * MIN_SWELL);
 
 	//Percussion
 	if (status.pressed_notes == 0) {
@@ -170,7 +182,6 @@ void B3Organ::process_sample(const SampleInfo &info) {
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
 		volume += data.tonewheels[i].compress_volume;
 	}
-	sample *= swell;
 	double vol_mul = 1;
 	if (volume && data.preset.multi_note_gain != 1) {
 		vol_mul = pow(volume, data.preset.multi_note_gain)/volume;
@@ -338,4 +349,8 @@ Menu* B3Organ::create_menu() {
 		view->init(this);
 		return view;
 	});
+}
+
+void B3Organ::press_note(const SampleInfo &info, unsigned int note,
+		double velocity) {
 }

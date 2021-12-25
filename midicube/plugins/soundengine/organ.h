@@ -13,6 +13,7 @@
 #include "../../framework/dsp/synthesis.h"
 
 #define ORGAN_DRAWBAR_COUNT 9
+#define ORGAN_BASS_DRAWBAR_COUNT 2
 #define ORGAN_DRAWBAR_MAX 8
 #define ORGAN_FOLDBACK_NOTE 114
 #define ORGAN_TONEWHEEL_AMOUNT 91
@@ -21,8 +22,7 @@
 #define ORGAN_MAX_DOWN_DELAY 0.0035
 #define ORGAN_MAX_UP_DELAY 0.005
 
-#define MIN_SWELL 0.1
-#define SWELL_RANGE (1 - MIN_SWELL)
+#define MIN_SWELL -80
 
 #define ORGAN_VIBRATO_RATE 7
 #define ORGAN_VIBRATO_DELAY_STAGES 9
@@ -37,9 +37,19 @@ enum OrganType {
 	ORGAN_TYPE_B3, ORGAN_TYPE_TRANSISTOR
 };
 
+enum OrganManual {
+	B3_UPPER_MANUAL, B3_LOWER_MANUAL, B3_BASS_MANUAL
+};
+
+struct B3OrganVoice : public TriggeredNote {
+	OrganManual manual;
+};
+
 struct B3OrganPreset {
 	OrganType type = ORGAN_TYPE_B3;
-	std::array<BindableTemplateValue<unsigned int>, ORGAN_DRAWBAR_COUNT> drawbars;
+	std::array<BindableTemplateValue<unsigned int>, ORGAN_DRAWBAR_COUNT> upper_drawbars;
+	std::array<BindableTemplateValue<unsigned int>, ORGAN_DRAWBAR_COUNT> lower_drawbars;
+	std::array<BindableTemplateValue<unsigned int>, ORGAN_BASS_DRAWBAR_COUNT> bass_drawbars;
 	double harmonic_foldback_volume{1};
 	double multi_note_gain{0.8};
 	double high_gain_reduction = 0.5;
@@ -51,7 +61,7 @@ struct B3OrganPreset {
 	BindableBooleanValue percussion_soft{true};
 	BindableBooleanValue percussion_fast_decay{true};
 
-	double percussion_soft_volume{1};
+	double percussion_soft_volume{2};
 	double percussion_hard_volume{5};
 	double percussion_fast_decay_time{0.2};
 	double percussion_slow_decay_time{1.0};
@@ -59,7 +69,7 @@ struct B3OrganPreset {
 	BindableTemplateValue<double> vibrato_mix{0, 0, 1};
 	BindableTemplateValue<double> swell{1, 0, 1};
 
-	B3OrganPreset () : drawbars{
+	B3OrganPreset () : upper_drawbars{
 		BindableTemplateValue<unsigned int>(8, 0, 8),
 		BindableTemplateValue<unsigned int>(8, 0, 8),
 		BindableTemplateValue<unsigned int>(8, 0, 8),
@@ -67,10 +77,24 @@ struct B3OrganPreset {
 		BindableTemplateValue<unsigned int>(8, 0, 8),
 		BindableTemplateValue<unsigned int>(8, 0, 8),
 		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+	}, lower_drawbars{
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+		BindableTemplateValue<unsigned int>(8, 0, 8),
+	},
+	bass_drawbars{
 		BindableTemplateValue<unsigned int>(8, 0, 8),
 		BindableTemplateValue<unsigned int>(8, 0, 8),
 	} {
-
+		swell.type = ControlType::EXPRESSION_PEDAL;
 	}
 };
 
@@ -115,7 +139,7 @@ public:
 
 #define B3_ORGAN_POLYPHONY 61
 
-class B3Organ : public SoundEngine<TriggeredNote, B3_ORGAN_POLYPHONY> {
+class B3Organ : public SoundEngine<B3OrganVoice, B3_ORGAN_POLYPHONY> {
 
 private:
 	//Static values
@@ -129,6 +153,8 @@ private:
 public:
 	B3OrganData data;
 
+	virtual void press_note(const SampleInfo &info, unsigned int note,
+			double velocity);
 	B3Organ(PluginHost& h, Plugin& p);
 
 	void process_note_sample(const SampleInfo& info, TriggeredNote& note, size_t note_index);
