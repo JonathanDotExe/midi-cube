@@ -199,7 +199,7 @@ bool Sampler::note_finished(const SampleInfo& info, SamplerVoice& note, size_t n
 	return true;
 }
 
-void Sampler::press_note(const SampleInfo& info, unsigned int note, double velocity) {
+void Sampler::press_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity) {
 	if (this->sample) {
 		for (SampleRegion* region : index.velocities[velocity * 127][note]) {
 			//Check triggers
@@ -210,7 +210,7 @@ void Sampler::press_note(const SampleInfo& info, unsigned int note, double veloc
 				}
 			}
 			if (trigger && preset_number >= region->min_preset && preset_number <= region->max_preset) {
-				size_t slot = this->voice_mgr.press_note(info, note, note + host.get_transpose(), velocity, 0);
+				size_t slot = this->voice_mgr.press_note(info, note, note + host.get_transpose(), channel, velocity, 0);
 				SamplerVoice& voice = this->voice_mgr.note[slot];
 				voice.region = region;
 				voice.layer_amp = sample->volume;
@@ -239,9 +239,9 @@ void Sampler::press_note(const SampleInfo& info, unsigned int note, double veloc
 	}
 }
 
-void Sampler::release_note(const SampleInfo& info, unsigned int note, double velocity) {
+void Sampler::release_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity) {
 	for (size_t i = 0; i < SAMPLER_POLYPHONY; ++i) {
-		if (this->voice_mgr.note[i].real_note == note && voice_mgr.note[i].pressed) {
+		if (this->voice_mgr.note[i].real_note == note && this->voice_mgr.note[i].channel == channel && voice_mgr.note[i].pressed) {
 			voice_mgr.note[i].pressed = false;
 			voice_mgr.note[i].release_time = info.time;
 			if (voice_mgr.note[i].region->trigger == TriggerType::RELEASE_TRIGGER) {

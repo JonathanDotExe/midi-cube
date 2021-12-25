@@ -141,7 +141,7 @@ Scene B3OrganView::create(ViewHost &frame) {
 		Drawbar* drawbar = new Drawbar(0, ORGAN_DRAWBAR_MAX, main_font, titles[i], tmp_x, 60, 60, 300, colors[i]);
 		drawbar->text.setFillColor(sf::Color::White);
 		drawbar->title_text.setFillColor(sf::Color::Yellow);
-		drawbar->property.bind(organ.data.preset.drawbars.at(i), handler);
+		drawbar->property.bind(organ.data.preset.upper_drawbars.at(i), handler);
 		controls.push_back(drawbar);
 
 		tmp_x += 70;

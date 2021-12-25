@@ -37,10 +37,6 @@ enum OrganType {
 	ORGAN_TYPE_B3, ORGAN_TYPE_TRANSISTOR
 };
 
-struct B3OrganVoice : public TriggeredNote {
-	OrganManual manual;
-};
-
 struct B3OrganPreset {
 	OrganType type = ORGAN_TYPE_B3;
 	std::array<BindableTemplateValue<unsigned int>, ORGAN_DRAWBAR_COUNT> upper_drawbars;
@@ -135,7 +131,7 @@ public:
 
 #define B3_ORGAN_POLYPHONY 61
 
-class B3Organ : public SoundEngine<B3OrganVoice, B3_ORGAN_POLYPHONY> {
+class B3Organ : public SoundEngine<TriggeredNote, B3_ORGAN_POLYPHONY> {
 
 private:
 	//Static values
