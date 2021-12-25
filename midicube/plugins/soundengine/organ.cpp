@@ -126,18 +126,40 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& 
 
 void B3Organ::process_note_sample(const SampleInfo &info, TriggeredNote& note, size_t note_index) {
 	//Organ sound
-	double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
-	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
-		double vol = data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
-		trigger_tonewheel(tonewheel, vol, info, note, vol);
+	switch (note.channel) {
+	case 0:
+	{
+		double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft && data.preset.percussion ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
+		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+			int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
+			double vol = data.preset.upper_drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
+			trigger_tonewheel(tonewheel, vol, info, note, vol);
+		}
 	}
-	double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
-	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
-		double vol = data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
-		trigger_tonewheel(tonewheel, vol, info, note, vol);
+		break;
+	case 1:
+	{
+		double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft_volume);
+		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+			int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
+			double vol = data.preset.lower_drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
+			trigger_tonewheel(tonewheel, vol, info, note, vol);
+		}
 	}
+		break;
+	case 2:
+	{
+		double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft_volume);
+		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+			int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
+			double vol = data.preset.bass_drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
+			trigger_tonewheel(tonewheel, vol, info, note, vol);
+		}
+	}
+		break;
+	}
+
+
 	//Percussion
 	double decay = data.preset.percussion_fast_decay ? data.preset.percussion_fast_decay_time : data.preset.percussion_slow_decay_time;
 	if (data.preset.percussion && info.time - data.percussion_start <= decay) {

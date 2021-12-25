@@ -329,8 +329,8 @@ bool AdvancedSynth::note_finished(const SampleInfo &info, AdvancedSynthVoice &no
 	return !note.pressed && amp_finished(info, note, host_environment);
 }
 
-void AdvancedSynth::press_note(const SampleInfo& info, unsigned int note, double velocity) {
-	AdvancedSynthVoice& voice = this->voice_mgr.note[this->voice_mgr.press_note(info, note, note + host.get_transpose(), velocity, 0)];
+void AdvancedSynth::press_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity) {
+	AdvancedSynthVoice& voice = this->voice_mgr.note[this->voice_mgr.press_note(info, note, note + host.get_transpose(), channel, velocity, 0)];//TODO polyphony limit
 	voice.aftertouch = 0;
 	for (size_t i = 0; i < preset.mod_env_count; ++i) {
 		voice.parts[i].mod_env.reset();
@@ -349,10 +349,6 @@ void AdvancedSynth::press_note(const SampleInfo& info, unsigned int note, double
 			}
 		}
 	}
-}
-
-void AdvancedSynth::release_note(const SampleInfo& info, unsigned int note, double velocity) {
-	SoundEngine::release_note(info, note, velocity);
 }
 
 bool AdvancedSynth::amp_finished(const SampleInfo &info, AdvancedSynthVoice &note,

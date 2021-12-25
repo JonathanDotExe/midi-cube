@@ -275,9 +275,7 @@ public:
 
 	bool note_finished(const SampleInfo& info, AdvancedSynthVoice& note, size_t note_index);
 	
-	void press_note(const SampleInfo& info, unsigned int note, double velocity);
-
-	void release_note(const SampleInfo& info, unsigned int note, double velocity);
+	void press_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity);
 
 	void save_program(PluginProgram **prog);
 

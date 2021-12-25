@@ -37,10 +37,6 @@ enum OrganType {
 	ORGAN_TYPE_B3, ORGAN_TYPE_TRANSISTOR
 };
 
-enum OrganManual {
-	B3_UPPER_MANUAL, B3_LOWER_MANUAL, B3_BASS_MANUAL
-};
-
 struct B3OrganVoice : public TriggeredNote {
 	OrganManual manual;
 };
