@@ -81,76 +81,75 @@ inline void SoundEngineChannel::process_sample(double& lsample, double& rsample,
 inline void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info, void* src) {
 	size_t scene = device->scene;
 	PluginInstance* engine = this->engine.get_plugin();
-	if (send_midi(message.type)) {
-		PluginInstance* next = nullptr;
-		bool found = false;
-		//Find nex seq
-		for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
-			PluginInstance* seq = sequencers[i].get_plugin();
-			if (seq) {
-				if (found || src == nullptr) {
-					next = seq;
-					break;
-				}
-				else if (src == seq) {
-					found = true;
-				}
-			}
-		}
-		//Sequencer
-		if (next) {
-			next->recieve_midi(message, info);
-		}
-		//Recieve MIDI
-		else {
-			double pitch = 0;
-			//Environment
-			switch (message.type) {
-			case MessageType::MONOPHONIC_AFTERTOUCH:
-				this->env.aftertouch = message.monophonic_aftertouch()/127.0;
-				break;
-			case MessageType::POLYPHONIC_AFTERTOUCH:
-				break;
-			case MessageType::NOTE_ON:
-				break;
-			case MessageType::NOTE_OFF:
-				break;
-			case MessageType::CONTROL_CHANGE:
-				//Sustain
-				if (message.control() == get_controls().sustain_pedal) {
-					bool new_sustain = message.value() != 0;
-					if (new_sustain != env.sustain) {
-						if (new_sustain) {
-							env.sustain_time = info.time;
-						}
-						else {
-							env.sustain_release_time = info.time;
-						}
-						env.sustain = new_sustain;
-					}
-					if (!scenes[scene].sustain) {
-						env.sustain = false;
-					}
-				}
-				break;
-			case MessageType::PROGRAM_CHANGE:
-				break;
-			case MessageType::PITCH_BEND:
-				env.pitch_bend_percent = message.pitch_bend()/8192.0 - 1.0;
-				pitch = env.pitch_bend_percent * 2;
-				env.pitch_bend = note_to_freq_transpose(pitch);
-				if (!scenes[scene].pitch_bend) {
-					env.pitch_bend = 1;
-					env.pitch_bend_percent = 0.5;
-				}
-				break;
-			case MessageType::SYSEX:
-				break;
-			case MessageType::INVALID:
+
+	PluginInstance* next = nullptr;
+	bool found = false;
+	//Find nex seq
+	for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
+		PluginInstance* seq = sequencers[i].get_plugin();
+		if (seq) {
+			if (found || src == nullptr) {
+				next = seq;
 				break;
 			}
-			engine->recieve_midi(message, info);
+			else if (src == seq) {
+				found = true;
+			}
 		}
+	}
+	//Sequencer
+	if (next) {
+		next->recieve_midi(message, info);
+	}
+	//Recieve MIDI
+	else {
+		double pitch = 0;
+		//Environment
+		switch (message.type) {
+		case MessageType::MONOPHONIC_AFTERTOUCH:
+			this->env.aftertouch = message.monophonic_aftertouch()/127.0;
+			break;
+		case MessageType::POLYPHONIC_AFTERTOUCH:
+			break;
+		case MessageType::NOTE_ON:
+			break;
+		case MessageType::NOTE_OFF:
+			break;
+		case MessageType::CONTROL_CHANGE:
+			//Sustain
+			if (message.control() == get_controls().sustain_pedal) {
+				bool new_sustain = message.value() != 0;
+				if (new_sustain != env.sustain) {
+					if (new_sustain) {
+						env.sustain_time = info.time;
+					}
+					else {
+						env.sustain_release_time = info.time;
+					}
+					env.sustain = new_sustain;
+				}
+				if (!scenes[scene].sustain) {
+					env.sustain = false;
+				}
+			}
+			break;
+		case MessageType::PROGRAM_CHANGE:
+			break;
+		case MessageType::PITCH_BEND:
+			env.pitch_bend_percent = message.pitch_bend()/8192.0 - 1.0;
+			pitch = env.pitch_bend_percent * 2;
+			env.pitch_bend = note_to_freq_transpose(pitch);
+			if (!scenes[scene].pitch_bend) {
+				env.pitch_bend = 1;
+				env.pitch_bend_percent = 0.5;
+			}
+			break;
+		case MessageType::SYSEX:
+			break;
+		case MessageType::INVALID:
+			break;
+		}
+		engine->recieve_midi(message, info);
 	}
 }
 
@@ -393,8 +392,10 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = channels[i];
-		ChannelSource& s = channel.scenes[scene].source;
-		if (channel.input < 0 || input == static_cast<size_t>(channel.input)) {
+		SoundEngineScene& scene = channel.scenes[this->scene];
+		ChannelSource& s = scene.source;
+		bool redirect = channel.redirect.redirect_to >= 0 && channel.redirect.redirect_to < SOUND_ENGINE_MIDI_CHANNELS;
+		if ((channel.input < 0 || input == static_cast<size_t>(channel.input)) && (redirect ? scene.active : channel.send_midi(message.type))) {
 			//Filter
 			bool pass = true;
 			switch (message.type) {
@@ -426,7 +427,15 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 			}
 			//Send
 			if (pass) {
-				if (channel.redirect.channel < 0 || channel.redirect.channel >= SOUND_ENGINE_MIDI_CHANNELS) {
+				if (redirect) {
+					//Redirect channel
+					MidiMessage msg = message;
+					msg.channel = channel.redirect.channel;
+					if (channels[channel.redirect.redirect_to].send_midi(msg.type)) {
+						channels[channel.redirect.redirect_to].send(msg, info, nullptr);
+					}
+				}
+				else {
 					if (s.update_channel >= 0) {
 						MidiMessage msg = message;
 						msg.channel = s.update_channel;
@@ -434,14 +443,6 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 					}
 					else {
 						channel.send(message, info, nullptr);
-					}
-				}
-				else {
-					//Redirect channel
-					MidiMessage msg = message;
-					msg.channel = channel.redirect.channel;
-					if (channel.send_midi(msg.type)) {
-						channels[channel.redirect.channel].send(msg, info, nullptr);
 					}
 				}
 			}
