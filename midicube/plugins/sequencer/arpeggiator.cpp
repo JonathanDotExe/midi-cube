@@ -9,11 +9,7 @@
 #include "../view/ArpeggiatorView.h"
 
 //Arpeggiator
-Arpeggiator::Arpeggiator() {
-
-}
-
-void Arpeggiator::apply(const SampleInfo& info, const Metronome& master, std::function<void(const SampleInfo&, unsigned int, double)> press, std::function<void(const SampleInfo&, unsigned int, double)> release, bool sustain) {
+void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master, bool sustain) {
 	//Clean sustained notes
 	if (!preset.hold && preset.sustain && !sustain) {
 		for (size_t i = 0; i < this->note.note.size(); ++i) {
@@ -255,12 +251,20 @@ void Arpeggiator::apply(const SampleInfo& info, const Metronome& master, std::fu
 		//Press note
 		if (!released || note_change) {
 			note_change = false;
-			release(info, curr_note, 0);
+			MidiMessage msg;
+			msg.type = MessageType::NOTE_ON;
+			msg.set_note(curr_note);
+			msg.set_velocity(0);
+			this->send_midi(msg, info);
 		}
 		if (next_index >= 0) {
 			curr_note = next_note;
 			this->note_index = next_index;
-			press(info, curr_note, this->note.note[note_index].velocity);
+			MidiMessage msg;
+			msg.type = MessageType::NOTE_ON;
+			msg.set_note(curr_note);
+			msg.set_velocity(this->note.note[note_index].velocity * 127);
+			this->send_midi(msg, info);
 			restart = false;
 
 			//Clean held notes
@@ -280,7 +284,7 @@ void Arpeggiator::apply(const SampleInfo& info, const Metronome& master, std::fu
 	}
 }
 
-void Arpeggiator::press_note(const SampleInfo& info, unsigned int note, double velocity, bool sustain) {
+void ArpeggiatorInstance::press_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity, bool sustain) {
 	//Clean held notes
 	if (preset.hold) {
 		bool released = true;
@@ -294,11 +298,11 @@ void Arpeggiator::press_note(const SampleInfo& info, unsigned int note, double v
 		}
 	}
 	note_change = true;
-	this->note.press_note(info, note, note, velocity);
+	this->note.press_note(info, note, note, channel, velocity);
 }
 
-void Arpeggiator::release_note(const SampleInfo& info, unsigned int note, bool sustain) {
-	this->note.release_note(info, note, !preset.hold && (!sustain || !preset.sustain));
+void ArpeggiatorInstance::release_note(const SampleInfo& info, unsigned int note, unsigned int channel, bool sustain) {
+	this->note.release_note(info, note, channel, !preset.hold && (!sustain || !preset.sustain));
 	note_change = true;
 }
 
@@ -341,14 +345,14 @@ boost::property_tree::ptree ArpeggiatorProgram::save() {
 void ArpeggiatorInstance::apply_program(PluginProgram *prog) {
 	ArpeggiatorProgram* p = dynamic_cast<ArpeggiatorProgram*>(prog);
 	if (p) {
-		arp.preset = p->preset;
-		arp.on = p->on;
-		arp.metronome.set_bpm(p->bpm);
+		preset = p->preset;
+		on = p->on;
+		metronome.set_bpm(p->bpm);
 	}
 	else {
-		arp.preset = {};
-		arp.on = true;
-		arp.metronome.set_bpm(120);
+		preset = {};
+		on = true;
+		metronome.set_bpm(120);
 	}
 }
 
@@ -359,27 +363,15 @@ void ArpeggiatorInstance::save_program(PluginProgram **prog) {
 		delete *prog;
 		p = new ArpeggiatorProgram();
 	}
-	p->preset = arp.preset;
-	p->on = arp.on;
-	p->bpm = arp.metronome.get_bpm();
+	p->preset = preset;
+	p->on = on;
+	p->bpm = metronome.get_bpm();
 	*prog = p;
 }
 
 void ArpeggiatorInstance::process(const SampleInfo &info) {
-	if (arp.on) {
-		arp.apply(info, host_metronome, [this](const SampleInfo& info, unsigned int note, double velocity) {
-			MidiMessage msg;
-			msg.type = MessageType::NOTE_ON;
-			msg.set_note(note);
-			msg.set_velocity(velocity * 127);
-			this->send_midi(msg, info);
-		}, [this](const SampleInfo& info, unsigned int note, double velocity) {
-			MidiMessage msg;
-			msg.type = MessageType::NOTE_OFF;
-			msg.set_note(note);
-			msg.set_velocity(velocity * 127);
-			this->send_midi(msg, info);
-		}, host_environment.sustain);
+	if (on) {
+		apply(info, host_metronome, host_environment.sustain);
 	}
 }
 
@@ -387,13 +379,13 @@ ArpeggiatorInstance::ArpeggiatorInstance(PluginHost &h, Plugin &p) : PluginInsta
 }
 
 void ArpeggiatorInstance::recieve_midi(const MidiMessage &message, const SampleInfo &info) {
-	if (arp.on) {
+	if (on) {
 		switch (message.type) {
 		case MessageType::NOTE_ON:
-			arp.press_note(info, message.note(), message.velocity()/127.0, host_environment.sustain);
+			press_note(info, message.note(), message.velocity()/127.0, message.channel, host_environment.sustain);
 			break;
 		case MessageType::NOTE_OFF:
-			arp.release_note(info, message.note(), host_environment.sustain);
+			release_note(info, message.note(), message.channel, host_environment.sustain);
 			/* no break */
 		default:
 			this->send_midi(message, info);

@@ -418,7 +418,7 @@ void B3Organ::press_note(const SampleInfo &info, unsigned int note,
 }
 
 Menu* B3Organ::create_menu(unsigned int channel) {
-	return new FunctionMenu([this]() { return new B3OrganView(*this, channel); }, [this]() {
+	return new FunctionMenu([this, channel]() { return new B3OrganView(*this, channel); }, [this]() {
 			ControlView* view = new ControlView("B3 Organ");
 			for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
 				view->bind(&data.preset.upper_drawbars[i], ControlType::SLIDER, i, 0);
