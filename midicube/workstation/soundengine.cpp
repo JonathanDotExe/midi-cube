@@ -35,8 +35,8 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 	size_t scene = device->scene;
 	//Properties
 	PluginInstance* engine = this->engine.get_plugin();
-	if (engine) {
-		SoundEngineScene& s = scenes[scene];
+	SoundEngineScene& s = scenes[scene];
+	if (engine && (s.active || engine->keep_active())) {
 		//Pitch and Sustain
 		/*if (!s.sustain) {
 			env.sustain = false;
@@ -45,12 +45,11 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 			env.pitch_bend = 1;
 		}*/
 
-		if (s.active || engine->keep_active()) {
-			//Process
-			engine->take_inputs(inputs, input_count);
-			engine->process(info);
-			engine->playback_outputs_stereo(lsample, rsample);
-		}
+		//Process
+		engine->take_inputs(inputs, input_count);
+		engine->process(info);
+		engine->playback_outputs_stereo(lsample, rsample);
+
 		//Sequencer
 		for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
 			PluginInstance* seq = sequencers[i].get_plugin();
