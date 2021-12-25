@@ -31,7 +31,7 @@ void SoundEngineChannel::init_device(SoundEngineDevice* device) {
 	}
 }
 
-void SoundEngineChannel::process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info) {
+inline void SoundEngineChannel::process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info) {
 	size_t scene = device->scene;
 	//Properties
 	PluginInstance* engine = this->engine.get_plugin();
@@ -78,10 +78,10 @@ void SoundEngineChannel::process_sample(double& lsample, double& rsample, double
 	}
 }
 
-void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info, void* src) {
+inline void SoundEngineChannel::send(const MidiMessage &message, const SampleInfo& info, void* src) {
 	size_t scene = device->scene;
 	PluginInstance* engine = this->engine.get_plugin();
-	if (engine && (scenes[scene].active || message.type != MessageType::NOTE_ON)) {
+	if (send_midi(message.type)) {
 		PluginInstance* next = nullptr;
 		bool found = false;
 		//Find nex seq
@@ -440,7 +440,9 @@ void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& sou
 					//Redirect channel
 					MidiMessage msg = message;
 					msg.channel = channel.redirect.channel;
-					channels[channel.redirect.channel].send(msg, info, nullptr);
+					if (channel.send_midi(msg.type)) {
+						channels[channel.redirect.channel].send(msg, info, nullptr);
+					}
 				}
 			}
 		}
@@ -533,7 +535,9 @@ void SoundEngineDevice::init(MidiCubeWorkstation *cube) {
 
 void SoundEngineChannel::recieve_midi(const MidiMessage &message,
 		const SampleInfo &info, void* src) {
-	this->send(message, info, src);
+	if (send_midi(message.type)) {
+		this->send(message, info, src);
+	}
 }
 
 MidiBindingHandler* SoundEngineChannel::get_binding_handler() {
@@ -679,4 +683,9 @@ int SoundEngineChannel::get_update_channel() const {
 
 void SoundEngineChannel::set_update_channel(int update_channel) {
 	scenes[device->scene].source.update_channel = update_channel;
+}
+
+inline bool SoundEngineChannel::send_midi(MessageType type) {
+	PluginInstance* engine = this->engine.get_plugin();
+	return engine && (scenes[device->scene].active || (engine->keep_active() && type != MessageType::NOTE_ON));
 }

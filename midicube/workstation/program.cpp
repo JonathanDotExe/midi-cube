@@ -103,8 +103,8 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 
 				program->channels[i].volume.load(c.second, "volume", 0.5);
 				program->channels[i].panning.load(c.second, "panning", 0);
-				program->channels[i].redirect.channel = c.second.get<int>("redirect.channel", 0);
-				program->channels[i].redirect.redirect_to = c.second.get<int>("redirect.redirect_to", 0);
+				program->channels[i].redirect.channel = c.second.get<int>("redirect.channel", -1);
+				program->channels[i].redirect.redirect_to = c.second.get<int>("redirect.redirect_to", -1);
 				program->channels[i].panning.load(c.second, "panning", 0);
 
 				//Sound engine

@@ -140,9 +140,11 @@ public:
 
 	void init_device(SoundEngineDevice* device);
 
-	void send(const MidiMessage& message, const SampleInfo& info, void* src);
+	inline void send(const MidiMessage& message, const SampleInfo& info, void* src);
 
-	void process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info);
+	inline void process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info);
+
+	inline bool send_midi(MessageType type);
 
 	PluginInstance* get_engine();
 
