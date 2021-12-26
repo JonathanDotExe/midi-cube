@@ -10,20 +10,6 @@
 #include <cmath>
 #include "../view/EffectView.h"
 
-double ReverbCombFilter::process(double in, double gain, unsigned int delay) {
-	double out = this->delay.process();
-	out += in;
-	this->delay.add_isample(out * gain, delay);
-	return out;
-}
-
-double ReverbAllPassFilter::process(double in, double gain, unsigned int delay) {
-	double out = in + this->indelay.process() + this->delay.process();
-	this->indelay.add_isample(out * -gain, delay);
-	this->delay.add_isample(out * gain, delay - 20);
-	return out;
-}
-
 ReverbEffect::ReverbEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.delay);
@@ -42,34 +28,22 @@ void ReverbEffect::process(const SampleInfo &info) {
 	if (preset.on) {
 		double l = 0;
 		double r = 0;
+		//Reverb
+		SchroederReverbData data;
+		data.delay = preset.delay;
+		data.feedback = preset.decay;
+		l = lreverb.apply(outputs[0], data, info);
+		data.delay *= 1 + (preset.stereo * 0.2);
+		data.feedback *= 1 + (preset.stereo * 0.1); //TODO better stereo
+		r = rreverb.apply(outputs[1], data, info);
 
-		//Comb filters
-		for (size_t i = 0; i < REVERB_COMB_FILTERS; ++i) {
-			double comb_delay = (preset.delay * comb_delay_mul[i]) * info.sample_rate;
-			double decay = preset.decay * comb_decay_mul[i];
-			l += lcomb_filters[i].process(outputs[0], decay, comb_delay * (1 - preset.stereo * 0.2));
-			r += rcomb_filters[i].process(outputs[1], decay, comb_delay * (1 + preset.stereo * 0.2));
-		}
-
-		//All pass filters
-		unsigned int allpass_delay = (this->allpass_delay) * info.sample_rate;
-		for (size_t i = 0; i < REVERB_ALLPASS_FILTERS; ++i) {
-			l = lallpass_filters[i].process(l, allpass_decay, allpass_delay);
-			r = rallpass_filters[i].process(r, allpass_decay, allpass_delay);
-		}
-		//Apply
-		l /= 3.0;
-		r /= 3.0;
 		//Lowpass
-		FilterData data = {FilterType::LP_12, scale_cutoff(preset.tone), preset.resonance};
-		l = lfilter.apply(data, l, info.time_step);
-		r = lfilter.apply(data, r, info.time_step);
+		FilterData d = {FilterType::LP_12, scale_cutoff(preset.tone), preset.resonance};
+		l = lfilter.apply(d, l, info.time_step);
+		r = lfilter.apply(d, r, info.time_step);
 		//Mix
-		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-
-		outputs[0] += l * fmin(0.5, preset.mix) * 2;
-		outputs[1] += r * fmin(0.5, preset.mix) * 2;
+		mix(outputs[0], l ,preset.mix);
+		mix(outputs[1], r ,preset.mix);
 	}
 }
 

@@ -33,8 +33,18 @@ struct ArpeggiatorPreset {
 	bool sustain = false;
 };
 
-class Arpeggiator {
+class ArpeggiatorProgram : public PluginProgram {
+public:
+	ArpeggiatorPreset preset;
+	unsigned int bpm = 120;
+	bool on;
 
+	void load(boost::property_tree::ptree tree);
+	std::string get_plugin_name();
+	boost::property_tree::ptree save();
+};
+
+class ArpeggiatorInstance : public PluginInstance {
 private:
 	unsigned int curr_note = 0;
 	std::size_t data_index = 0;
@@ -49,37 +59,17 @@ public:
 	ArpeggiatorPreset preset;
 	Metronome metronome;
 
-	Arpeggiator();
-
-	void apply(const SampleInfo& info, const Metronome& master, std::function<void(const SampleInfo&, unsigned int, double)> press, std::function<void(const SampleInfo&, unsigned int, double)> release, bool sustain);
-
-	void press_note(const SampleInfo& info, unsigned int note, double velocity, bool sustain);
-
-	void release_note(const SampleInfo& info, unsigned int note, bool sustain);
-
-};
-
-class ArpeggiatorProgram : public PluginProgram {
-public:
-	ArpeggiatorPreset preset;
-	unsigned int bpm = 120;
-	bool on;
-
-	void load(boost::property_tree::ptree tree);
-	std::string get_plugin_name();
-	boost::property_tree::ptree save();
-};
-
-class ArpeggiatorInstance : public PluginInstance {
-public:
-	Arpeggiator arp;
-
-	virtual Menu* create_menu();
+	Menu* create_menu();
 	ArpeggiatorInstance(PluginHost& h, Plugin& p);
 	void apply_program(PluginProgram *prog);
 	void process(const SampleInfo &info);
 	void save_program(PluginProgram **prog);
 	void recieve_midi(const MidiMessage &message, const SampleInfo &info);
+	void apply(const SampleInfo& info, const Metronome& master, bool sustain);
+
+	void press_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity, bool sustain);
+
+	void release_note(const SampleInfo& info, unsigned int note, unsigned int channel, bool sustain);
 
 	~ArpeggiatorInstance();
 };

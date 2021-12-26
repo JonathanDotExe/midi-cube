@@ -225,6 +225,20 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		controls.push_back(end_note);
 	}
 
+	//Redirect To
+	{
+		tmp_y += 5;
+		Label* label = new Label("Send To", main_font, 18, 470, tmp_y);
+		tmp_y += 30;
+		controls.push_back(label);
+
+		DragBox<int>* value = new DragBox<int>(0, -1, 16, main_font, 18, 470, tmp_y, 150, 60);
+		tmp_y += 60;
+		value->property.bind<int>(channel.redirect.redirect_to, handler);
+		controls.push_back(value);
+	}
+
+
 	//Col 4
 	tmp_y = 10;
 	Label* midi_filter = new Label("MIDI-Filter", main_font, 24, 630, 10);
@@ -316,6 +330,33 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 		tmp_y += 60;
 		end_velocity->property.bind_function<unsigned int>(std::bind(&SoundEngineChannel::get_end_velocity, &channel), std::bind(&SoundEngineChannel::set_end_velocity, &channel, std::placeholders::_1), handler);
 		controls.push_back(end_velocity);
+	}
+
+	//Redirect Channel
+	{
+		tmp_y += 5;
+		Label* label = new Label("Send CH", main_font, 18, 630, tmp_y);
+		tmp_y += 30;
+		controls.push_back(label);
+
+		DragBox<int>* value = new DragBox<int>(0, -1, 16, main_font, 18, 630, tmp_y, 150, 60);
+		tmp_y += 60;
+		value->property.bind<int>(channel.redirect.channel, handler);
+		controls.push_back(value);
+	}
+	tmp_y -= 95;
+
+	//MIDI Channel
+	{
+		tmp_y += 5;
+		Label* label = new Label("MIDI Ch", main_font, 18, 790, tmp_y);
+		tmp_y += 30;
+		controls.push_back(label);
+
+		DragBox<int>* value = new DragBox<int>(0, -1, 16, main_font, 18, 790, tmp_y, 150, 60);
+		tmp_y += 60;
+		value->property.bind_function<int>(std::bind(&SoundEngineChannel::get_update_channel, &channel), std::bind(&SoundEngineChannel::set_update_channel, &channel, std::placeholders::_1), handler);
+		controls.push_back(value);
 	}
 
 	//Copy

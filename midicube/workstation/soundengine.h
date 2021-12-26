@@ -49,6 +49,12 @@ struct ChannelSource {
 	bool transfer_cc = true;
 	bool transfer_prog_change = true;
 	bool transfer_other = true;
+	int update_channel = 0;
+};
+
+struct ChannelRedirect {
+	int redirect_to = -1;
+	int channel = -1;
 };
 
 struct SoundEngineScene {
@@ -70,7 +76,8 @@ struct SoundEngineScene {
 				source.transfer_pitch_bend == true &&
 				source.transfer_cc == true &&
 				source.transfer_prog_change == true &&
-				source.transfer_other == true;
+				source.transfer_other == true &&
+				source.update_channel == 0;
 	}
 };
 
@@ -78,6 +85,7 @@ struct ChannelProgram : public Copyable {
 	bool active = true;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double>  panning{0, -1, 1};
+	ChannelRedirect redirect;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	std::array<PluginSlotProgram, CHANNEL_INSERT_EFFECT_AMOUNT> effects;
 	ssize_t send_master = -1;
@@ -107,6 +115,7 @@ public:
 	PluginSlot engine;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
 	BindableTemplateValue<double> panning{0, -1, 1};
+	ChannelRedirect redirect;
 	std::array<SoundEngineScene, SOUND_ENGINE_SCENE_AMOUNT> scenes;
 	ssize_t input = 0;
 
@@ -131,9 +140,11 @@ public:
 
 	void init_device(SoundEngineDevice* device);
 
-	void send(const MidiMessage& message, const SampleInfo& info, void* src);
+	inline void send(const MidiMessage& message, const SampleInfo& info, void* src);
 
-	void process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info);
+	inline void process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info);
+
+	inline bool send_midi(MessageType type);
 
 	PluginInstance* get_engine();
 
@@ -156,6 +167,10 @@ public:
 	unsigned int get_start_note() const;
 
 	void set_start_note(unsigned int startNote = 0);
+
+	int get_update_channel() const;
+
+	void set_update_channel(int update_channel = 0);
 
 	unsigned int get_start_velocity() const;
 

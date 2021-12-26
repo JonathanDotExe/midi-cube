@@ -118,7 +118,7 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_y += 25;
 
 			ComboBox *distortion_type = new ComboBox(0, { "Digital",
-					"Polynomal", "Arctan", "Cubic", "Fuzz" }, main_font, 24, 0, tmp_x, tmp_y,
+					"Polynomal", "Arctan", "Cubic", "Fuzz", "Soft Clip", "Tanh", "Sigmoid"}, main_font, 24, 0, tmp_x, tmp_y,
 					180, 120);
 			distortion_type->property.bind_cast(amp->preset.type, handler);
 			controls.push_back(distortion_type);
@@ -141,6 +141,162 @@ Scene EffectView::create(ViewHost &frame) {
 
 			tmp_y -= 25;
 		}
+
+		tmp_y += 160;
+		tmp_x -= 200 * 5;
+
+		//Low Gain
+		{
+			Label *label = new Label("Low Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.low_gain, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mid Gain
+		{
+			Label *label = new Label("Mid Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.mid_gain, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//High Gain
+		{
+			Label *label = new Label("High Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.high_gain, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//High Gain
+		{
+			Label *label = new Label("High Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.high_gain, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Lowshelf Boost
+		{
+			Label *label = new Label("Lowshelf Boost", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 3, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.lowshelf_boost, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		tmp_y += 160;
+		tmp_x -= 200 * 4;
+
+		//Low Freq
+		{
+			Label *label = new Label("Low Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 20, 400, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(amp->preset.low_freq, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mid Freq
+		{
+			Label *label = new Label("Mid Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 200, 8000, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(amp->preset.mid_freq, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//High Freq
+		{
+			Label *label = new Label("High Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 1000, 20000, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(amp->preset.high_freq, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Lowshelf Cutoff
+		{
+			Label *label = new Label("Lowshelf Cutoff", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 15, 160, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.lowshelf_cutoff, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
 	}
 	//Rotary Speaker
 	else if (dynamic_cast<RotarySpeakerEffect*>(effect) != nullptr) {
@@ -152,13 +308,13 @@ Scene EffectView::create(ViewHost &frame) {
 
 		//Rotary
 		{
-			Label *label = new Label("Mode", main_font, 18, tmp_x, tmp_y);
+			Label *label = new Label("On", main_font, 18, tmp_x, tmp_y);
 			label->text.setFillColor(sf::Color::White);
 			controls.push_back(label);
 			tmp_y += 25;
 
 			OrganSwitch *on = new OrganSwitch(false, main_font, tmp_x, tmp_y,
-					80, 60, "Rotate", "Stop");
+					80, 60, "On", "Off");
 			on->property.bind(rotary->preset.on, handler);
 			controls.push_back(on);
 
@@ -176,6 +332,54 @@ Scene EffectView::create(ViewHost &frame) {
 					tmp_y, 80, 60, "Fast", "Slow");
 			rotary_speed->property.bind(rotary->preset.fast, handler);
 			controls.push_back(rotary_speed);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+
+		//Rotary Stop
+		{
+			Label *label = new Label("Stop", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			OrganSwitch *rotary_speed = new OrganSwitch(false, main_font, tmp_x,
+					tmp_y, 80, 60, "Stop", "Rotate");
+			rotary_speed->property.bind(rotary->preset.stop, handler);
+			controls.push_back(rotary_speed);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+
+		//Drive
+		{
+			Label *label = new Label("Drive", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rotary_stereo = new DragBox<double>(0, 0, 1,
+					main_font, 16, tmp_x, tmp_y, 80, 60);
+			rotary_stereo->property.bind(rotary->preset.drive, handler);
+			controls.push_back(rotary_stereo);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+
+		//Tone
+		{
+			Label *label = new Label("Tone", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rotary_stereo = new DragBox<double>(0, 0, 1,
+					main_font, 16, tmp_x, tmp_y, 80, 60);
+			rotary_stereo->property.bind(rotary->preset.tone, handler);
+			controls.push_back(rotary_stereo);
 
 			tmp_y -= 25;
 			tmp_x += 90;
@@ -244,6 +448,9 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_y -= 25;
 			tmp_x += 90;
 		}
+		tmp_y += 100;
+		tmp_x = 10;
+
 		//Mix
 		{
 			Label *label = new Label("Mix", main_font, 18, tmp_x, tmp_y);
@@ -259,8 +466,6 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_y -= 25;
 			tmp_x += 90;
 		}
-		tmp_y += 100;
-		tmp_x = 10;
 
 		//Horn Slow Freq
 		{
@@ -388,6 +593,40 @@ Scene EffectView::create(ViewHost &frame) {
 				main_font, 16, tmp_x, tmp_y, 80, 60);
 			value->property.bind(rotary->preset.bass_fast_ramp, handler);
 			value->drag_step = 2;
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+		tmp_y += 100;
+		tmp_x = 10;
+
+		//Room Amount
+		{
+			Label *label = new Label("Room Amount", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.room_amount, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+
+		//Room Size
+		{
+			Label *label = new Label("Room Size", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 0, 1,
+				main_font, 16, tmp_x, tmp_y, 80, 60);
+			value->property.bind(rotary->preset.room_size, handler);
 			controls.push_back(value);
 
 			tmp_y -= 25;

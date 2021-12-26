@@ -9,7 +9,7 @@
 
 #include "../../plugins/resources.h"
 
-B3OrganView::B3OrganView(B3Organ& o) : organ(o), binder{main_font} {
+B3OrganView::B3OrganView(B3Organ& o, unsigned int c) : organ(o), channel(c), binder{main_font} {
 
 }
 
@@ -62,9 +62,23 @@ Scene B3OrganView::create(ViewHost &frame) {
 		controls.push_back(label);
 		tmp_y += 25;
 
-		DragBox<double>* value = new DragBox<double>(0, 0, 0.0005, main_font, 16, tmp_x, tmp_y, 80, 60);
+		DragBox<double>* value = new DragBox<double>(0, 0, 0.005, main_font, 16, tmp_x, tmp_y, 80, 60);
 		value->drag_step = 2;
 		value->property.bind(organ.data.preset.click_attack, handler);
+		controls.push_back(value);
+
+		tmp_y += 65;
+	}
+	//Click Release
+	{
+		Label* label = new Label("Click Release", main_font, 18, tmp_x, tmp_y);
+		label->text.setFillColor(sf::Color::White);
+		controls.push_back(label);
+		tmp_y += 25;
+
+		DragBox<double>* value = new DragBox<double>(0, 0, 0.005, main_font, 16, tmp_x, tmp_y, 80, 60);
+		value->drag_step = 2;
+		value->property.bind(organ.data.preset.click_release, handler);
 		controls.push_back(value);
 
 		tmp_y += 65;
@@ -123,14 +137,43 @@ Scene B3OrganView::create(ViewHost &frame) {
 		"1'"
 	};
 
-	for (size_t i = 0; i < colors.size(); ++i) {
-		Drawbar* drawbar = new Drawbar(0, ORGAN_DRAWBAR_MAX, main_font, titles[i], tmp_x, 60, 60, 300, colors[i]);
-		drawbar->text.setFillColor(sf::Color::White);
-		drawbar->title_text.setFillColor(sf::Color::Yellow);
-		drawbar->property.bind(organ.data.preset.drawbars.at(i), handler);
-		controls.push_back(drawbar);
+	if (channel == 0) {
+		for (size_t i = 0; i < colors.size(); ++i) {
+			Drawbar* drawbar = new Drawbar(0, ORGAN_DRAWBAR_MAX, main_font, titles[i], tmp_x, 60, 60, 300, colors[i]);
+			drawbar->text.setFillColor(sf::Color::White);
+			drawbar->title_text.setFillColor(sf::Color::Yellow);
+			drawbar->property.bind(organ.data.preset.upper_drawbars.at(i), handler);
+			controls.push_back(drawbar);
 
-		tmp_x += 70;
+			tmp_x += 70;
+		}
+	}
+	if (channel == 1) {
+		for (size_t i = 0; i < colors.size(); ++i) {
+			Drawbar* drawbar = new Drawbar(0, ORGAN_DRAWBAR_MAX, main_font, titles[i], tmp_x, 60, 60, 300, colors[i]);
+			drawbar->text.setFillColor(sf::Color::White);
+			drawbar->title_text.setFillColor(sf::Color::Yellow);
+			drawbar->property.bind(organ.data.preset.lower_drawbars.at(i), handler);
+			controls.push_back(drawbar);
+
+			tmp_x += 70;
+		}
+	}
+	else if (channel == 2) {
+		std::vector<std::string> bass_titles{"16'", "8'"};
+		std::vector<sf::Color> bass_colors = {
+					sf::Color(150, 0, 0),
+					sf::Color::White,
+			};
+		for (size_t i = 0; i < ORGAN_BASS_DRAWBAR_COUNT; ++i) {
+			Drawbar* drawbar = new Drawbar(0, ORGAN_DRAWBAR_MAX, main_font, bass_titles[i], tmp_x, 60, 60, 300, bass_colors[i]);
+			drawbar->text.setFillColor(sf::Color::White);
+			drawbar->title_text.setFillColor(sf::Color::Yellow);
+			drawbar->property.bind(organ.data.preset.bass_drawbars.at(i), handler);
+			controls.push_back(drawbar);
+
+			tmp_x += 70;
+		}
 	}
 
 	//Col 3
@@ -216,6 +259,27 @@ Scene B3OrganView::create(ViewHost &frame) {
 		tmp_y += 65;
 	}
 
+	//Upper Button
+	Button* upper = new Button("Upper (CH 1)", main_font, 18, 0, frame.get_height() - 40, 120, 40);
+	upper->rect.setFillColor(sf::Color::Yellow);
+	upper->set_on_click([&frame, this]() {
+		frame.change_menu(organ.create_menu(0), false);
+	});
+	controls.push_back(upper);
+	//Lower Button
+	Button* lower = new Button("Lower (CH 2)", main_font, 18, 120, frame.get_height() - 40, 120, 40);
+	lower->rect.setFillColor(sf::Color::Yellow);
+	lower->set_on_click([&frame, this]() {
+		frame.change_menu(organ.create_menu(1), false);
+	});
+	controls.push_back(lower);
+	//Bass Button
+	Button* bass = new Button("Bass (CH 3)", main_font, 18, 240, frame.get_height() - 40, 120, 40);
+	bass->rect.setFillColor(sf::Color::Yellow);
+	bass->set_on_click([&frame, this]() {
+		frame.change_menu(organ.create_menu(2), false);
+	});
+	controls.push_back(bass);
 	controls.push_back(binder.create_button(frame.get_width() - 170, frame.get_height() - 40, &frame));
 	//Back Button
 	Button* back = new Button("Back", main_font, 18, frame.get_width() - 70, frame.get_height() - 40, 70, 40);

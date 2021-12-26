@@ -34,11 +34,8 @@ void ChorusEffect::process(const SampleInfo& info) {
 		rdelay.add_isample(inputs[1], del);
 
 		//Mix
-		outputs[0] *= (1 - (fmax(0, preset.mix - 0.5) * 2));
-		outputs[1] *= (1 - (fmax(0, preset.mix - 0.5) * 2));
-
-		outputs[0] += l * fmin(0.5, preset.mix) * 2;
-		outputs[1] += r * fmin(0.5, preset.mix) * 2;
+		mix(outputs[0], l, preset.mix);
+		mix(outputs[1], r, preset.mix);
 	}
 }
 

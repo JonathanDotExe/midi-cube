@@ -95,12 +95,16 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 						program->channels[i].scenes[j].source.transfer_cc = s.second.get<bool>("source.transfer_cc", true);
 						program->channels[i].scenes[j].source.transfer_prog_change = s.second.get<bool>("source.transfer_prog_change", true);
 						program->channels[i].scenes[j].source.transfer_other = s.second.get<bool>("source.transfer_other", true);
+						program->channels[i].scenes[j].source.update_channel = s.second.get<int>("source.update_channel", 0);
 
 						++j;
 					}
 				}
 
 				program->channels[i].volume.load(c.second, "volume", 0.5);
+				program->channels[i].panning.load(c.second, "panning", 0);
+				program->channels[i].redirect.channel = c.second.get<int>("redirect.channel", -1);
+				program->channels[i].redirect.redirect_to = c.second.get<int>("redirect.redirect_to", -1);
 				program->channels[i].panning.load(c.second, "panning", 0);
 
 				//Sound engine
@@ -191,13 +195,15 @@ void save_program(Program* program, pt::ptree& tree) {
 					s.put("source.transfer_cc", program->channels[i].scenes[j].source.transfer_cc);
 					s.put("source.transfer_prog_change", program->channels[i].scenes[j].source.transfer_prog_change);
 					s.put("source.transfer_other", program->channels[i].scenes[j].source.transfer_other);
+					s.put("source.update_channel", program->channels[i].scenes[j].source.update_channel);
 				}
 
 				c.add_child("scenes.scene", s);
 			}
 			program->channels[i].volume.save(c, "volume");
 			program->channels[i].panning.save(c, "panning");
-			//Arpeggiator
+			c.put("redirect.channel", program->channels[i].redirect.channel);
+			c.put("redirect.redirect_to", program->channels[i].redirect.redirect_to);
 
 			c.put("send_master", program->channels[i].send_master);
 			//Effects

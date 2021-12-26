@@ -26,7 +26,10 @@ src = [
 	'midicube/framework/data/binding.cpp',
 	'midicube/framework/data/data.cpp',
 	'midicube/framework/dsp/envelope.cpp',
+	'midicube/framework/dsp/distortion.cpp',
+	'midicube/framework/dsp/equalizer.cpp',
 	'midicube/framework/dsp/filter.cpp',
+	'midicube/framework/dsp/reverb.cpp',
 	'midicube/framework/dsp/oscilator.cpp',
 	'midicube/framework/dsp/pcm.cpp',
 	'midicube/framework/dsp/synthesis.cpp',
@@ -54,6 +57,7 @@ src = [
 	'midicube/plugins/soundengine/organ.cpp',
 	'midicube/plugins/soundengine/sampler.cpp',
 	'midicube/plugins/sequencer/arpeggiator.cpp',
+	'midicube/plugins/sequencer/note_tester.cpp',
 	
 	'midicube/plugins/resources.cpp',
 	'midicube/workstation/view/MasterEffectView.cpp',

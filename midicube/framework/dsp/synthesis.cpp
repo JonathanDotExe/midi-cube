@@ -12,18 +12,18 @@
 
 //DelayBuffer
 void DelayBuffer::add_sample(double sample, unsigned int delay) {
-	if (delay < buffer.size()) {
-		buffer[(index + delay) % buffer.size()] += sample;
+	if (delay < DELAY_BUFFER_SIZE) {
+		buffer[(index + delay) % DELAY_BUFFER_SIZE] += sample;
 	}
 }
 
 void DelayBuffer::add_isample(double sample, double delay) {
 	unsigned int delay_int = (unsigned int) delay;
 	double delay_frac = delay - delay_int;
-	if (delay_int < buffer.size()) {
-		buffer[(index + delay_int) % buffer.size()] += sample * (1 - delay_frac);
-		if (delay_int + 1 < buffer.size()) {
-			buffer[(index + delay_int + 1) % buffer.size()] += sample * delay_frac;
+	if (delay_int < DELAY_BUFFER_SIZE) {
+		buffer[(index + delay_int) % DELAY_BUFFER_SIZE] += sample * (1 - delay_frac);
+		if (delay_int + 1 < DELAY_BUFFER_SIZE) {
+			buffer[(index + delay_int + 1) % DELAY_BUFFER_SIZE] += sample * delay_frac;
 		}
 	}
 }
@@ -40,33 +40,62 @@ double DelayBuffer::process() {
 	double sample = buffer[index];
 	buffer[index] = 0;
 	++index;
-	index %= buffer.size();
+	index %= DELAY_BUFFER_SIZE;
 	return sample;
 }
 
 //PortamendoBuffer
-PortamendoBuffer::PortamendoBuffer(double value, double slope_time) {
-	this->last_value = value;
+PortamendoBuffer::PortamendoBuffer(double value) {
+	this->next_value = value;
 	this->value = value;
-	this->last_time = 0;
-	this->slope_time = slope_time;
+	this->step = 0;
 }
 
-double PortamendoBuffer::get(double time) {
-	if (last_time + slope_time <= time) {
-		return value;
+double PortamendoBuffer::process(double time_step) {
+	if (step) {
+		double next = value + step * time_step;
+		if ((next > next_value) != (value > next_value)) {
+			value = next_value;
+			step = 0;
+		}
+		else {
+			value = next;
+		}
+	}
+	return value;
+}
+
+double PortamendoBuffer::get() {
+	return value;
+}
+
+void PortamendoBuffer::set(double value, double attack_step, double release_step) {
+	next_value = value;
+	if (this->value > value) {
+		step = -release_step;
 	}
 	else {
-		double prog = (time - last_time)/slope_time;
-		return last_value * (1 - prog) + value * prog;
+		step = attack_step;
 	}
 }
 
-void PortamendoBuffer::set(double value, double time, double slope_time) {
-	last_value = get(time);
-	last_time = time;
-	this->value = value;
-	this->slope_time = slope_time;
+void LookbackDelayBuffer::process(double sample) {
+	++index;
+	index %= DELAY_BUFFER_SIZE;
+	buffer[index] = sample;
 }
 
-
+double LookbackDelayBuffer::get_isample(double delay) {
+	double sample = 0;
+	unsigned int delay_int = (unsigned int) ceil(delay);
+	double delay_frac = delay_int - delay;
+	if (delay_int < DELAY_BUFFER_SIZE) {
+		unsigned int delay_index = ((int) index - delay_int) % DELAY_BUFFER_SIZE;
+		sample += buffer[delay_index] * (1 - delay_frac);
+		if (delay_int + 1 < DELAY_BUFFER_SIZE) {
+			unsigned int next_index= ((int) delay_index + 1) % DELAY_BUFFER_SIZE;
+			sample += buffer[next_index] * delay_frac;
+		}
+	}
+	return sample;
+}

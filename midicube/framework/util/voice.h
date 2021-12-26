@@ -65,7 +65,7 @@ public:
 		}
 	}
 
-	size_t press_note(const SampleInfo& info, unsigned int real_note, unsigned int note, double velocity, size_t polyphony_limit = 0) {
+	size_t press_note(const SampleInfo& info, unsigned int real_note, unsigned int note, unsigned int channel, double velocity, size_t polyphony_limit = 0) {
 		size_t slot = next_freq_slot(info, polyphony_limit);
 		this->note[slot].freq = note_to_freq(note);
 		this->note[slot].velocity = velocity;
@@ -74,15 +74,15 @@ public:
 		this->note[slot].pressed = true;
 		this->note[slot].start_time = info.time;
 		this->note[slot].release_time = 0;
-		this->note[slot].phase_shift = 0;
 		this->note[slot].valid = true;
+		this->note[slot].channel = channel;
 		return slot;
 	}
 
 
-	void release_note(const SampleInfo& info, unsigned int real_note, bool invalidate = false) {
+	void release_note(const SampleInfo& info, unsigned int real_note, unsigned int channel, bool invalidate = false) {
 		for (size_t i = 0; i < P; ++i) {
-			if (this->note[i].real_note == real_note && this->note[i].pressed) {
+			if (this->note[i].real_note == real_note && this->note[i].channel == channel && this->note[i].pressed) {
 				this->note[i].pressed = false;
 				this->note[i].release_time = info.time;
 				if (invalidate) {

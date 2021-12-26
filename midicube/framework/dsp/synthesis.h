@@ -17,7 +17,7 @@
 constexpr double PI2{2 * M_PI};
 
 
-inline extern double db_to_amp(double db) {
+inline extern constexpr double db_to_amp(double db) {
 	return pow(10, db/10);
 }
 
@@ -100,6 +100,11 @@ inline extern double noise_wave() {
 	return ((double) rand())/RAND_MAX* 2 - 1;
 }
 
+inline void mix(double& dry, double wet, double mix) {
+	dry *= 1 - (fmax(0, mix - 0.5) * 2);
+	dry += wet * fmin(0.5, mix) * 2;
+}
+
 
 class DelayBuffer {
 private:
@@ -118,17 +123,29 @@ public:
 
 };
 
+class LookbackDelayBuffer {
+private:
+	std::array<double, DELAY_BUFFER_SIZE> buffer = {};
+	std::size_t index = 0;
+
+public:
+
+	void process(double sample);
+
+	double get_isample(double delay);
+
+};
 
 class PortamendoBuffer {
 private:
 	double value;
-	double last_value;
-	double slope_time;
-	double last_time;
+	double next_value;
+	double step;
 public:
-	PortamendoBuffer(double value, double slope_time);
-	double get(double time);
-	void set(double value, double time, double slope_time);
+	PortamendoBuffer(double value);
+	double process(double time_step);
+	double get();
+	void set(double value, double attack_step, double release_step);
 };
 
 template<size_t N>

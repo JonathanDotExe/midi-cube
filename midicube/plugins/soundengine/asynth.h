@@ -242,10 +242,10 @@ private:
 	std::array<double, ASYNTH_PART_COUNT> lfo_mod = {};
 	std::array<double, ASYNTH_PART_COUNT> lfo_vol = {};
 	std::array<double, ANALOG_CONTROL_COUNT> controls;
-	PortamendoBuffer aftertouch{0, 0};
+	PortamendoBuffer aftertouch{0};
 
 	bool first_port = true;
-	PortamendoBuffer note_port{0, 0};
+	PortamendoBuffer note_port{0};
 	AdvancedSynthVoice mono_voice;
 	DelayBuffer ldelay;
 	DelayBuffer rdelay;
@@ -275,9 +275,7 @@ public:
 
 	bool note_finished(const SampleInfo& info, AdvancedSynthVoice& note, size_t note_index);
 	
-	void press_note(const SampleInfo& info, unsigned int note, double velocity);
-
-	void release_note(const SampleInfo& info, unsigned int note, double velocity);
+	void press_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity);
 
 	void save_program(PluginProgram **prog);
 

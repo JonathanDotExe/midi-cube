@@ -40,7 +40,6 @@ public:
 				}
 				else {
 					++status.pressed_notes;
-					voice_mgr.note[i].phase_shift += (host_environment.pitch_bend - 1) * info.time_step;
 					process_note_sample(info, voice_mgr.note[i], i);
 					if (!status.pressed_notes || voice_mgr.note[status.latest_note_index].start_time < voice_mgr.note[i].start_time) {
 						status.latest_note_index = i;
@@ -66,10 +65,10 @@ public:
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info) {
 		switch (message.type) {
 		case MessageType::NOTE_ON:
-			this->press_note(info, message.note(), message.velocity()/127.0);
+			this->press_note(info, message.note(), message.channel, message.velocity()/127.0);
 			break;
 		case MessageType::NOTE_OFF:
-			this->release_note(info, message.note(), message.velocity()/127.0);
+			this->release_note(info, message.note(), message.channel, message.velocity()/127.0);
 			break;
 		case MessageType::CONTROL_CHANGE:
 			this->control_change(message.control(), message.value());
@@ -79,12 +78,12 @@ public:
 		}
 	}
 
-	virtual void press_note(const SampleInfo& info, unsigned int note, double velocity) {
-		voice_mgr.press_note(info, note, note + host.get_transpose(), velocity, 0);
+	virtual void press_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity) {
+		voice_mgr.press_note(info, note, note + host.get_transpose(), channel, velocity, 0);
 	}
 
-	virtual void release_note(const SampleInfo& info, unsigned int note, double velocity) {
-		voice_mgr.release_note(info, note);
+	virtual void release_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity) {
+		voice_mgr.release_note(info, note, channel);
 	}
 
 	virtual void control_change(unsigned int cc, unsigned int value) {

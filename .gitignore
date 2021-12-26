@@ -40,5 +40,6 @@
 /.settings/
 /Release/
 /data/
+CMakeFiles
 /lib
 midicube_log.txt

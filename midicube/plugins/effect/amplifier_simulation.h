@@ -11,22 +11,27 @@
 #include "../../framework/core/plugins/effect.h"
 #include "../../framework/core/audio.h"
 #include "../../framework/dsp/filter.h"
+#include "../../framework/dsp/distortion.h"
 #include "../../framework/dsp/synthesis.h"
 
 #define AMP_OVERSAMPLING 2
 #define AMPLIFIER_SIMULATION_IDENTIFIER "midicube_overdrive_amp"
-
-enum DistortionType {
-	DIGITAL_DISTORTION, POLYNOMAL_DISTORTION, ARCTAN_DISTORTION, CUBIC_DISTORTION, FUZZ_DISTORTION
-};
-
+#define AMPLIFIER_SIMULATION_EQ_BANDS 3
 
 struct AmplifierSimulationPreset {
 	BindableBooleanValue on{true};
 	BindableTemplateValue<double> post_gain{0, 0, 1};
 	BindableTemplateValue<double> drive{0, 0, 1};
-	BindableTemplateValue<double> tone{0.6, 0, 1};
-	DistortionType type = ARCTAN_DISTORTION;
+	BindableTemplateValue<double> tone{0.8, 0, 1};
+	BindableTemplateValue<double> low_freq{100, 20, 400};
+	BindableTemplateValue<double> low_gain{0, -1, 5};
+	BindableTemplateValue<double> mid_freq{1000, 200, 8000};
+	BindableTemplateValue<double> mid_gain{0, -1, 5};
+	BindableTemplateValue<double> high_freq{4000, 1000, 20000};
+	BindableTemplateValue<double> high_gain{0, -1, 5};
+	DistortionType type = TANH_DISTORTION;
+	BindableTemplateValue<double> lowshelf_cutoff{80, 15, 160};
+	BindableTemplateValue<double> lowshelf_boost{0, 0, 1};
 };
 
 class AmplifierSimulationProgram : public PluginProgram {
@@ -45,8 +50,8 @@ public:
 
 class AmplifierSimulationEffect : public Effect {
 private:
-	Filter lfilter;
-	Filter rfilter;
+	AmplifierSimulation<AMPLIFIER_SIMULATION_EQ_BANDS> lamp;
+	AmplifierSimulation<AMPLIFIER_SIMULATION_EQ_BANDS> ramp;
 public:
 	AmplifierSimulationPreset preset;
 

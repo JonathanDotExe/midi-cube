@@ -154,7 +154,7 @@ public:
 		second_data = v & 0xF8;
 	}
 
-	std::string to_string();
+	std::string to_string() const;
 
 };
 

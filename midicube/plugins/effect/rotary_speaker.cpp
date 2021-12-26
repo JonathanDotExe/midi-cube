@@ -18,8 +18,8 @@ RotarySpeakerEffect::RotarySpeakerEffect(PluginHost& h, Plugin& p) : Effect(h, p
 
 	cc.init(host.get_binding_handler(), this);
 
-	filter_data.type = FilterType::LP_24;
-	filter_data.cutoff = 800;
+	lfilter_data.type = FilterType::LP_24;
+	lfilter_data.cutoff = ROTARY_CUTOFF;
 }
 
 void RotarySpeakerEffect::process(const SampleInfo &info) {
@@ -28,18 +28,27 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 	if (preset.on) {
 		//Sum samples up
 		double sample = (outputs[0] + outputs[1]) / 2.0;
+
+		//Drive
+		AmplifierSimulationData<0> data;
+		data.post_gain = 1;
+		data.tone = preset.tone;
+		data.triode = {preset.drive, DistortionType::TANH_DISTORTION, 1, 25, 0.2};
+		sample = amp.apply(sample, data, info.time_step);
+
 		//Filter
-		double bass_sample = filter.apply(filter_data, sample, info.time_step);
-		double horn_sample = sample - bass_sample;
+		double bass_sample = lfilter.apply(lfilter_data, sample, info.time_step);
+		double horn_sample = sample - bass_sample /*hfilter.apply(hfilter_data, sample, info.time_step)*/;
 
 		//Horn
+		//TODO maybe apply sine at playback
 		double horn_pitch_rot = preset.type ? sin(freq_to_radians(horn_rotation)) : cos(freq_to_radians(horn_rotation));
 		double lhorn_delay = sound_delay(horn_pitch_rot, preset.max_delay, info.sample_rate);
 		double rhorn_delay = sound_delay(-horn_pitch_rot, preset.max_delay, info.sample_rate);
 		//Bass
 		double bass_pitch_rot = preset.type ? sin(freq_to_radians(bass_rotation)) : cos(freq_to_radians(bass_rotation));
 		double lbass_delay = sound_delay(bass_pitch_rot, preset.max_delay, info.sample_rate);
-		double rbass_delay = sound_delay(-bass_pitch_rot, preset.max_delay, info.sample_rate);
+		double rbass_delay = lbass_delay /*sound_delay(-bass_pitch_rot, preset.max_delay, info.sample_rate)*/;
 
 		//Rotations
 		double horn_rot = sin(freq_to_radians(horn_rotation));
@@ -47,9 +56,10 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 
 		//Process
 		left_delay.add_isample(horn_sample * ((1 - preset.min_amplitude) + (0.5 + horn_rot * 0.5) * preset.min_amplitude), lhorn_delay);
-		left_delay.add_isample(bass_sample * ((1 - preset.min_amplitude) + (0.5 + bass_rot * 0.5) * preset.min_amplitude), lbass_delay);
+		double delayed_bass = bass_sample * ((1 - preset.min_amplitude) + (0.5 + bass_rot * 0.5) * preset.min_amplitude);
+		left_delay.add_isample(delayed_bass, lbass_delay);
 		right_delay.add_isample(horn_sample * ((1 - preset.min_amplitude) + (0.5 - horn_rot * 0.5) * preset.min_amplitude), rhorn_delay);
-		right_delay.add_isample(bass_sample * ((1 - preset.min_amplitude) + (0.5 - bass_rot * 0.5) * preset.min_amplitude), rbass_delay);
+		right_delay.add_isample(delayed_bass /*bass_sample * ((1 - preset.min_amplitude) + (0.5 - bass_rot * 0.5) * preset.min_amplitude)*/, rbass_delay);
 
 		//Play delay
 		double l = left_delay.process();
@@ -59,29 +69,46 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		ls *= 2.0/(1 + preset.stereo_mix);
 		rs *= 2.0/(1 + preset.stereo_mix);
 
-		//Mix
-		outputs[0] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
-		outputs[1] *= 1 - (fmax(0, preset.mix - 0.5) * 2);
+		//Apply reverb
+		SchroederReverbData reverb_data;
+		reverb_data.delay = 0.07 + 0.13 * preset.room_size;
+		reverb_data.feedback = 0.3 + 0.5 * preset.room_size;
+		mix(ls, lreverb.apply(ls, reverb_data, info), preset.room_amount);
+		mix(rs, rreverb.apply(rs, reverb_data, info), preset.room_amount);
 
-		outputs[0] += ls * fmin(0.5, preset.mix) * 2;
-		outputs[1] += rs * fmin(0.5, preset.mix) * 2;
+		//Mix
+		mix(outputs[0], ls, preset.mix);
+		mix(outputs[1], rs, preset.mix);
 	}
 
 	//Rotate speakers
-	horn_rotation += horn_speed.get(info.time) * info.time_step;
-	bass_rotation -= bass_speed.get(info.time) * info.time_step;
+	horn_rotation += horn_speed.process(info.time_step) * info.time_step;
+	bass_rotation -= bass_speed.process(info.time_step) * info.time_step;
 
 	//Switch speaker speed
-	if (curr_rotary_fast != preset.fast) {
-		curr_rotary_fast = preset.fast;
-		if (curr_rotary_fast) {
-			horn_speed.set(preset.horn_fast_frequency, info.time, preset.horn_fast_ramp);
-			bass_speed.set(preset.bass_fast_frequency, info.time, preset.horn_slow_frequency);
+	RotaryState state = preset.state();
+	if (curr_rotary_state != state) {
+		curr_rotary_state = state;
+		double horn_attack = (preset.horn_fast_frequency - preset.horn_slow_frequency)/preset.horn_slow_ramp;
+		double horn_release = (preset.horn_fast_frequency - preset.horn_slow_frequency)/preset.horn_fast_ramp;
+		double bass_attack = (preset.bass_fast_frequency - preset.bass_slow_frequency)/preset.bass_slow_ramp;
+		double bass_release = (preset.bass_fast_frequency - preset.bass_slow_frequency)/preset.bass_fast_ramp;
+		double hspeed = 0;
+		double bspeed = 0;
+		switch (state) {
+		case RotaryState::ROTARY_SLOW:
+			hspeed = preset.horn_slow_frequency;
+			bspeed = preset.bass_slow_frequency;
+			break;
+		case RotaryState::ROTARY_STOP:
+			break;
+		case RotaryState::ROTARY_FAST:
+			hspeed = preset.horn_fast_frequency;
+			bspeed = preset.bass_fast_frequency;
+			break;
 		}
-		else {
-			horn_speed.set(preset.horn_slow_frequency, info.time, preset.horn_slow_ramp);
-			bass_speed.set(preset.bass_slow_frequency, info.time, preset.bass_slow_ramp);
-		}
+		horn_speed.set(hspeed, horn_attack, horn_release);
+		bass_speed.set(bspeed, bass_attack, bass_release);
 	}
 }
 
@@ -95,7 +122,10 @@ RotarySpeakerEffect::~RotarySpeakerEffect() {
 
 void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 	preset.on.load(tree, "on", true);
+	preset.stop.load(tree, "stop", false);
 	preset.fast.load(tree, "fast", false);
+	preset.drive.load(tree, "drive", 0);
+	preset.tone.load(tree, "tone", 0.8);
 
 	preset.stereo_mix = tree.get<double>("stereo_mix", 0.7);
 	preset.type = tree.get<bool>("type", false);
@@ -112,12 +142,18 @@ void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 	preset.horn_fast_ramp = tree.get<double>("horn_fast_ramp", ROTARY_HORN_FAST_RAMP);
 	preset.bass_slow_ramp = tree.get<double>("bass_slow_ramp", ROTARY_BASS_SLOW_RAMP);
 	preset.bass_fast_ramp = tree.get<double>("bass_fast_ramp", ROTARY_BASS_FAST_RAMP);
+
+	preset.room_amount = tree.get<double>("room_amount", 0.3);
+	preset.room_size = tree.get<double>("room_size", 0.3);
 }
 
 boost::property_tree::ptree RotarySpeakerProgram::save() {
 	boost::property_tree::ptree tree;
 	tree.add_child("on", preset.on.save());
+	tree.add_child("stop", preset.stop.save());
 	tree.add_child("fast", preset.fast.save());
+	tree.add_child("drive", preset.drive.save());
+	tree.add_child("tone", preset.tone.save());
 
 	tree.put("stereo_mix", preset.stereo_mix);
 	tree.put("type", preset.type);
@@ -134,6 +170,9 @@ boost::property_tree::ptree RotarySpeakerProgram::save() {
 	tree.put("horn_fast_ramp", preset.horn_fast_ramp);
 	tree.put("bass_slow_ramp", preset.horn_slow_ramp);
 	tree.put("bass_fast_ramp", preset.bass_fast_ramp);
+
+	tree.put("room_size", preset.room_size);
+	tree.put("room_amount", preset.room_amount);
 
 	return tree;
 }

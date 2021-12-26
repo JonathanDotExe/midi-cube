@@ -29,7 +29,7 @@ MidiMessage::MidiMessage(std::vector<unsigned char> message) {
 	}
 }
 
-std::string MidiMessage::to_string() {
+std::string MidiMessage::to_string() const {
 	using namespace std::string_literals;
 
 	switch (type) {

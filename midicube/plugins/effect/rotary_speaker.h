@@ -10,7 +10,9 @@
 
 #include "../../framework/core/audio.h"
 #include "../../framework/dsp/filter.h"
+#include "../../framework/dsp/distortion.h"
 #include "../../framework/dsp/synthesis.h"
+#include "../../framework/dsp/reverb.h"
 #include "../../framework/core/plugins/effect.h"
 
 #define ROTARY_SPEAKER_IDENTIFIER "midicube_rotary_speaker"
@@ -32,9 +34,16 @@
 #define ROTARY_BASS_SLOW_RAMP 5.5
 #define ROTARY_BASS_FAST_RAMP 5.5
 
+enum RotaryState {
+	ROTARY_STOP, ROTARY_SLOW, ROTARY_FAST
+};
+
 struct RotarySpeakerPreset {
 	BindableBooleanValue on = true;
+	BindableBooleanValue stop = false;
 	BindableBooleanValue fast = false;
+	BindableTemplateValue<double> drive{0, 0, 1};
+	BindableTemplateValue<double> tone{0.8, 0, 1};
 
 	double stereo_mix{0.7};
 	bool type{false};
@@ -51,6 +60,13 @@ struct RotarySpeakerPreset {
 	double horn_fast_ramp = ROTARY_HORN_FAST_RAMP;
 	double bass_slow_ramp = ROTARY_BASS_SLOW_RAMP;
 	double bass_fast_ramp = ROTARY_BASS_FAST_RAMP;
+
+	double room_amount = 0.15;
+	double room_size = 0.4;
+
+	inline RotaryState state() {
+		return fast ? RotaryState::ROTARY_FAST : (stop ? RotaryState::ROTARY_STOP : RotaryState::ROTARY_SLOW);
+	}
 };
 
 
@@ -69,14 +85,19 @@ public:
 
 class RotarySpeakerEffect : public Effect {
 private:
-	Filter filter;
-	FilterData filter_data;
+	AmplifierSimulation<0> amp;
+
+	Filter lfilter;
+	FilterData lfilter_data;
 
 	DelayBuffer left_delay;
 	DelayBuffer right_delay;
-	bool curr_rotary_fast = 0;
-	PortamendoBuffer horn_speed{ROTARY_HORN_SLOW_FREQUENCY, ROTARY_HORN_SLOW_RAMP};
-	PortamendoBuffer bass_speed{ROTARY_BASS_SLOW_FREQUENCY, ROTARY_BASS_SLOW_RAMP};
+
+	RotaryState curr_rotary_state = RotaryState::ROTARY_STOP;
+	PortamendoBuffer horn_speed{0};
+	PortamendoBuffer bass_speed{0};
+	SchroederReverb lreverb;
+	SchroederReverb rreverb;
 	double horn_rotation = 0;
 	double bass_rotation = 0;
 public:

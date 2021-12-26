@@ -32,19 +32,19 @@ Scene ArpeggiatorView::create(ViewHost &frame) {
 	//Active
 	int tmp_y = 40;
 	CheckBox* active = new CheckBox(true, "Active", main_font, 18, 10, tmp_y, 40, 40);
-	active->property.bind(arp.arp.on, handler);
+	active->property.bind(arp.on, handler);
 	controls.push_back(active);
 
 	//Hold
 	CheckBox* hold = new CheckBox(true, "Hold", main_font, 18, 150, tmp_y, 40, 40);
-	hold->property.bind(arp.arp.preset.hold, handler);
+	hold->property.bind(arp.preset.hold, handler);
 	controls.push_back(hold);
 	tmp_y += 50;
 
 	//Pattern
 	ComboBox* pattern = new ComboBox(0, patterns, main_font, 24, 0, 10, tmp_y, 300, 60);
 	pattern->rect.setFillColor(sf::Color(0, 180, 255));
-	pattern->property.bind_cast(arp.arp.preset.pattern, handler);
+	pattern->property.bind_cast(arp.preset.pattern, handler);
 	controls.push_back(pattern);
 	tmp_y += 70;
 
@@ -56,7 +56,7 @@ Scene ArpeggiatorView::create(ViewHost &frame) {
 
 		DragBox<int>* octave = new DragBox<int>(1, 1, 4, main_font, 18, 10, tmp_y, 150, 60);
 		tmp_y += 70;
-		octave->property.bind(arp.arp.preset.octaves, handler);
+		octave->property.bind(arp.preset.octaves, handler);
 		controls.push_back(octave);
 	}
 
@@ -68,7 +68,7 @@ Scene ArpeggiatorView::create(ViewHost &frame) {
 
 		DragBox<int>* bpm = new DragBox<int>(0, 10, 480, main_font, 18, 10, tmp_y, 150, 60);
 		tmp_y += 70;
-		bpm->property.bind_function<unsigned int>(std::bind(&Metronome::get_bpm, &arp.arp.metronome), std::bind(&Metronome::set_bpm, &arp.arp.metronome, std::placeholders::_1), handler);
+		bpm->property.bind_function<unsigned int>(std::bind(&Metronome::get_bpm, &arp.metronome), std::bind(&Metronome::set_bpm, &arp.metronome, std::placeholders::_1), handler);
 		controls.push_back(bpm);
 	}
 
@@ -80,30 +80,30 @@ Scene ArpeggiatorView::create(ViewHost &frame) {
 
 		DragBox<int>* step = new DragBox<int>(0, 1, 32, main_font, 18, 10, tmp_y, 150, 60);
 		tmp_y += 70;
-		step->property.bind(arp.arp.preset.value, handler);
+		step->property.bind(arp.preset.value, handler);
 		controls.push_back(step);
 	}
 
 	//Col 2
 	tmp_y = 40;
 	CheckBox* kb_sync = new CheckBox(true, "KB Sync", main_font, 18, 330, tmp_y, 40, 40);
-	kb_sync->property.bind(arp.arp.preset.kb_sync, handler);
+	kb_sync->property.bind(arp.preset.kb_sync, handler);
 	controls.push_back(kb_sync);
 	tmp_y += 50;
 	CheckBox* repeat_edges = new CheckBox(true, "Repeat Edges", main_font, 18, 330, tmp_y, 40, 40);
-	repeat_edges->property.bind(arp.arp.preset.repeat_edges, handler);
+	repeat_edges->property.bind(arp.preset.repeat_edges, handler);
 	controls.push_back(repeat_edges);
 	tmp_y += 50;
 	CheckBox* play_duplicates = new CheckBox(true, "Play Duplicates", main_font, 18, 330, tmp_y, 40, 40);
-	play_duplicates->property.bind(arp.arp.preset.play_duplicates, handler);
+	play_duplicates->property.bind(arp.preset.play_duplicates, handler);
 	controls.push_back(play_duplicates);
 	tmp_y += 50;
 	CheckBox* master_sync = new CheckBox(true, "Master Sync", main_font, 18, 330, tmp_y, 40, 40);
-	master_sync->property.bind(arp.arp.preset.master_sync, handler);
+	master_sync->property.bind(arp.preset.master_sync, handler);
 	controls.push_back(master_sync);
 	tmp_y += 50;
 	CheckBox* sustain = new CheckBox(true, "Sustain", main_font, 18, 330, tmp_y, 40, 40);
-	sustain->property.bind(arp.arp.preset.sustain, handler);
+	sustain->property.bind(arp.preset.sustain, handler);
 	controls.push_back(sustain);
 	tmp_y += 50;
 

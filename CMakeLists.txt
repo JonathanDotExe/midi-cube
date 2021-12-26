@@ -64,7 +64,7 @@ file(GLOB_RECURSE RESOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} "resources/*.*")
 
 set(CMAKE_INSTALL_BINDIR ".")
 set(CMAKE_INSTALL_LIBDIR ".")
-install(TARGETS midi-cube-framework midi-cube-plugins midi-cube-workstation midi-cube-autosampler)
+install(TARGETS midi-cube-framework midi-cube-plugins midi-cube-workstation midi-cube-autosampler ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}) 
 install(FILES ${DLL_FILES} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES "${CMAKE_SOURCE_DIR}/dependencies.txt" DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/" DESTINATION ${CMAKE_INSTALL_BINDIR}/resources)

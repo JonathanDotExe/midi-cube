@@ -12,9 +12,10 @@
 #include <cmath>
 
 //B3OrganTonewheel
-double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType type) {
+double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType type, double vol_mul, double click_attack, double click_release) {
 	//Rotation
-	double volume = this->volume;
+	this->volume_buffer.set(this->volume * vol_mul, 1/click_attack,1/click_release);
+	double volume = this->volume_buffer.process(info.time_step);
 	rotation += freq * info.time_step;
 	this->volume = 0;
 	this->compress_volume = 0;
@@ -39,7 +40,13 @@ double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType 
 B3Organ::B3Organ(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	//Bind
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		binder.add_binding(&data.preset.drawbars[i]);
+		binder.add_binding(&data.preset.upper_drawbars[i]);
+	}
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		binder.add_binding(&data.preset.lower_drawbars[i]);
+	}
+	for (size_t i = 0; i < ORGAN_BASS_DRAWBAR_COUNT; ++i) {
+		binder.add_binding(&data.preset.bass_drawbars[i]);
 	}
 	binder.add_binding(&data.preset.percussion);
 	binder.add_binding(&data.preset.percussion_third_harmonic);
@@ -108,10 +115,10 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& 
 	if (tonewheel >= 0 &&
 			info.time >= note.start_time + tonewheel_data[tonewheel].press_delay) {
 		if (note.pressed || info.time <= note.release_time + tonewheel_data[tonewheel].release_delay) {
-			data.tonewheels[tonewheel].volume += volume * vol_mul * fmin(1, (info.time - note.start_time - tonewheel_data[tonewheel].press_delay)/data.preset.click_attack);
+			data.tonewheels[tonewheel].volume += volume * vol_mul;
 		}
 		else {
-			data.tonewheels[tonewheel].volume += volume * vol_mul * fmax(0, 1 - (info.time - note.release_time - tonewheel_data[tonewheel].release_delay)/data.preset.click_attack);
+			data.tonewheels[tonewheel].volume += volume * vol_mul;
 		}
 		data.tonewheels[tonewheel].compress_volume += compress_volume;
 	}
@@ -119,20 +126,50 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& 
 
 void B3Organ::process_note_sample(const SampleInfo &info, TriggeredNote& note, size_t note_index) {
 	//Organ sound
-	double drawbar_amount = data.preset.drawbars.size() + (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
-	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
-		double vol = data.preset.drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
-		trigger_tonewheel(tonewheel, vol, info, note, vol);
-	}
-	//Percussion
-	double decay = data.preset.percussion_fast_decay ? data.preset.percussion_fast_decay_time : data.preset.percussion_slow_decay_time;
-	if (data.preset.percussion && info.time - data.percussion_start <= decay) {
-		double vol = (1 - (info.time - data.percussion_start)/decay) * (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
-		vol /= drawbar_amount;
-		int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12) - ORGAN_LOWEST_TONEWHEEL_NOTE;
+	switch (note.channel) {
+	case 0:
+	{
+		//Upper manual
+		double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft && data.preset.percussion ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
+		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+			int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
+			double vol = data.preset.upper_drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
+			trigger_tonewheel(tonewheel, vol, info, note, vol);
+		}
 
-		trigger_tonewheel(tonewheel, vol, info, note, 0);
+		//Percussion
+		double decay = data.preset.percussion_fast_decay ? data.preset.percussion_fast_decay_time : data.preset.percussion_slow_decay_time;
+		if (data.preset.percussion && info.time - data.percussion_start <= decay) {
+			double vol = (1 - (info.time - data.percussion_start)/decay) * (data.preset.percussion_soft ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
+			vol /= drawbar_amount;
+			int tonewheel = note.note + (data.preset.percussion_third_harmonic ? 19 : 12) - ORGAN_LOWEST_TONEWHEEL_NOTE;
+
+			trigger_tonewheel(tonewheel, vol, info, note, 0);
+		}
+	}
+		break;
+	case 1:
+	{
+		//Lower manual
+		double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft_volume);
+		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+			int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
+			double vol = data.preset.lower_drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
+			trigger_tonewheel(tonewheel, vol, info, note, vol);
+		}
+	}
+		break;
+	case 2:
+	{
+		//Bass manual
+		double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft_volume);
+		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+			int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
+			double vol = data.preset.bass_drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
+			trigger_tonewheel(tonewheel, vol, info, note, vol);
+		}
+	}
+		break;
 	}
 }
 
@@ -151,7 +188,7 @@ bool B3Organ::note_finished(const SampleInfo& info, TriggeredNote& note, size_t 
 void B3Organ::process_sample(const SampleInfo &info) {
 	EngineStatus status = get_status();
 	//Update properties
-	double swell = this->data.swell * SWELL_RANGE + MIN_SWELL;
+	double swell = SWELL_MIN + pow(data.preset.swell, 1.2) * SWELL_RANGE;
 
 	//Percussion
 	if (status.pressed_notes == 0) {
@@ -163,19 +200,21 @@ void B3Organ::process_sample(const SampleInfo &info) {
 	}
 
 	//Play organ sound
-	//Compute samples
+	//Compress
 	double sample = 0;
 	double volume = 0;
 	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
 		volume += data.tonewheels[i].compress_volume;
-		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * host_environment.pitch_bend, data.preset.type) * (1 + (tonewheel_data[i].volume - 1) * data.preset.high_gain_reduction);
+	}
+	double vol_mul = 1;
+	if (volume && data.preset.multi_note_gain != 1) {
+		vol_mul = pow(volume, data.preset.multi_note_gain)/volume;
+	}
+	//Compute samples
+	for (size_t i = 0; i < data.tonewheels.size(); ++i) {
+		sample += data.tonewheels[i].process(info, tonewheel_data[i].freq * host_environment.pitch_bend, data.preset.type, vol_mul, data.preset.click_attack, data.preset.click_release) * (1 + (tonewheel_data[i].volume - 1) * data.preset.high_gain_reduction);
 	}
 	sample *= swell;
-	//Compress
-	if (volume && data.preset.multi_note_gain != 1) {
-		//double v = calc_vol(status.pressed_notes, data.preset.multi_note_gain)/status.pressed_notes;
-		sample *= pow(volume, data.preset.multi_note_gain)/volume;
-	}
 
 	//Chorus/Vibrato
 	if (data.preset.vibrato_mix) {
@@ -245,16 +284,61 @@ void B3Organ::apply_program(PluginProgram *prog) {
 
 void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	preset = {};
-	//Drawbars
-	const auto& drawbars = tree.get_child_optional("drawbars");
+	//Upper Drawbars
+	const auto& upper_drawbars = tree.get_child_optional("upper_drawbars");
 	size_t i = 0;
-	if (drawbars) {
-		for (pt::ptree::value_type& d : drawbars.get()) {
+	if (upper_drawbars) {
+		for (pt::ptree::value_type& d : upper_drawbars.get()) {
 			if (i >= ORGAN_DRAWBAR_COUNT) {
 				break;
 			}
 
-			preset.drawbars[i].load(d.second);
+			preset.upper_drawbars[i].load(d.second);
+
+			++i;
+		}
+	}
+	else {
+		const auto& drawbars = tree.get_child_optional("drawbars");
+		i = 0;
+		if (drawbars) {
+			for (pt::ptree::value_type& d : drawbars.get()) {
+				if (i >= ORGAN_DRAWBAR_COUNT) {
+					break;
+				}
+
+				preset.upper_drawbars[i].load(d.second);
+
+				++i;
+			}
+		}
+	}
+
+	//Lower drawbars
+	const auto& lower_drawbars = tree.get_child_optional("lower_drawbars");
+	i = 0;
+	if (lower_drawbars) {
+		for (pt::ptree::value_type& d : lower_drawbars.get()) {
+			if (i >= ORGAN_DRAWBAR_COUNT) {
+				break;
+			}
+
+			preset.lower_drawbars[i].load(d.second);
+
+			++i;
+		}
+	}
+
+	//Bass drawbars
+	const auto& bass_drawbars = tree.get_child_optional("bass_drawbars");
+	i = 0;
+	if (bass_drawbars) {
+		for (pt::ptree::value_type& d : bass_drawbars.get()) {
+			if (i >= ORGAN_BASS_DRAWBAR_COUNT) {
+				break;
+			}
+
+			preset.lower_drawbars[i].load(d.second);
 
 			++i;
 		}
@@ -263,7 +347,8 @@ void B3OrganProgram::load(boost::property_tree::ptree tree) {
 	//Modeling
 	preset.harmonic_foldback_volume = tree.get<double>("harmonic_foldback_volume", 1);
 	preset.multi_note_gain = tree.get<double>("multi_note_gain", 0.8);
-	preset.click_attack = tree.get<double>("click_attack", 0.00004);
+	preset.click_attack = tree.get<double>("click_attack", 0.00015);
+	preset.click_release = tree.get<double>("click_release", 0.0005);
 	preset.high_gain_reduction = tree.get<double>("high_gain_reduction", 0.5);
 
 	//Percussion
@@ -282,13 +367,20 @@ boost::property_tree::ptree B3OrganProgram::save() {
 
 	//Drawbars
 	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		preset.drawbars[i].save(tree, "drawbars.drawbar");
+		preset.upper_drawbars[i].save(tree, "upper_drawbars.drawbar");
+	}
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		preset.lower_drawbars[i].save(tree, "lower_drawbars.drawbar");
+	}
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		preset.bass_drawbars[i].save(tree, "bass_drawbars.drawbar");
 	}
 
 	//Modeling
 	tree.put("harmonic_foldback_volume", preset.harmonic_foldback_volume);
 	tree.put("multi_note_gain", preset.multi_note_gain);
 	tree.put("click_attack", preset.click_attack);
+	tree.put("click_release", preset.click_release);
 	tree.put("high_gain_reduction", preset.high_gain_reduction);
 
 	//Percussion
@@ -317,18 +409,25 @@ PluginInstance* OrganPlugin::create(PluginHost *host) {
 }
 
 Menu* B3Organ::create_menu() {
-	return new FunctionMenu([this]() { return new B3OrganView(*this); }, [this]() {
-		ControlView* view = new ControlView("B3 Organ");
-		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-			view->bind(&data.preset.drawbars[i], ControlType::SLIDER, i, 0);
-		}
-		view->bind(&data.preset.percussion, ControlType::BUTTON, 2, 0);
-		view->bind(&data.preset.percussion_fast_decay, ControlType::BUTTON, 3, 0);
-		view->bind(&data.preset.percussion_soft, ControlType::BUTTON, 4, 0);
-		view->bind(&data.preset.percussion_third_harmonic, ControlType::BUTTON, 4, 0);
+	return create_menu(0);
+}
 
-		view->bind(&data.preset.vibrato_mix, ControlType::KNOB, 1, 0);
-		view->init(this);
-		return view;
-	});
+Menu* B3Organ::create_menu(unsigned int channel) {
+	return new FunctionMenu([this, channel]() { return new B3OrganView(*this, channel); }, [this]() {
+			ControlView* view = new ControlView("B3 Organ");
+			for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+				view->bind(&data.preset.upper_drawbars[i], ControlType::SLIDER, i, 0);
+			}
+			for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+				view->bind(&data.preset.lower_drawbars[i], ControlType::SLIDER, i, 1);
+			}
+			view->bind(&data.preset.percussion, ControlType::BUTTON, 2, 0);
+			view->bind(&data.preset.percussion_fast_decay, ControlType::BUTTON, 3, 0);
+			view->bind(&data.preset.percussion_soft, ControlType::BUTTON, 4, 0);
+			view->bind(&data.preset.percussion_third_harmonic, ControlType::BUTTON, 4, 0);
+
+			view->bind(&data.preset.vibrato_mix, ControlType::KNOB, 1, 0);
+			view->init(this);
+			return view;
+		});
 }

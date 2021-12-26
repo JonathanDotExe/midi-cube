@@ -62,7 +62,7 @@ struct VocoderBand {
 	Filter rfilter;
 	Filter mfilter;
 	EnvelopeFollower env{};
-	PortamendoBuffer port{0, 0};
+	PortamendoBuffer port{0};
 };
 
 class VocoderProgram : public PluginProgram {
