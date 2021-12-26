@@ -16,13 +16,22 @@
 
 #define AMP_OVERSAMPLING 2
 #define AMPLIFIER_SIMULATION_IDENTIFIER "midicube_overdrive_amp"
+#define AMPLIFIER_SIMULATION_EQ_BANDS 3
 
 struct AmplifierSimulationPreset {
 	BindableBooleanValue on{true};
 	BindableTemplateValue<double> post_gain{0, 0, 1};
 	BindableTemplateValue<double> drive{0, 0, 1};
-	BindableTemplateValue<double> tone{0.6, 0, 1};
-	DistortionType type = ARCTAN_DISTORTION;
+	BindableTemplateValue<double> tone{0.8, 0, 1};
+	BindableTemplateValue<double> low_freq{100, 20, 400};
+	BindableTemplateValue<double> low_gain{0, -1, 5};
+	BindableTemplateValue<double> mid_freq{1000, 200, 8000};
+	BindableTemplateValue<double> mid_gain{0, -1, 5};
+	BindableTemplateValue<double> high_freq{4000, 1000, 20000};
+	BindableTemplateValue<double> high_gain{0, -1, 5};
+	DistortionType type = TANH_DISTORTION;
+	BindableTemplateValue<double> lowshelf_cutoff{15, 160, 80};
+	BindableTemplateValue<double> lowshelf_boost{0, 3, 1};
 };
 
 class AmplifierSimulationProgram : public PluginProgram {
@@ -41,8 +50,8 @@ public:
 
 class AmplifierSimulationEffect : public Effect {
 private:
-	AmplifierSimulation lamp;
-	AmplifierSimulation ramp;
+	AmplifierSimulation<AMPLIFIER_SIMULATION_EQ_BANDS> lamp;
+	AmplifierSimulation<AMPLIFIER_SIMULATION_EQ_BANDS> ramp;
 public:
 	AmplifierSimulationPreset preset;
 

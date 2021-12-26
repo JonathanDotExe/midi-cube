@@ -57,12 +57,9 @@ public:
 
 template<size_t N>
 struct AmplifierSimulationData {
-	double drive = 0;
+	TubeAmpTriodeData data;
 	double post_gain = 0;
 	double tone = 0.8;
-	DistortionType type = ARCTAN_DISTORTION;
-	double lowshelf_boost = 1;
-	double lowshelf_cutoff = 80;
 	NBandEqualizerData<N> eq;
 };
 
@@ -80,20 +77,13 @@ template<size_t N>
 double AmplifierSimulation<N>::apply(double sample,
 		const AmplifierSimulationData<N> &data, double time_step) {
 	//Distortion
-	TubeAmpTriodeData d;
-	d.drive = data.drive;
-	d.type = data.type;
-	d.lowshelf_boost = data.lowshelf_boost;
-	d.lowshelf_cutoff = data.lowshelf_cutoff;
-
 	for (size_t i = 0; i < TUBE_AMP_TRIODE_COUNT; ++i) {
 		//EQ
 		if (i == TUBE_AMP_TRIODE_COUNT - 1) {
 			sample = eq.apply(sample, data.eq, time_step);
 		}
-		sample = triodes[i].apply(sample, d, time_step);
+		sample = triodes[i].apply(sample, data.triode, time_step);
 	}
-	sample = apply_distortion(sample, data.drive, data.type);
 
 	//Low-pass
 	FilterData f;
