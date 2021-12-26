@@ -27,8 +27,8 @@ inline double polynomial_waveshaper(double sample, double drive) {
 	return sample - (sample * sample * sample) * drive;
 }
 
-inline double arctan_waveshaper(double sample) {
-	return atan(sample);
+inline double arctan_waveshaper(double sample, double drive) {
+	return atan(sample * drive)/atan(sample);
 }
 
 inline double cubic_fuzz_waveshaper(double sample) {
@@ -39,8 +39,8 @@ inline double soft_clip_waveshaper(double sample) {
 	return 3*sample/2 * (1 - sample*sample/3);
 }
 
-inline double tanh_waveshaper(double sample) {
-	return tanh(sample);
+inline double tanh_waveshaper(double sample, double drive) {
+	return tanh(sample * drive)/tanh(sample);
 }
 
 inline double sigmoid_waveshaper(double sample) {
@@ -68,7 +68,7 @@ double apply_distortion(double sample, double drive, DistortionType type) {
 		break;
 	case DistortionType::ARCTAN_DISTORTION:
 	{
-		sample = arctan_waveshaper(sample * (1 + drive * 4));
+		sample = arctan_waveshaper(sample, (1 + drive * 4));
 	}
 		break;
 	case DistortionType::CUBIC_DISTORTION:
@@ -88,7 +88,7 @@ double apply_distortion(double sample, double drive, DistortionType type) {
 	break;
 	case DistortionType::TANH_DISTORTION:
 	{
-		sample = tanh_waveshaper((sample * (1 + 4 * drive)));
+		sample = tanh_waveshaper(sample, (1 + 4 * drive));
 	}
 	break;
 	case DistortionType::SIGMOID_DISTORTION:
@@ -100,20 +100,12 @@ double apply_distortion(double sample, double drive, DistortionType type) {
 	return sample;
 }
 
-double AmplifierSimulation::apply(double sample,
-		const AmplifierSimulationData &data, double time_step) {
-	//Distortion
-	sample = apply_distortion(sample, data.drive, data.type);
-
-	//Low-pass
-	FilterData f;
-	f.type = FilterType::LP_24;
-	f.cutoff = 200 + data.tone * 20000;
-	sample = filter.apply(f, sample, time_step);
-
-	//Gain
-	double gain = data.post_gain + 1;
-	sample *= gain;
-
+double TubeAmpTriode::apply(double sample, const TubeAmpTriodeData &data,
+		double time_step) {
+	sample = -apply_distortion(sample, data.drive, data.type);
+	FilterData h{FilterType::HP_24, data.highpass_cutoff};
+	sample = highfilter.apply(h, sample, time_step);
+	FilterData l{FilterType::HP_24, data.lowshelf_cutoff};
+	sample += lowfilter.apply(l, sample, time_step) * data.lowshelf_boost;
 	return sample;
 }
