@@ -141,6 +141,162 @@ Scene EffectView::create(ViewHost &frame) {
 
 			tmp_y -= 25;
 		}
+
+		tmp_y += 160;
+		tmp_x -= 200 * 5;
+
+		//Low Gain
+		{
+			Label *label = new Label("Low Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.low_gain, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mid Gain
+		{
+			Label *label = new Label("Mid Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.mid_gain, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//High Gain
+		{
+			Label *label = new Label("High Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.high_gain, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//High Gain
+		{
+			Label *label = new Label("High Gain", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.high_gain, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Lowshelf Boost
+		{
+			Label *label = new Label("Lowshelf Boost", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.lowshelf_boost, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		tmp_y += 160;
+		tmp_x -= 200 * 4;
+
+		//Low Freq
+		{
+			Label *label = new Label("Low Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 20, 400, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(amp->preset.low_freq, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Mid Freq
+		{
+			Label *label = new Label("Mid Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 200, 8000, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(amp->preset.mid_freq, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//High Freq
+		{
+			Label *label = new Label("High Freq", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, 1000, 20000, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->property.bind(amp->preset.high_freq, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
+		//Lowshelf Cutoff
+		{
+			Label *label = new Label("Lowshelf Cutoff", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+					tmp_x, tmp_y, 180, 120);
+			value->border = 0;
+			value->property.bind(amp->preset.lowshelf_cutoff, handler);
+			controls.push_back(value);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
 	}
 	//Rotary Speaker
 	else if (dynamic_cast<RotarySpeakerEffect*>(effect) != nullptr) {

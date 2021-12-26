@@ -57,7 +57,7 @@ public:
 
 template<size_t N>
 struct AmplifierSimulationData {
-	TubeAmpTriodeData data;
+	TubeAmpTriodeData triode;
 	double post_gain = 0;
 	double tone = 0.8;
 	NBandEqualizerData<N> eq;

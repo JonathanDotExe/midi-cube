@@ -23,7 +23,7 @@ void AmplifierSimulationEffect::process(const SampleInfo &info) {
 		AmplifierSimulationData<AMPLIFIER_SIMULATION_EQ_BANDS> data;
 		data.post_gain = preset.post_gain;
 		data.tone = preset.tone;
-		data.data = {preset.drive, preset.type, 1, preset.lowshelf_cutoff, preset.lowshelf_boost};
+		data.triode = {preset.drive, preset.type, 1, preset.lowshelf_cutoff, preset.lowshelf_boost};
 		data.eq.bands = {EqualizerBand{preset.low_freq, preset.low_gain, FilterType::LP_24}, EqualizerBand{preset.mid_freq, preset.mid_gain, FilterType::BP_12}, EqualizerBand{preset.high_freq, preset.high_gain, FilterType::HP_24}};
 		lsample = lamp.apply(lsample, data, info.time_step);
 		rsample = ramp.apply(rsample, data, info.time_step);
