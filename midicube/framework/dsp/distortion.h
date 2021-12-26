@@ -22,7 +22,7 @@ inline double hard_clip_waveshaper(double sample);
 
 inline double polynomial_waveshaper(double sample, double drive);
 
-inline double arctan_waveshaper(double sample, double drive);
+inline double arctan_waveshaper(double sample);
 
 inline double cubic_waveshaper(double sample);
 
@@ -30,7 +30,7 @@ inline double cubic_fuzz_waveshaper(double sample);
 
 inline double soft_clip_waveshaper(double sample);
 
-inline double tanh_waveshaper(double sample, double drive);
+inline double tanh_waveshaper(double sample);
 
 inline double sigmoid_waveshaper(double sample);
 
@@ -59,7 +59,7 @@ template<size_t N>
 struct AmplifierSimulationData {
 	TubeAmpTriodeData triode;
 	double post_gain = 0;
-	double tone = 0.8;
+	double tone = 0.9;
 	NBandEqualizerData<N> eq;
 };
 

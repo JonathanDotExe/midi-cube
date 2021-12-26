@@ -30,8 +30,8 @@ struct AmplifierSimulationPreset {
 	BindableTemplateValue<double> high_freq{4000, 1000, 20000};
 	BindableTemplateValue<double> high_gain{0, -1, 5};
 	DistortionType type = TANH_DISTORTION;
-	BindableTemplateValue<double> lowshelf_cutoff{15, 160, 80};
-	BindableTemplateValue<double> lowshelf_boost{0, 3, 1};
+	BindableTemplateValue<double> lowshelf_cutoff{80, 15, 160};
+	BindableTemplateValue<double> lowshelf_boost{0, 0, 1};
 };
 
 class AmplifierSimulationProgram : public PluginProgram {

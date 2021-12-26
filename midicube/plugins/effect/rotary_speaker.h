@@ -43,6 +43,7 @@ struct RotarySpeakerPreset {
 	BindableBooleanValue stop = false;
 	BindableBooleanValue fast = false;
 	BindableTemplateValue<double> drive{0, 0, 1};
+	BindableTemplateValue<double> tone{0.8, 0, 1};
 
 	double stereo_mix{0.7};
 	bool type{false};
@@ -84,10 +85,10 @@ public:
 
 class RotarySpeakerEffect : public Effect {
 private:
+	AmplifierSimulation<0> amp;
+
 	Filter lfilter;
 	FilterData lfilter_data;
-	Filter hfilter;
-	FilterData hfilter_data;
 
 	DelayBuffer left_delay;
 	DelayBuffer right_delay;

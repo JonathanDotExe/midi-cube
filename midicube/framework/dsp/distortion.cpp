@@ -27,8 +27,8 @@ inline double polynomial_waveshaper(double sample, double drive) {
 	return sample - (sample * sample * sample) * drive;
 }
 
-inline double arctan_waveshaper(double sample, double drive) {
-	return atan(sample * drive)/atan(sample);
+inline double arctan_waveshaper(double sample) {
+	return atan(sample);
 }
 
 inline double cubic_fuzz_waveshaper(double sample) {
@@ -39,8 +39,8 @@ inline double soft_clip_waveshaper(double sample) {
 	return 3*sample/2 * (1 - sample*sample/3);
 }
 
-inline double tanh_waveshaper(double sample, double drive) {
-	return tanh(sample * drive)/tanh(sample);
+inline double tanh_waveshaper(double sample) {
+	return tanh(sample);
 }
 
 inline double sigmoid_waveshaper(double sample) {
@@ -58,7 +58,7 @@ double apply_distortion(double sample, double drive, DistortionType type) {
 		break;*/
 	case DistortionType::DIGITAL_DISTORTION:
 	{
-		sample = hard_clip_waveshaper(sample * (1 + 9 * drive));
+		sample = hard_clip_waveshaper(sample * (1 + drive));
 	}
 		break;
 	case DistortionType::POLYNOMAL_DISTORTION:
@@ -68,12 +68,12 @@ double apply_distortion(double sample, double drive, DistortionType type) {
 		break;
 	case DistortionType::ARCTAN_DISTORTION:
 	{
-		sample = arctan_waveshaper(sample, (1 + drive * 4));
+		sample = arctan_waveshaper(sample * (1 + drive));
 	}
 		break;
 	case DistortionType::CUBIC_DISTORTION:
 	{
-		sample = cubic_waveshaper(sample * (0.3 + drive * 4.5));
+		sample = cubic_waveshaper(sample * (0.3 + drive));
 	}
 	break;
 	case DistortionType::FUZZ_DISTORTION:
@@ -83,17 +83,17 @@ double apply_distortion(double sample, double drive, DistortionType type) {
 	break;
 	case DistortionType::SOFT_CLIP_DISTORTION:
 	{
-		sample = soft_clip_waveshaper((sample * (1 + 4 * drive)));
+		sample = soft_clip_waveshaper((sample * (1 + drive)));
 	}
 	break;
 	case DistortionType::TANH_DISTORTION:
 	{
-		sample = tanh_waveshaper(sample, (1 + 4 * drive));
+		sample = tanh_waveshaper(sample * (1 + drive));
 	}
 	break;
 	case DistortionType::SIGMOID_DISTORTION:
 	{
-		sample = sigmoid_waveshaper((sample * (1 + 4 * drive)));
+		sample = sigmoid_waveshaper((sample * (1 + drive)));
 	}
 	break;
 	}
@@ -107,5 +107,6 @@ double TubeAmpTriode::apply(double sample, const TubeAmpTriodeData &data,
 	sample = highfilter.apply(h, sample, time_step);
 	FilterData l{FilterType::HP_24, data.lowshelf_cutoff};
 	sample += lowfilter.apply(l, sample, time_step) * data.lowshelf_boost;
+	sample /= 1 + data.lowshelf_boost;
 	return sample;
 }

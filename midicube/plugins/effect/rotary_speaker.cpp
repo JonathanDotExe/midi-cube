@@ -20,8 +20,6 @@ RotarySpeakerEffect::RotarySpeakerEffect(PluginHost& h, Plugin& p) : Effect(h, p
 
 	lfilter_data.type = FilterType::LP_24;
 	lfilter_data.cutoff = ROTARY_CUTOFF;
-	hfilter_data.type = FilterType::HP_24;
-	hfilter_data.cutoff = ROTARY_CUTOFF;
 }
 
 void RotarySpeakerEffect::process(const SampleInfo &info) {
@@ -32,7 +30,11 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		double sample = (outputs[0] + outputs[1]) / 2.0;
 
 		//Drive
-		//sample = apply_distortion(sample, preset.drive, DistortionType::CUBIC_DISTORTION);
+		AmplifierSimulationData<0> data;
+		data.post_gain = 1;
+		data.tone = preset.tone;
+		data.triode = {preset.drive, DistortionType::TANH_DISTORTION, 1, 25, 0.2};
+		sample = amp.apply(sample, data, info.time_step);
 
 		//Filter
 		double bass_sample = lfilter.apply(lfilter_data, sample, info.time_step);
@@ -122,6 +124,8 @@ void RotarySpeakerProgram::load(boost::property_tree::ptree tree) {
 	preset.on.load(tree, "on", true);
 	preset.stop.load(tree, "stop", false);
 	preset.fast.load(tree, "fast", false);
+	preset.drive.load(tree, "drive", 0);
+	preset.tone.load(tree, "tone", 0.8);
 
 	preset.stereo_mix = tree.get<double>("stereo_mix", 0.7);
 	preset.type = tree.get<bool>("type", false);
@@ -148,6 +152,8 @@ boost::property_tree::ptree RotarySpeakerProgram::save() {
 	tree.add_child("on", preset.on.save());
 	tree.add_child("stop", preset.stop.save());
 	tree.add_child("fast", preset.fast.save());
+	tree.add_child("drive", preset.drive.save());
+	tree.add_child("tone", preset.tone.save());
 
 	tree.put("stereo_mix", preset.stereo_mix);
 	tree.put("type", preset.type);

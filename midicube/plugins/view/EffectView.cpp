@@ -220,7 +220,7 @@ Scene EffectView::create(ViewHost &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+			DragBox<double> *value = new DragBox<double>(0, 0, 3, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->border = 0;
 			value->property.bind(amp->preset.lowshelf_boost, handler);
@@ -288,7 +288,7 @@ Scene EffectView::create(ViewHost &frame) {
 			controls.push_back(label);
 			tmp_y += 25;
 
-			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
+			DragBox<double> *value = new DragBox<double>(0, 15, 160, main_font, 24,
 					tmp_x, tmp_y, 180, 120);
 			value->border = 0;
 			value->property.bind(amp->preset.lowshelf_cutoff, handler);
@@ -348,6 +348,38 @@ Scene EffectView::create(ViewHost &frame) {
 					tmp_y, 80, 60, "Stop", "Rotate");
 			rotary_speed->property.bind(rotary->preset.stop, handler);
 			controls.push_back(rotary_speed);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+
+		//Drive
+		{
+			Label *label = new Label("Drive", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rotary_stereo = new DragBox<double>(0, 0, 1,
+					main_font, 16, tmp_x, tmp_y, 80, 60);
+			rotary_stereo->property.bind(rotary->preset.drive, handler);
+			controls.push_back(rotary_stereo);
+
+			tmp_y -= 25;
+			tmp_x += 90;
+		}
+
+		//Tone
+		{
+			Label *label = new Label("Tone", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *rotary_stereo = new DragBox<double>(0, 0, 1,
+					main_font, 16, tmp_x, tmp_y, 80, 60);
+			rotary_stereo->property.bind(rotary->preset.tone, handler);
+			controls.push_back(rotary_stereo);
 
 			tmp_y -= 25;
 			tmp_x += 90;
