@@ -17,7 +17,7 @@
 constexpr double PI2{2 * M_PI};
 
 
-inline extern constexpr double db_to_amp(double db) {
+inline extern const double db_to_amp(double db) {
 	return pow(10, db/10);
 }
 
