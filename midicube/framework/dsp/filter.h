@@ -14,8 +14,8 @@
 
 #define FILTER_MIN 14
 #define FILTER_MAX 44100
-constexpr double FILTER_PROGRESS_START = log(FILTER_MIN)/log(FILTER_MAX);
-constexpr double FILTER_PROGRESS_REST = 1 - FILTER_PROGRESS_START;
+const double FILTER_PROGRESS_START = log(FILTER_MIN)/log(FILTER_MAX);
+const double FILTER_PROGRESS_REST = 1 - FILTER_PROGRESS_START;
 
 inline double scale_cutoff(double prog) {
 	return pow(FILTER_MAX, FILTER_PROGRESS_START + FILTER_PROGRESS_REST * prog);
