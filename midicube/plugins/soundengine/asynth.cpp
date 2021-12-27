@@ -737,7 +737,7 @@ Menu* AdvancedSynth::create_menu()  {
 
 Menu* AdvancedSynth::create_operator_menu(size_t part) {
 	return new FunctionMenu([this, part]() { return new AnalogSynthOperatorView(*this, part);}, [this, part]() {
-		ControlView* view = new ControlView("Analog Synth Operator " + part);
+		ControlView* view = new ControlView("Analog Synth Operator " + std::to_string(part));
 		OperatorEntity& op = preset.operators.at(part);
 		view->bind(&op.volume.velocity_amount, ControlType::KNOB, 0, 0);
 		view->bind(&op.env.hold, ControlType::KNOB, 1, 0);
@@ -792,7 +792,7 @@ Menu* AdvancedSynth::create_operator_menu(size_t part) {
 
 Menu* AdvancedSynth::create_oscillator_menu(size_t part) {
 	return new FunctionMenu([this, part]() { return new AnalogSynthOscilatorView(*this, part);}, [this, part]() {
-		ControlView* view = new ControlView("Analog Synth Oscillator " + part);
+		ControlView* view = new ControlView("Analog Synth Oscillator " + std::to_string(part));
 		OscilatorEntity& osc = preset.oscilators.at(part);
 		view->bind(&osc.waveform, ControlType::KNOB, 0, 0);
 		view->bind(&osc.volume.velocity_amount, ControlType::KNOB, 1, 0);
@@ -840,7 +840,7 @@ Menu* AdvancedSynth::create_oscillator_menu(size_t part) {
 
 Menu* AdvancedSynth::create_modulation_menu(size_t part) {
 	return new FunctionMenu([this, part]() { return new AnalogSynthModulatorView(*this, part);}, [this, part]() {
-		ControlView* view = new ControlView("Analog Synth Modulation " + part);
+		ControlView* view = new ControlView("Analog Synth Modulation " + std::to_string(part));
 		ModEnvelopeEntity& env = preset.mod_envs.at(part);
 		LFOEntity& lfo = preset.lfos.at(part);
 		view->bind(&env.volume.velocity_amount, ControlType::KNOB, 0, 0);
