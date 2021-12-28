@@ -201,17 +201,7 @@ public:
 
 	inline void take_input_stereo_and_inputs(double lsample, double rsample, double* inputs, const size_t input_count) {
 		const size_t ins = plugin.info.input_channels;
-		if (ins > 1) {
-			this->inputs[0] = lsample;
-			this->inputs[1] = rsample;
-			unsigned long int mic_inputs = std::min((unsigned long int) ins - 2, (unsigned long int) input_count);
-			memcpy(this->inputs, inputs, mic_inputs * sizeof(inputs[0]));
-		}
-		else if (ins == 1){
-			this->inputs[0] = rsample + lsample;
-		}
-
-		const size_t ins = plugin.info.input_channels;
+		unsigned long int mic_inputs;
 		switch (ins) {
 		case 0:
 			break;
@@ -220,6 +210,8 @@ public:
 			break;
 		default:
 			memset(inputs + 2, 0, (ins - 2)* sizeof(inputs[0]));
+			mic_inputs = std::min((unsigned long int) ins - 2, (unsigned long int) input_count);
+			memcpy(this->inputs + 2, inputs, mic_inputs * sizeof(inputs[0]));
 			/* no break */
 		case 2:
 			inputs[0] = lsample;
@@ -234,28 +226,20 @@ public:
 	}
 
 	inline void playback_outputs_stereo(double& lsample, double& rsample) {
-		lsample = 0;
-		rsample = 0;
-		const size_t outs = plugin.info.output_channels;
-		if (outs > 1) {
-			lsample = outputs[0];
-			rsample = outputs[0];
-			outputs[0] = 0;
-			for (size_t i = 0; i < outs; ++i) {
-				if (i % 2 == 0) {
-					lsample += outputs[i];
-				}
-				else {
-					rsample += outputs[i];
-				}
-				outputs[i] = 0;
-			}
+		const size_t outs = plugin.info.input_channels;
+		switch (outs) {
+		case 0:
+			break;
+		case 1:
+			lsample = inputs[0];
+			rsample = inputs[0];
+			break;
+		default:
+			lsample = inputs[0];
+			rsample = inputs[1];
+			break;
 		}
-		else if (outs == 1) {
-			lsample = outputs[0];
-			rsample = outputs[0];
-			outputs[0] = 0;
-		}
+		memset(outputs, 0, sizeof(outputs[0]) * outs);
 	}
 
 };
