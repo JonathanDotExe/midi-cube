@@ -206,16 +206,16 @@ public:
 		case 0:
 			break;
 		case 1:
-			inputs[0] = (rsample + lsample)/2;
+			this->inputs[0] = (rsample + lsample)/2;
 			break;
 		default:
-			memset(inputs + 2, 0, (ins - 2)* sizeof(inputs[0]));
 			mic_inputs = std::min((unsigned long int) ins - 2, (unsigned long int) input_count);
+			memset(this->inputs + 2 + mic_inputs, 0, (ins - 2 - mic_inputs)* sizeof(inputs[0]));
 			memcpy(this->inputs + 2, inputs, mic_inputs * sizeof(inputs[0]));
 			/* no break */
 		case 2:
-			inputs[0] = lsample;
-			inputs[1] = rsample;
+			this->inputs[0] = lsample;
+			this->inputs[1] = rsample;
 			break;
 		}
 	}
@@ -231,12 +231,12 @@ public:
 		case 0:
 			break;
 		case 1:
-			lsample = inputs[0];
-			rsample = inputs[0];
+			lsample = outputs[0];
+			rsample = outputs[0];
 			break;
 		default:
-			lsample = inputs[0];
-			rsample = inputs[1];
+			lsample = outputs[0];
+			rsample = outputs[1];
 			break;
 		}
 		memset(outputs, 0, sizeof(outputs[0]) * outs);
