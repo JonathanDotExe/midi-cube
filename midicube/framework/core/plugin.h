@@ -169,27 +169,33 @@ public:
 
 	inline void take_input_mono(double sample) {
 		const size_t ins = plugin.info.input_channels;
-		for (size_t i = 0; i < ins; ++i) {
-			inputs[i] = sample;
+		switch (ins) {
+		case 0:
+			break;
+		default:
+			memset(inputs + 1, 0, (ins - 1) * sizeof(inputs[0]));
+			/* no break */
+		case 1:
+			inputs[0] = sample;
+			break;
 		}
 	}
 
 	inline void take_input_stereo(double lsample, double rsample) {
 		const size_t ins = plugin.info.input_channels;
-		if (ins > 1) {
-			for (size_t i = 0; i < ins; ++i) {
-				for (size_t i = 0; i < ins; ++i) {
-					if (i % 2 == 0) {
-						inputs[i] = lsample;
-					}
-					else {
-						inputs[i] = rsample;
-					}
-				}
-			}
-		}
-		else if (ins == 1){
-			inputs[0] = rsample + lsample;
+		switch (ins) {
+		case 0:
+			break;
+		case 1:
+			inputs[0] = (rsample + lsample)/2;
+			break;
+		default:
+			memset(inputs + 2, 0, (ins - 2)* sizeof(inputs[0]));
+			/* no break */
+		case 2:
+			inputs[0] = lsample;
+			inputs[1] = rsample;
+			break;
 		}
 	}
 
@@ -198,25 +204,33 @@ public:
 		if (ins > 1) {
 			this->inputs[0] = lsample;
 			this->inputs[1] = rsample;
-			const size_t mic_inputs = ins - 2;
-			if (mic_inputs > 0) {
-				for (size_t i = 0; i < input_count; ++i) {
-					this->inputs[2 + (i % mic_inputs)] = inputs[i];
-				}
-			}
+			unsigned long int mic_inputs = std::min((unsigned long int) ins - 2, (unsigned long int) input_count);
+			memcpy(this->inputs, inputs, mic_inputs * sizeof(inputs[0]));
 		}
 		else if (ins == 1){
 			this->inputs[0] = rsample + lsample;
 		}
+
+		const size_t ins = plugin.info.input_channels;
+		switch (ins) {
+		case 0:
+			break;
+		case 1:
+			inputs[0] = (rsample + lsample)/2;
+			break;
+		default:
+			memset(inputs + 2, 0, (ins - 2)* sizeof(inputs[0]));
+			/* no break */
+		case 2:
+			inputs[0] = lsample;
+			inputs[1] = rsample;
+			break;
+		}
 	}
 
 	inline void take_inputs(double* inputs, const size_t input_count) {
-		const size_t ins = plugin.info.input_channels;
-		if (ins > 0) {
-			for (size_t i = 0; i < input_count; ++i) {
-				this->inputs[(i % ins)] = inputs[i];
-			}
-		}
+		unsigned long int count = std::min((unsigned long int) input_count, (unsigned long int) plugin.info.input_channels);
+		memcpy(this->inputs, inputs, count * sizeof(inputs[0]));
 	}
 
 	inline void playback_outputs_stereo(double& lsample, double& rsample) {
@@ -224,6 +238,9 @@ public:
 		rsample = 0;
 		const size_t outs = plugin.info.output_channels;
 		if (outs > 1) {
+			lsample = outputs[0];
+			rsample = outputs[0];
+			outputs[0] = 0;
 			for (size_t i = 0; i < outs; ++i) {
 				if (i % 2 == 0) {
 					lsample += outputs[i];
