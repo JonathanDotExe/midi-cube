@@ -126,7 +126,8 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 				//Load file
 				std::string filename = path + "/" + file;
 				std::cout << "Including \"" << filename << "\"" << std::endl;
-				std::ifstream f(filename);
+				std::ifstream f;
+				f.open(filename);
 				std::string t;
 				if (f.fail()) {
 					std::cout << strerror(errno) << std::endl;

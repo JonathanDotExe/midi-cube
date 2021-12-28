@@ -8,6 +8,8 @@
 #include "autosampler.h"
 #include "../framework/dsp/synthesis.h"
 #include "../framework/dsp/filter.h"
+#include "../framework/util/audiofile.h"
+#include "../framework/util/sfz.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>

@@ -134,7 +134,7 @@ int AudioHandler::process(double* output_buffer, double* input_buffer, unsigned 
 };
 
 void AudioHandler::close() {
-	if (audio->isStreamOpen()) {
+	if (audio && audio->isStreamOpen()) {
 		audio->closeStream();
 	}
 	delete audio;
