@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.16)
 
 project(midi-cube VERSION 1.0
     DESCRIPTION "A C++ synthesizer workstation"
@@ -75,13 +75,14 @@ target_link_libraries(midi-cube-autosampler PUBLIC ${RTAUDIO_TARGET})
 target_link_libraries(midi-cube-autosampler PUBLIC ${RTMIDI_TARGET})
 target_include_directories(midi-cube-autosampler PUBLIC include)
 
-
-file(GLOB DLL_FILES ABSOLUTE "${CMAKE_SOURCE_DIR}/lib/*.dll")
-file(GLOB_RECURSE RESOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} "resources/*.*")
-
 set(CMAKE_INSTALL_BINDIR ".")
 set(CMAKE_INSTALL_LIBDIR ".")
+file(GLOB DLL_FILES ABSOLUTE "${CMAKE_SOURCE_DIR}/lib/*.dll")
+file(GLOB_RECURSE RESOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} "resources/*.*")
+file(GLOB_RECURSE RESOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} "resources/*.*")
+
 install(TARGETS midi-cube-framework midi-cube-plugins midi-cube-workstation midi-cube-autosampler ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}) 
 install(FILES ${DLL_FILES} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(CODE [[GET_RUNTIME_DEPENDENCIES EXECUTABLES ${CMAKE_INSTALL_BINDIR}]] DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES "${CMAKE_SOURCE_DIR}/dependencies.txt" DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/" DESTINATION ${CMAKE_INSTALL_BINDIR}/resources)
