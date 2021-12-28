@@ -226,7 +226,7 @@ public:
 	}
 
 	inline void playback_outputs_stereo(double& lsample, double& rsample) {
-		const size_t outs = plugin.info.input_channels;
+		const size_t outs = plugin.info.output_channels;
 		switch (outs) {
 		case 0:
 			break;

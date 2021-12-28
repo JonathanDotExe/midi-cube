@@ -97,7 +97,7 @@ public:
 	virtual ~SoundEngine() {
 
 	}
-	const EngineStatus& get_status() const {
+	inline const EngineStatus& get_status() const {
 		return status;
 	}
 
