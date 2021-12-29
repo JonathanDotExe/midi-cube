@@ -391,10 +391,14 @@ public:
 	}
 
 	void set_plugin(Plugin* plugin) {
-		delete this->plugin;
-		this->plugin = nullptr;
+		if (this->plugin) {
+			this->plugin->cleanup();
+			delete this->plugin;
+			this->plugin = nullptr;
+		}
 		if (plugin) {
 			this->plugin = plugin->create(host);
+			this->plugin->init();
 		}
 	}
 
@@ -405,7 +409,13 @@ public:
 		}
 		lock.lock();
 		PluginInstance* old = this->plugin;
+		if (old) {
+			old->cleanup();
+		}
 		this->plugin = inst;
+		if (this->plugin) {
+			this->plugin->init();
+		}
 		lock.unlock();
 
 		delete old;

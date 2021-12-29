@@ -55,7 +55,6 @@ private:
 public:
 	AmplifierSimulationPreset preset;
 
-	void init();
 	void save_program(PluginProgram **prog);
 	void apply_program(PluginProgram *prog);
 	AmplifierSimulationEffect(PluginHost& h, Plugin& plugin);

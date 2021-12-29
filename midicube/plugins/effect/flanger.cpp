@@ -17,8 +17,6 @@ FlangerEffect::FlangerEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 
 	cc.add_binding(&preset.delay);
 	cc.add_binding(&preset.feedback);
-
-	cc.init(host.get_binding_handler(), this);
 }
 
 void FlangerEffect::process(const SampleInfo& info) {
@@ -106,5 +104,3 @@ std::string FlangerProgram::get_plugin_name() {
 	return FLANGER_IDENTIFIER;
 }
 
-void FlangerEffect::init() {
-}

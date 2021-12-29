@@ -16,8 +16,6 @@ RotarySpeakerEffect::RotarySpeakerEffect(PluginHost& h, Plugin& p) : Effect(h, p
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.fast);
 
-	cc.init(host.get_binding_handler(), this);
-
 	lfilter_data.type = FilterType::LP_24;
 	lfilter_data.cutoff = ROTARY_CUTOFF;
 }
@@ -206,5 +204,3 @@ std::string RotarySpeakerProgram::get_plugin_name() {
 	return ROTARY_SPEAKER_IDENTIFIER;
 }
 
-void RotarySpeakerEffect::init() {
-}

@@ -103,7 +103,6 @@ private:
 public:
 	RotarySpeakerPreset preset;
 
-	void init();
 	RotarySpeakerEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);

@@ -49,7 +49,6 @@ private:
 public:
 	ChorusPreset preset;
 
-	void init();
 	ChorusEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);

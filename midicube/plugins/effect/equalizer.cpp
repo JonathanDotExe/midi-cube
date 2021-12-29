@@ -19,8 +19,6 @@ EqualizerEffect::EqualizerEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.mid_gain);
 	cc.add_binding(&preset.high_freq);
 	cc.add_binding(&preset.high_gain);
-
-	cc.init(host.get_binding_handler(), this);
 }
 
 void EqualizerEffect::process(const SampleInfo& info) {
@@ -104,5 +102,3 @@ std::string EqualizerProgram::get_plugin_name() {
 	return EQUALIZER_IDENTIFIER;
 }
 
-void EqualizerEffect::init() {
-}

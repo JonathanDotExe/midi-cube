@@ -13,7 +13,6 @@ AmplifierSimulationEffect::AmplifierSimulationEffect(PluginHost& h, Plugin& plug
 	cc.add_binding(&preset.post_gain);
 	cc.add_binding(&preset.drive);
 	cc.add_binding(&preset.tone);
-	cc.init(host.get_binding_handler(), this);
 }
 
 void AmplifierSimulationEffect::process(const SampleInfo &info) {
@@ -99,5 +98,3 @@ std::string AmplifierSimulationProgram::get_plugin_name() {
 	return AMPLIFIER_SIMULATION_IDENTIFIER;
 }
 
-void AmplifierSimulationEffect::init() {
-}

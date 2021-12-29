@@ -12,7 +12,6 @@
 
 BitCrusherEffect::BitCrusherEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
-	cc.init(host.get_binding_handler(), this);
 }
 
 void BitCrusherEffect::process(const SampleInfo& info) {
@@ -74,5 +73,3 @@ std::string BitCrusherProgram::get_plugin_name() {
 	return BIT_CRUSHER_IDENTIFIER;
 }
 
-void BitCrusherEffect::init() {
-}

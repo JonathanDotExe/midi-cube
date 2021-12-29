@@ -15,8 +15,6 @@ PhaserEffect::PhaserEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.lfo_depth);
 	cc.add_binding(&preset.lfo_rate);
 	cc.add_binding(&preset.mix);
-
-	cc.init(host.get_binding_handler(), this);
 }
 
 void PhaserEffect::process(const SampleInfo& info) {
@@ -106,5 +104,3 @@ std::string PhaserProgram::get_plugin_name() {
 	return PHASER_IDENTIFIER;
 }
 
-void PhaserEffect::init() {
-}

@@ -36,7 +36,6 @@ class BitCrusherEffect : public Effect {
 public:
 	BitCrusherPreset preset;
 
-	void init();
 	BitCrusherEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);

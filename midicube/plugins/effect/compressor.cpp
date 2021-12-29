@@ -15,10 +15,7 @@ CompressorEffect::CompressorEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.ratio);
 	cc.add_binding(&preset.attack);
 	cc.add_binding(&preset.release);
-	cc.add_binding(&preset.makeup_gain);
-
-	cc.init(host.get_binding_handler(), this);
-}
+	cc.add_binding(&preset.makeup_gain);}
 
 void CompressorEffect::process(const SampleInfo& info) {
 	outputs[0] = inputs[0];
@@ -112,5 +109,3 @@ std::string CompressorProgram::get_plugin_name() {
 	return COMPRESSOR_IDENTIFIER;
 }
 
-void CompressorEffect::init() {
-}

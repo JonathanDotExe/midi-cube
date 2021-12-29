@@ -31,6 +31,7 @@ public:
 	}
 
 	virtual void cleanup();
+	virtual void init();
 };
 
 template<typename T, typename P>

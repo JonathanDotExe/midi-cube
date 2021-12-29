@@ -19,3 +19,7 @@ void Effect::recieve_midi(const MidiMessage &message, const SampleInfo &info) {
 void Effect::cleanup() {
 	cc.unbind();
 }
+
+void Effect::init() {
+	cc.init(host.get_binding_handler(), this);
+}

@@ -61,7 +61,6 @@ private:
 public:
 	DelayPreset preset;
 
-	void init();
 	DelayEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);

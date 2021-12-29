@@ -18,8 +18,6 @@ ReverbEffect::ReverbEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.tone);
 	cc.add_binding(&preset.resonance);
 	cc.add_binding(&preset.stereo);
-
-	cc.init(host.get_binding_handler(), this);
 }
 
 void ReverbEffect::process(const SampleInfo &info) {
@@ -108,5 +106,3 @@ std::string ReverbProgram::get_plugin_name() {
 	return REVERB_IDENTIFIER;
 }
 
-void ReverbEffect::init() {
-}

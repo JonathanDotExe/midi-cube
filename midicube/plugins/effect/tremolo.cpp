@@ -13,8 +13,6 @@ TremoloEffect::TremoloEffect(PluginHost& h, Plugin& p) : Effect(h, p) {
 	cc.add_binding(&preset.on);
 	cc.add_binding(&preset.rate);
 	cc.add_binding(&preset.depth);
-
-	cc.init(host.get_binding_handler(), this);
 }
 
 void TremoloEffect::process(const SampleInfo& info) {
@@ -86,5 +84,3 @@ std::string TremoloProgram::get_plugin_name() {
 	return TREMOLO_IDENTIFIER;
 }
 
-void TremoloEffect::init() {
-}

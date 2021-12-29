@@ -38,6 +38,24 @@ double B3OrganTonewheel::process(const SampleInfo& info, double freq, OrganType 
 
 //B3Organ
 B3Organ::B3Organ(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
+	//Bind
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		binder.add_binding(&data.preset.upper_drawbars[i]);
+	}
+	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
+		binder.add_binding(&data.preset.lower_drawbars[i]);
+	}
+	for (size_t i = 0; i < ORGAN_BASS_DRAWBAR_COUNT; ++i) {
+		binder.add_binding(&data.preset.bass_drawbars[i]);
+	}
+	binder.add_binding(&data.preset.percussion);
+	binder.add_binding(&data.preset.percussion_third_harmonic);
+	binder.add_binding(&data.preset.percussion_soft);
+	binder.add_binding(&data.preset.percussion_fast_decay);
+
+	binder.add_binding(&data.preset.vibrato_mix);
+	binder.add_binding(&data.preset.swell);
+
 	drawbar_notes = {-12, 7, 0, 12, 19, 24, 28, 31, 36};
 	std::vector<double> gear_ratios = {
 		0.817307692,
@@ -412,24 +430,6 @@ Menu* B3Organ::create_menu(unsigned int channel) {
 }
 
 void B3Organ::init() {
-	//Bind
-	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		binder.add_binding(&data.preset.upper_drawbars[i]);
-	}
-	for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-		binder.add_binding(&data.preset.lower_drawbars[i]);
-	}
-	for (size_t i = 0; i < ORGAN_BASS_DRAWBAR_COUNT; ++i) {
-		binder.add_binding(&data.preset.bass_drawbars[i]);
-	}
-	binder.add_binding(&data.preset.percussion);
-	binder.add_binding(&data.preset.percussion_third_harmonic);
-	binder.add_binding(&data.preset.percussion_soft);
-	binder.add_binding(&data.preset.percussion_fast_decay);
-
-	binder.add_binding(&data.preset.vibrato_mix);
-	binder.add_binding(&data.preset.swell);
-
 	binder.init(host.get_binding_handler(), this);
 }
 

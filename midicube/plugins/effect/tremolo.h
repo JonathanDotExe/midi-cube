@@ -42,7 +42,6 @@ private:
 public:
 	TremoloPreset preset;
 
-	void init();
 	TremoloEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);

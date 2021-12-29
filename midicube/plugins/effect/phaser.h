@@ -47,7 +47,6 @@ private:
 public:
 	PhaserPreset preset;
 
-	void init();
 	PhaserEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);
