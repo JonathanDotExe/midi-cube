@@ -127,7 +127,7 @@ void B3Organ::process_note_sample(const SampleInfo &info, TriggeredNote& note, s
 	case 0:
 	{
 		//Upper manual
-		double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft && data.preset.percussion ? data.preset.percussion_soft_volume : data.preset.percussion_hard_volume);
+		double drawbar_amount = ORGAN_DRAWBAR_COUNT + ((!data.preset.percussion_soft && data.preset.percussion) ? data.preset.percussion_hard_volume : data.preset.percussion_soft_volume);
 		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
 			int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
 			double vol = data.preset.upper_drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
@@ -159,9 +159,9 @@ void B3Organ::process_note_sample(const SampleInfo &info, TriggeredNote& note, s
 	case 2:
 	{
 		//Bass manual
-		double drawbar_amount = ORGAN_DRAWBAR_COUNT + (data.preset.percussion_soft_volume);
-		for (size_t i = 0; i < ORGAN_DRAWBAR_COUNT; ++i) {
-			int tonewheel = note.note + drawbar_notes[i] - ORGAN_LOWEST_TONEWHEEL_NOTE;
+		double drawbar_amount = ORGAN_BASS_DRAWBAR_COUNT + (data.preset.percussion_soft_volume);
+		for (size_t i = 0; i < ORGAN_BASS_DRAWBAR_COUNT; ++i) {
+			int tonewheel = note.note + drawbar_notes[i * 2] - ORGAN_LOWEST_TONEWHEEL_NOTE; //FIXME possible overflow when sizes change
 			double vol = data.preset.bass_drawbars[i] / (double) ORGAN_DRAWBAR_MAX / drawbar_amount;
 			trigger_tonewheel(tonewheel, vol, info, note, vol);
 		}
@@ -183,12 +183,17 @@ bool B3Organ::note_finished(const SampleInfo& info, TriggeredNote& note, size_t 
 };
 
 void B3Organ::process_sample(const SampleInfo &info) {
-	EngineStatus status = get_status();
 	//Update properties
 	double swell = SWELL_MIN + pow(data.preset.swell, 1.2) * SWELL_RANGE;
 
 	//Percussion
-	if (status.pressed_notes == 0) {
+	bool pressed = false;
+	for (size_t i = 0; i < B3_ORGAN_POLYPHONY && !pressed; ++i) {
+		if (voice_mgr.note[i].channel == 0 && voice_mgr.note[i].valid) {
+			pressed = true;
+		}
+	}
+	if (!pressed) {
 		data.reset_percussion = true;
 	}
 	else if (data.reset_percussion) {
