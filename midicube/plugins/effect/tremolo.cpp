@@ -85,3 +85,6 @@ void TremoloEffect::apply_program(PluginProgram *prog) {
 std::string TremoloProgram::get_plugin_name() {
 	return TREMOLO_IDENTIFIER;
 }
+
+void TremoloEffect::init() {
+}

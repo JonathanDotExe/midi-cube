@@ -103,3 +103,6 @@ void EqualizerEffect::apply_program(PluginProgram *prog) {
 std::string EqualizerProgram::get_plugin_name() {
 	return EQUALIZER_IDENTIFIER;
 }
+
+void EqualizerEffect::init() {
+}

@@ -108,3 +108,6 @@ void WahWahEffect::apply_program(PluginProgram *prog) {
 std::string WahWahProgram::get_plugin_name() {
 	return WAH_WAH_IDENTIFIER;
 }
+
+void WahWahEffect::init() {
+}

@@ -17,39 +17,7 @@
 #define ENV_INDEX(note_index,i) (note_index + i * ANALOG_SYNTH_POLYPHONY)
 
 AdvancedSynth::AdvancedSynth(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
-	//Parts
-	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
-		LFOEntity& lfo = preset.lfos[i];
-		binder.add_binding(&lfo.volume.value);
-		binder.add_binding(&lfo.freq);
 
-		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
-		binder.add_binding(&mod_env.volume.value);
-		mod_env.env.add_bindings(binder);
-
-		OscilatorEntity& osc = preset.oscilators[i];
-		binder.add_binding(&osc.volume.value);
-		binder.add_binding(&osc.sync_mul.value);
-		binder.add_binding(&osc.pulse_width.value);
-		binder.add_binding(&osc.unison_detune.value);
-		binder.add_binding(&osc.pitch.value);
-
-		OperatorEntity& op = preset.operators[i];
-		op.env.add_bindings(binder);
-		binder.add_binding(&op.volume.value);
-		binder.add_binding(&op.panning.value);
-
-		binder.add_binding(&op.first_filter.cutoff.value);
-		binder.add_binding(&op.first_filter.resonance.value);
-		binder.add_binding(&op.first_filter.kb_track);
-
-		binder.add_binding(&op.second_filter.cutoff.value);
-		binder.add_binding(&op.second_filter.resonance.value);
-		binder.add_binding(&op.second_filter.kb_track);
-	}
-	//Global
-	binder.add_binding(&preset.portamendo);
-	binder.init(host.get_binding_handler(), this);
 }
 
 inline double AdvancedSynth::apply_modulation(const FixedScale &scale, PropertyModulation &mod, double velocity, double aftertouch, std::array<double, ASYNTH_PART_COUNT>& lfo_val) {
@@ -885,3 +853,42 @@ std::string AdvancedSynthProgram::get_plugin_name() {
 	return ASYNTH_IDENTIFIER;
 }
 
+void AdvancedSynth::init() {
+	//Parts
+	for (size_t i = 0; i < ASYNTH_PART_COUNT; ++i) {
+		LFOEntity& lfo = preset.lfos[i];
+		binder.add_binding(&lfo.volume.value);
+		binder.add_binding(&lfo.freq);
+
+		ModEnvelopeEntity& mod_env = preset.mod_envs[i];
+		binder.add_binding(&mod_env.volume.value);
+		mod_env.env.add_bindings(binder);
+
+		OscilatorEntity& osc = preset.oscilators[i];
+		binder.add_binding(&osc.volume.value);
+		binder.add_binding(&osc.sync_mul.value);
+		binder.add_binding(&osc.pulse_width.value);
+		binder.add_binding(&osc.unison_detune.value);
+		binder.add_binding(&osc.pitch.value);
+
+		OperatorEntity& op = preset.operators[i];
+		op.env.add_bindings(binder);
+		binder.add_binding(&op.volume.value);
+		binder.add_binding(&op.panning.value);
+
+		binder.add_binding(&op.first_filter.cutoff.value);
+		binder.add_binding(&op.first_filter.resonance.value);
+		binder.add_binding(&op.first_filter.kb_track);
+
+		binder.add_binding(&op.second_filter.cutoff.value);
+		binder.add_binding(&op.second_filter.resonance.value);
+		binder.add_binding(&op.second_filter.kb_track);
+	}
+	//Global
+	binder.add_binding(&preset.portamendo);
+	binder.init(host.get_binding_handler(), this);
+}
+
+void AdvancedSynth::cleanup() {
+	binder.unbind();
+}

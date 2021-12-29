@@ -97,3 +97,6 @@ Menu* ChorusEffect::create_menu() {
 std::string ChorusProgram::get_plugin_name() {
 	return CHORUS_IDENTIFIER;
 }
+
+void ChorusEffect::init() {
+}

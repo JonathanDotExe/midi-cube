@@ -129,9 +129,16 @@ public:
 	const KeyboardEnvironment& host_environment; //Cache pointer
 	const Metronome& host_metronome; //Cache pointer
 
+	//Must be thread safe
 	PluginInstance(PluginHost& h, Plugin& p) : host(h), plugin(p), controls(h.get_controls()), host_environment(h.get_environment()), host_metronome(h.get_metronome()) {
 		inputs = new double[p.info.input_channels]();
 		outputs = new double[p.info.output_channels]();
+	}
+
+
+	//In Audio Thread
+	virtual void init() {
+
 	}
 
 	virtual void process(const SampleInfo& info) = 0;
@@ -154,6 +161,12 @@ public:
 		return nullptr;
 	}
 
+	//In Audio Thread
+	virtual void cleanup() {
+
+	}
+
+	//Must be thread safe
 	virtual ~PluginInstance() {
 		delete inputs;
 		delete outputs;
@@ -378,10 +391,8 @@ public:
 	}
 
 	void set_plugin(Plugin* plugin) {
-		if (this->plugin) {
-			delete this->plugin;
-			this->plugin = nullptr;
-		}
+		delete this->plugin;
+		this->plugin = nullptr;
 		if (plugin) {
 			this->plugin = plugin->create(host);
 		}

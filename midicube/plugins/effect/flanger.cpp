@@ -105,3 +105,6 @@ void FlangerEffect::apply_program(PluginProgram *prog) {
 std::string FlangerProgram::get_plugin_name() {
 	return FLANGER_IDENTIFIER;
 }
+
+void FlangerEffect::init() {
+}

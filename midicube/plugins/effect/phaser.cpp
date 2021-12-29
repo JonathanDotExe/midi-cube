@@ -105,3 +105,6 @@ void PhaserEffect::apply_program(PluginProgram *prog) {
 std::string PhaserProgram::get_plugin_name() {
 	return PHASER_IDENTIFIER;
 }
+
+void PhaserEffect::init() {
+}

@@ -122,3 +122,6 @@ void DelayEffect::apply_program(PluginProgram *prog) {
 std::string DelayProgram::get_plugin_name() {
 	return DELAY_IDENTIFIER;
 }
+
+void DelayEffect::init() {
+}

@@ -205,3 +205,6 @@ void RotarySpeakerEffect::apply_program(PluginProgram *prog) {
 std::string RotarySpeakerProgram::get_plugin_name() {
 	return ROTARY_SPEAKER_IDENTIFIER;
 }
+
+void RotarySpeakerEffect::init() {
+}

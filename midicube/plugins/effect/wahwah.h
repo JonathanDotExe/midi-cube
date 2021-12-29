@@ -48,6 +48,7 @@ private:
 public:
 	WahWahPreset preset;
 
+	void init();
 	WahWahEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);

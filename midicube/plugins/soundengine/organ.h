@@ -145,6 +145,8 @@ private:
 public:
 	B3OrganData data;
 
+	void init();
+	void cleanup();
 	B3Organ(PluginHost& h, Plugin& p);
 
 	void process_note_sample(const SampleInfo& info, TriggeredNote& note, size_t note_index);

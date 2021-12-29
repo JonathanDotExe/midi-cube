@@ -263,6 +263,8 @@ private:
 public:
 	AdvancedSynthPreset preset;
 
+	void init();
+	void cleanup();
 	AdvancedSynth(PluginHost& h, Plugin& p);
 
 	void process_note_sample(const SampleInfo& info, AdvancedSynthVoice& note, size_t note_index);

@@ -107,3 +107,6 @@ boost::property_tree::ptree ReverbProgram::save() {
 std::string ReverbProgram::get_plugin_name() {
 	return REVERB_IDENTIFIER;
 }
+
+void ReverbEffect::init() {
+}

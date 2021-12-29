@@ -52,6 +52,7 @@ private:
 public:
 	EqualizerPreset preset;
 
+	void init();
 	EqualizerEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);

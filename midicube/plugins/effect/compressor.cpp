@@ -111,3 +111,6 @@ Menu* CompressorEffect::create_menu() {
 std::string CompressorProgram::get_plugin_name() {
 	return COMPRESSOR_IDENTIFIER;
 }
+
+void CompressorEffect::init() {
+}

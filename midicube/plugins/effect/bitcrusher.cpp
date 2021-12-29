@@ -73,3 +73,6 @@ Menu* BitCrusherEffect::create_menu() {
 std::string BitCrusherProgram::get_plugin_name() {
 	return BIT_CRUSHER_IDENTIFIER;
 }
+
+void BitCrusherEffect::init() {
+}

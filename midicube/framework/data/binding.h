@@ -343,6 +343,7 @@ public:
 			for (BindableValue* value : values) {
 				handler->unbind(value);
 			}
+			handler = nullptr;
 		}
 	}
 

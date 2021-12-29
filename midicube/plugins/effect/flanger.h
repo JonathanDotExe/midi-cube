@@ -48,6 +48,7 @@ private:
 public:
 	FlangerPreset preset;
 
+	void init();
 	FlangerEffect(PluginHost& h, Plugin& p);
 	void process(const SampleInfo& info);
 	void save_program(PluginProgram **prog);

@@ -24,9 +24,13 @@ public:
 	virtual void save_program(PluginProgram **prog);
 	virtual void recieve_midi(const MidiMessage &message, const SampleInfo &info);
 
+
+
 	virtual ~Effect() {
 
 	}
+
+	virtual void cleanup();
 };
 
 template<typename T, typename P>

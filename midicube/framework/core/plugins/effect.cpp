@@ -15,3 +15,7 @@ void Effect::save_program(PluginProgram **prog) {
 
 void Effect::recieve_midi(const MidiMessage &message, const SampleInfo &info) {
 }
+
+void Effect::cleanup() {
+	cc.unbind();
+}
