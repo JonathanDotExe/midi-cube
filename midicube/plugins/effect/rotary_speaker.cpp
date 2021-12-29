@@ -29,9 +29,9 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 
 		//Drive
 		AmplifierSimulationData<0> data;
-		data.post_gain = 1;
+		data.post_gain = 0;
 		data.tone = preset.tone;
-		data.triode = {preset.drive, DistortionType::TANH_DISTORTION, 1, 25, 0.2};
+		data.triode = {preset.drive, DistortionType::TANH_DISTORTION, 1, 25, 0.0};
 		sample = amp.apply(sample, data, info.time_step);
 
 		//Filter

@@ -159,6 +159,7 @@ double AmplifierSimulation<N>::apply(double sample,
 		}
 		sample = triodes[i].apply(sample, data.triode, time_step);
 	}
+	sample /= (1 + data.triode.drive * TUBE_AMP_TRIODE_COUNT);
 
 	//Low-pass
 	FilterData f;
