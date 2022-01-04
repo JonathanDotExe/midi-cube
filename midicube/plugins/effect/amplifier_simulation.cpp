@@ -58,7 +58,7 @@ void AmplifierSimulationProgram::load(boost::property_tree::ptree tree) {
 	preset.mid_gain.load(tree, "mid_gain", 0);
 	preset.high_freq.load(tree, "high_freq", 4000);
 	preset.high_gain.load(tree, "high_gain", 0);
-	preset.lowshelf_boost.load(tree, "lowshelf_boost", 2);
+	preset.lowshelf_boost.load(tree, "lowshelf_boost", 0);
 	preset.lowshelf_cutoff.load(tree, "lowshelf_cutoff", 80);
 }
 

@@ -100,7 +100,7 @@ struct ChannelProgram : public Copyable {
 	}
 
 	bool is_default() {
-		return engine_program.get_program() == nullptr;
+		return engine_program.get_program() == nullptr && redirect.channel == -1 && redirect.redirect_to == -1;
 	}
 };
 
