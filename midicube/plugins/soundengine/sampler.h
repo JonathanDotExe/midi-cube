@@ -33,13 +33,13 @@ struct SamplerCCModulation {
 struct ModulateableProperty {
 	double value = 0;
 	double velocity_amount = 0;
-	std::vector<SamplerCCModulation> cc;
+	std::vector<SamplerCCModulation> cc{};
 
 	inline double apply_modulation(SamplerVoice* voice, Sampler* sampler);
 
 	void load(boost::property_tree::ptree& parent, std::string path, double def) {
 		auto tree = parent.get_child_optional(path);
-		if (tree && (tree.get().get_child_optional("value") || tree.get().get_child_optional("cc_amount") || tree.get().get_child_optional("velocity_amount"))) {
+		if (tree && (tree.get().get_child_optional("value") || tree.get().get_child_optional("cc") || tree.get().get_child_optional("velocity_amount"))) {
 			load(tree.get(), def);
 		}
 		else {
@@ -49,16 +49,22 @@ struct ModulateableProperty {
 
 	void load(boost::property_tree::ptree& tree, double def) {
 		value = tree.get("value", def);
-		cc = tree.get("cc", cc);
-		cc_amount = tree.get("cc_amount", cc_amount);
-		cc_multiplier = tree.get("cc_multiplier", cc_multiplier);
 		velocity_amount = tree.get("velocity_amount", velocity_amount);
+		if (tree.get_child_optional("cc")) {
+			for (auto& cc : tree.get_child("cc")) {
+				SamplerCCModulation mod;
+				mod.cc = cc.second.get("cc", 128);
+				mod.amount = cc.second.get("amount", 0.0);
+				mod.multiply = cc.second.get("multiply", false);
+				this->cc.push_back(mod);
+			}
+		}
 	}
 
 };
 
 struct ModulatableADSREnvelopeData {
-	ModulateableProperty attack{0.001};
+	ModulateableProperty attack{0.0};
 	ModulateableProperty decay{0};
 	ModulateableProperty sustain{1};
 	ModulateableProperty release{0.001};
@@ -133,7 +139,7 @@ struct SampleFilter {
 };
 
 struct SampleEnvelope {
-	ModulatableADSREnvelopeData env = {0, 0, 1, 0.001, LINEAR_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR, EXPONENTIAL_ADSR};
+	ModulatableADSREnvelopeData env;
 	ModulateableProperty velocity_amount{1.0};
 	bool sustain_entire_sample = false;
 };
