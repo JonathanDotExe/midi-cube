@@ -27,10 +27,10 @@ void EqualizerEffect::process(const SampleInfo& info) {
 	if (preset.on) {
 		//Filters
 		NBandEqualizerData<EQ_4_BANDS> bands = {{
-				EqualizerBand{preset.low_freq, preset.low_gain, FilterType::LP_24},
+				EqualizerBand{preset.low_freq, preset.low_gain, FilterType::LP_6},
 				EqualizerBand{preset.low_mid_freq, preset.low_mid_gain, FilterType::BP_12},
 				EqualizerBand{preset.mid_freq, preset.mid_gain, FilterType::BP_12},
-				EqualizerBand{preset.high_freq, preset.high_gain, FilterType::HP_24}
+				EqualizerBand{preset.high_freq, preset.high_gain, FilterType::HP_6}
 			}};
 
 		outputs[0] = leq.apply(outputs[0], bands, info.time_step);

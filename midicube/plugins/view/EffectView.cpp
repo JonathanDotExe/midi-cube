@@ -196,23 +196,6 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_x += 200;
 		}
 
-		//High Gain
-		{
-			Label *label = new Label("High Gain", main_font, 18, tmp_x, tmp_y);
-			label->text.setFillColor(sf::Color::White);
-			controls.push_back(label);
-			tmp_y += 25;
-
-			DragBox<double> *value = new DragBox<double>(0, -1, 5, main_font, 24,
-					tmp_x, tmp_y, 180, 120);
-			value->border = 0;
-			value->property.bind(amp->preset.high_gain, handler);
-			controls.push_back(value);
-
-			tmp_y -= 25;
-			tmp_x += 200;
-		}
-
 		//Lowshelf Boost
 		{
 			Label *label = new Label("Lowshelf Boost", main_font, 18, tmp_x, tmp_y);
@@ -1904,7 +1887,7 @@ Scene EffectView::create(ViewHost &frame) {
 		tmp_x -= 200 * 3;
 		//Attack
 		{
-			Label *label = new Label("Mid Gain", main_font, 18, tmp_x, tmp_y);
+			Label *label = new Label("Attack", main_font, 18, tmp_x, tmp_y);
 			label->text.setFillColor(sf::Color::White);
 			controls.push_back(label);
 			tmp_y += 25;

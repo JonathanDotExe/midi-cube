@@ -16,11 +16,11 @@
 
 struct CompressorPreset {
 	BindableBooleanValue on = true;
-	BindableTemplateValue<double> threshold{-20, -50, 0};
+	BindableTemplateValue<double> threshold{-12, -50, 0};
 	BindableTemplateValue<double> ratio{4, 1, 15};
-	BindableTemplateValue<double> attack{0.1, 0, 1};
+	BindableTemplateValue<double> attack{0.02, 0, 1};
 	BindableTemplateValue<double> release{0.1, 0, 1};
-	BindableTemplateValue<double> makeup_gain{1, 0, 5};
+	BindableTemplateValue<double> makeup_gain{3, 0, 5};
 };
 
 
