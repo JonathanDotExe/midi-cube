@@ -24,12 +24,16 @@ namespace pt = boost::property_tree;
 class Sampler;
 struct SamplerVoice;
 
+struct SamplerCCModulation {
+	unsigned int cc = 0;
+	double amount = 0;
+	bool multiply = false;
+};
+
 struct ModulateableProperty {
 	double value = 0;
-	unsigned int cc = 0;
-	double cc_amount = 0;
-	double cc_multiplier = 1;
 	double velocity_amount = 0;
+	std::vector<SamplerCCModulation> cc;
 
 	inline double apply_modulation(SamplerVoice* voice, Sampler* sampler);
 
@@ -334,10 +338,15 @@ inline double ModulateableProperty::apply_modulation(SamplerVoice *voice,
 		Sampler *sampler) {
 	double val = value;
 	val += voice->velocity * velocity_amount;
-	double cc_val = sampler->get_cc_value(cc, voice);
-	val += cc_val * cc_amount;
-	if (cc_multiplier != 1) {
-		val *= (1 - cc_val) + cc_val * cc_multiplier;
+	for (SamplerCCModulation& mod : cc) {
+		double cc_val = sampler->get_cc_value(mod.cc, voice);
+
+		if (mod.multiply) {
+			val *= (1 - cc_val) + cc_val * mod.amount;
+		}
+		else {
+			val += cc_val * mod.amount;
+		}
 	}
 	return val;
 }
