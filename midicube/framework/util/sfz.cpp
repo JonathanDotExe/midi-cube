@@ -248,10 +248,6 @@ static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::s
 		control.put("cc", cc);
 		control.put("amount", mod_converter(opcode.second));
 		control.put("multiply", cc_multiplier);
-		//Amplitude FIXME
-		if (converted_name == "amplitude" && !tree.get_child_optional(converted_name + ".value")) {
-			tree.put(converted_name + ".value", 0.0);
-		}
 		tree.add_child(converted_name + ".cc.control", control);
 		return true;
 	}
@@ -363,7 +359,7 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			else if (parse_modulatable(opcode, "volume", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "gain", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "group_volume", "volume", tree, "", db_conv, db_conv, true)) {
 
 			}
-			else if (parse_modulatable(opcode, "amplitude", "amplitude", tree, "", percent_conv, percent_conv)) {
+			else if (parse_modulatable(opcode, "amplitude", "amplitude", tree, "", percent_conv, percent_conv, true)) {
 
 			}
 			else if (parse_modulatable(opcode, "pan", "pan", tree, "", percent_conv, percent_conv)) {
