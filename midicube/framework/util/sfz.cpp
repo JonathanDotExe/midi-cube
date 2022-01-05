@@ -253,7 +253,7 @@ static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::s
 		tree.add_child(converted_name + ".cc.control", control);
 		return true;
 	}
-	else if (opcode.first == vel_name) {
+	else if (vel_name != "" && opcode.first == vel_name) {
 		tree.put(converted_name + ".velocity_amount", mod_converter(opcode.second));
 		return true;
 	}
@@ -293,6 +293,9 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 
 			}
 			else if (parse_modulatable(opcode, "ampeg_release", "envelope.release", tree, "ampeg_vel2release")) {
+
+			}
+			else if (parse_modulatable(opcode, "tune", "pitch", tree, "", percent_conv, percent_conv) || parse_modulatable(opcode, "pitch", "pitch", tree, "", percent_conv, percent_conv)) {
 
 			}
 			else if (opcode.first == "sw_last") {
@@ -359,6 +362,9 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 
 			}
 			else if (parse_modulatable(opcode, "amplitude", "amplitude", tree, "", percent_conv, percent_conv)) {
+
+			}
+			else if (parse_modulatable(opcode, "pan", "pan", tree, "", percent_conv, percent_conv)) {
 
 			}
 			else if (opcode.first == "pitch_keytrack") {
