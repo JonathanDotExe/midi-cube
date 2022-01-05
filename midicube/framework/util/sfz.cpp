@@ -241,18 +241,16 @@ static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::s
 		return true;
 	}
 	else if (opcode.first.rfind(name + "_oncc", 0) == 0) {
+		pt::ptree control;
 		int cc = std::stoi(opcode.first.substr(name.size() + std::string("_oncc").size()));
-		tree.put(converted_name + ".cc", cc);
-		if (cc_multiplier) {
-			tree.put(converted_name + ".cc_multiplier", mod_converter(opcode.second));
-		}
-		else {
-			tree.put(converted_name + ".cc_amount", mod_converter(opcode.second));
-		}
+		control.put("cc", cc);
+		control.put("amount", mod_converter(opcode.second));
+		control.put("multiply", cc_multiplier);
 		//Amplitude FIXME
 		if (converted_name == "amplitude" && !tree.get_child_optional(converted_name + ".value")) {
 			tree.put(converted_name + ".value", 0.0);
 		}
+		tree.add_child(converted_name + ".cc.control", control);
 		return true;
 	}
 	else if (opcode.first == vel_name) {
