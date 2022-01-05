@@ -159,6 +159,7 @@ struct SampleRegion {
 	unsigned int max_note = 127;
 	std::unordered_map<unsigned int, ControlTrigger> control_triggers;
 	double note = 60;
+	ModulateableProperty pitch{0};
 	ModulateableProperty volume{1};
 	ModulateableProperty amplitude{1};
 	ModulateableProperty pan{0.0};

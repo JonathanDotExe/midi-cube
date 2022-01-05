@@ -178,7 +178,7 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
-			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack);
+			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack + note.region->pitch.apply_modulation(&note, this));
 			note.time += freq/note_to_freq(note.region->note) * host_environment.pitch_bend * info.time_step;
 			lsample += l * vol;
 			rsample += r * vol;
@@ -390,9 +390,8 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 		region.filter.filter_type = FilterType::BP_12;
 	}
 
-	if (tree.get_child_optional("note")) {
-		region.note = tree.get<double>("note", 60);
-	}
+	region.note = tree.get<double>("note", 60.0);
+	region.pitch.load(tree, "pitch", region.pitch.value);
 	region.min_note = tree.get<unsigned int>("min_note", region.min_note);
 	region.max_note = tree.get<unsigned int>("max_note", region.max_note);
 	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity);
