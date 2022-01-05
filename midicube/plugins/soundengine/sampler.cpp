@@ -106,12 +106,14 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
 	double lsample = 0;
 	double rsample = 0;
+	double pan = 0;
 	if (note.region && note.sample) {
 		double vol = note.region->amplitude.apply_modulation(&note, this);
 		double vel_amount = 0;
 
 		double l = 0;
 		double r = 0;
+		pan = note.region->pan.apply_modulation(&note, this);
 		double crossfade = 1;
 		//Sound
 		//Loop
@@ -188,8 +190,8 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 	}
 
 	//Playback
-	outputs[0] += lsample;
-	outputs[1] += rsample;
+	outputs[0] += lsample * (1 - fmax(0, pan));
+	outputs[1] += rsample * (1 - fmax(0, -pan));
 }
 
 bool Sampler::note_finished(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
@@ -408,6 +410,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 
 	region.volume.load(tree, "volume", region.volume.value);
 	region.amplitude.load(tree, "amplitude", region.amplitude.value);
+	region.pan.load(tree, "pan", region.pan.value);
 
 	std::string trigger = tree.get<std::string>("trigger", "");
 	if (trigger == "attack") {

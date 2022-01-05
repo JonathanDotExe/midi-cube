@@ -161,6 +161,7 @@ struct SampleRegion {
 	double note = 60;
 	ModulateableProperty volume{1};
 	ModulateableProperty amplitude{1};
+	ModulateableProperty pan{0.0};
 	double pitch_keytrack = 1;
 	double release_decay = 1;
 	unsigned int min_preset = 0;
