@@ -113,10 +113,10 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 			//Define
 			if (t.size() >= 3 && t[0] == "#define") {
 				defines[t[1]] = t[2];
+				std::cout << "Applying define " << t[1] << " " << t[2] << std::endl;
 			}
 			//Include
 			else if (t.size() >= 2 && t[0] == "#include") {
-				std::cout << "Including \"" << line << "\"" << std::endl;
 				std::string file = t[1];
 				for (size_t j = 2; j < t.size(); ++j) {
 					file += " " + t[j];
@@ -132,8 +132,10 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 				if (f.fail()) {
 					std::cout << strerror(errno) << std::endl;
 				}
+				size_t line_count = 1;
 				while (getline(f, t)) {
-					lines.insert(lines.begin() + i + 1, t);
+					lines.insert(lines.begin() + i + line_count, t);
+					++line_count;
 				}
 			}
 			else {
