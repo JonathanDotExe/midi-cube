@@ -103,8 +103,8 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 	return (block - 1) % block_count;
 }
 
-inline double velocity_amp_scale(double x) {
-	return x * x;
+inline double velocity_amp_scale(double x, double amt) {
+	return pow(x, amt * 4);
 }
 
 void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
@@ -176,7 +176,7 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 			vol *= note.env.amplitude(data, info.time_step, note.pressed, host_environment.sustain);
 		}
 		vel_amount = note.region->env.velocity_amount.apply_modulation(&note, this); //TODO introduce curves
-		double vel = velocity_amp_scale((1 - vel_amount) + note.velocity * vel_amount);
+		double vel = velocity_amp_scale(note.velocity, vel_amount);
 		vol *= vel;
 		vol *= note.layer_amp  * note.region->volume.apply_modulation(&note, this);
 
