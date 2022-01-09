@@ -103,15 +103,21 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 	return (block - 1) % block_count;
 }
 
+inline double velocity_amp_scale(double x, double amt) {
+	return pow(x, amt * 4);
+}
+
 void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
 	double lsample = 0;
 	double rsample = 0;
+	double pan = 0;
 	if (note.region && note.sample) {
 		double vol = note.region->amplitude.apply_modulation(&note, this);
 		double vel_amount = 0;
 
 		double l = 0;
 		double r = 0;
+		pan = note.region->pan.apply_modulation(&note, this);
 		double crossfade = 1;
 		//Sound
 		//Loop
@@ -169,14 +175,14 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 			ADSREnvelopeData data = note.region->env.env.apply(&note, this);
 			vol *= note.env.amplitude(data, info.time_step, note.pressed, host_environment.sustain);
 		}
-		vel_amount = note.region->env.velocity_amount.apply_modulation(&note, this);
-
-		vol *= (1 - vel_amount) + note.velocity * vel_amount;
+		vel_amount = note.region->env.velocity_amount.apply_modulation(&note, this); //TODO introduce curves
+		double vel = velocity_amp_scale(note.velocity, vel_amount);
+		vol *= vel;
 		vol *= note.layer_amp  * note.region->volume.apply_modulation(&note, this);
 
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
-			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack);
+			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack + note.region->pitch.apply_modulation(&note, this));
 			note.time += freq/note_to_freq(note.region->note) * host_environment.pitch_bend * info.time_step;
 			lsample += l * vol;
 			rsample += r * vol;
@@ -188,8 +194,8 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 	}
 
 	//Playback
-	outputs[0] += lsample;
-	outputs[1] += rsample;
+	outputs[0] += lsample * (1 - fmax(0, pan));
+	outputs[1] += rsample * (1 - fmax(0, -pan));
 }
 
 bool Sampler::note_finished(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
@@ -388,9 +394,8 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 		region.filter.filter_type = FilterType::BP_12;
 	}
 
-	if (tree.get_child_optional("note")) {
-		region.note = tree.get<double>("note", 60);
-	}
+	region.note = tree.get<double>("note", 60.0);
+	region.pitch.load(tree, "pitch", region.pitch.value);
 	region.min_note = tree.get<unsigned int>("min_note", region.min_note);
 	region.max_note = tree.get<unsigned int>("max_note", region.max_note);
 	region.min_velocity = tree.get<unsigned int>("min_velocity", region.min_velocity);
@@ -408,6 +413,7 @@ void load_region(pt::ptree tree, SampleRegion& region, bool load_sample, std::st
 
 	region.volume.load(tree, "volume", region.volume.value);
 	region.amplitude.load(tree, "amplitude", region.amplitude.value);
+	region.pan.load(tree, "pan", region.pan.value);
 
 	std::string trigger = tree.get<std::string>("trigger", "");
 	if (trigger == "attack") {

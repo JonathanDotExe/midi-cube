@@ -113,10 +113,10 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 			//Define
 			if (t.size() >= 3 && t[0] == "#define") {
 				defines[t[1]] = t[2];
+				std::cout << "Applying define " << t[1] << " " << t[2] << std::endl;
 			}
 			//Include
 			else if (t.size() >= 2 && t[0] == "#include") {
-				std::cout << "Including \"" << line << "\"" << std::endl;
 				std::string file = t[1];
 				for (size_t j = 2; j < t.size(); ++j) {
 					file += " " + t[j];
@@ -132,8 +132,10 @@ SfzInstrument SfzParser::parse(std::vector<std::string> lines, std::string path)
 				if (f.fail()) {
 					std::cout << strerror(errno) << std::endl;
 				}
+				size_t line_count = 1;
 				while (getline(f, t)) {
-					lines.insert(lines.begin() + i + 1, t);
+					lines.insert(lines.begin() + i + line_count, t);
+					++line_count;
 				}
 			}
 			else {
@@ -241,21 +243,15 @@ static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::s
 		return true;
 	}
 	else if (opcode.first.rfind(name + "_oncc", 0) == 0) {
+		pt::ptree control;
 		int cc = std::stoi(opcode.first.substr(name.size() + std::string("_oncc").size()));
-		tree.put(converted_name + ".cc", cc);
-		if (cc_multiplier) {
-			tree.put(converted_name + ".cc_multiplier", mod_converter(opcode.second));
-		}
-		else {
-			tree.put(converted_name + ".cc_amount", mod_converter(opcode.second));
-		}
-		//Amplitude FIXME
-		if (converted_name == "amplitude" && !tree.get_child_optional(converted_name + ".value")) {
-			tree.put(converted_name + ".value", 0.0);
-		}
+		control.put("cc", cc);
+		control.put("amount", mod_converter(opcode.second));
+		control.put("multiply", cc_multiplier);
+		tree.add_child(converted_name + ".cc.control", control);
 		return true;
 	}
-	else if (opcode.first == vel_name) {
+	else if (vel_name != "" && opcode.first == vel_name) {
 		tree.put(converted_name + ".velocity_amount", mod_converter(opcode.second));
 		return true;
 	}
@@ -295,6 +291,9 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 
 			}
 			else if (parse_modulatable(opcode, "ampeg_release", "envelope.release", tree, "ampeg_vel2release")) {
+
+			}
+			else if (parse_modulatable(opcode, "tune", "pitch", tree, "", percent_conv, percent_conv) || parse_modulatable(opcode, "pitch", "pitch", tree, "", percent_conv, percent_conv)) {
 
 			}
 			else if (opcode.first == "sw_last") {
@@ -360,7 +359,10 @@ static void parse_opcodes(std::unordered_map<std::string, std::string> opcodes, 
 			else if (parse_modulatable(opcode, "volume", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "gain", "volume", tree, "", db_conv, db_conv, true) || parse_modulatable(opcode, "group_volume", "volume", tree, "", db_conv, db_conv, true)) {
 
 			}
-			else if (parse_modulatable(opcode, "amplitude", "amplitude", tree, "", percent_conv, percent_conv)) {
+			else if (parse_modulatable(opcode, "amplitude", "amplitude", tree, "", percent_conv, percent_conv, true)) {
+
+			}
+			else if (parse_modulatable(opcode, "pan", "pan", tree, "", percent_conv, percent_conv)) {
 
 			}
 			else if (opcode.first == "pitch_keytrack") {
