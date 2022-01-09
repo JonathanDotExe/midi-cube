@@ -54,7 +54,7 @@ inline void SoundEngineChannel::process_sample(double& lsample, double& rsample,
 		for (size_t i = 0; i < CHANNEL_SEQUENCER_AMOUNT; ++i) {
 			PluginInstance* seq = sequencers[i].get_plugin();
 			if (seq) {
-				//seq->take_inputs(nullptr, 0);
+				seq->take_inputs(nullptr, 0);
 				seq->process(info);
 				//seq->playback_outputs_stereo(lsample, rsample); TODO
 			}

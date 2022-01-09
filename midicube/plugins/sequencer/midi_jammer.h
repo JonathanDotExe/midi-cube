@@ -12,8 +12,40 @@
 
 #define MIDI_JAMMER_IDENTIFIER "midicube_midi_jammer"
 
-class MidiJammer : public PluginInstance {
+
+enum MidiJammerAction {
+	MIDI_JAMMER_NONE, MIDI_JAMMER_PLAY_NEXT, MIDI_JAMMER_STOP_NEXT
+};
+
+struct MidiJammerMessage {
+	MidiMessage msg;
+	double time = 0;
+};
+
+class MidiJammerBeat {
+	std::vector<MidiJammerMessage> messages;
+};
+
+class MidiJammerChannel {
+private:
+	bool play = false;
+	unsigned int bars = 0;
+	std::vector<MidiJammerBeat> beats;
+
 public:
+	MidiJammerAction action = MIDI_JAMMER_NONE;
+
+	unsigned int quantize_step = 16;
+	double quantize = 0.0;
+};
+
+class MidiJammer : public PluginInstance {
+private:
+	int beats_per_bar = 4;
+
+public:
+	std::array<MidiJammerChannel, SOUND_ENGINE_MIDI_CHANNELS> channels;
+
 	MidiJammer(PluginHost& h, Plugin& p) : PluginInstance(h, p) {
 
 	}
