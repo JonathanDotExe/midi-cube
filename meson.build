@@ -58,6 +58,7 @@ src = [
 	'midicube/plugins/soundengine/sampler.cpp',
 	'midicube/plugins/sequencer/arpeggiator.cpp',
 	'midicube/plugins/sequencer/note_tester.cpp',
+	'midicube/plugins/sequencer/midi_jammer.cpp',
 	
 	'midicube/plugins/resources.cpp',
 	'midicube/workstation/view/MasterEffectView.cpp',

@@ -30,6 +30,7 @@
 
 #include "../plugins/sequencer/arpeggiator.h"
 #include "../plugins/sequencer/note_tester.h"
+#include "../plugins/sequencer/midi_jammer.h"
 
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/filesystem.hpp>
@@ -71,6 +72,7 @@ void MidiCubeWorkstation::init() {
 	plugin_mgr.add_plugin(new LooperPlugin());
 	//Sequencers
 	plugin_mgr.add_plugin(new ArpeggiatorPlugin());
+	plugin_mgr.add_plugin(new MidiJammerPlugin());
 	plugin_mgr.add_plugin(new NoteTesterPlugin());
 	//Load config
 	try {
