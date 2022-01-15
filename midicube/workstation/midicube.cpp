@@ -153,34 +153,15 @@ std::vector<MidiCubeInput> MidiCubeWorkstation::get_inputs() {
 
 inline void MidiCubeWorkstation::process_midi(MidiMessage& message, size_t input) {
 	SampleInfo info = audio_handler.sample_info();
-	size_t s = std::min((size_t) SOUND_ENGINE_MIDI_CHANNELS, used_sources);
-	//Sources
-	for (size_t i = 0; i < s; ++i) {
-		MidiSource& source = sources[i];
-		if (source.device >= 0 && static_cast<unsigned int>(source.device) == input && (source.channel < 0 || static_cast<unsigned int>(source.channel) == message.channel)) {
-			//Filter
-			bool pass = true;
-			switch (message.type) {
-			case CONTROL_CHANGE:
-				pass = source.transfer_cc;
-				if (pass && view) {
-					pass = !view->on_cc(message.control(), message.value()/127.0);
-				}
-				break;
-			case PROGRAM_CHANGE:
-				pass = source.transfer_prog_change;
-				break;
-			case PITCH_BEND:
-				pass = source.transfer_pitch_bend;
-				break;
-			default:
-				break;
-			}
-			//Send
-			if (pass) {
-				engine.send(message, i, source, info);
-			}
-		}
+	//Control
+	bool pass = true;
+	//View cc
+	if (view && message.type == CONTROL_CHANGE && match_source(message, input, control_source)) {
+		pass = !view->on_cc(message.control(), message.value()/127.0);
+	}
+	//Send
+	if (pass) {
+		engine.send(message, input, info);
 	}
 }
 

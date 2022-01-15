@@ -328,7 +328,7 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, double*
 	rsample *= volume;
 }
 
-void SoundEngineDevice::send(MidiMessage &message, size_t input, MidiSource& source, SampleInfo& info) {
+void SoundEngineDevice::send(const MidiMessage &message, size_t input, const SampleInfo& info) {
 	//Global values
 	switch (message.type) {
 	case MessageType::MONOPHONIC_AFTERTOUCH:

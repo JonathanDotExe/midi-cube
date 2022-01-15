@@ -265,10 +265,6 @@ struct Program : public Copyable {
 struct MidiSource {
 	ssize_t device = 1;
 	int channel = 0;
-	bool transfer_cc = true;
-	bool transfer_pitch_bend = true;
-	bool transfer_prog_change = true;
-	bool clock_in = false;
 };
 
 class SoundEngineDevice;
@@ -331,7 +327,7 @@ public:
 
 	void init(MidiCubeWorkstation* cube);
 
-	void send(MidiMessage& message, size_t input, MidiSource& source, SampleInfo& info);
+	void send(const MidiMessage& message, size_t input, const SampleInfo& info);
 
 	void process_sample(double& lsample, double& rsample, double* inputs, const size_t input_count, const SampleInfo& info);
 

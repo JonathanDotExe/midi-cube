@@ -58,7 +58,8 @@ private:
 	inline void process_midi(MidiMessage& message, size_t input);
 public:
 	std::array<MidiSource, SOUND_ENGINE_MIDI_CHANNELS> sources;
-	size_t used_sources = 1;
+	ssize_t control_source = -1;
+	ssize_t clock_source = -1;
 
 	ProgramManager prog_mgr;
 	SoundEngineDevice engine;
@@ -84,7 +85,15 @@ public:
 	void init();
 	inline void process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info);
 	std::vector<MidiCubeInput> get_inputs();
-
+	inline bool match_source(const MidiMessage& msg, size_t input, ssize_t src) {
+		if (src >= 0 && static_cast<size_t>(src) < SOUND_ENGINE_MIDI_CHANNELS) {
+			MidiSource& source = sources[input];
+			return source.device == input && (source.channel < 0 || source.channel == msg.channel);
+		}
+		else {
+			return true;
+		}
+	}
 
 	~MidiCubeWorkstation();
 };
