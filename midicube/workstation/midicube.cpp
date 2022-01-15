@@ -120,10 +120,12 @@ void MidiCubeWorkstation::init() {
 	}
 	srand(time(NULL));
 	//Sources
-	used_sources = std::min(config.default_sources.size(), (size_t) SOUND_ENGINE_MIDI_CHANNELS);
+	size_t used_sources = std::min(config.default_sources.size(), (size_t) SOUND_ENGINE_MIDI_CHANNELS);
 	for (size_t i = 0; i < used_sources; ++i) {
 		sources[i] = config.default_sources[i];
 	}
+	control_source = config.control_source;
+	clock_source = config.clock_source;
 	//Init audio
 	audio_handler.init(config.driver, config.sample_rate, config.buffer_size, config.output_device, config.input_device, config.input_channels);
 }
@@ -252,6 +254,8 @@ void MidiCubeConfig::load(pt::ptree tree) {
 	output_device = tree.get("output_device", output_device);
 	input_device = tree.get("input_device", input_device);
 	screen_sleep = tree.get("screen_sleep", screen_sleep);
+	control_source = tree.get("control_source", control_source);
+	clock_source = tree.get("clock_source", clock_source);
 
 	//Sources
 	if (tree.get_child_optional("default_sources")) {
@@ -260,10 +264,6 @@ void MidiCubeConfig::load(pt::ptree tree) {
 			MidiSource source;
 			source.device = s.second.get("device", source.device);
 			source.channel = s.second.get("channel", source.channel);
-			source.transfer_cc = s.second.get("transfer_cc", source.transfer_cc);
-			source.transfer_pitch_bend = s.second.get("transfer_pitch_bend", source.transfer_pitch_bend);
-			source.transfer_prog_change = s.second.get("transfer_prog_change", source.transfer_prog_change);
-			source.clock_in = s.second.get("clock_in", source.clock_in);
 			default_sources.push_back(source);
 		}
 	}
@@ -315,15 +315,13 @@ pt::ptree MidiCubeConfig::save() {
 	tree.put("output_device", output_device);
 	tree.put("input_device", input_device);
 	tree.put("screen_sleep", screen_sleep);
+	tree.put("control_source", control_source);
+	tree.put("clock_source", clock_source);
 	//Sources
 	for (MidiSource source : default_sources) {
 		pt::ptree s;
 		s.put("device", source.device);
 		s.put("channel", source.channel);
-		s.put("transfer_cc", source.transfer_cc);
-		s.put("transfer_pitch_bend", source.transfer_pitch_bend);
-		s.put("transfer_prog_change", source.transfer_prog_change);
-		s.put("clock_in", source.clock_in);
 		tree.add_child("default_sources.source", s);
 	}
 	//Controls

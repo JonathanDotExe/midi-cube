@@ -244,48 +244,6 @@ Scene SoundEngineChannelView::create(ViewHost &frame) {
 	Label* midi_filter = new Label("MIDI-Filter", main_font, 24, 630, 10);
 	controls.push_back(midi_filter);
 	tmp_y += 30;
-	//CC
-	{
-		tmp_y += 5;
-		CheckBox* cc = new CheckBox(true, "CC", main_font, 18, 630, tmp_y, 40, 40);
-		cc->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_cc, &channel), std::bind(&SoundEngineChannel::set_transfer_cc, &channel, std::placeholders::_1), handler);
-		tmp_y += 40;
-		controls.push_back(cc);
-	}
-	//Pitch
-	{
-		tmp_y += 20;
-		CheckBox* pitch = new CheckBox(true, "Bender", main_font, 18, 630, tmp_y, 40, 40);
-		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_pitch_bend, &channel), std::bind(&SoundEngineChannel::set_transfer_pitch_bend, &channel, std::placeholders::_1), handler);
-		tmp_y += 40;
-		controls.push_back(pitch);
-	}
-	//Prog
-	{
-		tmp_y += 20;
-		CheckBox* pitch = new CheckBox(true, "Prog", main_font, 18, 630, tmp_y, 40, 40);
-		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_prog_change, &channel), std::bind(&SoundEngineChannel::set_transfer_prog_change, &channel, std::placeholders::_1), handler);
-		tmp_y += 40;
-		controls.push_back(pitch);
-	}
-	tmp_y = 45;
-
-	//Aftertouch
-	{
-		tmp_y += 5;
-		CheckBox* cc = new CheckBox(true, "Aftertouch", main_font, 18, 790, tmp_y, 40, 40);
-		cc->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_channel_aftertouch, &channel), std::bind(&SoundEngineChannel::set_transfer_channel_aftertouch, &channel, std::placeholders::_1), handler);
-		tmp_y += 40;
-		controls.push_back(cc);
-	}
-	//Other
-	{
-		tmp_y += 20;
-		CheckBox* pitch = new CheckBox(true, "Other", main_font, 18, 790, tmp_y, 40, 40);
-		pitch->property.bind_function<bool>(std::bind(&SoundEngineChannel::is_transfer_other, &channel), std::bind(&SoundEngineChannel::set_transfer_other, &channel, std::placeholders::_1), handler);
-		tmp_y += 40;
-		controls.push_back(pitch);
-	}
 
 	//Sustain
 	{

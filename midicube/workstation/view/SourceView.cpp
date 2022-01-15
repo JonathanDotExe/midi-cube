@@ -60,43 +60,25 @@ Scene SourceView::create(ViewHost &frame) {
 			controls.push_back(label);
 		}
 		y += 40;
-		//CC
-		{
-			CheckBox* value = new CheckBox(true, "CC", main_font, 12, x + 5, y, 30, 30);
-			value->property.bind(source.transfer_cc, handler);
-			controls.push_back(value);
-		}
-		y += 40;
-		//Pitch Bend
-		{
-			CheckBox* value = new CheckBox(true, "Pitch Bend", main_font, 12, x + 5, y, 30, 30);
-			value->property.bind(source.transfer_pitch_bend, handler);
-			controls.push_back(value);
-		}
-		y += 40;
-		//Program
-		{
-			CheckBox* value = new CheckBox(true, "Program", main_font, 12, x + 5, y, 30, 30);
-			value->property.bind(source.transfer_prog_change, handler);
-			controls.push_back(value);
-		}
-		y += 40;
-		//Clock
-		{
-			CheckBox* value = new CheckBox(true, "Clock In", main_font, 12, x + 5, y, 30, 30);
-			value->property.bind(source.clock_in, handler);
-			controls.push_back(value);
-		}
-		y += 40;
 	}
 
-	//Used Sources
+	//Control Source
 	{
 		DragBox<int>* value = new DragBox<int>(0, 0, SOUND_ENGINE_MIDI_CHANNELS, main_font, 18, 5, frame.get_height() - 45, 60, 40);
-		value->property.bind(cube.used_sources, handler);
+		value->property.bind(cube.control_source, handler);
 		controls.push_back(value);
 
-		Label* label = new Label("Sources", main_font, 18, 70, frame.get_height() - 37);
+		Label* label = new Label("Control Source", main_font, 18, 70, frame.get_height() - 37);
+		controls.push_back(label);
+	}
+
+	//Clock Source
+	{
+		DragBox<int>* value = new DragBox<int>(0, 0, SOUND_ENGINE_MIDI_CHANNELS, main_font, 18, 200, frame.get_height() - 45, 60, 40);
+		value->property.bind(cube.clock_source, handler);
+		controls.push_back(value);
+
+		Label* label = new Label("Clock Source", main_font, 18, 265, frame.get_height() - 37);
 		controls.push_back(label);
 	}
 

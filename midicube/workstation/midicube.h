@@ -40,6 +40,8 @@ struct MidiCubeConfig {
 	ssize_t input_device = 0;
 	bool screen_sleep = false;
 	std::vector<MidiSource> default_sources = {{}};
+	ssize_t control_source = -1;
+	ssize_t clock_source = -1;
 	MidiControls controls;
 
 	void load(pt::ptree tree);
@@ -88,7 +90,7 @@ public:
 	inline bool match_source(unsigned int channel, size_t input, ssize_t src) {
 		if (src >= 0 && static_cast<size_t>(src) < SOUND_ENGINE_MIDI_CHANNELS) {
 			MidiSource& source = sources[input];
-			return source.device == input && (source.channel < 0 || source.channel == channel);
+			return source.device == input && (source.channel < 0 || static_cast<unsigned int>(source.channel) == channel);
 		}
 		else {
 			return true;

@@ -90,11 +90,6 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 						program->channels[i].scenes[j].source.start_velocity = s.second.get<unsigned int>("source.start_velocity", 0);
 						program->channels[i].scenes[j].source.end_velocity = s.second.get<unsigned int>("source.end_velocity", 127);
 						program->channels[i].scenes[j].source.octave = s.second.get<int>("source.octave", 0);
-						program->channels[i].scenes[j].source.transfer_channel_aftertouch = s.second.get<bool>("source.transfer_channel_aftertouch", true);
-						program->channels[i].scenes[j].source.transfer_pitch_bend = s.second.get<bool>("source.transfer_pitch_bend", true);
-						program->channels[i].scenes[j].source.transfer_cc = s.second.get<bool>("source.transfer_cc", true);
-						program->channels[i].scenes[j].source.transfer_prog_change = s.second.get<bool>("source.transfer_prog_change", true);
-						program->channels[i].scenes[j].source.transfer_other = s.second.get<bool>("source.transfer_other", true);
 						program->channels[i].scenes[j].source.update_channel = s.second.get<int>("source.update_channel", 0);
 
 						++j;
@@ -190,11 +185,6 @@ void save_program(Program* program, pt::ptree& tree) {
 					s.put("source.start_velocity", program->channels[i].scenes[j].source.start_velocity);
 					s.put("source.end_velocity", program->channels[i].scenes[j].source.end_velocity);
 					s.put("source.octave", program->channels[i].scenes[j].source.octave);
-					s.put("source.transfer_channel_aftertouch", program->channels[i].scenes[j].source.transfer_channel_aftertouch);
-					s.put("source.transfer_pitch_bend", program->channels[i].scenes[j].source.transfer_pitch_bend);
-					s.put("source.transfer_cc", program->channels[i].scenes[j].source.transfer_cc);
-					s.put("source.transfer_prog_change", program->channels[i].scenes[j].source.transfer_prog_change);
-					s.put("source.transfer_other", program->channels[i].scenes[j].source.transfer_other);
 					s.put("source.update_channel", program->channels[i].scenes[j].source.update_channel);
 				}
 
