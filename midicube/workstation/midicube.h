@@ -85,10 +85,10 @@ public:
 	void init();
 	inline void process(double& lsample, double& rsample, double* inputs, const size_t input_count, SampleInfo& info);
 	std::vector<MidiCubeInput> get_inputs();
-	inline bool match_source(const MidiMessage& msg, size_t input, ssize_t src) {
+	inline bool match_source(unsigned int channel, size_t input, ssize_t src) {
 		if (src >= 0 && static_cast<size_t>(src) < SOUND_ENGINE_MIDI_CHANNELS) {
 			MidiSource& source = sources[input];
-			return source.device == input && (source.channel < 0 || source.channel == msg.channel);
+			return source.device == input && (source.channel < 0 || source.channel == channel);
 		}
 		else {
 			return true;

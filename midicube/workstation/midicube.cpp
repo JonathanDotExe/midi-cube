@@ -155,10 +155,37 @@ inline void MidiCubeWorkstation::process_midi(MidiMessage& message, size_t input
 	SampleInfo info = audio_handler.sample_info();
 	//Control
 	bool pass = true;
-	//View cc
-	if (view && message.type == CONTROL_CHANGE && match_source(message, input, control_source)) {
-		pass = !view->on_cc(message.control(), message.value()/127.0);
+	switch(message.type) {
+	case CONTROL_CHANGE:
+		if (match_source(message.channel, input, control_source)) {
+			//View cc
+			if (view) {
+				pass = !view->on_cc(message.control(), message.value()/127.0);
+			}
+			if (pass) {
+				//Update scene
+				for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
+					if (config.controls.scene_buttons[i] == message.control()) {
+						engine.scene = i;
+						notify_property_update(&engine, &engine.scene);
+					}
+				}
+				//Binding handler
+				for (auto binding : engine.binding_handler.on_cc(message.control(), message.value()/127.0)) {
+					notify_property_update(binding.first, binding.second);
+				}
+			}
+		}
+		break;
+	case SYSEX:
+		if (clock_source >= 0 && match_source(message.channel, input, clock_source)) {
+			engine.clock_sync(message, info);
+		}
+		break;
+	default:
+		break;
 	}
+
 	//Send
 	if (pass) {
 		engine.send(message, input, info);

@@ -44,11 +44,6 @@ struct ChannelSource {
 	unsigned int start_velocity = 0;
 	unsigned int end_velocity = 127;
 	int octave = 0;
-	bool transfer_channel_aftertouch = true;
-	bool transfer_pitch_bend = true;
-	bool transfer_cc = true;
-	bool transfer_prog_change = true;
-	bool transfer_other = true;
 	int update_channel = 0;
 };
 
@@ -72,11 +67,6 @@ struct SoundEngineScene {
 				source.start_velocity == 0 &&
 				source.end_velocity == 127 &&
 				source.octave == 0 &&
-				source.transfer_channel_aftertouch == true &&
-				source.transfer_pitch_bend == true &&
-				source.transfer_cc == true &&
-				source.transfer_prog_change == true &&
-				source.transfer_other == true &&
 				source.update_channel == 0;
 	}
 };
@@ -263,7 +253,7 @@ struct Program : public Copyable {
 };
 
 struct MidiSource {
-	ssize_t device = 1;
+	size_t device = 1;
 	int channel = 0;
 };
 
@@ -334,6 +324,8 @@ public:
 	void apply_program(Program* program);
 
 	void save_program(Program* program);
+
+	void clock_sync(const MidiMessage& message, const SampleInfo& info);
 
 	MidiCubeWorkstation* get_cube() {
 		return cube;

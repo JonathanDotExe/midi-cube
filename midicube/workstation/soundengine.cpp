@@ -204,47 +204,6 @@ void SoundEngineChannel::set_start_velocity(unsigned int startVelocity) {
 	scenes[device->scene].source.start_velocity = startVelocity;
 }
 
-bool SoundEngineChannel::is_transfer_cc() const {
-	return scenes[device->scene].source.transfer_cc;
-}
-
-void SoundEngineChannel::set_transfer_cc(bool transferCc) {
-	scenes[device->scene].source.transfer_cc = transferCc;
-}
-
-bool SoundEngineChannel::is_transfer_channel_aftertouch() const {
-	return scenes[device->scene].source.transfer_channel_aftertouch;
-}
-
-void SoundEngineChannel::set_transfer_channel_aftertouch(
-		bool transferChannelAftertouch) {
-	scenes[device->scene].source.transfer_channel_aftertouch = transferChannelAftertouch;
-}
-
-bool SoundEngineChannel::is_transfer_other() const {
-	return scenes[device->scene].source.transfer_other;
-}
-
-void SoundEngineChannel::set_transfer_other(bool transferOther) {
-	scenes[device->scene].source.transfer_other = transferOther;
-}
-
-bool SoundEngineChannel::is_transfer_pitch_bend() const {
-	return scenes[device->scene].source.transfer_pitch_bend;
-}
-
-void SoundEngineChannel::set_transfer_pitch_bend(bool transferPitchBend) {
-	scenes[device->scene].source.transfer_pitch_bend = transferPitchBend;
-}
-
-bool SoundEngineChannel::is_transfer_prog_change() const {
-	return scenes[device->scene].source.transfer_prog_change;
-}
-
-void SoundEngineChannel::set_transfer_prog_change(bool transferProgChange) {
-	scenes[device->scene].source.transfer_prog_change = transferProgChange;
-}
-
 bool SoundEngineChannel::is_active() const {
 	return scenes[device->scene].active;
 }
@@ -329,97 +288,32 @@ void SoundEngineDevice::process_sample(double& lsample, double& rsample, double*
 }
 
 void SoundEngineDevice::send(const MidiMessage &message, size_t input, const SampleInfo& info) {
-	//Global values
-	switch (message.type) {
-	case MessageType::MONOPHONIC_AFTERTOUCH:
-		break;
-	case MessageType::POLYPHONIC_AFTERTOUCH:
-		break;
-	case MessageType::NOTE_ON:
-		break;
-	case MessageType::NOTE_OFF:
-		break;
-	case MessageType::CONTROL_CHANGE:
-		//Update scene
-		for (size_t i = 0; i < SOUND_ENGINE_SCENE_AMOUNT; ++i) {
-			if (cube->get_config().controls.scene_buttons[i] == message.control()) {
-				scene = i;
-				cube->notify_property_update(this, &scene);
-			}
-		}
-		//Binding handler
-		for (auto binding : binding_handler.on_cc(message.control(), message.value()/127.0)) {
-			cube->notify_property_update(binding.first, binding.second);
-		}
-		break;
-	case MessageType::PROGRAM_CHANGE:
-		break;
-	case MessageType::PITCH_BEND:
-		break;
-	case MessageType::SYSEX:
-		//Clock
-		if (source.clock_in) {
-			if (message.channel == 8) {
-				double delta = info.time - first_beat_time;
-				unsigned int old_bpm = metronome.get_bpm();
-				if (delta) {
-					if (clock_beat_count && clock_beat_count % 96 == 0) {
-						unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
-						metronome.set_bpm(bpm);
-						if (bpm != old_bpm) {
-							cube->notify_property_update(this, &scene);
-						}
-						metronome.init(first_beat_time);
-					}
-				}
-				clock_beat_count++;
-			}
-			else if (message.channel == 0x0A) {
-				first_beat_time = info.time;
-				clock_beat_count = 0;
-				metronome.init(info.time);
-			}
-			else if (message.channel == 0x0B) {
-				metronome.init(info.time);
-			}
-		}
-		break;
-	case MessageType::INVALID:
-		break;
-	}
-
 	//Channels
 	for (size_t i = 0; i < SOUND_ENGINE_MIDI_CHANNELS; ++i) {
 		SoundEngineChannel& channel = channels[i];
 		SoundEngineScene& scene = channel.scenes[this->scene];
 		ChannelSource& s = scene.source;
 		bool redirect = channel.redirect.redirect_to >= 0 && channel.redirect.redirect_to < SOUND_ENGINE_MIDI_CHANNELS;
-		if ((channel.input < 0 || input == static_cast<size_t>(channel.input)) && (redirect ? scene.active : channel.send_midi(message.type))) {
+		if (redirect ? scene.active : channel.send_midi(message.type)) {
 			//Filter
 			bool pass = true;
 			switch (message.type) {
 			case MessageType::NOTE_OFF:
+				pass = cube->match_source(message.channel, input, channel.input);
 				break;
 			case MessageType::NOTE_ON:
-				pass = message.velocity() >= s.start_velocity && message.velocity() <= s.end_velocity;
+				pass = cube->match_source(message.channel, input, channel.input) && message.velocity() >= s.start_velocity && message.velocity() <= s.end_velocity;
 				/* no break */
 			case MessageType::POLYPHONIC_AFTERTOUCH:
 				pass = pass && message.note() >= s.start_note && message.note() <= s.end_note;
 				break;
 			case MessageType::MONOPHONIC_AFTERTOUCH:
-				pass = s.transfer_channel_aftertouch;
-				break;
 			case MessageType::CONTROL_CHANGE:
-				pass = s.transfer_cc;	//FIXME global ccs are updated anyways
-				break;
 			case MessageType::PROGRAM_CHANGE:
-				pass = s.transfer_prog_change;
-				break;
 			case MessageType::PITCH_BEND:
-				pass = s.transfer_pitch_bend;
+				pass = cube->match_source(message.channel, input, cube->control_source);
 				break;
 			case MessageType::SYSEX:
-				pass = s.transfer_other; //TODO remove probably
 				break;
 			case MessageType::INVALID:
 				break;
@@ -688,4 +582,31 @@ void SoundEngineChannel::set_update_channel(int update_channel) {
 inline bool SoundEngineChannel::send_midi(MessageType type) {
 	PluginInstance* engine = this->engine.get_plugin();
 	return engine && (scenes[device->scene].active || (engine->keep_active() && type != MessageType::NOTE_ON));
+}
+
+void SoundEngineDevice::clock_sync(const MidiMessage &message,
+		const SampleInfo &info) {
+	if (message.channel == 8) {
+		double delta = info.time - first_beat_time;
+		unsigned int old_bpm = metronome.get_bpm();
+		if (delta) {
+			if (clock_beat_count && clock_beat_count % 96 == 0) {
+				unsigned int bpm = round(clock_beat_count/24.0 * 60.0/delta);
+				metronome.set_bpm(bpm);
+				if (bpm != old_bpm) {
+					cube->notify_property_update(this, &scene);
+				}
+				metronome.init(first_beat_time);
+			}
+		}
+		clock_beat_count++;
+	}
+	else if (message.channel == 0x0A) {
+		first_beat_time = info.time;
+		clock_beat_count = 0;
+		metronome.init(info.time);
+	}
+	else if (message.channel == 0x0B) {
+		metronome.init(info.time);
+	}
 }
