@@ -185,6 +185,8 @@ bool B3Organ::note_finished(const SampleInfo& info, TriggeredNote& note, size_t 
 void B3Organ::process_sample(const SampleInfo &info) {
 	//Update properties
 	double swell = SWELL_MIN + pow(data.preset.swell, 1.2) * SWELL_RANGE;
+	data.swell_port.set(swell, 1/0.1, 1/0.1);
+	swell = data.swell_port.process(info.time_step);
 
 	//Percussion
 	bool pressed = false;

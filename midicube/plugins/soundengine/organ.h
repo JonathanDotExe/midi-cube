@@ -22,7 +22,7 @@
 #define ORGAN_MAX_DOWN_DELAY 0.0035
 #define ORGAN_MAX_UP_DELAY 0.005
 
-constexpr double SWELL_MIN = 0.0;
+constexpr double SWELL_MIN = 0.05;
 constexpr double SWELL_RANGE = 1 - SWELL_MIN;
 
 #define ORGAN_VIBRATO_RATE 7
@@ -46,8 +46,8 @@ struct B3OrganPreset {
 	double harmonic_foldback_volume{1};
 	double multi_note_gain{0.8};
 	double high_gain_reduction = 0.5;
-	double click_attack = 0.001;
-	double click_release = 0.001;
+	double click_attack = 0.003;
+	double click_release = 0.003;
 
 	BindableBooleanValue percussion{false};
 	BindableBooleanValue percussion_third_harmonic{true};
@@ -110,6 +110,7 @@ public:
 class B3OrganData {
 public:
 	B3OrganPreset preset;
+	PortamendoBuffer swell_port{1};
 	Filter swell_filter;
 	std::array<B3OrganTonewheel, ORGAN_TONEWHEEL_AMOUNT> tonewheels = {};
 	std::array<DelayBuffer, ORGAN_VIBRATO_DELAY_STAGES> delays;
