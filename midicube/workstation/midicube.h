@@ -89,7 +89,7 @@ public:
 	std::vector<MidiCubeInput> get_inputs();
 	inline bool match_source(unsigned int channel, size_t input, ssize_t src) {
 		if (src >= 0 && static_cast<size_t>(src) < SOUND_ENGINE_MIDI_CHANNELS) {
-			MidiSource& source = sources[input];
+			MidiSource& source = sources[src];
 			return source.device == input && (source.channel < 0 || static_cast<unsigned int>(source.channel) == channel);
 		}
 		else {
