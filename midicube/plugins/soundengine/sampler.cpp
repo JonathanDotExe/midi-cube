@@ -104,7 +104,7 @@ inline size_t find_buffer_index(size_t block, size_t block_count) {
 }
 
 inline double velocity_amp_scale(double x, double amt) {
-	return pow(x, amt * 4);
+	return pow((1 - amt) + x * amt, 2);
 }
 
 void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index) {
