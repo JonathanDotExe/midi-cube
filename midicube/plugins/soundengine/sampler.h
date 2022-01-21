@@ -36,7 +36,7 @@ struct ModulateableProperty {
 	double velocity_amount = 0;
 	std::vector<SamplerCCModulation> cc{};
 
-	inline double apply_modulation(SamplerVoice* voice, Sampler* sampler);
+	inline double apply_modulation(SamplerVoice* voice, Sampler* sampler, std::unordered_map<SamplerCCModulation*, PortamendoBuffer> cc_portamendos);
 
 	void load(boost::property_tree::ptree& parent, std::string path, double def) {
 		auto tree = parent.get_child_optional(path);
@@ -94,26 +94,26 @@ struct ModulatableADSREnvelopeData {
 
 	bool pedal_catch = false;
 
-	inline ADSREnvelopeData apply(SamplerVoice* voice, Sampler* sampler) {
+	inline ADSREnvelopeData apply(SamplerVoice* voice, Sampler* sampler, std::unordered_map<SamplerCCModulation*, PortamendoBuffer> cc_portamendos) {
 		ADSREnvelopeData env;
-		env.attack = attack.apply_modulation(voice, sampler);
-		env.decay = decay.apply_modulation(voice, sampler);
-		env.sustain = sustain.apply_modulation(voice, sampler);
-		env.release = release.apply_modulation(voice, sampler);
+		env.attack = attack.apply_modulation(voice, sampler, cc_portamendos);
+		env.decay = decay.apply_modulation(voice, sampler, cc_portamendos);
+		env.sustain = sustain.apply_modulation(voice, sampler, cc_portamendos);
+		env.release = release.apply_modulation(voice, sampler, cc_portamendos);
 
 		env.attack_shape = attack_shape;
 		env.pre_decay_shape = pre_decay_shape;
 		env.decay_shape = decay_shape;
 		env.release_shape = release_shape;
 
-		env.hold = hold.apply_modulation(voice, sampler);
-		env.pre_decay =  pre_decay.apply_modulation(voice, sampler);
+		env.hold = hold.apply_modulation(voice, sampler, cc_portamendos);
+		env.pre_decay =  pre_decay.apply_modulation(voice, sampler, cc_portamendos);
 
-		env.attack_hold = attack_hold.apply_modulation(voice, sampler);
-		env.peak_volume = peak_volume.apply_modulation(voice, sampler);
-		env.decay_volume = decay_volume.apply_modulation(voice, sampler);
-		env.sustain_time = sustain_time.apply_modulation(voice, sampler);
-		env.release_volume = release_volume.apply_modulation(voice, sampler);
+		env.attack_hold = attack_hold.apply_modulation(voice, sampler, cc_portamendos);
+		env.peak_volume = peak_volume.apply_modulation(voice, sampler, cc_portamendos);
+		env.decay_volume = decay_volume.apply_modulation(voice, sampler, cc_portamendos);
+		env.sustain_time = sustain_time.apply_modulation(voice, sampler, cc_portamendos);
+		env.release_volume = release_volume.apply_modulation(voice, sampler, cc_portamendos);
 		return env;
 	}
 };
@@ -276,12 +276,13 @@ public:
 	SampleSoundStore& store;
 	std::array<double, MIDI_CONTROL_COUNT> cc;
 
-	virtual void process(const SampleInfo &info);
 	void control_change(unsigned int control, unsigned int value);
 
 	Sampler(PluginHost& h, Plugin& plugin, SampleSoundStore& s);
 
 	void process_note_sample(const SampleInfo& info, SamplerVoice& note, size_t note_index);
+
+	void process_sample(const SampleInfo &info);
 
 	bool note_finished(const SampleInfo& info, SamplerVoice& note, size_t note_index);
 
@@ -356,11 +357,17 @@ extern SampleSound* load_sound(std::string file, std::string folder, StreamedAud
 extern void save_sound(std::string file);
 
 inline double ModulateableProperty::apply_modulation(SamplerVoice *voice,
-		Sampler *sampler) {
+		Sampler *sampler, std::unordered_map<SamplerCCModulation*, PortamendoBuffer> cc_portamendos) {
 	double val = value;
 	val += voice->velocity * velocity_amount;
 	for (SamplerCCModulation& mod : cc) {
-		double cc_val = sampler->get_cc_value(mod.cc, voice);
+		double cc_val = 0;
+		if (mod.smooth > 0 && mod.cc <= 127) {
+			cc_val = cc_portamendos[&mod].get();
+		}
+		else {
+			cc_val = sampler->get_cc_value(mod.cc, voice);
+		}
 
 		if (mod.multiply) {
 			val *= (1 - cc_val) + cc_val * mod.amount;

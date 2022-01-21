@@ -112,12 +112,12 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 	double rsample = 0;
 	double pan = 0;
 	if (note.region && note.sample) {
-		double vol = note.region->amplitude.apply_modulation(&note, this);
+		double vol = note.region->amplitude.apply_modulation(&note, this, index.cc_portamendos);
 		double vel_amount = 0;
 
 		double l = 0;
 		double r = 0;
-		pan = note.region->pan.apply_modulation(&note, this);
+		pan = note.region->pan.apply_modulation(&note, this, index.cc_portamendos);
 		double crossfade = 1;
 		//Sound
 		//Loop
@@ -155,8 +155,8 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 		//Filter
 		if (note.region->filter.on) {
 			FilterData filter { note.region->filter.filter_type };
-			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.region->filter.filter_cutoff.apply_modulation(&note, this)))); //TODO optimize
-			filter.resonance = note.region->filter.filter_resonance.apply_modulation(&note, this);
+			filter.cutoff = scale_cutoff(fmax(0, fmin(1, note.region->filter.filter_cutoff.apply_modulation(&note, this, index.cc_portamendos)))); //TODO optimize
+			filter.resonance = note.region->filter.filter_resonance.apply_modulation(&note, this, index.cc_portamendos);
 
 			if (note.region->filter.filter_kb_track) {
 				double cutoff = filter.cutoff;
@@ -172,17 +172,17 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 		//Env
 		if (!note.region->env.sustain_entire_sample) {
 			//Volume
-			ADSREnvelopeData data = note.region->env.env.apply(&note, this);
+			ADSREnvelopeData data = note.region->env.env.apply(&note, this, index.cc_portamendos);
 			vol *= note.env.amplitude(data, info.time_step, note.pressed, host_environment.sustain);
 		}
-		vel_amount = note.region->env.velocity_amount.apply_modulation(&note, this); //TODO introduce curves
+		vel_amount = note.region->env.velocity_amount.apply_modulation(&note, this, index.cc_portamendos); //TODO introduce curves
 		double vel = velocity_amp_scale(note.velocity, vel_amount);
 		vol *= vel;
-		vol *= note.layer_amp  * note.region->volume.apply_modulation(&note, this);
+		vol *= note.layer_amp  * note.region->volume.apply_modulation(&note, this, index.cc_portamendos);
 
 		//Playback
 		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
-			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack + note.region->pitch.apply_modulation(&note, this));
+			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack + note.region->pitch.apply_modulation(&note, this, index.cc_portamendos));
 			note.time += freq/note_to_freq(note.region->note) * host_environment.pitch_bend * info.time_step;
 			lsample += l * vol;
 			rsample += r * vol;
@@ -231,7 +231,7 @@ void Sampler::press_note(const SampleInfo& info, unsigned int note, unsigned int
 					voice.time = (double) voice.sample->loop_start/voice.sample->sample->sample_rate;
 				}
 				else {
-					voice.time = (double) voice.sample->start.apply_modulation(&voice, this)/voice.sample->sample->sample_rate;
+					voice.time = (double) voice.sample->start.apply_modulation(&voice, this, index.cc_portamendos)/voice.sample->sample->sample_rate;
 				}
 				voice.hit_loop = false;
 				voice.env.reset();
@@ -258,8 +258,8 @@ void Sampler::release_note(const SampleInfo& info, unsigned int note, unsigned i
 //	BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY>::release_note(info, note);
 }
 
-void Sampler::process(const SampleInfo &info) {
-	PluginInstance::process(info);
+void Sampler::process_sample(const SampleInfo &info) {
+	SoundEngine::process_sample(info);
 	for (auto p : index.cc_portamendos) {
 		p.second.process(info.time_step);
 	}
