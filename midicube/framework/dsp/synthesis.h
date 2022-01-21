@@ -142,7 +142,7 @@ private:
 	double next_value;
 	double step;
 public:
-	PortamendoBuffer(double value);
+	PortamendoBuffer(double value = 0);
 	double process(double time_step);
 	double get();
 	void set(double value, double attack_step, double release_step);

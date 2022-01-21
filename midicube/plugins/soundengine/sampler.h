@@ -209,7 +209,7 @@ struct SamplerVoice : public TriggeredNote {
 struct SampleRegionIndex {
 	std::vector<unsigned int> controls = {};
 	std::array<std::array<std::vector<SampleRegion*>, MIDI_NOTES>, MIDI_NOTES> velocities;
-	std::unordered_map<SampleRegion*, std::unordered_map<SamplerCCModulation*, PortamendoBuffer>> cc_portamendos;
+	std::unordered_map<SamplerCCModulation*, PortamendoBuffer> cc_portamendos;
 };
 
 class SampleSound {
@@ -276,6 +276,7 @@ public:
 	SampleSoundStore& store;
 	std::array<double, MIDI_CONTROL_COUNT> cc;
 
+	virtual void process(const SampleInfo &info);
 	void control_change(unsigned int control, unsigned int value);
 
 	Sampler(PluginHost& h, Plugin& plugin, SampleSoundStore& s);

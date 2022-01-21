@@ -258,6 +258,13 @@ void Sampler::release_note(const SampleInfo& info, unsigned int note, unsigned i
 //	BaseSoundEngine<SamplerVoice, SAMPLER_POLYPHONY>::release_note(info, note);
 }
 
+void Sampler::process(const SampleInfo &info) {
+	PluginInstance::process(info);
+	for (auto p : index.cc_portamendos) {
+		p.second.process(info.time_step);
+	}
+}
+
 std::string Sampler::get_name() {
 	return "Sampler";
 }
@@ -334,6 +341,10 @@ void Sampler::set_sample(SampleSound *sample) {
 				for (size_t note = region->min_note; note <= max_note; ++note) {
 					index.velocities[vel][note].push_back(region);
 				}
+			}
+			//Modulations
+			for (SamplerCCModulation* mod : region->get_smooth_mod()) {
+				index.cc_portamendos[mod] = PortamendoBuffer(cc[mod->cc]);
 			}
 		}
 	}
@@ -593,6 +604,9 @@ void Sampler::control_change(unsigned int control, unsigned int value) {
 	SoundEngine::control_change(control, value);
 	if (std::find(index.controls.begin(), index.controls.end(), control) == index.controls.end()) {
 		cc[control] = value/127.0;
+		for (auto p : index.cc_portamendos) {
+			p.second.set(value/127.0, p.first->smooth, p.first->smooth);
+		}
 	}
 }
 
