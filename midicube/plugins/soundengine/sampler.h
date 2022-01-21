@@ -27,6 +27,7 @@ struct SamplerVoice;
 struct SamplerCCModulation {
 	unsigned int cc = 0;
 	double amount = 0;
+	double smooth = 0;
 	bool multiply = false;
 };
 
@@ -57,6 +58,14 @@ struct ModulateableProperty {
 				mod.amount = cc.second.get("amount", 0.0);
 				mod.multiply = cc.second.get("multiply", false);
 				this->cc.push_back(mod);
+			}
+		}
+	}
+
+	void add_smooth_cc(std::vector<SamplerCCModulation*>* mod) {
+		for (SamplerCCModulation& m : cc) {
+			if (m.smooth > 0) {
+				mod->push_back(&m);
 			}
 		}
 	}
@@ -179,6 +188,8 @@ struct SampleRegion {
 	SampleRegion() {
 
 	};
+
+	std::vector<SamplerCCModulation*> get_smooth_mod();
 };
 
 struct SamplerVoice : public TriggeredNote {
@@ -198,6 +209,7 @@ struct SamplerVoice : public TriggeredNote {
 struct SampleRegionIndex {
 	std::vector<unsigned int> controls = {};
 	std::array<std::array<std::vector<SampleRegion*>, MIDI_NOTES>, MIDI_NOTES> velocities;
+	std::unordered_map<SampleRegion*, std::unordered_map<SamplerCCModulation*, PortamendoBuffer>> cc_portamendos;
 };
 
 class SampleSound {

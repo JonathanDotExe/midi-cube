@@ -595,3 +595,31 @@ void Sampler::control_change(unsigned int control, unsigned int value) {
 		cc[control] = value/127.0;
 	}
 }
+
+std::vector<SamplerCCModulation*> SampleRegion::get_smooth_mod() {
+	std::vector<SamplerCCModulation*> mod;
+	pitch.add_smooth_cc(&mod);
+	volume.add_smooth_cc(&mod);
+	amplitude.add_smooth_cc(&mod);
+	pan.add_smooth_cc(&mod);
+
+	filter.filter_cutoff.add_smooth_cc(&mod);
+	filter.filter_resonance.add_smooth_cc(&mod);
+
+	env.velocity_amount.add_smooth_cc(&mod);
+	env.env.attack.add_smooth_cc(&mod);
+	env.env.decay.add_smooth_cc(&mod);
+	env.env.decay.add_smooth_cc(&mod);
+	env.env.sustain.add_smooth_cc(&mod);
+	env.env.release.add_smooth_cc(&mod);
+
+	env.env.hold.add_smooth_cc(&mod);
+	env.env.pre_decay.add_smooth_cc(&mod);
+
+	env.env.attack_hold.add_smooth_cc(&mod);
+	env.env.peak_volume.add_smooth_cc(&mod);
+	env.env.decay_volume.add_smooth_cc(&mod);
+	env.env.sustain_time.add_smooth_cc(&mod);
+	env.env.release_volume.add_smooth_cc(&mod);
+	return mod;
+}
