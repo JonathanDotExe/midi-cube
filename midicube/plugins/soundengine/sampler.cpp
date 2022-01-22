@@ -261,6 +261,7 @@ void Sampler::release_note(const SampleInfo& info, unsigned int note, unsigned i
 void Sampler::process_sample(const SampleInfo &info) {
 	SoundEngine::process_sample(info);
 	for (auto p : index.cc_portamendos) {
+		std::cout << "Portamento " << p.first->cc << "/" << p.first->smooth << std::endl;
 		p.second.process(info.time_step);
 	}
 }
@@ -604,8 +605,12 @@ void Sampler::control_change(unsigned int control, unsigned int value) {
 	SoundEngine::control_change(control, value);
 	if (std::find(index.controls.begin(), index.controls.end(), control) == index.controls.end()) {
 		cc[control] = value/127.0;
+		std::cout << "CC change " << control << std::endl;
 		for (auto p : index.cc_portamendos) {
-			p.second.set(value/127.0, p.first->smooth, p.first->smooth);
+			if (p.first->cc == control) {
+				std::cout << "Portamento set" << std::endl;
+				p.second.set(value/127.0, p.first->smooth, p.first->smooth);
+			}
 		}
 	}
 }

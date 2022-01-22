@@ -243,12 +243,64 @@ static bool parse_modulatable(std::pair<std::string, std::string> opcode, std::s
 		return true;
 	}
 	else if (opcode.first.rfind(name + "_oncc", 0) == 0) {
-		pt::ptree control;
 		int cc = std::stoi(opcode.first.substr(name.size() + std::string("_oncc").size()));
-		control.put("cc", cc);
-		control.put("amount", mod_converter(opcode.second));
-		control.put("multiply", cc_multiplier);
-		tree.add_child(converted_name + ".cc.control", control);
+		//Find control
+		if (!tree.get_child_optional(converted_name + ".cc")) {
+			pt::ptree t = {};
+			tree.put_child(converted_name + ".cc", t);
+		}
+		pt::ptree& c = tree.get_child(converted_name + ".cc");
+		pt::ptree* control = nullptr;
+		for (auto& ctrl: c) {
+			if (ctrl.second.get("cc", -1) == cc) {
+				control = &ctrl.second;
+				break;
+			}
+		}
+		//Create new control
+		if (control == nullptr) {
+			pt::ptree control;
+			control.put("cc", cc);
+			control.put("amount", mod_converter(opcode.second));
+			control.put("multiply", cc_multiplier);
+			tree.add_child(converted_name + ".cc.control", control);
+		}
+		//Set values
+		else {
+			control->put("cc", cc);
+			control->put("amount", mod_converter(opcode.second));
+			control->put("multiply", cc_multiplier);
+		}
+		return true;
+	}
+	else if (opcode.first.rfind(name + "_smoothcc", 0) == 0) {
+		int cc = std::stoi(opcode.first.substr(name.size() + std::string("_smoothcc").size()));
+		//Find control
+		if (!tree.get_child_optional(converted_name + ".cc")) {
+			pt::ptree t = {};
+			tree.put_child(converted_name + ".cc", t);
+		}
+		pt::ptree& c = tree.get_child(converted_name + ".cc");
+		pt::ptree* control = nullptr;
+		for (auto& ctrl: c) {
+			if (ctrl.second.get("cc", -1) == cc) {
+				control = &ctrl.second;
+				break;
+			}
+		}
+		//Create new control
+		if (control == nullptr) {
+			pt::ptree control;
+			control.put("cc", cc);
+			control.put("smooth", std::stod(opcode.second)/1000.0);
+			tree.add_child(converted_name + ".cc.control", control);
+		}
+		//Set values
+		else {
+			control->put("cc", cc);
+			control->put("smooth", std::stod(opcode.second)/1000.0);
+		}
+
 		return true;
 	}
 	else if (vel_name != "" && opcode.first == vel_name) {

@@ -56,6 +56,7 @@ struct ModulateableProperty {
 				SamplerCCModulation mod;
 				mod.cc = cc.second.get("cc", 128);
 				mod.amount = cc.second.get("amount", 0.0);
+				mod.smooth = cc.second.get("smooth", 0.0);
 				mod.multiply = cc.second.get("multiply", false);
 				this->cc.push_back(mod);
 			}
