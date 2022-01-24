@@ -50,7 +50,7 @@ inline double factor_to_cutoff(double cutoff, double time_step) {
 }
 
 enum FilterType {
-	LP_12, LP_24, HP_12, HP_24, LP_12_BP, LP_24_BP, LP_6, HP_6, BP_12
+	LP_12, LP_24, HP_12, HP_24, LP_12_BP, LP_24_BP, LP_6, HP_6, BP_12, BP_24, LP_18, HP_18, BP_18
 };
 
 struct FilterData {
@@ -58,6 +58,21 @@ struct FilterData {
 	double cutoff = 44100; //in Hz
 	double resonance = 0;
 };
+
+class FilterPole {
+public:
+	double pole = 0;
+	double last_pole = 0;
+
+	inline void update_lp(double factor);
+	inline void update_hp(double factor);
+};
+
+inline void FilterPole::update_lp(double factor) {
+}
+
+inline void FilterPole::update_hp(double factor) {
+}
 
 class Filter {
 private:

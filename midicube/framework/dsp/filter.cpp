@@ -12,8 +12,11 @@
 
 
 const double TWO_POLE_FACTOR = 1.0/sqrt(pow(2, 1/2.0) - 1);
+const double THREE_POLE_FACTOR = 1.0/sqrt(pow(2, 1/3.0) - 1);
 const double FOUR_POLE_FACTOR = 1.0/sqrt(pow(2, 1/4.0) - 1);
 const double BP_12_BOOST = db_to_amp(3);
+const double BP_18_BOOST = db_to_amp(4.5);
+const double BP_24_BOOST = db_to_amp(6);
 
 /**
  * To convert frequency into filter cutoff use time_step/(rc+time_step)
