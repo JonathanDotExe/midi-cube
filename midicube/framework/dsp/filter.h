@@ -14,6 +14,7 @@
 
 #define FILTER_MIN 14
 #define FILTER_MAX 44100
+#define FILTER_POLES 8
 const double FILTER_PROGRESS_START = log(FILTER_MIN)/log(FILTER_MAX);
 const double FILTER_PROGRESS_REST = 1 - FILTER_PROGRESS_START;
 
@@ -50,7 +51,7 @@ inline double factor_to_cutoff(double cutoff, double time_step) {
 }
 
 enum FilterType {
-	LP_12, LP_24, HP_12, HP_24, LP_12_BP, LP_24_BP, LP_6, HP_6, BP_12, BP_24, LP_18, HP_18, BP_18
+	LP_12, LP_24, HP_12, HP_24, BP_12, BP_24, LP_6, HP_6, LP_12_BP, LP_24_BP, LP_18, HP_18, BP_18
 };
 
 struct FilterData {
@@ -64,31 +65,44 @@ public:
 	double pole = 0;
 	double last_pole = 0;
 
-	inline void update_lp(double factor);
-	inline void update_hp(double factor);
+	inline void update_lp(double in, double factor);
+	inline void update_hp(double in, double factor);
 };
 
-inline void FilterPole::update_lp(double factor) {
+inline void FilterPole::update_lp(double in, double factor) {
+	pole += factor * (in - pole);
 }
 
-inline void FilterPole::update_hp(double factor) {
+inline void FilterPole::update_hp(double in, double factor) {
+	pole = factor * (in - last_pole + pole);
 }
 
 class Filter {
 private:
+	std::array<FilterPole, FILTER_POLES> poles;
 
+	inline void do_lowpass(double in, double c, double res, size_t poles, double time_step) {
+		double cutoff = cutoff_to_factor(c, time_step);
+		double feedback = res + res/(1 - cutoff);
+
+		double last = in + feedback * (this->poles[0].pole - this->poles[1].pole);
+		for (size_t i = 0; i < poles; ++i) {
+			this->poles[i].update_lp(last, cutoff);
+			last = this->poles[i].pole;
+		}
+	}
+	inline void do_lowpass(double in, double c, double res, size_t poles, double time_step) {
+		double cutoff = cutoff_to_factor(c, time_step);
+		double feedback = res + res/(1 - cutoff);
+
+		double last = in + feedback * (this->poles[0].pole - this->poles[1].pole);
+		for (size_t i = 0; i < poles; ++i) {
+			this->poles[i].update_lp(last, cutoff);
+			last = this->poles[i].pole;
+		}
+	}
 public:
-	double pole1 = 0;
-	double pole2 = 0;
-	double pole3 = 0;
-	double pole4 = 0;
-
-	double last_pole1 = 0;
-	double last_pole2 = 0;
-	double last_pole3 = 0;
-	double last_pole4 = 0;
 	double apply (FilterData& data, double sample, double time_step);
-
 };
 
 #endif /* MIDICUBE_FILTER_H_ */

@@ -27,7 +27,22 @@ double Filter::apply (FilterData& data, double sample, double time_step) {
 	switch (data.type) {
 	//Low pass algorithm
 	case FilterType::LP_6:
+	{
+		double cutoff = cutoff_to_factor(data.cutoff, time_step);
+		double feedback = data.resonance + data.resonance/(1 - cutoff);
+
+		poles[0].update_lp(sample, cutoff);
+		return poles[0].pole;
+	}
 	case FilterType::LP_12:
+	{
+		double cutoff = cutoff_to_factor(data.cutoff, time_step);
+		double feedback = data.resonance + data.resonance/(1 - cutoff);
+
+		poles[0].update_lp(sample, cutoff);
+		return poles[0].pole;
+	}
+	case FilterType::LP_18:
 	case FilterType::LP_24:
 	case FilterType::LP_12_BP:
 	case FilterType::LP_24_BP:
