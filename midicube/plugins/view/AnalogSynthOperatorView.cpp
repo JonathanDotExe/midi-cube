@@ -31,7 +31,7 @@ static void create_filter_view(int& tmp_x, int& tmp_y, FilterEntity& filter, std
 	tmp_x += 100;
 	//Filter Type
 	{
-		std::vector<std::string> filter_types = {"LP 12", "LP 24", "HP 12", "HP 24", "BP 12", "BP 24"};
+		std::vector<std::string> filter_types = {"LP 12", "LP 24", "HP 12", "HP 24", "BP 12", "BP 24", "LP 6", "HP 6", "BP 6", "LP 12 BP", "LP 24 BP", "LP 18", "HP 18", "BP 18"};
 
 		ComboBox* filter_type = new ComboBox(1, filter_types, main_font, 16, 0, tmp_x, tmp_y + 15, 150, 40);
 		filter_type->property.bind(filter.type, handler);
