@@ -51,7 +51,7 @@ inline double factor_to_cutoff(double cutoff, double time_step) {
 }
 
 enum FilterType {
-	LP_12, LP_24, HP_12, HP_24, BP_12, BP_24, LP_6, HP_6, LP_12_BP, LP_24_BP, LP_18, HP_18, BP_18
+	LP_12, LP_24, HP_12, HP_24, BP_12, BP_24, LP_6, HP_6, BP_6, LP_12_BP, LP_24_BP, LP_18, HP_18, BP_18
 };
 
 struct FilterData {
@@ -81,24 +81,26 @@ class Filter {
 private:
 	std::array<FilterPole, FILTER_POLES> poles;
 
-	inline void do_lowpass(double in, double c, double res, size_t poles, double time_step) {
+	inline void do_lowpass(double in, double c, double res, size_t poles, double time_step, size_t offset = 0) {
 		double cutoff = cutoff_to_factor(c, time_step);
 		double feedback = res + res/(1 - cutoff);
 
 		double last = in + feedback * (this->poles[0].pole - this->poles[1].pole);
 		for (size_t i = 0; i < poles; ++i) {
-			this->poles[i].update_lp(last, cutoff);
-			last = this->poles[i].pole;
+			size_t p = i + offset;
+			this->poles[p].update_lp(last, cutoff);
+			last = this->poles[p].pole;
 		}
 	}
-	inline void do_lowpass(double in, double c, double res, size_t poles, double time_step) {
+	inline void do_highpass(double in, double c, double res, size_t poles, double time_step, size_t offset = 0) {
 		double cutoff = cutoff_to_factor(c, time_step);
 		double feedback = res + res/(1 - cutoff);
 
 		double last = in + feedback * (this->poles[0].pole - this->poles[1].pole);
 		for (size_t i = 0; i < poles; ++i) {
-			this->poles[i].update_lp(last, cutoff);
-			last = this->poles[i].pole;
+			size_t p = i + offset;
+			this->poles[p].update_hp(last, cutoff);
+			last = this->poles[p].pole;
 		}
 	}
 public:

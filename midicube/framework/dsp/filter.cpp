@@ -14,6 +14,7 @@
 const double TWO_POLE_FACTOR = 1.0/sqrt(pow(2, 1/2.0) - 1);
 const double THREE_POLE_FACTOR = 1.0/sqrt(pow(2, 1/3.0) - 1);
 const double FOUR_POLE_FACTOR = 1.0/sqrt(pow(2, 1/4.0) - 1);
+const double BP_6_BOOST = db_to_amp(1.5);
 const double BP_12_BOOST = db_to_amp(3);
 const double BP_18_BOOST = db_to_amp(4.5);
 const double BP_24_BOOST = db_to_amp(6);
@@ -25,124 +26,66 @@ const double BP_24_BOOST = db_to_amp(6);
 //Filter
 double Filter::apply (FilterData& data, double sample, double time_step) {
 	switch (data.type) {
-	//Low pass algorithm
+	//Low pass
 	case FilterType::LP_6:
 	{
-		double cutoff = cutoff_to_factor(data.cutoff, time_step);
-		double feedback = data.resonance + data.resonance/(1 - cutoff);
-
-		poles[0].update_lp(sample, cutoff);
+		do_lowpass(sample, data.cutoff, data.resonance, 2, time_step);
 		return poles[0].pole;
 	}
 	case FilterType::LP_12:
 	{
-		double cutoff = cutoff_to_factor(data.cutoff, time_step);
-		double feedback = data.resonance + data.resonance/(1 - cutoff);
-
-		poles[0].update_lp(sample, cutoff);
-		return poles[0].pole;
+		do_lowpass(sample, data.cutoff * TWO_POLE_FACTOR, data.resonance, 2, time_step);
+		return poles[1].pole;
 	}
 	case FilterType::LP_18:
+		do_lowpass(sample, data.cutoff * THREE_POLE_FACTOR, data.resonance, 3, time_step);
+		return poles[2].pole;
 	case FilterType::LP_24:
+		do_lowpass(sample, data.cutoff * FOUR_POLE_FACTOR, data.resonance, 4, time_step);
+		return poles[3].pole;
+	//Low pass BP
 	case FilterType::LP_12_BP:
+		do_lowpass(sample, data.cutoff, data.resonance, 2, time_step);
+		return poles[0].pole - poles[1].pole;
 	case FilterType::LP_24_BP:
 	{
-		//Cutoff
-		double factor = 1;
-		if (data.type == LP_6) {
-			factor = 1;
-		}
-		else if (data.type % 2 == 0) {
-			factor = TWO_POLE_FACTOR;
-		}
-		else {
-			factor = FOUR_POLE_FACTOR;
-		}
-		double cutoff = cutoff_to_factor(data.cutoff * factor, time_step);
-		double feedback = data.resonance + data.resonance/(1 - cutoff);
-		//Update buffer
-		pole1 += cutoff * (sample - pole1 + feedback * (pole1 - pole2));
-		pole2 += cutoff * (pole1 - pole2);
-		pole3 += cutoff * (pole2 - pole3);
-		pole4 += cutoff * (pole3 - pole4);
-
-		//Values
-		switch (data.type) {
-		case FilterType::LP_6:
-			return pole1;
-		case FilterType::LP_12:
-			return pole2;
-		case FilterType::LP_24:
-			return pole4;
-		case FilterType::LP_12_BP:
-			return pole1 - pole2;
-		case FilterType::LP_24_BP:
-			return pole1 - pole4;
-		default:
-			break;
-		}
+		do_lowpass(sample, data.cutoff, data.resonance, 4, time_step);
+		return poles[0].pole - poles[3].pole;
 	}
-		break;
-	//High pass algorithm
+	//High pass
 	case FilterType::HP_6:
-	case FilterType::HP_12:
-	case FilterType::HP_24:
 	{
-		//Cutoff
-		double factor = 1;
-		if (data.type == HP_6) {
-			factor = 1;
-		}
-		else if (data.type % 2 == 0) {
-			factor = TWO_POLE_FACTOR;
-		}
-		else {
-			factor = FOUR_POLE_FACTOR;
-		}
-		double cutoff = cutoff_to_highpass_factor(data.cutoff * factor, time_step);
-		double feedback = data.resonance + data.resonance/(cutoff);
-		//High pass poles
-		sample +=  feedback * (pole1 - pole2);
-		pole1 = cutoff * (sample - last_pole1 + pole1);
-		pole2 = cutoff * (pole1 - last_pole2 + pole2);
-		pole3 = cutoff * (pole2 - last_pole3 + pole3);
-		pole4 = cutoff * (pole3 - last_pole4 + pole4);
-
-		last_pole1 = sample;
-		last_pole2 = pole1;
-		last_pole3 = pole2;
-		last_pole4 = pole3;
-
-		switch (data.type) {
-		case FilterType::HP_6:
-			return pole1;
-		case FilterType::HP_12:
-			return pole2;
-		case FilterType::HP_24:
-			return pole4;
-		default:
-			break;
-		}
+		do_highpass(sample, data.cutoff, data.resonance, 2, time_step);
+		return poles[0].pole;
 	}
-		break;
+	case FilterType::HP_12:
+	{
+		do_highpass(sample, data.cutoff * TWO_POLE_FACTOR, data.resonance, 2, time_step);
+		return poles[1].pole;
+	}
+	case FilterType::HP_18:
+		do_highpass(sample, data.cutoff * THREE_POLE_FACTOR, data.resonance, 3, time_step);
+		return poles[2].pole;
+	case FilterType::HP_24:
+		do_highpass(sample, data.cutoff * FOUR_POLE_FACTOR, data.resonance, 4, time_step);
+		return poles[3].pole;
+	//BP
+	case BP_6:
+		do_lowpass(sample, data.cutoff, data.resonance, 1, time_step);
+		do_highpass(poles[0].pole, data.cutoff, 0, 1, time_step, 4);
+		return poles[4].pole * BP_6_BOOST;
 	case BP_12:
-		//Cutoff
-		double factor = TWO_POLE_FACTOR;
-		double cutoff = cutoff_to_factor(data.cutoff * factor, time_step);
-		double hp_cutoff = cutoff_to_highpass_factor(data.cutoff * factor, time_step);
-		double feedback = data.resonance + data.resonance/(1 - cutoff);
-		//Update lowpass buffer
-		pole1 += cutoff * (sample - pole1 + feedback * (pole1 - pole2));
-		pole2 += cutoff * (pole1 - pole2);
-		//Update highpass buffer
-		pole3 = hp_cutoff * (pole2 - last_pole3 + pole3);
-		pole4 = hp_cutoff * (pole3 - last_pole4 + pole4);
-
-		last_pole3 = pole2;
-		last_pole4 = pole3;
-
-		//Values
-		return pole4 * BP_12_BOOST;
+		do_lowpass(sample, data.cutoff * TWO_POLE_FACTOR, data.resonance, 2, time_step);
+		do_highpass(poles[1].pole, data.cutoff * TWO_POLE_FACTOR, 0, 2, time_step, 4);
+		return poles[5].pole * BP_12_BOOST;
+	case BP_18:
+		do_lowpass(sample, data.cutoff * THREE_POLE_FACTOR, data.resonance, 3, time_step);
+		do_highpass(poles[2].pole, data.cutoff * THREE_POLE_FACTOR, 0, 3, time_step, 4);
+		return poles[6].pole * BP_18_BOOST;
+	case BP_24:
+		do_lowpass(sample, data.cutoff * FOUR_POLE_FACTOR, data.resonance, 4, time_step);
+		do_highpass(poles[3].pole, data.cutoff * FOUR_POLE_FACTOR, 0, 4, time_step, 4);
+		return poles[7].pole * BP_24_BOOST;
 	}
 
 	return sample;
