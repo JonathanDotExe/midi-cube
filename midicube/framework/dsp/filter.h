@@ -75,6 +75,7 @@ inline void FilterPole::update_lp(double in, double factor) {
 
 inline void FilterPole::update_hp(double in, double factor) {
 	pole = factor * (in - last_pole + pole);
+	last_pole = pole;
 }
 
 class Filter {
@@ -93,8 +94,8 @@ private:
 		}
 	}
 	inline void do_highpass(double in, double c, double res, size_t poles, double time_step, size_t offset = 0) {
-		double cutoff = cutoff_to_factor(c, time_step);
-		double feedback = res + res/(1 - cutoff);
+		double cutoff = cutoff_to_highpass_factor(c, time_step);
+		double feedback = res + res/(cutoff);
 
 		double last = in + feedback * (this->poles[0].pole - this->poles[1].pole);
 		for (size_t i = 0; i < poles; ++i) {

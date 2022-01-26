@@ -40,15 +40,15 @@ const std::vector<double> frequencies = {
 struct VocoderPreset {
 	bool on = true;
 	double modulator_amplification = 5;
-	double post_amplification = 10;
+	double post_amplification = 1;
 	double modulator_mix = 0.2;
 	double mix = 0;
 
-	double gate = 0;
+	double gate = 0.0001;
 	double mod_highpass = 1200;
 
 	double normalization = 0.2;
-	double slope = 0.0;
+	double slope = 0.002;
 
 	bool formant_mode = true;
 	double min_freq = 120;

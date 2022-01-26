@@ -125,7 +125,21 @@ private:
 public:
 	EnvelopeFollower();
 	void apply(double signal, double time_step);
-	double volume();
+	inline double volume();
+};
+
+class NoiseGate {
+private:
+	EnvelopeFollower follower;
+	PortamendoBuffer volume{0};
+
+public:
+	double attack = 0.05;
+	double release = 0.05;
+	double gate = 0.001;
+
+	double apply(double signal, double time_step);
+
 };
 
 template<size_t N>
