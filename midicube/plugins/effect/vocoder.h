@@ -82,7 +82,7 @@ class VocoderEffect : public Effect {
 private:
 	std::array<VocoderBand, VOCODER_BAND_COUNT> bands;
 	Filter mfilter;
-	EnvelopeFollower modulator_env{};
+	NoiseGate gate;
 public:
 	VocoderPreset preset;
 

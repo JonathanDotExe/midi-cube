@@ -16,10 +16,8 @@ void VocoderEffect::process(const SampleInfo& info) {
 	if (preset.on) {
 		//Gate
 		modulator *= preset.modulator_amplification;
-		modulator_env.apply(modulator, info.time_step);
-		if (modulator_env.volume() < preset.gate) {
-			modulator = 0;
-		}
+		gate.gate = preset.gate;
+		modulator = gate.apply(modulator, info.time_step);
 		//Vocode
 		double lvocoded = 0;
 		double rvocoded = 0;
