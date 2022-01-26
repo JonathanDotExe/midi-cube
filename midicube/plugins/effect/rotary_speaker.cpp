@@ -32,7 +32,7 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		data.post_gain = 0;
 		data.tone = preset.tone;
 		data.triode = {preset.drive, DistortionType::TANH_DISTORTION, 1, 25, 0.0};
-		sample = amp.apply(sample, data, info.time_step);
+		sample = sample * 0.4 + amp.apply(sample, data, info.time_step) * 0.6;
 
 		//Filter
 		double bass_sample = lfilter.apply(lfilter_data, sample, info.time_step);
@@ -71,12 +71,12 @@ void RotarySpeakerEffect::process(const SampleInfo &info) {
 		SchroederReverbData reverb_data;
 		reverb_data.delay = 0.07 + 0.13 * preset.room_size;
 		reverb_data.feedback = 0.3 + 0.5 * preset.room_size;
-		mix(ls, lreverb.apply(ls, reverb_data, info), preset.room_amount);
-		mix(rs, rreverb.apply(rs, reverb_data, info), preset.room_amount);
+		mix_add(ls, lreverb.apply(ls, reverb_data, info), preset.room_amount);
+		mix_add(rs, rreverb.apply(rs, reverb_data, info), preset.room_amount);
 
 		//Mix
-		mix(outputs[0], ls, preset.mix);
-		mix(outputs[1], rs, preset.mix);
+		mix_add(outputs[0], ls, preset.mix);
+		mix_add(outputs[1], rs, preset.mix);
 	}
 
 	//Rotate speakers

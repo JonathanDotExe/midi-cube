@@ -13,6 +13,7 @@ AmplifierSimulationEffect::AmplifierSimulationEffect(PluginHost& h, Plugin& plug
 	cc.add_binding(&preset.post_gain);
 	cc.add_binding(&preset.drive);
 	cc.add_binding(&preset.tone);
+	cc.add_binding(&preset.mix);
 	cc.add_binding(&preset.high_freq);
 	cc.add_binding(&preset.high_gain);
 	cc.add_binding(&preset.mid_freq);
@@ -35,8 +36,10 @@ void AmplifierSimulationEffect::process(const SampleInfo &info) {
 		lsample = lamp.apply(lsample, data, info.time_step);
 		rsample = ramp.apply(rsample, data, info.time_step);
 	}
-	outputs[0] = lsample;
-	outputs[1] = rsample;
+	outputs[0] = inputs[0];
+	outputs[1] = inputs[1];
+	mix(outputs[0], lsample, preset.mix);
+	mix(outputs[1], rsample, preset.mix);
 }
 
 Menu* AmplifierSimulationEffect::create_menu() {
@@ -52,6 +55,7 @@ void AmplifierSimulationProgram::load(boost::property_tree::ptree tree) {
 	preset.post_gain.load(tree, "post_gain", 0);
 	preset.drive.load(tree, "drive", 0);
 	preset.tone.load(tree, "tone", 0.6);
+	preset.mix.load(tree, "mix", 1);
 	preset.low_freq.load(tree, "low_freq", 100);
 	preset.low_gain.load(tree, "low_gain", 0);
 	preset.mid_freq.load(tree, "mid_freq", 1000);
@@ -68,6 +72,7 @@ boost::property_tree::ptree AmplifierSimulationProgram::save() {
 	tree.add_child("post_gain", preset.post_gain.save());
 	tree.add_child("drive", preset.drive.save());
 	tree.add_child("tone", preset.tone.save());
+	tree.add_child("mix", preset.mix.save());
 	tree.add_child("low_freq", preset.low_freq.save());
 	tree.add_child("low_gain", preset.low_gain.save());
 	tree.add_child("mid_freq", preset.mid_freq.save());

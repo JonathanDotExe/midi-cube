@@ -125,7 +125,9 @@ private:
 public:
 	EnvelopeFollower();
 	void apply(double signal, double time_step);
-	inline double volume();
+	inline double volume() {
+		return value;
+	}
 };
 
 class NoiseGate {

@@ -40,8 +40,8 @@ void ReverbEffect::process(const SampleInfo &info) {
 		l = lfilter.apply(d, l, info.time_step);
 		r = lfilter.apply(d, r, info.time_step);
 		//Mix
-		mix(outputs[0], l ,preset.mix);
-		mix(outputs[1], r ,preset.mix);
+		mix_add(outputs[0], l ,preset.mix);
+		mix_add(outputs[1], r ,preset.mix);
 	}
 }
 

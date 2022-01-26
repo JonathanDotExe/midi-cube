@@ -140,6 +140,7 @@ Scene EffectView::create(ViewHost &frame) {
 			controls.push_back(amp_tone);
 
 			tmp_y -= 25;
+			tmp_x += 200;
 		}
 
 		tmp_y += 160;
@@ -213,8 +214,24 @@ Scene EffectView::create(ViewHost &frame) {
 			tmp_x += 200;
 		}
 
+		//Mix
+		{
+			Label *label = new Label("Mix", main_font, 18, tmp_x, tmp_y);
+			label->text.setFillColor(sf::Color::White);
+			controls.push_back(label);
+			tmp_y += 25;
+
+			DragBox<double> *amp_mix = new DragBox<double>(0, 0, 1, main_font,
+					24, tmp_x, tmp_y, 180, 120);
+			amp_mix->property.bind(amp->preset.mix, handler);
+			controls.push_back(amp_mix);
+
+			tmp_y -= 25;
+			tmp_x += 200;
+		}
+
 		tmp_y += 160;
-		tmp_x -= 200 * 4;
+		tmp_x -= 200 * 5;
 
 		//Low Freq
 		{

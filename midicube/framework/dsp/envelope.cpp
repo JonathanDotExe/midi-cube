@@ -214,12 +214,9 @@ void EnvelopeFollower::apply(double signal, double time_step) {
 	value = filter.apply(data, signal, time_step);
 }
 
-double EnvelopeFollower::volume() {
-	return value;
-}
-
 double NoiseGate::apply(double signal, double time_step) {
-	double curr_vol = follower.apply(signal, time_step);
+	follower.apply(signal, time_step);
+	double curr_vol = follower.volume();
 	if (curr_vol < gate) {
 		volume.set(0, 1/attack, 1/release);
 	}

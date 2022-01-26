@@ -23,6 +23,7 @@ struct AmplifierSimulationPreset {
 	BindableTemplateValue<double> post_gain{0, 0, 1};
 	BindableTemplateValue<double> drive{0, 0, 1};
 	BindableTemplateValue<double> tone{0.8, 0, 1};
+	BindableTemplateValue<double> mix{1, 0, 1};
 	BindableTemplateValue<double> low_freq{100, 20, 400};
 	BindableTemplateValue<double> low_gain{0, -1, 5};
 	BindableTemplateValue<double> mid_freq{1000, 200, 8000};
