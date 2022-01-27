@@ -94,6 +94,7 @@ struct MidiControls {
 	}
 };
 
+template<typename T>
 class IParameter {
 public:
 
@@ -101,13 +102,17 @@ public:
 
 	virtual void* get_property() = 0;
 
+	virtual T get() = 0;
+
+	virtual void set(T val) = 0;
+
 	virtual ~IParameter() {
 
 	}
 };
 
 template<typename T>
-class ITemplateParameter : public IParameter {
+class ITemplateParameter : public IParameter<T> {
 public:
 
 	virtual T get_min() const = 0;
@@ -123,41 +128,19 @@ public:
 template<typename T>
 class TemplateParameter : public ITemplateParameter<T> {
 private:
-	T value;
+	T& variable;
+	T total_min;
+	T total_max;
+	//TODO converter and scale
 
 public:
-
-	//DONT CHANGE
-	T total_min;
-	//DONT CHANGE
-	T total_max;
 
 	void* get_property() {
 		return this;
 	}
 
-	TemplateParameter(T val, T min, T max) : total_min(min), total_max(max) {
-		this->value = val;
-	}
+	TemplateParameter(T& v, T min, T max) : variable(v), total_min(min), total_max(max) {
 
-	TemplateParameter(const TemplateParameter<T>& other) {
-		this->value = other.value;
-		this->total_min = other.total_min;
-		this->total_max = other.total_max;
-	}
-
-	inline TemplateParameter<T>& operator=(const TemplateParameter<T>& other) {
-		if (&other != this) {
-			this->value = other.value;
-			this->total_min = other.total_min;
-			this->total_max = other.total_max;
-		}
-		return *this;
-	}
-
-	inline T& operator=(const T& other) {
-		this->value = other;
-		return value;
 	}
 
 	inline operator T&() {
@@ -178,6 +161,14 @@ public:
 
 	T get_max() const {
 		return total_max;
+	}
+
+	T get() {
+		return variable;
+	}
+
+	void set(T val) {
+		variable = val;
 	}
 
 };
