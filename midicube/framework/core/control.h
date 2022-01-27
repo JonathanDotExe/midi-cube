@@ -125,13 +125,23 @@ public:
 
 };
 
+class IConverterFunction {
+public:
+	virtual double apply(double x) const = 0;
+	virtual double inverse(double x) const = 0;
+	virtual ~IConverterFunction() {
+
+	}
+};
+
 template<typename T>
 class TemplateParameter : public ITemplateParameter<T> {
 private:
 	T& variable;
 	T total_min;
 	T total_max;
-	//TODO converter and scale
+	const IConverterFunction& converter;
+	const IConverterFunction& curve;
 
 public:
 
@@ -139,20 +149,12 @@ public:
 		return this;
 	}
 
-	TemplateParameter(T& v, T min, T max) : variable(v), total_min(min), total_max(max) {
+	TemplateParameter(T& v, T min, T max, const IConverterFunction& c, const IConverterFunction& cu) : variable(v), total_min(min), total_max(max), converter(c), curve(c) {
 
-	}
-
-	inline operator T&() {
-		return value;
-	}
-
-	inline operator T() const {
-		return value;
 	}
 
 	void change(double val) {
-		value = total_min + (total_max - total_min) * val;
+		set(total_min + (total_max - total_min) * curve.apply(val));
 	}
 
 	T get_min() const {
@@ -164,11 +166,11 @@ public:
 	}
 
 	T get() {
-		return variable;
+		return converter.inverse(variable);
 	}
 
 	void set(T val) {
-		variable = val;
+		variable = converter.apply(val);
 	}
 
 };
@@ -180,9 +182,7 @@ private:
 
 public:
 
-	//DONT CHANGE
 	T total_min;
-	//DONT CHANGE
 	T total_max;
 
 	void* get_property() {
