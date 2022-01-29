@@ -252,7 +252,7 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 		if (!released || note_change) {
 			note_change = false;
 			MidiMessage msg;
-			msg.type = MessageType::NOTE_ON;
+			msg.type = MessageType::NOTE_OFF;
 			msg.set_note(curr_note);
 			msg.set_velocity(0);
 			this->send_midi(msg, info);
