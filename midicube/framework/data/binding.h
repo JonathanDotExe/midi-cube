@@ -20,6 +20,7 @@
 
 namespace pt = boost::property_tree;
 
+/*
 class BindableValue {
 
 public:
@@ -253,7 +254,7 @@ public:
 		return tree;
 	}
 
-};
+};*/
 
 class MidiBindingHandler {
 private:

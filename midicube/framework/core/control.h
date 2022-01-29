@@ -94,13 +94,22 @@ struct MidiControls {
 	}
 };
 
-template<typename T>
-class IParameter {
+class IBindable {
 public:
 
 	virtual void change(double val) = 0;
 
 	virtual void* get_property() = 0;
+
+	virtual ~IBindable() {
+
+	}
+
+};
+
+template<typename T>
+class IParameter : public IBindable {
+public:
 
 	virtual T get() = 0;
 
@@ -214,9 +223,9 @@ public:
 
 };
 
-class BooleanParameter : public IParameter {
+class BooleanParameter : public IParameter<bool> {
 private:
-	bool value;
+	bool& value;
 
 public:
 
@@ -224,28 +233,20 @@ public:
 		return this;
 	}
 
-	BooleanParameter(bool val = false) {
-		this->value = val;
+	BooleanParameter(bool& val) : value(val){
+
 	}
 
-	BooleanParameter(const BooleanParameter& other) {
-		this->value = other.value;
-	}
-
-	inline bool operator=(const bool other) {
-		value = other;
-		return value;
-	}
-
-	inline operator bool() const {
-		return value;
-	}
-
-	inline operator bool&(){
-		return value;
-	}
 	void change(double val) {
 		value = val > 0;
+	}
+
+	bool get() {
+		return value;
+	}
+
+	void set(bool val) {
+		value = val;
 	}
 
 };
@@ -256,7 +257,7 @@ struct ControlBind {
 	size_t index = 0;
 	size_t bank = 0;
 
-	IParameter* param = nullptr;
+	IBindable* param = nullptr;
 };
 
 class ControlHost {
@@ -297,7 +298,7 @@ public:
 		return changed;
 	}
 
-	ControlView& bind(IParameter* param, ControlType type, size_t index, size_t bank) {
+	ControlView& bind(IBindable* param, ControlType type, size_t index, size_t bank) {
 		if (plugin) {
 			throw "ControlView is closed for further bindings";
 		}
