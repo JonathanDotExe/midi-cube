@@ -256,61 +256,41 @@ public:
 
 };*/
 
+struct MidiBinding {
+	ControlType type;
+	size_t index = 0;
+	ControlHost* source = nullptr;
+	IBindable* param = nullptr;
+};
+
 class MidiBindingHandler {
 private:
 	/*std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> persistent;
 	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> temp;*/
-	std::vector<std::pair<ControlHost*, BindableValue*>> bindings;
+	std::vector<MidiBinding> bindings;
 
 public:
 
-	void bind(ControlHost* source, BindableValue* value) {
-		bindings.push_back({source, value});
-		/*//Unbind
-		if (value->persistent_cc < MIDI_CONTROL_COUNT) {
-			std::vector<BindableValue*>& vec = persistent[value->persistent_cc];
-			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
-		}
-		if (value->temp_cc < MIDI_CONTROL_COUNT) {
-			std::vector<BindableValue*>& vec = temp[value->temp_cc];
-			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
-		}
-		//Update
-		value->persistent_cc = persistent_cc;
-		value->temp_cc = temp_cc;
-		//Bind
-		if (value->persistent_cc < MIDI_CONTROL_COUNT) {
-			std::vector<BindableValue*>& vec = persistent[value->persistent_cc];
-			vec.push_back(value);
-		}
-		if (value->temp_cc < MIDI_CONTROL_COUNT) {
-			std::vector<BindableValue*>& vec = temp[value->temp_cc];
-			vec.push_back(value);
-		}*/
+	void bind(MidiBinding binding) {
+		bindings.push_back(binding);
 	}
 
-	void unbind(BindableValue* value) {
-		//Unbind
-		/*if (value->persistent_cc < MIDI_CONTROL_COUNT) {
-			std::vector<BindableValue*>& vec = persistent[value->persistent_cc];
-			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
-		}
-		if (value->temp_cc < MIDI_CONTROL_COUNT) {
-			std::vector<BindableValue*>& vec = temp[value->temp_cc];
-			vec.erase(std::remove_if(vec.begin(), vec.end(), [value](BindableValue* v) { return v == value; }), vec.end());
-		}*/
-		bindings.erase(std::remove_if(bindings.begin(), bindings.end(), [value](std::pair<void*, BindableValue*> v) { return v.second == value; }), bindings.end());
+	void unbind(IBindable* value) {
+		bindings.erase(std::remove_if(bindings.begin(), bindings.end(), [value](MidiBinding& b) { return b.param == value; }), bindings.end());
 	}
 
-	std::vector<std::pair<void*, void*>> on_cc(unsigned int control, double value) {
-		std::vector<std::pair<void*, void*>> changes;
-		for (std::pair<ControlHost*, BindableValue*> val : bindings) {
-			if (val.first->get_controls().get_cc(val.second->type, val.second->cc, val.second->bank) == control) {
-				val.second->change(value);
+	void unbind(MidiBinding binding) {
+		bindings.erase(std::remove(bindings.begin(), bindings.end(), binding), bindings.end());
+	}
+
+	void on_cc(unsigned int control, double value) {
+		for (MidiBinding& val : bindings) {
+			if (val.source->get_controls().get_cc(val.type, val.index) == control) {
+				val.param->change(value);
+				val.source->notify_property_update()
 				changes.push_back(val); //TODO
 			}
 		}
-		return changes;
 	}
 
 };
