@@ -19,8 +19,8 @@
 struct ChorusPreset {
 	BindableBooleanValue on = true;
 	BindableTemplateValue<double> vibrato_rate{2, 0, 8};
-	BindableTemplateValue<double> vibrato_depth{0.5, 0, 1};
-	BindableTemplateValue<double> mix{0.5, 0, 1};
+	BindableTemplateValue<double> vibrato_depth{0.3, 0, 1};
+	BindableTemplateValue<double> mix{0.3, 0, 1};
 
 	BindableTemplateValue<double> delay{0.015, 0, 0.03};
 	AnalogWaveForm vibrato_waveform = AnalogWaveForm::TRIANGLE_WAVE;

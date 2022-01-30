@@ -65,7 +65,7 @@ void AdvancedSynth::apply_filter(FilterEntity& filter, Filter& f, double& carrie
 	if (filter.on) {
 		//Pre drive
 		if (filter.drive) {
-			carrier = atan(carrier * (1.5 + filter.drive_amount * 10));
+			carrier = tanh_waveshaper(carrier * (1 + filter.drive));
 		}
 
 		FilterData data { filter.type };
@@ -568,7 +568,7 @@ void AdvancedSynthProgram::load(boost::property_tree::ptree tree) {
 			}
 			OscilatorEntity& osc = preset.oscilators[i];
 			osc.waveform = (AnalogWaveForm) o.second.get<int>("waveform", 0);
-			osc.analog = o.second.get<bool>("analog", true);
+			//osc.analog = o.second.get<bool>("analog", true);
 			osc.sync = o.second.get<bool>("sync", false);
 			osc.reset = o.second.get<bool>("reset", false);
 			osc.randomize = o.second.get<bool>("randomize", false);

@@ -179,7 +179,7 @@ void B3Organ::process_note_sample(const SampleInfo &info, TriggeredNote& note, s
 }*/
 
 bool B3Organ::note_finished(const SampleInfo& info, TriggeredNote& note, size_t note_index) {
-	return !note.pressed && info.time > note.release_time + ORGAN_MAX_UP_DELAY + data.preset.click_attack;
+	return (!note.pressed || (host_environment.sustain && note.release_time >= host_environment.sustain_time)) && info.time > note.release_time + ORGAN_MAX_UP_DELAY + data.preset.click_attack;
 };
 
 void B3Organ::process_sample(const SampleInfo &info) {
