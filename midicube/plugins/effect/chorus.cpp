@@ -34,7 +34,7 @@ void ChorusEffect::process(const SampleInfo& info) {
 
 		//Mix
 		mix_add(outputs[0], l, preset.mix);
-		mix_add(outputs[1], r, preset.mix);
+		mix_add(outputs[1], -r, preset.mix);
 	}
 }
 
