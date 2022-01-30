@@ -13,6 +13,7 @@
 #include "../../framework/dsp/oscilator.h"
 #include "../../framework/dsp/filter.h"
 #include "../../framework/util/util.h"
+#include "../../framework/dsp/distortion.h"
 
 #define ASYNTH_PART_COUNT 8
 #define ANALOG_CONTROL_COUNT 128
