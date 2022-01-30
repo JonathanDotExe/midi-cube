@@ -67,7 +67,7 @@ public:
 				Label* title = new Label("Type", font, 12, frame.get_width()/2 - width/2 + 90 * index, 200);
 				controls.push_back(title);
 
-				ComboBox* value = new ComboBox(0, {"CC", "Slider", "Knob", "Button", "Scene", "Mod", "Breath", "Vol. Ped.", "Expression", "Sustain", "Sostenuto", "Soft"}, font, 16, 0, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
+				ComboBox* value = new ComboBox(0, {"CC", "Slider", "Knob", "Button", "Scene", "Mod", "Breath", "Foot SW.", "Expression", "Sustain", "Sostenuto", "Soft"}, font, 16, 0, frame.get_width()/2 - width/2 + 90 * index, 225, 80, 40);
 				value->property.bind_cast(this->value.type, handler);
 				controls.push_back(value);
 			}

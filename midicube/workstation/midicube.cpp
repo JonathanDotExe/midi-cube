@@ -269,26 +269,19 @@ void MidiCubeConfig::load(pt::ptree tree) {
 	}
 
 	//Controls
-	if (tree.get_child_optional("controls.banks")) {
-		controls.control_banks = {};
-		for (auto b : tree.get_child("controls.banks")) {
-			ControlBank bank;
-			if (b.second.get_child_optional("sliders")) {
-				for (auto slider : b.second.get_child("sliders")) {
-					bank.sliders.push_back(slider.second.get_value<unsigned int>(128));
-				}
-			}
-			if (b.second.get_child_optional("knobs")) {
-				for (auto knob : b.second.get_child("knobs")) {
-					bank.knobs.push_back(knob.second.get_value<unsigned int>(128));
-				}
-			}
-			if (b.second.get_child_optional("buttons")) {
-				for (auto button : b.second.get_child("buttons")) {
-					bank.buttons.push_back(button.second.get_value<unsigned int>(128));
-				}
-			}
-			controls.control_banks.push_back(bank);
+	if (tree.get_child_optional("sliders")) {
+		for (auto slider : tree.get_child("sliders")) {
+			controls.sliders.push_back(slider.second.get_value<unsigned int>(128));
+		}
+	}
+	if (tree.get_child_optional("knobs")) {
+		for (auto knob : tree.get_child("knobs")) {
+			controls.knobs.push_back(knob.second.get_value<unsigned int>(128));
+		}
+	}
+	if (tree.get_child_optional("buttons")) {
+		for (auto button : tree.get_child("buttons")) {
+			controls.buttons.push_back(button.second.get_value<unsigned int>(128));
 		}
 	}
 	if (tree.get_child_optional("controls.scene_buttons")) {
@@ -297,10 +290,25 @@ void MidiCubeConfig::load(pt::ptree tree) {
 			controls.scene_buttons.push_back(button.second.get_value<unsigned int>(128));
 		}
 	}
-	controls.mod_wheel = tree.get<unsigned int>("controls.mod_wheel", controls.mod_wheel);
+	if (tree.get_child_optional("controls.mod_wheels")) {
+		controls.mod_wheels = {};
+		for (auto button : tree.get_child("controls.mod_wheels")) {
+			controls.mod_wheels.push_back(button.second.get_value<unsigned int>(128));
+		}
+	}
+	if (tree.get_child_optional("controls.expression_pedals")) {
+		controls.expression_pedals = {};
+		for (auto button : tree.get_child("controls.expression_pedals")) {
+			controls.expression_pedals.push_back(button.second.get_value<unsigned int>(128));
+		}
+	}
+	if (tree.get_child_optional("controls.foot_switches")) {
+		controls.foot_switches = {};
+		for (auto button : tree.get_child("controls.foot_switches")) {
+			controls.foot_switches.push_back(button.second.get_value<unsigned int>(128));
+		}
+	}
 	controls.breath_controller = tree.get<unsigned int>("controls.breath_controller", controls.breath_controller);
-	controls.volume_pedal = tree.get<unsigned int>("controls.volume_pedal", controls.volume_pedal);
-	controls.expresion_pedal = tree.get<unsigned int>("controls.expression_pedal", controls.expresion_pedal);
 	controls.sustain_pedal = tree.get<unsigned int>("controls.sustain_pedal", controls.sustain_pedal);
 	controls.sostenuto_pedal = tree.get<unsigned int>("controls.sostenuto_pedal", controls.sostenuto_pedal);
 	controls.soft_pedal = tree.get<unsigned int>("controls.soft_pedal", controls.soft_pedal);
@@ -325,33 +333,28 @@ pt::ptree MidiCubeConfig::save() {
 		tree.add_child("default_sources.source", s);
 	}
 	//Controls
-	for (ControlBank& bank : controls.control_banks) {
-		pt::ptree b;
-		pt::ptree sliders;
-		pt::ptree knobs;
-		pt::ptree buttons;
-		for (unsigned int slider : bank.sliders) {
-			sliders.add("slider", slider);
-		}
-		for (unsigned int knob : bank.knobs) {
-			knobs.add("knob", knob);
-		}
-		for (unsigned int button : bank.buttons) {
-			buttons.add("button", button);
-		}
-		b.put_child("sliders", sliders);
-		b.put_child("knobs", knobs);
-		b.put_child("buttons", buttons);
-
-		tree.add_child("controls.banks.bank", b);
+	for (unsigned int slider : controls.sliders) {
+		tree.add("controls.sliders.slider", slider);
+	}
+	for (unsigned int knob : controls.knobs) {
+		tree.add("controls.knobs.knob", knob);
+	}
+	for (unsigned int button : controls.buttons) {
+		tree.add("controls.buttons.button", button);
 	}
 	for (unsigned int button : controls.scene_buttons) {
 		tree.add("controls.scene_buttons.button", button);
 	}
-	tree.put("controls.mod_wheel", controls.mod_wheel);
+	for (unsigned int mod_wheel : controls.mod_wheels) {
+		tree.add("controls.mod_wheels.mod_wheel", mod_wheel);
+	}
+	for (unsigned int pedal : controls.expression_pedals) {
+		tree.add("controls.expression_pedals.expression_pedal", pedal);
+	}
+	for (unsigned int pedal : controls.foot_switches) {
+		tree.add("controls.foot_switches.foot_switch", pedal);
+	}
 	tree.put("controls.breath_controller", controls.breath_controller);
-	tree.put("controls.volume_pedal", controls.volume_pedal);
-	tree.put("controls.expression_pedal", controls.expresion_pedal);
 	tree.put("controls.sustain_pedal", controls.sustain_pedal);
 	tree.put("controls.sostenuto_pedal", controls.sostenuto_pedal);
 	tree.put("controls.soft_pedal", controls.soft_pedal);
