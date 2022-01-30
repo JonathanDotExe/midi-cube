@@ -12,62 +12,40 @@
 #include <unordered_map>
 #include <iostream>
 
-struct ControlBank {
-	std::vector<unsigned int> sliders;
-	std::vector<unsigned int> knobs;
-	std::vector<unsigned int> buttons;
-};
-
 enum ControlType {
-	CC, SLIDER, KNOB, BUTTON, SCENE_BUTTON, MOD_WHEEL, BREATH_CONTROLLER, VOLUME_PEDAL, EXPRESSION_PEDAL, SUSTAIN_PEDAL, SOSTENUTO_PEDAL, SOFT_PEDAL
+	CC, SLIDER, KNOB, BUTTON, SCENE_BUTTON, MOD_WHEELS, BREATH_CONTROLLER, FOOT_SWITCHES, EXPRESSION_PEDALS, SUSTAIN_PEDAL, SOSTENUTO_PEDAL, SOFT_PEDAL
 };
 
 struct MidiControls {
-	std::vector<ControlBank> control_banks = {{
-			{67, 68, 69, 70, 87, 88, 89, 90, 92},
-			{35, 36, 37, 38, 39, 40, 41, 42, 43},
-			{22, 23, 24, 25, 26, 27, 28, 29, 30}
-	},
-	{
-			{73, 75, 79, 72, 80, 81, 82, 83, 84},
-			{74, 71, 76, 77, 93, 18, 19, 16, 17},
-			{128, 128, 128, 128, 128, 128, 128, 128, 128}
-	}};
+	std::vector<unsigned int> sliders{67, 68, 69, 70, 87, 88, 89, 90, 92, 73, 75, 79, 72, 80, 81, 82, 83, 84};
+	std::vector<unsigned int> knobs{35, 36, 37, 38, 39, 40, 41, 42, 43, 74, 71, 76, 77, 93, 18, 19, 16, 17};
+	std::vector<unsigned int> buttons{22, 23, 24, 25, 26, 27, 28, 29, 30};
 	std::vector<unsigned int> scene_buttons = {52, 53, 54, 55, 56, 57, 58, 59, 60, 61};
-	unsigned int mod_wheel = 1;
+	std::vector<unsigned int> mod_wheels{1};
+	std::vector<unsigned int> expression_pedals{11, 7};
+	std::vector<unsigned int> foot_switches{};
 	unsigned int breath_controller = 2;
-	unsigned int volume_pedal = 7;
-	unsigned int expresion_pedal = 11;
 	unsigned int sustain_pedal = 64;
 	unsigned int sostenuto_pedal = 66;
 	unsigned int soft_pedal = 67;
 
-	unsigned int get_cc(ControlType type, size_t index, size_t bank) const {
+	unsigned int get_cc(ControlType type, size_t index) const {
 		switch (type) {
 		case CC:
 			return index;
 		case SLIDER:
-			if (bank < control_banks.size()) {
-				const ControlBank& b = control_banks[bank];
-				if (index < b.sliders.size()) {
-					return b.sliders[index];
-				}
+			if (index < sliders.size()) {
+				return sliders[index];
 			}
 			return 128;
 		case KNOB:
-			if (bank < control_banks.size()) {
-				const ControlBank& b = control_banks[bank];
-				if (index < b.knobs.size()) {
-					return b.knobs[index];
-				}
+			if (index < knobs.size()) {
+				return knobs[index];
 			}
 			return 128;
 		case BUTTON:
-			if (bank < control_banks.size()) {
-				const ControlBank& b = control_banks[bank];
-				if (index < b.buttons.size()) {
-					return b.buttons[index];
-				}
+			if (index < buttons.size()) {
+				return buttons[index];
 			}
 			return 128;
 		case SCENE_BUTTON:
@@ -75,14 +53,23 @@ struct MidiControls {
 				return scene_buttons[index];
 			}
 			return 128;
-		case MOD_WHEEL:
-			return mod_wheel;
+		case MOD_WHEELS:
+			if (index < mod_wheels.size()) {
+				return mod_wheels[index];
+			}
+			return 128;
 		case BREATH_CONTROLLER:
 			return breath_controller;
-		case VOLUME_PEDAL:
-			return volume_pedal;
-		case EXPRESSION_PEDAL:
-			return expresion_pedal;
+		case FOOT_SWITCHES:
+			if (index < foot_switches.size()) {
+				return foot_switches[index];
+			}
+			return 128;
+		case EXPRESSION_PEDALS:
+			if (index < expression_pedals.size()) {
+				return expression_pedals[index];
+			}
+			return 128;
 		case SUSTAIN_PEDAL:
 			return sustain_pedal;
 		case SOSTENUTO_PEDAL:
@@ -252,11 +239,9 @@ public:
 };
 
 
-struct ControlBind {
+struct ControlViewBind {
 	ControlType type;
 	size_t index = 0;
-	size_t bank = 0;
-
 	IBindable* param = nullptr;
 };
 
@@ -275,7 +260,7 @@ public:
 
 class ControlView {
 private:
-	std::vector<ControlBind> params;
+	std::vector<ControlViewBind> params;
 	ControlHost* plugin = nullptr;
 	std::string name = "";
 
@@ -288,8 +273,8 @@ public:
 	bool on_cc(unsigned int cc, double val) {
 		bool changed = false;
 		const MidiControls& controls = plugin->get_controls();
-		for (ControlBind& bind : params) {
-			if (cc == controls.get_cc(bind.type, bind.index, bind.bank)) {
+		for (ControlViewBind& bind : params) {
+			if (cc == controls.get_cc(bind.type, bind.index)) {
 				bind.param->change(val);
 				plugin->notify_property_update(bind.param->get_property());
 				changed = true;
@@ -302,7 +287,7 @@ public:
 		if (plugin) {
 			throw "ControlView is closed for further bindings";
 		}
-		params.push_back({type, index, bank, param});
+		params.push_back({type, index, param});
 		return *this;
 	}
 

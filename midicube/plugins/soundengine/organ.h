@@ -87,7 +87,7 @@ struct B3OrganPreset {
 		BindableTemplateValue<unsigned int>(8, 0, 8),
 		BindableTemplateValue<unsigned int>(8, 0, 8),
 	} {
-		swell.type = ControlType::EXPRESSION_PEDAL;
+		swell.type = ControlType::EXPRESSION_PEDALS;
 	}
 };
 

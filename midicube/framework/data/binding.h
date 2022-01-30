@@ -354,32 +354,4 @@ public:
 
 };
 
-/*
-namespace boost {
-	namespace property_tree {
-
-		template<>
-		struct translator_between<ptree, BindableBooleanValue>
-		{
-			struct type {
-				typedef ptree internal_type;
-				typedef BindableBooleanValue external_type;
-
-				boost::optional<external_type> get_value(const internal_type& tree) {
-					BindableBooleanValue b = true;
-					b.load(tree);
-					return b;
-				}
-
-				boost::optional<internal_type> put_value(const external_type& b) {
-					return b.save();
-				}
-
-			};
-		};
-
-	}
-}*/
-
-
 #endif /* MIDICUBE_BINDING_H_ */
