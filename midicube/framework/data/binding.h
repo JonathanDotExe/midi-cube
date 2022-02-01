@@ -259,36 +259,47 @@ public:
 struct MidiBinding {
 	ControlType type;
 	size_t index = 0;
-	ControlHost* source = nullptr;
-	IBindable* param = nullptr;
+	double min = 0;
+	double max = 1;
 };
 
 class MidiBindingHandler {
 private:
 	/*std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> persistent;
 	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> temp;*/
-	std::vector<MidiBinding> bindings;
+	std::unordered_map<IBindable*, std::vector<MidiBinding>> bindings;
 
 public:
 
-	void bind(MidiBinding binding) {
-		bindings.push_back(binding);
+	void bind(IBindable* param, MidiBinding binding) {
+		if (!bindings.count(param)) {
+			bindings[param] = {};
+		}
+		bindings[param].push_back(binding);
 	}
 
 	void unbind(IBindable* value) {
-		bindings.erase(std::remove_if(bindings.begin(), bindings.end(), [value](MidiBinding& b) { return b.param == value; }), bindings.end());
+		bindings.erase(value);
 	}
 
-	void unbind(MidiBinding binding) {
-		bindings.erase(std::remove(bindings.begin(), bindings.end(), binding), bindings.end());
+	void unbind(IBindable* value, int index) {
+		bindings[value].erase(bindings[value].begin() + index);
+	}
+
+	std::vector<MidiBinding> get_bindings(IBindable* param) {
+		if (!bindings.count(param)) {
+			return {};
+		}
+		return param;
 	}
 
 	void on_cc(unsigned int control, double value) {
-		for (MidiBinding& val : bindings) {
-			if (val.source->get_controls().get_cc(val.type, val.index) == control) {
-				val.param->change(value);
-				val.source->notify_property_update()
-				changes.push_back(val); //TODO
+		for (auto val : bindings) {
+			const MidiControls& controls = val.first->host->get_controls();
+			for (MidiBinding& b : val.second) {
+				if (controls.get_cc(b.type, b.index) == control) {
+					val.first->change(value);
+				}
 			}
 		}
 	}

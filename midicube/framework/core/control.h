@@ -84,9 +84,9 @@ struct MidiControls {
 class ControlHost {
 
 public:
-	virtual void notify_property_update(void* property) = 0;
+	virtual void notify_property_update(void* property) const = 0;
 
-	virtual const MidiControls& get_controls() = 0;
+	virtual const MidiControls& get_controls() const = 0;
 
 	virtual ~ControlHost() {
 
@@ -96,8 +96,6 @@ public:
 
 class IBindable {
 private:
-	std::string name;
-	ControlHost* host = nullptr;
 
 protected:
 	inline void notify_poperty_change() {
@@ -105,6 +103,8 @@ protected:
 	}
 
 public:
+	const std::string name;
+	const ControlHost* host;
 
 	IBindable(ControlHost* host, std::string name) {
 		this->host = host;
