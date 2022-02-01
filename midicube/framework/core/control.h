@@ -81,10 +81,39 @@ struct MidiControls {
 	}
 };
 
+class ControlHost {
+
+public:
+	virtual void notify_property_update(void* property) = 0;
+
+	virtual const MidiControls& get_controls() = 0;
+
+	virtual ~ControlHost() {
+
+	}
+
+};
+
 class IBindable {
+private:
+	std::string name;
+	ControlHost* host = nullptr;
+
+protected:
+	inline void notify_poperty_change() {
+		host->notify_property_update(this);
+	}
+
 public:
 
+	IBindable(ControlHost* host, std::string name) {
+		this->host = host;
+		this->name = name;
+	}
+
 	virtual void change(double val) = 0;
+
+	virtual double get_scaled() = 0;
 
 	virtual void* get_property() = 0;
 
@@ -98,6 +127,8 @@ template<typename T>
 class IParameter : public IBindable {
 public:
 
+	IParameter(ControlHost* host, std::string name) : IBindable(host, name) { }
+
 	virtual T get() = 0;
 
 	virtual void set(T val) = 0;
@@ -110,6 +141,8 @@ public:
 template<typename T>
 class ITemplateParameter : public IParameter<T> {
 public:
+
+	ITemplateParameter(ControlHost* host, std::string name) : IParameter<T>(host, name) { }
 
 	virtual T get_min() const = 0;
 
@@ -145,12 +178,13 @@ public:
 		return this;
 	}
 
-	TemplateParameter(T& v, T min, T max, const IConverterFunction& c, const IConverterFunction& cu) : variable(v), total_min(min), total_max(max), converter(c), curve(c) {
+	TemplateParameter(T& v, T min, T max, const IConverterFunction& c, const IConverterFunction& cu, ControlHost* host, std::string name) : ITemplateParameter<T>(host, name), variable(v), total_min(min), total_max(max), converter(c), curve(c) {
 
 	}
 
 	void change(double val) {
 		set(total_min + (total_max - total_min) * curve.apply(val));
+		notify_poperty_change();
 	}
 
 	T get_min() const {
@@ -184,12 +218,13 @@ public:
 		return this;
 	}
 
-	TemplateEnumParameter(T& v, T min, T max) : variable(v){
+	TemplateEnumParameter(T& v, T min, T max, ControlHost* host, std::string name) : ITemplateParameter<T>(host, name),variable(v){
 
 	}
 
 	void change(double val) {
 		set(static_cast<T>(static_cast<int>(total_min) + (static_cast<int>(total_max) - static_cast<int>(total_min)) * val));
+		notify_poperty_change();
 	}
 
 	T get_min() const {
@@ -226,6 +261,7 @@ public:
 
 	void change(double val) {
 		value = val > 0;
+		notify_poperty_change();
 	}
 
 	bool get() {
@@ -245,18 +281,6 @@ struct ControlViewBind {
 	IBindable* param = nullptr;
 };
 
-class ControlHost {
-
-public:
-	virtual void notify_property_update(void* property) = 0;
-
-	virtual const MidiControls& get_controls() = 0;
-
-	virtual ~ControlHost() {
-
-	}
-
-};
 
 class ControlView {
 private:
