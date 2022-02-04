@@ -12,6 +12,9 @@
 #include <unordered_map>
 #include <iostream>
 
+#include <boost/property_tree/ptree.hpp>
+namespace pt = boost::property_tree;
+
 enum ControlType {
 	CC, SLIDER, KNOB, BUTTON, SCENE_BUTTON, MOD_WHEELS, BREATH_CONTROLLER, FOOT_SWITCHES, EXPRESSION_PEDALS, SUSTAIN_PEDAL, SOSTENUTO_PEDAL, SOFT_PEDAL
 };
@@ -86,7 +89,7 @@ class ControlHost {
 public:
 	virtual void notify_property_update(void* property) const = 0;
 
-	virtual const MidiControls& get_controls() const = 0;
+//	virtual const MidiControls& get_controls() const = 0;
 
 	virtual ~ControlHost() {
 
@@ -94,8 +97,12 @@ public:
 
 };
 
+class MidiBindingHandler;
+
 class IBindable {
 private:
+	ControlHost* host = nullptr;
+	MidiBindingHandler* handler = nullptr;
 
 protected:
 	inline void notify_poperty_change() {
@@ -104,11 +111,17 @@ protected:
 
 public:
 	const std::string name;
-	const ControlHost* host;
 
-	IBindable(ControlHost* host, std::string name) {
-		this->host = host;
+
+	IBindable(std::string name) {
 		this->name = name;
+	}
+
+	void init (ControlHost* host, MidiBindingHandler* handler) {
+		if (this->host == nullptr && this->handler == handler) {
+			this->host = host;
+			this->handler = handler;
+		}
 	}
 
 	virtual void change(double val) = 0;
@@ -117,9 +130,9 @@ public:
 
 	virtual void* get_property() = 0;
 
-	virtual ~IBindable() {
+	virtual void save() = 0;
 
-	}
+	virtual ~IBindable();
 
 };
 
@@ -127,7 +140,7 @@ template<typename T>
 class IParameter : public IBindable {
 public:
 
-	IParameter(ControlHost* host, std::string name) : IBindable(host, name) { }
+	IParameter(std::string name) : IBindable(name) { }
 
 	virtual T get() = 0;
 
@@ -142,7 +155,7 @@ template<typename T>
 class ITemplateParameter : public IParameter<T> {
 public:
 
-	ITemplateParameter(ControlHost* host, std::string name) : IParameter<T>(host, name) { }
+	ITemplateParameter(std::string name) : IParameter<T>(name) { }
 
 	virtual T get_min() const = 0;
 
@@ -178,7 +191,7 @@ public:
 		return this;
 	}
 
-	TemplateParameter(T& v, T min, T max, const IConverterFunction& c, const IConverterFunction& cu, ControlHost* host, std::string name) : ITemplateParameter<T>(host, name), variable(v), total_min(min), total_max(max), converter(c), curve(c) {
+	TemplateParameter(T& v, T min, T max, const IConverterFunction& c, const IConverterFunction& cu, std::string name) : ITemplateParameter<T>(name), variable(v), total_min(min), total_max(max), converter(c), curve(c) {
 
 	}
 
