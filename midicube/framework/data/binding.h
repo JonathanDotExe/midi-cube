@@ -259,23 +259,30 @@ public:
 struct MidiBinding {
 	ControlType type;
 	size_t index = 0;
-	double min = 0;
-	double max = 1;
+	double amount = 0;
+	bool persistent = true;
+	double cc_value = 0;
+};
+
+struct MidiBindingCollection {
+	double start_value = 0;
+	std::vector<MidiBinding> bindings;
 };
 
 class MidiBindingHandler {
 private:
 	/*std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> persistent;
 	std::array<std::vector<BindableValue*>, MIDI_CONTROL_COUNT> temp;*/
-	std::unordered_map<IBindable*, std::vector<MidiBinding>> bindings;
+	std::unordered_map<IBindable*, MidiBindingCollection> bindings;
 
 public:
 
 	void bind(IBindable* param, MidiBinding binding) {
+		binding.cc_value = 0; // TODO maybe create extra data stucture
 		if (!bindings.count(param)) {
 			bindings[param] = {};
 		}
-		bindings[param].push_back(binding);
+		bindings[param].bindings.push_back(binding);
 	}
 
 	void unbind(IBindable* value) {
@@ -283,7 +290,7 @@ public:
 	}
 
 	void unbind(IBindable* value, int index) {
-		bindings[value].erase(bindings[value].begin() + index);
+		bindings[value].bindings.erase(bindings[value].bindings.begin() + index);
 	}
 
 	std::vector<MidiBinding> get_bindings(IBindable* param) {
@@ -294,53 +301,24 @@ public:
 	}
 
 	void on_cc(unsigned int control, double value) {
-		for (auto val : bindings) {
+		for (auto& val : bindings) {
 			const MidiControls& controls = val.first->host->get_controls();
-			for (MidiBinding& b : val.second) {
+			bool changed = false;
+			//Apply controls
+			for (MidiBinding& b : val.second.bindings) {
 				if (controls.get_cc(b.type, b.index) == control) {
-					val.first->change(value);
+					b.cc_value = value;
 				}
 			}
-		}
-	}
-
-};
-
-class LocalMidiBindingHandler {
-private:
-	std::vector<BindableValue*> values;
-	MidiBindingHandler* handler = nullptr;
-	ControlHost* source = nullptr;
-
-public:
-
-	void add_binding(BindableValue* value) {
-		values.push_back(value);
-	}
-
-	void init(MidiBindingHandler* handler, ControlHost* source) {
-		if (this->handler || this->source) {
-			throw "Binding handler already initialized";
-		}
-		this->source = source;
-		this->handler = handler;
-		//Init values
-		for (BindableValue* value : values) {
-			handler->bind(this->source, value);
-		}
-	}
-
-	void unbind() {
-		if (handler) {
-			for (BindableValue* value : values) {
-				handler->unbind(value);
+			//Changed
+			if (changed) {
+				double v = val.second.start_value;
+				for (MidiBinding& b : val.second.bindings) {
+					v += b.cc_value * b.amount;
+				}
+				val.first->change(std::min(std::max(v, 0.0), 1.0));
 			}
-			handler = nullptr;
 		}
-	}
-
-	~LocalMidiBindingHandler() {
-		unbind();
 	}
 
 };
