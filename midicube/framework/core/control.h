@@ -411,11 +411,11 @@ public:
 	}
 
 	T get_min() const {
-		return total_min;
+		return 0;
 	}
 
 	T get_max() const {
-		return total_max;
+		return values.size() - 1;
 	}
 
 	T get() {
@@ -424,6 +424,14 @@ public:
 
 	void set(T val) {
 		variable = val;
+	}
+
+	virtual void put_value(pt::ptree& tree, T val) {
+		tree.put_value(static_cast<int>(val));
+	}
+
+	virtual T get_value(pt::ptree& tree) {
+		return static_cast<T>(tree.get_value<int>());
 	}
 
 	const std::vector<std::pair<T, std::string>>& get_values() {
