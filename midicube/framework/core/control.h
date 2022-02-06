@@ -11,6 +11,7 @@
 #include <vector>
 #include <unordered_map>
 #include <iostream>
+#include "../dsp/synthesis.h"
 
 #include <boost/property_tree/ptree.hpp>
 namespace pt = boost::property_tree;
@@ -84,25 +85,11 @@ struct MidiControls {
 	}
 };
 
-class ControlHost {
-
-public:
-	virtual void notify_property_update(void* property) const = 0;
-
-//	virtual const MidiControls& get_controls() const = 0;
-
-	virtual ~ControlHost() {
-
-	}
-
-};
-
-class MidiBindingHandler;
+class ControlHost;
 
 class IBindable {
 private:
 	ControlHost* host = nullptr;
-	MidiBindingHandler* handler = nullptr;
 
 protected:
 	inline void notify_poperty_change() {
@@ -117,11 +104,14 @@ public:
 		this->name = name;
 	}
 
-	void init (ControlHost* host, MidiBindingHandler* handler) {
-		if (this->host == nullptr && this->handler == handler) {
+	void init (ControlHost* host) {
+		if (this->host == nullptr) {
 			this->host = host;
-			this->handler = handler;
 		}
+	}
+
+	inline ControlHost* get_host() {
+		return host;
 	}
 
 	virtual void change(double val) = 0;
@@ -133,6 +123,101 @@ public:
 	virtual void save() = 0;
 
 	virtual ~IBindable();
+
+};
+
+struct MidiBinding {
+	ControlType type;
+	size_t index = 0;
+	double amount = 0;
+	bool persistent = true;
+	double smooth = 0;
+};
+
+
+struct MidiBindingCollection {
+	double start_value = 0;
+	std::vector<std::pair<MidiBinding, PortamendoBuffer>> bindings;
+};
+
+
+class ControlHost {
+
+private:
+	std::unordered_map<IBindable*, MidiBindingCollection> bindings;
+
+public:
+	virtual void notify_property_update(void* property) const = 0;
+
+	virtual const MidiControls& get_controls() const = 0;
+
+
+	//Binding functions
+	void bind(IBindable* param, MidiBinding binding) {
+		if (param->get_host() != this) {
+			throw "Can bind parameter, that is not attached to this host!";
+		}
+		if (!bindings.count(param)) {
+			bindings[param] = {};
+		}
+		bindings[param].bindings.push_back({binding, {0}});
+	}
+
+	void unbind(IBindable* value) {
+		bindings.erase(value);
+	}
+
+	void unbind(IBindable* value, int index) {
+		bindings[value].bindings.erase(bindings[value].bindings.begin() + index);
+	}
+
+	std::vector<MidiBinding> get_bindings(IBindable* param) {
+		if (!bindings.count(param)) {
+			return {};
+		}
+		std::vector<MidiBinding> b;
+		for (auto& p : bindings[param].bindings) {
+			b.push_back(p.first);
+		}
+		return b;
+	}
+
+	std::vector<MidiBinding*> get_binding_values(IBindable* param) {
+			if (!bindings.count(param)) {
+				return {};
+			}
+			std::vector<std::pair<MidiBinding, double>> b;
+			for (auto& p : bindings[param].bindings) {
+				b.push_back({p.first, p.second.get()});
+			}
+			return b;
+		}
+
+
+	void on_cc(unsigned int control, double value) {
+		for (auto& val : bindings) {
+			const MidiControls& controls = val.first->host->get_controls();
+			bool changed = false;
+			//Apply controls
+			for (MidiBinding& b : val.second.bindings) {
+				if (controls.get_cc(b.type, b.index) == control) {
+					b.cc_value = value;
+				}
+			}
+			//Changed
+			if (changed) {
+				double v = val.second.start_value;
+				for (MidiBinding& b : val.second.bindings) {
+					v += b.cc_value * b.amount;
+				}
+				val.first->change(std::min(std::max(v, 0.0), 1.0));
+			}
+		}
+	}
+
+	virtual ~ControlHost() {
+
+	}
 
 };
 
