@@ -131,13 +131,12 @@ struct MidiBinding {
 	size_t index = 0;
 	double amount = 0;
 	bool persistent = true;
-	double smooth = 0;
 };
 
 
 struct MidiBindingCollection {
 	double start_value = 0;
-	std::vector<std::pair<MidiBinding, PortamendoBuffer>> bindings;
+	std::vector<std::pair<MidiBinding, double>> bindings;
 };
 
 
@@ -150,7 +149,6 @@ public:
 	virtual void notify_property_update(void* property) const = 0;
 
 	virtual const MidiControls& get_controls() const = 0;
-
 
 	//Binding functions
 	void bind(IBindable* param, MidiBinding binding) {
@@ -182,33 +180,30 @@ public:
 		return b;
 	}
 
-	std::vector<MidiBinding*> get_binding_values(IBindable* param) {
-			if (!bindings.count(param)) {
-				return {};
-			}
-			std::vector<std::pair<MidiBinding, double>> b;
-			for (auto& p : bindings[param].bindings) {
-				b.push_back({p.first, p.second.get()});
-			}
-			return b;
+	std::vector<std::pair<MidiBinding, double>> get_binding_values(IBindable* param) {
+		if (!bindings.count(param)) {
+			return {};
 		}
+		return bindings[param].bindings;
+	}
 
 
 	void on_cc(unsigned int control, double value) {
 		for (auto& val : bindings) {
-			const MidiControls& controls = val.first->host->get_controls();
+			const MidiControls& controls = get_controls();
 			bool changed = false;
 			//Apply controls
-			for (MidiBinding& b : val.second.bindings) {
-				if (controls.get_cc(b.type, b.index) == control) {
-					b.cc_value = value;
+			for (std::pair<MidiBinding, double>& b : val.second.bindings) {
+				if (controls.get_cc(b.first.type, b.first.index) == control) {
+					b.second = value;
+					changed = true;
 				}
 			}
 			//Changed
 			if (changed) {
 				double v = val.second.start_value;
-				for (MidiBinding& b : val.second.bindings) {
-					v += b.cc_value * b.amount;
+				for (std::pair<MidiBinding, double>& b : val.second.bindings) {
+					v += b.second * b.first.amount;
 				}
 				val.first->change(std::min(std::max(v, 0.0), 1.0));
 			}
