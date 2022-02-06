@@ -223,6 +223,11 @@ public:
 		}
 	}
 
+	//Has to be called from subclass
+	void process(double time_step) {
+		//TODO parameter smoothing
+	}
+
 	virtual ~ControlHost() {
 
 	}
@@ -315,8 +320,7 @@ template<typename T>
 class TemplateEnumParameter : public ITemplateParameter<T> {
 private:
 	T& variable;
-	T total_min;
-	T total_max;
+	std::vector<std::pair<T, std::string>> values;
 
 public:
 
@@ -324,12 +328,12 @@ public:
 		return this;
 	}
 
-	TemplateEnumParameter(T& v, T min, T max, ControlHost* host, std::string name) : ITemplateParameter<T>(host, name),variable(v){
+	TemplateEnumParameter(T& v, std::vector<std::pair<T, std::string>>, ControlHost* host, std::string name) : ITemplateParameter<T>(host, name), variable(v){
 
 	}
 
 	void change(double val) {
-		set(static_cast<T>(static_cast<int>(total_min) + (static_cast<int>(total_max) - static_cast<int>(total_min)) * val));
+		set(values[(values.size() - 1) * val]);
 		notify_poperty_change();
 	}
 
@@ -347,6 +351,10 @@ public:
 
 	void set(T val) {
 		variable = val;
+	}
+
+	const std::vector<std::pair<T, std::string>>& get_values() {
+		return values;
 	}
 
 };
