@@ -144,11 +144,24 @@ class ControlHost {
 
 private:
 	std::unordered_map<IBindable*, MidiBindingCollection> bindings;
+	std::vector<IBindable*> parameters;
+
+protected:
+
+	void add_paramter(IBindable* p) {
+		p->init(this);
+		parameters.push_back(p);
+	}
 
 public:
 	virtual void notify_property_update(void* property) const = 0;
 
 	virtual const MidiControls& get_controls() const = 0;
+
+	//Parameter functions
+	std::vector<IBindable*> get_parameters() {
+		return parameters;
+	}
 
 	//Binding functions
 	void bind(IBindable* param, MidiBinding binding) {
@@ -187,7 +200,7 @@ public:
 		return bindings[param].bindings;
 	}
 
-
+	//Has to be called from subclass
 	void on_cc(unsigned int control, double value) {
 		for (auto& val : bindings) {
 			const MidiControls& controls = get_controls();
