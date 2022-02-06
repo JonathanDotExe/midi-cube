@@ -120,8 +120,6 @@ public:
 
 	virtual void* get_property() = 0;
 
-	virtual void save() = 0;
-
 	virtual ~IBindable();
 
 };
@@ -164,6 +162,16 @@ public:
 	}
 
 	//Binding functions
+	double& start_value(IBindable* param) {
+		if (param->get_host() != this) {
+			throw "Can bind parameter, that is not attached to this host!";
+		}
+		if (!bindings.count(param)) {
+			bindings[param] = {};
+		}
+		return bindings[param].start_value;
+	}
+
 	void bind(IBindable* param, MidiBinding binding) {
 		if (param->get_host() != this) {
 			throw "Can bind parameter, that is not attached to this host!";
@@ -256,6 +264,10 @@ public:
 		tree.put_value(val);
 	}
 
+	virtual T get_value(pt::ptree& tree) {
+		return tree.get_value<T>();
+	}
+
 	virtual pt::ptree save() {
 		pt::ptree t;
 		std::vector<std::pair<MidiBinding, double>> bindings = get_host()->get_bindings(this);
@@ -270,9 +282,10 @@ public:
 			pt::ptree val;
 			put_value(val, scale(value));
 			t.put_child("value", val);
+			t.put_child("start_value", get_host()->start_value(this));
 			for (auto& value : bindings) {
 				pt::ptree binding;
-				binding.put("type", value.first.type);
+				binding.put("type", static_cast<int>(value.first.type));
 				binding.put("index", value.first.index);
 				binding.put("amount", value.first.amount);
 				binding.put("persistent", value.first.persistent);
@@ -283,6 +296,27 @@ public:
 			put_value(t, get());
 		}
 		return t;
+	}
+
+	virtual void load(pt::ptree tree) {
+		if (tree.get_child_optional("value")) {
+			set(get_value(tree.get_child("value")));
+			if (tree.get_child_optional("bindings")) {
+				get_host()->start_value(this) = tree.get("start_value", 0);
+				for (auto& b : tree.get_child("bindings")) {
+					MidiBinding binding;
+					binding.type = static_cast<ControlType>(b.second.get("type", 0));
+					binding.index = b.second.get("index", 0);
+					binding.amount = b.second.get("amount", 0);
+					binding.persistent = b.second.get("persistent", true);
+
+					get_host()->bind(this, binding);
+				}
+			}
+		}
+		else {
+			set(get_value(tree));
+		}
 	}
 
 	virtual ~IParameter() {
