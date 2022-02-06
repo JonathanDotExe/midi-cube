@@ -244,6 +244,47 @@ public:
 
 	virtual void set(T val) = 0;
 
+	virtual T scale(double val) = 0;
+
+	virtual void change(double val) {
+		set(scale(val));
+		notify_poperty_change();
+	}
+
+	//Save load
+	virtual void put_value(pt::ptree& tree, T val) {
+		tree.put_value(val);
+	}
+
+	virtual pt::ptree save() {
+		pt::ptree t;
+		std::vector<std::pair<MidiBinding, double>> bindings = get_host()->get_bindings(this);
+		if (bindings.size()) {
+			double value = get_scaled();
+			for (auto& b : bindings) {
+				//Remove temporary changes
+				if (!b.first.persistent) {
+					value -= b.second * b.first.amount;
+				}
+			}
+			pt::ptree val;
+			put_value(val, scale(value));
+			t.put_child("value", val);
+			for (auto& value : bindings) {
+				pt::ptree binding;
+				binding.put("type", value.first.type);
+				binding.put("index", value.first.index);
+				binding.put("amount", value.first.amount);
+				binding.put("persistent", value.first.persistent);
+				t.add_child("bindings.binding", binding);
+			}
+		}
+		else {
+			put_value(t, get());
+		}
+		return t;
+	}
+
 	virtual ~IParameter() {
 
 	}
@@ -293,9 +334,8 @@ public:
 
 	}
 
-	void change(double val) {
-		set(total_min + (total_max - total_min) * curve.apply(val));
-		notify_poperty_change();
+	T scale(double val) {
+		return total_min + (total_max - total_min) * curve.apply(val);
 	}
 
 	T get_min() const {
@@ -332,9 +372,8 @@ public:
 
 	}
 
-	void change(double val) {
-		set(values[(values.size() - 1) * val]);
-		notify_poperty_change();
+	T scale(double val) {
+		return values[(values.size() - 1) * val];
 	}
 
 	T get_min() const {
@@ -373,9 +412,8 @@ public:
 
 	}
 
-	void change(double val) {
-		value = val > 0;
-		notify_poperty_change();
+	bool scale(double val) {
+		return value = val > 0.5;
 	}
 
 	bool get() {
