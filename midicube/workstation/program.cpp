@@ -28,30 +28,12 @@ std::string bank_filename(std::string name) {
 Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 	Program* program = new Program("");
 	program->name = tree.get<std::string>("name", "Init");
-	program->metronome_bpm = tree.get<unsigned int>("metronome_bpm", 120);
-	//Motion Sequencers
-	/*const auto& motion_sequencers = tree.get_child_optional("motion_seqeuncers");
-	if (motion_sequencers) {
-		size_t i = 0;
-		for (pt::ptree::value_type& m : motion_sequencers.get()) {
-			if (i < program->motion_sequencers.size()) {
-				program->motion_sequencers[i].clock_value = m.second.get("clock_value", 1);
-				const auto& steps = m.second.get_child_optional("steps");
-				size_t j = 0;
-				for (pt::ptree::value_type& s : steps.get()) {
-					if (j < program->motion_sequencers[i].entries.size()) {
-						program->motion_sequencers[i].entries[j].beats = s.second.get("beats", 1);
-						program->motion_sequencers[i].entries[j].value = s.second.get("value", 0.0);
-						program->motion_sequencers[i].entries[j].shape = (ADSREnvelopeShape) s.second.get("shape", 0);
-					}
-					j++;
-				}
-			}
-			++i;
-		}
-	}*/
+	program->host = tree.get<std::string>("host", "");
+	program->version = tree.get<unsigned int>("version", 0);
+	program->data = tree;
+
 	//Channels
-	const auto& channels = tree.get_child_optional("channels");
+	/*const auto& channels = tree.get_child_optional("channels");
 	if (channels) {
 		size_t i = 0;
 		for (pt::ptree::value_type& c : channels.get()) {
@@ -137,28 +119,17 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 			}
 			++j;
 		}
-	}
+	}*/
 	return program;
 }
 
 void save_program(Program* program, pt::ptree& tree) {
+	tree = program->data;
 	tree.put("name", program->name);
-	tree.put("metronome_bpm", program->metronome_bpm);
-	//Motion Sequencers
-	/*for (size_t i = 0; i < program->motion_sequencers.size(); ++i) {
-		pt::ptree m;
-		m.put("clock_value", program->motion_sequencers[i].clock_value);
-		for (size_t j = 0; j < program->motion_sequencers[i].entries.size(); ++j) {
-			pt::ptree s;
-			s.put("beats", program->motion_sequencers[i].entries[j].beats);
-			s.put("shape", (int) program->motion_sequencers[i].entries[j].shape);
-			s.put("value", program->motion_sequencers[i].entries[j].value);
-			m.add_child("entry", s);
-		}
-		tree.add_child("entries", m);
-	}*/
+	tree.put("host", program->host);
+	tree.put("version", program->version);
 	//Channels
-	for (size_t i = 0; i < program->channels.size(); ++i) {
+	/*for (size_t i = 0; i < program->channels.size(); ++i) {
 		pt::ptree c;
 		ChannelProgram default_channel;
 		if (!program->channels[i].is_default()) {
@@ -212,7 +183,7 @@ void save_program(Program* program, pt::ptree& tree) {
 		t.put_child("effect", effect.prog.save());
 		t.put("next_effect", effect.next_effect);
 		tree.add_child("master_effects.effect", t);
-	}
+	}*/
 }
 
 Bank* load_bank(std::string path, std::string filename, PluginManager* mgr) {
