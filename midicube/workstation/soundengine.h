@@ -71,6 +71,7 @@ struct SoundEngineScene {
 	}
 };
 
+/*
 struct ChannelProgram : public Copyable {
 	bool active = true;
 	BindableTemplateValue<double> volume{0.5, 0, 1};
@@ -92,7 +93,7 @@ struct ChannelProgram : public Copyable {
 	bool is_default() {
 		return engine_program.get_program() == nullptr && redirect.channel == -1 && redirect.redirect_to == -1;
 	}
-};
+};*/
 
 class SoundEngineChannel : public PluginHost, public ControlHost {
 private:
@@ -242,9 +243,9 @@ public:
 
 struct Program : public Copyable {
 	std::string name;
-	unsigned int metronome_bpm = 120;
-	std::array<ChannelProgram, SOUND_ENGINE_MIDI_CHANNELS> channels = {};
-	std::array<MasterEffectProgram, SOUND_ENGINE_MASTER_EFFECT_AMOUNT> effects;
+	std::string host;
+	unsigned int version = 0;
+	pt::ptree data;
 
 	Program(std::string name) : Copyable() {
 		this->name = name;

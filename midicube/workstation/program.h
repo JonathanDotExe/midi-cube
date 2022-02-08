@@ -64,11 +64,25 @@ enum ProgramManagerProperty {
 	pProgramManagerProgram,
 };
 
+class VersionManager {
+public:
+	const std::string host;
+	const unsigned int version;
+
+	VersionManager(std::string h, unsigned int v) : host(h), version(v) {
+
+	}
+
+};
+
 class ProgramManager {
 private:
 	std::string path = "";
 	std::string index_path = "";
 	std::string preset_path = "";
+
+	std::string host;
+	VersionManager& version_manager;
 	size_t curr_bank = 0;
 	size_t curr_program = 0;
 	std::vector<Bank*> banks;
@@ -79,7 +93,8 @@ public:
 	std::string bank_name = "";
 	std::string program_name = "";
 
-	ProgramManager(std::string path, std::string index_path, std::string preset_path);
+	ProgramManager(VersionManager& mgr, std::string path, std::string index_path, std::string preset_path);
+
 	inline void lock() {
 		mutex.lock();
 	}

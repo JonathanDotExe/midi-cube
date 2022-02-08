@@ -259,7 +259,7 @@ void save_bank(Bank& bank, std::string path) {
 	}
 }
 
-ProgramManager::ProgramManager(std::string path, std::string index_path, std::string preset_path) {
+ProgramManager::ProgramManager(VersionManager& mgr, std::string path, std::string index_path, std::string preset_path) : version_manager(mgr){
 	this->path = path;
 	this->index_path = index_path;
 	this->preset_path = preset_path;
