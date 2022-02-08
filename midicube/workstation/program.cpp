@@ -25,12 +25,14 @@ std::string bank_filename(std::string name) {
 	return filename;
 }
 
-Program* load_program(pt::ptree& tree, PluginManager* mgr) {
+Program* ProgramManager::load_program(pt::ptree& tree) {
 	Program* program = new Program("");
 	program->name = tree.get<std::string>("name", "Init");
 	program->host = tree.get<std::string>("host", "");
-	program->version = tree.get<unsigned int>("version", 0);
+	size_t version = tree.get<size_t>("version", 0);
 	program->data = tree;
+
+	version_manager.update(program->data, version);
 
 	//Channels
 	/*const auto& channels = tree.get_child_optional("channels");
@@ -123,11 +125,11 @@ Program* load_program(pt::ptree& tree, PluginManager* mgr) {
 	return program;
 }
 
-void save_program(Program* program, pt::ptree& tree) {
+void ProgramManager::save_program(Program* program, pt::ptree& tree) {
 	tree = program->data;
 	tree.put("name", program->name);
 	tree.put("host", program->host);
-	tree.put("version", program->version);
+	tree.put("version", version_manager.get_version());
 	//Channels
 	/*for (size_t i = 0; i < program->channels.size(); ++i) {
 		pt::ptree c;
@@ -186,7 +188,7 @@ void save_program(Program* program, pt::ptree& tree) {
 	}*/
 }
 
-Bank* load_bank(std::string path, std::string filename, PluginManager* mgr) {
+Bank* ProgramManager::load_bank(std::string path, std::string filename) {
 	pt::ptree tree;
 	try {
 		pt::read_xml(path, tree);
@@ -203,14 +205,14 @@ Bank* load_bank(std::string path, std::string filename, PluginManager* mgr) {
 	const auto& programs =  tree.get_child_optional("bank.programs");
 	if (programs) {
 		for (pt::ptree::value_type& p : programs.get()) {
-			Program* prog = load_program(p.second, mgr);
+			Program* prog = load_program(p.second);
 			bank->programs.push_back(prog);
 		}
 	}
 	return bank;
 }
 
-void save_bank(Bank& bank, std::string path) {
+void ProgramManager::save_bank(Bank& bank, std::string path) {
 	pt::ptree tree;
 	//Name
 	tree.put("bank.name", bank.name);
@@ -338,7 +340,7 @@ void ProgramManager::load_all(PluginManager* mgr) {
 	//Load presets
 	std::vector<std::string> presets = {"preset_piano", "preset_synth_pad", "preset_synth_lead", "preset_synth_bass", "preset_synth_keys", "preset_organ", "preset_combi", "preset_special"};
 	for (std::string filename : presets) {
-		Bank* bank = load_bank(preset_path + "/" + filename + ".xml", filename, mgr);
+		Bank* bank = load_bank(preset_path + "/" + filename + ".xml", filename);
 		if (bank) {
 			bank->preset = true;
 			banks.push_back(bank);
@@ -366,7 +368,7 @@ void ProgramManager::load_all(PluginManager* mgr) {
 		std::string file = f.path().string();
 		if (std::regex_match(file, reg)) {
 			std::string name = f.path().stem().string();
-			Bank* bank = load_bank(file, name, mgr);
+			Bank* bank = load_bank(file, name);
 			if (bank) {
 				banks.push_back(bank);
 				std::cout << "Loaded bank " << bank->name << std::endl;
@@ -432,3 +434,12 @@ ProgramManager::~ProgramManager() {
 	unlock();
 }
 
+unsigned int VersionManager::get_version() {
+	return versions.size();
+}
+
+void VersionManager::update(pt::ptree &tree, size_t version) {
+	for (size_t i = version; i < versions.size(); ++i) {
+		versions[i](tree);
+	}
+}

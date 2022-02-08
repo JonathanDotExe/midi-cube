@@ -41,14 +41,6 @@ struct Bank {
 	}
 };
 
-Program* load_program(pt::ptree& tree);
-
-void save_program(Program* program, pt::ptree& tree);
-
-Bank* load_bank(std::string path, std::string filename);
-
-void save_bank(Bank& bank, std::string path);
-
 class ProgramUser {
 public:
 	//Methods are executed in realtime thread
@@ -65,13 +57,19 @@ enum ProgramManagerProperty {
 };
 
 class VersionManager {
+private:
+	const std::vector<std::function<void(pt::ptree&)>> versions;
+
 public:
 	const std::string host;
-	const unsigned int version;
 
-	VersionManager(std::string h, unsigned int v) : host(h), version(v) {
+	VersionManager(std::string h, std::vector<std::function<void(pt::ptree&)>> v) : host(h), versions(v) {
 
 	}
+
+	unsigned int get_version();
+
+	void update(pt::ptree& tree, size_t version);
 
 };
 
@@ -101,6 +99,13 @@ public:
 	inline void unlock() {
 		mutex.unlock();
 	}
+	Program* load_program(pt::ptree& tree);
+
+	void save_program(Program* program, pt::ptree& tree);
+
+	Bank* load_bank(std::string path, std::string filename);
+
+	void save_bank(Bank& bank, std::string path);
 	//Mutex has to be locked by user
 	size_t bank_count() {
 		return banks.size();

@@ -244,7 +244,6 @@ public:
 struct Program : public Copyable {
 	std::string name;
 	std::string host;
-	unsigned int version = 0;
 	pt::ptree data;
 
 	Program(std::string name) : Copyable() {
