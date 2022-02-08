@@ -22,6 +22,7 @@ src = [
 	'midicube/framework/core/metronome.cpp',
 	'midicube/framework/core/midi.cpp',
 	'midicube/framework/core/plugin.cpp',
+	'midicube/framework/core/program.cpp',
 	'midicube/framework/core/ui.cpp',
 	'midicube/framework/data/binding.cpp',
 	'midicube/framework/data/data.cpp',
@@ -49,7 +50,6 @@ src = [
 	'midicube/workstation/audio.cpp',
 	'midicube/workstation/midicube.cpp',
 	'midicube/workstation/midiio.cpp',
-	'midicube/workstation/program.cpp',
 	'midicube/workstation/soundengine.cpp',
 
 	'midicube/plugins/soundengine/asynth.cpp',

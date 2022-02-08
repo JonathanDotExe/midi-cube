@@ -14,6 +14,7 @@
 #include "../framework/dsp/synthesis.h"
 #include "../framework/core/metronome.h"
 #include "../framework/core/plugin.h"
+#include "../framework/core/program.h"
 #include "../framework/util/voice.h"
 #include <string>
 #include <array>
@@ -98,8 +99,6 @@ struct ChannelProgram : public Copyable {
 class SoundEngineChannel : public PluginHost, public ControlHost {
 private:
 	SoundEngineDevice* device = nullptr;
-
-	LocalMidiBindingHandler binder;
 	KeyboardEnvironment env;
 public:
 	std::array<PluginSlot, CHANNEL_SEQUENCER_AMOUNT> sequencers;
@@ -123,7 +122,6 @@ public:
 	virtual SpinLock& get_lock();
 	void recieve_midi(const MidiMessage &message,
 			const SampleInfo &info, void* src);
-	MidiBindingHandler* get_binding_handler();
 	Plugin* get_plugin(std::string identifier);
 	const Metronome& get_metronome();
 	const KeyboardEnvironment& get_environment();
@@ -241,17 +239,6 @@ public:
 	}
 };
 
-struct Program : public Copyable {
-	std::string name;
-	std::string host;
-	pt::ptree data;
-
-	Program(std::string name) : Copyable() {
-		this->name = name;
-	}
-
-};
-
 struct MidiSource {
 	size_t device = 1;
 	int channel = 0;
@@ -272,7 +259,6 @@ public:
 	void recieve_midi(const MidiMessage &message,
 			const SampleInfo &info, void* src);
 	Plugin* get_plugin(std::string identifier);
-	MidiBindingHandler* get_binding_handler();
 	const Metronome& get_metronome();
 	const KeyboardEnvironment& get_environment();
 	SpinLock& get_lock();
@@ -304,7 +290,6 @@ private:
 	SoundEngineDeviceHost host;
 
 public:
-	MidiBindingHandler binding_handler;
 
 	Metronome metronome;
 	bool play_metronome{false};
