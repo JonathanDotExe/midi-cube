@@ -67,9 +67,6 @@ public:
 	//Pointer should always stay the same
 	virtual SpinLock& get_lock() = 0;
 
-	//Pointer should always stay the same
-	virtual MidiBindingHandler* get_binding_handler() = 0;
-
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info, void* source) = 0;
 
 	virtual Plugin* get_plugin(std::string identifier) = 0;
@@ -103,8 +100,6 @@ public:
 	}
 
 	virtual PluginInstance* create(PluginHost* host) = 0;
-
-	virtual PluginProgram* create_program() = 0;
 
 	virtual ~Plugin() {
 
@@ -145,9 +140,9 @@ public:
 
 	virtual void recieve_midi(const MidiMessage& message, const SampleInfo& info) = 0;
 
-	virtual void apply_program(PluginProgram* prog) = 0;
+	virtual void apply_program(pt::ptree& tree) = 0;
 
-	virtual void save_program(PluginProgram** prog) = 0;
+	virtual void save_program(pt::ptree& tree) = 0;
 
 	virtual bool keep_active() {
 		return false;
@@ -315,6 +310,7 @@ public:
 
 };
 
+/*
 class PluginSlotProgram : public Copyable  {
 private:
 	PluginProgram* program = nullptr;
@@ -365,7 +361,7 @@ public:
 		delete program;
 	}
 
-};
+};*/
 
 class PluginSlot {
 
@@ -421,24 +417,25 @@ public:
 		delete old;
 	}
 
-	void load(PluginSlotProgram& prog, PluginManager* mgr) {
-		if (prog.get_program()) {
-			Plugin* p = mgr->get_plugin(prog.get_program()->get_plugin_name());
-			if (p) {
-				set_plugin(p);
-				plugin->apply_program(prog.get_program());
+	void load(pt::ptree tree, PluginManager* mgr) {
+		Plugin* plugin = mgr->get_plugin(tree.get("plugin", ""));
+		if (plugin) {
+			if (tree.get_child_optional("preset")) {
+				pt::ptree t = tree.get_child("preset");
+				plugin->apply_program(t);
 			}
-			else {
-				set_plugin(nullptr);
-			}
-		}
-		else {
-			set_plugin(nullptr);
 		}
 	}
 
-	void save(PluginSlotProgram& prog) {
-		prog.save_program(plugin);
+	pt::ptree save() {
+		pt::ptree tree;
+		tree.put("plugin", plugin ? plugin->plugin.info.identifier_name : "");
+		if (plugin) {
+			pt::ptree t;
+			plugin->save_program(t);
+			tree.put_child("preset", t);
+		}
+		return tree;
 	}
 
 	~PluginSlot() {
@@ -458,9 +455,6 @@ public:
 
 	//Pointer should always stay the same
 	virtual SpinLock& get_lock() = 0;
-
-	//Pointer should always stay the same
-	virtual MidiBindingHandler* get_binding_handler() = 0;
 
 	virtual ~MasterPluginHost() {
 
