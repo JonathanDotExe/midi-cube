@@ -18,7 +18,7 @@ SampleDrums::SampleDrums(PluginHost& h, Plugin& p) : SoundEngine(h, p){
 	drumkit = load_drumkit("./data/drumkits/drums1");
 }
 
-void SampleDrums::process_note_sample(const SampleInfo& info, TriggeredNote& note, size_t note_index) {
+void SampleDrums::process_note_sample(const SampleInfo& info, Voice& note, size_t note_index) {
 	try {
 		if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
 			AudioSample& audio = drumkit->notes[note.note];
@@ -32,7 +32,7 @@ void SampleDrums::process_note_sample(const SampleInfo& info, TriggeredNote& not
 	}
 }
 
-bool SampleDrums::note_finished(const SampleInfo& info, TriggeredNote& note, size_t note_index) {
+bool SampleDrums::note_finished(const SampleInfo& info, Voice& note, size_t note_index) {
 	if (drumkit->notes.find(note.note) != drumkit->notes.end()) {
 		return info.time - note.start_time > (double) drumkit->notes[note.note].duration();
 	}

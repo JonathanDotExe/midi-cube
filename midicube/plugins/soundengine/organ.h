@@ -132,14 +132,14 @@ public:
 
 #define B3_ORGAN_POLYPHONY 61
 
-class B3Organ : public SoundEngine<TriggeredNote, B3_ORGAN_POLYPHONY> {
+class B3Organ : public SoundEngine<Voice, B3_ORGAN_POLYPHONY> {
 
 private:
 	//Static values
 	std::array<int, ORGAN_DRAWBAR_COUNT> drawbar_notes;
 	std::array<B3OrganTonewheelData, ORGAN_TONEWHEEL_AMOUNT> tonewheel_data;
 
-	void trigger_tonewheel(int tonewheel, double vol, const SampleInfo& info, TriggeredNote& note, double compress_volume);
+	void trigger_tonewheel(int tonewheel, double vol, const SampleInfo& info, Voice& note, double compress_volume);
 
 	LocalMidiBindingHandler binder;
 
@@ -150,13 +150,13 @@ public:
 	void cleanup();
 	B3Organ(PluginHost& h, Plugin& p);
 
-	void process_note_sample(const SampleInfo& info, TriggeredNote& note, size_t note_index);
+	void process_note_sample(const SampleInfo& info, Voice& note, size_t note_index);
 
 	void process_sample(const SampleInfo& info);
 
 	void control_change(unsigned int control, unsigned int value);
 
-	bool note_finished(const SampleInfo& info, TriggeredNote& note, size_t note_index);
+	bool note_finished(const SampleInfo& info, Voice& note, size_t note_index);
 
 	void save_program(PluginProgram **prog);
 

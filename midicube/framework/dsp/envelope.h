@@ -17,19 +17,6 @@
 #include "wavetable.h"
 #include "../core/metronome.h"
 
-struct TriggeredNote {
-	double start_time = 0;
-	bool pressed = false;
-	double release_time = 0;
-	unsigned int real_note = 0;
-	unsigned int note = 0;
-	double freq = 0;
-	double velocity = 0;
-	double aftertouch = 0;
-	bool valid = false;
-	unsigned int channel = 0;
-};
-
 struct KeyboardEnvironment {
 	bool sustain = false;
 	double sustain_time = 0;

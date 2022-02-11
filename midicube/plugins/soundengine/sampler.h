@@ -194,7 +194,7 @@ struct SampleRegion {
 	std::vector<SamplerCCModulation*> get_smooth_mod();
 };
 
-struct SamplerVoice : public TriggeredNote {
+struct SamplerVoice : public Voice {
 	double unirand = 0;
 	double birand = 0;
 	bool alternate = false;

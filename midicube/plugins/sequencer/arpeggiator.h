@@ -52,7 +52,7 @@ private:
 	bool restart = true;
 	bool second = false;
 	bool note_change = false;
-	VoiceManager<TriggeredNote, ARPEGGIATOR_POLYPHONY> note;
+	VoiceManager<Voice, ARPEGGIATOR_POLYPHONY> note;
 
 public:
 	bool on = true;

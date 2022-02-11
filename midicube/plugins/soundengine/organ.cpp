@@ -99,7 +99,7 @@ B3Organ::B3Organ(PluginHost& h, Plugin& p) : SoundEngine(h, p) {
 	}
 }
 
-void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& info, TriggeredNote& note, double compress_volume) {
+void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& info, Voice& note, double compress_volume) {
 	bool vol_mul = 1;
 	while (tonewheel < 0) {
 		tonewheel += 12;
@@ -121,7 +121,7 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& 
 	}
 }
 
-void B3Organ::process_note_sample(const SampleInfo &info, TriggeredNote& note, size_t note_index) {
+void B3Organ::process_note_sample(const SampleInfo &info, Voice& note, size_t note_index) {
 	//Organ sound
 	switch (note.channel) {
 	case 0:
@@ -178,7 +178,7 @@ void B3Organ::process_note_sample(const SampleInfo &info, TriggeredNote& note, s
 	return vol;
 }*/
 
-bool B3Organ::note_finished(const SampleInfo& info, TriggeredNote& note, size_t note_index) {
+bool B3Organ::note_finished(const SampleInfo& info, Voice& note, size_t note_index) {
 	return (!note.pressed || (host_environment.sustain && note.release_time >= host_environment.sustain_time)) && info.time > note.release_time + ORGAN_MAX_UP_DELAY + data.preset.click_attack;
 };
 

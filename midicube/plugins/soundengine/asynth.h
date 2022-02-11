@@ -216,7 +216,7 @@ struct AdvancedSynthPart {
 	double fm = 0;
 };
 
-struct AdvancedSynthVoice : public TriggeredNote {
+struct AdvancedSynthVoice : public Voice {
 	std::array<AdvancedSynthPart, ASYNTH_PART_COUNT> parts;
 	double max_aftertouch = 0;
 };

@@ -34,9 +34,9 @@ public:
 		EngineStatus status = {0, 0};
 		//Notes
 		for (size_t i = 0; i < P; ++i) {
-			if (voice_mgr.note[i].valid) {
+			if (voice_mgr.note[i] != VOICE_INACTIVE) {
 				if (note_finished(info, voice_mgr.note[i], i)) {
-					voice_mgr.note[i].valid = false;
+					voice_mgr.note[i].state = VOICE_INACTIVE;
 				}
 				else {
 					++status.pressed_notes;
@@ -91,7 +91,7 @@ public:
 	}
 
 	virtual bool note_finished(const SampleInfo& info, V& note, size_t note_index) {
-		return !note.pressed || (host_environment.sustain && note.release_time >= host_environment.sustain_time);
+		return !note.state != VOICE_PRESSED || (host_environment.sustain && note.release_time >= host_environment.sustain_time);
 	};
 
 	virtual ~SoundEngine() {

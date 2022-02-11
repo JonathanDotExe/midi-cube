@@ -17,6 +17,23 @@
 #include <functional>
 #include <limits>
 
+enum VoiceState {
+	VOICE_PRESSED, VOICE_RELEASED, VOICE_STOLEN, VOICE_INACTIVE
+};
+
+struct Voice {
+	VoiceState state = VOICE_INACTIVE;
+	double start_time = 0;
+	double release_time = 0;
+	unsigned int real_note = 0;
+	unsigned int note = 0;
+	double freq = 0;
+	double velocity = 0;
+	double aftertouch = 0;
+	unsigned int channel = 0;
+};
+
+
 template<typename V, size_t P>
 class VoiceManager {
 private:
@@ -25,11 +42,11 @@ private:
 		size_t longest_index = 0;
 		double longest_time = std::numeric_limits<double>::max();
 		for (size_t i = 0; i < P; ++i) {
-			if (!note[i].valid) {
+			if (note[i].state == VOICE_INACTIVE) {
 				return i;
 			}
 			else {
-				if (!note[i].pressed) {
+				if (!note[i].state == VOICE_PRESSED) {
 					if (release) {
 						if (longest_time > note[i].release_time) {
 							longest_time = note[i].release_time;
@@ -122,10 +139,9 @@ public:
 		this->note[slot].velocity = velocity;
 		this->note[slot].real_note = real_note;
 		this->note[slot].note = note;
-		this->note[slot].pressed = true;
+		this->note[slot].state = VOICE_PRESSED;
 		this->note[slot].start_time = info.time;
 		this->note[slot].release_time = 0;
-		this->note[slot].valid = true;
 		this->note[slot].channel = channel;
 		//Check polyphony
 		check_polyphony(info.time, polyphony_limit);
@@ -134,12 +150,9 @@ public:
 
 	void release_note(const SampleInfo& info, unsigned int real_note, unsigned int channel, bool invalidate = false) {
 		for (size_t i = 0; i < P; ++i) {
-			if (this->note[i].real_note == real_note && this->note[i].channel == channel && this->note[i].pressed) {
-				this->note[i].pressed = false;
+			if (this->note[i].real_note == real_note && this->note[i].channel == channel && this->note[i].state == VOICE_PRESSED) {
+				this->note[i].state = invalidate ? VOICE_INACTIVE : VOICE_RELEASED;
 				this->note[i].release_time = info.time;
-				if (invalidate) {
-					this->note[i].valid = false;
-				}
 			}
 		}
 	}
