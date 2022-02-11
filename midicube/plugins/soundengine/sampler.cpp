@@ -147,7 +147,7 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 			}
 		}
 
-		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
+		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || note.state != VOICE_PRESSED) {
 			l += note.sample->sample->isample(0, note.time, info.sample_rate) * crossfade;
 			r += note.sample->sample->isample(1, note.time, info.sample_rate) * crossfade;
 		}
@@ -173,7 +173,7 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 		if (!note.region->env.sustain_entire_sample) {
 			//Volume
 			ADSREnvelopeData data = note.region->env.env.apply(&note, this, index.cc_portamendos);
-			vol *= note.env.amplitude(data, info.time_step, note.pressed, host_environment.sustain);
+			vol *= note.env.amplitude(data, info.time_step, note.state == VOICE_PRESSED, host_environment.sustain);
 		}
 		vel_amount = note.region->env.velocity_amount.apply_modulation(&note, this, index.cc_portamendos); //TODO introduce curves
 		double vel = velocity_amp_scale(note.velocity, vel_amount);
@@ -181,7 +181,7 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 		vol *= note.layer_amp  * note.region->volume.apply_modulation(&note, this, index.cc_portamendos);
 
 		//Playback
-		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || !note.pressed) {
+		if (note.region->trigger == TriggerType::ATTACK_TRIGGER || note.state != VOICE_PRESSED) {
 			double freq = note_to_freq(note.region->note + (note.note - note.region->note) * note.region->pitch_keytrack + note.region->pitch.apply_modulation(&note, this, index.cc_portamendos));
 			note.time += freq/note_to_freq(note.region->note) * host_environment.pitch_bend * info.time_step;
 			lsample += l * vol;
@@ -190,7 +190,7 @@ void Sampler::process_note_sample(const SampleInfo& info, SamplerVoice& note, si
 	}
 	else {
 		ADSREnvelopeData data = {0, 0, 0, 0};
-		note.env.amplitude(data, info.time_step, note.pressed, host_environment.sustain);
+		note.env.amplitude(data, info.time_step, note.state == VOICE_PRESSED, host_environment.sustain);
 	}
 
 	//Playback
@@ -247,8 +247,8 @@ void Sampler::press_note(const SampleInfo& info, unsigned int note, unsigned int
 
 void Sampler::release_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity) {
 	for (size_t i = 0; i < SAMPLER_POLYPHONY; ++i) {
-		if (this->voice_mgr.note[i].real_note == note && this->voice_mgr.note[i].channel == channel && voice_mgr.note[i].pressed) {
-			voice_mgr.note[i].pressed = false;
+		if (this->voice_mgr.note[i].real_note == note && this->voice_mgr.note[i].channel == channel && voice_mgr.note[i].state == VOICE_PRESSED) {
+			voice_mgr.note[i].state = VOICE_RELEASED;
 			voice_mgr.note[i].release_time = info.time;
 			if (voice_mgr.note[i].region->trigger == TriggerType::RELEASE_TRIGGER) {
 				voice_mgr.note[i].layer_amp *= pow(voice_mgr.note[i].region->release_decay, voice_mgr.note[i].release_time - voice_mgr.note[i].start_time);

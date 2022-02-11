@@ -239,7 +239,7 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 			}
 			//Trigger note
 			if (mono_voice.state != VOICE_PRESSED || voice.note != mono_voice.note) {
-				mono_voice.state == VOICE_PRESSED;
+				mono_voice.state = VOICE_PRESSED;
 				//Reset envs to attack
 				for (size_t i = 0; i < preset.mod_env_count; ++i) {
 					if (!preset.legato || mono_voice.parts[i].mod_env.phase >= RELEASE) {

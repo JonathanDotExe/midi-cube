@@ -111,7 +111,7 @@ void B3Organ::trigger_tonewheel(int tonewheel, double volume, const SampleInfo& 
 	}
 	if (tonewheel >= 0 &&
 			info.time >= note.start_time + tonewheel_data[tonewheel].press_delay) {
-		if (note.pressed || info.time <= note.release_time + tonewheel_data[tonewheel].release_delay) {
+		if (note.state == VOICE_PRESSED || info.time <= note.release_time + tonewheel_data[tonewheel].release_delay) {
 			data.tonewheels[tonewheel].volume += volume * vol_mul;
 		}
 		else {
@@ -179,7 +179,7 @@ void B3Organ::process_note_sample(const SampleInfo &info, Voice& note, size_t no
 }*/
 
 bool B3Organ::note_finished(const SampleInfo& info, Voice& note, size_t note_index) {
-	return (!note.pressed || (host_environment.sustain && note.release_time >= host_environment.sustain_time)) && info.time > note.release_time + ORGAN_MAX_UP_DELAY + data.preset.click_attack;
+	return (note.state != VOICE_PRESSED || (host_environment.sustain && note.release_time >= host_environment.sustain_time)) && info.time > note.release_time + ORGAN_MAX_UP_DELAY + data.preset.click_attack;
 };
 
 void B3Organ::process_sample(const SampleInfo &info) {
@@ -191,7 +191,7 @@ void B3Organ::process_sample(const SampleInfo &info) {
 	//Percussion
 	bool pressed = false;
 	for (size_t i = 0; i < B3_ORGAN_POLYPHONY && !pressed; ++i) {
-		if (voice_mgr.note[i].channel == 0 && voice_mgr.note[i].valid) {
+		if (voice_mgr.note[i].channel == 0 && voice_mgr.note[i].state != VOICE_INACTIVE) {
 			pressed = true;
 		}
 	}
