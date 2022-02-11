@@ -15,19 +15,16 @@
 #include <string>
 #include <array>
 #include <functional>
+#include <limits>
 
 template<typename V, size_t P>
 class VoiceManager {
 private:
-	size_t next_freq_slot(const SampleInfo& info, size_t polyphony_limit = 0) {
-		size_t size = P;
-		if (polyphony_limit > 0) {
-			size = std::min(polyphony_limit, P);
-		}
+	inline size_t next_freq_slot() {
 		bool release = false;
 		size_t longest_index = 0;
-		double longest_time = info.time + 1;
-		for (size_t i = 0; i < size; ++i) {
+		double longest_time = std::numeric_limits<double>::max();
+		for (size_t i = 0; i < P; ++i) {
 			if (!note[i].valid) {
 				return i;
 			}
@@ -54,6 +51,59 @@ private:
 		return longest_index;
 	}
 
+	inline size_t next_longest_slot() {
+		bool release = false;
+		size_t longest_index = 0;
+		double longest_time = std::numeric_limits<double>::max();
+		for (size_t i = 0; i < P; ++i) {
+			if (note[i].valid) {
+				if (!note[i].pressed) {
+					if (release) {
+						if (longest_time > note[i].release_time) {
+							longest_time = note[i].release_time;
+							longest_index = i;
+						}
+					}
+					else {
+						release = true;
+						longest_time = note[i].release_time;
+						longest_index = i;
+					}
+				}
+				else if (!release && longest_time > note[i].start_time) {
+					longest_time = note[i].start_time;
+					longest_index = i;
+				}
+			}
+		}
+		return longest_index;
+	}
+
+	inline void check_polyphony(double time, size_t polyphony_limit = 0) {
+		size_t size = P;
+		if (polyphony_limit > 0) {
+			size = std::min(polyphony_limit, P);
+		}
+
+		if (size < P) {
+			//TODO smooth release
+			//Count
+			size_t count = 0;
+			for (size_t i = 0; i < P; ++i) {
+				if (note[i].pressed) {
+					++count;
+				}
+			}
+			//Invalidate
+			while (count > size) {
+				size_t slot = next_longest_slot();
+				this->note[slot].pressed = false;
+				this->note[slot].release_time = time;
+				this->note[slot].valid = false;
+			}
+		}
+	}
+
 public:
 	std::array<V, P> note;
 
@@ -66,7 +116,8 @@ public:
 	}
 
 	size_t press_note(const SampleInfo& info, unsigned int real_note, unsigned int note, unsigned int channel, double velocity, size_t polyphony_limit = 0) {
-		size_t slot = next_freq_slot(info, polyphony_limit);
+		//Next slot and note
+		size_t slot = next_freq_slot();
 		this->note[slot].freq = note_to_freq(note);
 		this->note[slot].velocity = velocity;
 		this->note[slot].real_note = real_note;
@@ -76,9 +127,10 @@ public:
 		this->note[slot].release_time = 0;
 		this->note[slot].valid = true;
 		this->note[slot].channel = channel;
+		//Check polyphony
+		check_polyphony(info.time, polyphony_limit);
 		return slot;
 	}
-
 
 	void release_note(const SampleInfo& info, unsigned int real_note, unsigned int channel, bool invalidate = false) {
 		for (size_t i = 0; i < P; ++i) {

@@ -185,6 +185,7 @@ struct SampleRegion {
 	SampleEnvelope env;
 
 	TriggerType trigger = TriggerType::ATTACK_TRIGGER;
+	double off_time = 0;
 
 	SampleRegion() {
 
@@ -218,6 +219,7 @@ public:
 	std::string default_path = "./";
 	std::string name = "Sample";
 	double volume = 1;
+	size_t polyphony_spare = 15;
 	std::vector<SampleControl> controls;
 	std::vector<SamplePreset> presets = {};
 	std::vector<SampleRegion*> samples = {};
@@ -259,7 +261,7 @@ public:
 	~SampleSoundStore();
 };
 
-#define SAMPLER_POLYPHONY 64
+#define SAMPLER_POLYPHONY 128
 
 class Sampler : public SoundEngine<SamplerVoice, SAMPLER_POLYPHONY> {
 
