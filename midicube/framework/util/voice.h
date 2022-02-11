@@ -73,24 +73,22 @@ private:
 		size_t longest_index = 0;
 		double longest_time = std::numeric_limits<double>::max();
 		for (size_t i = 0; i < P; ++i) {
-			if (note[i].valid) {
-				if (!note[i].pressed) {
-					if (release) {
-						if (longest_time > note[i].release_time) {
-							longest_time = note[i].release_time;
-							longest_index = i;
-						}
-					}
-					else {
-						release = true;
+			if (note[i].state == VOICE_RELEASED) {
+				if (release) {
+					if (longest_time > note[i].release_time) {
 						longest_time = note[i].release_time;
 						longest_index = i;
 					}
 				}
-				else if (!release && longest_time > note[i].start_time) {
-					longest_time = note[i].start_time;
+				else {
+					release = true;
+					longest_time = note[i].release_time;
 					longest_index = i;
 				}
+			}
+			else if (note[i].state == VOICE_PRESSED && !release && longest_time > note[i].start_time) {
+				longest_time = note[i].start_time;
+				longest_index = i;
 			}
 		}
 		return longest_index;
@@ -107,16 +105,15 @@ private:
 			//Count
 			size_t count = 0;
 			for (size_t i = 0; i < P; ++i) {
-				if (note[i].pressed) {
+				if (note[i].state == VOICE_PRESSED || note[i].state == VOICE_RELEASED) {
 					++count;
 				}
 			}
 			//Invalidate
 			while (count > size) {
 				size_t slot = next_longest_slot();
-				this->note[slot].pressed = false;
+				this->note[slot].state = VOICE_STOLEN;
 				this->note[slot].release_time = time;
-				this->note[slot].valid = false;
 			}
 		}
 	}

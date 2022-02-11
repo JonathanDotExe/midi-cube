@@ -13,15 +13,15 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 	//Clean sustained notes
 	if (!preset.hold && preset.sustain && !sustain) {
 		for (size_t i = 0; i < this->note.note.size(); ++i) {
-			if (!this->note.note[i].pressed) {
-				this->note.note[i].valid = false;
+			if (this->note.note[i].state != VOICE_PRESSED) {
+				this->note.note[i].state = VOICE_RELEASED;
 			}
 		}
 	}
 	//Reset if no keys are pressed
 	bool released = true;
 	for (size_t i = 0; i < this->note.note.size() && released; ++i) {
-		released = !this->note.note[i].valid;
+		released = this->note.note[i].state == VOICE_INACTIVE;
 	}
 	if (!restart) {
 		restart = released;
@@ -46,7 +46,7 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 		switch (preset.pattern) {
 		case ArpeggiatorPattern::ARP_UP:
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
-				if (this->note.note[i].valid) {
+				if (this->note.note[i].state != VOICE_INACTIVE) {
 					if (this->note.note[i].note < lowest_note + preset.play_duplicates) {
 						lowest_note = this->note.note[i].note;
 						lowest_index = i;
@@ -71,7 +71,7 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 		case ArpeggiatorPattern::ARP_DOWN:
 			next_note = -1;
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
-				if (this->note.note[i].valid) {
+				if (this->note.note[i].state != VOICE_INACTIVE) {
 					if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note - preset.play_duplicates) {
 						highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
 						highest_index = i;
@@ -99,7 +99,7 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 				//Down
 				next_note = -1;
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
-					if (this->note.note[i].valid) {
+					if (this->note.note[i].state != VOICE_INACTIVE) {
 						if (this->note.note[i].note < lowest_note + preset.play_duplicates) {
 							lowest_note = this->note.note[i].note;
 							lowest_index = i;
@@ -126,7 +126,7 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 			else {
 				//Up
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
-					if (this->note.note[i].valid) {
+					if (this->note.note[i].state != VOICE_INACTIVE) {
 						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note - preset.play_duplicates) {
 							highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
 							highest_index = i;
@@ -164,7 +164,7 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 			if (second) {
 				//Up
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
-					if (this->note.note[i].valid) {
+					if (this->note.note[i].state != VOICE_INACTIVE) {
 						if ((int) (this->note.note[i].note + (preset.octaves - 1) * 12) > highest_note - preset.play_duplicates) {
 							highest_note = this->note.note[i].note  + (preset.octaves - 1) * 12;
 							highest_index = i;
@@ -191,7 +191,7 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 				//Down
 				next_note = -1;
 				for (size_t i = 0; i < this->note.note.size(); ++i) {
-					if (this->note.note[i].valid) {
+					if (this->note.note[i].state != VOICE_INACTIVE) {
 						if (this->note.note[i].note < lowest_note + preset.play_duplicates) {
 							lowest_note = this->note.note[i].note;
 							lowest_index = i;
@@ -230,7 +230,7 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 			//Count valid notes
 			size_t count = 0;
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
-				count += this->note.note[i].valid;
+				count += this->note.note[i].state != VOICE_INACTIVE;
 			}
 			if (count > 0) {
 				size_t next = rand() % count;
@@ -238,7 +238,7 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 				//Find next note
 				count = 0;
 				for (size_t i = 0; i < this->note.note.size() && count <= next; ++i) {
-					if (this->note.note[i].valid) {
+					if (this->note.note[i].state != VOICE_INACTIVE) {
 						next_note = this->note.note[i].note + octave * 12;
 						next_index = i;
 						++count;
@@ -271,11 +271,11 @@ void ArpeggiatorInstance::apply(const SampleInfo& info, const Metronome& master,
 			if (!preset.hold && !(sustain || preset.sustain)) {
 				bool released = true;
 				for (size_t i = 0; i < this->note.note.size() && released; ++i) {
-					released = !this->note.note[i].pressed;
+					released = this->note.note[i].state != VOICE_PRESSED;
 				}
 				if (released) {
 					for (size_t i = 0; i < this->note.note.size(); ++i) {
-						this->note.note[i].valid = false;
+						this->note.note[i].state = VOICE_INACTIVE;
 					}
 				}
 				note_change = true;
@@ -289,11 +289,11 @@ void ArpeggiatorInstance::press_note(const SampleInfo& info, unsigned int note, 
 	if (preset.hold) {
 		bool released = true;
 		for (size_t i = 0; i < this->note.note.size() && released; ++i) {
-			released = !this->note.note[i].pressed;
+			released = this->note.note[i].state != VOICE_PRESSED;
 		}
 		if (released) {
 			for (size_t i = 0; i < this->note.note.size(); ++i) {
-				this->note.note[i].valid = false;
+				this->note.note[i].state = VOICE_INACTIVE;
 			}
 		}
 	}

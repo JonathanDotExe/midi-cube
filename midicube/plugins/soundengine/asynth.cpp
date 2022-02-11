@@ -110,7 +110,7 @@ void AdvancedSynth::process_note(double& lsample, double& rsample,
 		ModEnvelopeEntity &mod_env = preset.mod_envs[i];
 		ADSREnvelopeData data = mod_env.env;
 		double volume = apply_modulation(VOLUME_SCALE, mod_env.volume, velocity, aftertouch, lfo_val);
-		env_val[i] = note.parts[i].mod_env.amplitude(data, info.time_step, note.pressed, env.sustain)* volume;
+		env_val[i] = note.parts[i].mod_env.amplitude(data, info.time_step, note.state == VOICE_PRESSED, env.sustain)* volume;
 	}
 	//LFOs
 	for (size_t i = 0; i < preset.lfo_count; ++i) {
@@ -177,7 +177,7 @@ void AdvancedSynth::process_note(double& lsample, double& rsample,
 		//Volume
 		ADSREnvelopeData data = op.env;
 		double volume = apply_modulation(VOLUME_SCALE, op.volume, velocity, aftertouch, lfo_val) * op_part.amp_env.amplitude(data, info.time_step,
-						note.pressed, env.sustain);
+						note.state == VOICE_PRESSED, env.sustain);
 		//Octave amp
 		if (op.amp_kb_track_upper && note.note > op.amp_kb_track_note) {
 			volume *= fmax(0, fmin(2, 1.0 + ((double) note.note - op.amp_kb_track_note)/12.0 * op.amp_kb_track_upper));
@@ -234,13 +234,12 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 				note_port.set(voice.note, port_step, port_step);
 				first_port = false;
 			}
-			if (!preset.legato || !mono_voice.valid) {
+			if (!preset.legato || mono_voice.state == VOICE_INACTIVE) {
 				mono_voice.velocity = voice.velocity;
 			}
 			//Trigger note
-			if (!mono_voice.pressed || voice.note != mono_voice.note) {
-				mono_voice.valid = true;
-				mono_voice.pressed = true;
+			if (mono_voice.state != VOICE_PRESSED || voice.note != mono_voice.note) {
+				mono_voice.state == VOICE_PRESSED;
 				//Reset envs to attack
 				for (size_t i = 0; i < preset.mod_env_count; ++i) {
 					if (!preset.legato || mono_voice.parts[i].mod_env.phase >= RELEASE) {
@@ -265,11 +264,11 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 			first_port = false;
 		}
 		else {
-			mono_voice.pressed = false;
+			mono_voice.state = VOICE_RELEASED;
 		}
 
 		//Playback
-		if (mono_voice.valid) {
+		if (mono_voice.state != VOICE_INACTIVE) {
 			double pitch = note_port.get();
 			KeyboardEnvironment e = host_environment;
 			e.pitch_bend *= note_to_freq_transpose(
@@ -277,7 +276,7 @@ void AdvancedSynth::process_sample(const SampleInfo &info) {
 
 			process_note(outputs[0], outputs[1], info, mono_voice, e);
 			if (amp_finished(info, mono_voice, e)) {
-				mono_voice.valid = false;
+				mono_voice.state = VOICE_INACTIVE;
 			}
 		}
 	}
@@ -323,9 +322,9 @@ void AdvancedSynth::control_change(unsigned int control, unsigned int value) {
 bool AdvancedSynth::note_finished(const SampleInfo &info, AdvancedSynthVoice &note, size_t note_index) {
 	//Mono notes
 	if (preset.mono) {
-		return !note.pressed;
+		return note.state != VOICE_PRESSED;
 	}
-	return !note.pressed && amp_finished(info, note, host_environment);
+	return note.state != VOICE_PRESSED && amp_finished(info, note, host_environment);
 }
 
 void AdvancedSynth::press_note(const SampleInfo& info, unsigned int note, unsigned int channel, double velocity) {

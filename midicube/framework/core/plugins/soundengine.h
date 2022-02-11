@@ -34,7 +34,7 @@ public:
 		EngineStatus status = {0, 0};
 		//Notes
 		for (size_t i = 0; i < P; ++i) {
-			if (voice_mgr.note[i] != VOICE_INACTIVE) {
+			if (voice_mgr.note[i].state != VOICE_INACTIVE) {
 				if (note_finished(info, voice_mgr.note[i], i)) {
 					voice_mgr.note[i].state = VOICE_INACTIVE;
 				}
